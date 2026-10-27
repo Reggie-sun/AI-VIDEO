@@ -1,0 +1,23 @@
+{
+  "user_quote": "繼續",
+  "scope": "Repair same stair event R05/R06/R07; retain only verified genuine descent if sufficient, prepare two push-direction endpoint reference images, one Seedance2.0 native1080p door-action qualification unit, then canonical local editorial review. No new story, identity, B6, font or music.",
+  "prior_known_raw_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "predecessor_bound_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/operator-bound.json",
+  "predecessor_bound_sha256": "89d1ed1d8ecce0a1e7a67f8a33ba414c48a1b5ad8a4d2c13f659cb99d69d3453",
+  "macro_paid_calls_before": 4,
+  "macro_maximum_after": 5,
+  "new_paid_video_submit_limit": 1,
+  "automatic_video_retries": 0,
+  "new_builtin_reference_image_limit": 2,
+  "macro_builtin_reference_image_calls_before": 20,
+  "new_media_review_limit": 2,
+  "macro_media_review_rounds_before": 5,
+  "macro_media_review_ceiling": 7,
+  "per_call_preconfigured_internal_CRD_upper_bound": 1500,
+  "cumulative_preconfigured_internal_CRD_upper_bound_after": 7500,
+  "market_quote_claim": false,
+  "issued_at": "2026-10-27T09:23:21.594549+00:00",
+  "expires_at": "2026-10-27T12:23:21.594549+00:00",
+  "stop_on_unknown": true,
+  "production_activation": false
+}

@@ -1,0 +1,10 @@
+{
+  "scope": "Canvas planner role syntax only; no provider or creative reference change",
+  "old_canvas_role": "first_frame",
+  "valid_canvas_role": "approved_keyframe",
+  "resulting_native_role": "first_frame",
+  "endpoint_assets_unchanged": true,
+  "generation_intent_hash_unchanged": true,
+  "prompt_unchanged": true,
+  "no_attempt_created_or_submitted": true
+}

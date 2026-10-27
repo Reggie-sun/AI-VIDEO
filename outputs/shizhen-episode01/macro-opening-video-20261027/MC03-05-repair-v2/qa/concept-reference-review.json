@@ -1,0 +1,22 @@
+{
+  "reviewer": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "round": 6,
+  "cumulative_review_ceiling": 7,
+  "scope": "independent concept/reference review, not new media acceptance",
+  "failed_raw_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "findings": [
+    {
+      "id": "SHZ-STAIR-R08",
+      "classification": "blocking_candidate",
+      "observation": "Only approx1.4–2.5s descent;2.65s already moves upward; full extinguisher visible only near2.25s; no lower arrival",
+      "parent": "CONFIRMED; rejected trim+door-only pickup; full-event controlled repair chosen"
+    },
+    {
+      "id": "SHZ-STAIR-R07-reference-cause",
+      "observation": "Original closed L02 does not prove door motion; original L03-r2 receding free-edge geometry is compatible with inward push",
+      "parent": "CONFIRMED evidence limitation; original reference cause not proven; do not label original reference a pull configuration"
+    }
+  ],
+  "limits": "No continuous normal-speed viewing/listening or mode capability proof; new frame roles do not guarantee intermediate motion"
+}

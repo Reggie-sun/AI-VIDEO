@@ -1,0 +1,90 @@
+{
+  "model_id": "seedance_2.0_vip",
+  "mode": {
+    "aspectRatioDefault": "16:9",
+    "aspectRatios": [
+      "21:9",
+      "16:9",
+      "4:3",
+      "1:1",
+      "3:4",
+      "9:16"
+    ],
+    "count": {
+      "defaultValue": 1,
+      "maxValue": 4
+    },
+    "duration": {
+      "defaultMs": 4000,
+      "valuesMs": [
+        4000,
+        5000,
+        6000,
+        7000,
+        8000,
+        9000,
+        10000,
+        11000,
+        12000,
+        13000,
+        14000,
+        15000
+      ]
+    },
+    "longVideo": {
+      "defaultValue": false,
+      "supported": false
+    },
+    "materials": {
+      "acceptedTypes": [
+        2
+      ],
+      "maxCount": 2,
+      "minCount": 2,
+      "promptRequired": false,
+      "requiresRole": true,
+      "roles": [
+        1,
+        2
+      ]
+    },
+    "mode": 3,
+    "promptMaxCharacters": 4000,
+    "resolutionDefault": "720p",
+    "resolutions": [
+      "720p",
+      "1080p",
+      "4k"
+    ],
+    "toolKinds": [
+      "style",
+      "palette",
+      "camera_motion"
+    ],
+    "toolMaxCounts": {
+      "camera_motion": 5
+    },
+    "supportsPromptEnhancement": true
+  },
+  "commerce": {
+    "generationResourceType": "video",
+    "benefitKey": {
+      "resourceType": "aigc",
+      "resourceId": "generate_video",
+      "benefitType": "seedance_20_pro_720p_output"
+    },
+    "resolutionBenefitKeys": {
+      "1080p": {
+        "resourceType": "aigc",
+        "resourceId": "generate_video",
+        "benefitType": "seedance_20_pro_1080p_output"
+      },
+      "4k": {
+        "resourceType": "aigc",
+        "resourceId": "generate_video",
+        "benefitType": "seedance_20_pro_4k_output"
+      }
+    }
+  },
+  "account_verified": true
+}

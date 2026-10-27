@@ -1,0 +1,48 @@
+{
+  "reviewer": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "permissions": "read-only",
+  "cumulative_macro_review_round": 7,
+  "bounded_macro_review_ceiling": 7,
+  "extension_reason": "One concept and one actual-media review for user-continued bounded same-event repair; prior5 retained",
+  "candidate_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+  "evidence_scope": [
+    "ExactSHA verified",
+    "All25 actualPTS frames viewed",
+    "Technical metadata inspected"
+  ],
+  "continuous_normal_speed_viewing": "NOT_EVALUATED",
+  "actual_listening": "NOT_EVALUATED",
+  "findings": [
+    {
+      "id": "SHZ-STAIR-R06",
+      "severity": "blocking_candidate",
+      "time_seconds": [
+        0.5,
+        4.5
+      ],
+      "observation": "Turns from downward back-facing pose to ascend toward camera; lower closed door stays behind, then cut to another doorway",
+      "parent_adjudication": "CONFIRMED",
+      "impact": "Missing complete ordinary descent and lower-platform arrival",
+      "local_edit_limit": "No complete descent arrival source window observed; removing ascent cannot supply absent action"
+    },
+    {
+      "id": "SHZ-STAIR-R07",
+      "severity": "blocking_candidate",
+      "time_seconds": [
+        6.55,
+        9.5
+      ],
+      "observation": "Door first protrudes toward woman around7s, nearly closes7.5–8s, then opens inward8.5–9s while hand is separated; contact restored near9.5s",
+      "parent_adjudication": "CONFIRMED with full-resolution frames15,18,19,20",
+      "impact": "Repeated door event and apparent self-moving door create unintended anomaly",
+      "local_edit_limit": "Trimming out swing/closure still leaves contact-free opening; no complete one-push source observed"
+    }
+  ],
+  "unresolved_blockers": [
+    "SHZ-STAIR-R06",
+    "SHZ-STAIR-R07"
+  ],
+  "next_shot_submit": "STOP",
+  "no_extra_review_or_generation": true
+}

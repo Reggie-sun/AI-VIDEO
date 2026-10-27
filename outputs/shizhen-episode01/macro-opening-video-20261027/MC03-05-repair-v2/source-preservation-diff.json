@@ -1,0 +1,22 @@
+{
+  "failed_raw_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "changed": [
+    "generic multimodal6 references -> native first_last_frame2 bound endpoints",
+    "same-side door medium framing retains contact and reaction together",
+    "repair prose explicitly requires downward foot progression and receding door edge"
+  ],
+  "preserved": [
+    "same12s complete event",
+    "same character and outfit",
+    "ordinary dent+pipe before missing-pipe reveal",
+    "right-hand inward push and outside-threshold stop",
+    "original speed and native sound",
+    "B6/font/music unchanged"
+  ],
+  "new_builtin_image_calls": 2,
+  "new_paid_video_calls": 1,
+  "new_paid_video_limit": 1,
+  "original_FAIL_retained": true,
+  "new_raw_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+  "full_goal_status": "NOT_MET; observed reverse ascent and repeated door motion"
+}

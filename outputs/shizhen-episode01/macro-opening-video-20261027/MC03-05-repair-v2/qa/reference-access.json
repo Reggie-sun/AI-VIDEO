@@ -1,0 +1,23 @@
+{
+  "board_url": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05-repair-v2/reference-review.html",
+  "images": [
+    {
+      "url": "http://127.0.0.1:8883/referces/shizhen/macro-opening-20261027/L01-X.png",
+      "status": 200,
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50",
+      "size": 2361971
+    },
+    {
+      "url": "http://127.0.0.1:8883/referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+      "status": 200,
+      "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648",
+      "size": 2111259
+    },
+    {
+      "url": "http://127.0.0.1:8883/referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+      "status": 200,
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876",
+      "size": 2126384
+    }
+  ]
+}

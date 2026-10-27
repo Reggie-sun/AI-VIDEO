@@ -1,0 +1,112 @@
+{
+  "shot_id": "MC03-05",
+  "attempt_id": "shizhen-macro-MC03-05-firstlast-repair-005",
+  "artifact_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+  "artifact_path": "runs/shizhen-macro-opening-20261027/MC03-05-repair-v2/state/video-generation/fetch/files/aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5.mp4",
+  "artifact_size_bytes": 30389843,
+  "sealed_generation_intent_sha256": "baf308775aeb6465eb8b8494bf2f631ee5606dd64ba55c8d8bde3d7bc354bae4",
+  "explicit_project_video_analysis_sha256": "e474b70ff22911614581675988c3246df45bbe9af9df97ea4ba086625bba7e92",
+  "predecessor_evidence_clearance": "predecessor-media-clearance.json",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "同一低马尾、灰褐外套和深灰裤人物保持；限已见身份外观，无用户接受继承",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/technical-probe.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "FAIL",
+      "reason": "0.5秒后回身，1–4秒向上行走；门前发生开合反复，未完成一次连续推门与完整下行；8.5–9秒右手脱离把手时门仍继续打开",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/technical-probe.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "FAIL",
+      "reason": "约4.083和6.55秒切镜；上楼接近门前，不能构成向低处平台的叙事推进。MCP scene_count=1漏检切镜",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/technical-probe.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "NOT_EVALUATED",
+      "reason": "可见末尾门外停留，但动作错误破坏完整正常下行、先核对再听辨的表演，未完整听验",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/technical-probe.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "FAIL",
+      "reason": "从下行起态转上楼到上平台，再切门前；较低平台到达关系未建立，门前开合不连续",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/technical-probe.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "reason": "已见写实旧住宅、灰绿墙、红灭火器与旧卡箍印，未加片名字幕或奇观；限可见美术项",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/technical-probe.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "reason": "一次盲分析识别硬地脚步、门开与关门、空房回声；不能证明滴水、门前后变化和逐动作同步，无human听验",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/technical-probe.json",
+        "qa/native-audio-result.json",
+        "qa/independent-media-review.json"
+      ]
+    }
+  ],
+  "verdict": "FAIL",
+  "execution_disposition": "STOP_CURRENT_UNIT_NO_NEXT_SHOT",
+  "new_video_calls_this_unit": 1,
+  "macro_video_calls_cumulative": 5,
+  "new_builtin_image_calls": 2,
+  "new_audio_analysis_calls": 1,
+  "automatic_retries": 0,
+  "actual_charges": "NOT_CONFIRMED",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "final_acceptance": false,
+  "local_edit_assessment": "No complete descent or single-contact push window observed. Approx9.5–12s tail is only a clue/held-door candidate, not a fully reviewed usable source; trimming alone cannot restore full event. No editorial repair/canonical salvage execution claimed.",
+  "independent_media_review": "qa/independent-media-review.json",
+  "unresolved_blockers": [
+    "SHZ-STAIR-R06",
+    "SHZ-STAIR-R07"
+  ],
+  "earlier_findings": {
+    "SHZ-STAIR-R05": "Not reproduced in new candidate; initial ordinary pipe state is now first",
+    "SHZ-STAIR-R06": "CONFIRMED persists",
+    "SHZ-STAIR-R07": "CONFIRMED persists with repeated motion and hand separation"
+  }
+}

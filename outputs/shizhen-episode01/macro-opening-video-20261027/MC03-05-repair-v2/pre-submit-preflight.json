@@ -1,0 +1,23 @@
+{
+  "scope": "one same-Shot controlled repair, no next Shot",
+  "continuity": "same Dong Wenhui identity and wardrobe; accepted municipal predecessor clearance retained",
+  "handoff": "ordinary upper landing extinguisher+pipe to downstairs closed door to missing-pipe reveal",
+  "axis_action_camera": "back-facing down-flight start; downward progression; door exterior same-side medium view; inward push and outside threshold stop",
+  "adaptation": "native first_last_frame two endpoint images, no six-image multimodal ordering",
+  "lint": {
+    "two_exact_endpoints": true,
+    "native_endpoint_roles": true,
+    "pure_chinese_body": true,
+    "exact_authored_prompt": true,
+    "no_dialogue_music": true,
+    "inward_push": true,
+    "first_frame_ordinary": true,
+    "duration12": true,
+    "1080p": true,
+    "native_audio": true
+  },
+  "compiled_prompt_sha256": "910a2ecadd4d4ba3ace710ca2630440cdc708fa534fa4686445ee3610ded1829",
+  "qualification_only": true,
+  "new_paid_submit_ceiling": 1,
+  "automatic_retries": 0
+}

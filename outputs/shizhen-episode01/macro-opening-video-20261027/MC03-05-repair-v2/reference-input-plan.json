@@ -1,0 +1,32 @@
+{
+  "scope": "Static references and actual native first/last inputs, not Production acceptance",
+  "images": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-X.png",
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50",
+      "native_role": "first_frame"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+      "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648",
+      "native_role": "last_frame"
+    }
+  ],
+  "review_only": {
+    "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+    "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876",
+    "native_binding": false
+  },
+  "source_identity": {
+    "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+    "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+  },
+  "builtin_image_calls_this_unit": 2,
+  "builtin_image_calls_cohort_total": 22,
+  "old_image_history_retained": true,
+  "original_static_pull_cause_proven": false,
+  "reference_geometry_observed": "Open endpoint free-edge projection shorter than hinge edge, recedes behind threshold; right hand maintains contact",
+  "dynamic_validation": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED",
+  "conditioning_assessment": "conditioning-assessment.json"
+}

@@ -1,0 +1,110 @@
+{
+  "answers_sha256": "fa6744ebb1505e72cac97289cf602a25f7123a101c19f4101caf779e60683aff",
+  "authority": "development_only",
+  "evaluator_name": "user, explicit reply 已完整看听，可以保留; Codex transcribed exact-source records",
+  "inventory_sha256": "028e7c218dde6b2abda5dae781af9a6052dd30783dae87c39ca94d94a730b83e",
+  "junction_review": {
+    "cuts": [
+      {
+        "audio_basis": "actual_listening",
+        "audio_observation": "用户对本6.83秒exact片明确回复已完整看听、切镜动作和声音衔接可以保留；此为人工听验，自动分析的未证明项目与旧记录保留",
+        "audio_reason": "声画同窗裁切保持原速，未新增配乐或替代音效；实际人工聆听尚未完成",
+        "audio_verdict": "pass",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "用户要求剪已有片；保留原片24fps网格[0,104)与[132,192)，原速，直接删去含叠化的[104,132)，输出接点104帧。候选保留，仍待完整原速声画审看",
+        "editing_intent": {
+          "audio_reason": "原生声画各自同窗裁切，原速0dB，无新声轨",
+          "audio_track_ids": [
+            "native-MC01-W",
+            "native-MC02-C"
+          ],
+          "audio_treatment": "sync",
+          "axis_eyeline_space": "同侧设备，钢索右向，保持同一雨夜场景",
+          "continuity_risks": [
+            "裁去源1.167秒造成动作阶段省略",
+            "近景目标屏幕位置变化保留用户已认可基线"
+          ],
+          "expected_effect": "同一设备由远景进入近景，无透明重叠",
+          "incoming_phase": "同一已到限位连接近景，随后继续有限形变",
+          "narrative_type": "opening",
+          "outgoing_phase": "灯灭后门已滑向限位，工人收手观察",
+          "pickup_requirement": null,
+          "reason": "删除生成片的非叙事叠化重影，工人观察后直接看受力连接",
+          "rhythm_reveal": "省去叠化过渡，保留之前操作与之后形变",
+          "scale_reaction": "远景交代作业与观察，近景给受力细节",
+          "technique": "hard_cut"
+        },
+        "editing_review": {
+          "action_match": {
+            "observation": "源出[0,104)到入[132,192)始终向前；动态动作匹配保留未评估；当前本片用户完整声画审看明确可以保留，不扩张为原始生成片重新资格化",
+            "verdict": "pass"
+          },
+          "axis_eyeline_space": {
+            "observation": "远近景均同侧钢索朝右，目标位置变化源已存在，按用户认可基线保留；当前本片用户完整声画审看明确可以保留，不扩张为原始生成片重新资格化",
+            "verdict": "pass"
+          },
+          "rhythm_reveal": {
+            "observation": "删除叠化1.167秒；未对完整原速节奏签通过；当前本片用户完整声画审看明确可以保留，不扩张为原始生成片重新资格化",
+            "verdict": "pass"
+          },
+          "scale_reaction": {
+            "observation": "实际景别由作业中远景到连接近景，未见叠加人物；当前本片用户完整声画审看明确可以保留，不扩张为原始生成片重新资格化",
+            "verdict": "pass"
+          },
+          "sound_bridge": {
+            "observation": "同源PCM窗口匹配画面，不新增配乐；盲分析无法证明接点自然，未人工听验；当前本片用户完整声画审看明确可以保留，不扩张为原始生成片重新资格化",
+            "verdict": "pass"
+          }
+        },
+        "evidence_gaps": [],
+        "frame": 104,
+        "from_shot_id": "MC01-W",
+        "junction_id": "9c1af3621b836082c523144aba5ba6597decea6f2e56488be578cffadff37856",
+        "source_selection": {
+          "incoming": {
+            "asset_id": "hd-close-capture",
+            "asset_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+            "duration_frames": 60,
+            "layer_id": "retained-MC02-C",
+            "opacity_milli": 1000,
+            "shot_id": "MC02-C",
+            "start_frame": 104,
+            "trim_duration_frames": 60,
+            "trim_start_frame": 132,
+            "z_index": 0
+          },
+          "outgoing": {
+            "asset_id": "hd-wide-capture",
+            "asset_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+            "duration_frames": 104,
+            "layer_id": "retained-MC01-W",
+            "opacity_milli": 1000,
+            "shot_id": "MC01-W",
+            "start_frame": 0,
+            "trim_duration_frames": 104,
+            "trim_start_frame": 0,
+            "z_index": 0
+          },
+          "source_in_frame": 132,
+          "source_out_frame_exclusive": 104
+        },
+        "to_shot_id": "MC02-C",
+        "verdict": "pass",
+        "viewing_mode": "full_playback",
+        "viewing_speed_milli": 1000,
+        "visual_observation": "实际导出0.25秒序列在4.25秒仍是单一远景，4.50秒已是单一近景，无叠化双重工人和设备；完整动作自然度未由静态序列证明；用户在默认原速审看入口完整看听后明确认可本剪辑",
+        "visual_verdict": "pass"
+      }
+    ],
+    "evidence_gaps": [],
+    "verdict": "pass"
+  },
+  "limitation": "Validates exact bindings and declared evidence, not semantic detection or human acceptance",
+  "production_acceptance": "NOT_EVALUATED",
+  "purpose": "assembly_review_evidence",
+  "render_report_sha256": "c2b988e6a46de0bdb346c8f5416830b6eaa878a367a822b90608c069ab286742",
+  "strength": "human",
+  "timeline_sha256": "d83c28c3b003db62046e5151456633dd089929ab20c554582ad7e2c603bafc8d",
+  "verdict": "pass",
+  "video_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d"
+}

@@ -1,0 +1,269 @@
+{
+  "boundary": "Author assessment of compatible endpoint route, not proof that model obeys the intermediate action",
+  "compatibility": {
+    "action_endpoint_reachable": true,
+    "available_duration_seconds": 12.0,
+    "axis_compatible": true,
+    "camera_path_reachable": true,
+    "character_prop_state_reachable": true,
+    "composition_compatible": true,
+    "first_anchor_id": "MC03-05-repair-v2-first-frame-down",
+    "lane": "fl2va",
+    "last_anchor_id": "MC03-05-repair-v2-last_frame",
+    "same_subject_scale": true,
+    "screen_order_compatible": true
+  },
+  "kind": "explicit-frame-conditioning-assessment/1",
+  "rationale": {
+    "action_endpoint_reachable": "Ordinary descent, one door push and restrained pause are the same approved event; endpoint geometry recedes behind threshold",
+    "axis_compatible": "Back-facing down-flight and camera behind-left at doorway, no reverse upward movement required",
+    "camera_path_reachable": "Follow a short flight down, then an explicitly motivated direct cut at completed arrival, within12s",
+    "character_prop_state_reachable": "Same woman/outfit, free right hand reaches handle and pushes inward while feet stay outside",
+    "composition_compatible": "Normal landing clue is visible left of descending subject, lower closed door locatable; endpoint is the corresponding lower doorway, intentional scene progression",
+    "same_subject_scale": "Both actual references show one full-body figure occupying roughly60 percent of image height; earlier front-facing93-percent-height frame was not selected",
+    "screen_order_compatible": "Single woman, pipe/extinguisher normal-state left and lower doorway after descent; no unexplained subject exchange"
+  },
+  "row": {
+    "composition": {
+      "muted": false,
+      "source_audio_policy": "KEEP"
+    },
+    "generation": {
+      "audio_need": "required",
+      "conditioning_compatibility": {
+        "action_endpoint_reachable": true,
+        "available_duration_seconds": 12.0,
+        "axis_compatible": true,
+        "camera_path_reachable": true,
+        "character_prop_state_reachable": true,
+        "composition_compatible": true,
+        "first_anchor_id": "MC03-05-repair-v2-first-frame-down",
+        "lane": "fl2va",
+        "last_anchor_id": "MC03-05-repair-v2-last_frame",
+        "same_subject_scale": true,
+        "screen_order_compatible": true
+      },
+      "generation_intent": {
+        "ambience_intent": {
+          "environment_bed": "平台滴水、住宅生活底噪，门后环境声与门外不同",
+          "explicitly_silent": false,
+          "foley_cues": [
+            "正常脚步",
+            "衣料摩擦",
+            "随开门的门轴声"
+          ]
+        },
+        "axis_continuity": {
+          "camera_axis": "下行斜侧观察，开门从身后偏左同侧观察",
+          "crossing_policy": "开门与反应保持门槛外同侧，不越轴",
+          "framing_continuity": "下行到达后从门外同侧看一次向内推门，门边退远而非伸向摄影机，右手随把手前伸"
+        },
+        "camera_endpoint": {
+          "end_framing": "同侧门外中景，门扇退在门框后方、右手保持接触，两个门内线索可见",
+          "orientation_lock": false,
+          "position_lock": false,
+          "start_framing": "上平台斜侧中全景，同时可辨董文慧、灭火器及管道"
+        },
+        "camera_intent": {
+          "expression_strength": "semantic_prompt_allowed",
+          "framing_intent": "先看清正常平台凹痕与管道，再用门外中景同时看到右手、门槛、门内凹痕和旧印；不另切掉接触过程",
+          "movement": "短随真实下行，完成到达后直接切门外中景，一次推门和同侧停步核对",
+          "stability": "稳定短跟随和门外稳定观察"
+        },
+        "camera_subject_relation": {
+          "end_relation": "门外同侧观察董文慧扶门与两个门内线索，不丢右手接触",
+          "relation_kind": "follow",
+          "start_relation": "人物、灭火器管道与折返梯段可读",
+          "subject_id": "dong-wenhui"
+        },
+        "close_state": {
+          "kind": "typed_text",
+          "required_change": true,
+          "state_hash": null,
+          "state_ref": null,
+          "state_text": "她留在低处平台门槛外，右手保持扶门，已看清门内同样凹痕及消失管道留下的旧卡箍印，核对后轻微侧头听辨，尚无答案"
+        },
+        "dialogue_intent": {
+          "end_seconds": null,
+          "lip_sync_required": false,
+          "mode": "none",
+          "on_screen": null,
+          "response_obligation": null,
+          "speaker_id": null,
+          "start_seconds": null,
+          "verbatim_text": null
+        },
+        "identity_continuity": {
+          "allowed_variation": [],
+          "character_ids": [
+            "dong-wenhui"
+          ],
+          "preservation": "exact"
+        },
+        "lighting_intent": {
+          "continuity_state": "同一住宅雨夜，无闪光或突然换时段",
+          "direction": "沿首帧普通平台和尾帧门外中景的实用光保持",
+          "exposure_priority": "凹痕、管道存在与缺失、右手门把接触和台阶可辨",
+          "motivated_source": "楼梯实用灯和雨夜窗外冷光"
+        },
+        "motion_envelope": {
+          "amplitude_class": "自然步幅和有限开门、轻微侧头",
+          "direction": "连续下行，随后门向内开",
+          "onset": "经过上平台凹痕与管道，正常下楼",
+          "peak": "到低处平台右手压把手向前推门，逐渐显露凹痕和旧管箍印",
+          "settle": "保持扶门并停步，核对后听辨"
+        },
+        "music_intent": {
+          "dynamics": null,
+          "instrumentation": null,
+          "mode": "none",
+          "tempo_rhythm": null
+        },
+        "open_state": {
+          "kind": "typed_text",
+          "required_change": false,
+          "state_hash": null,
+          "state_ref": null,
+          "state_text": "董文慧已在上平台连通的下行梯段上，背对摄影机向较低平台走；上平台带凹痕的灭火器与外露管道同框，下方关闭的门可定位"
+        },
+        "pacing": {
+          "cadence": "普通下行、到达推门、先看清差异、停步核对听辨",
+          "shot_duration_seconds": 12.0,
+          "tempo_class": "正常原速，保留完整下行与开门反应，不按固定秒数切镜"
+        },
+        "performance_intent": {
+          "body_behavior": "先普通下行，到门外停步，不跨门槛",
+          "character_directions": [
+            {
+              "beats": [
+                {
+                  "body_behavior": "右手扶门，脚步停在门槛外，随后轻微侧头听辨",
+                  "breathing": "自然平稳",
+                  "emotion": "先平常通行，再克制核对",
+                  "facial_expression": "平静中轻微疑惑，不提前惊恐",
+                  "gaze_target": "先看路，再核对凹痕与管道旧印",
+                  "intensity": "subtle",
+                  "phase": "throughout",
+                  "trigger": "普通下楼之后，门内出现熟悉凹痕与缺失管道的差异"
+                }
+              ],
+              "character_id": "dong-wenhui",
+              "offscreen_reason": null,
+              "role": "principal",
+              "screen_identity": "灰褐外套低马尾的董文慧",
+              "visibility": "visible"
+            }
+          ],
+          "gaze_target": "灭火器凹痕和旧卡箍印",
+          "hand_behavior": "右手压把手向内推门并保持接触，左手自然垂下",
+          "terminal_performance_state": "克制疑惑，听辨而未得到答案",
+          "trigger": "门开后看到相同凹痕但旁边管道缺失",
+          "visible_response": "见到两处细节差异后停步核对，再轻微侧头听辨，肩背与侧脸反应克制"
+        },
+        "primary_camera_motion": {
+          "amplitude_class": "subtle",
+          "direction": "down",
+          "end_motion_state": "settled",
+          "movement_kind": "pedestal_down",
+          "speed_class": "slow",
+          "start_motion_state": "in_motion"
+        },
+        "scene_continuity": {
+          "mood": "普通住宅路径中出现熟悉细节与缺失差异",
+          "scene_id": "residential-switchback",
+          "state_constraints": [
+            "同一董文慧、灰褐外套、深灰裤、低马尾",
+            "上平台管道存在，低处门内管道缺失而凹痕相同",
+            "右手推门始终留在门槛外，不加解释或新机制"
+          ],
+          "time_of_day": "雨夜"
+        },
+        "space_continuity": {
+          "crossing_policy": "身体不跨门槛，不穿门或栏杆",
+          "entrance_state": null,
+          "exit_state": null,
+          "screen_direction": "沿已建立的梯段实际下行，门向远离她的方向内开",
+          "subject_position": "上平台经过灭火器，沿折返梯段向下到较低平台门外"
+        },
+        "subject_action": {
+          "endpoint": {
+            "required_change": true,
+            "state_hash": null,
+            "state_ref": null,
+            "state_text": "她留在低处平台门槛外，右手保持扶门，已看清门内同样凹痕及消失管道留下的旧卡箍印，核对后轻微侧头听辨，尚无答案"
+          },
+          "progression": "先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。\n到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。\n保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。",
+          "start_state": "董文慧已在上平台连通的下行梯段上，背对摄影机向较低平台走；上平台带凹痕的灭火器与外露管道同框，下方关闭的门可定位"
+        },
+        "visual_treatment": {
+          "material_treatment": "旧楼墙漆、湿台阶、真实衣料、红灭火器和金属门",
+          "medium_look": "正常速度真人实拍质感",
+          "palette": "住宅旧墙灰绿与实用暖灯、窗外冷光",
+          "prohibited_visual_drift": [
+            "叠化、透明重影、分格或瞬移",
+            "新增人物、光效、片名或字幕"
+          ]
+        }
+      },
+      "intent_evidence": {
+        "character_action_required": true,
+        "state_change_required": true,
+        "subject_motion_directive_present": true
+      },
+      "output_need": {
+        "aspect_ratio": "16:9",
+        "container_mime": "video/mp4",
+        "duration_seconds": 12,
+        "fps": null,
+        "geometry_policy": "adaptive",
+        "timing_mode": "content_driven"
+      },
+      "quality_need": {
+        "objective_tier": "preview"
+      },
+      "references": [
+        {
+          "asset_id": "MC03-05-repair-v2-first-frame-down",
+          "role": "approved_keyframe"
+        },
+        {
+          "asset_id": "MC03-05-repair-v2-last_frame",
+          "role": "last_frame"
+        }
+      ]
+    },
+    "shot": {
+      "character_ids": [
+        "dong-wenhui"
+      ],
+      "continuity_constraints": [
+        "遵原MC03–MC05完整事件，不改剧情或角色",
+        "同一凹痕、上平台有管道、门内无管道但有旧印",
+        "下行真实连续、右手随把手、门槛外停步与同次反应",
+        "市政转楼梯明确换场，机器声不迁入住宅",
+        "不改B6、字体、音乐或后续事件"
+      ],
+      "dialogue": "",
+      "duration_policy": {
+        "mode": "fixed",
+        "seconds": 12
+      },
+      "generated_video_rationale": "已知失败的同一MC03–MC05修复：可用下行不足以剪辑保住完整事件，因此用严格首尾帧约束一次完整12秒，保留原剧情与人物，不再六参考自由排序",
+      "intent": "从首帧的普通楼梯状态开始，到尾帧的门内显露与门外停步结束，按事件顺序拍摄，不能先展示门已打开。全程同一董文慧，低马尾、灰褐外套、深灰裤；雨夜旧住宅，真人实拍质感。\n先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。\n到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。\n保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。\n正常原速，脚步、衣料和门轴声跟随动作，保留住宅滴水与门后环境变化；无对白、配乐或惊吓重击。不叠化、不倒放、不瞬移、不增人物、光效、片名或字幕。",
+      "required_asset_roles": [
+        {
+          "allowed_asset_types": [
+            "video"
+          ],
+          "asset_ids": [],
+          "role": "primary_visual"
+        }
+      ],
+      "scene_id": "residential-switchback",
+      "shot_id": "MC03-05",
+      "storyboard_beat_id": "stairs-familiar-mark",
+      "visual_strategy": "generated_video"
+    }
+  },
+  "source_identity_sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+}

@@ -1,0 +1,165 @@
+{
+  "duration": 12.063991,
+  "width": 1920,
+  "height": 1080,
+  "rate": 1,
+  "muted": false,
+  "volume": 1,
+  "ended": true,
+  "wall_seconds": 12.508899999976158,
+  "samples": [
+    {
+      "t": 0.178767,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 0.685603,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 1.183888,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 1.683847,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 2.183191,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 2.678524,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 3.189172,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 3.68822,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 4.183377,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 4.68246,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 5.181598,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 5.680429,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 6.187515,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 6.6858,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 7.185448,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 7.680689,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 8.191408,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 8.69042,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 9.189106,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 9.684696,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 10.183706,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 10.682146,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 11.181748,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 11.689747,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 12.063991,
+      "rate": 1,
+      "paused": true,
+      "readyState": 4
+    }
+  ],
+  "errors": [],
+  "human_listening": "NOT_EVALUATED",
+  "playback_success_is_quality_acceptance": false
+}

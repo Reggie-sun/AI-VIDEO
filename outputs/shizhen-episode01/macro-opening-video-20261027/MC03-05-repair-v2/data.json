@@ -1,0 +1,194 @@
+{
+  "objective": "修复同一MC03–MC05的提前揭示、反向上楼和拉门：先建立正常凹痕与管道、真实下楼到达、一次向内推门、停步核对听辨；不改B6、字体、音乐或角色",
+  "images": [
+    {
+      "asset_id": "MC03-05-repair-v2-first-frame-down",
+      "node_id": "MC03-05-repair-v2-first-frame-down-node",
+      "resource_id": "MC03-05-repair-v2-first-frame-down-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-X.png",
+      "usage_license": "Task-owned existing same-identity descent reference for authorized bounded repair",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05-repair-v2/reference-first-descent-source.json",
+        "record_sha256": "a2a5fd4db1f948e86797220be7a77a939be8a1c83db9cdff632e2a26ffa238f4",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-05-repair-v2-last_frame",
+      "node_id": "MC03-05-repair-v2-last_frame-node",
+      "resource_id": "MC03-05-repair-v2-last_frame-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+      "usage_license": "Original fictional task references for authorized Shizhen stair repair",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05-repair-v2/reference-2-source.json",
+        "record_sha256": "8ed52f1b7a261a506f22b75d8855042537671552e365dbceb2594511b9fd6d4a",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "dong-wenhui",
+      "name": "董文慧",
+      "identity": "28岁，夜间应急服务文字记录者；原分镜中经过住宅楼梯、察觉细节差异而核对听辨，不解释规则",
+      "appearance_bible": "沿既有董文慧identity-v1面貌、低马尾；本宏观场景灰褐外套、深灰打底裤与黑鞋，不移植第二集场次的包本",
+      "reference_asset_ids": [
+        "MC03-05-repair-v2-first_frame",
+        "MC03-05-repair-v2-last_frame"
+      ]
+    }
+  ],
+  "scene_images": [
+    "MC03-05-repair-v2-first-frame-down",
+    "MC03-05-repair-v2-last_frame"
+  ],
+  "observations": {
+    "identity": "同一董文慧脸、低马尾、灰褐外套和深灰裤，无身份变化或多人复制",
+    "action": "经过带凹痕灭火器和管道，真实下行至低平台；右手连续推门显露相同凹痕与缺失管道的旧印，随后停步核对",
+    "camera": "首帧为普通楼梯、不能提前展示开门；下行到达后直接切同侧门外中景，连续看清推门接触及停步核对，不叠化或重演",
+    "performance": "开始普通走路，不提前惊恐；见差异后停步核对再听辨，保持门槛外右手扶门",
+    "space": "正常平台灭火器旁有管道，低处门内相同凹痕旁无管道有旧印；真实下行至低处，门自由边退入门框后方、右手前伸且双脚门外，不后退拉门",
+    "art": "同一写实旧住宅、灰绿旧墙实用灯，无光效、字幕或片名",
+    "sound": "原生脚步、衣料、门轴随动作，平台与门后声场可区分，无对白、配乐、耳语或惊吓重击，不继承市政机器声"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "art": [
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.1",
+      "generation_intent.ambience_intent.foley_cues.2",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "从首帧的普通楼梯状态开始，到尾帧的门内显露与门外停步结束，按事件顺序拍摄，不能先展示门已打开。全程同一董文慧，低马尾、灰褐外套、深灰裤；雨夜旧住宅，真人实拍质感。"
+    ],
+    "action": [
+      "先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。",
+      "到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。",
+      "保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。"
+    ],
+    "camera": [
+      "先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。",
+      "到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。",
+      "保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。"
+    ],
+    "performance": [
+      "先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。",
+      "到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。",
+      "保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。"
+    ],
+    "space": [
+      "先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。",
+      "到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。",
+      "保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。"
+    ],
+    "art": [
+      "从首帧的普通楼梯状态开始，到尾帧的门内显露与门外停步结束，按事件顺序拍摄，不能先展示门已打开。全程同一董文慧，低马尾、灰褐外套、深灰裤；雨夜旧住宅，真人实拍质感。",
+      "正常原速，脚步、衣料和门轴声跟随动作，保留住宅滴水与门后环境变化；无对白、配乐或惊吓重击。不叠化、不倒放、不瞬移、不增人物、光效、片名或字幕。"
+    ],
+    "sound": [
+      "正常原速，脚步、衣料和门轴声跟随动作，保留住宅滴水与门后环境变化；无对白、配乐或惊吓重击。不叠化、不倒放、不瞬移、不增人物、光效、片名或字幕。"
+    ]
+  },
+  "intent_sha256": "baf308775aeb6465eb8b8494bf2f631ee5606dd64ba55c8d8bde3d7bc354bae4"
+}

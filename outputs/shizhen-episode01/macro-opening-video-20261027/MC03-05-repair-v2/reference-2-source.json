@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648",
+  "size_bytes": 2111259,
+  "width": 1672,
+  "height": 941,
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "fictional_characters": true,
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Parent viewed exact ordinary-platform start and physically recessed inward-open endpoint; static evidence does not prove video action",
+  "source_path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+  "reference_role": "last_frame"
+}

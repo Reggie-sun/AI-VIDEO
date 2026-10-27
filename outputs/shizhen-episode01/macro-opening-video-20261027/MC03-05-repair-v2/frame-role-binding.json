@@ -1,0 +1,10 @@
+{
+  "kind": "shot-input-frame-roles-authoring/1",
+  "shot_id": "MC03-05",
+  "roles": {
+    "first_frame": "MC03-05-repair-v2-first-frame-down",
+    "last_frame": "MC03-05-repair-v2-last_frame"
+  },
+  "scope": "Explicit source-frame inputs for already-approved full stair repair; no output acceptance",
+  "parent_assessment_sha256": "e258d2ce976b913bf95400c291ebb67c74ff347580bd4490e109099771f2cb9b"
+}

@@ -1,0 +1,9 @@
+{
+  "attempt_id": "shizhen-macro-MC03-05-firstlast-repair-005",
+  "known_fetched_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+  "outcome": "KNOWN_MEDIA_FAIL",
+  "gate": "post-media-gate.json",
+  "automatic_retry": false,
+  "next_shot_submit": false,
+  "production_activation": false
+}

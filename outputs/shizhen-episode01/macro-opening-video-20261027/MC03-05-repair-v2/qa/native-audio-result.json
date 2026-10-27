@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5\",\n  \"source_size_bytes\": 30389843,\n  \"audio_sha256\": \"6ff8460b7a9d1ff9d3bd470e999e210e9a3b23254a3dc78db76820ead7809ae3\",\n  \"audio_size_bytes\": 2130044,\n  \"duration_seconds\": 12.07437641723356,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"8e1c857cd99f17d24911907e1baf266073d14cf0c8c6359d5ab1d80deb2091ee\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"54f7f8a1797b8a0133b6de64bed90e641f629370e82d4e59fc5727d730b81708\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"rhythmic footsteps walking on a hard surface\",\n      \"a door creaking open and latching shut\",\n      \"ambient echoes in a hollow or tiled room\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC03-05-repair-v2/state/video-generation/fetch/files/aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

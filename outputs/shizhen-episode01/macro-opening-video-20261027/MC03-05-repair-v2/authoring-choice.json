@@ -1,0 +1,25 @@
+{
+  "user_quote": "繼續",
+  "repair_findings": [
+    "SHZ-STAIR-R05",
+    "SHZ-STAIR-R06",
+    "SHZ-STAIR-R07"
+  ],
+  "new_reference_evidence": "../../../../referces/shizhen/macro-opening-20261027/door-push-repair-03",
+  "review_round6_parent": {
+    "SHZ-STAIR-R08": "CONFIRMED genuine descent only~1.4–2.5s and clue establishment too brief; do not use as a completeMC03",
+    "reference_root_cause": "No proof that original L03-r2 is a pull configuration; do not blame all source geometry"
+  },
+  "chosen_route": "One complete12s stair-event qualification repair using native first_last_frame mode3, back-facing downward L01-X start and physically recessed push-open endpoint. Closed edit remains review-only.",
+  "rejected_route": "Trim brief descent and generate only a door pickup: cannot preserve full ordinary-space establishment and descent arrival",
+  "unchanged_limits": {
+    "new_paid_video_submits": 1,
+    "new_builtin_images": 2,
+    "no_automatic_retry": true,
+    "macro_paid_before": 4,
+    "macro_ceiling_after": 5
+  },
+  "qualification_only": true,
+  "production_activation": false,
+  "initial_first_frame_candidate": "L01-r1; rejected before submission because frontal subject scale differed"
+}

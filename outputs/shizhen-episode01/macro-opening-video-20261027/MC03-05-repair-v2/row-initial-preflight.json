@@ -1,0 +1,229 @@
+{
+  "shot": {
+    "shot_id": "MC03-05",
+    "scene_id": "residential-switchback",
+    "storyboard_beat_id": "stairs-familiar-mark",
+    "intent": "从首帧的普通楼梯状态开始，到尾帧的门内显露与门外停步结束，按事件顺序拍摄，不能先展示门已打开。全程同一董文慧，低马尾、灰褐外套、深灰裤；雨夜旧住宅，真人实拍质感。\n先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。\n到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。\n保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。\n正常原速，脚步、衣料和门轴声跟随动作，保留住宅滴水与门后环境变化；无对白、配乐或惊吓重击。不叠化、不倒放、不瞬移、不增人物、光效、片名或字幕。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 12
+    },
+    "character_ids": [
+      "dong-wenhui"
+    ],
+    "continuity_constraints": [
+      "遵原MC03–MC05完整事件，不改剧情或角色",
+      "同一凹痕、上平台有管道、门内无管道但有旧印",
+      "下行真实连续、右手随把手、门槛外停步与同次反应",
+      "市政转楼梯明确换场，机器声不迁入住宅",
+      "不改B6、字体、音乐或后续事件"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "已知失败的同一MC03–MC05修复：可用下行不足以剪辑保住完整事件，因此用严格首尾帧约束一次完整12秒，保留原剧情与人物，不再六参考自由排序"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "approved_keyframe",
+        "asset_id": "MC03-05-repair-v2-first_frame"
+      },
+      {
+        "role": "last_frame",
+        "asset_id": "MC03-05-repair-v2-last_frame"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "董文慧在老住宅上平台，经过带斜向凹痕的红灭火器与旁边外露管道，准备沿折返楼梯下行",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "她留在低处平台门槛外，右手保持扶门，已看清门内同样凹痕及消失管道留下的旧卡箍印，核对后轻微侧头听辨，尚无答案",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "dong-wenhui"
+        ],
+        "preservation": "exact",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "residential-switchback",
+        "time_of_day": "雨夜",
+        "mood": "普通住宅路径中出现熟悉细节与缺失差异",
+        "state_constraints": [
+          "同一董文慧、灰褐外套、深灰裤、低马尾",
+          "上平台管道存在，低处门内管道缺失而凹痕相同",
+          "右手推门始终留在门槛外，不加解释或新机制"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "上平台经过灭火器，沿折返梯段向下到较低平台门外",
+        "screen_direction": "沿已建立的梯段实际下行，门向远离她的方向内开",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "身体不跨门槛，不穿门或栏杆"
+      },
+      "axis_continuity": {
+        "camera_axis": "下行斜侧观察，开门从身后偏左同侧观察",
+        "framing_continuity": "下行到达后从门外同侧看一次向内推门，门边退远而非伸向摄影机，右手随把手前伸",
+        "crossing_policy": "开门与反应保持门槛外同侧，不越轴"
+      },
+      "subject_action": {
+        "start_state": "董文慧在老住宅上平台，经过带斜向凹痕的红灭火器与旁边外露管道，准备沿折返楼梯下行",
+        "progression": "先让观众看清她身旁带斜向凹痕的红灭火器和外露管道。她正常沿台阶向下走，重心和落脚逐级降低，经过折返处走到低处平台。只下楼、不向上返回，不跳过到达，不提前惊恐；摄影短距离跟随，栏杆和下方平台关系清楚。\n到达关着的门前后，直接切至身后偏左的门外中景。她右手压把手并向前推，门的自由边与把手朝门内退远，身体略靠近而非后退拉门，双脚留在门槛外；一次连续推开，右手随把手自然前伸。随着门开，逐渐露出相同凹痕的灭火器，旁边只有旧卡箍印、没有管道。\n保持同侧门外构图，手、门槛和两个线索可见。她先停步，目光核对凹痕与旧印，再轻微侧头听辨；肩背与侧脸反应克制，右手持续扶门，不再演一次开门或大幅回头。终态门扇退在门框后方，不能向摄影机突出。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "她留在低处平台门槛外，右手保持扶门，已看清门内同样凹痕及消失管道留下的旧卡箍印，核对后轻微侧头听辨，尚无答案",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "经过上平台凹痕与管道，正常下楼",
+        "peak": "到低处平台右手压把手向前推门，逐渐显露凹痕和旧管箍印",
+        "settle": "保持扶门并停步，核对后听辨",
+        "direction": "连续下行，随后门向内开",
+        "amplitude_class": "自然步幅和有限开门、轻微侧头"
+      },
+      "pacing": {
+        "cadence": "普通下行、到达推门、先看清差异、停步核对听辨",
+        "tempo_class": "正常原速，保留完整下行与开门反应，不按固定秒数切镜",
+        "shot_duration_seconds": 12.0
+      },
+      "camera_intent": {
+        "movement": "短随真实下行，完成到达后直接切门外中景，一次推门和同侧停步核对",
+        "stability": "稳定短跟随和门外稳定观察",
+        "framing_intent": "先看清正常平台凹痕与管道，再用门外中景同时看到右手、门槛、门内凹痕和旧印；不另切掉接触过程",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "上平台斜侧中全景，同时可辨董文慧、灭火器及管道",
+        "end_framing": "同侧门外中景，门扇退在门框后方、右手保持接触，两个门内线索可见",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "门开后看到相同凹痕但旁边管道缺失",
+        "visible_response": "见到两处细节差异后停步核对，再轻微侧头听辨，肩背与侧脸反应克制",
+        "gaze_target": "灭火器凹痕和旧卡箍印",
+        "body_behavior": "先普通下行，到门外停步，不跨门槛",
+        "hand_behavior": "右手压把手向内推门并保持接触，左手自然垂下",
+        "terminal_performance_state": "克制疑惑，听辨而未得到答案",
+        "character_directions": [
+          {
+            "character_id": "dong-wenhui",
+            "screen_identity": "灰褐外套低马尾的董文慧",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "普通下楼之后，门内出现熟悉凹痕与缺失管道的差异",
+                "emotion": "先平常通行，再克制核对",
+                "intensity": "subtle",
+                "facial_expression": "平静中轻微疑惑，不提前惊恐",
+                "gaze_target": "先看路，再核对凹痕与管道旧印",
+                "breathing": "自然平稳",
+                "body_behavior": "右手扶门，脚步停在门槛外，随后轻微侧头听辨"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "正常速度真人实拍质感",
+        "palette": "住宅旧墙灰绿与实用暖灯、窗外冷光",
+        "material_treatment": "旧楼墙漆、湿台阶、真实衣料、红灭火器和金属门",
+        "prohibited_visual_drift": [
+          "叠化、透明重影、分格或瞬移",
+          "新增人物、光效、片名或字幕"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "楼梯实用灯和雨夜窗外冷光",
+        "direction": "沿首帧普通平台和尾帧门外中景的实用光保持",
+        "exposure_priority": "凹痕、管道存在与缺失、右手门把接触和台阶可辨",
+        "continuity_state": "同一住宅雨夜，无闪光或突然换时段"
+      },
+      "ambience_intent": {
+        "environment_bed": "平台滴水、住宅生活底噪，门后环境声与门外不同",
+        "foley_cues": [
+          "正常脚步",
+          "衣料摩擦",
+          "随开门的门轴声"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "pedestal_down",
+        "direction": "down",
+        "amplitude_class": "subtle",
+        "speed_class": "slow",
+        "start_motion_state": "in_motion",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "dong-wenhui",
+        "relation_kind": "follow",
+        "start_relation": "人物、灭火器管道与折返梯段可读",
+        "end_relation": "门外同侧观察董文慧扶门与两个门内线索，不丢右手接触"
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 12,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

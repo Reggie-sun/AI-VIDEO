@@ -1,0 +1,9 @@
+{
+  "tool": "builtin-imagegen",
+  "source": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-c80ab02d-5fd6-4bd6-ae8e-4d71e91780a5.png",
+  "destination": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+  "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648",
+  "call_number": 2,
+  "known_outcome": true,
+  "observed": "free edge top lower/bottom higher than hinge edge, receding behind threshold; same woman right hand touching handle, remains outside; dynamic push still unverified"
+}

@@ -1,0 +1,91 @@
+{
+  "scope": "Per-Shot exact edited media clearance for user-selected accepted baseline only",
+  "artifact_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "artifact_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+  "explicit_project_video_analysis_sha256": "5b3555f76b4834df16f70426d5b678b7decf8eb7df0929a8ed2054d500c44cb5",
+  "human_evidence": {
+    "user_quote": "已完整看听，可以保留",
+    "question": "上一版6.83秒剪辑片，你是否已经完整看过并听过，确认切镜、动作和声音衔接可以保留？",
+    "artifact_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+    "scope": "Exact6.83s edited candidate actual full audiovisual human review; accepted source baseline for second event. Does not requalify original unedited generation or claim Final Acceptance of the whole opening.",
+    "recorded_at": "2026-10-27T08:38:14.815884+00:00"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "Parent实际28帧保持同一工人、黄色安全帽和深蓝工作服，用户完整审看认可；该末态与楼梯角色为明确换场",
+      "evidence": [
+        "../MC01-02-edit-v4/qa/frames",
+        "../MC01-02-edit-v4/qa/independent-media-review.json",
+        "human_evidence"
+      ]
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "PASS",
+      "reason": "源保留按停、门继续向右及连接后续变化，无重演，用户完整声画认可本剪辑",
+      "evidence": [
+        "../MC01-02-edit-v4/qa/frames",
+        "../MC01-02-edit-v4/qa/independent-media-review.json",
+        "human_evidence"
+      ]
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "去掉104..132源交付帧的叠化，输出frame103/104直接远转近；独立review R03已闭合，用户认可切镜",
+      "evidence": [
+        "../MC01-02-edit-v4/qa/frames",
+        "../MC01-02-edit-v4/qa/independent-media-review.json",
+        "human_evidence"
+      ]
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "PASS",
+      "reason": "保留原工人按停收手、观察受力点，未重新生成或改表演；用户完整审看认可",
+      "evidence": [
+        "../MC01-02-edit-v4/qa/frames",
+        "../MC01-02-edit-v4/qa/independent-media-review.json",
+        "human_evidence"
+      ]
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "reason": "1920x1080实用雨夜光和真实设备保留，B6不变；用户认可本段",
+      "evidence": [
+        "../MC01-02-edit-v4/qa/frames",
+        "../MC01-02-edit-v4/qa/independent-media-review.json",
+        "human_evidence"
+      ]
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "PASS",
+      "reason": "保持源设备索向、同侧和门已到限位阶段，按用户已认可的源变化审看，未声称旧构图偏好已技术修正",
+      "evidence": [
+        "../MC01-02-edit-v4/qa/frames",
+        "../MC01-02-edit-v4/qa/independent-media-review.json",
+        "human_evidence"
+      ]
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "PASS",
+      "reason": "用户明确完整听过并认可当前切镜、动作和声音衔接；盲分析能力不足的历史仍保留，此项以当前exact片的人工接受闭合，不伪称已自动测准马达/摩擦时序",
+      "evidence": [
+        "../MC01-02-edit-v4/qa/frames",
+        "../MC01-02-edit-v4/qa/independent-media-review.json",
+        "human_evidence"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "unresolved_blockers": [],
+  "previous_NOT_EVALUATED_record_retained": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/post-media-gate.json",
+  "original_raw_quality_history_retained": true,
+  "production_activation": false,
+  "whole_opening_Final_Acceptance": false
+}
