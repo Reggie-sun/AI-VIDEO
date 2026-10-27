@@ -40,6 +40,9 @@ from ai_video.production.production_strategy_contracts import (
     ProductionSourceOption,
     ProductionStrategyDecision,
 )
+from ai_video.production.production_strategy_salvage import (
+    assess_salvage_candidate, candidate_plan_key, salvage_review_for,
+)
 
 
 def _project_invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -265,6 +268,7 @@ def _materialize_child(
     previous = next((s for s in loaded.shots if s.shot_id == unit.shot_id), None)
     artifact_id, revision = (previous.artifact_id, previous.revision + 1) if previous else (unit.shot_id, 1)
     from ai_video.production.production_strategy_reader import production_parent_context
+    salvage = salvage_review_for(loaded.qa_policy, parent)
     lineage = ProductionComponentLineage(
         parent=parent_reference,
         origin_project_hash=production_parent_context(loaded, parent.shot_id)[3],
@@ -277,6 +281,8 @@ def _materialize_child(
         decision_hash=decision.decision_hash,
         operation=selected.operation,
         source=selected.source,
+        salvage_review_hash=salvage.review_hash if salvage else None,
+        salvage_plan_key=candidate_plan_key(decision.selected) if salvage else None,
     )
     return seal_artifact(Shot(
         artifact_id=artifact_id,
@@ -322,6 +328,9 @@ def prepare_strategy_commit(
 ) -> StateCommitRequest:
     """Build a P2 project/registry commit from one already-selected strategy."""
     parent = _current_parent(loaded, decision)
+    salvage = salvage_review_for(loaded.qa_policy, parent)
+    if salvage and (decision.selected is None or assess_salvage_candidate(loaded, parent, decision.selected, salvage)):
+        raise _project_invalid("Production salvage candidate is stale, unreviewed or infeasible.")
     coverage, selected_units = _selected_coverage(
         decision=decision, coverage_options=parent.production_intent.coverage_options  # type: ignore[union-attr]
     )

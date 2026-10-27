@@ -1,0 +1,96 @@
+{
+  "schema_version": "assembly-review/1",
+  "authority": "development_only",
+  "video_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "timeline_sha256": "bd7ef09c496676a88cdee6818b0110610a0547187ba8769b65c46b7d647ef241",
+  "render_report_sha256": "7a1ff29d471fcfb986c05dd82aea29ab2a35c032a42b71fad1de9a15795db57b",
+  "inventory_sha256": "5b172f29da67d239b06cf196622f708cb02ed68b3e3dff7e70ba562b80f3f9b5",
+  "evaluator_name": "Codex Parent - B6 sampled cut-state review",
+  "strength": "explicit_evaluator",
+  "junction_findings": [
+    {
+      "junction_id": "386310e83628d6558e73d1b11a4c45e744fc9d19ff180bebd9603f9c36549ce1",
+      "inventory_sha256": "5b172f29da67d239b06cf196622f708cb02ed68b3e3dff7e70ba562b80f3f9b5",
+      "edit_decision": "retain_with_reason",
+      "edit_reason": "卡车遮挡中的原接点保留；没有新增卡车重复镜头",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "前后均为同一横向车辆遮挡，人物变化由遮挡隐藏。实际MP4抽帧支持上述局部观察，未以此代替完整人工动态验收",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "事件原417帧对应PCM在编码前与原成片完全一致；未取得完整人工听音证据",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": "sampled_frames",
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "卡车遮挡中的原接点保留；没有新增卡车重复镜头；完整动态重复动作审查待人工连看"
+        },
+        "state_continuity": {
+          "verdict": "not_evaluated",
+          "observation": "前后均为同一横向车辆遮挡，人物变化由遮挡隐藏；连续动作的完整观看未代签"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "浏览器1倍速完整561帧零掉帧，但该记录不证明主观节奏与正常速度人工观看"
+        }
+      }
+    },
+    {
+      "junction_id": "8f4e18cd7e5b1d77450a459fdb881b0522a54d4dd2788cff4c338fd5792af455",
+      "inventory_sha256": "5b172f29da67d239b06cf196622f708cb02ed68b3e3dff7e70ba562b80f3f9b5",
+      "edit_decision": "retain_with_reason",
+      "edit_reason": "沿已修订版本在源361帧入近景，保留回答，不恢复旧25帧姿态接缝",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "从站台全景切通话近景，人物仍右手持电话，视线朝右。实际MP4抽帧支持上述局部观察，未以此代替完整人工动态验收",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "事件原417帧对应PCM在编码前与原成片完全一致；未取得完整人工听音证据",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": "sampled_frames",
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "沿已修订版本在源361帧入近景，保留回答，不恢复旧25帧姿态接缝；完整动态重复动作审查待人工连看"
+        },
+        "state_continuity": {
+          "verdict": "not_evaluated",
+          "observation": "从站台全景切通话近景，人物仍右手持电话，视线朝右；连续动作的完整观看未代签"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "浏览器1倍速完整561帧零掉帧，但该记录不证明主观节奏与正常速度人工观看"
+        }
+      }
+    },
+    {
+      "junction_id": "d5302ebc91502c69b3fbbf57c0dbe29a9047818efac9540060dc971e63e85543",
+      "inventory_sha256": "5b172f29da67d239b06cf196622f708cb02ed68b3e3dff7e70ba562b80f3f9b5",
+      "edit_decision": "retain_with_reason",
+      "edit_reason": "保留同站台空位回看；B5去掉前36帧重复转头，以右向持电话状态入镜。原B5源36..143按原速度，不倒放、不冻帧或新变速；其既有底片为原A3帧306附近至359的2倍时长光流段，仍是较早源素材的编辑复用",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "16.8秒近景已朝右；17.45/17.9/18.5秒全景同样朝右持电话，检查帧不再出现回正后重新右转。显影主体与终态保留。仅抽帧支持局部改善，完整动态自然度待用户审看",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "声音连续取B5头部4.5秒承接前段同一音乐，在尾1秒淡出；视觉从B5第1.5秒起，声画源窗有意不同。事件四句对白原PCM保留；未代签实际听感",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": "sampled_frames",
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "采样三态不再见旧版回正再转右；原速人工完整动作观看尚未取得，不签全范围PASS"
+        },
+        "state_continuity": {
+          "verdict": "not_evaluated",
+          "observation": "头、视线、右手持电话在实测入出截图一致；大景别切换保留，完整运动与速度感仍需审看"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "前417帧不变，后108帧保持B5原速度；没有新加速，删去重复动作前导后共21.875秒。播放器525帧零掉帧不等同艺术节奏通过"
+        }
+      }
+    }
+  ]
+}

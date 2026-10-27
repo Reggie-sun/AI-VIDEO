@@ -1,0 +1,79 @@
+{
+  "source_manifest": "referces/shizhen/macro-opening-20261027/repair-02/current-reference-usage.json",
+  "source_manifest_sha256": "533e84642cd0b36218a43527d6c786beff634682bc34f97c542ad65b8228961c",
+  "identity_parent": {
+    "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+    "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+    "role": "Review-only original identity board; inherited by six exact clean scene references, not sent as a multi-person board"
+  },
+  "actual_video_images": [
+    {
+      "reference_role": "L01",
+      "path": "referces/shizhen/macro-opening-20261027/L01-r1.png",
+      "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea",
+      "actual_model_index": 0,
+      "semantic_job": "MC03 上平台下行起态",
+      "static_observation": "VIEWED",
+      "video_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "reference_role": "L01-X",
+      "path": "referces/shizhen/macro-opening-20261027/L01-X.png",
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50",
+      "actual_model_index": 1,
+      "semantic_job": "MC03 转向继续下行",
+      "static_observation": "VIEWED",
+      "video_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "reference_role": "L02",
+      "path": "referces/shizhen/macro-opening-20261027/L02.png",
+      "sha256": "d844a00b053d2fedb7aae07843b0d03751fe969186edd5ab7a61524b0cefb039",
+      "actual_model_index": 2,
+      "semantic_job": "MC04 到达、右手接触把手",
+      "static_observation": "VIEWED",
+      "video_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "reference_role": "L02-O",
+      "path": "referces/shizhen/macro-opening-20261027/L02-O-r1.png",
+      "sha256": "4af82ec9f76de8a783fc0686a9254dd0a61e48ef723ed7554de31befdec89bff",
+      "actual_model_index": 3,
+      "semantic_job": "MC04 向内半开、线索显露",
+      "static_observation": "VIEWED",
+      "video_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "reference_role": "L03",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/L03-r2.png",
+      "sha256": "c5716f4a6ee2c1ca92723596c23910410a1db4a3d398c6f8da5b9a1c6181fdec",
+      "actual_model_index": 4,
+      "semantic_job": "MC04 门已开、未跨门槛",
+      "static_observation": "VIEWED",
+      "video_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "reference_role": "L04",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/L04.png",
+      "sha256": "fb9fbda5bc6e3dd9babfbc0098b0c6cad83c2b422e98e3d1ade70e1b69ec3491",
+      "actual_model_index": 5,
+      "semantic_job": "MC05 同次停步的侧脸核对",
+      "static_observation": "VIEWED",
+      "video_acceptance": "NOT_EVALUATED"
+    }
+  ],
+  "selected_model": "seedance_2.0_vip",
+  "selected_mode": "multimodal",
+  "duration_seconds": 12,
+  "resolution": "1080p",
+  "max_images": 9,
+  "new_image_generation_calls": 0,
+  "prior_static_failures_preserved": true,
+  "predecessor": {
+    "path": "MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+    "sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+    "relationship": "explicit scene change, do not inherit municipal cable or sound",
+    "required_media_gate": "NOT_EVALUATED_PENDING_EVIDENCE"
+  },
+  "generation_POSTs": 0
+}

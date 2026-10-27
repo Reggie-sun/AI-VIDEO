@@ -162,10 +162,10 @@ class CanvasProductionService:
         return ProductionPlanningService(committer=self.committer, targets=self.targets, policy=self.production_policy)
 
     @_input_errors
-    def prepare_production(self, *, parent_shot_id, include_control_report=False):
+    def prepare_production(self, *, parent_shot_id, include_control_report=False, include_salvage_report=False):
         """Assess existing-source/edit means before any generation, without writes."""
         return self._production_planning().prepare(parent_shot_id=parent_shot_id,
-            include_control_report=include_control_report)
+            include_control_report=include_control_report, include_salvage_report=include_salvage_report)
 
     @_input_errors
     def materialize_production(self, *, decision, attempt_id):
@@ -433,10 +433,14 @@ class CanvasProductionService:
             return None
         from ai_video.production.production_strategy_reader import production_parent_context
         try:
-            production_parent_context(loaded, position.shot_id)
+            parent, _, _, _ = production_parent_context(loaded, position.shot_id)
         except AiVideoError as error:
             raise _blocked("Closed quality repair requires an authored ProductionIntent with existing-source/edit "
                            "options and protected requirements; run prepare_production before more generation.") from error
+        from ai_video.production.production_strategy_salvage import salvage_review_for
+        if salvage_review_for(loaded.qa_policy, parent) is None:
+            raise _blocked("Closed quality repair requires a current Take salvage review in the selected QA policy; "
+                           "review exact footage before choosing an edit or another generation.")
         return self.prepare_production(parent_shot_id=position.shot_id)
 
     @_input_errors

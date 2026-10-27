@@ -1,0 +1,10 @@
+{
+  "reviewer": "/root/opening_concept_check",
+  "candidate_sha256": "f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067",
+  "scope": "Pillar interval, glyph integrity and middle-stage readability only",
+  "findings": [],
+  "observations": "所审B5帧中两字骨架完整，未见拆字残片、字柱相切或文字侵入人物。失位于两柱之间，帧位于细柱右侧，柱间留白替代B4穿字关系。3.4秒帧的巾旁仍较淡，4.6至5.8秒可辨认，未见持续丢笔。",
+  "evidence": ["B5-3.4.png", "B5-5.8.png", "playback-B5.json", "preservation-B5.json"],
+  "parent_disposition": "CONFIRMED scoped findings empty; user art acceptance pending",
+  "boundary": "Exact SHA and playback/preservation records checked; not full human listening or artistic acceptance"
+}

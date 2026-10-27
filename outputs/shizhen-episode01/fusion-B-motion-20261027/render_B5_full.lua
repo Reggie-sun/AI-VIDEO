@@ -1,0 +1,5 @@
+local p=resolve:GetProjectManager():GetCurrentProject();assert(p:GetName()=='Shizhen-B-Layered-20261027')
+local c=p:GetCurrentTimeline():GetItemListInTrack('video',1)[1]:GetFusionCompByIndex(1)
+assert(c:FindTool('PillarAsInterval'));local saver=c:FindTool('BMotionFrames')
+assert(string.find(saver.Clip[0],'render%-B5'))
+print('B5_FULL_RENDER',c:Render({Start=0,End=143,Wait=true,HiQ=true,Tool=saver}))

@@ -1,0 +1,10 @@
+{
+  "verification_level": "focused",
+  "commands": [
+    "PYTHONPATH=src .venv/bin/python -m pytest -p no:cacheprovider tests/test_open_video_skill.py tests/test_agent_harness_assembly.py -q"
+  ],
+  "result": "72 passed in 6.58s",
+  "scope": "Existing advisory Skill contract and assembly evidence validator only; documentation rule strengthened, no shared runtime implementation modified",
+  "full_suite": "NOT_RUN",
+  "media_art_acceptance": "PENDING"
+}

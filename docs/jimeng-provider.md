@@ -90,6 +90,12 @@ P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。�
 
 沿用 `VideoGenerationService.start`、`submit_once`、`refresh_once`、`fetch_once` 和标准验证/验收；仅已有 Jimeng unknown attempt 可调用 `recover_jimeng_unknown_once`，不得再次调用 `submit_once`。Paid preview 使用 `billing_mode=remote_metered`、`currency=CRD`、profile 上限及 `SecretReference(kind="secret_store", reference_id="JIMENG_BROWSER_SESSION")` 作为浏览器会话元数据。账号/profile 由私有配置注入；Cookie、Token 不写入仓库、prompt、argv、日志或 receipt。
 
+## Native Prompt Compiler Versions
+
+`jimeng_prompt.py`显式支持compiler version`2`：在request/preview/permit封存前，按native客户端相同的[ECMAScript TrimString](https://tc39.es/ecma262/2026/multipage/text-processing.html#sec-trimstring)处理最终正文的首尾空白，包含FEFF，不把Python额外识别的控制字符当作native空白。Adapter消费selected compiler contract的版本；version`1`保持历史正文bytes及hash，不隐式升级已有请求。素材引用及meta_list仍由归一化后的exact正文生成。
+
+该适配不重写QA或其native_text映射；若封存的literal fragment本身要求被trim掉的边界空白，仍返回unsupported，不能通过放宽coverage过关。内容、内部空白、参考身份、对白、完整Goal及媒体PASS要求不因此改变。历史UNKNOWN先取得真实原输入证据并沿既有reconciliation关闭，后继才可封存新compiler候选与一次性runtime repair；新版本不授权重试UNKNOWN。
+
 ## Worker Reliability Boundary
 
 原生商业执行可能只提供 `benefit_type`，省略可选 `quote_precondition`。Worker 在 admission 前用已核验、有限额的当前 quote 补齐该字段，再由原有 admission、发送前 fresh quote、HTTP/fetch fence 共同核对；generation params、reference identity 与 native selection 保持原样。已提供的 precondition 必须精确匹配，漂移或超上限仍拒绝，不静默覆盖。

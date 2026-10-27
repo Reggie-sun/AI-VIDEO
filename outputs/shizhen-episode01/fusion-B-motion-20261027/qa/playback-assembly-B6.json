@@ -1,0 +1,14 @@
+{
+  "errors": [],
+  "proof": {
+    "ended": true,
+    "rate": 1,
+    "duration": 21.875,
+    "muted": false,
+    "dropped": 0,
+    "total": 525,
+    "error": null
+  },
+  "controls": "junction seek and replay checked",
+  "boundary": "Technical 1x playback, not human listening/art acceptance"
+}

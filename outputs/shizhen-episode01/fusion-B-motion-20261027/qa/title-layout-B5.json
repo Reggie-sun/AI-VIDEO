@@ -1,0 +1,36 @@
+{
+  "scope": "Geometry diagnostic only; actual rendered frame/readability review is required",
+  "glyphs": [
+    {
+      "glyph": "失",
+      "visible_alpha_threshold": 64,
+      "predicted_bounds_pixels": [
+        413.86168761220824,
+        154.18723404255323,
+        719.4990305206463,
+        508.05957446808503
+      ]
+    },
+    {
+      "glyph": "帧",
+      "visible_alpha_threshold": 64,
+      "predicted_bounds_pixels": [
+        767.6127827648115,
+        520.0659574468084,
+        991.1072172351884,
+        808.0927659574468
+      ]
+    }
+  ],
+  "mullion_protection_x_intervals": [
+    [
+      329.28,
+      392.64
+    ],
+    [
+      741.12,
+      758.4
+    ]
+  ],
+  "note": "Both visible glyphs lie in separate open spaces, not across a protected pillar. Source glyph masks are complementary, not a redraw."
+}

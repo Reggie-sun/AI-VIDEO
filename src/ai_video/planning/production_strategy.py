@@ -21,6 +21,10 @@ from ai_video.production.production_strategy_contracts import (
 )
 from ai_video.production.source_use_evidence import assess_source_use
 from ai_video.production.visual_media import resolved_video_trim_duration
+from ai_video.production.production_strategy_salvage import (
+    assess_salvage_candidate, preferred_salvage_candidates, salvage_review_for,
+    repeated_failure_requirements,
+)
 
 
 class ProductionStrategyPolicy(StrictModel):
@@ -218,18 +222,20 @@ def _candidate(loaded, parent, coverage, selected_units, policy, capabilities):
 class ProductionStrategyResolver:
     """Enumerate production alternatives before any generation routing."""
 
-    def resolve(self, *, loaded, parent_shot_id, policy=None, capabilities=None):
+    def resolve(self, *, loaded, parent_shot_id, policy=None, capabilities=None, experiences=()):
         policy = policy or ProductionStrategyPolicy()
         capabilities = capabilities or ProductionCapabilities()
         from ai_video.production.production_strategy_reader import production_parent_context
 
         parent, _, _, _ = production_parent_context(loaded, parent_shot_id)
         intent = parent.production_intent
+        salvage = salvage_review_for(loaded.qa_policy, parent)
         input_hash = canonical_sha256({
             "project": loaded.project.content_hash, "registry": loaded.registry.content_hash,
             "manifest": loaded.manifest.model_dump(mode="json"), "parent": parent.content_hash,
             "qa": loaded.qa_policy.content_hash if loaded.qa_policy else None,
             "policy": policy.model_dump(mode="json"), "capabilities": capabilities.model_dump(mode="json"),
+            **({"salvage_history": [x.model_dump(mode="json") for x in experiences]} if salvage else {}),
         })
         common = dict(input_hash=input_hash, parent_shot_id=parent.shot_id,
             parent_shot_content_hash=parent.content_hash, task_id=intent.task_id)
@@ -244,9 +250,25 @@ class ProductionStrategyResolver:
         candidates = tuple(_candidate(loaded, parent, coverage, units, policy, capabilities)
             for coverage in intent.coverage_options
             for units in product(*(_unit_options(u) for u in coverage.units)))
+        if salvage is not None:
+            repeated = repeated_failure_requirements(experiences, parent, salvage)
+            candidates = tuple(c.model_copy(update={"blockers": tuple(dict.fromkeys((
+                *c.blockers, *assess_salvage_candidate(loaded, parent, c, salvage),
+                *(("needs_authoring_revision:salvage_repeated_failure:" + ",".join(repeated),)
+                  if repeated and c.new_generation_count else ()),
+            )))}) for c in candidates)
         feasible = tuple(c for c in candidates if not c.blockers)
         if feasible:
-            if policy.preference == "qualified_reuse":
+            if salvage is not None:
+                pending = tuple(c for c in candidates if c.new_generation_count < min(
+                    item.new_generation_count for item in feasible) and c.blockers
+                    and all(b.startswith("evidence_required:") and b != "evidence_required:source_fail"
+                            for b in c.blockers))
+                if pending:
+                    return ProductionStrategyDecision(**common, candidates=candidates,
+                        disposition="evidence_required", reasons=("salvage alternatives need observation before generation",))
+                preferred = preferred_salvage_candidates(feasible, salvage)
+            elif policy.preference == "qualified_reuse":
                 score = min(c.new_generation_count for c in feasible)
                 if policy.version == "production-strategy/2":
                     evidence_pending = tuple(
@@ -270,7 +292,11 @@ class ProductionStrategyResolver:
                 preferred = feasible
             if len(preferred) == 1:
                 return ProductionStrategyDecision(**common, candidates=candidates,
-                    selected=preferred[0], disposition="selected")
+                    selected=preferred[0], disposition="selected",
+                    reasons=(("Evidence-qualified existing footage preserves the required events; new output still needs P6 review",)
+                             if salvage and preferred[0].new_generation_count == 0 else
+                             ("All lower-generation alternatives are infeasible; generate only selected missing components",)
+                             if salvage else ()))
             return ProductionStrategyDecision(**common, candidates=candidates,
                 disposition="unresolved_choice", reasons=("equally preferred production alternatives",))
         reasons = tuple(dict.fromkeys(b for c in candidates for b in c.blockers))

@@ -40,22 +40,30 @@ class ProductionPlanningService:
             generation_targets_hash=canonical_sha256({"targets": observations}))
 
     def _resolve(self, loaded, parent_shot_id):
+        from ai_video.production.production_strategy_reader import production_parent_context
+        from ai_video.production.production_strategy_salvage import salvage_review_for
+        parent, _, _, _ = production_parent_context(loaded, parent_shot_id)
+        history = self.committer.read_generation_experiences() if salvage_review_for(loaded.qa_policy, parent) else ()
         return ProductionStrategyResolver().resolve(loaded=loaded,
-            parent_shot_id=parent_shot_id, policy=self.policy, capabilities=self._capabilities())
+            parent_shot_id=parent_shot_id, policy=self.policy, capabilities=self._capabilities(), experiences=history)
 
-    def prepare(self, *, parent_shot_id, include_control_report=False):
+    def prepare(self, *, parent_shot_id, include_control_report=False, include_salvage_report=False):
         """Standard read, bounded candidate production, no state/media effects."""
         loaded = self._load()
         decision = self._resolve(loaded, parent_shot_id)
-        if not include_control_report:
+        if not include_control_report and not include_salvage_report:
             return decision
         from ai_video.production.production_responsibility import production_responsibility_report
         from ai_video.production.production_strategy_reader import production_parent_context
 
         parent, _, _, _ = production_parent_context(loaded, parent_shot_id)
-        return {"decision": decision.model_dump(mode="json"),
+        result = {"decision": decision.model_dump(mode="json"),
             "production_control": production_responsibility_report(qa_policy=loaded.qa_policy,
                 shot=parent, decision=decision, qa_authority="selected_policy")}
+        if include_salvage_report:
+            from ai_video.production.production_strategy_salvage import salvage_report
+            result["salvage"] = salvage_report(loaded, parent, decision)
+        return result
 
     def reassess_generation(self, *, component_shot_id, prepared_generation):
         """Route generation's authoring exit back to the same approved intent."""
@@ -118,6 +126,10 @@ class ProductionPlanningService:
                 or shot.production_lineage.source is not None
                 or any(r.asset_ids for r in shot.required_asset_roles if r.role == "primary_visual")):
             raise _invalid("Only an unresolved selected generation component can be generated.")
+        from ai_video.production.production_strategy_reader import production_parent_context
+        from ai_video.production.production_strategy_salvage import salvage_review_for, candidate_plan_key
+        parent, _, _, _ = production_parent_context(loaded, component_shot_id)
+        salvage = salvage_review_for(loaded.qa_policy, parent)
         if limits.task_id != shot.production_lineage.task_id:
             raise _invalid("Generation must retain the production task identity.")
         current_strategy = self._resolve(loaded, component_shot_id)
@@ -128,6 +140,9 @@ class ProductionPlanningService:
                 or selected.coverage.coverage_id != shot.production_lineage.coverage_id
                 or selected.allocation_hash != shot.production_lineage.allocation_hash):
             raise _invalid("Production inputs changed; reassess and materialize the current strategy first.")
+        if salvage and (shot.production_lineage.salvage_review_hash != salvage.review_hash
+                        or shot.production_lineage.salvage_plan_key != candidate_plan_key(selected)):
+            raise _invalid("Generation requires the current materialized salvage plan.")
 
         def selected_context(current):
             result = context_loader(current, component_shot_id)

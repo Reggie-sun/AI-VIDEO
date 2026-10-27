@@ -3,15 +3,15 @@
   "authority": "development_only",
   "creative_input": {
     "path": "review-creative-input.txt",
-    "sha256": "ccbe5161bf4da0bfc265cffc2c94f07af84094061d892716767003baaa6f009f"
+    "sha256": "3b4247291f0e17772b354158cfff40d3880735a6f37c93f8b175d0578bb1db89"
   },
   "coverage": {
     "path": "director-coverage.json",
-    "sha256": "9dae932447d31a2c493814fb5685daeacddd51c491d20a68b7e9b4e9cade6da9"
+    "sha256": "91850a1af0ab4041630eecd5036887e8f3c2cc48bada47ca23ca883f9a819eee"
   },
   "final_output_contract": {
     "path": "final-output-contract.json",
-    "sha256": "e31c31e26080cbf040d3ece9f3650cc6afba0643b9e9fd2a0a22355fff38e4e2"
+    "sha256": "f997e2be36141af72c8805449902b0f63106de591ef3133e6d1eda5f76b87ad5"
   },
   "bindings": [
     {
@@ -380,6 +380,38 @@
       ],
       "requirement_ids": [
         "intent-23"
+      ]
+    },
+    {
+      "intent_item_id": "intent-24",
+      "constraint_ids": [
+        "intent-24"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-24"
+      ]
+    },
+    {
+      "intent_item_id": "intent-25",
+      "constraint_ids": [
+        "intent-25"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-25"
       ]
     }
   ]

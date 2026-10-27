@@ -1,0 +1,49 @@
+{
+  "candidate_sha256": "f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067",
+  "protected_roi": [
+    1050,
+    120,
+    1920,
+    850
+  ],
+  "protected_roi_comparison": [
+    {
+      "frame": 0,
+      "max_channel_difference": 0,
+      "mean_channel_difference": 0.0
+    },
+    {
+      "frame": 24,
+      "max_channel_difference": 0,
+      "mean_channel_difference": 0.0
+    },
+    {
+      "frame": 48,
+      "max_channel_difference": 0,
+      "mean_channel_difference": 0.0
+    },
+    {
+      "frame": 72,
+      "max_channel_difference": 0,
+      "mean_channel_difference": 0.0
+    },
+    {
+      "frame": 96,
+      "max_channel_difference": 0,
+      "mean_channel_difference": 0.0
+    },
+    {
+      "frame": 120,
+      "max_channel_difference": 0,
+      "mean_channel_difference": 0.0
+    },
+    {
+      "frame": 143,
+      "max_channel_difference": 0,
+      "mean_channel_difference": 0.0
+    }
+  ],
+  "decoded_audio_identical_to_B4": true,
+  "pcm_sha256": "3dd2b3edecdfb9bd01ea823f0d35a2a0b3252ae7a0ec8399b8e30961d1f5c9e2",
+  "boundaries": "Pixel/PCM preservation only; does not prove perceived depth, optical-flow quality, human hearing or artistic acceptance"
+}

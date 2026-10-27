@@ -1,0 +1,188 @@
+{
+  "artifact_id": "rendered-review-assembly",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "4944b1812e7d74950c640b88d311a6ee33400f7f4defdc11209f2040b7bc52eb",
+  "creation_receipt_id": "user-requested-existing-render-assembly",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/8402716c1833c4000ab0edfec240ce4004240b9b8989cc2bef032612a206193b.json",
+      "content_hash": "8402716c1833c4000ab0edfec240ce4004240b9b8989cc2bef032612a206193b"
+    }
+  ],
+  "composition_id": "standalone-B5-assembly",
+  "shot_ids": [
+    "CO-A1",
+    "CO-A2",
+    "CO-A3",
+    "CO-TAIL"
+  ],
+  "layers": [
+    {
+      "layer_id": "retained-CO-A1",
+      "shot_id": "CO-A1",
+      "asset_role": "primary_visual",
+      "asset_id": "event-render",
+      "trim_start_frame": 0,
+      "trim_duration_frames": 184,
+      "source_audio_policy": "REPLACE",
+      "source_audio_reason": "P4 uses PCM decoded from this exact existing rendered mix, at unity gain, event exact windows retained; tail uses original music continuation with end fade and its picture starts 36 frames later",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    },
+    {
+      "layer_id": "retained-CO-A2",
+      "shot_id": "CO-A2",
+      "asset_role": "primary_visual",
+      "asset_id": "event-render",
+      "trim_start_frame": 184,
+      "trim_duration_frames": 66,
+      "source_audio_policy": "REPLACE",
+      "source_audio_reason": "P4 uses PCM decoded from this exact existing rendered mix, at unity gain, event exact windows retained; tail uses original music continuation with end fade and its picture starts 36 frames later",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    },
+    {
+      "layer_id": "retained-CO-A3",
+      "shot_id": "CO-A3",
+      "asset_role": "primary_visual",
+      "asset_id": "event-render",
+      "trim_start_frame": 250,
+      "trim_duration_frames": 167,
+      "source_audio_policy": "REPLACE",
+      "source_audio_reason": "P4 uses PCM decoded from this exact existing rendered mix, at unity gain, event exact windows retained; tail uses original music continuation with end fade and its picture starts 36 frames later",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    },
+    {
+      "layer_id": "retained-CO-TAIL",
+      "shot_id": "CO-TAIL",
+      "asset_role": "primary_visual",
+      "asset_id": "title-render",
+      "trim_start_frame": 36,
+      "trim_duration_frames": 108,
+      "source_audio_policy": "REPLACE",
+      "source_audio_reason": "P4 uses PCM decoded from this exact existing rendered mix, at unity gain, event exact windows retained; tail uses original music continuation with end fade and its picture starts 36 frames later",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    }
+  ],
+  "transitions": [
+    {
+      "from_shot_id": "CO-A1",
+      "to_shot_id": "CO-A2",
+      "kind": "cut",
+      "duration_frames": 0
+    },
+    {
+      "from_shot_id": "CO-A2",
+      "to_shot_id": "CO-A3",
+      "kind": "cut",
+      "duration_frames": 0
+    },
+    {
+      "from_shot_id": "CO-A3",
+      "to_shot_id": "CO-TAIL",
+      "kind": "cut",
+      "duration_frames": 0
+    }
+  ],
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "requested_renderer": "hyperframes",
+  "audio_tracks": [
+    {
+      "track_id": "retained-mix-CO-A1",
+      "audio_kind": "dialogue",
+      "asset_id": "event-render-mix",
+      "shot_id": "CO-A1",
+      "start_sample": null,
+      "trim_start_sample": 0,
+      "trim_duration_samples": 368000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "retained-mix-CO-A2",
+      "audio_kind": "dialogue",
+      "asset_id": "event-render-mix",
+      "shot_id": "CO-A2",
+      "start_sample": null,
+      "trim_start_sample": 368000,
+      "trim_duration_samples": 132000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "retained-mix-CO-A3",
+      "audio_kind": "dialogue",
+      "asset_id": "event-render-mix",
+      "shot_id": "CO-A3",
+      "start_sample": null,
+      "trim_start_sample": 500000,
+      "trim_duration_samples": 334000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "retained-mix-CO-TAIL",
+      "audio_kind": "dialogue",
+      "asset_id": "title-render-mix",
+      "shot_id": "CO-TAIL",
+      "start_sample": null,
+      "trim_start_sample": 0,
+      "trim_duration_samples": 216000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 48000,
+      "ducking": null
+    }
+  ],
+  "caption_tracks": [],
+  "graphic_layer_ids": [],
+  "graphic_layer_animations": [],
+  "commercial_graphics": [],
+  "advertising_sound_cues": [],
+  "ad_creative_plan_id": null,
+  "ad_creative_plan_hash": null
+}

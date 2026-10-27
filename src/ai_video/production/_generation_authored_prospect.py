@@ -2,7 +2,10 @@
 
 from ai_video.production.generation_visual_revision import validate_visual_revision_goal
 from ai_video.production.video import VideoGenerationMode
-from ai_video.production.generation_authored_retarget import _same_goal_with_new_version
+from ai_video.production.generation_authored_retarget import (
+    _acceptance_revision_ids,
+    _same_goal_with_new_version,
+)
 
 
 def is_same_rubric_authored_prospect(*, inputs, projection, policy, latest, prior):
@@ -43,7 +46,7 @@ def is_same_rubric_authored_prospect(*, inputs, projection, policy, latest, prio
 
 
 def is_authored_generation_retarget_prospect(*, inputs, projection, policy, latest, prior):
-    """Recognize an exact same-QA Seedance 2.0 R2V target during diagnosis."""
+    """Recognize an exact same-model R2V retarget with permitted raw-QA revisions."""
     try:
         limits = inputs.limits
         if (
@@ -79,15 +82,28 @@ def is_authored_generation_retarget_prospect(*, inputs, projection, policy, late
         if (
             prior.capabilities.provider_name != target.capabilities.provider_name
             or old_variant.provider_kind != new_variant.provider_kind
-            or old_variant.model_id == new_variant.model_id
             or new_variant.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
-            or prior.recipe.acceptance_policy != target.recipe.acceptance_policy
             or not _same_goal_with_new_version(prior.final_output_goal, target.final_output_goal)
             or source[0].projection.requirement.generation_intent == projection.requirement.generation_intent
             or new_variant.output_capability is None
             or not new_variant.output_capability.supports(target.output_requirement)
             or "reference" not in new_variant.allowed_image_roles
         ):
+            return False
+        if old_variant.model_id == new_variant.model_id:
+            if (
+                old_variant.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
+                or prior.capability_id != target.capability_id
+                or prior.capabilities != target.capabilities
+                or prior.compiler_contract != target.compiler_contract
+                or prior.output_requirement != target.output_requirement
+                or _acceptance_revision_ids(
+                    prior.recipe.acceptance_policy, target.recipe.acceptance_policy,
+                    intent=projection.requirement.generation_intent,
+                ) is None
+            ):
+                return False
+        elif prior.recipe.acceptance_policy != target.recipe.acceptance_policy:
             return False
         return True
     except (AttributeError, TypeError, ValueError, StopIteration):

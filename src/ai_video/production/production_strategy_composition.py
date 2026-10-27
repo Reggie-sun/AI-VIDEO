@@ -17,6 +17,16 @@ def validate_strategy_composition_uses(bundle, spec):
             continue
         lineage = child.production_lineage
         parent, _, _, _ = production_parent_context(bundle, child.shot_id)
+        from ai_video.production.production_strategy_salvage import (
+            review_context_blockers, salvage_review_for,
+        )
+        salvage = salvage_review_for(bundle.qa_policy, parent)
+        if salvage is not None or lineage.salvage_review_hash is not None:
+            plan = next((p for p in salvage.candidate_plans if p.plan_key == lineage.salvage_plan_key), None) if salvage else None
+            if (salvage is None or lineage.salvage_review_hash != salvage.review_hash
+                    or plan is None or plan.viability != "feasible"
+                    or review_context_blockers(bundle, parent, salvage)):
+                raise _invalid("Actual composition requires the current exact salvage review and materialized plan.")
         coverage = next(c for c in parent.production_intent.coverage_options
                         if c.coverage_id == lineage.coverage_id)
         unit = next(u for u in coverage.units if u.component_id == lineage.component_id)

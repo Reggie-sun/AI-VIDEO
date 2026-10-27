@@ -471,6 +471,8 @@ mandatory changed-path routing 仍由 `.agent/harness/policy.yaml` 独占。
 
 ## Generation Decision Loop
 
+`generation_authored_retarget.py` 封存既有 supersession `/5` 的 R2V 目标；`_generation_authored_prospect.py` 与 `_qualification_authoring_revision.py` 分别核验 prospective candidate 和 canonical closure/submit-lock。同模型修订仅允许 known fetched FAIL、原 task/Shot/Provider、原 exact media/output/capability/compiler；旧 image binding 对象须全部保留，新增图必须恰好匹配 sealed `additional_image_reference_ids`。QA仅可修订 sealed `revised_requirement_ids` 列出的既有 raw required rules，复用 `/4` 的字段边界并保持全部IDs/proof/stage/dimension/owner及其他规则；空声明保持原exact QA/参考限制且省略序列化，旧目标hash不变，模型切换分支不消费这些新增声明。完整Goal内容不变，仅Goal version前进，Project恰好+1；保留全部历史、paid quota n→n+1、零resample、remote/budget authorization与新permit，UNKNOWN不进入此分支。不新增writer或执行链，准入不证明表演质量。针对性验证见 `tests/test_generation_authored_retarget.py` 与 `tests/test_generation_authored_prospect.py`。
+
 `generation_coverage_revision.py` 是 authored coverage target 与准入predicate的无writer叶模块；`generation_visual_revision.py` 的supersession `/2` 与原committer复用唯一关闭/严格重开路径，`/1` 历史hash不变。`GenerationIntent` 既有语义camera/framing字段承载已批准切镜文字，不新增runtime镜头枚举或第二timeline；具体切镜仍须exact MP4逐项验证。新target只允许有界摄影/物理调度修订，保护对白、声音、身份、原首帧及未失败QA；budget/quota/permit/QA acceptance原owner保持。
 
 `generation_resolution_revision.py` 仅拥有typed输出分辨率升级目标、纯qualification准入与锁内原`/3` lineage核验；不写state或操作Provider。`generation_visual_revision.py`沿既有唯一committer/reader封存旧known fetched result，旧`/1`、`/2`序列化不变；exact prompt、参考、intent、非分辨率output与原raw QA保持，NE不签PASS。新规格仍经selected profile/compiler、累计paid/count与原permit执行，新MP4重新审片，不赋予activation/qualification。
@@ -480,6 +482,8 @@ mandatory changed-path routing 仍由 `.agent/harness/policy.yaml` 独占。
 用户明确改变既有目标时，authored target 的可选 `goal_requirement_revisions` 逐项封存旧/新 requirement 与 exact closure 授权引用，仅允许改 observable，旧 IDs、proof 和未声明项保持；空字段不写入历史payload，旧 `/4` hash保持可重开。纯前瞻检查不冻结已被用户修订的 `user_goal` 原文，submit锁仍核对 exact target/Goal/Project。一次续作按已消费n→n+1封存，全部retained同task调用须与durable paid集合精确相等，不能将证据条数或新task名称当作重置消费的依据；其他visual/coverage/resolution目标冻结规则不变。
 
 Authored 续作可以保留正确首帧而修订表演文字；由旧 multimodal 转为唯一 first-frame 时允许移除旧 media bindings，目标仍禁止新增 media。仅当 sealed 输出时长与未变 authored pacing 确实矛盾、尚无任何 successor video request、当前 Project/QA/原授权均精确匹配时，`ProductionStateCommitter.correct_unsubmitted_authored_timing` 可把输出及 profile 校正到原意图时长；`previous_supersession` 保留旧 immutable target，最多一次校正，严格 reader 重验两者。不得改变意图、QA、Goal、首帧、Project、Provider/model 或历史消费；不创建 paid side effect，不替代新 preview、quota、budget 和 permit。
+
+未提交的 `/5` target 若仅遗漏既有动作图的人物归属，`ProductionStateCommitter.correct_unsubmitted_retarget_references` 可在正常 authoring 后追加一次引用归属恢复。`unsubmitted_retarget_references` 校验原角色、造型、Shot及所有其他Project字段不变，只补回旧exact source中同角色拥有且新target仍选用的图片；原身份母图不得移除。`previous_supersession` 保留原target和一跳Project修订，strict reader与submit锁均重开该关系；禁止任何successor video request之后修订、改intent/QA/Goal/输入bytes/model/output或历史消费，重复链拒绝、exact replay零写入。preflight仅识别候选，第二个Project修订不能独立授权submit；新preview、累计预算/quota、一用permit和逐镜媒体Gate不变。
 
 `generation_visual_revision.py` 独占已 fetched 版本的 typed supersession receipt 与 exact lineage 校验；唯一 writer 仍为 `ProductionStateCommitter.supersede_video_generation`。`_lifecycle_schema` 绑定 terminal reason / pointer，原 feedback reader 重开历史 QA / request / selected candidate / projection / media，封存后的观察只允许 exact replay。`_qualification_visual_revision.py` 仅验证同任务的新视觉版本及 submit-lock predecessor，不拥有选择、预算、quota、permit、activation 或质量结论；正常 authoring revision、Router、原 Paid owner 与逐镜 Gate 保持独占。
 
@@ -1077,3 +1081,7 @@ Canvas 的显式 `source_video` handoff 仍由 `CanvasProductionService.handoff_
 不是 `known_no_effect`，不授权 unknown retry，且后继 start/submit 重新核验并消费 one-use grant。
 
 本矩阵只定义 surface-level focused gate。最终交付遵守 `AGENTS.md`：检查实际 diff ownership，报告与改动影响相称的实际验证、剩余风险、未验证区域及 publication 状态；仅在完成正式 Harness 时报告其 fresh passing receipt，局部验证不冒充完整 Harness。
+
+## First No-effect Native Compiler Recovery
+
+`_qualification_compiler_repair.py`仅给既有`generation_execution`提供纯scope判定：同Jimeng模型compiler1→2 native首尾空白适配，首次canonical /3 paid-no-effect runtime grant、完整known-media历史、unique paid attempts累计used与单次used+1 ceiling、零resample；原Goal/recipe/output/reference约束保持。重复评价同request/media不重复计费，身份冲突与UNKNOWN拒绝。Registered grant、exact corrective receipt、完整持久history、quota、预算、one-use permit及真实媒体Gate仍由原committer/paid owners裁决；此predicate不写state、不恢复UNKNOWN、不授权媒体PASS。对应checks为`tests/test_qualification_compiler_repair.py`、`tests/test_generation_execution_guards.py`与`tests/test_generation_runtime_repair.py`。

@@ -1,0 +1,55 @@
+{
+  "output": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+  "sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "bytes": 24390940,
+  "size_bytes": 24390940,
+  "timeline_frames": 525,
+  "timeline_fingerprint": "35348b5e4f978c782a5ccb445caab6a669a56d0b526bd08562e6379db7a52445",
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 525,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 1050624,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 624,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "0835fd16e2bd1865aa8a468f48756b04af896499bae505e2cc0cefd3c0460d35",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_audio_matches_new_visual_windows": false,
+  "usage_scope": "production",
+  "native_dialogue": "Existing event mix decoded to PCM with same-window trims; all four lines and captions retained. B5 audio starts at zero for music continuity and fades out over last second; tail audio and picture have explicitly different windows. This is a rendered-film assembly, not raw requalification.",
+  "title_plate": "B5 picture frames36..143 at unchanged speed; omitted repeated head-turn lead. All lettering/reveal thereafter retained. 4.5sec tail with original-speed audio from B5 start and 1sec end fade, music remains continuous. No new generation.",
+  "s01": "OUT_OF_SCOPE_NOT_INCLUDED",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

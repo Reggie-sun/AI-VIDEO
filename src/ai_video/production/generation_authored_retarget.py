@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
@@ -48,6 +49,8 @@ class AuthoredGenerationRetargetTarget(StrictModel):
     target_project: ProjectSnapshotPointer
     image_bindings: tuple[VideoImageReferenceBinding, ...] = Field(min_length=1)
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
+    revised_requirement_ids: tuple[str, ...] = ()
+    additional_image_reference_ids: tuple[str, ...] = ()
     authorization_reference: str = Field(min_length=1)
     rationale: str = Field(min_length=1)
     content_hash: str = Field(pattern=_SHA256)
@@ -64,11 +67,29 @@ class AuthoredGenerationRetargetTarget(StrictModel):
         media_keys = tuple((item.role, item.asset_id) for item in self.media_bindings)
         if media_keys != tuple(sorted(set(media_keys))):
             raise ValueError("authored media references must use unique canonical asset order")
+        for name, values in (
+            ("revised requirement IDs", self.revised_requirement_ids),
+            ("additional image reference IDs", self.additional_image_reference_ids),
+        ):
+            if any(not value.strip() for value in values) or values != tuple(sorted(set(values))):
+                raise ValueError(f"authored {name} must be unique and in canonical order")
         if not self.image_bindings and not self.media_bindings:
             raise ValueError("authored reference-to-video target needs exact reference inputs")
         if self.content_hash != canonical_sha256(self.model_dump(mode="json", exclude={"content_hash"})):
             raise ValueError("authored retarget target content hash is invalid")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_legacy_compatible_target(self, handler):
+        data = handler(self)
+        # /5 targets were sealed before these additive repair declarations
+        # existed. Omit empty defaults so their persisted bytes and hashes stay
+        # valid while non-empty declarations remain part of the exact seal.
+        if not self.revised_requirement_ids:
+            data.pop("revised_requirement_ids", None)
+        if not self.additional_image_reference_ids:
+            data.pop("additional_image_reference_ids", None)
+        return data
 
     @classmethod
     def create(cls, **values) -> "AuthoredGenerationRetargetTarget":
@@ -95,6 +116,49 @@ def _source_candidate(experience):
     return candidate, variants[0]
 
 
+def _acceptance_revision_ids(old: DomainAcceptancePolicy, new: DomainAcceptancePolicy, *, intent=None):
+    """Return the exact permitted old raw QA IDs changed, or None if inadmissible."""
+    if old == new:
+        return ()
+    try:
+        from ai_video.production.generation_authoring_revision import (
+            _raw_rules,
+            _validate_acceptance,
+        )
+
+        # The narrow /5 repair can revise observables on existing raw required
+        # rules only. Requirement inventory and required IDs remain fixed.
+        if old.required_requirement_ids != new.required_requirement_ids:
+            return None
+        old_rules = _raw_rules(old)
+        new_rules = _raw_rules(new)
+        if set(old_rules) != set(new_rules):
+            return None
+        revised = tuple(sorted(
+            requirement_id for requirement_id, old_rule in old_rules.items()
+            if old_rule != new_rules[requirement_id]
+        ))
+        if not revised:
+            return None
+        _validate_acceptance(old, SimpleNamespace(
+            acceptance=new, revised_requirement_ids=revised, intent=intent,
+        ))
+        return revised
+    except (AttributeError, KeyError, TypeError, ValueError):
+        return None
+
+
+def _image_append_ids(old_bindings, new_bindings):
+    """Return only newly appended exact images; reject edits/removals of prior refs."""
+    old_by_id = {item.asset_id: item for item in old_bindings}
+    new_by_id = {item.asset_id: item for item in new_bindings}
+    if len(old_by_id) != len(old_bindings) or len(new_by_id) != len(new_bindings):
+        return None
+    if any(new_by_id.get(asset_id) != item for asset_id, item in old_by_id.items()):
+        return None
+    return tuple(sorted(set(new_by_id) - set(old_by_id)))
+
+
 def _validate_target_against_source(*, source_request, task_id, shot_id, experience,
                                    target: AuthoredGenerationRetargetTarget) -> None:
     target = target.verify()
@@ -104,9 +168,36 @@ def _validate_target_against_source(*, source_request, task_id, shot_id, experie
         or target.shot_id != shot_id
         or target.provider_name != candidate.capabilities.provider_name
         or target.provider_kind != variant.provider_kind
-        or target.model_id == variant.model_id
     ):
-        raise ValueError("authored retarget must preserve task, Shot, Provider and kind while selecting a new model")
+        raise ValueError("authored retarget must preserve task, Shot, Provider and kind")
+    if target.model_id == variant.model_id:
+        # A same-model performance repair cannot silently change conditioning,
+        # output or compiler. The original exact paid source owns those inputs.
+        if (
+            source_request.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
+            or target.mode is not source_request.mode
+            or target.media_bindings != source_request.media_bindings
+            or target.output_requirement != source_request.output_requirement
+            or target.capability_id != candidate.capability_id
+            or target.capabilities_fingerprint != candidate.capabilities.capabilities_fingerprint
+            or target.compiler_contract != candidate.compiler_contract
+        ):
+            raise ValueError("same-model authored repair must preserve exact R2V inputs, output and compiler")
+        acceptance_revisions = _acceptance_revision_ids(
+            candidate.recipe.acceptance_policy, target.acceptance, intent=target.intent,
+        )
+        image_additions = _image_append_ids(source_request.image_bindings, target.image_bindings)
+        if (
+            acceptance_revisions is None
+            or target.revised_requirement_ids != acceptance_revisions
+            or image_additions is None
+            or target.additional_image_reference_ids != image_additions
+        ):
+            raise ValueError("same-model authored repair declarations must exactly match permitted QA and image additions")
+    elif target.revised_requirement_ids or target.additional_image_reference_ids:
+        # Model swaps retain the pre-existing route: the additive declarations
+        # below authorize only the same-model repair case.
+        raise ValueError("authored QA and image-addition declarations are limited to same-model repairs")
     if source_request.base_project is None or target.target_project.revision != source_request.base_project.revision + 1:
         raise ValueError("authored retarget Project must advance the exact source snapshot by one revision")
     if not experience.evidence:
@@ -123,8 +214,8 @@ def _validate_target_against_source(*, source_request, task_id, shot_id, experie
         or evidence.rubric_hash != candidate.recipe.rubric_hash
     ):
         raise ValueError("authored retarget must retain the exact known fetched Shot evaluation")
-    if target.acceptance != candidate.recipe.acceptance_policy:
-        raise ValueError("authored retarget cannot change the selected QA acceptance contract")
+    if target.model_id != variant.model_id and target.acceptance != candidate.recipe.acceptance_policy:
+        raise ValueError("model-swapped authored retarget cannot change the selected QA acceptance contract")
     if target.intent == experience.projection.requirement.generation_intent:
         raise ValueError("authored retarget must change the exact failed Shot intent")
 
@@ -165,10 +256,15 @@ def _same_goal_with_new_version(old: FinalOutputContract, new: FinalOutputContra
 
 def validate_authored_generation_retarget_binding(
     binding, selected, target: AuthoredGenerationRetargetTarget, *, target_goal,
-    authorization_receipt_id: str,
+    authorization_receipt_id: str, previous_target=None,
 ) -> None:
     """Match the compiled /5 request, all inputs and the advanced unchanged goal."""
     target = target.verify()
+    source_target = target
+    if previous_target is not None:
+        from .unsubmitted_retarget_references import validate_target_rebase
+        validate_target_rebase(previous_target, target)
+        source_target = previous_target
     if target.authorization_reference != authorization_receipt_id:
         raise ValueError("retarget target must cite the exact authorization receipt")
     experiences = tuple(binding.inputs.experiences)
@@ -187,7 +283,7 @@ def validate_authored_generation_retarget_binding(
         task_id=binding.inputs.limits.task_id,
         shot_id=binding.context.target_shot_id,
         experience=experience,
-        target=target,
+        target=source_target,
     )
     if (
         any(item.outcome == "unknown_outcome" for item in binding.inputs.evidence)
@@ -259,6 +355,7 @@ def validate_authored_generation_retarget_binding(
         or request.image_bindings != target.image_bindings
         or request.media_bindings != target.media_bindings
         or selected.final_output_goal != target_goal
+        or selected.recipe.acceptance_policy != target.acceptance
     ):
         raise ValueError("compiled multimodal retarget differs from its sealed exact target")
 

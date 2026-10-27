@@ -341,7 +341,7 @@ checks:
     covered_by_check_ids: [production_dependency_tests]
     description: Verify image/P7 graph and selective rebuild boundaries; skip only after the full dependency owner passes in this run.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_jimeng.py, tests/test_jimeng_shot_modes.py, tests/test_jimeng_causal_compilation.py, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_h3_max.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_seedance_rejection.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_jimeng.py, tests/test_jimeng_shot_modes.py, tests/test_jimeng_causal_compilation.py, tests/test_jimeng_authored_prompt.py, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_h3_max.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_seedance_rejection.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
@@ -360,7 +360,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
   authored_visual_revision_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_visual_revision.py, tests/test_qualification_visual_revision.py, tests/test_qualification_quality_repair.py, tests/test_generation_coverage_revision.py, tests/test_generation_coverage_supersession.py, tests/test_generation_resolution_revision.py, tests/test_generation_resolution_supersession.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_visual_revision.py, tests/test_unsubmitted_retarget_references.py, tests/test_generation_authored_retarget.py, tests/test_generation_authored_prospect.py, tests/test_qualification_visual_revision.py, tests/test_qualification_quality_repair.py, tests/test_qualification_compiler_repair.py, tests/test_generation_coverage_revision.py, tests/test_generation_coverage_supersession.py, tests/test_generation_resolution_revision.py, tests/test_generation_resolution_supersession.py, -q]
     cwd: .
     description: Verify explicit fetched-version supersession, retained observations and paid history, and one exact authored visual qualification unit.
   generation_feedback_tests:
@@ -750,6 +750,8 @@ categories:
       - src/ai_video/production/generation_evaluation_criteria.py
       - src/ai_video/production/requirement_semantics.py
       - src/ai_video/production/generation_execution.py
+      - src/ai_video/production/_qualification_compiler_repair.py
+      - tests/test_qualification_compiler_repair.py
       - src/ai_video/production/generation_decision.py
       - src/ai_video/production/generation_diagnosis.py
       - src/ai_video/production/_state_commit_generation_feedback.py
@@ -792,12 +794,18 @@ categories:
   authored_visual_revision:
     patterns:
       - src/ai_video/production/generation_visual_revision.py
+      - src/ai_video/production/unsubmitted_retarget_references.py
       - src/ai_video/production/_qualification_visual_revision.py
       - src/ai_video/production/generation_authoring_revision.py
+      - src/ai_video/production/generation_authored_retarget.py
+      - src/ai_video/production/_generation_authored_prospect.py
       - src/ai_video/production/_qualification_authoring_revision.py
       - src/ai_video/production/generation_coverage_revision.py
       - src/ai_video/production/generation_resolution_revision.py
       - tests/test_generation_visual_revision.py
+      - tests/test_unsubmitted_retarget_references.py
+      - tests/test_generation_authored_retarget.py
+      - tests/test_generation_authored_prospect.py
       - tests/test_qualification_visual_revision.py
       - tests/test_generation_coverage_revision.py
       - tests/test_generation_coverage_supersession.py
@@ -1453,6 +1461,7 @@ categories:
       - tests/test_production_jimeng.py
       - tests/test_jimeng_shot_modes.py
       - tests/test_jimeng_causal_compilation.py
+      - tests/test_jimeng_authored_prompt.py
       - tests/test_production_minimax_h3.py
       - tests/test_production_metaso_h3.py
       - tests/test_production_minimax_h3_max.py

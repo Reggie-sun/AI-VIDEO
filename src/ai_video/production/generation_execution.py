@@ -346,6 +346,9 @@ class GenerationDecisionExecutionBinding(StrictModel):
             from ai_video.production._qualification_quality_repair import allows_one_known_quality_repair
 
             quality_repair_trial = allows_one_known_quality_repair(self, selected)
+            from ai_video.production._qualification_compiler_repair import allows_first_no_effect_compiler_repair
+
+            compiler_repair_trial = allows_first_no_effect_compiler_repair(self, selected)
             from ai_video.production._qualification_visual_revision import allows_authored_visual_revision
 
             visual_revision_trial = allows_authored_visual_revision(self, selected)
@@ -372,7 +375,7 @@ class GenerationDecisionExecutionBinding(StrictModel):
                 or not (initial_trial or recovery_trial or recovery_trial_three
                         or recovery_trial_four or recovery_trial_five or quality_repair_trial
                         or visual_revision_trial or coverage_revision_trial or resolution_revision_trial
-                        or authored_generation_revision_trial)
+                        or authored_generation_revision_trial or compiler_repair_trial)
                 or not self.policy.remote_authorized
                 or not self.policy.budget_authorized
             ):

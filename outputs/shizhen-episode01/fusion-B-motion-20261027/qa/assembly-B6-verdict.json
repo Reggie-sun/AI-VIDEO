@@ -1,0 +1,106 @@
+{
+  "answers_sha256": "04b5701499d409f46da8282cee77c9a853130789dcb1165e5c4de49505e5d955",
+  "authority": "development_only",
+  "evaluator_name": "Codex Parent - B6 sampled cut-state review",
+  "inventory_sha256": "5b172f29da67d239b06cf196622f708cb02ed68b3e3dff7e70ba562b80f3f9b5",
+  "junction_review": {
+    "cuts": [
+      {
+        "audio_basis": "not_listened",
+        "audio_observation": "事件原417帧对应PCM在编码前与原成片完全一致；未取得完整人工听音证据",
+        "audio_reason": null,
+        "audio_verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "卡车遮挡中的原接点保留；没有新增卡车重复镜头",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated",
+          "action_repetition_not_evaluated",
+          "action_state_continuity_not_evaluated",
+          "action_pacing_not_evaluated"
+        ],
+        "frame": 184,
+        "from_shot_id": "CO-A1",
+        "junction_id": "386310e83628d6558e73d1b11a4c45e744fc9d19ff180bebd9603f9c36549ce1",
+        "to_shot_id": "CO-A2",
+        "verdict": "not_evaluated",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "visual_observation": "前后均为同一横向车辆遮挡，人物变化由遮挡隐藏。实际MP4抽帧支持上述局部观察，未以此代替完整人工动态验收",
+        "visual_verdict": "not_evaluated"
+      },
+      {
+        "audio_basis": "not_listened",
+        "audio_observation": "事件原417帧对应PCM在编码前与原成片完全一致；未取得完整人工听音证据",
+        "audio_reason": null,
+        "audio_verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "沿已修订版本在源361帧入近景，保留回答，不恢复旧25帧姿态接缝",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated",
+          "action_repetition_not_evaluated",
+          "action_state_continuity_not_evaluated",
+          "action_pacing_not_evaluated"
+        ],
+        "frame": 250,
+        "from_shot_id": "CO-A2",
+        "junction_id": "8f4e18cd7e5b1d77450a459fdb881b0522a54d4dd2788cff4c338fd5792af455",
+        "to_shot_id": "CO-A3",
+        "verdict": "not_evaluated",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "visual_observation": "从站台全景切通话近景，人物仍右手持电话，视线朝右。实际MP4抽帧支持上述局部观察，未以此代替完整人工动态验收",
+        "visual_verdict": "not_evaluated"
+      },
+      {
+        "audio_basis": "not_listened",
+        "audio_observation": "声音连续取B5头部4.5秒承接前段同一音乐，在尾1秒淡出；视觉从B5第1.5秒起，声画源窗有意不同。事件四句对白原PCM保留；未代签实际听感",
+        "audio_reason": null,
+        "audio_verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "保留同站台空位回看；B5去掉前36帧重复转头，以右向持电话状态入镜。原B5源36..143按原速度，不倒放、不冻帧或新变速；其既有底片为原A3帧306附近至359的2倍时长光流段，仍是较早源素材的编辑复用",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated",
+          "action_repetition_not_evaluated",
+          "action_state_continuity_not_evaluated",
+          "action_pacing_not_evaluated"
+        ],
+        "frame": 417,
+        "from_shot_id": "CO-A3",
+        "junction_id": "d5302ebc91502c69b3fbbf57c0dbe29a9047818efac9540060dc971e63e85543",
+        "to_shot_id": "CO-TAIL",
+        "verdict": "not_evaluated",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "visual_observation": "16.8秒近景已朝右；17.45/17.9/18.5秒全景同样朝右持电话，检查帧不再出现回正后重新右转。显影主体与终态保留。仅抽帧支持局部改善，完整动态自然度待用户审看",
+        "visual_verdict": "not_evaluated"
+      }
+    ],
+    "evidence_gaps": [
+      "normal_speed_human_playback_unverified",
+      "visual_not_evaluated",
+      "audio_not_listened",
+      "audio_not_evaluated",
+      "action_repetition_not_evaluated",
+      "action_state_continuity_not_evaluated",
+      "action_pacing_not_evaluated"
+    ],
+    "verdict": "not_evaluated"
+  },
+  "limitation": "Validates exact bindings and declared evidence, not semantic detection or human acceptance",
+  "production_acceptance": "NOT_EVALUATED",
+  "purpose": "assembly_review_evidence",
+  "render_report_sha256": "7a1ff29d471fcfb986c05dd82aea29ab2a35c032a42b71fad1de9a15795db57b",
+  "strength": "explicit_evaluator",
+  "timeline_sha256": "bd7ef09c496676a88cdee6818b0110610a0547187ba8769b65c46b7d647ef241",
+  "verdict": "not_evaluated",
+  "video_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a"
+}

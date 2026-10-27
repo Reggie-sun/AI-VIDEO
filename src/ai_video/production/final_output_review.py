@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_serializer
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.artifact_contracts import StrictModel
@@ -26,6 +26,14 @@ class FinalOutputObservation(StrictModel):
     viewing_mode: Literal["sampled_frames", "full_playback"] | None = None
     visual_frame_inventory: VisualFrameInventory | None = None
     findings: tuple[FinalOutputFinding, ...] = Field(min_length=1)
+    audio_reviewed: bool | None = Field(default=None, strict=True)
+
+    @model_serializer(mode="wrap")
+    def _legacy_shape(self, handler):
+        data = handler(self)
+        if self.audio_reviewed is None:
+            data.pop("audio_reviewed", None)
+        return data
 
 
 @dataclass(frozen=True)
@@ -44,7 +52,8 @@ class FinalOutputAdjudication:
     evidence_gaps: tuple[str, ...]
 
 
-def adjudicate_final_output_details(contract, evidence, *, review_request_content_hash):
+def adjudicate_final_output_details(contract, evidence, *, review_request_content_hash,
+                                   continuous_requirement_ids=()):
     """Compute eligible observations once, retaining global incomplete evidence."""
     rules = {r.requirement_id: r for r in contract.requirements}
     observations = {name: [] for name in rules}
@@ -76,6 +85,12 @@ def adjudicate_final_output_details(contract, evidence, *, review_request_conten
             continue
         for finding in source.findings:
             rule = rules[finding.requirement_id]
+            if finding.requirement_id in continuous_requirement_ids and (
+                source.viewing_mode != "full_playback" or source.viewing_speed_milli != 1000
+                or source.audio_reviewed is not True
+            ):
+                gaps[finding.requirement_id].append("continuous_audiovisual_review_required")
+                continue
             if rule.visual_dimension is not None and not valid_visual_finding(rule, finding, source, item):
                 gaps[finding.requirement_id].append("invalid_visual_proof")
                 continue
@@ -106,10 +121,12 @@ def adjudicate_final_output_details(contract, evidence, *, review_request_conten
     return FinalOutputAdjudication(verdict, tuple(requirements), tuple(dict.fromkeys(global_gaps)))
 
 
-def adjudicate_final_output(contract, evidence, *, review_request_content_hash):
+def adjudicate_final_output(contract, evidence, *, review_request_content_hash,
+                            continuous_requirement_ids=()):
     """Preserve the aggregate API as a projection of the shared calculation."""
     return adjudicate_final_output_details(contract, evidence,
-        review_request_content_hash=review_request_content_hash).verdict
+        review_request_content_hash=review_request_content_hash,
+        continuous_requirement_ids=continuous_requirement_ids).verdict
 
 
 def adjudicate_semantic_review(policy, evidence, *, review_request_content_hash):
@@ -127,8 +144,11 @@ def adjudicate_semantic_review(policy, evidence, *, review_request_content_hash)
     if not authorized:
         return QaVerdict.NOT_EVALUATED
     if policy.final_output is not None:
+        continuous_ids = tuple({i for r in policy.production_salvage_reviews
+            for i in (*r.transition_requirement_ids, *r.scene_requirement_ids)})
         final_verdict = adjudicate_final_output(policy.final_output, authorized,
-            review_request_content_hash=review_request_content_hash)
+            review_request_content_hash=review_request_content_hash,
+            continuous_requirement_ids=continuous_ids)
         if final_verdict is not QaVerdict.PASS or policy.domain_acceptance is None:
             return final_verdict
     if policy.domain_acceptance is not None:

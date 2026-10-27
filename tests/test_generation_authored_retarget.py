@@ -178,7 +178,7 @@ def _retarget_binding(old_binding, experience, target, *, request_changes=None,
     ), selected
 
 
-def _changed_acceptance(policy):
+def _changed_acceptance(policy, *, changes=None):
     from ai_video.production.domain_acceptance import DomainAcceptancePolicy
     from ai_video.production.hashing import canonical_sha256
 
@@ -187,7 +187,12 @@ def _changed_acceptance(policy):
     payload.pop("content_hash")
     payload["profile_version"] = f"{policy.profile_version}-tampered"
     rules = [dict(item) for item in payload["generation_requirements"]]
-    rules[0]["observable"] = "Changed QA observable that was never authorized."
+    updates = changes or {rules[0]["requirement_id"]: {
+        "observable": "Changed QA observable that was never authorized.",
+    }}
+    for rule in rules:
+        for field, value in updates.get(rule["requirement_id"], {}).items():
+            rule[field] = value
     payload["generation_requirements"] = rules
     digest = canonical_sha256(payload)
     payload["content_hash"] = digest
@@ -212,6 +217,9 @@ def test_retarget_target_seals_exact_model_mode_and_full_image_media_references(
     assert len(target.image_bindings) == 2
     assert len(target.media_bindings) == 1
     assert target.verify().content_hash == target.content_hash
+    serialized = target.model_dump(mode="json")
+    assert "revised_requirement_ids" not in serialized
+    assert "additional_image_reference_ids" not in serialized
     prospective, selected = _retarget_binding(old_binding, experience, target)
     from ai_video.production.generation_authored_retarget import (
         validate_authored_generation_retarget_binding,
@@ -368,3 +376,314 @@ def test_retarget_qualification_admits_only_one_known_exact_next_submit(tmp_path
         )
     unknown, unknown_selected = _retarget_binding(old_binding, experience, target, unknown=True)
     assert not allows_authored_generation_retarget(unknown, unknown_selected)
+
+
+def _same_model_reference_repair(tmp_path):
+    """A pure guard fixture whose baseline already has the complete R2V inputs."""
+    from test_generation_visual_revision import _ready_fixture
+
+    writer, prior, experience = _ready_fixture(tmp_path, evaluation_verdict="FAIL")
+    original = writer._reopen_generation_execution_binding(prior.video_generation_state.execution_binding)
+    initial = _retarget_target(original, experience)
+    source, source_selected = _retarget_binding(original, experience, initial)
+    source_request = source.compiled_request.activation_scope.request
+    candidate = SimpleNamespace(**{
+        **vars(source_selected), "scope_hash": experience.candidate.scope_hash,
+        "recipe": experience.candidate.recipe,
+        "final_output_goal": experience.candidate.final_output_goal,
+    })
+    evidence = experience.evidence[-1].model_copy(update={
+        "request_hash": source_request.request_input_hash,
+    })
+    retained = SimpleNamespace(projection=experience.projection, candidate=candidate,
+                               evidence=(evidence,))
+    baseline = SimpleNamespace(compiled_request=source.compiled_request,
+        inputs=source.inputs, context=source.context, projection=experience.projection)
+    target = _retarget_target(baseline, retained)
+    repaired, selected = _retarget_binding(baseline, retained, target,
+        request_changes={"prompt_text": source_request.prompt_text + " Urgent restrained speech."})
+    # The real capability document is unchanged by a fresh node/profile pointer.
+    selected.capabilities = candidate.capabilities
+    return baseline, retained, target, repaired, selected
+
+
+def test_same_model_r2v_repair_preserves_inputs_and_admits_exact_one_next_submit(tmp_path):
+    from ai_video.production.generation_authored_retarget import (
+        validate_authored_generation_retarget_target,
+        validate_authored_generation_retarget_binding,
+    )
+    from ai_video.production._qualification_authoring_revision import allows_authored_generation_retarget
+    from ai_video.production._generation_authored_prospect import is_authored_generation_retarget_prospect
+
+    baseline, retained, target, repaired, selected = _same_model_reference_repair(tmp_path)
+    validate_authored_generation_retarget_target(baseline, retained, target)
+    validate_authored_generation_retarget_binding(repaired, selected, target,
+        target_goal=selected.final_output_goal, authorization_receipt_id=target.authorization_reference)
+    assert allows_authored_generation_retarget(repaired, selected)
+    projection = SimpleNamespace(requirement=SimpleNamespace(
+        target_shot=SimpleNamespace(shot_id=target.shot_id), generation_intent=target.intent))
+    assert is_authored_generation_retarget_prospect(inputs=repaired.inputs, projection=projection,
+        policy=repaired.policy, latest=repaired.inputs.evidence[-1], prior=retained.candidate)
+
+
+def test_same_model_repair_seals_explicit_performance_qa_and_additive_closeup_references(tmp_path):
+    from ai_video.production.generation_authored_retarget import (
+        validate_authored_generation_retarget_target,
+        validate_authored_generation_retarget_binding,
+    )
+    from ai_video.production.video import VideoImageReferenceBinding
+    from ai_video.production._qualification_authoring_revision import allows_authored_generation_retarget
+    from ai_video.production._generation_authored_prospect import is_authored_generation_retarget_prospect
+
+    baseline, retained, original, _, _ = _same_model_reference_repair(tmp_path)
+    # The previously fixed output contract remains unchanged while the raw QA
+    # coverage and performance observables gain explicit revisions.
+    coverage_and_performance = _changed_acceptance(
+        retained.candidate.recipe.acceptance_policy,
+        changes={
+            "duration": {"observable": "The continuous authored event uses multiple camera shots and one settled bottle state."},
+            "performance": {"observable": "Visible anxious face and hurried, restrained speech while checking the impossible absence."},
+        },
+    )
+    closeups = (
+        VideoImageReferenceBinding(
+            role="reference", asset_id="s03-closeup-face-a", asset_sha256="a" * 64,
+            mime_type="image/png", width=1920, height=1080, size_bytes=101_000,
+        ),
+        VideoImageReferenceBinding(
+            role="reference", asset_id="s03-closeup-face-b", asset_sha256="b" * 64,
+            mime_type="image/png", width=1920, height=1080, size_bytes=102_000,
+        ),
+    )
+    target = _retarget_target(
+        baseline, retained,
+        image_bindings=tuple(sorted((*original.image_bindings, *closeups), key=lambda item: item.asset_id)),
+        acceptance=coverage_and_performance,
+        revised_requirement_ids=("duration", "performance"),
+        additional_image_reference_ids=("s03-closeup-face-a", "s03-closeup-face-b"),
+    )
+    validate_authored_generation_retarget_target(baseline, retained, target)
+    assert target.output_requirement == baseline.compiled_request.activation_scope.request.output_requirement
+    bound_by_id = {item.asset_id: item for item in target.image_bindings}
+    for item in original.image_bindings:
+        assert bound_by_id[item.asset_id] == item
+    for item in closeups:
+        assert bound_by_id[item.asset_id] == item
+    assert target.verify().content_hash == target.content_hash
+
+    prompt = baseline.compiled_request.activation_scope.request.prompt_text
+    repaired, selected = _retarget_binding(
+        baseline, retained, target,
+        request_changes={
+            "prompt_text": prompt + " Multi-shot coverage, visible anxious closeup, immediate reaction.",
+        },
+    )
+    # The candidate's QA recipe is the new exact acceptance contract.
+    selected.capabilities = retained.candidate.capabilities
+    selected.recipe = SimpleNamespace(acceptance_policy=coverage_and_performance)
+    validate_authored_generation_retarget_binding(
+        repaired, selected, target, target_goal=selected.final_output_goal,
+        authorization_receipt_id=target.authorization_reference,
+    )
+    assert allows_authored_generation_retarget(repaired, selected)
+    projection = SimpleNamespace(requirement=SimpleNamespace(
+        target_shot=SimpleNamespace(shot_id=target.shot_id), generation_intent=target.intent))
+    assert is_authored_generation_retarget_prospect(
+        inputs=repaired.inputs, projection=projection, policy=repaired.policy,
+        latest=repaired.inputs.evidence[-1], prior=retained.candidate,
+    )
+
+
+@pytest.mark.parametrize("change", [
+    "undeclared_qa", "wrong_qa_declaration", "changed_proof", "undeclared_image",
+    "removed_original", "changed_original_hash", "wrong_image_declaration",
+])
+def test_same_model_repair_rejects_undeclared_or_non_additive_qa_and_images(tmp_path, change):
+    from ai_video.production.generation_authored_retarget import (
+        validate_authored_generation_retarget_target,
+    )
+    from ai_video.production.video import VideoImageReferenceBinding
+
+    baseline, retained, original, _, _ = _same_model_reference_repair(tmp_path)
+    old_acceptance = retained.candidate.recipe.acceptance_policy
+    revised_acceptance = _changed_acceptance(
+        old_acceptance,
+        changes={"performance": {"observable": "The subject visibly shows anxiety in a readable closeup."}},
+    )
+    additional = VideoImageReferenceBinding(
+        role="reference", asset_id="s03-new-closeup", asset_sha256="a" * 64,
+        mime_type="image/png", width=1920, height=1080, size_bytes=90_000,
+    )
+    images = (*original.image_bindings, additional)
+    values = {
+        "image_bindings": tuple(sorted(images, key=lambda item: item.asset_id)),
+        "acceptance": revised_acceptance,
+        "revised_requirement_ids": ("performance",),
+        "additional_image_reference_ids": (additional.asset_id,),
+    }
+    if change == "undeclared_qa":
+        values["revised_requirement_ids"] = ()
+    elif change == "wrong_qa_declaration":
+        values["revised_requirement_ids"] = ("duration",)
+    elif change == "changed_proof":
+        old_proof = next(
+            item["proof"] for item in old_acceptance.profile_payload["generation_requirements"]
+            if item["requirement_id"] == "performance"
+        )
+        values["acceptance"] = _changed_acceptance(
+            old_acceptance, changes={"performance": {
+                "proof": "human" if old_proof != "human" else "technical",
+            }},
+        )
+    elif change == "undeclared_image":
+        values["image_bindings"] = tuple(sorted(images, key=lambda item: item.asset_id))
+        values["additional_image_reference_ids"] = ()
+    elif change == "removed_original":
+        values["image_bindings"] = original.image_bindings[1:]
+        values["additional_image_reference_ids"] = ()
+    elif change == "changed_original_hash":
+        changed = original.image_bindings[0].model_copy(update={"asset_sha256": "f" * 64})
+        values["image_bindings"] = tuple(sorted(
+            (changed, *original.image_bindings[1:]), key=lambda item: item.asset_id,
+        ))
+        values["additional_image_reference_ids"] = ()
+    elif change == "wrong_image_declaration":
+        values["additional_image_reference_ids"] = ("s03-not-bound",)
+
+    target = _retarget_target(baseline, retained, **values)
+    with pytest.raises(ValueError):
+        validate_authored_generation_retarget_target(baseline, retained, target)
+
+
+def test_same_model_repair_rejects_duplicate_or_nonraw_declarations(tmp_path):
+    from ai_video.production.generation_authored_retarget import (
+        _acceptance_revision_ids,
+    )
+    from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+    from ai_video.production.hashing import canonical_sha256
+    from ai_video.production.video import VideoImageReferenceBinding
+
+    baseline, retained, original, _, _ = _same_model_reference_repair(tmp_path)
+    old_acceptance = retained.candidate.recipe.acceptance_policy
+    old_proof = next(
+        item["proof"] for item in old_acceptance.profile_payload["generation_requirements"]
+        if item["requirement_id"] == "performance"
+    )
+    changed_proof = _changed_acceptance(old_acceptance, changes={
+        "performance": {"proof": "human" if old_proof != "human" else "technical"},
+    })
+    assert _acceptance_revision_ids(old_acceptance, changed_proof) is None
+    assert _acceptance_revision_ids(
+        old_acceptance,
+        old_acceptance.model_copy(update={"measurement_contract_version": "unapproved-v2"}),
+    ) is None
+    renamed_data = old_acceptance.model_dump(mode="json")
+    renamed_payload = renamed_data["profile_payload"]
+    renamed_payload.pop("content_hash")
+    renamed_ids = tuple(
+        "performance-renamed" if item == "performance" else item
+        for item in renamed_data["required_requirement_ids"]
+    )
+    renamed_payload["required_requirement_ids"] = list(renamed_ids)
+    renamed_payload["generation_requirements"] = [
+        {
+            **rule,
+            "requirement_id": "performance-renamed"
+            if rule["requirement_id"] == "performance" else rule["requirement_id"],
+        }
+        for rule in renamed_payload["generation_requirements"]
+    ]
+    renamed_hash = canonical_sha256(renamed_payload)
+    renamed_payload["content_hash"] = renamed_hash
+    renamed_data.update(
+        required_requirement_ids=renamed_ids,
+        profile_content_hash=renamed_hash,
+        profile_payload=renamed_payload,
+    )
+    renamed_acceptance = DomainAcceptancePolicy.model_validate(renamed_data)
+    assert _acceptance_revision_ids(old_acceptance, renamed_acceptance) is None
+
+    extra = VideoImageReferenceBinding(
+        role="reference", asset_id="s03-extra", asset_sha256="c" * 64,
+        mime_type="image/png", width=1920, height=1080, size_bytes=80_000,
+    )
+    with pytest.raises(ValueError, match="unique and in canonical order"):
+        _retarget_target(
+            baseline, retained,
+            image_bindings=tuple(sorted((*original.image_bindings, extra), key=lambda item: item.asset_id)),
+            additional_image_reference_ids=("s03-extra", "s03-extra"),
+        )
+    with pytest.raises(ValueError, match="unique and in canonical order"):
+        _retarget_target(
+            baseline, retained,
+            revised_requirement_ids=("performance", "performance"),
+        )
+    with pytest.raises(ValueError, match="unique canonical asset order"):
+        _retarget_target(
+            baseline, retained,
+            image_bindings=tuple(sorted(
+                (*original.image_bindings, original.image_bindings[0]),
+                key=lambda item: item.asset_id,
+            )),
+        )
+
+    # Removing a previously required raw-generation rule is not a revision of
+    # that rule; the existing /4 validator and shared delta predicate reject it.
+    reduced = old_acceptance.model_copy(update={
+        "required_requirement_ids": tuple(
+            item for item in old_acceptance.required_requirement_ids if item != "performance"
+        ),
+    })
+    assert _acceptance_revision_ids(old_acceptance, reduced) is None
+
+
+@pytest.mark.parametrize("change", ["images", "media", "output", "compiler", "capability"])
+def test_same_model_repair_cannot_retarget_conditioning_or_execution_contract(tmp_path, change):
+    from ai_video.production.generation_authored_retarget import (
+        AuthoredGenerationRetargetTarget, validate_authored_generation_retarget_target,
+    )
+    from ai_video.production._shot_router_contracts import AdapterCompilerContract
+
+    baseline, retained, target, _, _ = _same_model_reference_repair(tmp_path)
+    values = {key: getattr(target, key) for key in type(target).model_fields if key != "content_hash"}
+    if change == "images":
+        values["image_bindings"] = (target.image_bindings[0].model_copy(update={"asset_sha256": "f" * 64}),
+                                    *target.image_bindings[1:])
+    elif change == "media":
+        values["media_bindings"] = ()
+    elif change == "output":
+        values["output_requirement"] = target.output_requirement.model_copy(update={"duration_seconds": 14})
+    elif change == "compiler":
+        values["compiler_contract"] = AdapterCompilerContract.create(compiler_id="other", compiler_version="1")
+    else:
+        values["capability_id"] = "other"
+    changed = AuthoredGenerationRetargetTarget.create(**values)
+    with pytest.raises(ValueError, match="same-model authored repair"):
+        validate_authored_generation_retarget_target(baseline, retained, changed)
+
+
+@pytest.mark.parametrize("change", ["unknown", "quota", "resample", "remote", "budget", "same_prompt", "images", "output"])
+def test_same_model_compiled_repair_remains_fail_closed(tmp_path, change):
+    from ai_video.production._qualification_authoring_revision import allows_authored_generation_retarget
+
+    baseline, _, _, repaired, selected = _same_model_reference_repair(tmp_path)
+    if change == "unknown":
+        item = repaired.inputs.evidence[-1].model_copy(update={"outcome": "unknown_outcome"})
+        repaired.inputs = repaired.inputs.model_copy(update={"evidence": (item,), "latest_attempt_hash": item.evidence_hash})
+    elif change == "quota":
+        repaired.inputs = repaired.inputs.model_copy(update={"limits": repaired.inputs.limits.model_copy(
+            update={"paid_submit_ceiling": 3})})
+    elif change == "resample":
+        repaired.inputs = repaired.inputs.model_copy(update={"policy": repaired.inputs.policy.model_copy(
+            update={"max_resamples": 1})})
+    elif change in {"remote", "budget"}:
+        setattr(repaired.policy, change + "_authorized", False)
+    else:
+        request = repaired.compiled_request.activation_scope.request
+        key, value = ({
+            "same_prompt": ("prompt_text", baseline.compiled_request.activation_scope.request.prompt_text),
+            "images": ("image_bindings", request.image_bindings[1:]),
+            "output": ("output_requirement", request.output_requirement.model_copy(update={"duration_seconds": 14})),
+        })[change]
+        repaired.compiled_request.activation_scope.request = request.model_copy(update={key: value})
+    assert not allows_authored_generation_retarget(repaired, selected)

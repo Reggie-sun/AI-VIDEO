@@ -372,9 +372,11 @@ def verify_generation_feedback(root, state, request):
                     validate_authored_generation_retarget_target,
                 )
 
-                validate_authored_generation_retarget_target(
-                    binding, experience, receipt.authored_retarget
-                )
+                source_target = receipt.authored_retarget
+                if receipt.previous_supersession is not None:
+                    original = load_generation_visual_supersession(root, receipt.previous_supersession)
+                    source_target = original.authored_retarget
+                validate_authored_generation_retarget_target(binding, experience, source_target)
             from ai_video.production.generation_evaluation import validate_generation_evaluation_sources
             from ai_video.production.project import load_qa_policy
 

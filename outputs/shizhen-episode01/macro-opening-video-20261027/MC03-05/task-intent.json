@@ -1,0 +1,26 @@
+{
+  "user_quote": "开始第二个shot",
+  "coverage": [
+    "MC03",
+    "MC04",
+    "MC05"
+  ],
+  "model_id": "seedance_2.0_vip",
+  "resolution": "1080p",
+  "duration_seconds": 12,
+  "native_audio": true,
+  "new_generation_count_limit": 1,
+  "macro_paid_submits_before": 3,
+  "macro_cumulative_ceiling": 4,
+  "automatic_retries": 0,
+  "predecessor_gate": "NOT_EVALUATED",
+  "start_submit_blocked_until": "predecessor-media-clearance.json exact all required PASS plus human evidence",
+  "no_reuse_aborted_empty_node": "node_gm3a1rrn58",
+  "protected": [
+    "B6",
+    "font",
+    "music",
+    "story",
+    "character identity"
+  ]
+}

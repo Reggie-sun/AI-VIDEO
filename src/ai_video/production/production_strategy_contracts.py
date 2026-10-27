@@ -187,6 +187,22 @@ class ProductionComponentLineage(StrictModel):
     decision_hash: str = Field(pattern=SHA256)
     operation: ProductionOperation
     source: ProductionSourceOption | None = None
+    salvage_review_hash: str | None = Field(default=None, pattern=SHA256)
+    salvage_plan_key: str | None = Field(default=None, pattern=SHA256)
+
+    @model_validator(mode="after")
+    def _salvage_pair(self):
+        if (self.salvage_review_hash is None) != (self.salvage_plan_key is None):
+            raise ValueError("salvage lineage needs both exact review and plan identities")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _salvage_legacy_shape(self, handler):
+        data = handler(self)
+        if self.salvage_review_hash is None:
+            data.pop("salvage_review_hash", None)
+            data.pop("salvage_plan_key", None)
+        return data
 
     @model_validator(mode="after")
     def _parent_path(self):

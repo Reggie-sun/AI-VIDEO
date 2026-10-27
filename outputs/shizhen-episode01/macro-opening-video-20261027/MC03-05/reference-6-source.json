@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "sha256": "fb9fbda5bc6e3dd9babfbc0098b0c6cad83c2b422e98e3d1ade70e1b69ec3491",
+  "size_bytes": 1879409,
+  "width": 1672,
+  "height": 941,
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "fictional_characters": true,
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Actual image viewed and byte-checked for this approved stair event; static state does not prove motion",
+  "source_path": "referces/shizhen/macro-opening-20261027/repair-02/L04.png",
+  "reference_role": "L04"
+}

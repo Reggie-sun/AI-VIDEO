@@ -1,0 +1,74 @@
+{
+  "project": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-fusion-B-motion-20261027/project-assembly-B5",
+  "sources": [
+    {
+      "shot_id": "CO-A1",
+      "asset_id": "CO-A1-review-video",
+      "raw_root": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A1",
+      "attempt_id": "shizhen-CO-A1-qualification-001",
+      "start": 8,
+      "frames": 184,
+      "sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+      "transform": {
+        "video_fit": "cover"
+      },
+      "audio_id": "CO-A1-original-mix"
+    },
+    {
+      "shot_id": "CO-A2",
+      "asset_id": "CO-A2-review-video",
+      "raw_root": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2",
+      "attempt_id": "shizhen-CO-A2-qualification-001",
+      "start": 30,
+      "frames": 66,
+      "sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+      "transform": {},
+      "audio_id": "CO-A2-original-mix"
+    },
+    {
+      "shot_id": "CO-A3",
+      "asset_id": "CO-A3-review-video",
+      "raw_root": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3",
+      "attempt_id": "shizhen-CO-A3-qualification-001",
+      "start": 361,
+      "frames": 167,
+      "sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "transform": {},
+      "audio_id": "CO-A3-original-mix"
+    },
+    {
+      "shot_id": "CO-TAIL",
+      "asset_id": "fusion-title-composite",
+      "raw_root": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3",
+      "attempt_id": "shizhen-CO-A3-qualification-001",
+      "start": 0,
+      "frames": 144,
+      "sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "transform": {},
+      "audio_id": "CO-TAIL-original-mix",
+      "source_asset_id": "CO-A3-review-video"
+    }
+  ],
+  "order": [
+    "CO-A1",
+    "CO-A2",
+    "CO-A3",
+    "CO-TAIL"
+  ],
+  "caption_id": "A1-local-editorial-captions",
+  "style": {
+    "artifact_id": "shizhen-bilingual-style-v4",
+    "content_hash": "c0258ca10836547a872d57b5ae9def7f97ed5c18174d53e8eccaea6268e90e67",
+    "path": "assets/styles/c0258ca10836547a872d57b5ae9def7f97ed5c18174d53e8eccaea6268e90e67.json",
+    "revision": 4
+  },
+  "title_frames": 0,
+  "music_asset_id": "two-passengers-missing-response-B",
+  "music_source_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+  "music_note": "B candidate used only on title, no score over the event or S01; motif/style human review pending",
+  "cold_open_frames": 417,
+  "total_frames": 561,
+  "scope": "development_audio_preview",
+  "production_activation": false,
+  "publication_state": "NOT_PUBLISHED"
+}

@@ -1,0 +1,21 @@
+{
+  "candidate_sha256": "f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067",
+  "scope": "B5 pillar/title composition only, not full opening",
+  "evidence": ["video-analysis-B5.json", "playback-B5.json", "preservation-B5.json", "B5-4.6.png", "B5-5.8.png"],
+  "observations": {
+    "major_strokes_clear_of_pillars": "PASS in reviewed final-output frames",
+    "separated_glyph_integrity": "No visible detached fragments in reviewed frames",
+    "asymmetric_relationship": "失 sits upper-left of the thin mullion; 帧 sits lower-right, clear of the woman",
+    "protected_source_region": "Seven sampled PNG ROIs identical to B4",
+    "audio": "Decoded PCM identical to B4; not a human listening claim",
+    "playback": "144 frames, 24fps, 6s, 1x, zero reported drops"
+  },
+  "remaining_limits": [
+    "Early latent phase intentionally low contrast; full readability belongs to later reveal",
+    "Terminal dark-letter layer remains an existing aesthetic limitation",
+    "Local optical-flow slowdown and source AI badge retained",
+    "Full opening, rights clearance and human artistic acceptance not evaluated by these checks"
+  ],
+  "artistic_acceptance": "PENDING_USER_REVIEW",
+  "publication": "LOCAL_REVIEW_ONLY"
+}

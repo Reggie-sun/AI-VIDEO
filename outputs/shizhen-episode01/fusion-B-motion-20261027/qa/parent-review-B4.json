@@ -1,0 +1,18 @@
+{
+  "candidate": "variant-B4/失帧-Fusion片名试片-B4.mp4",
+  "sha256": "e00963afc77ac0501243657bf1a60afe1ac16482b70d6911e1cb2a9c59f206a8",
+  "scope": "Six-second title image-layer refinement, no S01 or core-event changes",
+  "checks": {
+    "media": "PASS: 6s, 144 frames, 24fps, 1080p, H264/AAC",
+    "normal_speed_browser": "PASS: 144 total / 0 dropped, ended, no errors; B3 comparison and B4 replay verified",
+    "protected_woman_right_street": "PASS within seven checked intermediate PNG frames: zero pixel difference to B3 in ROI [1050,120,1920,850]",
+    "original_sound_structure": "PASS: decoded PCM identical to B3",
+    "visible_development": "Partial glyphs at 3s, increasing form through 4s, full readable form in final second; real rain highlights retained in sampled frames",
+    "depth_and_typography": "Improved relative to B3 in examined frames, but frequency separation only approximates image layers; not actual scene depth segmentation",
+    "full_audiovisual_art_acceptance": "PENDING_USER; no human hearing claim",
+    "full_independent_opening": "NOT_EVALUATED: title clip only"
+  },
+  "paid_generation_calls": 0,
+  "production_activation": false,
+  "publication": "LOCAL_REVIEW_ONLY"
+}

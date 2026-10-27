@@ -200,7 +200,8 @@ class JimengVideoProvider:
         from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
 
         native = compile_jimeng_native_prompt(
-            compiler_id=self._profile.compiler_id, compiler_version="1",
+            compiler_id=self._profile.compiler_id,
+            compiler_version=provider_bound.compiler_contract.compiler_version,
             requirement=requirement, provider_bound=provider_bound,
             continuity_expression=continuity_expression,
         )
@@ -208,7 +209,8 @@ class JimengVideoProvider:
             return native
         compiled = compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
-            compiler_id=self._profile.compiler_id, compiler_version="1",
+            compiler_id=self._profile.compiler_id,
+            compiler_version=provider_bound.compiler_contract.compiler_version,
             capabilities=self.capabilities(), continuity_expression=continuity_expression,
             native_prompt=native,
         )

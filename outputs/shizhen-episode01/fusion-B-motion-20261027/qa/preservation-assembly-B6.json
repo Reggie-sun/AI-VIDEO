@@ -1,0 +1,26 @@
+{
+  "output_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "frames": 525,
+  "event_frames": 417,
+  "title_frames": 108,
+  "event_preservation": {
+    "mean_absolute_8bit_error": 2.5067775640598633,
+    "frame_mean_error_max": 2.6356738683127574
+  },
+  "title_preservation": {
+    "mean_absolute_8bit_error": 2.338572030749886,
+    "frame_mean_error_max": 2.403661908436214
+  },
+  "event_pcm_before_encoding_identical": true,
+  "tail_audio_design": "B5 source0..216000, final48000 samples fade-out; visual source36..143 frames",
+  "audio_comparison_note": "Whole-film differences expected from deliberate last-second fade and measured AAC lag; no PCM identity claim",
+  "audio_same_window_reference_samples": 1050000,
+  "audio_rms_error": 0.048513658344745636,
+  "audio_correlation": -0.08685808878851865,
+  "audio_peak": 0.4629197418689728,
+  "input_sha256": {
+    "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/variant-R3/失帧-独立开场-空位片名-R3.mp4": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+    "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-B-motion-20261027/variant-B5/失帧-Fusion片名试片-B5.mp4": "f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067"
+  },
+  "boundaries": "Lossy re-encode comparison; no new actions/text/sound authored. Metrics do not replace listening or whole-film artistic review."
+}

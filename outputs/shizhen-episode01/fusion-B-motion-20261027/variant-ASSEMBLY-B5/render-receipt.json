@@ -1,0 +1,55 @@
+{
+  "output": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B5/失帧-独立开场-ASSEMBLY-B5.mp4",
+  "sha256": "edeacc78b2fd85fb33565aee742a6c5745a106962b5a86efc06b8a5d5e0a87fb",
+  "bytes": 25509958,
+  "size_bytes": 25509958,
+  "timeline_frames": 561,
+  "timeline_fingerprint": "7bc14b614383eee1de9de89a03aa6173594d50813f072c06d7318c6513c608e2",
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 561,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 1122304,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 304,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "a742c5f3b7bf84a5ef9fe3538fc0295b4c0b945064e2dc69ba093d9721e44a00",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_audio_matches_new_visual_windows": true,
+  "usage_scope": "production",
+  "native_dialogue": "Existing rendered review mix decoded to PCM and same-window trims; all four lines and burned captions retained. No new audio processing. This is a rendered-film assembly, not raw requalification.",
+  "title_plate": "User-approved B5 reused unchanged: six-second title-only optical-flow slowdown, original-speed rain/music. Same-station editorial return, no second disappearance. B5 first music sample 128000 continues preceding music without restart.",
+  "s01": "OUT_OF_SCOPE_NOT_INCLUDED",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

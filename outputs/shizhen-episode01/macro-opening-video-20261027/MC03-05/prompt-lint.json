@@ -1,0 +1,12 @@
+{
+  "six_exact_references": true,
+  "six_bound_markers": true,
+  "pure_chinese_body": true,
+  "exact_authored_prompt": true,
+  "no_dialogue_music": true,
+  "right_hand_and_threshold": true,
+  "no_dissolve": true,
+  "duration12": true,
+  "1080p": true,
+  "native_audio": true
+}

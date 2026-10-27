@@ -6,6 +6,14 @@ learning_eligibility: ineligible
 
 # Jimeng Pre-dispatch Gate Repair
 
+## Runtime Recovery Completed
+
+原006已canonical known-no-effect纠正，compiler2与首次恢复准入经round10空findings后，007实际submit/平台完成/fetch成功，证明本次修复已走通真实平台链路。媒体Gate仍NOT_EVALUATED，不代签质量。真实交付、当前28次尝试与声音观察归S05 primary record最新S05-007段；下方pre-submit/旧UNKNOWN是历史。新source改动按成片优先等待审片后完整验证及owned commit/push；旧Gate独立slice已push。
+
+## Supersession Notice — Original Attempt Recovery
+
+下文关于S05-006仍UNKNOWN的陈述是本工程单元完成时的历史状态。用户继续修复后查明原始native prompt被trim掉末尾LF，依据同次缓存body及原Worker复现，经证据复核沿既有committer追加纠正到真实Manifest82/known_no_effect，旧UNKNOWN bytes保留。当前状态与证据归[S05 primary record](2026-10-27-shizhen-S05-rider-exchange.md#known-no-effect-recovery--current)；本记录的软件修复及历史测试边界保持。
+
 ## Result And Scope
 
 用户“先修复gate”授权的工程修复已完成：本次HTTP wrapper在admission前明确拒绝且有完整本地证据时，能够沿原协议和Paid Owner记录`KNOWN_NO_EFFECT`；泛化错误、缺证、仍pending、owner变化或已dispatch仍UNKNOWN。不修改媒体验收标准、预算/count/permit或writer，不生成新媒体，不将旧S05-006改签为无效果。

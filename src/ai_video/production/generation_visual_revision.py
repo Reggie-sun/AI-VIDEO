@@ -222,7 +222,11 @@ def load_generation_visual_supersession(root, pointer):
             if prior.previous_supersession is not None:
                 raise ValueError("Timing correction cannot form an unbounded amendment chain")
             prior = load_generation_visual_supersession(root, receipt.previous_supersession)
-            validate_authored_timing_correction(prior, receipt)
+            if receipt.authored_retarget is not None:
+                from .unsubmitted_retarget_references import validate_reference_correction
+                validate_reference_correction(root, prior, receipt)
+            else:
+                validate_authored_timing_correction(prior, receipt)
         except (OSError, TypeError, ValueError, AiVideoError) as exc:
             raise AiVideoError(code=ErrorCode.PRODUCTION_PROJECT_INVALID,
                 user_message="Could not reopen the exact timing correction lineage.",

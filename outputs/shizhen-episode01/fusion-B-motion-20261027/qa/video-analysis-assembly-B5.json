@@ -1,0 +1,156 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B5/失帧-独立开场-ASSEMBLY-B5.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B5/失帧-独立开场-ASSEMBLY-B5.mp4",
+      "size_bytes": 25509958,
+      "size_mb": 24.33,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 23.375,
+      "duration_hms": "00:00:23.375",
+      "bit_rate_kbps": 8731
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "fps": 24,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 8531,
+      "frame_count": 561
+    },
+    "audio_stream": {
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "bit_rate_kbps": 195,
+      "language": "und"
+    },
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "encoder": "Lavf62.12.102"
+    }
+  },
+  "frames": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B5/失帧-独立开场-ASSEMBLY-B5.mp4",
+    "total_frames_extracted": 12,
+    "interval_used": 2,
+    "frames": [
+      {
+        "timestamp_seconds": 0,
+        "timestamp_hms": "00:00:00.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 30314
+      },
+      {
+        "timestamp_seconds": 2,
+        "timestamp_hms": "00:00:02.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 30712
+      },
+      {
+        "timestamp_seconds": 4,
+        "timestamp_hms": "00:00:04.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 30345
+      },
+      {
+        "timestamp_seconds": 6,
+        "timestamp_hms": "00:00:06.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 20660
+      },
+      {
+        "timestamp_seconds": 8,
+        "timestamp_hms": "00:00:08.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 9310
+      },
+      {
+        "timestamp_seconds": 10,
+        "timestamp_hms": "00:00:10.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 30325
+      },
+      {
+        "timestamp_seconds": 12,
+        "timestamp_hms": "00:00:12.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 23591
+      },
+      {
+        "timestamp_seconds": 14,
+        "timestamp_hms": "00:00:14.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 23711
+      },
+      {
+        "timestamp_seconds": 16,
+        "timestamp_hms": "00:00:16.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 23716
+      },
+      {
+        "timestamp_seconds": 18,
+        "timestamp_hms": "00:00:18.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 29480
+      },
+      {
+        "timestamp_seconds": 20,
+        "timestamp_hms": "00:00:20.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 29257
+      },
+      {
+        "timestamp_seconds": 22,
+        "timestamp_hms": "00:00:22.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 30685
+      }
+    ]
+  },
+  "transcription": null,
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B5/失帧-独立开场-ASSEMBLY-B5.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0,
+        "start_hms": "00:00:00.000",
+        "end_time": 23.375,
+        "end_hms": "00:00:23.375",
+        "duration_seconds": 23.375,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:23.375",
+    "resolution": "1920x1080",
+    "has_audio": true,
+    "estimated_speaking_duration_seconds": 0,
+    "scene_count": 1,
+    "frames_extracted": 12
+  }
+}

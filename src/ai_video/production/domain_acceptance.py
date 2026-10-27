@@ -25,6 +25,7 @@ from ai_video.production.source_use_evidence import (
     SourceUseEvidence,
     require_source_use_evidence_authority,
 )
+from ai_video.production.production_strategy_salvage_contracts import SalvageReview
 
 
 def _deep_immutable_json(value: object) -> object:
@@ -291,6 +292,7 @@ class DomainAcceptanceQaPolicyMixin:
     generation_evaluation_authorities: tuple[GenerationEvaluationAuthority, ...] = ()
     production_allocations: tuple[ProductionRequirementAllocation, ...] = ()
     production_source_evidence: tuple[SourceUseEvidence, ...] = ()
+    production_salvage_reviews: tuple[SalvageReview, ...] = ()
 
     def selected_generation_acceptance(self) -> DomainAcceptancePolicy | None:
         """Select the generation rubric without replacing final domain acceptance.
@@ -379,6 +381,9 @@ class DomainAcceptanceQaPolicyMixin:
             raise ValueError("Production allocations require a current acceptance policy")
         if self.production_source_evidence and parent_acceptance is None:
             raise ValueError("Production source-use evidence requires a current acceptance policy")
+        if self.production_salvage_reviews:
+            from ai_video.production.production_strategy_salvage import validate_salvage_policy
+            validate_salvage_policy(self)
         if parent_acceptance is not None:
             for allocation in self.production_allocations:
                 if allocation.parent_acceptance_hash != parent_acceptance.profile_content_hash:
@@ -420,4 +425,6 @@ class DomainAcceptanceQaPolicyMixin:
             data.pop("production_allocations", None)
         if not data.get("production_source_evidence"):
             data.pop("production_source_evidence", None)
+        if not self.production_salvage_reviews:
+            data.pop("production_salvage_reviews", None)
         return data

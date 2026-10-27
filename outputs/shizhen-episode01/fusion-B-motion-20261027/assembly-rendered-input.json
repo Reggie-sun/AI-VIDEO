@@ -1,0 +1,76 @@
+{
+  "project": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-fusion-B-motion-20261027/project-assembly-rendered-B5-r3",
+  "sources": [
+    {
+      "shot_id": "CO-A1",
+      "asset_id": "event-render",
+      "audio_id": "event-render-mix",
+      "start": 0,
+      "frames": 184,
+      "transform": {}
+    },
+    {
+      "shot_id": "CO-A2",
+      "asset_id": "event-render",
+      "audio_id": "event-render-mix",
+      "start": 184,
+      "frames": 66,
+      "transform": {}
+    },
+    {
+      "shot_id": "CO-A3",
+      "asset_id": "event-render",
+      "audio_id": "event-render-mix",
+      "start": 250,
+      "frames": 167,
+      "transform": {}
+    },
+    {
+      "shot_id": "CO-TAIL",
+      "asset_id": "title-render",
+      "audio_id": "title-render-mix",
+      "start": 0,
+      "frames": 144,
+      "transform": {}
+    }
+  ],
+  "total_frames": 561,
+  "origin": {
+    "request": "可以就先这样,拼接起来我看下",
+    "scope": "Existing rendered review films, no raw qualification or activation. R3 event prefix only; B5 unchanged. S01 excluded. No new music/video generation.",
+    "inputs": [
+      {
+        "asset_id": "event-render",
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/variant-R3/失帧-独立开场-空位片名-R3.mp4",
+        "frames": 489,
+        "sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+      },
+      {
+        "asset_id": "title-render",
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-B-motion-20261027/variant-B5/失帧-Fusion片名试片-B5.mp4",
+        "frames": 144,
+        "sha256": "f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067"
+      }
+    ],
+    "known_limits": "Original generated material, AI badge and prior raw QA history retained. Only B5 local appearance accepted by user. Assembly pending review.",
+    "source_windows": [
+      [
+        0,
+        184
+      ],
+      [
+        184,
+        66
+      ],
+      [
+        250,
+        167
+      ],
+      [
+        0,
+        144
+      ]
+    ],
+    "audio": "Embedded final mix decoded without retiming; R3 prefix stops before its old title/fade. B5 music starts source sample128000, matching preceding R3 music offset."
+  }
+}

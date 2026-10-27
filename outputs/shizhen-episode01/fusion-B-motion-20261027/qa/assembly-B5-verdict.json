@@ -1,0 +1,109 @@
+{
+  "answers_sha256": "ba38edcd9f67daf96e734fc9ecae3f5a7f5182497dde16ca20cbdf75212fbca2",
+  "authority": "development_only",
+  "evaluator_name": "Codex Parent - bounded sampled visual review",
+  "inventory_sha256": "c4c6c45ef2a5cf8014105cafdafa9d23dad1a0e268a3f931dd4cb0aa7d6625b0",
+  "junction_review": {
+    "cuts": [
+      {
+        "audio_basis": "not_listened",
+        "audio_observation": "P4混合PCM与原成片相同窗拼接完全一致；最终AAC测得额外1024样本时差，未实际聆听，不能代签声音通过",
+        "audio_reason": null,
+        "audio_verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "卡车遮挡中的原接点保留；没有新增卡车重复镜头",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated",
+          "action_repetition_not_evaluated",
+          "action_state_continuity_not_evaluated",
+          "action_pacing_not_evaluated"
+        ],
+        "frame": 184,
+        "from_shot_id": "CO-A1",
+        "junction_id": "f32b915fb6816986fde2347550c113a84365c307e9aaf1dd609800a2d16bdd40",
+        "to_shot_id": "CO-A2",
+        "verdict": "not_evaluated",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "visual_observation": "前后均为同一横向车辆遮挡，人物变化由遮挡隐藏。实际MP4抽帧支持上述局部观察，未以此代替完整人工动态验收",
+        "visual_verdict": "not_evaluated"
+      },
+      {
+        "audio_basis": "not_listened",
+        "audio_observation": "P4混合PCM与原成片相同窗拼接完全一致；最终AAC测得额外1024样本时差，未实际聆听，不能代签声音通过",
+        "audio_reason": null,
+        "audio_verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "沿已修订版本在源361帧入近景，保留回答，不恢复旧25帧姿态接缝",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated",
+          "action_repetition_not_evaluated",
+          "action_state_continuity_not_evaluated",
+          "action_pacing_not_evaluated"
+        ],
+        "frame": 250,
+        "from_shot_id": "CO-A2",
+        "junction_id": "d9ed4ab461b678b458511c786cdd80875a29fc2ea43d77888f9d91786999009d",
+        "to_shot_id": "CO-A3",
+        "verdict": "not_evaluated",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "visual_observation": "从站台全景切通话近景，人物仍右手持电话，视线朝右。实际MP4抽帧支持上述局部观察，未以此代替完整人工动态验收",
+        "visual_verdict": "not_evaluated"
+      },
+      {
+        "audio_basis": "not_listened",
+        "audio_observation": "P4混合PCM与原成片相同窗拼接完全一致；最终AAC测得额外1024样本时差，未实际聆听，不能代签声音通过",
+        "audio_reason": null,
+        "audio_verdict": "not_evaluated",
+        "edit_decision": "trim",
+        "edit_reason": "用户指出16秒后切镜不自然；17.375秒接点确有姿态复位，待修入出点，不能沿用retain判断",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "trim_recommended",
+          "audio_not_listened",
+          "audio_not_evaluated",
+          "action_repetition_failed",
+          "action_state_continuity_failed",
+          "action_pacing_not_evaluated"
+        ],
+        "frame": 417,
+        "from_shot_id": "CO-A3",
+        "junction_id": "c75bbcb1d9280908dd5e2bc3adf371dfc1a2b871aa7cc16879e90cd56b67951b",
+        "to_shot_id": "CO-TAIL",
+        "verdict": "fail",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "visual_observation": "16.8秒近景女人头与目光朝画面右侧；17.45秒全景头部回到偏正面，18.5秒又转向右侧。B5底片复用源288..359早于前段源361..527，动作顺序回接。大景别跳切与片名底片半速加重脱节",
+        "visual_verdict": "fail"
+      }
+    ],
+    "evidence_gaps": [
+      "normal_speed_human_playback_unverified",
+      "visual_not_evaluated",
+      "audio_not_listened",
+      "audio_not_evaluated",
+      "action_repetition_not_evaluated",
+      "action_state_continuity_not_evaluated",
+      "action_pacing_not_evaluated",
+      "trim_recommended",
+      "action_repetition_failed",
+      "action_state_continuity_failed"
+    ],
+    "verdict": "fail"
+  },
+  "limitation": "Validates exact bindings and declared evidence, not semantic detection or human acceptance",
+  "production_acceptance": "NOT_EVALUATED",
+  "purpose": "assembly_review_evidence",
+  "render_report_sha256": "ffc827abba6d0fb392d1c6d515776596ec24b8dc32e247888cd05d835e861652",
+  "strength": "explicit_evaluator",
+  "timeline_sha256": "db681b5802dea8c19720cf9bfd9356f73a3b4fa2e7321778a813067328b05eb6",
+  "verdict": "fail",
+  "video_sha256": "edeacc78b2fd85fb33565aee742a6c5745a106962b5a86efc06b8a5d5e0a87fb"
+}

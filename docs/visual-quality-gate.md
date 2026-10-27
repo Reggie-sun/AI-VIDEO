@@ -151,6 +151,7 @@ python -m scripts.agent_harness verify-assembly \
 不能把该命令退出0当成验证通过。逐刀检查前后完整行动与回应，不能只看切点一帧；
 `action_review` 明确记录 `repetition`（动作是否无意重复）、`state_continuity`（持物、接触支撑、
 视线与动作阶段）、`pacing`（停顿、速度与反应时机）的 verdict/observation；有意重演须说明叙事理由。
+复用素材或变速片段时，在这些既有observation中写明源入出点/时序及速度，核对切前、切后入态和随后动作；不以持物相同或单段认可替代动作接续。无需新增时间线或自动语义检测，缺完整听看证据仍保持NOT_EVALUATED。
 同时保留原Gate的剪辑决定、画面、声音、实际观看速度与观察依据。重复动作、连续性或节奏项明确FAIL
 即阻断，其他证据缺失不掩盖已见FAIL；仅抽帧或未听声音不能签接点PASS。改剪辑后重渲染，
 新MP4、timeline、report和inventory均须重新绑定，旧记录不能直接用于新输出。

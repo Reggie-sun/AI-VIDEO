@@ -29,6 +29,10 @@ def _artifact(path: Path, model) -> PreparedArtifact:
 
 
 class _StateCommitGenerationRejectionMixin:
+    def correct_unsubmitted_retarget_references(self, **kwargs):
+        from .unsubmitted_retarget_references import correct_unsubmitted_retarget_references
+        return correct_unsubmitted_retarget_references(self, **kwargs)
+
     def correct_unsubmitted_authored_timing(self, **kwargs):
         from .generation_visual_revision import correct_unsubmitted_authored_timing
         return correct_unsubmitted_authored_timing(self, **kwargs)

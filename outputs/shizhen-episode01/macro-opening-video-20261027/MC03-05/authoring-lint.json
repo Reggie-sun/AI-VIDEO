@@ -1,0 +1,14 @@
+{
+  "pure_chinese_prompt": true,
+  "six_exact_markers": true,
+  "all_reference_bytes_verified": true,
+  "all_images_viewed": true,
+  "prompt_characters": 526,
+  "duration_seconds": 12,
+  "model_rule": "at most15 seconds Seedance2.0",
+  "resolution_rule": "Seedance2.0 defaults1080p",
+  "scene_change_not_continuous_action": true,
+  "predecessor_gate": "NOT_EVALUATED",
+  "submit_ready": false,
+  "new_paid_calls": 0
+}

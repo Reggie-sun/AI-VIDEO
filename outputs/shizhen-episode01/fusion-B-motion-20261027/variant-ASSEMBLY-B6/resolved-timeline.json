@@ -1,0 +1,210 @@
+{
+  "artifact_id": "timeline-standalone-B5-assembly",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "62c4d47a241c8c2e7157500c6eb386fe9671262f61bc92e803ab63e2a47a4a7a",
+  "creation_receipt_id": "resolve-4944b1812e7d74950c640b88d311a6ee33400f7f4defdc11209f2040b7bc52eb",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/8402716c1833c4000ab0edfec240ce4004240b9b8989cc2bef032612a206193b.json",
+      "content_hash": "8402716c1833c4000ab0edfec240ce4004240b9b8989cc2bef032612a206193b"
+    }
+  ],
+  "usage_scope": "production",
+  "timeline_id": "timeline-standalone-B5-assembly-r1",
+  "composition_spec_id": "rendered-review-assembly",
+  "composition_spec_revision": 1,
+  "composition_spec_hash": "4944b1812e7d74950c640b88d311a6ee33400f7f4defdc11209f2040b7bc52eb",
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "renderer": {
+    "kind": "hyperframes",
+    "version": "0.7.103"
+  },
+  "visual_spans": [
+    {
+      "layer_id": "retained-CO-A1",
+      "shot_id": "CO-A1",
+      "asset_role": "primary_visual",
+      "asset_id": "event-render",
+      "asset_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc.mp4",
+      "start_frame": 0,
+      "duration_frames": 184,
+      "start_sample": 0,
+      "duration_samples": 368000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": 184,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": null
+    },
+    {
+      "layer_id": "retained-CO-A2",
+      "shot_id": "CO-A2",
+      "asset_role": "primary_visual",
+      "asset_id": "event-render",
+      "asset_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc.mp4",
+      "start_frame": 184,
+      "duration_frames": 66,
+      "start_sample": 368000,
+      "duration_samples": 132000,
+      "trim_start_frame": 184,
+      "trim_duration_frames": 66,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": {
+        "from_shot_id": "CO-A1",
+        "to_shot_id": "CO-A2",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    },
+    {
+      "layer_id": "retained-CO-A3",
+      "shot_id": "CO-A3",
+      "asset_role": "primary_visual",
+      "asset_id": "event-render",
+      "asset_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc.mp4",
+      "start_frame": 250,
+      "duration_frames": 167,
+      "start_sample": 500000,
+      "duration_samples": 334000,
+      "trim_start_frame": 250,
+      "trim_duration_frames": 167,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": {
+        "from_shot_id": "CO-A2",
+        "to_shot_id": "CO-A3",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    },
+    {
+      "layer_id": "retained-CO-TAIL",
+      "shot_id": "CO-TAIL",
+      "asset_role": "primary_visual",
+      "asset_id": "title-render",
+      "asset_sha256": "f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067.mp4",
+      "start_frame": 417,
+      "duration_frames": 108,
+      "start_sample": 834000,
+      "duration_samples": 216000,
+      "trim_start_frame": 36,
+      "trim_duration_frames": 108,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": {
+        "from_shot_id": "CO-A3",
+        "to_shot_id": "CO-TAIL",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    }
+  ],
+  "audio_spans": [
+    {
+      "track_id": "retained-mix-CO-A1",
+      "audio_kind": "dialogue",
+      "asset_id": "event-render-mix",
+      "asset_sha256": "35d48e1508f2218c422ffba0186540ee3c7778e4c2f53b51f06fc940fd7a7c5c",
+      "start_sample": 0,
+      "duration_samples": 368000,
+      "source_start_sample": 0,
+      "source_duration_samples": 368000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "retained-mix-CO-A2",
+      "audio_kind": "dialogue",
+      "asset_id": "event-render-mix",
+      "asset_sha256": "35d48e1508f2218c422ffba0186540ee3c7778e4c2f53b51f06fc940fd7a7c5c",
+      "start_sample": 368000,
+      "duration_samples": 132000,
+      "source_start_sample": 368000,
+      "source_duration_samples": 132000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "retained-mix-CO-A3",
+      "audio_kind": "dialogue",
+      "asset_id": "event-render-mix",
+      "asset_sha256": "35d48e1508f2218c422ffba0186540ee3c7778e4c2f53b51f06fc940fd7a7c5c",
+      "start_sample": 500000,
+      "duration_samples": 334000,
+      "source_start_sample": 500000,
+      "source_duration_samples": 334000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "retained-mix-CO-TAIL",
+      "audio_kind": "dialogue",
+      "asset_id": "title-render-mix",
+      "asset_sha256": "79ae0d480660c88fe89fefbc703223f0f92b11c2e659ecb8ad41c0571e97b71e",
+      "start_sample": 834000,
+      "duration_samples": 216000,
+      "source_start_sample": 0,
+      "source_duration_samples": 216000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 48000,
+      "ducking": null
+    }
+  ],
+  "caption_cues": [],
+  "commercial_graphics": [],
+  "total_frames": 525,
+  "total_samples": 1050000,
+  "composition_fingerprint": "35348b5e4f978c782a5ccb445caab6a669a56d0b526bd08562e6379db7a52445"
+}

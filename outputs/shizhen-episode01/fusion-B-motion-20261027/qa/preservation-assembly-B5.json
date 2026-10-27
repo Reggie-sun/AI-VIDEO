@@ -1,0 +1,29 @@
+{
+  "output_sha256": "edeacc78b2fd85fb33565aee742a6c5745a106962b5a86efc06b8a5d5e0a87fb",
+  "frames": 561,
+  "event_frames": 417,
+  "title_frames": 144,
+  "event_preservation": {
+    "mean_absolute_8bit_error": 2.5068045486450345,
+    "frame_mean_error_max": 2.6356738683127574
+  },
+  "title_preservation": {
+    "mean_absolute_8bit_error": 2.3587168138431642,
+    "frame_mean_error_max": 2.4459876543209877
+  },
+  "audio_same_window_reference_samples": 1122000,
+  "audio_rms_error": 0.047724515199661255,
+  "audio_correlation": -0.09884257299646954,
+  "audio_peak": 0.4629197418689728,
+  "input_sha256": {
+    "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/variant-R3/失帧-独立开场-空位片名-R3.mp4": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+    "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-B-motion-20261027/variant-B5/失帧-Fusion片名试片-B5.mp4": "f8b3b65e3554ba19a19ce0d5e818445acd21ef98cb29be06f39a7baaa1018067"
+  },
+  "boundaries": "Lossy re-encode comparison; no new actions/text/sound authored. Metrics do not replace listening or whole-film artistic review.",
+  "p4_mixed_pcm_identical_to_source_concatenation": true,
+  "measured_encoded_audio_lag_samples": 1024,
+  "measured_encoded_audio_lag_ms": 21.333333333333332,
+  "lag_aligned_correlation": 0.9996033787630108,
+  "lag_aligned_rms_error": 0.000909260066691786,
+  "audio_limit": "Measured final AAC waveforms lag source-PCM concatenation by 1024 samples; reported rather than falsely claiming PCM identity. No extra source retiming; actual listening remains not evaluated."
+}

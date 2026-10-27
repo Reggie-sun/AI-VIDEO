@@ -1,0 +1,259 @@
+{
+  "objective": "依据原分镜MC03–MC05制作董文慧下行、推门发现重复凹痕与缺失管道、停步核对的完整事件；不新增机制、不改B6字体音乐",
+  "images": [
+    {
+      "asset_id": "MC03-05-ref-1",
+      "node_id": "MC03-05-ref-1-node",
+      "resource_id": "MC03-05-ref-1-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-r1.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/reference-1-source.json",
+        "record_sha256": "8ee4d26dba36ad7e38383393bc8ba6ebe877911f85bdfb3afa9ea3428806369b",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-05-ref-2",
+      "node_id": "MC03-05-ref-2-node",
+      "resource_id": "MC03-05-ref-2-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-X.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/reference-2-source.json",
+        "record_sha256": "fd364db02b2e69a22505fff904d753f3b377418eb4bc4196c664d54c9210975c",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-05-ref-3",
+      "node_id": "MC03-05-ref-3-node",
+      "resource_id": "MC03-05-ref-3-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L02.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/reference-3-source.json",
+        "record_sha256": "54305a87f5f5843d3e0da329a365558a3003875aa78de04447676876474582e0",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-05-ref-4",
+      "node_id": "MC03-05-ref-4-node",
+      "resource_id": "MC03-05-ref-4-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L02-O-r1.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/reference-4-source.json",
+        "record_sha256": "d7b38ade81f98bd0c3e78188ff8ca700f856d16bd4b39561ff1d7665b8329ca5",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-05-ref-5",
+      "node_id": "MC03-05-ref-5-node",
+      "resource_id": "MC03-05-ref-5-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/L03-r2.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/reference-5-source.json",
+        "record_sha256": "26ea4f01c7791f1ada73a2fdcc032b65917ac4efe88658a4db50c813fe6e5317",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-05-ref-6",
+      "node_id": "MC03-05-ref-6-node",
+      "resource_id": "MC03-05-ref-6-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/L04.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/reference-6-source.json",
+        "record_sha256": "e005bc8c2f4b98a34fe8fb974d14de356e56060269fa3d978b923990fb80db90",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "dong-wenhui",
+      "name": "董文慧",
+      "identity": "28岁，夜间应急服务文字记录者；原分镜中经过住宅楼梯、察觉细节差异而核对听辨，不解释规则",
+      "appearance_bible": "沿既有董文慧identity-v1面貌、低马尾；本宏观场景灰褐外套、深灰打底裤与黑鞋，不移植第二集场次的包本",
+      "reference_asset_ids": [
+        "MC03-05-ref-1",
+        "MC03-05-ref-6"
+      ]
+    }
+  ],
+  "scene_images": [
+    "MC03-05-ref-1",
+    "MC03-05-ref-2",
+    "MC03-05-ref-3",
+    "MC03-05-ref-4",
+    "MC03-05-ref-5",
+    "MC03-05-ref-6"
+  ],
+  "observations": {
+    "identity": "同一董文慧脸、低马尾、灰褐外套和深灰裤，无身份变化或多人复制",
+    "action": "经过带凹痕灭火器和管道，真实下行至低平台；右手连续推门显露相同凹痕与缺失管道的旧印，随后停步核对",
+    "camera": "梯段空间可读，身后偏左中景呈现开门，停步后直接切同侧反应，无叠化或错误重复动作",
+    "performance": "开始普通走路，不提前惊恐；见差异后停步核对再听辨，保持门槛外右手扶门",
+    "space": "上平台凹痕灭火器旁有管道，门内相同凹痕旁无管道有旧印；下行路径和左铰链内开门符合实际参考，手门身体不穿透",
+    "art": "同一写实旧住宅、灰绿旧墙实用灯，无光效、字幕或片名",
+    "sound": "原生脚步、衣料、门轴随动作，平台与门后声场可区分，无对白、配乐、耳语或惊吓重击，不继承市政机器声"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "art": [
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.1",
+      "generation_intent.ambience_intent.foley_cues.2",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "素材一{{image:0}}固定董文慧面貌、灰褐外套和上平台；素材二{{image:1}}指导下行路径；素材三{{image:2}}到达门外；素材四{{image:3}}右手推门半开；素材五{{image:4}}开门后的站位；素材六{{image:5}}只指导同次扶门反应。参考不是连续播放的照片，全程只有同一人。"
+    ],
+    "action": [
+      "雨夜老住宅折返楼梯，真人实拍质感，正常原速。先以斜侧中全景短距离跟随她经过带斜向凹痕的红灭火器和外露管道，沿台阶下行、转向，走到已建立的低处平台。步速自然，先不表现害怕；上下平台、栏杆和梯段关系可辨，不瞬移或重复下楼。",
+      "接到她身后偏左的中景，右手压下把手，向前推开左侧铰链的门，手随把手自然前伸、身体适度靠近，始终留在门槛外。门内逐渐显露有同样凹痕的灭火器，旁边管道却不见，只剩旧卡箍印；先让观众看清差异，她才停步。",
+      "停住后直接切同侧中近景，右手仍扶把手，开门角度和身体位置接续。她平静核对凹痕与旧印，再轻微侧头听辨，不猛回头或夸张惊恐，不再开一次门。换镜直接切换，不叠化、透明重影或分格。"
+    ],
+    "camera": [
+      "雨夜老住宅折返楼梯，真人实拍质感，正常原速。先以斜侧中全景短距离跟随她经过带斜向凹痕的红灭火器和外露管道，沿台阶下行、转向，走到已建立的低处平台。步速自然，先不表现害怕；上下平台、栏杆和梯段关系可辨，不瞬移或重复下楼。",
+      "接到她身后偏左的中景，右手压下把手，向前推开左侧铰链的门，手随把手自然前伸、身体适度靠近，始终留在门槛外。门内逐渐显露有同样凹痕的灭火器，旁边管道却不见，只剩旧卡箍印；先让观众看清差异，她才停步。",
+      "停住后直接切同侧中近景，右手仍扶把手，开门角度和身体位置接续。她平静核对凹痕与旧印，再轻微侧头听辨，不猛回头或夸张惊恐，不再开一次门。换镜直接切换，不叠化、透明重影或分格。"
+    ],
+    "performance": [
+      "雨夜老住宅折返楼梯，真人实拍质感，正常原速。先以斜侧中全景短距离跟随她经过带斜向凹痕的红灭火器和外露管道，沿台阶下行、转向，走到已建立的低处平台。步速自然，先不表现害怕；上下平台、栏杆和梯段关系可辨，不瞬移或重复下楼。",
+      "接到她身后偏左的中景，右手压下把手，向前推开左侧铰链的门，手随把手自然前伸、身体适度靠近，始终留在门槛外。门内逐渐显露有同样凹痕的灭火器，旁边管道却不见，只剩旧卡箍印；先让观众看清差异，她才停步。",
+      "停住后直接切同侧中近景，右手仍扶把手，开门角度和身体位置接续。她平静核对凹痕与旧印，再轻微侧头听辨，不猛回头或夸张惊恐，不再开一次门。换镜直接切换，不叠化、透明重影或分格。"
+    ],
+    "space": [
+      "雨夜老住宅折返楼梯，真人实拍质感，正常原速。先以斜侧中全景短距离跟随她经过带斜向凹痕的红灭火器和外露管道，沿台阶下行、转向，走到已建立的低处平台。步速自然，先不表现害怕；上下平台、栏杆和梯段关系可辨，不瞬移或重复下楼。",
+      "接到她身后偏左的中景，右手压下把手，向前推开左侧铰链的门，手随把手自然前伸、身体适度靠近，始终留在门槛外。门内逐渐显露有同样凹痕的灭火器，旁边管道却不见，只剩旧卡箍印；先让观众看清差异，她才停步。",
+      "停住后直接切同侧中近景，右手仍扶把手，开门角度和身体位置接续。她平静核对凹痕与旧印，再轻微侧头听辨，不猛回头或夸张惊恐，不再开一次门。换镜直接切换，不叠化、透明重影或分格。"
+    ],
+    "art": [
+      "素材一{{image:0}}固定董文慧面貌、灰褐外套和上平台；素材二{{image:1}}指导下行路径；素材三{{image:2}}到达门外；素材四{{image:3}}右手推门半开；素材五{{image:4}}开门后的站位；素材六{{image:5}}只指导同次扶门反应。参考不是连续播放的照片，全程只有同一人。",
+      "雨夜老住宅折返楼梯，真人实拍质感，正常原速。先以斜侧中全景短距离跟随她经过带斜向凹痕的红灭火器和外露管道，沿台阶下行、转向，走到已建立的低处平台。步速自然，先不表现害怕；上下平台、栏杆和梯段关系可辨，不瞬移或重复下楼。",
+      "脚步、衣料和门轴声随动作，平台滴水有明确方位，门后环境声与门外不同；无对白、配乐、耳语或惊吓重击。不移入市政机器声，不增人物、光效、片名或字幕。"
+    ],
+    "sound": [
+      "脚步、衣料和门轴声随动作，平台滴水有明确方位，门后环境声与门外不同；无对白、配乐、耳语或惊吓重击。不移入市政机器声，不增人物、光效、片名或字幕。"
+    ]
+  },
+  "intent_sha256": "65d6583f90fb7fe3587c813aac7628de99b1cdf88146ec8d682f29df802574db"
+}

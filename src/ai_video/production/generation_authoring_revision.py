@@ -19,7 +19,8 @@ from ai_video.production.video_requirement import GenerationIntent
 
 
 _SHA256 = r"^[0-9a-f]{64}$"
-_REVISED_RULE_FIELDS = frozenset({"observable", "tolerance", "measurement", "intent_paths"})
+_REVISED_RULE_FIELDS = frozenset({"observable", "tolerance", "measurement", "intent_paths",
+                                  "native_text", "native_text_mapping"})
 _RULE_IDENTITY_FIELDS = frozenset({
     "requirement_id", "level", "stage", "proof", "dimension", "production_owner",
 })
@@ -173,6 +174,16 @@ def _validate_acceptance(old: DomainAcceptancePolicy, target: AuthoredGeneration
             raise ValueError("unlisted raw QA rule changed during authored revision")
         if any(old_rule.get(key) != new_rule.get(key) for key in _RULE_IDENTITY_FIELDS):
             raise ValueError("authored revision cannot lower raw QA rule identity or proof obligations")
+        if any(old_rule.get(key) != new_rule.get(key) for key in ("native_text", "native_text_mapping")):
+            from ai_video.production.generation_recipe import RequirementExpression
+            from ai_video.production.generation_input_control import native_text_mapping_evidence
+
+            rule = RequirementExpression.model_validate(new_rule)
+            if rule.native_text_mapping is None or getattr(target, "intent", None) is None:
+                raise ValueError("authored native text revision requires current intent and sealed scalar mappings")
+            _, issues = native_text_mapping_evidence((rule,), target.intent, "\n".join(rule.native_text))
+            if issues:
+                raise ValueError("authored native text revision has stale or invalid scalar mappings")
         fields = set(old_rule) | set(new_rule)
         if any(
             old_rule.get(key) != new_rule.get(key)

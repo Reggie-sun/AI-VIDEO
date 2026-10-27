@@ -10,13 +10,15 @@ from ai_video.production.generation_authoring_revision import (
 from ai_video.production.video import VideoGenerationMode
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.generation_authored_retarget import (
+    _acceptance_revision_ids,
+    _image_append_ids,
     _same_goal_with_new_version,
     validate_authored_generation_retarget_binding,
 )
 
 
 def allows_authored_generation_retarget(binding, selected) -> bool:
-    """Admit one Seedance 2.0 R2V retarget after exact known fetched media."""
+    """Admit one exact same-model R2V retarget after known fetched media."""
     try:
         if selected is None or binding.policy.execution_purpose != "qualification":
             return False
@@ -77,12 +79,10 @@ def allows_authored_generation_retarget(binding, selected) -> bool:
         if (
             old_candidate.capabilities.provider_name != selected.capabilities.provider_name
             or prior_variant.provider_kind != variant.provider_kind
-            or prior_variant.model_id == variant.model_id
             or variant.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
             or variant.output_capability is None
             or not variant.output_capability.supports(selected.output_requirement)
             or "reference" not in variant.allowed_image_roles
-            or old_candidate.recipe.acceptance_policy != selected.recipe.acceptance_policy
             or not _same_goal_with_new_version(old_candidate.final_output_goal, selected.final_output_goal)
             or prior_experiences[0].projection.requirement.generation_intent
                 == binding.projection.requirement.generation_intent
@@ -95,7 +95,10 @@ def allows_authored_generation_retarget(binding, selected) -> bool:
             or after.model_id != variant.model_id
             or after.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
             or after.base_project is None
-            or after.base_project.revision != before.base_project.revision + 1
+            # Candidate recognition only. A second authoring step still needs
+            # the exact one-hop ownership correction under the submit lock.
+            or after.base_project.revision not in {before.base_project.revision + 1,
+                                                  before.base_project.revision + 2}
             or not after.image_bindings and not after.media_bindings
             or any(item.role != "reference" for item in after.image_bindings)
             or len(after.image_bindings) > variant.max_reference_count
@@ -109,8 +112,33 @@ def allows_authored_generation_retarget(binding, selected) -> bool:
         if not media_bindings_satisfy_capabilities(after.media_bindings, variant.media_capabilities):
             return False
         changed = set(compare_compiled_requests(before, after)["changed_variables"])
+        if prior_variant.model_id == variant.model_id:
+            acceptance_delta = _acceptance_revision_ids(
+                old_candidate.recipe.acceptance_policy,
+                selected.recipe.acceptance_policy,
+                intent=binding.projection.requirement.generation_intent,
+            )
+            image_additions = _image_append_ids(before.image_bindings, after.image_bindings)
+            return (
+                binding.policy.remote_authorized
+                and binding.policy.budget_authorized
+                and prior_variant.mode is VideoGenerationMode.REFERENCE_TO_VIDEO
+                and acceptance_delta is not None
+                and image_additions is not None
+                and before.mode is after.mode
+                and before.media_bindings == after.media_bindings
+                and before.output_requirement == after.output_requirement
+                and old_candidate.capability_id == selected.capability_id
+                and old_candidate.capabilities == selected.capabilities
+                and old_candidate.compiler_contract == selected.compiler_contract
+                and "prompt_text" in changed
+                and changed <= {
+                    "prompt_text", "image_bindings", "provider_profile", "execution_stack_hash",
+                }
+            )
         return (
-            {"model_id", "mode", "image_bindings"} <= changed
+            old_candidate.recipe.acceptance_policy == selected.recipe.acceptance_policy
+            and {"model_id", "mode", "image_bindings"} <= changed
             and changed <= {
                 "model_id", "mode", "image_bindings", "media_bindings", "prompt_text",
                 "provider_profile", "output_requirement", "adapter_compiler_id",
@@ -304,9 +332,15 @@ def require_authored_generation_revision_predecessor(
         raise _state_invalid("Authored target differs from its retained paid source or exact new request.")
     try:
         if is_retarget:
+            original_target = None
+            if receipt.previous_supersession is not None:
+                original = load_generation_visual_supersession(committer.project_root,
+                    receipt.previous_supersession)
+                original_target = original.authored_retarget
             validate_authored_generation_retarget_binding(
                 binding, selected, target, target_goal=receipt.target_goal,
                 authorization_receipt_id=receipt.authorization_receipt_id,
+                previous_target=original_target,
             )
         else:
             validate_authored_revision_goal(

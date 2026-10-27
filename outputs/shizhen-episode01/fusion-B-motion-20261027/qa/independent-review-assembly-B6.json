@@ -1,0 +1,10 @@
+{
+  "reviewer": "/root/opening_concept_check",
+  "candidate_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "scope": "User-authorized junction repair, one additional bounded review; historical B2-B5 findings preserved",
+  "findings": [],
+  "observations": "16.8秒近景朝右倾听，17.45秒全景延续朝向，17.9至18.5秒未见旧B5回正后重新转头。19.8秒字形形成，21.4秒完整停留，所审画面未见显影或字形受损。",
+  "evidence": ["assembly-B6-16.8.png", "assembly-B6-17.45.png", "assembly-B6-17.9.png", "assembly-B6-18.5.png", "assembly-B6-19.8.png", "assembly-B6-21.4.png", "playback-assembly-B6.json"],
+  "parent_disposition": "CONFIRMED within sampled visual scope; full assembly verdict remains NOT_EVALUATED",
+  "limits": "Frames and 525-frame zero-drop playback do not establish subjective cut smoothness, speed perception, actual listening or final acceptance"
+}

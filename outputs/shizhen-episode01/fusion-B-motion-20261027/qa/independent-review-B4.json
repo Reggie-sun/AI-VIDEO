@@ -1,0 +1,23 @@
+{
+  "reviewer": "/root/opening_concept_check",
+  "profile": "reviewer_high",
+  "candidate_sha256": "e00963afc77ac0501243657bf1a60afe1ac16482b70d6911e1cb2a9c59f206a8",
+  "findings": [
+    {
+      "id": "B4-01",
+      "severity": "non_blocking",
+      "finding": "灰膜感明显减轻，建筑明暗、雨痕与灯光保留；失右侧笔画仍与立柱竞争",
+      "parent": "CONFIRMED",
+      "status": "RETAINED_FOR_USER_REVIEW"
+    },
+    {
+      "id": "B4-02",
+      "severity": "non_blocking",
+      "finding": "文字局部明暗形成过程更清楚，后段仍呈较实的墨字层；须结合前序事件判断，不盲目叠加特效",
+      "parent": "CONFIRMED",
+      "status": "RETAINED_FOR_USER_REVIEW"
+    }
+  ],
+  "boundary": "Exact SHA and captured playback frames/metrics/preservation evidence; not full human audiovisual/art acceptance",
+  "decision": "Current B4 review candidate; no final acceptance asserted"
+}
