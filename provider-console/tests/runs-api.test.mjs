@@ -1109,13 +1109,15 @@ test("reference library is read-only, fixed-root, query bounded and registers ex
   const catalog = await invoke(handler, request("GET", "/api/reference-library?query=character&offset=12"));
   assert.equal(catalog.res.statusCode, 200);
   assert.equal(catalog.res.headers.get("cache-control"), "no-store");
-  assert.deepEqual(received, ["references", null, null, { query: "character", offset: 12 }]);
+  assert.deepEqual(received, ["references", null, null, { query: "character", offset: 12, category: "all", group: "" }]);
   assert.equal(JSON.parse(catalog.res.body).items[1].media.token, undefined);
   assert.equal(catalog.res.body.toString().includes(root), false);
+  assert.equal((await invoke(handler, request("GET", "/api/reference-library?category=shot&group=shot:demo:S06"))).res.statusCode, 200);
+  assert.deepEqual(received, ["references", null, null, { query: "", offset: 0, category: "shot", group: "shot:demo:S06" }]);
   const image = await invoke(handler, request("GET", `/api/runs/media/${media.token}`));
   assert.equal(image.res.statusCode, 200);
   assert.deepEqual(image.res.body, bytes);
-  for (const query of ["offset=-1", "offset=100001", "root=/tmp", "offset=0&offset=1", `query=${"x".repeat(257)}`]) {
+  for (const query of ["category=invalid", "category=shot&category=character", `group=${"x".repeat(257)}`, "offset=-1", "offset=100001", "root=/tmp", "offset=0&offset=1", `query=${"x".repeat(257)}`]) {
     assert.equal((await invoke(handler, request("GET", `/api/reference-library?${query}`))).res.statusCode, 400);
   }
   assert.equal((await invoke(handler, request("POST", "/api/reference-library"))).res.statusCode, 405);

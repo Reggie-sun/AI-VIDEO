@@ -1,0 +1,19 @@
+{
+  "schema": "reference-library-groups/1",
+  "projects": [
+    {
+      "id": "shizhen",
+      "name": "失帧",
+      "path_prefixes": ["shizhen/", "runs/shizhen-", "outputs/shizhen-"],
+      "characters": [
+        {"id": "lin-xu", "name": "林序", "directory_names": ["lin-xu"]},
+        {"id": "tang-jie", "name": "唐姐", "directory_names": ["tang-jie"]},
+        {"id": "courier", "name": "快递员", "directory_names": ["courier"]},
+        {"id": "dong-wenhui", "name": "董文慧", "directory_names": ["dong-wenhui"]},
+        {"id": "luo-min", "name": "罗敏", "directory_names": ["luo-min"]},
+        {"id": "gao-zheng", "name": "高峥", "directory_names": ["gao-zheng"]},
+        {"id": "wen-sufen", "name": "闻素芬", "directory_names": ["wen-sufen"]}
+      ]
+    }
+  ]
+}

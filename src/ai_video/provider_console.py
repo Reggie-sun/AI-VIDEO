@@ -869,6 +869,8 @@ def _parser() -> argparse.ArgumentParser:
         if command == "references":
             child.add_argument("--query", default="")
             child.add_argument("--offset", type=int, default=0)
+            child.add_argument("--category", choices=["all", "character", "shot", "other"], default="all")
+            child.add_argument("--group", default="")
         if command in {"detail", "continuity-review"}:
             child.add_argument("--workspace", required=True)
         if command == "continuity-review":
@@ -886,7 +888,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "catalog":
             result = catalog_runs(args.runs_root)
         elif args.command == "references":
-            result = catalog_reference_library(args.runs_root.absolute().parent / "referces", query=args.query, offset=args.offset)
+            result = catalog_reference_library(args.runs_root.absolute().parent / "referces", query=args.query, offset=args.offset, category=args.category, group=args.group)
         elif args.command == "detail":
             result = project_workspace_detail(args.runs_root, args.workspace)
         else:

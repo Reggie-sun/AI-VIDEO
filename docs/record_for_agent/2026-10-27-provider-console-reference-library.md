@@ -7,6 +7,34 @@ evidence_index_version: "1"
 
 # Provider Console Reference Library
 
+## Character And Shot Grouping Update
+
+用户进一步要求按人物和 Shot 分开浏览。前端现在分为“人物 / Shot / 其他素材”，
+各分类内先选择具体人物或镜头，再分页查看对应图片。人物组内标明身份底图、身份合板、
+场次参考、来源画面或人物单图；支持中文人物名、Shot 编号及路径搜索。
+实测识别林序、唐姐、快递员、董文慧、罗敏、高峥、闻素芬七个人物组。
+
+`provider-console/src/reference-library-groups.json` 仅拥有前端浏览标签和目录规则，
+按项目隔离人物、镜头分组，不拥有 Production 角色身份、reference binding 或验收状态。
+Python 只读取此固定、有限、校验后的配置；任意 archive JSON 仍不读取。
+配置缺失、无效或链接时提示分类不可用，文件仍可浏览。Shot 归类优先所在目录，
+例如 S06 目录的 S05 末帧归到 S06；人物目录里的 S01 来源帧仍属于该人物。
+未确认归属的文件进入“其他素材”，不靠图像内容推断人物或伪造生成绑定。
+
+本次验证：88 个 Python 测试、114 个 Node 测试及 Vite build；覆盖跨项目同名人物隔离、
+组内分页、中文搜索、目录优先级、配置失败和 API 参数边界。
+真实 5174 浏览器验证人物切换、分页、S05/S06、其他素材、中文搜索、放大与焦点恢复、
+刷新 503 保留结果及恢复；1440×1000 和 390×844 无横向溢出、无 pageerror。
+脚本和日志 `/tmp/reference-groups-browser.cjs`、`/tmp/reference-groups-browser.log`；
+截图 `/tmp/reference-groups-character.png`、`/tmp/reference-groups-shot.png`、
+`/tmp/reference-groups-mobile.png`。目录内图片会随其他制作任务增加，数量不是固定契约。
+本次 Harness receipt 使用 `.agent/harness/runs/20261027-reference-groups-{focused,related,full}/receipt.json`，
+按实际级别结果解释，不把局部通过当作完整回归通过。
+
+Parent 自审：只读归类与展示，现有媒体读取边界不变，`NATIVE_REVIEW_NOT_REQUIRED`。
+继续使用 `record-ai-video-session=record`；`distill-ai-video-learning=no_candidate`。
+下文保留首次平铺图库实现的历史证据，当前界面以上述分组为准。
+
 ## Scope
 
 用户明确要求把 repository 的 `referces/` 接入前端。新增左侧“素材”和顶部“参考素材”入口，

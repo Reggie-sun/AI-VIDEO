@@ -193,7 +193,7 @@ function createPythonProjector(repoRoot) {
   return async (command, workspace, attemptId, options = {}) => {
     const args = ["-m", "ai_video.provider_console", command, "--runs-root", runsRoot];
     if (workspace) args.push("--workspace", workspace);
-    if (command === "references") args.push("--query", options.query || "", "--offset", String(options.offset || 0));
+    if (command === "references") args.push("--query", options.query || "", "--offset", String(options.offset || 0), "--category", options.category || "all", "--group", options.group || "");
     if (command === "continuity-review") {
       args.push("--attempt-id", attemptId, ...continuityIdentityArgs());
     }
@@ -667,12 +667,15 @@ export function createRunsApiHandler({
         if (req.method !== "GET") return methodNotAllowed(res, "GET");
         const query = parsed.searchParams.get("query") || "";
         const offset = parsed.searchParams.get("offset") || "0";
+        const category = parsed.searchParams.get("category") || "all";
+        const group = parsed.searchParams.get("group") || "";
         if (query.length > 256 || !/^\d{1,6}$/.test(offset) || Number(offset) > 100000
-          || [...parsed.searchParams.keys()].some((key) => !["query", "offset"].includes(key))
-          || parsed.searchParams.getAll("query").length > 1 || parsed.searchParams.getAll("offset").length > 1) {
+          || [...parsed.searchParams.keys()].some((key) => !["query", "offset", "category", "group"].includes(key))
+          || !["all", "character", "shot", "other"].includes(category) || group.length > 256
+          || ["query", "offset", "category", "group"].some((key) => parsed.searchParams.getAll(key).length > 1)) {
           return send(res, 400, { error: { code: "INVALID_REFERENCE_QUERY", message: "参考素材查询无效。" } });
         }
-        const result = await runProjector("references", null, null, { query, offset: Number(offset) });
+        const result = await runProjector("references", null, null, { query, offset: Number(offset), category, group });
         const unavailableTokens = await registerRunsMedia(result, path.join(repoRoot, "referces"), mediaCache);
         send(res, 200, publicProjection(unavailableMediaDescriptors(result, unavailableTokens)));
         return;

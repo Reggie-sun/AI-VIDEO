@@ -1860,3 +1860,58 @@ def test_cli_returns_sanitized_json_for_unknown_workspace(
     assert json.loads(capsys.readouterr().out) == {
         "error": {"code": "WORKSPACE_NOT_FOUND", "message": "workspace 不存在。"}
     }
+
+
+def test_reference_library_separates_characters_shots_and_projects(tmp_path):
+    from ai_video.provider_console_preparation import catalog_reference_library
+
+    root = tmp_path / "referces"
+    projects = [{"id": project, "name": project, "path_prefixes": [project + "/"],
+                 "characters": [{"id": "hero", "name": "主角", "directory_names": ["hero"]}]}
+                for project in ("first", "second")]
+    _write(root.parent / "provider-console/src/reference-library-groups.json", json.dumps({"schema": "reference-library-groups/1", "projects": projects}).encode())
+    for index in range(13):
+        _write(root / f"first/hero/identity/{index}.png", b"image")
+    _write(root / "first/hero/source-frames/S01-frame.png", b"source")
+    _write(root / "second/hero/identity/other.png", b"other")
+    _write(root / "first/S06/references/01-S05-actual-terminal.png", b"terminal")
+    _write(root / "first/trial-S06-v2/references/new.png", b"revision")
+    _write(root / "first/macro/M01-r2.png", b"opening")
+    _write(root / "second/trial-H01/references/frame.png", b"other-shot")
+    _write(root / "first/scene/wide.png", b"scene")
+    first = catalog_reference_library(root, category="character", group="character:first:hero")
+    assert first["total"] == 14
+    assert first["category_counts"] == {"character": 15, "shot": 4, "other": 1}
+    assert all(row["group_id"] == "character:first:hero" for row in first["items"])
+    second = catalog_reference_library(root, category="character", group="character:first:hero", offset=12)
+    assert len(second["items"]) == 2
+    assert {row["relative_path"] for row in first["items"]}.isdisjoint(row["relative_path"] for row in second["items"])
+    assert {row["usage"] for row in first["items"] + second["items"]} == {"身份底图", "来源画面"}
+    assert catalog_reference_library(root, query="主角")["total"] == 15
+    shot = catalog_reference_library(root, category="shot", group="shot:first:S06")
+    assert shot["total"] == 2
+    assert {row["group_label"] for row in shot["items"]} == {"S06"}
+    assert catalog_reference_library(root, category="shot", group="shot:first:M01")["total"] == 1
+    assert catalog_reference_library(root, category="shot", group="shot:second:H01")["total"] == 1
+    assert catalog_reference_library(root, category="other")["items"][0]["file_name"] == "wide.png"
+    assert catalog_reference_library(root, category="shot", group="character:first:hero")["total"] == 0
+    for kwargs in ({"category": "invalid"}, {"group": "x" * 257}):
+        with pytest.raises(ValueError):
+            catalog_reference_library(root, **kwargs)
+
+
+def test_reference_library_invalid_or_linked_classification_keeps_files_visible(tmp_path):
+    from ai_video.provider_console_preparation import catalog_reference_library
+
+    root = tmp_path / "referces"
+    _write(root / "hero/identity/base.png", b"image")
+    config = _write(root.parent / "provider-console/src/reference-library-groups.json", b'{"schema":"bad"}')
+    invalid = catalog_reference_library(root, category="other")
+    assert invalid["classification_unavailable"] is True
+    assert invalid["total"] == 1
+    config.unlink()
+    config.symlink_to(_write(tmp_path / "private.json", b'{"secret":"NEVER_READ"}'))
+    linked = catalog_reference_library(root)
+    assert linked["classification_unavailable"] is True
+    assert linked["total"] == 1
+    assert "NEVER_READ" not in json.dumps(linked)
