@@ -1,0 +1,14 @@
+{
+  "requested_time": 5,
+  "actual_time": 5,
+  "readyState": 4,
+  "duration": 8.057007,
+  "seekable": [
+    [
+      0,
+      8.057007
+    ]
+  ],
+  "media_error": null,
+  "errors": []
+}

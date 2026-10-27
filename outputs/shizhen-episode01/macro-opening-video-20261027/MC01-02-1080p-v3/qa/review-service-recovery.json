@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-10-27T07:56:13.099988+00:00",
+  "initial_failure": "8883 not listening; page connection refused; media files intact",
+  "recovery": "existing byte-range handler now owned by independent user systemd transient service",
+  "service": "ai-video-shizhen-macro-review.service",
+  "runtime_bus_owner_verified": true,
+  "runtime_state": {
+    "Restart": "on-failure",
+    "MainPID": "966245",
+    "ExecMainStatus": "0",
+    "ControlGroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ai-video-shizhen-macro-review.service",
+    "ActiveState": "active",
+    "SubState": "running"
+  },
+  "page_status": 200,
+  "partial_video_status": 206,
+  "partial_bytes": 1024,
+  "out_of_bounds_status": 416,
+  "browser_full_playback": "service-recovery-playback.json",
+  "browser_seek": "service-recovery-seek.json",
+  "browser_ended": true,
+  "browser_seek_time": 5,
+  "source_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "media_bytes_unchanged": true,
+  "new_generation_calls": 0,
+  "exposure": "127.0.0.1:8883 only",
+  "lifecycle": "survives chat exec process exit; transient user service, not boot-installed",
+  "stop_command": "systemctl --user stop ai-video-shizhen-macro-review.service",
+  "media_quality_gate_unchanged": true
+}

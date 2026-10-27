@@ -148,3 +148,13 @@ record-ai-video-session记录本稳定交付／失败检查点；distill-ai-vide
 同一新MP4完整音轨仅盲分析一次，source/audio SHA绑定独立development operator unit，Gemini3.8Flash HTTP200。返回风声、机械重响、低频撞击，无语音片段；不足以可靠证明完整声场及马达停声／受力摩擦时序，无human listening结论。内部0.05USD上限不是报价，结算待确认。旧音频unit与UNKNOWN无重试，声音仍走EVIDENCE_REPAIR_FIRST，不生成新视频来补声音证据。
 
 核验receipt `MC01-02-1080p-v3/verification.json`、规则receipt `rule-verification.json`。8项seedance-authoring精准检查、docs_contract_gate和本轮operator脚本py_compile通过，无共享runtime行为变更，不宣称完整工程回归或媒体通过。record-ai-video-session记录本稳定原片交付／差异检查点；distill-ai-video-learning为no_candidate：单次1080p与720p对照仍受uncontrolled seed影响，不能归因为普遍分辨率或版本规律，且默认规格来自用户直接选择。Implementation Risk Gate为NATIVE_REVIEW_NOT_REQUIRED；实际媒体所需的单名独立复核已完成，新增blocker未解决，明确保留HD待审状态。
+
+## Playback Service Recovery
+
+用户反馈“打不开”。现场证据：8883无监听，原播放页curl connection refused；HTML与30,452,488字节原片都存在，源SHA未变。旧一次性exec启动方式没有维持可用服务；本轮只恢复播放可达性，不修改媒体、质量Gate、默认规格或生成结果，无新增Provider／音频调用。
+
+改用同一现有Range handler，由当前UID的独立user systemd transient unit `ai-video-shizhen-macro-review.service`托管，WorkingDirectory为本repository，Restart=on-failure／RestartSec=2，仍只绑定127.0.0.1:8883。当前exec环境缺少user bus变量，先核验`/run/user/1000`和bus属于当前UID，再对systemd命令显式接线；不读取凭据或扩大网络暴露。unit位于user manager的app.slice，MainPID966245，独立于启动exec；不是开机安装的永久服务。停止入口为`systemctl --user stop ai-video-shizhen-macro-review.service`。
+
+原始地址恢复200，视频Range0–1023返回206／1024字节，越界Range返回416。独立Chromium原速、声音开启播放8.057秒到结尾，无page error；另行seek到5.0秒成功，readyState4、seekable[0,8.057007]、media error=null。原完整播放metadata保留，新证据为`MC01-02-1080p-v3/qa/service-recovery-playback.json`、`service-recovery-seek.json`及`review-service-recovery.json`。本地MP4可直接打开作为另一个入口，原文件SHA仍`88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52`；已有叠化差异与人工待审状态未变，服务恢复不等于影片验收。
+
+本轮无共享源码或媒体修改，不追加单元测试／完整回归；验证直接覆盖服务独立生命周期、HTTP、真实浏览器播放和拖动。Risk Gate为NATIVE_REVIEW_NOT_REQUIRED。record-ai-video-session记录本稳定恢复；distill-ai-video-learning为no_candidate：单次服务退出／恢复事件，不扩张为通用Skill或Gate规则。项目经验检索返回stale advisory，未等待后台刷新，结论按实际端口、HTTP、浏览器和exact bytes核验。
