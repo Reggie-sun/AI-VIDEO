@@ -1,0 +1,115 @@
+{
+  "project": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC03-descent-edit-v3/project",
+  "sources": [
+    {
+      "shot_id": "DESCENT-PRE",
+      "asset_id": "descent-pre-capture",
+      "start": 0,
+      "frames": 144,
+      "audio_id": "DESCENT-PRE-original-mix"
+    },
+    {
+      "shot_id": "DESCENT-TAIL",
+      "asset_id": "descent-tail-capture",
+      "start": 144,
+      "frames": 48,
+      "audio_id": "DESCENT-TAIL-original-mix"
+    }
+  ],
+  "total_frames": 192,
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "origin": {
+    "scope": "development_audio_preview; raw quality findings retained, no Production acceptance",
+    "user_feedback": "原像素回放仍然抖动",
+    "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+    "source_frame": 144,
+    "source_pts_seconds": 6.0,
+    "roi_xywh": [
+      1000,
+      835,
+      760,
+      245
+    ],
+    "overlay_window_source_frames": [
+      144,
+      192
+    ],
+    "preserved": [
+      "all person pixels/action",
+      "native speed",
+      "same-window original audio",
+      "ordinary clues",
+      "original source and its failed/unevaluated findings",
+      "B6/fonts/music"
+    ],
+    "new_paid_video_calls": 0,
+    "max_local_renders": 2,
+    "new_audio_analysis_limit": 1,
+    "new_actual_media_review_limit": 1,
+    "reviews_before": 9,
+    "paired_review_ceiling_after_local_repair": 11,
+    "created_at": "2026-10-27T11:24:12.168707+00:00",
+    "scope_boundary": "Local development_audio_preview via CompositionSpec/ResolvedTimeline/HyperFrames, not Production acceptance",
+    "chosen_route": "Keep source[0,144) wide; source[144,192) reframe to lower closed door and full person using FixedTransform; no freeze, retime or repeated source phase",
+    "abandoned_route": "Static-alpha image overlay on captured qualification video is not available through current non-ad composition path; strict prepare rejected, no Product published",
+    "tail_transform": {
+      "translate_x_px": -1223,
+      "translate_y_px": -344,
+      "scale_x_milli": 1637,
+      "scale_y_milli": 1637
+    },
+    "tail_visible_source_approx_xywh": [
+      747,
+      210,
+      1173,
+      660
+    ],
+    "quality_limits": [
+      "Tail is digital reframe of1080p source, not new native high-detail generation",
+      "Hard cut at actual lower-platform arrival requires normal-speed review",
+      "No complete stair event or human acceptance claimed"
+    ],
+    "local_renders_before": 1,
+    "previous_candidate": "MC03-descent-edit-v2: first post-cut step too close to lower frame edge; not delivered as approved",
+    "AI_disclosure": "Original raw AI生成 visible in wide source; same AI生成 disclosure retained with post text layer in cropped tail",
+    "kind": "bounded-source-arrival-reframe/1",
+    "windows": [
+      {
+        "shot_id": "DESCENT-PRE",
+        "asset_id": "descent-pre-capture",
+        "start": 0,
+        "frames": 144
+      },
+      {
+        "shot_id": "DESCENT-TAIL",
+        "asset_id": "descent-tail-capture",
+        "start": 144,
+        "frames": 48
+      }
+    ],
+    "abandoned_patch_provenance": {
+      "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+      "extracted_frame_index": 144,
+      "actual_pts_seconds": 6.0,
+      "frame_sha256": "019d2a89114271d91d70827269ba7b4ae97bf1250c618c59b6cafb6f6c1e556c",
+      "patch_sha256": "8844969157468b07e4f96ee60b7feb0c61338bd65e5a95f69529e1731ce90f80",
+      "size": [
+        1920,
+        1080
+      ],
+      "alpha_bounds": [
+        1000,
+        835,
+        1760,
+        1080
+      ],
+      "feather_px": 8,
+      "opaque_pixel_count": 176565,
+      "all_RGB_matches_exact_source_frame": true,
+      "outside_bounds_fully_transparent": true,
+      "person_clearance_observation": "Actual source6-8s soles above y835; subject excluded",
+      "method": "ffmpeg exact frame RGB plus separately generated alpha; no MP4 editing/new imagery",
+      "rejected_preparation": "Direct geq RGB sampler altered rare edge pixels; retained rejected PNG and switched to separate alpha merge, not tolerance weakening"
+    }
+  }
+}

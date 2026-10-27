@@ -1,0 +1,41 @@
+{
+  "source_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC03-descent-v1/state/video-generation/fetch/files/326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e.mp4",
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "size_bytes": 14440394,
+  "review_copy": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/失帧-下楼到达-1080p-2.0-试片01.mp4",
+  "probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "aac",
+        "codec_type": "audio",
+        "sample_rate": "44100",
+        "channels": 2,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "duration": "8.063991",
+        "nb_frames": "350"
+      },
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "60/1",
+        "avg_frame_rate": "11580/481",
+        "duration": "8.016667",
+        "nb_frames": "193"
+      }
+    ],
+    "format": {
+      "duration": "8.065000",
+      "size": "14440394"
+    }
+  },
+  "full_decode": true,
+  "original_rate_preserved": true,
+  "detected_scene_change_pts": [],
+  "fps_note": "r_frame_rate is not measured playback rate; source timestamps are retained",
+  "quality": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

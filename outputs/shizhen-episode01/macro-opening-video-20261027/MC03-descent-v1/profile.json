@@ -1,0 +1,12 @@
+{
+  "model_id": "seedance_2.0_vip",
+  "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+  "project_id": "e09b617d-5af1-40ee-9136-d36a7422d40c",
+  "node_id": "node_hpjhj0pbj1",
+  "duration_seconds": 8,
+  "resolution": "1080p",
+  "aspect_ratio": "16:9",
+  "benefit_amount": 8,
+  "benefit_type": "seedance_20_pro_1080p_output",
+  "credit_upper_bound": 1500
+}

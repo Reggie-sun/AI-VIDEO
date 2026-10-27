@@ -1,0 +1,14 @@
+{
+  "question_quote": "最後的時候樓梯懂了正常嗎",
+  "clarification": "右下方台阶边缘在抖／变形",
+  "human_acceptance": "NOT_ACCEPTED_PENDING_QUALITY_INVESTIGATION",
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "known_good_observation": "Back-facing downward progression reaches lower closed door; no reverse ascent observed",
+  "investigation": "Static patch NCC at5-8s yields best integer shifts0 for walls/window/rail and tested stair regions; cannot rule out subpixel/local edge/texture shimmer. Dense6-8s crops inspected. No camera movement or structural displacement conclusion signed.",
+  "next_source_submit": false,
+  "new_paid_retries": 0,
+  "original_pixel_followup": "原像素回放仍然抖动",
+  "source_only_scaling_explanation": "NOT_SUPPORTED_AS_SOLE_CAUSE; user still observes in original-pixel source playback",
+  "source_quality_verdict": "FAIL_REPORTED_LOCAL_EDGE_STABILITY",
+  "root_cause": "Not diagnosed: do not claim exact structural deformation from zero integer displacement test"
+}

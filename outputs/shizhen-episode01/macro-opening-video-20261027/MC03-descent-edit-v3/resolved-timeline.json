@@ -1,0 +1,156 @@
+{
+  "artifact_id": "timeline-descent-arrival-reframe-v3",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "a818e2bb9cdd427855ea1caad05ed80f3374257899d438fdd921639a071eccee",
+  "creation_receipt_id": "resolve-a87d8130531d0e641f0bc3f17e70265966562657567267e0dd48c92e4f1fbe0f",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/d645fe81631ea8292470fedadf335a54513c252be9995f1387d69db07e2fc528.json",
+      "content_hash": "d645fe81631ea8292470fedadf335a54513c252be9995f1387d69db07e2fc528"
+    }
+  ],
+  "usage_scope": "development_audio_preview",
+  "timeline_id": "timeline-descent-arrival-reframe-v3-r1",
+  "composition_spec_id": "descent-arrival-reframe-composition",
+  "composition_spec_revision": 1,
+  "composition_spec_hash": "a87d8130531d0e641f0bc3f17e70265966562657567267e0dd48c92e4f1fbe0f",
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "renderer": {
+    "kind": "hyperframes",
+    "version": "0.7.103"
+  },
+  "visual_spans": [
+    {
+      "layer_id": "retained-DESCENT-PRE",
+      "shot_id": "DESCENT-PRE",
+      "asset_role": "primary_visual",
+      "asset_id": "descent-pre-capture",
+      "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e.mp4",
+      "start_frame": 0,
+      "duration_frames": 144,
+      "start_sample": 0,
+      "duration_samples": 288000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": 144,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": null
+    },
+    {
+      "layer_id": "retained-DESCENT-TAIL",
+      "shot_id": "DESCENT-TAIL",
+      "asset_role": "primary_visual",
+      "asset_id": "descent-tail-capture",
+      "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e.mp4",
+      "start_frame": 144,
+      "duration_frames": 48,
+      "start_sample": 288000,
+      "duration_samples": 96000,
+      "trim_start_frame": 144,
+      "trim_duration_frames": 48,
+      "transform": {
+        "translate_x_px": -1223,
+        "translate_y_px": -344,
+        "scale_x_milli": 1637,
+        "scale_y_milli": 1637,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": {
+        "from_shot_id": "DESCENT-PRE",
+        "to_shot_id": "DESCENT-TAIL",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    }
+  ],
+  "audio_spans": [
+    {
+      "track_id": "native-DESCENT-PRE",
+      "audio_kind": "dialogue",
+      "asset_id": "DESCENT-PRE-original-mix",
+      "asset_sha256": "bd2a83850f371a6e947f2616d648f359f6ee32d6079c7b8ff89ea8f41c1f2baa",
+      "start_sample": 0,
+      "duration_samples": 288000,
+      "source_start_sample": 0,
+      "source_duration_samples": 288000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "native-DESCENT-TAIL",
+      "audio_kind": "dialogue",
+      "asset_id": "DESCENT-TAIL-original-mix",
+      "asset_sha256": "bd2a83850f371a6e947f2616d648f359f6ee32d6079c7b8ff89ea8f41c1f2baa",
+      "start_sample": 288000,
+      "duration_samples": 96000,
+      "source_start_sample": 288000,
+      "source_duration_samples": 96000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    }
+  ],
+  "caption_cues": [],
+  "commercial_graphics": [],
+  "text_layers": [
+    {
+      "graphic_id": "retained-ai-disclosure",
+      "role": "proof_label",
+      "text": "AI生成",
+      "shot_id": "DESCENT-TAIL",
+      "start_frame": 144,
+      "end_frame_exclusive": 192,
+      "start_sample": 288000,
+      "end_sample": 384000,
+      "x_milli": 16,
+      "y_milli": 21,
+      "width_milli": 100,
+      "font_size_px": 40,
+      "font_weight": 400,
+      "text_color": "#DDDDDD99",
+      "background_color": "#FFFFFF12",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 0,
+        "right_milli": 0,
+        "bottom_milli": 0,
+        "left_milli": 0
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "none",
+      "exit": "none",
+      "z_index": 10
+    }
+  ],
+  "total_frames": 192,
+  "total_samples": 384000,
+  "composition_fingerprint": "f291bfe0c9b131e226932d470fe233b4f9b7e5b68be462fc40af18737e2cd112"
+}

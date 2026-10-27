@@ -1,0 +1,117 @@
+{
+  "duration": 8.063991,
+  "width": 1920,
+  "height": 1080,
+  "rate": 1,
+  "muted": false,
+  "volume": 1,
+  "ended": true,
+  "wall_seconds": 8.510299999952316,
+  "samples": [
+    {
+      "t": 0.197408,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 0.703585,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 1.202651,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 1.710077,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 2.208191,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 2.707402,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 3.207464,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 3.71391,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 4.213407,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 4.7094,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 5.20793,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 5.707,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 6.207664,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 6.718902,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 7.217481,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 7.716587,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 8.063991,
+      "rate": 1,
+      "paused": true,
+      "readyState": 4
+    }
+  ],
+  "errors": [],
+  "human_listening": "NOT_EVALUATED",
+  "playback_success_is_quality_acceptance": false
+}

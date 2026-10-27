@@ -1,0 +1,208 @@
+{
+  "objective": "为原楼梯事件取得合格下楼到达源：看清正常灭火器管道，董文慧连续下楼到关闭灰门前、双手空着。推门显露与反应归后续B源和完整拼接验收，本段不代表完整事件通过。",
+  "images": [
+    {
+      "asset_id": "MC03-DESCENT-ref-1",
+      "node_id": "MC03-DESCENT-ref-1-node",
+      "resource_id": "MC03-DESCENT-ref-1-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-X.png",
+      "usage_license": "Task-owned same-identity action reference for authorized Shizhen qualification",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-v1/reference-1-source.json",
+        "record_sha256": "42563d77fb9126a3bd32b95f6e1094935283081bfda610634ae94a6e7f3b71cc",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-DESCENT-ref-2",
+      "node_id": "MC03-DESCENT-ref-2-node",
+      "resource_id": "MC03-DESCENT-ref-2-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/action-sequences-04/A1-descent.png",
+      "usage_license": "Task-owned same-identity action reference for authorized Shizhen qualification",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-v1/reference-2-source.json",
+        "record_sha256": "6118a6be244bae3a5e1fb343c1e9cadd65655399ee9bbf69dbf232b3b1240a07",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC03-DESCENT-ref-3",
+      "node_id": "MC03-DESCENT-ref-3-node",
+      "resource_id": "MC03-DESCENT-ref-3-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/action-sequences-04/A2-arrival.png",
+      "usage_license": "Task-owned same-identity action reference for authorized Shizhen qualification",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-v1/reference-3-source.json",
+        "record_sha256": "5d882135fc94f3da3a10bc488b1c0895c05ed02b910b5e04fb6410d2d9b850f8",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "dong-wenhui",
+      "name": "董文慧",
+      "identity": "28岁，夜间应急服务文字记录者；原分镜中经过住宅楼梯、察觉细节差异而核对听辨，不解释规则",
+      "appearance_bible": "沿既有董文慧identity-v1面貌、低马尾；本宏观场景灰褐外套、深灰打底裤与黑鞋，不移植第二集场次的包本",
+      "reference_asset_ids": [
+        "MC03-DESCENT-ref-1"
+      ]
+    }
+  ],
+  "scene_images": [
+    "MC03-DESCENT-ref-1",
+    "MC03-DESCENT-ref-2",
+    "MC03-DESCENT-ref-3"
+  ],
+  "observations": {
+    "identity": "同一董文慧、低马尾、灰褐外套、深灰裤，没有新增或复制人物",
+    "action": "背向起态逐级连续下楼到低平台关门前，没有回身上楼、跳步或瞬移",
+    "camera": "固定高处看完整梯段，人物走远变小，无切镜叠化",
+    "performance": "普通走路、踏实承重，到达双手空着，不提前恐惧或听辨",
+    "space": "正常凹痕灭火器与管道存在，下方灰门保持关闭；平台可定位，最终双脚落在低平台平地",
+    "art": "写实旧楼、灰绿墙、湿台阶、暖顶灯冷窗光，无额外文字奇观",
+    "sound": "可闻自然脚步衣料住宅底噪，随走远变化，无对白音乐门声或机器声"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "art": [
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.1",
+      "generation_intent.ambience_intent.foley_cues.2",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "素材一{{image:0}}固定同一董文慧、灰褐外套和下楼起态；素材二{{image:1}}说明沿同一梯段继续下降；素材三{{image:2}}说明到达低处关闭灰门前、双手空着的终态。三张图按这个动作顺序参考，不是照片轮播。"
+    ],
+    "action": [
+      "素材一{{image:0}}固定同一董文慧、灰褐外套和下楼起态；素材二{{image:1}}说明沿同一梯段继续下降；素材三{{image:2}}说明到达低处关闭灰门前、双手空着的终态。三张图按这个动作顺序参考，不是照片轮播。",
+      "从素材一的背向姿态开始，先让观众看清上平台红灭火器的斜凹痕和旁边外露管道。她背对摄影机，沿画面由近处台阶走向远处灰门，每步从较高踏步落到前方较低踏步，连续走完可见梯段。人物因走远自然变小，不转身朝摄影机上楼，不返回上平台、不跳步或瞬移。到达低平台后双脚落在关门前平地，双手仍空着自然下垂；门始终关闭。",
+      "正常原速，脚步踏实且随走远变轻，保留自然衣料声、住宅微弱滴水与底噪；无对白、配乐、耳语或惊吓重击，不加入机器声。"
+    ],
+    "camera": [
+      "素材一{{image:0}}固定同一董文慧、灰褐外套和下楼起态；素材二{{image:1}}说明沿同一梯段继续下降；素材三{{image:2}}说明到达低处关闭灰门前、双手空着的终态。三张图按这个动作顺序参考，不是照片轮播。",
+      "固定参考中的俯视机位，看清梯段、栏杆和下方平台，完整拍下这一段下行，不切镜或叠化。她只是普通通行，神态平静，视线看前方落脚处，不提前恐惧或回头听辨。真人电影质感，灰绿旧墙、湿台阶、暖顶灯和冷窗光保持；不出现门后异常、额外人物、片名、字幕或光效。"
+    ],
+    "performance": [
+      "从素材一的背向姿态开始，先让观众看清上平台红灭火器的斜凹痕和旁边外露管道。她背对摄影机，沿画面由近处台阶走向远处灰门，每步从较高踏步落到前方较低踏步，连续走完可见梯段。人物因走远自然变小，不转身朝摄影机上楼，不返回上平台、不跳步或瞬移。到达低平台后双脚落在关门前平地，双手仍空着自然下垂；门始终关闭。",
+      "固定参考中的俯视机位，看清梯段、栏杆和下方平台，完整拍下这一段下行，不切镜或叠化。她只是普通通行，神态平静，视线看前方落脚处，不提前恐惧或回头听辨。真人电影质感，灰绿旧墙、湿台阶、暖顶灯和冷窗光保持；不出现门后异常、额外人物、片名、字幕或光效。",
+      "正常原速，脚步踏实且随走远变轻，保留自然衣料声、住宅微弱滴水与底噪；无对白、配乐、耳语或惊吓重击，不加入机器声。"
+    ],
+    "space": [
+      "素材一{{image:0}}固定同一董文慧、灰褐外套和下楼起态；素材二{{image:1}}说明沿同一梯段继续下降；素材三{{image:2}}说明到达低处关闭灰门前、双手空着的终态。三张图按这个动作顺序参考，不是照片轮播。",
+      "从素材一的背向姿态开始，先让观众看清上平台红灭火器的斜凹痕和旁边外露管道。她背对摄影机，沿画面由近处台阶走向远处灰门，每步从较高踏步落到前方较低踏步，连续走完可见梯段。人物因走远自然变小，不转身朝摄影机上楼，不返回上平台、不跳步或瞬移。到达低平台后双脚落在关门前平地，双手仍空着自然下垂；门始终关闭。",
+      "固定参考中的俯视机位，看清梯段、栏杆和下方平台，完整拍下这一段下行，不切镜或叠化。她只是普通通行，神态平静，视线看前方落脚处，不提前恐惧或回头听辨。真人电影质感，灰绿旧墙、湿台阶、暖顶灯和冷窗光保持；不出现门后异常、额外人物、片名、字幕或光效。"
+    ],
+    "art": [
+      "素材一{{image:0}}固定同一董文慧、灰褐外套和下楼起态；素材二{{image:1}}说明沿同一梯段继续下降；素材三{{image:2}}说明到达低处关闭灰门前、双手空着的终态。三张图按这个动作顺序参考，不是照片轮播。",
+      "固定参考中的俯视机位，看清梯段、栏杆和下方平台，完整拍下这一段下行，不切镜或叠化。她只是普通通行，神态平静，视线看前方落脚处，不提前恐惧或回头听辨。真人电影质感，灰绿旧墙、湿台阶、暖顶灯和冷窗光保持；不出现门后异常、额外人物、片名、字幕或光效。"
+    ],
+    "sound": [
+      "正常原速，脚步踏实且随走远变轻，保留自然衣料声、住宅微弱滴水与底噪；无对白、配乐、耳语或惊吓重击，不加入机器声。"
+    ]
+  },
+  "intent_sha256": "ebf772214ad5961bba5388ed54a30ba024f32c94d743f55500719d3ab6980753"
+}

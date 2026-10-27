@@ -1,0 +1,52 @@
+{
+  "scope": "One local same-source arrival reframe; no new generation or audio changes",
+  "user_feedback": "原像素回放仍然抖动",
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "source_frame": 144,
+  "source_pts_seconds": 6.0,
+  "roi_xywh": [
+    1000,
+    835,
+    760,
+    245
+  ],
+  "overlay_window_source_frames": [
+    144,
+    192
+  ],
+  "preserved": [
+    "all person pixels/action",
+    "native speed",
+    "same-window original audio",
+    "ordinary clues",
+    "original source and its failed/unevaluated findings",
+    "B6/fonts/music"
+  ],
+  "new_paid_video_calls": 0,
+  "max_local_renders": 1,
+  "new_audio_analysis_limit": 1,
+  "new_actual_media_review_limit": 1,
+  "reviews_before": 9,
+  "paired_review_ceiling_after_local_repair": 11,
+  "created_at": "2026-10-27T11:24:12.168707+00:00",
+  "scope_boundary": "Local development_audio_preview via CompositionSpec/ResolvedTimeline/HyperFrames, not Production acceptance",
+  "chosen_route": "Keep source[0,144) wide; source[144,192) reframe to lower closed door and full person using FixedTransform; no freeze, retime or repeated source phase",
+  "abandoned_route": "Static-alpha image overlay on captured qualification video is not available through current non-ad composition path; strict prepare rejected, no Product published",
+  "tail_transform": {
+    "translate_x_px": -1372,
+    "translate_y_px": -343,
+    "scale_x_milli": 1715,
+    "scale_y_milli": 1715
+  },
+  "tail_visible_source_approx_xywh": [
+    800,
+    200,
+    1120,
+    630
+  ],
+  "quality_limits": [
+    "Tail is digital reframe of1080p source, not new native high-detail generation",
+    "Hard cut at actual lower-platform arrival requires normal-speed review",
+    "No complete stair event or human acceptance claimed"
+  ]
+}

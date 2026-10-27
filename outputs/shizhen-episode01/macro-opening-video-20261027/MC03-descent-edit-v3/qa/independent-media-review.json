@@ -1,0 +1,24 @@
+{
+  "reviewer": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "permissions": "read-only",
+  "cumulative_review_round": 10,
+  "current_finite_ceiling": 11,
+  "extension_reason": "New user-reported original-pixel stair jitter; one local same-source candidate review plus one futureB slot, prior9 retained",
+  "candidate_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "findings": [],
+  "evidence_scope": [
+    "32 actual0.25s frames",
+    "Direct output frames143,144,147 at5.958,6.000,6.125s"
+  ],
+  "observations": [
+    "0–5.75s continues descent to lower platform; normal extinguisher/pipe retained",
+    "6s reframe keeps same closed door/direction, no observed repeated action/backstep/foot clipping",
+    "6–7.75s full feet/hands free, ends before closed door, original lower-right foreground treads out of view"
+  ],
+  "parent_adjudication": "No concrete static/boundary visual blocker observed; limited candidate, not whole-media PASS",
+  "continuous_normal_speed_viewing": "NOT_EVALUATED",
+  "audio": "NOT_EVALUATED",
+  "remaining_temporal_stability": "NOT_EVALUATED",
+  "original_human_jitter_report_preserved": true
+}

@@ -1,0 +1,99 @@
+{
+  "target": "MC03-DESCENT local reframe03",
+  "artifact_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "artifact_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-edit-v3/失帧-下楼到达-1080p-到达近景修订03.mp4",
+  "artifact_size_bytes": 7059018,
+  "local_repair_intent_sha256": "947a7ba95d0a2d58d1d731fae5959be20cc14fe3e1558317d04f6ea9b52ca530",
+  "source_raw_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "source_raw_gate": "../MC03-descent-v1/qa/post-media-gate.json",
+  "source_raw_gate_preserved": "FAIL due human original-pixel jitter feedback",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "同一原片时序与人物，已看序列服装/发型/人物数保持；未新增人物",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/assembly-verdict.json"
+      ]
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "PASS",
+      "reason": "原片[0,144)后接[144,192)，保持下楼到达、关门和手空；取帧及直接边界帧未见重复/倒退",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/assembly-verdict.json"
+      ]
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "NOT_EVALUATED",
+      "reason": "6秒完成梯段后同源切近，构图可对应；原速切近观感尚待用户确认，不继承原固定机位通过",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/assembly-verdict.json"
+      ]
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "NOT_EVALUATED",
+      "reason": "新32帧及边界未见脚被裁，逐步自然度与停止时机须原速看听",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/assembly-verdict.json"
+      ]
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "NOT_EVALUATED",
+      "reason": "台阶前景在末2秒退出构图、双脚/门/低平台仍可见；未修好原像素或证明剩余区域没有抖动",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/assembly-verdict.json"
+      ]
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "NOT_EVALUATED",
+      "reason": "保留写实旧楼和正常线索；近景为1.637数字放大，后段AI生成说明由后期文字承接，清晰度/来源标识观感待审",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/assembly-verdict.json"
+      ]
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "reason": "同源相邻样本窗连续、0dB无fade，单次exact新片盲音频识别规律脚步回声；原速接点听感未获用户接受",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/assembly-verdict.json",
+        "qa/native-audio-result.json"
+      ]
+    }
+  ],
+  "verdict": "NOT_EVALUATED",
+  "execution": "WAIT_EXACT_NEW_MEDIA_FULL_AV_REVIEW_NO_B_SUBMIT",
+  "human_acceptance": "NOT_EVALUATED",
+  "new_paid_video_calls_for_repair": 0,
+  "local_renders_total": 2,
+  "new_audio_analysis_calls_for_repair": 1,
+  "full_MC03_05_event": "NOT_EVALUATED; B not generated",
+  "production_activation": false,
+  "final_acceptance": false
+}

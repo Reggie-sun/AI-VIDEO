@@ -1,0 +1,10 @@
+{
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "reason": "Per-source media requirements not all PASS; user flagged tail lower-right stair edge stability",
+  "known_fetch": true,
+  "outcome_unknown": false,
+  "disposition": "EVIDENCE_REPAIR_FIRST",
+  "new_paid_retry": false,
+  "next_source_submit": false,
+  "no_user_acceptance_inferred": true
+}

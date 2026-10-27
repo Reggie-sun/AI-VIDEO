@@ -1,0 +1,63 @@
+{
+  "scope": "A source plus bounded local same-source reframe candidate, not full stair event",
+  "artifact_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "size_bytes": 7059018,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "duration_seconds": 8,
+  "frames": 192,
+  "fps": 24,
+  "full_decode": true,
+  "Range206": true,
+  "browser_original_rate_unmuted_to_end": true,
+  "CompositionSpec_to_ResolvedTimeline_to_HyperFrames": true,
+  "single_resolved_timeline_fingerprint": "f291bfe0c9b131e226932d470fe233b4f9b7e5b68be462fc40af18737e2cd112",
+  "source_windows": [
+    {
+      "shot_id": "DESCENT-PRE",
+      "asset_id": "descent-pre-capture",
+      "start": 0,
+      "frames": 144,
+      "audio_id": "DESCENT-PRE-original-mix"
+    },
+    {
+      "shot_id": "DESCENT-TAIL",
+      "asset_id": "descent-tail-capture",
+      "start": 144,
+      "frames": 48,
+      "audio_id": "DESCENT-TAIL-original-mix"
+    }
+  ],
+  "source_audio_matches_new_visual_windows": true,
+  "no_retime_freeze_new_performance": true,
+  "digital_reframe_tail_scale": 1.637,
+  "original_AI_disclosure_wide_and_post_disclosure_tail": true,
+  "static_background_patch_applied": false,
+  "source_raw_SHA": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "source_raw_gate": "FAIL retained",
+  "MCP_exact_media": "qa/video-analysis.json",
+  "independent_media_review": "qa/independent-media-review.json",
+  "blind_audio_once": "qa/native-audio-result.json",
+  "assembly_verdict": "qa/assembly-verdict.json",
+  "post_media_gate": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED",
+  "new_video_calls_this_turn": 1,
+  "macro_video_calls_cumulative": 6,
+  "new_paid_video_calls_for_local_repair": 0,
+  "new_image_generation_calls": 0,
+  "local_render_count": 2,
+  "blind_audio_calls_this_turn": 2,
+  "actual_charges": "NOT_CONFIRMED",
+  "B_submitted": false,
+  "B6_unchanged": true,
+  "shared_engineering_changes_by_this_task": false,
+  "task_py_compile": "PASS",
+  "docs_contract_gate": "PASS",
+  "full_engineering_regression": "NOT_RUN_NO_SHARED_ENGINEERING_CHANGE_BY_THIS_TASK",
+  "publication": "NOT_PUBLISHED",
+  "production_activation": false,
+  "record_skill": "record-ai-video-session",
+  "learning_evaluation": "no_candidate"
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": "assembly-review/2",
+  "authority": "development_only",
+  "video_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "timeline_sha256": "8a6b16f9bac6c12eeb549ed4434432a587b82cb23f6b17f01020ec0d4244d1b0",
+  "render_report_sha256": "f141b36dac2f6c9d290c1777097ed30a469599418afb6415564169ceef62bf35",
+  "inventory_sha256": "0be9518f8930d852362f4bd8a3fef4e4d36719f671e3a6a6adfbd34934a0ad8b",
+  "evaluator_name": "pending",
+  "strength": "explicit_evaluator",
+  "junction_findings": [
+    {
+      "junction_id": "64387ea7a56965fe72bf2b7695b677d9c65d4601289037d63a61ca71762fc618",
+      "inventory_sha256": "0be9518f8930d852362f4bd8a3fef4e4d36719f671e3a6a6adfbd34934a0ad8b",
+      "edit_decision": null,
+      "edit_reason": "待审看后决定修剪或说明保留理由",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "待正常速度观看前后完整行动与反应",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "待实际聆听接点是否重复、截断或跳变",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "检查前后完整动作是否重复；对有意复现记录叙事理由。"
+        },
+        "state_continuity": {
+          "verdict": "not_evaluated",
+          "observation": "检查动作阶段、人物视线、持物与接触支撑是否合理衔接。"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "检查动作速度、重复停顿、响应时机及切镜节奏。"
+        }
+      },
+      "editing_intent": null,
+      "source_selection": {
+        "outgoing": {
+          "layer_id": "retained-DESCENT-PRE",
+          "shot_id": "DESCENT-PRE",
+          "asset_id": "descent-pre-capture",
+          "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+          "start_frame": 0,
+          "duration_frames": 144,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 144,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "incoming": {
+          "layer_id": "retained-DESCENT-TAIL",
+          "shot_id": "DESCENT-TAIL",
+          "asset_id": "descent-tail-capture",
+          "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+          "start_frame": 144,
+          "duration_frames": 48,
+          "trim_start_frame": 144,
+          "trim_duration_frames": 48,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "source_out_frame_exclusive": 144,
+        "source_in_frame": 144
+      },
+      "editing_review": {
+        "action_match": {
+          "verdict": "not_evaluated",
+          "observation": "核对实际出入动作阶段、方向、速度和重复；Match Cut 须有可见对应。"
+        },
+        "axis_eyeline_space": {
+          "verdict": "not_evaluated",
+          "observation": "对照场景地理、机位工作侧、视线对象及过轴重定位，不能只看脸朝向。"
+        },
+        "scale_reaction": {
+          "verdict": "not_evaluated",
+          "observation": "景别改变是否给出所需信息，反应是否可读，是否近似机位跳切。"
+        },
+        "rhythm_reveal": {
+          "verdict": "not_evaluated",
+          "observation": "原速检查完整事件、情绪停顿、悬念及揭示时机，是否实现切镜理由。"
+        },
+        "sound_bridge": {
+          "verdict": "not_evaluated",
+          "observation": "实际聆听原句、呼吸和环境声；J/L 声桥的来源及方向须与意图一致。"
+        }
+      }
+    }
+  ]
+}

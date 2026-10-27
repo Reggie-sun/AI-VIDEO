@@ -1,0 +1,29 @@
+{
+  "facts": {
+    "width": 1920,
+    "height": 1080,
+    "rate": 1,
+    "muted": false,
+    "paused": false,
+    "source": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/%E5%A4%B1%E5%B8%A7-%E4%B8%8B%E6%A5%BC%E5%88%B0%E8%BE%BE-1080p-2.0-%E8%AF%95%E7%89%8701.mp4",
+    "cssWidth": "1920px",
+    "cssHeight": "1080px"
+  },
+  "samples": [
+    6.133034,
+    6.388985,
+    6.644288,
+    6.898401,
+    7.15362,
+    7.421906,
+    7.681702,
+    7.946376,
+    6,
+    6,
+    6.03716,
+    6.292692
+  ],
+  "errors": [],
+  "images": 9,
+  "quality_acceptance": false
+}

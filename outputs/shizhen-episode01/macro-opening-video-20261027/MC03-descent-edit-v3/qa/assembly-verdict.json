@@ -1,0 +1,137 @@
+{
+  "answers_sha256": "f29fe36d45096379d1db270af2dbb57f2a42eeea8e3a278127b8cf1d10118482",
+  "authority": "development_only",
+  "evaluator_name": "Codex explicit evaluator; actual source/output frames and exact blind audio; full human A/V acceptance pending",
+  "inventory_sha256": "0be9518f8930d852362f4bd8a3fef4e4d36719f671e3a6a6adfbd34934a0ad8b",
+  "junction_review": {
+    "cuts": [
+      {
+        "audio_basis": "not_listened",
+        "audio_observation": "同一源原声相邻样本窗0..288000和288000..384000按48k保持、0dB无fade无retime；盲分析仅报脚步回声，不证明接点听感",
+        "audio_reason": "保留原生脚步与住宅声场，未新增或替换声音；真实用户完整看听尚待",
+        "audio_verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "完整保留源[0,144)全景和[144,192)同一次到达，6秒到低平台后切同源近景，避开无叙事职责的前景台阶；暂保留候选，原速接点/听验未签",
+        "editing_intent": {
+          "audio_reason": "相邻同源样本窗连续，0dB无fade或新声音",
+          "audio_track_ids": [
+            "native-DESCENT-PRE",
+            "native-DESCENT-TAIL"
+          ],
+          "audio_treatment": "sync",
+          "axis_eyeline_space": "同一原机位只作数字重取景；同侧窗、灰门、电箱与栏杆对应",
+          "continuity_risks": [
+            "数字放大导致清晰度下降",
+            "同角度景别跳变须原速确认",
+            "源片其余可见区域时间性不稳定尚未获human通过"
+          ],
+          "expected_effect": "仍看清正常下楼和双脚到达，不重复动作；进入同侧较近观察",
+          "incoming_phase": "同一源的下一帧继续在平台迈步，双手空着",
+          "narrative_type": "opening",
+          "outgoing_phase": "下行完成后走向同一低平台关闭灰门",
+          "pickup_requirement": null,
+          "reason": "完成可见下行后把关注转到低平台门前到达，排除用户指出的前景台阶局部不稳定",
+          "rhythm_reveal": "切近只在完成可见梯段后，不预设5秒切点；原速观感仍待用户确认",
+          "scale_reaction": "1.637倍数字放大并放宽下沿，保留完整落脚；没有添加反应或惊恐",
+          "technique": "hard_cut"
+        },
+        "editing_review": {
+          "action_match": {
+            "observation": "源边界连续，无静帧可见重演；原速匹配待审",
+            "verdict": "not_evaluated"
+          },
+          "axis_eyeline_space": {
+            "observation": "门窗和栏杆位置可对应，未见明确空间矛盾；实际切镜观感待审",
+            "verdict": "not_evaluated"
+          },
+          "rhythm_reveal": {
+            "observation": "没有新异常揭示，关注到达关门前，切近节奏待原速确认",
+            "verdict": "not_evaluated"
+          },
+          "scale_reaction": {
+            "observation": "双脚完整入画，1.637数字放大较软，未签人类接受",
+            "verdict": "not_evaluated"
+          },
+          "sound_bridge": {
+            "observation": "盲分析只识别规律脚步/回声，不能替代接点聆听",
+            "verdict": "not_evaluated"
+          }
+        },
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated",
+          "action_repetition_not_evaluated",
+          "action_state_continuity_not_evaluated",
+          "action_pacing_not_evaluated",
+          "editing_action_match_not_evaluated",
+          "editing_axis_eyeline_space_not_evaluated",
+          "editing_scale_reaction_not_evaluated",
+          "editing_rhythm_reveal_not_evaluated",
+          "editing_sound_bridge_not_evaluated"
+        ],
+        "frame": 144,
+        "from_shot_id": "DESCENT-PRE",
+        "junction_id": "64387ea7a56965fe72bf2b7695b677d9c65d4601289037d63a61ca71762fc618",
+        "source_selection": {
+          "incoming": {
+            "asset_id": "descent-tail-capture",
+            "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+            "duration_frames": 48,
+            "layer_id": "retained-DESCENT-TAIL",
+            "opacity_milli": 1000,
+            "shot_id": "DESCENT-TAIL",
+            "start_frame": 144,
+            "trim_duration_frames": 48,
+            "trim_start_frame": 144,
+            "z_index": 0
+          },
+          "outgoing": {
+            "asset_id": "descent-pre-capture",
+            "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+            "duration_frames": 144,
+            "layer_id": "retained-DESCENT-PRE",
+            "opacity_milli": 1000,
+            "shot_id": "DESCENT-PRE",
+            "start_frame": 0,
+            "trim_duration_frames": 144,
+            "trim_start_frame": 0,
+            "z_index": 0
+          },
+          "source_in_frame": 144,
+          "source_out_frame_exclusive": 144
+        },
+        "to_shot_id": "DESCENT-TAIL",
+        "verdict": "not_evaluated",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "visual_observation": "32张0.25秒图及143/144/147直接边界帧未见动作重复或脚被裁；剩余区域时间性抖动和原速切近观感仍未评估",
+        "visual_verdict": "not_evaluated"
+      }
+    ],
+    "evidence_gaps": [
+      "normal_speed_human_playback_unverified",
+      "visual_not_evaluated",
+      "audio_not_listened",
+      "audio_not_evaluated",
+      "action_repetition_not_evaluated",
+      "action_state_continuity_not_evaluated",
+      "action_pacing_not_evaluated",
+      "editing_action_match_not_evaluated",
+      "editing_axis_eyeline_space_not_evaluated",
+      "editing_scale_reaction_not_evaluated",
+      "editing_rhythm_reveal_not_evaluated",
+      "editing_sound_bridge_not_evaluated"
+    ],
+    "verdict": "not_evaluated"
+  },
+  "limitation": "Validates exact bindings and declared evidence, not semantic detection or human acceptance",
+  "production_acceptance": "NOT_EVALUATED",
+  "purpose": "assembly_review_evidence",
+  "render_report_sha256": "f141b36dac2f6c9d290c1777097ed30a469599418afb6415564169ceef62bf35",
+  "strength": "explicit_evaluator",
+  "timeline_sha256": "8a6b16f9bac6c12eeb549ed4434432a587b82cb23f6b17f01020ec0d4244d1b0",
+  "verdict": "not_evaluated",
+  "video_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384"
+}

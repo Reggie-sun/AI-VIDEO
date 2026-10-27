@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6",
+  "size_bytes": 2359244,
+  "width": 1672,
+  "height": 941,
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "fictional_characters": true,
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Parent and independent static review; motion NOT_EVALUATED",
+  "source_path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A2-arrival.png",
+  "reference_role": "lower_landing_arrival"
+}

@@ -1,0 +1,71 @@
+{
+  "output": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-edit-v3/失帧-下楼到达-1080p-到达近景修订03.mp4",
+  "renderer_output": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC03-descent-edit-v3/render-001-software/output/descent-arrival-reframe-v3.mp4",
+  "sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "bytes": 7059018,
+  "size_bytes": 7059018,
+  "timeline_frames": 192,
+  "timeline_fingerprint": "f291bfe0c9b131e226932d470fe233b4f9b7e5b68be462fc40af18737e2cd112",
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 192,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 384000,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 0,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "9f31d7e095e9a8e5aefe0caa65cdf85dee9f30fd7d0612182a0edbd99039d1e0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "source_audio_matches_new_visual_windows": true,
+  "source_windows": [
+    {
+      "shot_id": "DESCENT-PRE",
+      "asset_id": "descent-pre-capture",
+      "start": 0,
+      "frames": 144,
+      "audio_id": "DESCENT-PRE-original-mix"
+    },
+    {
+      "shot_id": "DESCENT-TAIL",
+      "asset_id": "descent-tail-capture",
+      "start": 144,
+      "frames": 48,
+      "audio_id": "DESCENT-TAIL-original-mix"
+    }
+  ],
+  "usage_scope": "development_audio_preview",
+  "production_activation": false,
+  "publication": "NOT_PUBLISHED",
+  "human_review": "PENDING",
+  "paid_generation_calls": 0
+}

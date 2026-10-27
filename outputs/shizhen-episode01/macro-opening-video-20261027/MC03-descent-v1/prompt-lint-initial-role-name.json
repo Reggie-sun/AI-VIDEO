@@ -1,0 +1,13 @@
+{
+  "three_exact_inputs": true,
+  "three_native_reference_roles": false,
+  "markers_once_each": true,
+  "pure_chinese_body": true,
+  "exact_authored_prompt": true,
+  "no_dialogue_music": true,
+  "complete_downward_arrival": true,
+  "closed_door": true,
+  "duration8": true,
+  "1080p": true,
+  "native_audio": true
+}

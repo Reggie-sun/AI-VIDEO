@@ -1,0 +1,12 @@
+{
+  "sha256": "efc254158826a4504263b019cd0633e4a91fb0f44b1a5436dd7a504f40ff2979",
+  "verdict": "FAIL",
+  "parent_findings": [
+    "first post-cut footstep too close to/lost at bottom edge",
+    "original source AI disclosure cropped from tail, not accepted as delivered"
+  ],
+  "replacement": "MC03-descent-edit-v3",
+  "paid_video_calls": 0,
+  "static_background_patch_applied": false,
+  "human_acceptance": "NOT_EVALUATED"
+}

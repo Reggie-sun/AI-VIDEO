@@ -1,0 +1,103 @@
+{
+  "shot_id": "MC03-DESCENT",
+  "attempt_id": "shizhen-macro-MC03-descent-qualification-006",
+  "artifact_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "artifact_path": "runs/shizhen-macro-opening-20261027/MC03-descent-v1/state/video-generation/fetch/files/326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e.mp4",
+  "artifact_size_bytes": 14440394,
+  "sealed_generation_intent_sha256": "ebf772214ad5961bba5388ed54a30ba024f32c94d743f55500719d3ab6980753",
+  "explicit_project_video_analysis_sha256": "1abdc1ca51fadf1088d0f96b32b74391508107d2939e2a76fcd015d44473489a",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "已见序列保持低马尾、灰褐外套和深灰裤的同一人物轮廓，无新增人物；背面为主，不声明未见面部细节",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "PASS",
+      "reason": "0–8秒背向持续下行，走完可见梯段并到低平台关门前，双手空着；本项限方向与到达，不签逐步流畅度",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "全景保持固定，未检出切镜；墙窗栏杆测试区域5–8秒整数位移为0，不等于局部边缘稳定性通过",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "NOT_EVALUATED",
+      "reason": "17张离散帧与技术播放不足以签正常速度步态/落脚自然；用户没有回答完整看听可保留",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "FAIL",
+      "reason": "上下平台到达关系已建立，但用户指出末尾右下台阶边缘抖动/变形，局部稳定性尚未裁决；用户在原像素原MP4局部回放再次确认仍抖，不能只归因为缩小显示，按观感缺陷处理，物理形变根因未确诊",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/human-quality-feedback.json",
+        "qa/static-geometry-comparison.json",
+        "qa/stair-edge-tail/frame-index.json"
+      ]
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "FAIL",
+      "reason": "旧楼和正常线索可见；尾段台阶局部抖动反馈需核查，尚未排除局部纹理/反光重绘或缩放显示影响；用户在原像素原MP4局部回放再次确认仍抖，不能只归因为缩小显示，按观感缺陷处理，物理形变根因未确诊",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/human-quality-feedback.json",
+        "qa/static-geometry-comparison.json",
+        "qa/stair-edge-tail/frame-index.json"
+      ]
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "reason": "一次盲分析识别硬地规律脚步和房间回声，无可辨语音；不能证明每步同步、衣料/滴水或原速整体听感",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/native-audio-result.json"
+      ]
+    }
+  ],
+  "verdict": "FAIL",
+  "execution_disposition": "STOP_RAW_SOURCE_LOCAL_REPAIR_ONLY_NO_B_SUBMIT",
+  "unresolved_observations": [
+    "SHZ-DESCENT-U01 lower-right step-edge jitter/deformation reported at tail; no definitive global motion or structural displacement diagnosed"
+  ],
+  "new_video_calls_this_unit": 1,
+  "macro_video_calls_cumulative": 6,
+  "conditional_B_submitted": false,
+  "new_audio_analysis_calls": 1,
+  "automatic_retries": 0,
+  "actual_charges": "NOT_CONFIRMED",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "final_acceptance": false,
+  "full_MC03_05_event": "NOT_EVALUATED; doorway source and assembly still missing"
+}

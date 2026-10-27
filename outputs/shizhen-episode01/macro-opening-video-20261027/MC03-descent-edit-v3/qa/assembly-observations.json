@@ -1,0 +1,113 @@
+{
+  "schema_version": "assembly-review/2",
+  "authority": "development_only",
+  "video_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "timeline_sha256": "8a6b16f9bac6c12eeb549ed4434432a587b82cb23f6b17f01020ec0d4244d1b0",
+  "render_report_sha256": "f141b36dac2f6c9d290c1777097ed30a469599418afb6415564169ceef62bf35",
+  "inventory_sha256": "0be9518f8930d852362f4bd8a3fef4e4d36719f671e3a6a6adfbd34934a0ad8b",
+  "evaluator_name": "Codex explicit evaluator; actual source/output frames and exact blind audio; full human A/V acceptance pending",
+  "strength": "explicit_evaluator",
+  "junction_findings": [
+    {
+      "junction_id": "64387ea7a56965fe72bf2b7695b677d9c65d4601289037d63a61ca71762fc618",
+      "inventory_sha256": "0be9518f8930d852362f4bd8a3fef4e4d36719f671e3a6a6adfbd34934a0ad8b",
+      "edit_decision": "retain_with_reason",
+      "edit_reason": "完整保留源[0,144)全景和[144,192)同一次到达，6秒到低平台后切同源近景，避开无叙事职责的前景台阶；暂保留候选，原速接点/听验未签",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "32张0.25秒图及143/144/147直接边界帧未见动作重复或脚被裁；剩余区域时间性抖动和原速切近观感仍未评估",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "同一源原声相邻样本窗0..288000和288000..384000按48k保持、0dB无fade无retime；盲分析仅报脚步回声，不证明接点听感",
+      "audio_basis": "not_listened",
+      "audio_reason": "保留原生脚步与住宅声场，未新增或替换声音；真实用户完整看听尚待",
+      "viewing_mode": "sampled_frames",
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "源窗口0..144后接144..192，帧时序向前无重放；正常速度行为仍待确认"
+        },
+        "state_continuity": {
+          "verdict": "not_evaluated",
+          "observation": "离散图中人物继续向同一关闭灰门、手空，6.0/6.125/6.25双脚完整；全运动流畅度未证明"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "全长8秒、原速，无拖长或冻结；6秒切近有到达关注目的，原速节奏待审"
+        }
+      },
+      "editing_intent": {
+        "narrative_type": "opening",
+        "technique": "hard_cut",
+        "reason": "完成可见下行后把关注转到低平台门前到达，排除用户指出的前景台阶局部不稳定",
+        "expected_effect": "仍看清正常下楼和双脚到达，不重复动作；进入同侧较近观察",
+        "outgoing_phase": "下行完成后走向同一低平台关闭灰门",
+        "incoming_phase": "同一源的下一帧继续在平台迈步，双手空着",
+        "axis_eyeline_space": "同一原机位只作数字重取景；同侧窗、灰门、电箱与栏杆对应",
+        "scale_reaction": "1.637倍数字放大并放宽下沿，保留完整落脚；没有添加反应或惊恐",
+        "rhythm_reveal": "切近只在完成可见梯段后，不预设5秒切点；原速观感仍待用户确认",
+        "continuity_risks": [
+          "数字放大导致清晰度下降",
+          "同角度景别跳变须原速确认",
+          "源片其余可见区域时间性不稳定尚未获human通过"
+        ],
+        "audio_treatment": "sync",
+        "audio_reason": "相邻同源样本窗连续，0dB无fade或新声音",
+        "audio_track_ids": [
+          "native-DESCENT-PRE",
+          "native-DESCENT-TAIL"
+        ],
+        "pickup_requirement": null
+      },
+      "source_selection": {
+        "outgoing": {
+          "layer_id": "retained-DESCENT-PRE",
+          "shot_id": "DESCENT-PRE",
+          "asset_id": "descent-pre-capture",
+          "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+          "start_frame": 0,
+          "duration_frames": 144,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 144,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "incoming": {
+          "layer_id": "retained-DESCENT-TAIL",
+          "shot_id": "DESCENT-TAIL",
+          "asset_id": "descent-tail-capture",
+          "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+          "start_frame": 144,
+          "duration_frames": 48,
+          "trim_start_frame": 144,
+          "trim_duration_frames": 48,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "source_out_frame_exclusive": 144,
+        "source_in_frame": 144
+      },
+      "editing_review": {
+        "action_match": {
+          "verdict": "not_evaluated",
+          "observation": "源边界连续，无静帧可见重演；原速匹配待审"
+        },
+        "axis_eyeline_space": {
+          "verdict": "not_evaluated",
+          "observation": "门窗和栏杆位置可对应，未见明确空间矛盾；实际切镜观感待审"
+        },
+        "scale_reaction": {
+          "verdict": "not_evaluated",
+          "observation": "双脚完整入画，1.637数字放大较软，未签人类接受"
+        },
+        "rhythm_reveal": {
+          "verdict": "not_evaluated",
+          "observation": "没有新异常揭示，关注到达关门前，切近节奏待原速确认"
+        },
+        "sound_bridge": {
+          "verdict": "not_evaluated",
+          "observation": "盲分析只识别规律脚步/回声，不能替代接点聆听"
+        }
+      }
+    }
+  ]
+}

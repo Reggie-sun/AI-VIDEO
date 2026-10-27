@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "sha256": "945a1b50359d3ce8fccc0bac15c7a70578f067613a82e62765d16310d11815ce",
+  "size_bytes": 2308505,
+  "width": 1672,
+  "height": 941,
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "fictional_characters": true,
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Parent and independent static review; motion NOT_EVALUATED",
+  "source_path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A1-descent.png",
+  "reference_role": "descent_progress"
+}

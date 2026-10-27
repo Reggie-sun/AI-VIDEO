@@ -1,0 +1,25 @@
+{
+  "parent_full_event_raw": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+  "parent_full_goal": "依据原分镜MC03–MC05制作董文慧下行、推门发现重复凹痕与缺失管道、停步核对的完整事件；不新增机制、不改B6字体音乐",
+  "changed": [
+    "separate descent-arrival qualification before doorway",
+    "three actual same-camera references",
+    "fixed high camera for travel and foot support"
+  ],
+  "preserved": [
+    "identity and wardrobe",
+    "normal extinguisher and pipe",
+    "same lower closed door",
+    "native speed/sound",
+    "B6/font/music"
+  ],
+  "remaining_required_in_B": [
+    "right-hand reach/contact",
+    "one inward push",
+    "same dent/no pipe/old marks",
+    "outside-threshold stop and listening"
+  ],
+  "full_stair_status": "NOT_EVALUATED; A alone is incomplete",
+  "new_video_calls": 0,
+  "new_call_limit": 1
+}

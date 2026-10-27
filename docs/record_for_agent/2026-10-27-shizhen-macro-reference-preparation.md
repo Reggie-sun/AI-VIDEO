@@ -8,7 +8,9 @@ learning_eligibility: ineligible
 
 Date: 2026-10-27
 
-> **Current Update:** 市政6.833秒剪辑版已获用户完整看听认可。第二事件楼梯原片及首尾帧修订02均已实际生成，修订02消除提前揭示，但仍反向上楼、门动作反复且短暂脱离右手接触，Post-Media Gate FAIL。宏观视频累计5次，本修复单元上限1次已用，停止本单元与下一Shot，未改B6或签Production/最终验收。最新参考重整已补4张并复用3张，七张静态候选审看板已可访问；本轮没有新视频提交。详见 Action Reference Sequence Regrouping、First/Last Stair Repair 及对应 verification.json。
+> **Current Update:** 用户“開始吧”后已生成8秒2.0／1080p下楼到达源，方向与到达在取帧中成立；用户指出尾段右下台阶抖动并确认原像素仍抖，原片按FAIL保留。当前本地同源近景修订03为8秒审看候选，已完成exact MCP/独立取帧复核和技术播放；6秒切近、剩余时间性稳定与原声待完整看听，Gate NOT_EVALUATED，推门源尚未提交。宏观真实视频累计6次，本轮只提交1次；没有付费重抽，B6未改。详见 Descent Source And Local Arrival Reframe。
+
+> **Historical Update — Reference Regrouping:** 市政6.833秒剪辑版已获用户完整看听认可。第二事件楼梯原片及首尾帧修订02均已实际生成，修订02消除提前揭示，但仍反向上楼、门动作反复且短暂脱离右手接触，Post-Media Gate FAIL。宏观视频累计5次，本修复单元上限1次已用，停止本单元与下一Shot，未改B6或签Production/最终验收。最新参考重整已补4张并复用3张，七张静态候选审看板已可访问；本轮没有新视频提交。详见 Action Reference Sequence Regrouping、First/Last Stair Repair 及对应 verification.json。
 
 > **Historical Update — HD Regeneration:** 用户已明确认可720p试片02并要求同方案1080p，本轮1080p版03已真实生成、可播放。新片约4.5–5.5秒出现基线没有的叠化，已标注新片未通过项，待用户审看；旧AI意见与720p用户认可分别保留。另按用户指令改为Seedance2.0默认1080p，2.5保持480p先审。未提交下一Shot、未改B6或签Production验收。
 
@@ -239,3 +241,28 @@ record-ai-video-session更新同一topic历史与当前阻断，distill-ai-video
 同一native只读reviewer /root/macro720_review、reviewer_high完成新用户批准静态包的一次独立复核，宏观累计第8轮／本单位有限上限8，前7轮保留。查看并核验7张图，finding为空，未发现A2→B0或B组可明确证实的空间、手别、接触状态或门扇方向矛盾。Parent对照同一门/窗/栏杆、电箱、手空到接触及门自由边后，保留为REVIEWED_CANDIDATE；不将此写成自然下楼、持续握把、一次推门或细微听辨的动态PASS。动态、声音和human接受均NOT_EVALUATED，原两条楼梯失败视频与Gate字节/FAIL状态不变，B6 exact SHA仍d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a。
 
 新单位来源/用途、图片意图与结果、独立复核、浏览器和核验receipt均归outputs/shizhen-episode01/macro-opening-video-20261027/reference-sequences-v4/，主receipt verification.json。没有共享工程变更；任务脚本py_compile、docs_contract_gate和diff检查为对应验证，未跑完整工程测试或新增验收规则。record-ai-video-session继续同一topic记录，distill-ai-video-learning评估no_candidate：本轮是静态准备改善，没有新的受控动态实验或可提升为普遍模型结论的证据。PNG和网页截图本地保留，Git推送提示词、来源/用途及核验metadata，未发布影片。
+
+
+## Descent Source And Local Arrival Reframe
+
+用户“開始吧”授权按新参考分别动态验证下楼到达和接触推门，Parent封存最多两源、每源一次、零自动重抽，宏观5→最多7；先A、仅媒体Gate通过才B。时长按完整行动分别预留8秒，不把5秒或clip边界作为强制剪点。选seedance_2.0_vip／multimodal4／1080p／16:9／native audio，实际画布核验8000ms、1080p与三图支持，A新空节点node_hpjhj0pbj1。输入为新参考包A0旧L01-X、A1新下降、A2新低平台到达，实际三条reference角色、顺序、hash、三个markers与443字符正文（去除markers为410）均通过lint；没有把中间态留在审看板，也没有新增图片生成。原完整楼梯目标和未完成的B推门显露/反应保留在unit-intent、source-preservation-diff和brief中，不以A源通过替代完整MC03–MC05。
+
+准备阶段恰逢另一窗口reference-planning修改暂时引用尚未加入的ShotFacet，standard loader报AttributeError，尚无生成POST。该次只写本任务data/row/三条图片观察，Parent没有修改对方源码；依赖导入恢复后通过独立completion caller完成尚未执行的准备尾段，没有重复已写exclusive文件。一次自写lint误把当前native reference角色叫reference_image，当前adapter实际为reference，原失败lint保留为initial-role-name，核对源码后修正技术别名，不放宽图数量或顺序。canonical bootstrap／strict loader／compiler及Budget/egress/durable intent/一用permit沿原owner执行，未改共享规则。
+
+A单位为outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-v1，canonical根runs/shizhen-macro-opening-20261027/MC03-descent-v1。唯一submit在2026-10-27T10:52:11.975569Z受理，查询同一任务至succeeded并fetch；真实宏观累计6次，旧S05 UNKNOWN仍隔离。内部每源1500CRD、A后累计9000CRD是预配置保护上界，不是价格；本轮视频1次，实际结算待确认，条件B尚未提交。
+
+原MP4 SHA326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e，14,440,394bytes，1920×1080，container8.065秒、video8.016667秒／193帧，AAC44.1k双声道。nominal60/1不是实测播放率；按actual PTS观察，不retime。显式project-local video-analysis MCP绑定exact片并取17帧，无local scene-change候选。取帧中人物持续背向下楼、走到低平台关门前、双手空，未重现反向上楼。一次盲audio-understand绑定exact source/audio SHA、HTTP200，仅识别规律硬地脚步与房间回声，无可辨语音；不证明衣料、滴水、逐步同步或人类听验。Range206、声画完整decode及独立Chromium1x原声开启播到结尾通过，仍非质量接受。
+
+同一native只读reviewer／reviewer_high完成累计第9轮A实际媒体取帧复核，17帧finding为空；未连续原速观看/聆听，不能据此否决后来的用户反馈。用户对完整看听问题回复“最後的時候樓梯懂了正常嗎”，进一步定位“右下方台阶边缘在抖／变形”；没有回答“可以保留”，Parent不借此推进B。末段5–8秒墙窗栏杆及选定台阶区域的整数NCC位移最佳值均为0，但该测量不能排除局部/亚像素/纹理不稳定。另取6–8秒0.25秒原尺寸局部帧，并做同一MP4原像素／1x局部循环诊断页；用户明确回复“原像素回放仍然抖动”，因此不能只归因为整幅缩小显示，源片按human报告的局部观感缺陷FAIL保留，结构形变根因仍未确诊。相关证据在qa/human-quality-feedback.json、static-geometry-comparison.json与stair-edge-tail/，未把采样或NCC当human接受。
+
+Parent先尝试不新增生成的静态背景补片：同源frame144／6秒、右下ROI1000,835,760,245，人物已在ROI上方。直接geq采RGB造成少量边缘像素变化，保留拒绝PNG；改为独立alpha加alphamerge后，所有RGB与同源帧逐字节相同，ROI外透明。该路线未实际用于出片：bootstrap先拒绝将captured开发VIDEO直接绑为Production角色，纠正为原preview-use后，又拒绝pending generated_video上任意绑定背景PNG角色；当前caller所需普通图片叠层未沿非广告语义接通，Parent未伪造ad plan、绕准入、普通import原FAIL视频或修改Gate。两次prepare拒绝均发生发布前、target核对为空；同源PNG补片仅保留为未采用试验，不宣称修复已执行。
+
+随后改用现有FixedTransform的有动机到达近景：完整保留原源[0,144)全景和[144,192)同一次低平台到达，后者只重取景，原速原声、无倒放/重演/冻结/叠化。第一本地候选MC03-descent-edit-v2通过canonical capture→CompositionSpec→ResolvedTimeline→HyperFrames software导出，但Parent查到6秒后第一步脚边过紧、尾段原AI说明被裁，故保留FAIL候选，不交作通过；SHAefc254158826a4504263b019cd0633e4a91fb0f44b1a5436dd7a504f40ff2979，7,003,964bytes。一次render caller在input receipt不存在时即停止，实际renderer尚未启动，不算额外render或未知副作用。后续有限本地上限由1扩到2仅为已见脚部覆盖回归，旧候选/计数保留，没有新Video Provider调用。
+
+最终候选MC03-descent-edit-v3放宽下沿：末两秒FixedTransform translate(-1223,-344)、scale1.637，约取原图747,210,1173,660，双脚与关门前平台完整入画；前六秒正常灭火器与管道保留。近景明确为数字放大，不冒称新生高清；原AI生成字样在全景源中可见，裁切尾段用现有text_layers的来源说明承接“AI生成”，没有改B6片名/字体/音乐。192帧8秒，独占CompositionSpec→ResolvedTimeline，usage_scope=development_audio_preview；source windows连续、48k样本窗0..288000后接288000..384000，0dB无fade/retime、无新增声音。选software沿已验证参数，没有改renderer或node_modules。源捕获保留qualification谱系，未把原片FAIL重新资格化或Production激活。
+
+修订03 exact SHAbaecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384，7,059,018bytes，1920×1080／24fps／192帧、8秒、AAC48k双声道。审看入口index-descent-edit-v3.html；原片和第一本地候选页面分别保留问题与替代提示。全decode、Range206、Chromium1x不静音播至结束、HyperFrames lint/check/render证据通过。显式video-analysis MCP绑定新MP4取16帧，另有32张0.25秒actualPTS帧；MCP仍漏报6秒cut，以local scene detector与直接边界为准。新exact片只做一次盲audio-understand，识别硬底鞋脚步与房间回声；两条音频观察对应raw和新片，未拿原片报告冒充新SHA听验，真实账单待确认。
+
+同一reviewer累计第10轮，仅一次最终本地候选复核；有据有限上限11保留未来B一次，前9轮不重置。查看32帧并直接解码143/144/147帧（5.958/6.000/6.125秒），未见源阶段倒退/重演或脚被裁，末段右下原前景梯级已出画，finding为空。Parent接受该有限视觉观察；未签剩余区域时间性抖动、原速景别跳变或声音连续性通过。prepare-assembly-review与verify-assembly绑定exact新MP4/timeline/render report，显式evaluator为sampled_frames、未听验，真实verdict NOT_EVALUATED；没有用技术结果或renderer成功冒充human。修订03Post-Media Gate保持NOT_EVALUATED，完整8秒看听问题已发用户，B尚未submit，原raw FAIL不覆盖。主receipt MC03-descent-edit-v3/verification.json，A源receipt MC03-descent-v1/verification.json。
+
+本任务新增1条生成视频、2次有界本地render、0次imagegen、2次exact盲音频观察；宏观视频累计6，条件B预算未消费。B6 exact SHA仍d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a。无本任务共享工程改动；并行aa10dee reference-risk功能与audio修改不归本任务，不stage或代签。任务脚本py_compile、docs_contract_gate及diff检查为对应验证，非完整工程回归。record-ai-video-session更新同一topic，distill-ai-video-learning评估no_candidate：新A与原完整事件同时改变覆盖、机位、参考和动作密度；单条改善不能孤立证明某个变量或普遍模型能力，局部观感反馈也不由单一相关指标推导根因。媒体本地保留，Git只推caller／来源／审看页与核验资料；未发布、未签Production/P6/Final Acceptance。

@@ -1,0 +1,24 @@
+{
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "extracted_frame_index": 144,
+  "actual_pts_seconds": 6.0,
+  "frame_sha256": "019d2a89114271d91d70827269ba7b4ae97bf1250c618c59b6cafb6f6c1e556c",
+  "patch_sha256": "8844969157468b07e4f96ee60b7feb0c61338bd65e5a95f69529e1731ce90f80",
+  "size": [
+    1920,
+    1080
+  ],
+  "alpha_bounds": [
+    1000,
+    835,
+    1760,
+    1080
+  ],
+  "feather_px": 8,
+  "opaque_pixel_count": 176565,
+  "all_RGB_matches_exact_source_frame": true,
+  "outside_bounds_fully_transparent": true,
+  "person_clearance_observation": "Actual source6-8s soles above y835; subject excluded",
+  "method": "ffmpeg exact frame RGB plus separately generated alpha; no MP4 editing/new imagery",
+  "rejected_preparation": "Direct geq RGB sampler altered rare edge pixels; retained rejected PNG and switched to separate alpha merge, not tolerance weakening"
+}

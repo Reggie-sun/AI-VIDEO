@@ -1,0 +1,49 @@
+{
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "roi_xywh": [
+    1100,
+    760,
+    650,
+    320
+  ],
+  "analysis_only": true,
+  "rescale_or_retouch": false,
+  "frames": [
+    {
+      "file": "frame-01.png",
+      "source_pts_seconds": 6.0
+    },
+    {
+      "file": "frame-02.png",
+      "source_pts_seconds": 6.25
+    },
+    {
+      "file": "frame-03.png",
+      "source_pts_seconds": 6.5
+    },
+    {
+      "file": "frame-04.png",
+      "source_pts_seconds": 6.75
+    },
+    {
+      "file": "frame-05.png",
+      "source_pts_seconds": 7.0
+    },
+    {
+      "file": "frame-06.png",
+      "source_pts_seconds": 7.25
+    },
+    {
+      "file": "frame-07.png",
+      "source_pts_seconds": 7.5
+    },
+    {
+      "file": "frame-08.png",
+      "source_pts_seconds": 7.75
+    },
+    {
+      "file": "frame-09.png",
+      "source_pts_seconds": 8.0
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "shot": {
+    "shot_id": "MC03-DESCENT",
+    "scene_id": "residential-switchback",
+    "storyboard_beat_id": "stairs-descent-arrival",
+    "intent": "素材一{{image:0}}固定同一董文慧、灰褐外套和下楼起态；素材二{{image:1}}说明沿同一梯段继续下降；素材三{{image:2}}说明到达低处关闭灰门前、双手空着的终态。三张图按这个动作顺序参考，不是照片轮播。\n从素材一的背向姿态开始，先让观众看清上平台红灭火器的斜凹痕和旁边外露管道。她背对摄影机，沿画面由近处台阶走向远处灰门，每步从较高踏步落到前方较低踏步，连续走完可见梯段。人物因走远自然变小，不转身朝摄影机上楼，不返回上平台、不跳步或瞬移。到达低平台后双脚落在关门前平地，双手仍空着自然下垂；门始终关闭。\n固定参考中的俯视机位，看清梯段、栏杆和下方平台，完整拍下这一段下行，不切镜或叠化。她只是普通通行，神态平静，视线看前方落脚处，不提前恐惧或回头听辨。真人电影质感，灰绿旧墙、湿台阶、暖顶灯和冷窗光保持；不出现门后异常、额外人物、片名、字幕或光效。\n正常原速，脚步踏实且随走远变轻，保留自然衣料声、住宅微弱滴水与底噪；无对白、配乐、耳语或惊吓重击，不加入机器声。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 8
+    },
+    "character_ids": [
+      "dong-wenhui"
+    ],
+    "continuity_constraints": [
+      "原MC03–MC05仍需推门显露和反应，本段不冒充完整事件",
+      "同一人物、服装、楼梯和正常灭火器管道",
+      "背向下楼到低平台，不反向返回、提前开门或恐惧",
+      "到达手空，下一机位从同一关门手空状态接续",
+      "不改B6、字体、音乐或后续剧情"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "用户批准重整参考后先验证完整可见梯段下楼到达；固定机位服务地理和落脚可读性，开门属于后续源和全事件验收"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "character_reference",
+        "asset_id": "MC03-DESCENT-ref-1",
+        "owner_id": "dong-wenhui"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "MC03-DESCENT-ref-2"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "MC03-DESCENT-ref-3"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "董文慧背向摄影机处于通往远处关闭灰门的下行梯段，上平台红灭火器与管道可见",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "她走完可见梯段，到达较低平台关闭灰门前，双脚在平地、双手空着，尚未接触把手",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "dong-wenhui"
+        ],
+        "preservation": "exact",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "residential-switchback",
+        "time_of_day": "雨夜",
+        "mood": "普通住宅正常下行，尚未显露异常",
+        "state_constraints": [
+          "同一董文慧、低马尾、灰褐外套、深灰裤",
+          "上平台凹痕灭火器旁管道始终存在，下方灰门始终关闭",
+          "逐级下行到低平台，双手空着，不开门或提前反应"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "由近处较高踏步走到远处灰门所在低平台",
+        "screen_direction": "背向摄影机远离，沿梯段由高到低",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不穿栏杆、台阶、门或地面，不进门"
+      },
+      "axis_continuity": {
+        "camera_axis": "固定高处向下看同一楼梯",
+        "framing_continuity": "同机位保持上平台线索、梯段与低平台关系",
+        "crossing_policy": "不换轴、不转身上楼、不镜像"
+      },
+      "subject_action": {
+        "start_state": "董文慧背向摄影机处于通往远处关闭灰门的下行梯段，上平台红灭火器与管道可见",
+        "progression": "从素材一的背向姿态开始，先让观众看清上平台红灭火器的斜凹痕和旁边外露管道。她背对摄影机，沿画面由近处台阶走向远处灰门，每步从较高踏步落到前方较低踏步，连续走完可见梯段。人物因走远自然变小，不转身朝摄影机上楼，不返回上平台、不跳步或瞬移。到达低平台后双脚落在关门前平地，双手仍空着自然下垂；门始终关闭。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "她走完可见梯段，到达较低平台关闭灰门前，双脚在平地、双手空着，尚未接触把手",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "看清普通平台线索后背向走低",
+        "peak": "沿可见梯段逐级下降",
+        "settle": "双脚到低平台平地，双手空着",
+        "direction": "从较高台阶到远处更低平台",
+        "amplitude_class": "正常步幅，人物随走远变小"
+      },
+      "pacing": {
+        "cadence": "普通下楼到达后自然站定",
+        "tempo_class": "正常原速，完整走完梯段，不强塞开门",
+        "shot_duration_seconds": 8.0
+      },
+      "camera_intent": {
+        "movement": "固定高处俯视，不切镜",
+        "stability": "稳定固定机位",
+        "framing_intent": "完整梯段、上下平台、落脚及正常凹痕管道同框",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "参考起态的固定楼梯全景",
+        "end_framing": "同机位中人物走远到低处关闭灰门前",
+        "position_lock": true,
+        "orientation_lock": true
+      },
+      "performance_intent": {
+        "trigger": "正常通行下楼，尚未遇到异常",
+        "visible_response": "平常看路、逐级下行，到门前自然站住",
+        "gaze_target": "前方较低落脚处和关闭灰门",
+        "body_behavior": "连续下行交替承重，到平地站定，不转身向上",
+        "hand_behavior": "双手自然摆动后下垂，均空着，不摸把手",
+        "terminal_performance_state": "站在关门前、双手空着，未察觉异常",
+        "character_directions": [
+          {
+            "character_id": "dong-wenhui",
+            "screen_identity": "灰褐外套低马尾的董文慧",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "正常通行下楼，尚未遇到异常",
+                "emotion": "平常通行",
+                "intensity": "subtle",
+                "facial_expression": "自然平静，不提前恐惧",
+                "gaze_target": "前方较低落脚处和关闭灰门",
+                "breathing": "自然平稳",
+                "body_behavior": "连续下行交替承重，到平地站定，不转身向上"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "正常速度真人实拍质感",
+        "palette": "住宅旧墙灰绿与实用暖灯、窗外冷光",
+        "material_treatment": "旧楼墙漆、湿台阶、真实衣料、红灭火器和金属门",
+        "prohibited_visual_drift": [
+          "叠化、透明重影、分格或瞬移",
+          "新增人物、光效、片名或字幕"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "楼梯实用灯和雨夜窗外冷光",
+        "direction": "延续三张同机位楼梯图实用光",
+        "exposure_priority": "踏步支撑、栏杆、正常凹痕管道和关门可辨",
+        "continuity_state": "同一住宅雨夜，无闪光或突然换时段"
+      },
+      "ambience_intent": {
+        "environment_bed": "住宅微弱滴水和底噪，随走远变化的自然脚步",
+        "foley_cues": [
+          "踏实的正常脚步",
+          "自然衣料摩擦",
+          "住宅微弱滴水"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "dong-wenhui",
+        "relation_kind": "fixed_frame",
+        "start_relation": "高处观察背向下行人物、正常线索与远处门",
+        "end_relation": "相同机位观察人物已到低平台，因走远自然变小"
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 8,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

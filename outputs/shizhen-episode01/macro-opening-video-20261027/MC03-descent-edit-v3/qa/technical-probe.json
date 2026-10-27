@@ -1,0 +1,43 @@
+{
+  "source_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-edit-v3/失帧-下楼到达-1080p-到达近景修订03.mp4",
+  "source_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "size_bytes": 7059018,
+  "review_copy": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-edit-v3/失帧-下楼到达-1080p-到达近景修订03.mp4",
+  "probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "24/1",
+        "avg_frame_rate": "24/1",
+        "duration": "8.000000",
+        "nb_frames": "192"
+      },
+      {
+        "codec_name": "aac",
+        "codec_type": "audio",
+        "sample_rate": "48000",
+        "channels": 2,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "duration": "8.000000",
+        "nb_frames": "376"
+      }
+    ],
+    "format": {
+      "duration": "8.000000",
+      "size": "7059018"
+    }
+  },
+  "full_decode": true,
+  "original_rate_preserved": true,
+  "detected_scene_change_pts": [
+    6.0
+  ],
+  "fps_note": "r_frame_rate is not measured playback rate; source timestamps are retained",
+  "quality": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

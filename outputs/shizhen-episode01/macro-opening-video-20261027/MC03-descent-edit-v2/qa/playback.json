@@ -1,0 +1,117 @@
+{
+  "duration": 8,
+  "width": 1920,
+  "height": 1080,
+  "rate": 1,
+  "muted": false,
+  "volume": 1,
+  "ended": true,
+  "wall_seconds": 8.503,
+  "samples": [
+    {
+      "t": 0.289501,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 0.789619,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 1.289802,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 1.789919,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 2.290116,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 2.790085,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 3.290433,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 3.790598,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 4.290742,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 4.790923,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 5.291049,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 5.791217,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 6.29137,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 6.791643,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 7.291821,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 7.792105,
+      "rate": 1,
+      "paused": false,
+      "readyState": 4
+    },
+    {
+      "t": 8,
+      "rate": 1,
+      "paused": true,
+      "readyState": 4
+    }
+  ],
+  "errors": [],
+  "human_listening": "NOT_EVALUATED",
+  "playback_success_is_quality_acceptance": false
+}

@@ -1,0 +1,68 @@
+{
+  "authority": "current-task-parent-bounded-operator",
+  "authorization_quote": "開始吧",
+  "model_id": "seedance_2.0_vip",
+  "provider": "jimeng",
+  "scope": "One8s1080p descent-arrival qualification source using3 actual multimodal image inputs; conditional doorway source later; full stair goal retained",
+  "predecessor_bound_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05-repair-v2/operator-bound.json",
+  "predecessor_bound_sha256": "8072e4899a4bb34f5ad19ba691c317d80c3b97aa62c4d56c4ffb7692e97659ae",
+  "preconfigured_per_call_credit_upper_bound": 1500,
+  "per_call_credit_upper_bound": 1500,
+  "project_credit_upper_bound": 1500,
+  "currency": "CRD",
+  "issued_at": "2026-10-27T10:49:07.302282+00:00",
+  "expires_at": "2026-10-27T12:49:07.302282+00:00",
+  "max_submit_count": 1,
+  "automatic_retries": 0,
+  "macro_paid_submits_before": 5,
+  "macro_cumulative_ceiling_after_authorized_unit": 6,
+  "macro_cumulative_internal_credit_upper_bound": 9000,
+  "market_quote_claim": false,
+  "resolution": "1080p",
+  "ancestors": [
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC01-02",
+      "attempt_id": "shizhen-macro-MC01-02-qualification-001",
+      "manifest_sha256": "02c00f53626c176ecd3335da0c962ce74250bc697e44ae74960d8b1156628f70",
+      "artifact_sha256": "bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4",
+      "known_fetched": true
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC01-02-720p-v2",
+      "attempt_id": "shizhen-macro-MC01-02-720p-preview-002",
+      "manifest_sha256": "9d4736ccb89c7dea694a4af440eaf4cfbadfeaf285dd7fd948b3ac77635f20fc",
+      "artifact_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+      "known_fetched": true
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3",
+      "attempt_id": "shizhen-macro-MC01-02-1080p-approved-003",
+      "manifest_sha256": "0a219fa0a304a4396fb774c388d73d628a86b166c900238880fb455e4c396873",
+      "artifact_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+      "known_fetched": true
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC03-05",
+      "attempt_id": "shizhen-macro-MC03-05-1080p-qualification-004",
+      "manifest_sha256": "d0b843e790e04da4f4c4a29a0c8e92521538db181e074fac14448a78f2df3744",
+      "artifact_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+      "known_fetched": true
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC03-05-repair-v2",
+      "attempt_id": "shizhen-macro-MC03-05-firstlast-repair-005",
+      "manifest_sha256": "036bd2144f5b7d90bcd6acc7822b6d5fbfad7db7be7b0a0616752fa95b93844c",
+      "artifact_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+      "known_fetched": true
+    }
+  ],
+  "production_activation": false,
+  "historical_unknown_attempts_preserved": [
+    "shizhen-S05-qualification-attempt-006"
+  ],
+  "no_historical_count_reset_or_refund": true,
+  "failed_same_shot_gate_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05-repair-v2/qa/post-media-gate.json",
+  "failed_same_shot_gate_sha256": "1efdb1276a3c0a9f066a7c78fa67a50d2b2c96227e1f9cbac8da1c1445803eb2",
+  "failed_same_shot_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+  "paired_unit_cumulative_ceiling": 7
+}

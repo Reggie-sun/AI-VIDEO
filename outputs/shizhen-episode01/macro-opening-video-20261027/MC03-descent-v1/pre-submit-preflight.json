@@ -1,0 +1,42 @@
+{
+  "continuity": "same Dong Wenhui identity/wardrobe; ordinary extinguisher and pipe remain, no doorway event in A",
+  "handoff": "end at lower closed door with both hands free; B and complete-event acceptance remain outstanding",
+  "axis_action_camera": "fixed high camera, face away and move from near upper steps toward far lower closed door; natural downward foot support",
+  "adaptation": "three actual multimodal state references, reduced one-source complete action, no mandatory5s cut",
+  "actual_bindings": [
+    {
+      "asset_id": "MC03-DESCENT-ref-1",
+      "role": "reference",
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50"
+    },
+    {
+      "asset_id": "MC03-DESCENT-ref-2",
+      "role": "reference",
+      "sha256": "945a1b50359d3ce8fccc0bac15c7a70578f067613a82e62765d16310d11815ce"
+    },
+    {
+      "asset_id": "MC03-DESCENT-ref-3",
+      "role": "reference",
+      "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6"
+    }
+  ],
+  "lint": {
+    "three_exact_inputs": true,
+    "three_native_reference_roles": true,
+    "markers_once_each": true,
+    "pure_chinese_body": true,
+    "exact_authored_prompt": true,
+    "no_dialogue_music": true,
+    "complete_downward_arrival": true,
+    "closed_door": true,
+    "duration8": true,
+    "1080p": true,
+    "native_audio": true
+  },
+  "compiled_prompt_sha256": "f5b64e6a8bcd284bdefa78ff2f528d704c0863274ec1a4d5b97a924f5f03ab8b",
+  "one_submit_for_A": true,
+  "no_automatic_retry": true,
+  "qualification_only": true,
+  "predecessor_accepted_source": "municipal edit-v4, exact human clearance retained",
+  "failed_parent_evidence": "previous full stair raw and FAIL gate preserved; new user-authorized component verification, not next story event"
+}

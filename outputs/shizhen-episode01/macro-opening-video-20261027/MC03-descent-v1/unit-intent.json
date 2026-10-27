@@ -1,0 +1,32 @@
+{
+  "user_quote": "開始吧",
+  "scope": "Two separately authored qualification sources for same MC03–MC05 repair: descent-arrival8s first, contact-push-reaction8s only after predecessor media PASS. Full stair event remains unfinished until actual assembly review.",
+  "prior_known_macro_paid_submits": 5,
+  "max_new_video_submits": 2,
+  "per_component_max_submits": 1,
+  "automatic_retries": 0,
+  "macro_video_ceiling": 7,
+  "no_unknown_retry": true,
+  "new_image_calls": 0,
+  "model": "seedance_2.0_vip",
+  "resolution": "1080p",
+  "input_mode": "multimodal",
+  "source_reference_package": "outputs/shizhen-episode01/macro-opening-video-20261027/reference-sequences-v4/reference-input-plan.json",
+  "prior_failed_raws_preserved": [
+    "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+    "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5"
+  ],
+  "duration_reason": "8s descent allows normal footsteps through the visible flight and ordinary-clue establishment; separate8s doorway allows reach/contact/push/response; neither value fixes the later edit point",
+  "protected": [
+    "story and identity",
+    "B6",
+    "fonts",
+    "music"
+  ],
+  "new_media_review_limit": 2,
+  "reviews_before": 8,
+  "review_ceiling": 10,
+  "created_at": "2026-10-27T10:41:59.391906+00:00",
+  "qualification_only": true,
+  "production_activation": false
+}

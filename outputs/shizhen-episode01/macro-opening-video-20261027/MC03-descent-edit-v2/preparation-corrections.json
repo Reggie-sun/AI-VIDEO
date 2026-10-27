@@ -1,0 +1,7 @@
+{
+  "rejected_bootstrap": "Captured development VIDEO may only be used via preview CompositionSpec; binding it directly to a Production Shot role was rejected before publish",
+  "correction": "Keep primary video role unbound, as existing qualification-preview caller; captured asset only enters explicit preview layer/use. Static same-source patch remains image layer. No gate/source changes.",
+  "bootstrap_target_verified_empty_after_rejection": true,
+  "renderer_not_started_before_input_receipt": true,
+  "new_video_calls": 0
+}

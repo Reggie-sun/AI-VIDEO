@@ -1,0 +1,20 @@
+{
+  "reviewer": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "permissions": "read-only",
+  "cumulative_macro_review_round": 9,
+  "paired_unit_review_ceiling": 10,
+  "candidate_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "scope": "A descent-arrival only; not doorway/full stair event",
+  "findings": [],
+  "evidence_scope": [
+    "ExactSHA checked",
+    "All17 frames at0-8s viewed"
+  ],
+  "continuous_normal_speed_viewing": "NOT_EVALUATED",
+  "actual_listening": "NOT_EVALUATED",
+  "reviewer_result": "No reverse ascent, railing penetration, premature door opening or obvious spatial jump observed in discrete frames",
+  "parent_adjudication": "No discrete-frame blocker; this does not cover later human-reported lower-right step-edge shimmer or full-speed motion acceptance",
+  "later_human_feedback": "human-quality-feedback.json",
+  "human_acceptance": "NOT_EVALUATED"
+}
