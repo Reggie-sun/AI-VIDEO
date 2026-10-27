@@ -1,0 +1,295 @@
+{
+  "scope": "用户最新点名四套；身份层与当前场次层严格分开",
+  "roles": [
+    {
+      "id": "dong-wenhui",
+      "name": "董文慧",
+      "design_status": "新身份设计候选",
+      "story_basis": "二十八岁，女性，夜间应急服务文字记录工作，过去做过地下疏散临时接线员，熟悉救援通路，判断快但承认听辨有限，会隐瞒自己的听觉损伤；普通劳动与行动者，不是制服执法者。",
+      "visual_proposal": "设计一位二十八岁的中国成年女性。自然中等偏瘦体型、普通体能，椭圆略长脸，直而不过分凌厉的眉，中等大小的眼睛、清楚的鼻梁但不尖，嘴唇自然略薄，黑色齐肩直发松松低束，耳廓与额角可见、无刘海遮眼；眼周有轻微夜班疲劳。克制而警觉，眼神像在认真听清楚再下判断，有具体工作的习惯，不是冷艳女杀手或青春偶像。长期特征与罗敏的短卷发圆下颌明显区分。此为新造型候选，不沿用其他演员的脸。",
+      "identity_layer": {
+        "target_views": [
+          "正面",
+          "四分之三侧面",
+          "侧面",
+          "全身"
+        ],
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "prompt": "referces/shizhen/character-packs-20261027/dong-wenhui/prompts/identity-v1.txt",
+        "prompt_sha256": "d757cb4c9c60e92eced434ca5ed8fdd1c8bf6dbd371dc5f0a4b17f655c5c57ae",
+        "output": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "inputs": [],
+        "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-dc41c49b-16fa-4054-8695-fccdac89429e.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+        "width": 1536,
+        "height": 1024,
+        "visual_observation": "同一28岁女性，三个人像角度和全身可辨；干燥中性服装，无场次携带物",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "scene_layer": {
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "source_policy": "Luo/Gao reuse exact generated shot frames; Dong/Wen first-appearance visual proposals grounded in E02/E05",
+        "scene_id": "E02 首次出场候选",
+        "candidate_not_canon": true,
+        "prompt": "referces/shizhen/character-packs-20261027/dong-wenhui/prompts/scene-v3.txt",
+        "prompt_sha256": "6c75afbac26d33c0d2a7bea939b7165dd802c6a8de8b27612fe4cac306e3c1ca",
+        "output": "referces/shizhen/character-packs-20261027/dong-wenhui/scene/scene-v3.png",
+        "inputs": [
+          {
+            "path": "referces/shizhen/character-packs-20261027/dong-wenhui/scene/scene-v2.png",
+            "sha256": "921d4c728583afc3312babf71713f77b13a5d52fdb1136d14b5569e796b9c1c5"
+          },
+          {
+            "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+            "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+          }
+        ],
+        "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-61aa611d-60da-4c6c-abdb-6ed05ed54332.png",
+        "sha256": "690abb95fa7e12d459ae6931eda9abb881c716df2b789c018e9a77e9d82eeaf6",
+        "width": 1777,
+        "height": 885,
+        "history": [
+          {
+            "status": "KNOWN_HANDEDNESS_MISMATCH",
+            "source_policy": "Luo/Gao reuse exact generated shot frames; Dong/Wen first-appearance visual proposals grounded in E02/E05",
+            "scene_id": "E02 首次出场候选",
+            "candidate_not_canon": true,
+            "prompt": "referces/shizhen/character-packs-20261027/dong-wenhui/prompts/scene-v1.txt",
+            "prompt_sha256": "8e367938e6821d76a7bcf9f009bb1bed2e4942b73cf6937c765230a14fb7e471",
+            "output": "referces/shizhen/character-packs-20261027/dong-wenhui/scene/scene-v1.png",
+            "inputs": [
+              {
+                "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+                "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+              }
+            ],
+            "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-59b67adb-7abd-4bd3-b1dc-293e4edb3368.png",
+            "sha256": "363f56e9649dcc17026711d204ce8b41ca390251fccec9fd87d2a43e4cebb9f4",
+            "width": 1778,
+            "height": 884,
+            "observation": "Middle panel places the notebook in anatomical right hand and gestures with anatomical left; conflicts with sealed left notebook/right free action."
+          },
+          {
+            "status": "TURNED_POSE_HANDEDNESS_NOT_PROVEN",
+            "source_policy": "Luo/Gao reuse exact generated shot frames; Dong/Wen first-appearance visual proposals grounded in E02/E05",
+            "scene_id": "E02 首次出场候选",
+            "candidate_not_canon": true,
+            "prompt": "referces/shizhen/character-packs-20261027/dong-wenhui/prompts/scene-v2.txt",
+            "prompt_sha256": "ad35b96ee9e54f3f417cf59f9b30096b943ab7730196348590f5d8486df89c53",
+            "output": "referces/shizhen/character-packs-20261027/dong-wenhui/scene/scene-v2.png",
+            "inputs": [
+              {
+                "path": "referces/shizhen/character-packs-20261027/dong-wenhui/scene/scene-v1.png",
+                "sha256": "363f56e9649dcc17026711d204ce8b41ca390251fccec9fd87d2a43e4cebb9f4"
+              },
+              {
+                "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+                "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+              }
+            ],
+            "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-7bbc8722-3030-4f93-b947-51a5b9e34e0c.png",
+            "sha256": "921d4c728583afc3312babf71713f77b13a5d52fdb1136d14b5569e796b9c1c5",
+            "width": 1778,
+            "height": 885,
+            "repair_reason": "Middle panel places the notebook in anatomical right hand and gestures with anatomical left; conflicts with sealed left notebook/right free action.",
+            "observation": "Middle panel repaired, but third side-turned torso makes anatomical notebook-hand continuity ambiguous; request frontal torso to expose the connection."
+          }
+        ],
+        "repair_reason": "Middle panel places the notebook in anatomical right hand and gestures with anatomical left; conflicts with sealed left notebook/right free action.",
+        "visual_observation": "v3三格左手持同一本、右手空手可辨；先听辨、再看出口、再迈步；灰蓝外套/包和干燥状态连续",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "luo-min",
+      "name": "罗敏",
+      "design_status": "由已生成镜头整理",
+      "story_basis": "三十多岁的普通夜班工人，高峥同厂同事，主动联系接车司机，注意现实生活，并不会预知同事消失；后续能核对排班和接车路线。",
+      "visual_proposal": "只保留参考图中罗敏的身份：第一张是她的近景，第二张画面右侧短卷发女性才是目标，不能混入左侧高峥。严格延续她既有的圆而较短的下颌、眼鼻唇关系、自然三十多岁年龄感和中等偏瘦成人比例、短微卷黑发的自然发际线。保留普通夜班工人的精神和疲惫，神情自然务实，有主动与人说话的生活感，不做少女美化。把原雨湿头发整理成干燥自然状态即可，不重新设计五官。原图的墨绿雨衣、手机与包属于场次层，本图改成统一中性打底服。",
+      "identity_layer": {
+        "target_views": [
+          "正面",
+          "四分之三侧面",
+          "侧面",
+          "全身"
+        ],
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "prompt": "referces/shizhen/character-packs-20261027/luo-min/prompts/identity-v1.txt",
+        "prompt_sha256": "d3b8e3646edf7800583cfc04fcef4866dfa1598186def8f8ef55eef5bde2305d",
+        "output": "referces/shizhen/character-packs-20261027/luo-min/identity/identity-v1.png",
+        "inputs": [
+          {
+            "path": "referces/shizhen/character-packs-20261027/sources/survivor-close.png",
+            "sha256": "ce0eb27be3dc61df29870f9be5cc85f7bbc78a39d6643b8742eeaa1ca77e015e"
+          },
+          {
+            "path": "referces/shizhen/character-packs-20261027/sources/station-entry.png",
+            "sha256": "f0218a6e228b15837d9b3164a9d5b9e7d78d4f3956af7ccff0f26722e3feff1d"
+          }
+        ],
+        "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-233c1f92-837a-4a71-83b3-bb859c43920d.png",
+        "sha256": "ef4ecd9ba7c4246787e62a07004b25448a20d5fd0a8583482e6600480ac5e33c",
+        "width": 1672,
+        "height": 941,
+        "visual_observation": "沿用已有短卷发、圆下颌及眼鼻关系；去掉雨衣手机包；原片风格影响和年龄感待人审",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "scene_layer": {
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "source_policy": "Luo/Gao reuse exact generated shot frames; Dong/Wen first-appearance visual proposals grounded in E02/E05",
+        "output": "referces/shizhen/character-packs-20261027/luo-min/scene/scene-v1.png",
+        "source_record": "referces/shizhen/character-packs-20261027/luo-min/scene/scene-source.json",
+        "model_calls": 0,
+        "sha256": "8c1037e2d166037157f2de6b66b44aa6707fc47ce94a6182a7670987b6edce6d",
+        "width": 3200,
+        "height": 2048,
+        "visual_observation": "同一既有雨站素材，墨绿雨衣/黑包/左手机原状态保留；等待、提醒、遮挡、独自通话",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "gao-zheng",
+      "name": "高峥",
+      "design_status": "由已生成镜头整理",
+      "story_basis": "四十岁上下，普通夜班设备维护工，罗敏同厂同事，关心路滑和按时回家；维修经验是现实劳动技能，不是秘密研究者。",
+      "visual_proposal": "只保留两张参考图画面左侧高峥的身份，不能画成右侧女同事。严格保持成熟宽脸、原有眼鼻嘴和下颌比例、略稀短黑发及额角发际线、自然四十岁上下年龄感、轻胡茬和普通中年劳动者体态。细金属框透明眼镜沿用原图且不能遮挡眼形，眼镜是可摘戴配件，不是身份变化依据。气质踏实，有维修现场的观察习惯，站姿自然稳、不做军人或时装模特。原褐灰外套、通勤包、雨湿和插兜姿态均属于场次层，本图换成统一中性打底服和双手自然垂放。",
+      "identity_layer": {
+        "target_views": [
+          "正面",
+          "四分之三侧面",
+          "侧面",
+          "全身"
+        ],
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "prompt": "referces/shizhen/character-packs-20261027/gao-zheng/prompts/identity-v1.txt",
+        "prompt_sha256": "e817899c3bdab9e38eb964c3e6d9540685dcc4c17f85f9ce6e2464c3ab319ff3",
+        "output": "referces/shizhen/character-packs-20261027/gao-zheng/identity/identity-v1.png",
+        "inputs": [
+          {
+            "path": "referces/shizhen/character-packs-20261027/sources/before-04.0s.png",
+            "sha256": "383365cb101b12edf60b1984f07791ba247bc670a665e6849163f79bc3d1caaf"
+          },
+          {
+            "path": "referces/shizhen/character-packs-20261027/sources/station-entry.png",
+            "sha256": "f0218a6e228b15837d9b3164a9d5b9e7d78d4f3956af7ccff0f26722e3feff1d"
+          }
+        ],
+        "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-a7f36159-2200-45ef-bebe-5c204157b40b.png",
+        "sha256": "97d4a53c1c854603d9b1d612bdb6fe31a59fa6e37762209b655726bd3b4589dd",
+        "width": 1672,
+        "height": 941,
+        "visual_observation": "沿用中年面孔、轻胡茬、细框眼镜和发际线；眼镜可摘戴，不固定为身体身份",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "scene_layer": {
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "source_policy": "Luo/Gao reuse exact generated shot frames; Dong/Wen first-appearance visual proposals grounded in E02/E05",
+        "output": "referces/shizhen/character-packs-20261027/gao-zheng/scene/scene-v1.png",
+        "source_record": "referces/shizhen/character-packs-20261027/gao-zheng/scene/scene-source.json",
+        "model_calls": 0,
+        "sha256": "0767e0c517ef3fce3a14e58379ba0b739ed0c20ba0e6a7cb670321a0e400212e",
+        "width": 3200,
+        "height": 2048,
+        "visual_observation": "同一既有雨站素材，褐灰外套/眼镜/深棕包；回应、遮挡、事后缺席，不生成走开或透明化",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "wen-sufen",
+      "name": "闻素芬",
+      "design_status": "文字设定下的外观补全候选",
+      "story_basis": "四十四岁，存照馆经营者、旧档案修复师，保管并鉴别来源；审慎、在工作流程里有控制感，曾做过有代价的交易，也必须承认自己认人和判断的局限。",
+      "visual_proposal": "设计一位四十四岁的中国成熟女性，中等结实普通体型，方椭圆脸、颧骨和下颌有自然骨感但不消瘦，眼角浅纹、轻眼袋和真实颈部皮肤显示成熟年龄；深黑发鬓角少量自然灰丝，发际线和额角清楚，后方低挽发。安静审慎、目光在核对细节，具有长期经营修复业务的熟练和分寸，站姿稳、手部放松，不把她画成贵妇、女老板宣传照或神秘巫师；不靠夸张凶脸暗示她做过交易。和董文慧的年轻直发长脸、罗敏的短卷发有清楚区别。当前未有既定人像，这是待确认的新外观候选，不冒称成片演员。",
+      "identity_layer": {
+        "target_views": [
+          "正面",
+          "四分之三侧面",
+          "侧面",
+          "全身"
+        ],
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "prompt": "referces/shizhen/character-packs-20261027/wen-sufen/prompts/identity-v1.txt",
+        "prompt_sha256": "9cacb4cf49b2409e9f32e37445fcf14f4b84dfd0a264a27162e2e0b615905282",
+        "output": "referces/shizhen/character-packs-20261027/wen-sufen/identity/identity-v1.png",
+        "inputs": [],
+        "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-c4423d10-5784-4120-aa9a-f86e7348f90b.png",
+        "sha256": "46efde5271929d11131d08c1a46943936e78a9bd70e58f6d1c03e90575e24c73",
+        "width": 1536,
+        "height": 1024,
+        "visual_observation": "44岁修复师外观候选，成熟皮肤、发际线、体型基线可辨；暂无旧人像可比对",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "scene_layer": {
+        "status": "STATIC_REVIEWED_CANDIDATE",
+        "source_policy": "Luo/Gao reuse exact generated shot frames; Dong/Wen first-appearance visual proposals grounded in E02/E05",
+        "scene_id": "E05 存照馆鉴源候选",
+        "candidate_not_canon": true,
+        "prompt": "referces/shizhen/character-packs-20261027/wen-sufen/prompts/scene-v1.txt",
+        "prompt_sha256": "330f41ee8d842528b7693ea4efbf2489938bdde39e047a032e21f273eed14ee1",
+        "output": "referces/shizhen/character-packs-20261027/wen-sufen/scene/scene-v1.png",
+        "inputs": [
+          {
+            "path": "referces/shizhen/character-packs-20261027/wen-sufen/identity/identity-v1.png",
+            "sha256": "46efde5271929d11131d08c1a46943936e78a9bd70e58f6d1c03e90575e24c73"
+          }
+        ],
+        "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-0a0c1b01-5ed2-49ea-b242-8e4dca888434.png",
+        "sha256": "3f5c815d8a4a8eb10ffb672dbe0d599d8eae7b05a63f41bbc7d5c78f9c10de9e",
+        "width": 1774,
+        "height": 887,
+        "visual_observation": "同一44岁女性，深褐开衫/石白衬衫；两组照片与纸袋先核对再分开，静态接触可见",
+        "human_acceptance": "NOT_EVALUATED",
+        "runtime_model_consumption": "NOT_EVALUATED"
+      },
+      "human_acceptance": "NOT_EVALUATED"
+    }
+  ],
+  "source_documents": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/season-01-outline.md",
+      "sha256": "565a58628203f70e714234f7ff3e8d4761544f1d124e273be9af2796388c91a8"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md",
+      "sha256": "2f0903f829e4007499e059890a3a849206523bc94fd1815824b9aa1a637e4e0e"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/faction-bible.md",
+      "sha256": "f1c89c6dbcb6b5ccd2ab3d2f699beea3f5915493b98e4b9093f10f5d918e8992"
+    }
+  ],
+  "generation_bounds": {
+    "identity_calls": 4,
+    "new_scene_calls": 2,
+    "known_failure_repair_calls_max": 2,
+    "unknown_retry": 0,
+    "known_failure_repairs_consumed": 2
+  },
+  "scene_proposals_not_new_canon": true,
+  "runtime_state_mutation": false,
+  "actual_cost": "NOT_EXPOSED",
+  "summary": {
+    "selected_deliverables": 8,
+    "roles": 4,
+    "identity_sheets": 4,
+    "scene_sheets": 4,
+    "image_generation_calls": 8,
+    "known_outcomes": 8,
+    "unknown_outcomes_this_four_pack": 0,
+    "known_failure_repair_calls": 2,
+    "local_scene_document_renders": 2,
+    "runtime_state_mutation": false,
+    "human_acceptance": "NOT_EVALUATED",
+    "actual_cost": "NOT_EXPOSED"
+  }
+}

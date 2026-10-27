@@ -1,0 +1,99 @@
+[
+  {
+    "id": "station-entry",
+    "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/station-entry.png",
+    "sha256": "f0218a6e228b15837d9b3164a9d5b9e7d78d4f3956af7ccff0f26722e3feff1d",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd.mp4",
+    "source_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+    "source_frame": 8,
+    "source_pts_seconds": 0.3333333333333333,
+    "role": "空间与人物站位，仅已观测画面；不是宏观全街布局或真人肤质参考",
+    "source_ai_label_retained": true,
+    "model_input_bound": false,
+    "local_path": "referces/shizhen/character-packs-20261027/sources/station-entry.png"
+  },
+  {
+    "id": "station-reveal",
+    "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/station-reveal.png",
+    "sha256": "cb48839e9d8489f2b89b18f72806f15a458ba7e7fd8084a403c9cb24c6b748f7",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+    "source_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+    "source_frame": 95,
+    "source_pts_seconds": 3.9583333333333335,
+    "role": "事后空位，审查使用；不得绑定宏观入口以免提前漏人",
+    "source_ai_label_retained": true,
+    "model_input_bound": false,
+    "local_path": "referces/shizhen/character-packs-20261027/sources/station-reveal.png"
+  },
+  {
+    "id": "survivor-close",
+    "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/survivor-close.png",
+    "sha256": "ce0eb27be3dc61df29870f9be5cc85f7bbc78a39d6643b8742eeaa1ca77e015e",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+    "source_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+    "source_frame": 361,
+    "source_pts_seconds": 15.041666666666666,
+    "role": "接缝真实入点及表演；不是新镜首帧",
+    "source_ai_label_retained": true,
+    "model_input_bound": false,
+    "local_path": "referces/shizhen/character-packs-20261027/sources/survivor-close.png"
+  },
+  {
+    "id": "optional-tail",
+    "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/optional-tail.png",
+    "sha256": "8249cde74298c965ec73e7e7f3bf886934a62606f364a3a4edd925325c796bce",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+    "source_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+    "source_frame": 288,
+    "source_pts_seconds": 12.0,
+    "role": "片尾全景候选；原时间牌为空，Grok合成前需核对时间连续性，不是最终成片",
+    "source_ai_label_retained": true,
+    "model_input_bound": false,
+    "local_path": "referces/shizhen/character-packs-20261027/sources/optional-tail.png"
+  },
+  {
+    "id": "before-02.0s",
+    "local_path": "referces/shizhen/character-packs-20261027/sources/before-02.0s.png",
+    "sha256": "a37f73c1cebed54e28055326dc7ee6e80396cafffc5c667ce45aec20af7dc3e3",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd.mp4",
+    "source_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+    "requested_timestamp_seconds": 2.0,
+    "scope": "Actual generated shot frame; no overall acceptance inference"
+  },
+  {
+    "id": "before-04.0s",
+    "local_path": "referces/shizhen/character-packs-20261027/sources/before-04.0s.png",
+    "sha256": "383365cb101b12edf60b1984f07791ba247bc670a665e6849163f79bc3d1caaf",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd.mp4",
+    "source_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+    "requested_timestamp_seconds": 4.0,
+    "scope": "Actual generated shot frame; no overall acceptance inference"
+  },
+  {
+    "id": "before-06.5s",
+    "local_path": "referces/shizhen/character-packs-20261027/sources/before-06.5s.png",
+    "sha256": "536777e310c00b72e79130304fd072a51d457a3e4cabde7ec5e8405a077f6646",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd.mp4",
+    "source_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+    "requested_timestamp_seconds": 6.5,
+    "scope": "Actual generated shot frame; no overall acceptance inference"
+  },
+  {
+    "id": "occlusion-00.0s",
+    "local_path": "referces/shizhen/character-packs-20261027/sources/occlusion-00.0s.png",
+    "sha256": "6f96c0779a0c1fdaee36d783e118497c3f12d42ce6bc8352644a479313046af5",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+    "source_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+    "requested_timestamp_seconds": 0.0,
+    "scope": "Actual generated shot frame; no overall acceptance inference"
+  },
+  {
+    "id": "occlusion-02.0s",
+    "local_path": "referces/shizhen/character-packs-20261027/sources/occlusion-02.0s.png",
+    "sha256": "5354e27360f0724d8acb03caeac6c8e41331bb46a5d4b2b2a0666454138bd98b",
+    "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+    "source_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+    "requested_timestamp_seconds": 2.0,
+    "scope": "Actual generated shot frame; no overall acceptance inference"
+  }
+]

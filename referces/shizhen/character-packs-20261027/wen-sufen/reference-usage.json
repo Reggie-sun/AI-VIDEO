@@ -1,0 +1,20 @@
+{
+  "name": "闻素芬",
+  "story_role": "四十四岁，存照馆经营者、旧档案修复师，保管并鉴别来源；审慎、在工作流程里有控制感，曾做过有代价的交易，也必须承认自己认人和判断的局限。",
+  "age_baseline": "44岁",
+  "work_and_position": "存照馆经营者兼旧档案修复师",
+  "behaviour": "审慎、有分寸、熟悉工作流程，保管权不等于处置权",
+  "identity_baseline": [
+    "脸部结构与五官关系",
+    "发际线、原生发质与体态比例基线",
+    "自然年龄感基线，不宣称永久不老"
+  ],
+  "identity_is_not_scene_wardrobe": true,
+  "change_policy": "可换衣服、受伤、变老；新状态需对照同一身份底图，保留可识别的面部结构与可解释变化，另存版本，不用一次湿发或服装反向更换演员",
+  "scene_scope": "第五集存照馆候选：接收两组资料 → 核对来源 → 分开归置并收手",
+  "temporary_state": "深褐开衫、石白衬衫、规整袖口；两组照片与纸质寄存袋；干燥、无新伤",
+  "visual_status": "暂无既定人像，外观补全候选",
+  "new_visual_choices_not_canon": true,
+  "identity": "wen-sufen/identity/identity-v1.png",
+  "scene": "wen-sufen/scene/scene-v1.png"
+}

@@ -1,0 +1,126 @@
+{
+  "verification_kind": "static_reference_assets_and_exact_source_files",
+  "scope": "4 named characters × identity and current-scene layers",
+  "checks": [
+    {
+      "role": "董文慧",
+      "layer": "identity_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+      "width": 1536,
+      "height": 1024,
+      "decode_valid": true,
+      "visual_observation": "同一28岁女性，三个人像角度和全身可辨；干燥中性服装，无场次携带物"
+    },
+    {
+      "role": "董文慧",
+      "layer": "scene_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/dong-wenhui/scene/scene-v3.png",
+      "sha256": "690abb95fa7e12d459ae6931eda9abb881c716df2b789c018e9a77e9d82eeaf6",
+      "width": 1777,
+      "height": 885,
+      "decode_valid": true,
+      "visual_observation": "v3三格左手持同一本、右手空手可辨；先听辨、再看出口、再迈步；灰蓝外套/包和干燥状态连续"
+    },
+    {
+      "role": "罗敏",
+      "layer": "identity_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/luo-min/identity/identity-v1.png",
+      "sha256": "ef4ecd9ba7c4246787e62a07004b25448a20d5fd0a8583482e6600480ac5e33c",
+      "width": 1672,
+      "height": 941,
+      "decode_valid": true,
+      "visual_observation": "沿用已有短卷发、圆下颌及眼鼻关系；去掉雨衣手机包；原片风格影响和年龄感待人审"
+    },
+    {
+      "role": "罗敏",
+      "layer": "scene_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/luo-min/scene/scene-v1.png",
+      "sha256": "8c1037e2d166037157f2de6b66b44aa6707fc47ce94a6182a7670987b6edce6d",
+      "width": 3200,
+      "height": 2048,
+      "decode_valid": true,
+      "visual_observation": "同一既有雨站素材，墨绿雨衣/黑包/左手机原状态保留；等待、提醒、遮挡、独自通话"
+    },
+    {
+      "role": "高峥",
+      "layer": "identity_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/gao-zheng/identity/identity-v1.png",
+      "sha256": "97d4a53c1c854603d9b1d612bdb6fe31a59fa6e37762209b655726bd3b4589dd",
+      "width": 1672,
+      "height": 941,
+      "decode_valid": true,
+      "visual_observation": "沿用中年面孔、轻胡茬、细框眼镜和发际线；眼镜可摘戴，不固定为身体身份"
+    },
+    {
+      "role": "高峥",
+      "layer": "scene_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/gao-zheng/scene/scene-v1.png",
+      "sha256": "0767e0c517ef3fce3a14e58379ba0b739ed0c20ba0e6a7cb670321a0e400212e",
+      "width": 3200,
+      "height": 2048,
+      "decode_valid": true,
+      "visual_observation": "同一既有雨站素材，褐灰外套/眼镜/深棕包；回应、遮挡、事后缺席，不生成走开或透明化"
+    },
+    {
+      "role": "闻素芬",
+      "layer": "identity_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/wen-sufen/identity/identity-v1.png",
+      "sha256": "46efde5271929d11131d08c1a46943936e78a9bd70e58f6d1c03e90575e24c73",
+      "width": 1536,
+      "height": 1024,
+      "decode_valid": true,
+      "visual_observation": "44岁修复师外观候选，成熟皮肤、发际线、体型基线可辨；暂无旧人像可比对"
+    },
+    {
+      "role": "闻素芬",
+      "layer": "scene_layer",
+      "artifact": "referces/shizhen/character-packs-20261027/wen-sufen/scene/scene-v1.png",
+      "sha256": "3f5c815d8a4a8eb10ffb672dbe0d599d8eae7b05a63f41bbc7d5c78f9c10de9e",
+      "width": 1774,
+      "height": 887,
+      "decode_valid": true,
+      "visual_observation": "同一44岁女性，深褐开衫/石白衬衫；两组照片与纸袋先核对再分开，静态接触可见"
+    }
+  ],
+  "chinese_only_actual_prompts": true,
+  "source_documents_current": true,
+  "new_visual_designs_are_candidates": true,
+  "human_acceptance": "NOT_EVALUATED",
+  "actual_model_input_and_motion": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED",
+  "engineering_harness": "NOT_EVALUATED: no focused mapping for local reference archive metadata; no runtime code changed",
+  "native_review": {
+    "decision": "NATIVE_REVIEW_NOT_REQUIRED",
+    "basis": "Advisory media preparation and local document rendering only; source and output bytes verified; no Production mutation"
+  },
+  "manifest_sha256": "ef0b04fb6155f77ac9142070f5488e6295e29baaddf0e6fac67be55bbe851bc2",
+  "gallery_links_resolve": true,
+  "gallery_render_review": "Local Chrome rendered; both identity and scene columns load; final image and scene documents visually inspected",
+  "metadata_sha256": {
+    "README.md": "dda406c0902012548027ba64cd3c1e8f64e40690f64f0103cde5aaee0756acf3",
+    "dong-wenhui/README.md": "f2b3bff1a60512e86e48ee9e16ef5a9fb818c7ce4e9588e3c2000a6b7a04cb46",
+    "dong-wenhui/prompts/identity-v1.txt": "d757cb4c9c60e92eced434ca5ed8fdd1c8bf6dbd371dc5f0a4b17f655c5c57ae",
+    "dong-wenhui/prompts/scene-v1.txt": "8e367938e6821d76a7bcf9f009bb1bed2e4942b73cf6937c765230a14fb7e471",
+    "dong-wenhui/prompts/scene-v2.txt": "ad35b96ee9e54f3f417cf59f9b30096b943ab7730196348590f5d8486df89c53",
+    "dong-wenhui/prompts/scene-v3.txt": "6c75afbac26d33c0d2a7bea939b7165dd802c6a8de8b27612fe4cac306e3c1ca",
+    "dong-wenhui/reference-usage.json": "bd533c407f6bb9c2804cedde6c9da636e6e1dc574847e7443fd0aa41d53684d4",
+    "gao-zheng/README.md": "65c2c67219793f8cc3c7b4592d89aa807ec8d1312bfffbc6e04c82c370fa3c60",
+    "gao-zheng/prompts/identity-v1.txt": "e817899c3bdab9e38eb964c3e6d9540685dcc4c17f85f9ce6e2464c3ab319ff3",
+    "gao-zheng/reference-usage.json": "dfaa8e463a8cded7bae259d78f46f4263856a573537ca514614c5a2934f70ab8",
+    "gao-zheng/scene/scene-source.json": "1572c3835d054e3e27dcf3f7c8385e3cabe6fb8b5c4bb222dc2cc2fe31dae6ef",
+    "gao-zheng/scene/scene-v1.html": "62641d49019a317e57a34fbf8ca8c703c1addbf31b90853d9332af8ebd7fb5c7",
+    "index.html": "b5237ed2c350f2944af6d860ee3af2acb7863ad91b24a5ee45ccd740fbc8408d",
+    "luo-min/README.md": "308bf9fe21dc3d4233591030c985796e92a007e92168b6e9736af31891dfab66",
+    "luo-min/prompts/identity-v1.txt": "d3b8e3646edf7800583cfc04fcef4866dfa1598186def8f8ef55eef5bde2305d",
+    "luo-min/reference-usage.json": "a10594f9d75aaac14256dd207d2d20078bb98612e396ac78e86371fb13eab15b",
+    "luo-min/scene/scene-source.json": "0bc620f64c375d0f429219b95d9556af0ae29b6757de954b241b17ce55915d92",
+    "luo-min/scene/scene-v1.html": "b9615ec8cb75b03d43905318eb25ec0a915ab522697188c055c7f26a4ef0be2a",
+    "package-manifest.json": "ef0b04fb6155f77ac9142070f5488e6295e29baaddf0e6fac67be55bbe851bc2",
+    "source-evidence.json": "a7859fab5f875ed9e4d3be7d8ad2b403cb30ba8bdc8049fa7b7d7a9250f4fc9b",
+    "wen-sufen/README.md": "39cd991d24c24eca64e3e5d058cc062c2795a5cf22145683dc9b9a2bde0067e1",
+    "wen-sufen/prompts/identity-v1.txt": "9cacb4cf49b2409e9f32e37445fcf14f4b84dfd0a264a27162e2e0b615905282",
+    "wen-sufen/prompts/scene-v1.txt": "330f41ee8d842528b7693ea4efbf2489938bdde39e047a032e21f273eed14ee1",
+    "wen-sufen/reference-usage.json": "a1eaa05449ebe0859581e1c28958276c9d24f2386195bfe38273077b5d49e435"
+  }
+}

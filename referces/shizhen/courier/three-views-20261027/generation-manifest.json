@@ -1,0 +1,79 @@
+{
+  "project": "失帧",
+  "character": "第一集快递员（骑手，匿名）",
+  "scope": "用户限定3张简单人物参考图",
+  "generation_call_limit": 3,
+  "retry_limit": 0,
+  "actual_cost": "NOT_EXPOSED",
+  "inputs": [
+    {
+      "path": "referces/shizhen/courier/three-views-20261027/source-frames/S05-005-08.0s.png",
+      "sha256": "67aa4977b544e6b45dbdc7e48cda03a16f2a1e11280a3bfa5868f3adfe5696c7"
+    },
+    {
+      "path": "referces/shizhen/courier/three-views-20261027/source-frames/S05-005-15.0s.png",
+      "sha256": "e36fc151164628bafe112c6ae8a5e2015ca69c267646b42e0745a81a2b62be30"
+    }
+  ],
+  "assets": [
+    {
+      "id": "01-front",
+      "view": "正面",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "prompt": "referces/shizhen/courier/three-views-20261027/prompts/01-front.txt",
+      "prompt_sha256": "c59f399eefae2848da7ae0bc1433e09090ba06da69c7a7e63232070e3a409e8d",
+      "output": "referces/shizhen/courier/three-views-20261027/images/01-front.png",
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-9e3b4759-240e-4b1b-9fe3-b905bc2e0715.png",
+      "sha256": "8b59a0960bdc290dc7563c2c096d942c56cf6addd1dcb0b4d7eb7096f4db3cb1",
+      "width": 1024,
+      "height": 1536,
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "02-side",
+      "view": "侧面",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "prompt": "referces/shizhen/courier/three-views-20261027/prompts/02-side.txt",
+      "prompt_sha256": "182d2db1c6c3eaddfd20f05e199074dc5a562e5c20d9fe238637dcf3425caa85",
+      "output": "referces/shizhen/courier/three-views-20261027/images/02-side.png",
+      "additional_reference": {
+        "path": "referces/shizhen/courier/three-views-20261027/images/01-front.png",
+        "sha256": "8b59a0960bdc290dc7563c2c096d942c56cf6addd1dcb0b4d7eb7096f4db3cb1"
+      },
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-e125dd3a-29d0-493b-bc6b-6bd54e16df21.png",
+      "sha256": "0662a71dc54cce7194a81ba0aa44f57a4c9f7c95e39e572df32db25fa092cbc0",
+      "width": 1024,
+      "height": 1536,
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "03-back",
+      "view": "背面",
+      "status": "UNKNOWN",
+      "prompt": "referces/shizhen/courier/three-views-20261027/prompts/03-back.txt",
+      "prompt_sha256": "195e9826a6116d8ebb0ee6efb8c46941ca9bd5bf627a9ce171145ad2894027f2",
+      "output": "referces/shizhen/courier/three-views-20261027/images/03-back.png",
+      "additional_reference": {
+        "path": "referces/shizhen/courier/three-views-20261027/images/01-front.png",
+        "sha256": "8b59a0960bdc290dc7563c2c096d942c56cf6addd1dcb0b4d7eb7096f4db3cb1"
+      },
+      "additional_side_reference": {
+        "path": "referces/shizhen/courier/three-views-20261027/images/02-side.png",
+        "sha256": "0662a71dc54cce7194a81ba0aa44f57a4c9f7c95e39e572df32db25fa092cbc0"
+      },
+      "error": "image generation failed: network error: error sending request",
+      "retry_count": 0
+    }
+  ],
+  "human_acceptance": "NOT_EVALUATED",
+  "production_state_mutation": false,
+  "summary": {
+    "requested_images": 3,
+    "returned_images": 2,
+    "actual_generation_calls": 3,
+    "unknown_outcomes": 1,
+    "automatic_retry": 0,
+    "status": "PARTIAL_UNKNOWN_BACK",
+    "cost": "NOT_EXPOSED"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "董文慧",
+  "story_role": "二十八岁，女性，夜间应急服务文字记录工作，过去做过地下疏散临时接线员，熟悉救援通路，判断快但承认听辨有限，会隐瞒自己的听觉损伤；普通劳动与行动者，不是制服执法者。",
+  "age_baseline": "28岁",
+  "work_and_position": "夜间应急文字记录／过去的临时接线员",
+  "behaviour": "克制、先听辨再核对，判断快但承认局限",
+  "identity_baseline": [
+    "脸部结构与五官关系",
+    "发际线、原生发质与体态比例基线",
+    "自然年龄感基线，不宣称永久不老"
+  ],
+  "identity_is_not_scene_wardrobe": true,
+  "change_policy": "可换衣服、受伤、变老；新状态需对照同一身份底图，保留可识别的面部结构与可解释变化，另存版本，不用一次湿发或服装反向更换演员",
+  "scene_scope": "第二集白天首次出场候选：服务口停步听辨 → 核对普通出口 → 引路迈步",
+  "temporary_state": "灰蓝短风衣、米灰内搭、深灰裤、帆布包；左手记事本，右手空手；干燥、无新增伤口",
+  "visual_status": "新设计候选",
+  "new_visual_choices_not_canon": true,
+  "identity": "dong-wenhui/identity/identity-v1.png",
+  "scene": "dong-wenhui/scene/scene-v3.png"
+}

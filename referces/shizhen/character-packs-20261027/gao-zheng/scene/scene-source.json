@@ -1,0 +1,41 @@
+{
+  "method": "fixed layout of exact generated video frames",
+  "scene": "E01 cold open rain stop",
+  "temporary_state": "褐灰工作外套、深灰针织内搭，肩部有雨湿；细框眼镜、深棕帆布通勤包；接车时自然站立、回应路滑。",
+  "role_behaviour_basis": "四十岁上下 · 夜班设备维护工 · 关心同伴路上安全",
+  "identity_source_policy": "Existing screen faces retained; scene state does not redefine identity",
+  "stage_labels": [
+    "等车观察路面",
+    "提醒司机路滑",
+    "车经过遮挡",
+    "事后不在原位置"
+  ],
+  "stage_images": [
+    "sources/station-entry.png",
+    "sources/before-04.0s.png",
+    "sources/before-06.5s.png",
+    "sources/station-reveal.png"
+  ],
+  "inputs": [
+    {
+      "path": "sources/before-04.0s.png",
+      "sha256": "383365cb101b12edf60b1984f07791ba247bc670a665e6849163f79bc3d1caaf"
+    },
+    {
+      "path": "sources/before-06.5s.png",
+      "sha256": "536777e310c00b72e79130304fd072a51d457a3e4cabde7ec5e8405a077f6646"
+    },
+    {
+      "path": "sources/station-entry.png",
+      "sha256": "f0218a6e228b15837d9b3164a9d5b9e7d78d4f3956af7ccff0f26722e3feff1d"
+    },
+    {
+      "path": "sources/station-reveal.png",
+      "sha256": "cb48839e9d8489f2b89b18f72806f15a458ba7e7fd8084a403c9cb24c6b748f7"
+    }
+  ],
+  "model_calls": 0,
+  "new_plot": false,
+  "image_output": "gao-zheng/scene/scene-v1.png",
+  "source_style_limit": "Existing frames have stylized CG influence; this archive does not certify unified live-action quality"
+}

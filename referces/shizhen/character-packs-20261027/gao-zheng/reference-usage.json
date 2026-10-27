@@ -1,0 +1,20 @@
+{
+  "name": "高峥",
+  "story_role": "四十岁上下，普通夜班设备维护工，罗敏同厂同事，关心路滑和按时回家；维修经验是现实劳动技能，不是秘密研究者。",
+  "age_baseline": "四十岁上下",
+  "work_and_position": "夜班设备维护工，罗敏同厂同事",
+  "behaviour": "踏实、观察路面、关心同伴安全，保持普通劳动经验",
+  "identity_baseline": [
+    "脸部结构与五官关系",
+    "发际线、原生发质与体态比例基线",
+    "自然年龄感基线，不宣称永久不老"
+  ],
+  "identity_is_not_scene_wardrobe": true,
+  "change_policy": "可换衣服、受伤、变老；新状态需对照同一身份底图，保留可识别的面部结构与可解释变化，另存版本，不用一次湿发或服装反向更换演员",
+  "scene_scope": "第一集冷开场既有素材：等待 → 提醒路滑 → 遮挡 → 事后不在原位置",
+  "temporary_state": "褐灰外套、深灰针织内搭、细框眼镜、深棕通勤包；肩部雨湿",
+  "visual_status": "既有面孔整理；眼镜属于可摘戴配件",
+  "new_visual_choices_not_canon": false,
+  "identity": "gao-zheng/identity/identity-v1.png",
+  "scene": "gao-zheng/scene/scene-v1.png"
+}

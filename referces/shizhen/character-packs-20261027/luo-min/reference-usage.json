@@ -1,0 +1,20 @@
+{
+  "name": "罗敏",
+  "story_role": "三十多岁的普通夜班工人，高峥同厂同事，主动联系接车司机，注意现实生活，并不会预知同事消失；后续能核对排班和接车路线。",
+  "age_baseline": "三十多岁",
+  "work_and_position": "普通夜班工人，主动联系接车的同事",
+  "behaviour": "务实、注意当下生活，不预知高峥缺席",
+  "identity_baseline": [
+    "脸部结构与五官关系",
+    "发际线、原生发质与体态比例基线",
+    "自然年龄感基线，不宣称永久不老"
+  ],
+  "identity_is_not_scene_wardrobe": true,
+  "change_policy": "可换衣服、受伤、变老；新状态需对照同一身份底图，保留可识别的面部结构与可解释变化，另存版本，不用一次湿发或服装反向更换演员",
+  "scene_scope": "第一集冷开场既有素材：联系接车 → 听同事提醒 → 遮挡 → 继续接听",
+  "temporary_state": "墨绿雨衣、衣袖与发梢雨湿；黑色斜挎包、左手手机贴左耳",
+  "visual_status": "既有面孔整理；风格与年龄感待人审",
+  "new_visual_choices_not_canon": false,
+  "identity": "luo-min/identity/identity-v1.png",
+  "scene": "luo-min/scene/scene-v1.png"
+}

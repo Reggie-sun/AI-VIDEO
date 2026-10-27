@@ -1,0 +1,20 @@
+{
+  "kind": "local image files",
+  "checks": [
+    {
+      "id": "01-front",
+      "path": "referces/shizhen/courier/three-views-20261027/images/01-front.png",
+      "sha256": "8b59a0960bdc290dc7563c2c096d942c56cf6addd1dcb0b4d7eb7096f4db3cb1",
+      "decode_valid": true
+    },
+    {
+      "id": "02-side",
+      "path": "referces/shizhen/courier/three-views-20261027/images/02-side.png",
+      "sha256": "0662a71dc54cce7194a81ba0aa44f57a4c9f7c95e39e572df32db25fa092cbc0",
+      "decode_valid": true
+    }
+  ],
+  "back": "UNKNOWN; no image returned; not retried",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}
