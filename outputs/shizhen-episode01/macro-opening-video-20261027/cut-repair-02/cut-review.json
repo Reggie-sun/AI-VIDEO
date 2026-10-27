@@ -1,0 +1,39 @@
+{
+  "authority": "development_review_only",
+  "source_path": "runs/shizhen-macro-opening-20261027/MC01-02/state/video-generation/fetch/files/bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4.mp4",
+  "source_sha256": "bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4",
+  "user_feedback": "还有5s这个切镜头太奇怪了",
+  "cut_pts_seconds": 5.216666666666667,
+  "decoded_near_cut_pts_seconds": [
+    5.13333,
+    5.16667,
+    5.21667,
+    5.25,
+    5.3
+  ],
+  "before_frame": "cut-02.png",
+  "after_frame": "cut-03.png",
+  "previous_camera_verdict": "PASS_FOR_STRUCTURAL_PRESENCE_ONLY",
+  "current_camera_verdict": "FAIL_USER_REJECTED_INTERNAL_CUT",
+  "observations": [
+    "切前工人手仍接触停止控制；切后工人突然变为远处左边背景",
+    "连接耳从中远景右侧约0.68画宽，跳到近景左侧约0.42画宽，索线构图与视角重新建立",
+    "后镜底板未展示清楚的渐进形变，切镜没有兑现新的动作信息"
+  ],
+  "repair": [
+    "停机与继续滑门仍同镜成立；只在手收回、视线交接、门到限位后切",
+    "近景保留连接耳中右位置、朝右索向、门边限位和同一动作阶段",
+    "切后从未弯状态开始，直接呈现有限拱起，不靠溶解、变速或冻结掩盖"
+  ],
+  "source_shotboard": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md",
+  "requested_preview_resolution": "480p",
+  "selected_model_preserved": "seedance_2.0_vip",
+  "current_channel_resolutions": [
+    "720p",
+    "1080p",
+    "4k"
+  ],
+  "model_switch_authorized": false,
+  "new_media_calls": 0,
+  "repair_media_quality": "NOT_EVALUATED"
+}

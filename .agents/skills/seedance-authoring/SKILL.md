@@ -52,6 +52,12 @@ compiler表达，再沿原authoring revision、preview、预算和permit执行�
 [2.5官方发布](https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5)，
 以及当前`src/ai_video/production/jimeng_models.py`。没有实际A/B证据时，不将版本宣传差异当作本项目质量结论。
 
+## Preview Resolution And Approval
+
+横版叙事/短剧的新生成与修复重生成统一先用480p试片，只有用户明确认可适用方案并授权升档后才生成1080p；
+具体规则归[制作规格](../../../docs/canvas-continuous-production.md#formal-narrative-output-defaults)。所选模型/渠道缺少480p时报告缺口，
+不擅自改用720p/1080p、换模型，或先高分辨率生成再缩小冒充原生480p；方法稳定或历史认可不豁免本次升档认可。
+
 如果缺失事项属于其他 owner，先按以下规则 route：
 
 - concept、coverage 或 ordered multi-Shot design -> `open-video`；

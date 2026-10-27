@@ -1,0 +1,30 @@
+{
+  "kind": "parent-transcription-of-native-read-only-model-config",
+  "observed_date": "2026-10-27",
+  "recorded_at": "2026-10-27T06:30:39.893575+00:00",
+  "surface": "Jimeng logged-in canvas native videoGenerationConfigStore.getModeConfig(model,4)",
+  "project_id": "e09b617d-5af1-40ee-9136-d36a7422d40c",
+  "account_verified": true,
+  "models": [
+    {
+      "model_id": "seedance_2.0_vip",
+      "mode": 4,
+      "resolutions": [
+        "720p",
+        "1080p",
+        "4k"
+      ]
+    },
+    {
+      "model_id": "seedance_2.5",
+      "mode": 4,
+      "resolutions": [
+        "480p",
+        "720p",
+        "1080p"
+      ]
+    }
+  ],
+  "generation_POSTs": 0,
+  "no_claim_about_other_channels": true
+}

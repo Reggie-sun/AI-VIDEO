@@ -96,3 +96,15 @@ seedance-authoring现有8项检查通过；8秒2.0 VIP的五张原图SHA、时�
 当前有限单元为1次视频，已消费1次；预配置内部单次1500CRD上限不是报价，未取得实际结算金额。声音分析内部0.05USD上限同样不是报价，实际费用待确认。严格reader审计先前24个视频attempt；原S05 UNKNOWN保持不动，不重试、不清零、不退款或复用旧permit。本次为独立宏观首段的新任务，观察cohort累计25个，不声称这是账单统计。
 
 核验receipt：`outputs/shizhen-episode01/macro-opening-video-20261027/verification.json`；含exact copy/SHA、全片声画decode、Range206、浏览器原速播放到结尾、B6保护核验。docs_contract_gate通过，任务脚本py_compile通过；未改共享源码，不额外跑全套或把技术检查当作质量通过。旧规则Harness的并行policy映射失败仍按上节保留。Risk Gate为NATIVE_REVIEW_NOT_REQUIRED：只新增任务数据及调用既有owner，无修改凭据、权限、恢复或共享执行行为，Parent已核验实际证据。record-ai-video-session记录本稳定质量阻断；distill-ai-video-learning评估no_candidate，一次新片及其音频观察不构成独立多实验，不改Skill/Policy/Gate。
+
+## Preview-First Rule And Rejected Internal Cut
+
+用户明确修订“统一先用480p，我点头再用1080p”，并指出“5s这个切镜头太奇怪了”。本次只改规则和切镜依据，零新增视频／图像／声音调用；不把此反馈当1080p认可或自动换型号授权。横版叙事/短剧的canonical规格`docs/canvas-continuous-production.md`删除“方法稳定后直接1080p”的豁免，改为统一480p试片、用户明确认可适用方案并授权后才1080p，CLI/表格同步；seedance-authoring只增加该owner的入口与能力缺口处理。
+
+实际只读核验当前同一即梦账号与画布的全模态配置：`seedance_2.0_vip`只有720p/1080p/4k，`seedance_2.5`支持480p/720p/1080p。这个结论限当前渠道，不宣称2.0整个模型家族不支持480p。Parent提出2.5/480p选项后，用户追问为何不用2.0，没有批准换型；当前仍保留2.0，480p能力缺口未解除，不擅自用720p、1080p或先高分辨率再缩小冒充。15秒及以内选2.0的规则保留；新480p规则与当前渠道不可同时满足时报告，不静默择一。
+
+原片SHA不变。按解码PTS确认实际切镜为5.2166667秒，切前5.16667秒工人手仍在停止控制上，连接耳位于画面右侧；切后连接耳跳到偏左，工人缩成远处左边背景，近景又未兑现新的形变动作。旧Gate的camera PASS只核对“有同侧近景”等结构，不能代表剪辑自然；当前camera判断由用户反馈及实际前后帧复核为FAIL。旧receipt保留，supersession见`outputs/shizhen-episode01/macro-opening-video-20261027/cut-repair-02/cut-review.json`，不把原片或旧PASS改成新片通过。
+
+MC01/MC02镜头依据已修订：停机与继续滑移同镜不变；待手收回、目光交到牵引点、门到限位后再切，不硬钉第5秒；近景继承中右连接耳、朝右索向、门边限位与同一次受力阶段，在镜内从平直到有限拱起，不接静止细节图等到结束。D0/D1只承担形变前后职责，不自动批准旧构图。此为repair authoring，尚无新媒体，修订效果NOT_EVALUATED；不以转场、变速或冻结假装修复。
+
+现有preparation和审看页同步当前480p要求、切镜失败与能力阻断。seedance-authoring精准测试8项通过，docs_contract_gate通过；切点按exact原片SHA/实际PTS与前后全尺寸帧核对，无新增共享代码行为，不运行完整工程套件。现有Harness policy的并行映射问题仍按旧段保留。record-ai-video-session更新本稳定规则/阻断检查点；distill-ai-video-learning为no_candidate：本次是用户直接规则和同片新观察，不是独立多实验或Skill学习adoption。Risk Gate仍NATIVE_REVIEW_NOT_REQUIRED，由Parent核验规则diff与实际帧；不改并行dirty AGENTS、Provider源码/文档或他人暂存。

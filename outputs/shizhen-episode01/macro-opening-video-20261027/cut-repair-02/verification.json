@@ -1,0 +1,21 @@
+{
+  "kind": "documentation-and-source-media-review-checkpoint",
+  "resolution_rule": "480p preview first;1080p only after applicable user approval",
+  "model_unchanged": "seedance_2.0_vip",
+  "paid_calls_this_revision": 0,
+  "media_changed": false,
+  "checks": {
+    "seedance_authoring_tests": "8 passed",
+    "docs_contract_gate": "PASS",
+    "near_cut_pts_and_full_size_frames": "verified",
+    "new_repair_media": "NOT_EVALUATED"
+  },
+  "rule_file_hashes": {
+    ".agents/skills/seedance-authoring/SKILL.md": "2b2dd6c479d5c8475391234cad89d64c09ff4c57ef19091667ce1b78e6a6d939",
+    "docs/canvas-continuous-production.md": "8a13aa9277fa48311ae245ab554011d8555cafe880c4329e2c340b18152e15d9",
+    "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md": "ddfe9e24a75b35488a2c1886fc2d49ef865ef905454efe4c144c5af4543339d7"
+  },
+  "native_model_support": "model-support-readback.json",
+  "cut_review": "cut-review.json",
+  "runtime_mutation": false
+}
