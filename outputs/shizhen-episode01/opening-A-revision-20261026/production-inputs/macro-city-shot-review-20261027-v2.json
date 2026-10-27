@@ -1,0 +1,63 @@
+{
+  "authority": "advisory_creative_revision_review",
+  "predecessor": {
+    "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-city-shot-review-20261027.json",
+    "sha256": "1c00beb4392a611ee04e8fa6b146df2ab869ff9dfce2032f440107638e1f88b3",
+    "commit": "c3f637ffed026dd1b87acad5a88434611fe7a3e2",
+    "preserved": true
+  },
+  "user_confirmation": {
+    "quote": "可以",
+    "context": "回应屋檐滴雨、横移揭示城市、道路纵深下降、减速交给钢索及工人控制盒的运镜方案",
+    "scope": "MC00 camera direction only; retained six event shots and B6",
+    "does_not_establish": [
+      "city map accepted",
+      "exact duration sealed",
+      "actual single-take quality",
+      "whole-opening single-take rewrite",
+      "Production acceptance"
+    ]
+  },
+  "route": "roof-eave rain close foreground -> lateral city reveal -> road-guided curved descent -> decelerate -> cable foreground and worker/control handoff",
+  "files": [
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md",
+      "sha256": "f1a572f5b5af8584d2e471eca3caf622d43f1bb513ff14c1f3fa23ac8de2b19e",
+      "relative_links": "PASS"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-CREATIVE-DISCUSSION-20261027.md",
+      "sha256": "7f3ed75d41aba31fdb6865fb2b65dfcba640dc517a51aa5623e46cbb4c45c936",
+      "relative_links": "PASS"
+    }
+  ],
+  "b6_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "b6_bytes_unchanged": true,
+  "independent_concept_review": {
+    "agent": "/root/macro720_review",
+    "actual_profile": "reviewer_high",
+    "city_text_review_count": 2,
+    "previous_city_text_review_count": 1,
+    "existing_media_review_count": 11,
+    "new_media_review_count": 0,
+    "scope": "targeted current camera-direction revision, read-only",
+    "findings": [],
+    "parent_adjudication": "No textual blocker found. Route, focal transition, duration, recognized landmarks and exact MC01 seam still require actual references/previs/media evidence",
+    "snapshot_identity": "matches file SHAs above"
+  },
+  "static_checks": {
+    "docs_contract": "PASS",
+    "relative_links": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "runtime_or_media_validation": "NOT_EVALUATED",
+  "approved_production_shot_created": false,
+  "actual_reference_binding": false,
+  "new_image_calls": 0,
+  "new_video_calls": 0,
+  "new_music_calls": 0,
+  "new_paid_calls": 0,
+  "publication": "AUTHORING_REVISION_ONLY_NOT_PUBLISHED_FILM",
+  "learning_outcome": "no_candidate",
+  "engineering_risk_gate": "NATIVE_REVIEW_NOT_REQUIRED; independent creative check separately completed"
+}
