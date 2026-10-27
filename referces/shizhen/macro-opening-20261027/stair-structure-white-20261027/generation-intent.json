@@ -1,0 +1,27 @@
+{
+  "created_at": "2026-10-27T21:22:10.785760+00:00",
+  "user_request": "问题是之前的暴露的楼梯是弯的...应该把楼梯作为一个单独的白底图作为referces",
+  "scope": "one isolated staircase geometry reference image, not scene or action endpoint",
+  "provider": "builtin image_gen.imagegen",
+  "max_calls": 1,
+  "auto_retries": 0,
+  "new_video_calls": 0,
+  "reference_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/background-source-frame.png",
+  "reference_sha256": "019d2a89114271d91d70827269ba7b4ae97bf1250c618c59b6cafb6f6c1e556c",
+  "reference_duty": "material and railing style only; original bent geometry explicitly corrected",
+  "prompt": "制作一张供影视视频生成参考的独立楼梯结构母图。只制作一组完整、可搭建的直跑楼梯，不制作整间楼梯间。\n参考图片只用于旧居民楼的灰色石质台阶、黑色钢制栏杆的类型与尺度感。原图露出的台阶有弯曲问题，必须纠正；不要沿袭弯曲、扇形、宽窄变化或透视断裂的梯级。不要复制原图人物、墙面、门窗、管线、灭火器或文字。\n楼梯由上方矩形平台、一段连续笔直的下行梯段、底部矩形平台组成，九级矩形踏步。每一级实际宽度、踏面进深、踢面高度分别完全一致；所有踏步前缘是笔直的平行线，左右边界各自沿一条直线，不逐级偏转，不产生转弯。两端平台与梯段连接清楚，底部平台确实平坦，台阶没有被地板纹理替代。\n只在下楼方向的左侧设黑色金属栏杆：一条连续笔直的斜扶手，等间距的竖直栏杆，栏杆牢固落在梯段侧边。平台处扶手平直收尾，连接形成明确直角；不弯成弧形，不横跨行走路径。右侧开放，清楚露出直梯边界和混凝土结构侧面。\n用高位三分之四俯视角完整展示这一件楼梯，让每级踏面、台阶直线、左侧栏杆及上下平台的高低关系都容易判断。建筑模型级准确几何，写实灰色哑光石质或混凝土踏步，只有很轻的旧化，不使用强烈反光或复杂花纹。\n纯白无缝背景，柔和接触阴影，整件物体完整入画、周围留白。只要一张单图，不要拼图，不要多视图，不要透视说明图。不要人物、文字、尺寸线、箭头、边框、透明缺口或场景背景。横向画幅。",
+  "prompt_sha256": "51d63d40a3eb35d940d1a345cc22f2c86624701a717f2b75d33728f82b7a9317",
+  "transparent_background": false,
+  "status": "KNOWN_OUTPUT_SAVED",
+  "actual_video_binding": false,
+  "acceptance": "REVIEW_PENDING",
+  "actual_calls": 1,
+  "output_path": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/stair-structure-white-v1.png",
+  "output_sha256": "8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e",
+  "output_dimensions": [
+    1672,
+    941
+  ],
+  "billing": "NOT_EXPOSED",
+  "model_identity": "NOT_EXPOSED"
+}

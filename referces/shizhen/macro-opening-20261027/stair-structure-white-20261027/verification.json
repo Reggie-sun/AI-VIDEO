@@ -1,0 +1,48 @@
+{
+  "file": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/stair-structure-white-v1.png",
+  "sha256": "8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e",
+  "size_bytes": 1601794,
+  "dimensions": [
+    1672,
+    941
+  ],
+  "mode": "RGB",
+  "opaque_white_background": true,
+  "actual_reference_inputs": [
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/background-source-frame.png",
+      "sha256": "019d2a89114271d91d70827269ba7b4ae97bf1250c618c59b6cafb6f6c1e556c",
+      "duty": "material and railing style only; original bent geometry explicitly corrected"
+    }
+  ],
+  "review_only_feedback_images": [
+    {
+      "path": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/user-geometry-feedback-01.png",
+      "sha256": "a3a92e1bf3a4f4a93734ab094b53873cc658378773982ab7d95817d6cdc38630"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/user-geometry-feedback-02.png",
+      "sha256": "c556096216a0e896bd65bc51971746b21a908d8e30b2c23e098576013989aae7"
+    }
+  ],
+  "observations": {
+    "isolated_staircase": "PASS_IN_STATIC_REVIEW",
+    "straight_single_flight": "PASS_IN_STATIC_REVIEW",
+    "straight_parallel_tread_edges": "PASS_IN_STATIC_REVIEW",
+    "visible_upper_and_lower_platforms": "PASS_IN_STATIC_REVIEW",
+    "no_person_or_room_background": "PASS_IN_STATIC_REVIEW",
+    "railing_handedness_in_final_scene": "NOT_EVALUATED: new oblique view must be oriented against descent camera, no mirror assumption",
+    "constant_world_measurements": "NOT_MEASURED: generated raster is not CAD or construction survey",
+    "natural_descent_or_dynamic_stability": "NOT_EVALUATED"
+  },
+  "status": "STATIC_REFERENCE_CANDIDATE",
+  "actual_video_binding": false,
+  "new_video_calls": 0,
+  "builtin_image_calls": 1,
+  "paid_settlement": "NOT_EXPOSED",
+  "resized_or_cropped": false,
+  "production_activation": false,
+  "human_acceptance": "PENDING",
+  "review_link_http_status": 200,
+  "review_link_exact_bytes": true
+}

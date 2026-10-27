@@ -8,7 +8,11 @@ learning_eligibility: ineligible
 
 Date: 2026-10-27
 
-> **Current Update:** 用户“開始吧”后已生成8秒2.0／1080p下楼到达源，方向与到达在取帧中成立；用户指出尾段右下台阶抖动并确认原像素仍抖，原片按FAIL保留。当前本地同源近景修订03为8秒审看候选，已完成exact MCP/独立取帧复核和技术播放；6秒切近、剩余时间性稳定与原声待完整看听，Gate NOT_EVALUATED，推门源尚未提交。宏观真实视频累计6次，本轮只提交1次；没有付费重抽，B6未改。详见 Descent Source And Local Arrival Reframe。
+> **Current Update — Isolated Stair Reference:** 用户用两张截图指出先前露出的梯级本身弯曲，明确要求“把楼梯作为一个单独的白底图作为referces”。本轮已生成一张独立白底直梯结构候选，包含上下平台与单侧栏杆，归 `referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/`。这纠正了Parent此前将需求理解为尾部补片、随后又交原片截图的偏离；既有补片不能解决前段结构错误，不记为视频通过。新增内置生图1次、视频0次，尚未绑定新视频。详见 Isolated Stair Geometry Reference。
+
+> **Historical Update — Static Stair Image:** 用户“那個樓梯你就不能給一個image嗎”后，Parent曾以同源台阶PNG覆盖末两秒背景并导出8秒／1080p全景修订04。该方案保留人物、全景和原声，但并未处理用户随后指出的前段梯级弯曲，不能作为结构修复通过；未提交推门源。该阶段新增生成／远程音频调用均为0，只有1次本地HyperFrames渲染。详见 Static Stair Image Repair。
+
+> **Historical Update — Arrival Reframe:** 用户“開始吧”后已生成8秒2.0／1080p下楼到达源，方向与到达在取帧中成立；用户指出尾段右下台阶抖动并确认原像素仍抖，原片按FAIL保留。同源近景修订03曾为8秒审看候选；未获用户声画认可，不将“给一个image”的后续要求记为接受。详见 Descent Source And Local Arrival Reframe。
 
 > **Historical Update — Reference Regrouping:** 市政6.833秒剪辑版已获用户完整看听认可。第二事件楼梯原片及首尾帧修订02均已实际生成，修订02消除提前揭示，但仍反向上楼、门动作反复且短暂脱离右手接触，Post-Media Gate FAIL。宏观视频累计5次，本修复单元上限1次已用，停止本单元与下一Shot，未改B6或签Production/最终验收。最新参考重整已补4张并复用3张，七张静态候选审看板已可访问；本轮没有新视频提交。详见 Action Reference Sequence Regrouping、First/Last Stair Repair 及对应 verification.json。
 
@@ -266,3 +270,37 @@ Parent先尝试不新增生成的静态背景补片：同源frame144／6秒、�
 同一reviewer累计第10轮，仅一次最终本地候选复核；有据有限上限11保留未来B一次，前9轮不重置。查看32帧并直接解码143/144/147帧（5.958/6.000/6.125秒），未见源阶段倒退/重演或脚被裁，末段右下原前景梯级已出画，finding为空。Parent接受该有限视觉观察；未签剩余区域时间性抖动、原速景别跳变或声音连续性通过。prepare-assembly-review与verify-assembly绑定exact新MP4/timeline/render report，显式evaluator为sampled_frames、未听验，真实verdict NOT_EVALUATED；没有用技术结果或renderer成功冒充human。修订03Post-Media Gate保持NOT_EVALUATED，完整8秒看听问题已发用户，B尚未submit，原raw FAIL不覆盖。主receipt MC03-descent-edit-v3/verification.json，A源receipt MC03-descent-v1/verification.json。
 
 本任务新增1条生成视频、2次有界本地render、0次imagegen、2次exact盲音频观察；宏观视频累计6，条件B预算未消费。B6 exact SHA仍d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a。无本任务共享工程改动；并行aa10dee reference-risk功能与audio修改不归本任务，不stage或代签。任务脚本py_compile、docs_contract_gate及diff检查为对应验证，非完整工程回归。record-ai-video-session更新同一topic，distill-ai-video-learning评估no_candidate：新A与原完整事件同时改变覆盖、机位、参考和动作密度；单条改善不能孤立证明某个变量或普遍模型能力，局部观感反馈也不由单一相关指标推导根因。媒体本地保留，Git只推caller／来源／审看页与核验资料；未发布、未签Production/P6/Final Acceptance。
+
+## Static Stair Image Repair
+
+用户随后要求“那個樓梯你就不能給一個image嗎”。本轮选择实际以固定图片覆盖背景，保留原8秒全景与人物运动，不再用切近避开问题；没有新剧情、换人、重新生成视频、修改B6、字体或音乐。新单元为`outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/`，审看入口`index-descent-image-v4.html`。Macro真实视频计数仍6，B推门未submit；旧raw FAIL与修订02/03历史不覆盖。
+
+补片像素取同一raw的第144帧／6秒，来源PNG SHA `019d2a89114271d91d70827269ba7b4ae97bf1250c618c59b6cafb6f6c1e556c`。新`stair-lock-rgba.png` SHA `09590726eff3c4758ebe885cf253db020c82297af73cbb4438697c4455a46106`，1920×1080 RGBA，RGB全部与来源帧逐字节相同。Alpha外框1000,835–1760,1080、8px羽化；比旧矩形更保守地将脚部范围1290,835–1581,899完全透明。旧版“人物在ROI上方”仅来自较疏采样，不能作为足够避让证据；本轮另取6–8秒每0.125秒16帧并核对脚部，旧矩形不使用。没有用imagegen重绘台阶或改人物；补片只在源帧144..192生效，原AI标识保持。
+
+现有Composition入口拒绝普通PNG-only叠层，因为`graphic_layer_ids`此前与AdCreativePlan一并要求绑定；captured原声布局也把图片误算作第二主视频。最小共享修复位于`composition_contracts.py`和`_composition_visual.py`：普通registered raster image沿已有graphic层、asset role/type、同一ResolvedTimeline与HyperFrames解析；仅从captured主视频数量/连续音轨窗口检查中排除显式声明的图片层，继续核验每Shot确有主视频、原音频exact provenance/trim/gain/fade、Development隔离。商业图文和广告声音仍要求exact AdCreativePlan，未伪造广告计划，未改QA/paid/egress/permit/activation Gates；未新增renderer、timeline、依赖、Provider或自动动态遮罩。原source FAIL视频仅经`prepare_qualification_preview_input`捕获，仍不绑定Production主角色；PNG以现有reference IMAGE角色登记。
+
+按TDD先观察普通PNG无广告计划测试因旧入口失败；最小修复后124项composition/ad测试通过。真实接入又暴露captured原声布局的限制，在修改该路径前先跑新测试观察有效叠层被拒绝，再修复并跑当前代码159项composition/caption-preview/repair-admission/source-audio测试全通过；错音频来源、短音轨、缺主视频仍拒绝。当前另跑原声/retime/subtitle回归73通过、17跳过；使用已有系统`libfreetype.so.6`的进程级`LD_PRELOAD`解决Conda libass链接冲突，没有安装依赖或修改系统环境。另有2项Runtime Skill边界测试、docs contract与task architecture检查通过。
+
+正式Harness不标通过：初次focused封存较早3路径，后续staging新增captured音频路径导致snapshot不再覆盖最终delta；其中47项voice通过，composition/audio大组1074通过、23跳过、1项因原生libass依赖`FT_Get_Transform`缺失失败。上述进程级环境修正后的73项回归包括该字幕失败测试。最终5路径related入口在未改动的`AGENTS.md`篇幅预算检查即失败；独立policy audit还报告HEAD已有9个未映射路径／5个未引用测试，均非本轮新增，未改政策放行。完整工程回归未完成，相关receipt保留于`.agent/harness/runs/shizhen-raster-overlay-{focused,related}-20261027/receipt.json`，补充验证与限制见新单元`qa/engineering-checks.json`；不能将手动局部通过冒充正式related或full PASS。
+
+实际渲染沿canonical bootstrap→strict loader→CompositionSpec 2.3→ResolvedTimeline→pinned HyperFrames 0.7.103 software；零至六秒源窗0..144及六至八秒144..192连续、identity transform，PNG仅随第二窗叠加，无新增摄影切镜或重定时。原声布局及静图trim的拒绝均发生在resolver阶段、实际renderer尚未启动前；静图沿Shot全窗不设置video trim，未放宽静图校验。本轮实际本地renderer只执行1次。192帧／24fps、8秒、384000音频samples，usage_scope仍development_audio_preview，源Manifest渲染前后相同，无Production激活。
+
+新片`失帧-下楼到达-1080p-台阶静图修订04.mp4` SHA `76d27a534fe5e97e2dc39f4833cc1c9e9a6f89639e3fc240e20581e073a7c9b8`，7,533,163bytes。已显式调用project-local video-analysis MCP，另取32张actual PTS帧、全decode、HyperFrames lint/check零错误、Range206和Chromium1x不静音实际播至结束。补片不透明像素的平均时间标准差由raw 1.272降到output 0.093，只证明选定区域时变降低，不代表观众感知或整体空间通过。完整解码48k双声道PCM与修订03逐字节相同，SHA `e1355ff057289357dd2ecb5b485c8c15612e91941ad07e26ece95d2e98170fac`；只经同音频identity桥接旧盲观察，不把旧MP4报告或先前市政接受搬到新片。新增远程音频调用0，新增生成调用0，新增生成/分析费用0。
+
+复用原native reviewer_high `/root/macro720_review`完成一次只读复核，宏观媒体第11轮／本单元上限11，旧10轮与计数保留，不因换候选重置。查看32帧、alpha和5个源码/测试/文档hash；未发现遮脚、静止人影、重复脚、明显补片接缝或具体准入旁路，finding set为空。Parent接受有限取帧和代码观察，仍不签原速时间性稳定、补片启用瞬间及声音通过。此为本次有界复核，未来B如需审查须先保留历史并合理封存新有限单元。
+
+`prepare-assembly-review`和`verify-assembly`重新绑定exact新片/timeline/report，sampled_frames、未实际听验，实际结果NOT_EVALUATED。新Post-Media Gate身份/行动/固定全景仅按已看证据PASS，performance/space/art/sound保持NOT_EVALUATED；STOP_BEFORE_NEXT_SHOT，已向用户发完整8秒看听问题，不把静图、量化、空finding或播放器成功当视频通过。主receipt `verification.json`，分项`qa/post-media-gate.json`、`patch-verification.json`、`assembly-verdict.json`；B6 SHA仍为原`d64aef43...84a532a`。媒体/PNG留本地，影片NOT_PUBLISHED，无P6/Final Acceptance。当前代码及记录未commit/push：正式验证被上述既有文档预算／policy问题阻断，且用户原速声画认可尚待；保留本任务staged源码与其余本地owned资料，不把检查失败隐藏为通过后发布代码。
+
+`record-ai-video-session`继续更新同一主题；`distill-ai-video-learning`评估no_candidate：同一源的单次固定补片尚缺原速human接受，局部像素变化也不能提升为跨模型稳定方法或下楼动作规律。不创建学习占位、不修改Skill/Policy/Gate。另一窗口audio-understanding及through-S05文件保持原状。
+
+## Isolated Stair Geometry Reference
+
+用户展示之前下楼时逐渐露出的台阶，指出“之前的暴露的楼梯是弯的，不对劲，你开始给的referces就有问题”，并指定将楼梯单独做成白底参考。Parent承认此前修补末两秒抖动、误交透明补片及随后只给原片全帧，没有解决这项结构准备问题；没有将用户追问记为修订04接受。用户截图作为独立反馈原件exact copy保留在新参考目录。它支持当前素材的几何问题反馈，不证明所有动态失败只有参考这一个原因。
+
+沿scenario-seedance-storyboard与内置imagegen完成一个有界新单元：生图上限1、视频0、自动重试0。实际仅引用完整原片第144帧，职责限定为旧居民楼灰色石质台阶／黑色栏杆的材质与类型；提示词明确不继承弯曲、扇形、宽窄变化或原图人物/房间。两张用户截图仅用于审查，未伪称实际输入。纯中文正文已核对，要求独立直跑梯段、矩形踏步与上下平台、单侧栏杆、纯白不透明背景。此为独立物件几何参考，不将其作为人物动作首帧；未改人物、剧情、B6、字体或音乐。
+
+唯一内置调用返回后，将输出exact copy保存为`referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/stair-structure-white-v1.png`，SHA `8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e`，1672×941 RGB、无resize/crop，白底无透明缺口。Parent实际看图核对独立梯段、笔直踏步、上下平台、无人物及房间；为STATIC_REFERENCE_CANDIDATE。生成光栅不能证明精确世界尺寸或施工参数，接回原场景还须重验上下行、栏杆物理侧、机位及门前平台；本次新视角不能靠图像左右直接判断原动作工作侧。没有将图片、长提示词或白底形式视为动态硬约束或验收。
+
+当前图仅实际绑定本次制图输入，未绑定Seedance新请求、未提交新视频或激活Production。对旧片新增用户几何反馈，与已有抖动FAIL历史共同保留；尾部补片没有改变前六秒，因此不能作为该几何目标通过。主来源／用途与静态观察归新目录`generation-intent.json`、`verification.json`及README；审看图片已直接展示给用户。新增builtin生图1次，macro累计builtin图片26→27；macro真实视频仍6，UNKNOWN及旧计数不改。工具未提供本次图像结算金额，不推断为免费。
+
+此轮不改共享工程，不追加工程测试；核验PNG解码、RGB/尺寸/SHA、exact copy和实际图像几何，未作动态质量、真实视频输入或human接受结论。沿同一record-ai-video-session记录检查点；distill-ai-video-learning评估no_candidate，单个静态候选及同源失败链不能升级为模型通用规律或自动采用新的Skill/Gate。本轮Git提交范围仅新白底参考的说明、提示词、来源核验与本记录；PNG和用户截图留本地。前轮共享合成源码及其staged测试不纳入本次提交，既有工程验证阻断及原速声画未验收状态保留。
