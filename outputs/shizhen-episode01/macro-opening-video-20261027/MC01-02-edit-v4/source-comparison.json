@@ -1,0 +1,10 @@
+{
+  "source_prompt_same": true,
+  "five_image_bindings_same": true,
+  "different_generation_attempts": true,
+  "source_720p_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "source_hd_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "interpretation": "New generation is not an upscale or exact replay. Resolution effect not isolated from uncontrolled sampling. No claim that hard-cut prompt guarantees a result.",
+  "new_generation_calls": 0,
+  "protect_B6_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a"
+}

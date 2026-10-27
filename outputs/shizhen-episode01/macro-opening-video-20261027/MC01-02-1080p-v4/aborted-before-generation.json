@@ -1,0 +1,11 @@
+{
+  "user_steering": "这个不能剪辑吗",
+  "state": "ABORTED_UNSUBMITTED",
+  "side_effects": [
+    "one empty video node created on existing exact canvas"
+  ],
+  "video_generation_POSTs": 0,
+  "paid_reservations": 0,
+  "reason": "User steered to editing existing HD footage; do not bootstrap, prepare, start or submit this node/unit",
+  "replacement": "../MC01-02-edit-v4"
+}

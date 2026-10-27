@@ -1,0 +1,69 @@
+{
+  "scope": "bounded editorial repair of MC01-02; not next Shot admission",
+  "artifact_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+  "artifact_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "model_source": "Seedance2.0 fetched1080p v3; no new generation",
+  "explicit_project_video_analysis": "qa/video-analysis.json",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/frames; qa/assembly-verdict.json",
+      "reason": "Source visual windows and original speed retained; no inherited PASS for the new exact edited film. Full original-speed A/V/human acceptance remains open."
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/frames; qa/assembly-verdict.json",
+      "reason": "Source visual windows and original speed retained; no inherited PASS for the new exact edited film. Full original-speed A/V/human acceptance remains open."
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/frames; qa/assembly-verdict.json",
+      "reason": "Exact output-frame sequence contains clean wide then clean close; R03 double-exposure interval excluded. Full normal-speed action, timing and sound review remains open."
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/frames; qa/assembly-verdict.json",
+      "reason": "Source visual windows and original speed retained; no inherited PASS for the new exact edited film. Full original-speed A/V/human acceptance remains open."
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/frames; qa/assembly-verdict.json",
+      "reason": "Source visual windows and original speed retained; no inherited PASS for the new exact edited film. Full original-speed A/V/human acceptance remains open."
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/frames; qa/assembly-verdict.json",
+      "reason": "Source visual windows and original speed retained; no inherited PASS for the new exact edited film. Full original-speed A/V/human acceptance remains open."
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/frames; qa/assembly-verdict.json; qa/native-audio-result.json",
+      "reason": "Source visual windows and original speed retained; no inherited PASS for the new exact edited film. Full original-speed A/V/human acceptance remains open."
+    }
+  ],
+  "resolved_local_finding": {
+    "id": "SHZ-HD-R03",
+    "source_interval_removed_seconds": [
+      4.333333333333333,
+      5.5
+    ],
+    "output_cut_frame": 104,
+    "sampled_frames_show_no_double_exposure": true,
+    "complete_A_V_acceptance": "NOT_EVALUATED"
+  },
+  "verdict": "NOT_EVALUATED",
+  "execution_disposition": "STOP_NO_NEXT_SHOT",
+  "new_video_generation_calls": 0,
+  "new_blind_audio_analysis_calls": 1,
+  "actual_audio_charge": "NOT_CONFIRMED",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "publication_state": "NOT_PUBLISHED"
+}

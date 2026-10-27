@@ -1,0 +1,49 @@
+{
+  "project": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-edit-v4/project",
+  "sources": [
+    {
+      "shot_id": "MC01-W",
+      "asset_id": "hd-wide-capture",
+      "start": 0,
+      "frames": 104,
+      "audio_id": "MC01-W-original-mix"
+    },
+    {
+      "shot_id": "MC02-C",
+      "asset_id": "hd-close-capture",
+      "start": 132,
+      "frames": 60,
+      "audio_id": "MC02-C-original-mix"
+    }
+  ],
+  "total_frames": 164,
+  "source_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "origin": {
+    "kind": "bounded-editorial-repair/1",
+    "user_request": "这个不能剪辑吗",
+    "failed_source_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+    "original_gate": "MC01-02-1080p-v3/qa/post-media-gate.json",
+    "edit": "Remove source [104,132) on the 24fps delivery grid, preserving original-speed [0,104) and [132,192). Direct cut, no dissolve, retiming, repeated frames, new footage or music. Keep same-window native sound at unity gain.",
+    "windows": [
+      {
+        "shot_id": "MC01-W",
+        "asset_id": "hd-wide-capture",
+        "start": 0,
+        "frames": 104
+      },
+      {
+        "shot_id": "MC02-C",
+        "asset_id": "hd-close-capture",
+        "start": 132,
+        "frames": 60
+      }
+    ],
+    "scope": "development_audio_preview, inherited raw FAIL and NOT_EVALUATED retained; not Production acceptance",
+    "new_video_submissions": 0,
+    "review_extension": {
+      "previous_rounds": 3,
+      "maximum_total_rounds": 4,
+      "reason": "New explicit user feedback identifies HD dissolve; one local deterministic cut candidate with exact new media, no generation loop"
+    }
+  }
+}

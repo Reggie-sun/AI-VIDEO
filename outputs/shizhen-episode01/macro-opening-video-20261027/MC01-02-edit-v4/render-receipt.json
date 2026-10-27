@@ -1,0 +1,71 @@
+{
+  "output": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+  "renderer_output": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-edit-v4/render-002-software/output/macro-hd-cut-v4.mp4",
+  "sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "bytes": 13606194,
+  "size_bytes": 13606194,
+  "timeline_frames": 164,
+  "timeline_fingerprint": "c4f6d84f202f2a2a190bf6c3491a4a277f4c8f43cb0a9e84da3f6ed8bb336028",
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 164,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 328704,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 704,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "33524789b56716657f47f4de27bcdd460da26f2d4ae4426997b7b8bdc6dad629",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "source_audio_matches_new_visual_windows": true,
+  "source_windows": [
+    {
+      "shot_id": "MC01-W",
+      "asset_id": "hd-wide-capture",
+      "start": 0,
+      "frames": 104,
+      "audio_id": "MC01-W-original-mix"
+    },
+    {
+      "shot_id": "MC02-C",
+      "asset_id": "hd-close-capture",
+      "start": 132,
+      "frames": 60,
+      "audio_id": "MC02-C-original-mix"
+    }
+  ],
+  "usage_scope": "development_audio_preview",
+  "production_activation": false,
+  "publication": "NOT_PUBLISHED",
+  "human_review": "PENDING",
+  "paid_generation_calls": 0
+}

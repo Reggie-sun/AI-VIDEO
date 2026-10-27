@@ -1,0 +1,122 @@
+{
+  "artifact_id": "timeline-macro-hd-cut-v4",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "62754fa983c3e0939f2222548a75e028dbf98ba20ac8a96fedc15ff81d6ace5e",
+  "creation_receipt_id": "resolve-d7e91ff154d3ff285aa942e3df6ba02ad8704d002e6c9754708e6bba6df93f6a",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/801ef2145b443f4fef0e56fe0daceeeb2ae32772966d824c82f853e5fccc6fa2.json",
+      "content_hash": "801ef2145b443f4fef0e56fe0daceeeb2ae32772966d824c82f853e5fccc6fa2"
+    }
+  ],
+  "usage_scope": "development_audio_preview",
+  "timeline_id": "timeline-macro-hd-cut-v4-r1",
+  "composition_spec_id": "macro-hd-cut-composition",
+  "composition_spec_revision": 1,
+  "composition_spec_hash": "d7e91ff154d3ff285aa942e3df6ba02ad8704d002e6c9754708e6bba6df93f6a",
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "renderer": {
+    "kind": "hyperframes",
+    "version": "0.7.103"
+  },
+  "visual_spans": [
+    {
+      "layer_id": "retained-MC01-W",
+      "shot_id": "MC01-W",
+      "asset_role": "primary_visual",
+      "asset_id": "hd-wide-capture",
+      "asset_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+      "start_frame": 0,
+      "duration_frames": 104,
+      "start_sample": 0,
+      "duration_samples": 208000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": 104,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": null
+    },
+    {
+      "layer_id": "retained-MC02-C",
+      "shot_id": "MC02-C",
+      "asset_role": "primary_visual",
+      "asset_id": "hd-close-capture",
+      "asset_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+      "start_frame": 104,
+      "duration_frames": 60,
+      "start_sample": 208000,
+      "duration_samples": 120000,
+      "trim_start_frame": 132,
+      "trim_duration_frames": 60,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": {
+        "from_shot_id": "MC01-W",
+        "to_shot_id": "MC02-C",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    }
+  ],
+  "audio_spans": [
+    {
+      "track_id": "native-MC01-W",
+      "audio_kind": "dialogue",
+      "asset_id": "MC01-W-original-mix",
+      "asset_sha256": "6d07a4a4b42634a58a3f1b986eea69a521d703b7d9bb7bda80d6e55070ea3592",
+      "start_sample": 0,
+      "duration_samples": 208000,
+      "source_start_sample": 0,
+      "source_duration_samples": 208000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "native-MC02-C",
+      "audio_kind": "dialogue",
+      "asset_id": "MC02-C-original-mix",
+      "asset_sha256": "6d07a4a4b42634a58a3f1b986eea69a521d703b7d9bb7bda80d6e55070ea3592",
+      "start_sample": 208000,
+      "duration_samples": 120000,
+      "source_start_sample": 264000,
+      "source_duration_samples": 120000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    }
+  ],
+  "caption_cues": [],
+  "commercial_graphics": [],
+  "total_frames": 164,
+  "total_samples": 328000,
+  "composition_fingerprint": "c4f6d84f202f2a2a190bf6c3491a4a277f4c8f43cb0a9e84da3f6ed8bb336028"
+}

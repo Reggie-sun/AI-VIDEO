@@ -1,0 +1,108 @@
+{
+  "artifact_id": "macro-hd-cut-composition",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "d7e91ff154d3ff285aa942e3df6ba02ad8704d002e6c9754708e6bba6df93f6a",
+  "creation_receipt_id": "user-requested-dissolve-cut",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/801ef2145b443f4fef0e56fe0daceeeb2ae32772966d824c82f853e5fccc6fa2.json",
+      "content_hash": "801ef2145b443f4fef0e56fe0daceeeb2ae32772966d824c82f853e5fccc6fa2"
+    }
+  ],
+  "composition_id": "macro-hd-cut-v4",
+  "shot_ids": [
+    "MC01-W",
+    "MC02-C"
+  ],
+  "layers": [
+    {
+      "layer_id": "retained-MC01-W",
+      "shot_id": "MC01-W",
+      "asset_role": "primary_visual",
+      "asset_id": "hd-wide-capture",
+      "trim_start_frame": 0,
+      "trim_duration_frames": 104,
+      "source_audio_policy": "KEEP",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    },
+    {
+      "layer_id": "retained-MC02-C",
+      "shot_id": "MC02-C",
+      "asset_role": "primary_visual",
+      "asset_id": "hd-close-capture",
+      "trim_start_frame": 132,
+      "trim_duration_frames": 60,
+      "source_audio_policy": "KEEP",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    }
+  ],
+  "transitions": [
+    {
+      "from_shot_id": "MC01-W",
+      "to_shot_id": "MC02-C",
+      "kind": "cut",
+      "duration_frames": 0
+    }
+  ],
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "requested_renderer": "hyperframes",
+  "audio_tracks": [
+    {
+      "track_id": "native-MC01-W",
+      "audio_kind": "dialogue",
+      "asset_id": "MC01-W-original-mix",
+      "shot_id": "MC01-W",
+      "start_sample": null,
+      "trim_start_sample": 0,
+      "trim_duration_samples": 208000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "native-MC02-C",
+      "audio_kind": "dialogue",
+      "asset_id": "MC02-C-original-mix",
+      "shot_id": "MC02-C",
+      "start_sample": null,
+      "trim_start_sample": 264000,
+      "trim_duration_samples": 120000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    }
+  ],
+  "caption_tracks": [],
+  "graphic_layer_ids": [],
+  "graphic_layer_animations": [],
+  "commercial_graphics": [],
+  "advertising_sound_cues": [],
+  "ad_creative_plan_id": null,
+  "ad_creative_plan_hash": null
+}

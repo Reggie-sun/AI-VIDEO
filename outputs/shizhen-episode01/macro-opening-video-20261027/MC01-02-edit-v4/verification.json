@@ -1,0 +1,25 @@
+{
+  "exact_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "full_decode": true,
+  "range206": true,
+  "range_bytes": 1024,
+  "hyperframes_lint_check": "PASS",
+  "renderer": "HyperFrames0.7.103",
+  "browser_gpu_mode": "software",
+  "hardware_check_failure_retained": "runs/shizhen-macro-opening-20261027/MC01-02-edit-v4/render-001/check-diagnostic.json",
+  "source_raw_gate_retained": true,
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "publication": "NOT_PUBLISHED",
+  "new_video_generation_POSTs": 0,
+  "task_py_compile": true,
+  "docs_contract_gate": "PASS",
+  "engineering_full_regression": "NOT_RUN_NO_SHARED_ENGINEERING_CHANGES",
+  "independent_media_review": "qa/independent-media-review.json",
+  "assembly_gate": "NOT_EVALUATED",
+  "unresolved_limits": [
+    "Full normal-speed human A/V review and audio junction listening pending"
+  ],
+  "record_skill": "record-ai-video-session",
+  "learning_evaluation": "no_candidate"
+}

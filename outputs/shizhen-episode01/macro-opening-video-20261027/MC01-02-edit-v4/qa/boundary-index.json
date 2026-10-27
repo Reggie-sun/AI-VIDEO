@@ -1,0 +1,77 @@
+{
+  "evidence_kind": "ORIGINAL_HD_SOURCE_BOUNDARIES_NOT_EDITED_OUTPUT",
+  "source_path": "outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-1080p-2.0-认可方案03.mp4",
+  "source_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "time_basis": "source MP4 PTS seconds, not output time; original dissolve retained as failure evidence",
+  "edited_output_index": "frame-index.json",
+  "frames": [
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-01.png",
+      "source_pts_seconds": 4.21667
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-02.png",
+      "source_pts_seconds": 4.25
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-03.png",
+      "source_pts_seconds": 4.3
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-04.png",
+      "source_pts_seconds": 4.33333
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-05.png",
+      "source_pts_seconds": 4.38333
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-06.png",
+      "source_pts_seconds": 4.41667
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-07.png",
+      "source_pts_seconds": 4.46667
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-08.png",
+      "source_pts_seconds": 4.5
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-09.png",
+      "source_pts_seconds": 5.21667
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-10.png",
+      "source_pts_seconds": 5.25
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-11.png",
+      "source_pts_seconds": 5.3
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-12.png",
+      "source_pts_seconds": 5.33333
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-13.png",
+      "source_pts_seconds": 5.38333
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-14.png",
+      "source_pts_seconds": 5.41667
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-15.png",
+      "source_pts_seconds": 5.46667
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-16.png",
+      "source_pts_seconds": 5.5
+    },
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/qa/boundary-17.png",
+      "source_pts_seconds": 5.55
+    }
+  ]
+}

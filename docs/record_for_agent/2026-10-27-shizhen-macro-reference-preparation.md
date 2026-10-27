@@ -158,3 +158,23 @@ record-ai-video-session记录本稳定交付／失败检查点；distill-ai-vide
 原始地址恢复200，视频Range0–1023返回206／1024字节，越界Range返回416。独立Chromium原速、声音开启播放8.057秒到结尾，无page error；另行seek到5.0秒成功，readyState4、seekable[0,8.057007]、media error=null。原完整播放metadata保留，新证据为`MC01-02-1080p-v3/qa/service-recovery-playback.json`、`service-recovery-seek.json`及`review-service-recovery.json`。本地MP4可直接打开作为另一个入口，原文件SHA仍`88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52`；已有叠化差异与人工待审状态未变，服务恢复不等于影片验收。
 
 本轮无共享源码或媒体修改，不追加单元测试／完整回归；验证直接覆盖服务独立生命周期、HTTP、真实浏览器播放和拖动。Risk Gate为NATIVE_REVIEW_NOT_REQUIRED。record-ai-video-session记录本稳定恢复；distill-ai-video-learning为no_candidate：单次服务退出／恢复事件，不扩张为通用Skill或Gate规则。项目经验检索返回stale advisory，未等待后台刷新，结论按实际端口、HTTP、浏览器和exact bytes核验。
+
+## HD Dissolve Editorial Repair
+
+用户指出“这个5s的时候有问题”，Parent核对1080p-v3约4.5–5.5秒双重工人与设备叠化。最初准备同模型单变量重生成，但用户及时追问“这个不能剪辑吗”，遂改为直接剪已有原片；只已在原画布创建一个空video node `node_gm3a1rrn58`，未bootstrap generation、未prepare/start/submit、无paid reservation／POST。该空节点不删除或复用，`MC01-02-1080p-v4/aborted-before-generation.json`明确ABORTED_UNSUBMITTED；宏观实际视频消费仍3次，没有第四次视频提交。
+
+本轮使用open-video既有剪辑方法，完整目标仍是停机后门持续受力、工人确认和连接近景，不改B6、字体、音乐、人物、参考或后续剧情。实际逐帧定位后，保留HD v3的24fps交付网格源[0,104)及[132,192)，删[104,132)即约4.333–5.500秒，原速直接切换，总164帧／6.833秒；不冻结、插帧、变速或补新素材。每段同源原声同步裁切，0dB无fade、无新配乐。标准prepare_qualification_preview_input捕获exact paid fetched qualification链，保留原源FAIL／sound NOT_EVALUATED，ProductionStateCommitter独占新开发bundle bootstrap，未将原片当普通import绕过qualification；两条捕获资产分别绑定各自Shot和trim，同一原MP4身份。source-native-48k.wav仅同源解码/重采样，AudioImportRequest绑定对应VIDEO与源SHA，不伪造语音。
+
+调用方 `outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/{prepare.py,render.py}`，新独立development project在 `runs/shizhen-macro-opening-20261027/MC01-02-edit-v4/project`。首个bootstrap在写入前因origin共用可变windows、增加audio_id后hash不匹配而拒绝；保持目标空目录，改为深拷贝封存origin，核验已生成PCM与当前exact源一致后重跑通过，无Source/Manifest损坏或未知副作用。新唯一CompositionSpec→ResolvedTimeline为development_audio_preview，HyperFrames0.7.103完成实际导出。首次硬件check返回sweep_static，未出片；保留render-001失败证据，核对既有S03同类记录与当前公开browser_gpu_mode参数后，在相同timeline用software模式及新render-002-software staging完成lint/check零错误、真实render与adapter输出验证。未改renderer代码、node_modules、检查或隔离规则。
+
+交付 `MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4`，SHA `b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d`，13,606,194bytes，1920×1080／24fps／164帧，AAC48k双声道。入口 `http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index-edit-v4.html`，继续由已有user systemd Range服务托管。原片/720p均保留。源B6 exact SHA仍d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a。
+
+显式project-local video-analysis MCP绑定本次MP4，抽取14帧；另取28张actual PTS的0.25秒序列，实际输出4.25秒为干净远景、4.50秒为干净近景，叠化双影区间已排除。MCP scene detector仍漏报硬切，未用scene_count=1冒充单镜。全片声画decode、SHA、Range206和独立Chromium1x声音开启播放到结尾通过；这些技术事实不证明自然表演或human听验。原声只盲分析一次、HTTP200、exact source/audio SHA／一用operatorunit绑定，返回水声/海浪拟声、无语音，无法证明马达停声/金属摩擦时序和接点听感；不向分析器喂预期，不重复分析换取通过。内部音频保护上限0.05USD非报价，实际结算待确认；本轮视频生成费为零。
+
+`prepare-assembly-review`与`verify-assembly`均显式执行，回答绑定当前exact视频/timeline/render report；实际取帧观察与源窗口写入，完整原速声画/听验不足仍NOT_EVALUATED、exit1，不伪造PASS。一次填写误用keep枚举导致exit2，改为当前typed retain_with_reason后返回有效NOT_EVALUATED，保留最终回答和verdict。`qa/post-media-gate.json`阻断下一Shot，未activation/P6/Final Acceptance/publication。review服务可达、影片有音轨、render检查通过均不用于签质量。
+
+用户另问为何相同处理差异大：当前prepare.json核验720p-v2与HD-v3 actual native prompt及5个image_bindings完全相同，但模型进行了新一轮生成，分辨率与commercial selector不同，当前渠道seed_supported=false，无法固定采样对照；不是原片上采样，分辨率因果作用未隔离，不能断言差异全由分辨率造成。`source-comparison.json`保存直接输入对照。官方多镜/参考能力资料仅advisory，不宣称显式hard-cut prompt必定可控；最终采用已有片确定性剪辑而非追加模型试错。
+
+本轮无共享工程修改，任务脚本py_compile、docs_contract_gate通过，实际canonical bootstrap/resolve/render、MCP、decode、HTTP/浏览器为对应验证，不宣称完整工程回归。Implementation Risk Gate NATIVE_REVIEW_NOT_REQUIRED，媒体按适用open-video独立review要求另取证。record-ai-video-session记录本稳定剪辑交付，distill-ai-video-learning评估no_candidate：仍是同一macro修复链、无controlled seed或多独立模型实验；software单例仅复用已有兼容参数，不升级默认配置或学习规则。
+
+同一native只读reviewer `/root/macro720_review`、profile reviewer_high完成有据有限扩展第4轮／上限4；前三轮保留，扩展原因是用户新指认HD R03并改为一版确定性本地剪辑，不开启连续模型重试。Reviewer独立核验exact SHA、查看28帧并直接解码输出frame103/104：R03叠影在候选中未重现，未发现新增视觉问题；未连续原速观看或听验。SHZ-EDIT-R04 non_blocking指出boundary-index没有标明它是原片取帧，4.5秒源叠影可能被误认作输出；Parent CONFIRMED，补原片exact path/SHA、source_pts_seconds及显著ORIGINAL_HD_SOURCE_BOUNDARIES_NOT_EDITED_OUTPUT说明，另指输出frame-index。不改媒体bytes，证据标签修正无需新审查。Parent将原R03局部问题判为OBSOLETE_AFTER_CHANGE，整片节奏/声音仍NOT_EVALUATED；`qa/independent-media-review.json`记录闭合及范围。经验跟进检索返回fresh advisory，命中既有S03 sweep_static/software恢复，已重开当前记录与参数验证；未为此重建索引或扩建共享工程。

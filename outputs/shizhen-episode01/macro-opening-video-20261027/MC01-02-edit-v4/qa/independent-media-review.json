@@ -1,0 +1,34 @@
+{
+  "reviewer": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "permissions": "read-only",
+  "round": 4,
+  "maximum_rounds": 4,
+  "extension_reason": "Fresh explicit HD5s failure and user steering to one deterministic local edit; previous3 rounds preserved",
+  "candidate_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "evidence_scope": [
+    "SHA verified",
+    "28 actual output frames viewed",
+    "frame103 and104 directly decoded"
+  ],
+  "human_full_speed_viewing": "NOT_EVALUATED",
+  "actual_listening": "NOT_EVALUATED",
+  "findings": [
+    {
+      "id": "SHZ-EDIT-R04",
+      "severity": "non_blocking",
+      "observation": "boundary-index initially omitted original source identity, confusing source dissolve and edited output timestamps",
+      "parent_adjudication": "CONFIRMED",
+      "resolution": "Added exact source path/SHA, ORIGINAL_HD_SOURCE_BOUNDARIES_NOT_EDITED_OUTPUT kind and explicit source_pts_seconds; separate edited-output index retained",
+      "media_bytes_changed": false,
+      "re_review": "Not required for evidence labeling only"
+    }
+  ],
+  "prior_blocker": {
+    "id": "SHZ-HD-R03",
+    "observation": "Not reproduced in candidate output samples or decoded frame103/104; no new visual issues seen",
+    "parent_adjudication": "OBSOLETE_AFTER_CHANGE",
+    "limitation": "Bounded double-exposure finding resolved, not full quality acceptance"
+  },
+  "complete_media_acceptance": "NOT_EVALUATED"
+}
