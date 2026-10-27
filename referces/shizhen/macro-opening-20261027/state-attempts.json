@@ -1,0 +1,305 @@
+[
+  {
+    "id": "M01-v0",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/M01.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-5a5f7621-8e95-47fb-8836-1b548fb070cf.png",
+    "path": "referces/shizhen/macro-opening-20261027/M01-v0.png",
+    "sha256": "c3fc9637731c10c124dff588cf60dff8fcc1f5ef1370af44640440efebf0e836",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [],
+    "prompt_sha256": "ce2c7d6514e33ae0ba938c77fd1828ea14fe698624293bb4dbca353bdd4f1798",
+    "verdict": "FAIL",
+    "finding": "钢索左拉，与分镜向右运动冲突",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "L01-v0",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/L01.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-15b279ca-de75-4ab7-ac9c-f3b9d9fcc64e.png",
+    "path": "referces/shizhen/macro-opening-20261027/L01-v0.png",
+    "sha256": "164caa88ef43109fad2e2e439bb879a068e2c2613f4d0c59f05e90730350e39b",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+      }
+    ],
+    "prompt_sha256": "c972040d25c5ca220afaff3ec20a73a3bafb6a079f3ab2f05818ff8c70c2f319",
+    "verdict": "FAIL",
+    "finding": "浅凹痕生成成明显裂口",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "M01-r1",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/M01-r1.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-dd93ecfe-3703-47f3-a68e-2001569d6011.png",
+    "path": "referces/shizhen/macro-opening-20261027/M01-r1.png",
+    "sha256": "2b547b88e986513ddd81ff6eab8eb4beb2fc6f35a1c0839b24c3038bf31f34e1",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/M01-v0.png",
+        "sha256": "c3fc9637731c10c124dff588cf60dff8fcc1f5ef1370af44640440efebf0e836"
+      }
+    ],
+    "prompt_sha256": "bdb4d1ef7be8c6a8f52f13faa386506a6082cef0d519c328207b592bb76b717b",
+    "verdict": "FAIL",
+    "finding": "右滑轮已增加但门仍直连左绞盘",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "L01-r1",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/L01-r1.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-c82641ca-0705-46d9-b19e-31092d2de224.png",
+    "path": "referces/shizhen/macro-opening-20261027/L01-r1.png",
+    "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-v0.png",
+        "sha256": "164caa88ef43109fad2e2e439bb879a068e2c2613f4d0c59f05e90730350e39b"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+      }
+    ],
+    "prompt_sha256": "26a418cb4d1a0788d51f0036b1d38986fa9bd53ea23341677cc150bf00d2720c",
+    "verdict": "REVIEW_CANDIDATE",
+    "finding": "浅凹已封闭；身份/本场灰褐服装可辨；非动态下行证明",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "L01-X",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/L01-X.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-424b775d-38c0-4afa-9b15-e9aff00e2928.png",
+    "path": "referces/shizhen/macro-opening-20261027/L01-X.png",
+    "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-r1.png",
+        "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+      }
+    ],
+    "prompt_sha256": "997e0fe47fb1d073d48b44ca83b2e303eb1518512e32aa0d05aaab0964363fb2",
+    "verdict": "REVIEW_CANDIDATE",
+    "finding": "下行梯段与低平台可定位；远处凹痕细节不足，不替代L01",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "L02",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/L02.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-76d3fe74-1f9c-4c8d-b33d-d51ed5d09f16.png",
+    "path": "referces/shizhen/macro-opening-20261027/L02.png",
+    "sha256": "d844a00b053d2fedb7aae07843b0d03751fe969186edd5ab7a61524b0cefb039",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-X.png",
+        "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+      }
+    ],
+    "prompt_sha256": "8c5e6b618c55a002f315c18a4fe2ad8d984f40ca6e7de1ef301e7b0ea15e0c20",
+    "verdict": "REVIEW_CANDIDATE",
+    "finding": "到达低平台；解剖右手接触门把、门关闭、人物门槛外",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "L02-O",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/L02-O.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-51e2f5ba-411a-48ea-96d5-23f6e9cb0262.png",
+    "path": "referces/shizhen/macro-opening-20261027/L02-O.png",
+    "sha256": "e866f5f82cabf7b10f0ec05dfb0c209fea900d1e2ec8af2730ea68a3344fb1fe",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L02.png",
+        "sha256": "d844a00b053d2fedb7aae07843b0d03751fe969186edd5ab7a61524b0cefb039"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-r1.png",
+        "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+      }
+    ],
+    "prompt_sha256": "17d4d774241ebd473ebac7ec38388a0def2dd2b18106105779fbc0e8afabf7ce",
+    "verdict": "FAIL",
+    "finding": "门向摄影机侧外开，违背向内推开要求",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "T01",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/T01.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-36cf6a4b-474b-4b54-b68c-8c9ca2a1c28d.png",
+    "path": "referces/shizhen/macro-opening-20261027/T01.png",
+    "sha256": "e922c151f9b4532cf5d5ec26546efe03c3f0d5c299e36c229b62d4cd2d98a270",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/B6-exact-first-frame.png",
+        "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/station-entry.png",
+        "sha256": "f0218a6e228b15837d9b3164a9d5b9e7d78d4f3956af7ccff0f26722e3feff1d"
+      }
+    ],
+    "prompt_sha256": "c53ffb78b85f48b222415775e3722709619fd4e0e9f5f6259b419d3b969032f9",
+    "verdict": "REVIEW_CANDIDATE",
+    "finding": "双人都在、同站棚较远定位；原B6时钟保留为静态模板，不证明动态时序",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "M01-r2",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/M01-r2.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-53aa5067-4a8f-4e3d-b86a-0a6359488fc3.png",
+    "path": "referces/shizhen/macro-opening-20261027/M01-r2.png",
+    "sha256": "7c120beb84433c3852176c848d21fdd8e75d09c532f34128b5c24c23f9ce205a",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/geometry-guides/M01-routing.png",
+        "sha256": "5eb25730634c4774fc5ccffc861320c0bc644f8e979c3213ebc915a09bb9754d"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/M01-r1.png",
+        "sha256": "2b547b88e986513ddd81ff6eab8eb4beb2fc6f35a1c0839b24c3038bf31f34e1"
+      }
+    ],
+    "prompt_sha256": "98d410d3949c2f6ed0983ed11521070428c1744e6fc448764e0b08acbe1561c6",
+    "verdict": "FAIL",
+    "finding": "几何引导后仍多出左绞盘到门的直连钢索",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "L02-O-r1",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/L02-O-r1.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-4f69f95e-da8f-4df2-ac62-3933a969c764.png",
+    "path": "referces/shizhen/macro-opening-20261027/L02-O-r1.png",
+    "sha256": "4af82ec9f76de8a783fc0686a9254dd0a61e48ef723ed7554de31befdec89bff",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/geometry-guides/L02-inward.png",
+        "sha256": "ee4ef2335bf6d35d5740cf52f670be81e6690eec70db157bed6ff1a6c17e4a54"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L02.png",
+        "sha256": "d844a00b053d2fedb7aae07843b0d03751fe969186edd5ab7a61524b0cefb039"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-r1.png",
+        "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea"
+      }
+    ],
+    "prompt_sha256": "5bed54e0b732cccfdba908dfd6d019c4276577c14995957395e6241cd439d013",
+    "verdict": "REVIEW_CANDIDATE",
+    "finding": "几何引导后向内半开、右手接触、门槛外；凹痕匹配仍须近处实图核验",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  },
+  {
+    "id": "L03",
+    "prompt_path": "referces/shizhen/macro-opening-20261027/L03.prompt.txt",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-5fb1c448-49af-45d9-8d0d-c1f364572b62.png",
+    "path": "referces/shizhen/macro-opening-20261027/L03.png",
+    "sha256": "0af41f272cb8458c9c15df917c87909faff462fa5ae6372542075038f3ab358a",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L02-O-r1.png",
+        "sha256": "4af82ec9f76de8a783fc0686a9254dd0a61e48ef723ed7554de31befdec89bff"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-r1.png",
+        "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+      }
+    ],
+    "prompt_sha256": "e76702004acecb615f79be52b249ddbcf42c3169ab8b9de8f49539381436691c",
+    "verdict": "FAIL",
+    "finding": "门已进一步向内转，但右手/把手悬空，未跟随门扇",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "model_input_bound_for_video": false
+  }
+]

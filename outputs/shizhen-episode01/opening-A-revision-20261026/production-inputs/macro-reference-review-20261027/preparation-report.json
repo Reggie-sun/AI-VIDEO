@@ -1,0 +1,223 @@
+{
+  "scope": "角色复用后的六镜参考准备；部分候选与已知失败检查点，非完整图包",
+  "source_documents": [
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md",
+      "sha256": "d4a7b90b47d7a1b27f4cf7431f28c6c5781ed3687ffbbaff6a076f0f9baf8292"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-CREATIVE-DISCUSSION-20261027.md",
+      "sha256": "67ab5ef3aa98e7ec71a2691246a737d972090e2b1a64db201d7d2fea11055c1b"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/reference-manifest.json",
+      "sha256": "84000b3e3d07ffea40413020a3fbee0ccd37105b19c91a4ae4b791b032fa662b"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md",
+      "sha256": "2f0903f829e4007499e059890a3a849206523bc94fd1815824b9aa1a637e4e0e"
+    },
+    {
+      "path": "referces/shizhen/character-packs-20261027/package-manifest.json",
+      "sha256": "7aef533fb371713830b466232e60875c62dfd8d6e19e2902ab08d3790c8bc55c"
+    },
+    {
+      "path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a"
+    }
+  ],
+  "existing_references": [
+    {
+      "id": "station-entry",
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/station-entry.png",
+      "sha256": "f0218a6e228b15837d9b3164a9d5b9e7d78d4f3956af7ccff0f26722e3feff1d",
+      "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd.mp4",
+      "source_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+      "source_frame": 8,
+      "source_pts_seconds": 0.3333333333333333,
+      "role": "空间与人物站位，仅已观测画面；不是宏观全街布局或真人肤质参考",
+      "source_ai_label_retained": true,
+      "model_input_bound": false,
+      "path_accessible": true,
+      "path_observed_sha256": "f0218a6e228b15837d9b3164a9d5b9e7d78d4f3956af7ccff0f26722e3feff1d",
+      "source_accessible": true,
+      "source_observed_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+      "observed_purpose": "入口两人对照，仅T02可复用；非B6精确首帧",
+      "visually_inspected": true
+    },
+    {
+      "id": "station-reveal",
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/station-reveal.png",
+      "sha256": "cb48839e9d8489f2b89b18f72806f15a458ba7e7fd8084a403c9cb24c6b748f7",
+      "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+      "source_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+      "source_frame": 95,
+      "source_pts_seconds": 3.9583333333333335,
+      "role": "事后空位，审查使用；不得绑定宏观入口以免提前漏人",
+      "source_ai_label_retained": true,
+      "model_input_bound": false,
+      "path_accessible": true,
+      "path_observed_sha256": "cb48839e9d8489f2b89b18f72806f15a458ba7e7fd8084a403c9cb24c6b748f7",
+      "source_accessible": true,
+      "source_observed_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+      "observed_purpose": "审看来源；禁止作为MC06入口",
+      "visually_inspected": true
+    },
+    {
+      "id": "survivor-close",
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/survivor-close.png",
+      "sha256": "ce0eb27be3dc61df29870f9be5cc85f7bbc78a39d6643b8742eeaa1ca77e015e",
+      "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+      "source_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "source_frame": 361,
+      "source_pts_seconds": 15.041666666666666,
+      "role": "接缝真实入点及表演；不是新镜首帧",
+      "source_ai_label_retained": true,
+      "model_input_bound": false,
+      "path_accessible": true,
+      "path_observed_sha256": "ce0eb27be3dc61df29870f9be5cc85f7bbc78a39d6643b8742eeaa1ca77e015e",
+      "source_accessible": true,
+      "source_observed_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "observed_purpose": "审看来源；禁止作为MC06入口",
+      "visually_inspected": true
+    },
+    {
+      "id": "optional-tail",
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/references/optional-tail.png",
+      "sha256": "8249cde74298c965ec73e7e7f3bf886934a62606f364a3a4edd925325c796bce",
+      "source": "runs/shizhen-opening-world-title-20261026/project-r1/assets/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+      "source_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "source_frame": 288,
+      "source_pts_seconds": 12.0,
+      "role": "片尾全景候选；原时间牌为空，Grok合成前需核对时间连续性，不是最终成片",
+      "source_ai_label_retained": true,
+      "model_input_bound": false,
+      "path_accessible": true,
+      "path_observed_sha256": "8249cde74298c965ec73e7e7f3bf886934a62606f364a3a4edd925325c796bce",
+      "source_accessible": true,
+      "source_observed_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "observed_purpose": "审看来源；禁止作为MC06入口",
+      "visually_inspected": true
+    }
+  ],
+  "mother": {
+    "path": "referces/shizhen/dong-wenhui/macro-opening-20261027/mother-001.png",
+    "sha256": "2c6c395f69ff537b943c8874a6b7b8fca6b3edc50e3b2ad7758813c4f6528594",
+    "source_tool": "image_gen.imagegen",
+    "original_output_path": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-a80aef1b-9eca-486d-b280-703354e89b39.png",
+    "exact_copy": true,
+    "dimensions": [
+      1024,
+      1536
+    ],
+    "mode": "RGB",
+    "prompt": "referces/shizhen/dong-wenhui/macro-opening-20261027/mother-001.prompt.txt",
+    "prompt_sha256": "0be9a1c45151fa9782323a49499068820463006a1a45e98d512baca4d1706147",
+    "actual_reference_paths": [
+      "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png"
+    ],
+    "actual_reference_sha256": [
+      "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    ],
+    "purpose": "用户提醒角色已有后不再采用为身份锚点，仅保留此前一次生成历史",
+    "preserve_if_selected": [
+      "面貌与年龄感",
+      "发际线与低束发",
+      "本场灰褐短外套及袖口",
+      "炭灰圆领内搭"
+    ],
+    "do_not_inherit": [
+      "浅灰背景",
+      "正面站姿",
+      "柔光方向",
+      "干燥状态作为所有镜头固定天气"
+    ],
+    "observed": [
+      "单人单幅，无分格文字或额外道具",
+      "灰褐短外套、炭灰内搭可辨，与罗敏橄榄绿区分",
+      "黑色低束发、自然肤质与轻微疲劳可辨",
+      "双手空手可见，未发现明显额外手指",
+      "耳廓部分被发丝遮挡，后续侧面须检查"
+    ],
+    "limitations": [
+      "只有正面至大腿；鞋、背面、严格侧面未验证",
+      "母图较原身份板显消瘦，是否接受脸型与疲劳程度须用户审看",
+      "未检验楼梯空间、右手扶门、步速、声音及视频连续性"
+    ],
+    "human_acceptance": "NOT_SELECTED_AFTER_USER_CLARIFICATION",
+    "model_input_bound_for_video": false
+  },
+  "calls_this_task": {
+    "builtin_imagegen": 12,
+    "paid_provider": 0,
+    "video": 0,
+    "music": 0,
+    "automatic_retries": 0,
+    "cost": "内置工具未提供结算信息；未调用新增付费Provider",
+    "breakdown": {
+      "unselected_mother": 1,
+      "fresh_state_attempts": 7,
+      "known_quality_repairs": 4
+    }
+  },
+  "production_state_mutation": false,
+  "b6_modified": false,
+  "pending": [
+    "市政M01结构仍FAIL，M02/M03/受力近景未继续生成",
+    "全开门L03右手接触FAIL，L04未继续生成",
+    "L02-O-r1门后凹痕与L01是否同一轮廓尚未证明",
+    "所有视频运动、声音、跨镜连续性与人工接受未评估"
+  ],
+  "native_review": "NATIVE_REVIEW_NOT_REQUIRED:仅隔离候选图与来源审看，无Production/核心行为更改",
+  "learning": "no_candidate:单链结构方向修复，仅有有界个案，不升级通用规则",
+  "state_attempts_record": "referces/shizhen/macro-opening-20261027/state-attempts.json",
+  "existing_role_pack": "referces/shizhen/character-packs-20261027",
+  "user_direction": "用户说明referces角色图已经有了；后续复用已有身份，不重新定妆或扩视角",
+  "source_manifest_recheck": [
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md",
+      "initial_sha256": "d4a7b90b47d7a1b27f4cf7431f28c6c5781ed3687ffbbaff6a076f0f9baf8292",
+      "recheck_sha256": "d4a7b90b47d7a1b27f4cf7431f28c6c5781ed3687ffbbaff6a076f0f9baf8292",
+      "same_bytes": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-CREATIVE-DISCUSSION-20261027.md",
+      "initial_sha256": "67ab5ef3aa98e7ec71a2691246a737d972090e2b1a64db201d7d2fea11055c1b",
+      "recheck_sha256": "67ab5ef3aa98e7ec71a2691246a737d972090e2b1a64db201d7d2fea11055c1b",
+      "same_bytes": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/reference-manifest.json",
+      "initial_sha256": "84000b3e3d07ffea40413020a3fbee0ccd37105b19c91a4ae4b791b032fa662b",
+      "recheck_sha256": "84000b3e3d07ffea40413020a3fbee0ccd37105b19c91a4ae4b791b032fa662b",
+      "same_bytes": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md",
+      "initial_sha256": "2f0903f829e4007499e059890a3a849206523bc94fd1815824b9aa1a637e4e0e",
+      "recheck_sha256": "2f0903f829e4007499e059890a3a849206523bc94fd1815824b9aa1a637e4e0e",
+      "same_bytes": true
+    },
+    {
+      "path": "referces/shizhen/character-packs-20261027/package-manifest.json",
+      "initial_sha256": "7aef533fb371713830b466232e60875c62dfd8d6e19e2902ab08d3790c8bc55c",
+      "recheck_sha256": "ef0b04fb6155f77ac9142070f5488e6295e29baaddf0e6fac67be55bbe851bc2",
+      "same_bytes": false
+    },
+    {
+      "path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "initial_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+      "recheck_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+      "same_bytes": true
+    }
+  ],
+  "role_pack_recheck_note": "其他窗口把package-manifest的审看状态由GENERATED_UNREVIEWED更新至STATIC_REVIEWED_CANDIDATE，实际董文慧身份图SHA未变化，human_acceptance仍NOT_EVALUATED；本轮不编辑其文件",
+  "B6_first_frame": {
+    "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/B6-exact-first-frame.png",
+    "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812",
+    "frame": 0,
+    "clock_observed": "03:16:53",
+    "source_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+    "derivation": "ffmpeg -i exact B6 -frames:v 1; decoded PNG, not source MP4 byte copy"
+  }
+}

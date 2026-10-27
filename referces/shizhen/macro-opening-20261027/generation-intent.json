@@ -1,0 +1,31 @@
+{
+  "scope": "六镜参考状态；身份复用已有character-packs，跳过角色重新设计",
+  "max_state_calls": 12,
+  "max_known_output_repair_calls": 2,
+  "unknown_retry": false,
+  "paid_provider_calls": 0,
+  "video_calls": 0,
+  "stage": "INITIAL_SCENE_GEOGRAPHY",
+  "human_and_video_acceptance": "NOT_EVALUATED",
+  "geometry_repair_extension": {
+    "predecessor_known_repairs_max": 2,
+    "predecessor_known_repairs_consumed": 2,
+    "predecessor_state_calls_consumed": 8,
+    "next_calls_max": 2,
+    "new_total_known_repairs_max": 4,
+    "reason": "两次已知结构方向失败；改为独立几何参考，不重复纯文字修复",
+    "source": "https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide",
+    "stop": "每项最多一次几何引导输出，失败则阻断后续依赖，不再自动重试",
+    "no_paid_provider": true
+  },
+  "known_output_state_calls_consumed": 11,
+  "known_repairs_consumed": 4,
+  "status": "STOPPED_KNOWN_QUALITY_FAILURE",
+  "unattempted_dependencies": [
+    "M02",
+    "M03",
+    "M03-D0",
+    "M03-D1",
+    "L04"
+  ]
+}

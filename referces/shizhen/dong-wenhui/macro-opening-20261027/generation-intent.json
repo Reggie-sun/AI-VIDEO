@@ -1,0 +1,18 @@
+{
+  "attempt_id": "dong-wenhui-macro-mother-001",
+  "tool": "image_gen.imagegen",
+  "maximum_calls": 1,
+  "retry_on_unknown": false,
+  "new_paid_generation_authorized": false,
+  "stage": "MOTHER_CANDIDATE_ONLY",
+  "identity_reference": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+  "identity_sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_mutation": false,
+  "outcome": "KNOWN_OUTPUT_SAVED",
+  "result_path": "referces/shizhen/dong-wenhui/macro-opening-20261027/mother-001.png",
+  "result_sha256": "2c6c395f69ff537b943c8874a6b7b8fca6b3edc50e3b2ad7758813c4f6528594",
+  "tool_calls_consumed": 1,
+  "selection_status": "NOT_SELECTED_AFTER_USER_CLARIFICATION",
+  "current_role_source": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png"
+}
