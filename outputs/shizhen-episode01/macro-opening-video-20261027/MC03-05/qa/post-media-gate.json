@@ -1,0 +1,93 @@
+{
+  "shot_id": "MC03-05",
+  "attempt_id": "shizhen-macro-MC03-05-1080p-qualification-004",
+  "artifact_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "artifact_path": "runs/shizhen-macro-opening-20261027/MC03-05/state/video-generation/fetch/files/43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528.mp4",
+  "artifact_size_bytes": 33005511,
+  "sealed_generation_intent_sha256": "65d6583f90fb7fe3587c813aac7628de99b1cdf88146ec8d682f29df802574db",
+  "predecessor_evidence_clearance": "predecessor-media-clearance.json",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "同一低马尾董文慧、灰褐外套与深灰裤在已查看序列保持，无多人复制，限静态身份观察",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "FAIL",
+      "reason": "开头门后差异先出现，随后才下行；5–7秒实际向人物一侧拉门而非向前推门",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "FAIL",
+      "reason": "先开门后下楼再开门，1.5–2.5秒下行后3–4秒反向上行，信息与行动次序被打乱",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "NOT_EVALUATED",
+      "reason": "可见停门核对和转头，但完整正常步态、细微听辨与不提前察觉的表演因错误起态无法判通过",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "FAIL",
+      "reason": "反向上楼后直接到关门前，低平台到达关系未清楚建立；门开启方向与封存intent相反",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "reason": "1920x1080写实旧住宅、灰绿墙和实用灯，未见新增字幕片名或奇观，限已见美术项",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json"
+      ]
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "reason": "一次盲音频分析识别硬表面脚步、门开/把手和微弱室内环境，无语音；未证明上下平台/门后声场差异及逐动作时序，无human听验",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/frame-index.json",
+        "qa/independent-media-review.json",
+        "qa/native-audio-result.json"
+      ]
+    }
+  ],
+  "verdict": "FAIL",
+  "execution_disposition": "STOP_CURRENT_UNIT_NO_NEXT_SHOT",
+  "new_video_calls_this_unit": 1,
+  "macro_video_calls_cumulative": 4,
+  "new_audio_analysis_calls": 1,
+  "automatic_retries": 0,
+  "actual_charges": "NOT_CONFIRMED",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "final_acceptance": false,
+  "local_edit_assessment": "Head trim alone insufficient; no completed fully conforming editorial repair claimed"
+}

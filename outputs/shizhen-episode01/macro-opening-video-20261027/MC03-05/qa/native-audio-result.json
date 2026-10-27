@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528\",\n  \"source_size_bytes\": 33005511,\n  \"audio_sha256\": \"c5eeb66c5f66623c456fc6619b11fd8d4b2930aee144953bbdac92a75d49826e\",\n  \"audio_size_bytes\": 2130044,\n  \"duration_seconds\": 12.07437641723356,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"c44e736a86c8c0cc13139d28ec617b7d83977c005c51ea40b691f7da24193337\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"f13de9c56f9e4e9125a0ff914e501270f7da546e1cab932da3f01c467ca7c8ec\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"footsteps walking on a hard surface\",\n      \"door opening or handle turning\",\n      \"faint ambient room noise\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/失帧-楼梯异常-1080p-2.0-原片01.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

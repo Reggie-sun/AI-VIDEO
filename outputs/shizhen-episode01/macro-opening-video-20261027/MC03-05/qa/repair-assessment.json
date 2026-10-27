@@ -1,0 +1,19 @@
+{
+  "artifact_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "source_preserving_edit_considered": true,
+  "early_reveal_head_trim_candidate_seconds": [
+    0,
+    1.41667
+  ],
+  "not_a_verified_edit_window": true,
+  "other_unresolved_motion_window_seconds": [
+    2.5,
+    4.5
+  ],
+  "non_editorial_failure": "Actual pull direction cannot become a push through ordinary trimming",
+  "safe_conclusion": "No complete conforming pure-edit repair established; preserve original and stop this unit",
+  "paid_retry_authorized_in_this_unit": false,
+  "unused_count": 0,
+  "official_advisory_source": "https://seed.bytedance.com/en/blog/official-launch-of-seedance-2-0",
+  "primary_source_boundary": "Supports multi-shot and references; does not prove exact sequence, first-frame or push-door fidelity on this request; no source claim used as acceptance"
+}

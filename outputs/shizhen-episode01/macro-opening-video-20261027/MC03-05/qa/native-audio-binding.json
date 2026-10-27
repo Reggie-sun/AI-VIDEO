@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/qa/native-audio",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/qa/native-audio/intent.json",
+  "intent_sha256": "aa789457241f5c08a30bab3c0f1043a2d87e483f16558e1bedf13c49adad11a6",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05/qa/native-audio/reservation.json",
+  "reservation_sha256": "7a91d08201c4a6b54e98fe0adc96a8162f36d989eae7254054183339e97bca97",
+  "source_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "source_size_bytes": 33005511,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

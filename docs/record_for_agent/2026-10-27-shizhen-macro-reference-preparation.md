@@ -178,3 +178,23 @@ record-ai-video-session记录本稳定交付／失败检查点；distill-ai-vide
 本轮无共享工程修改，任务脚本py_compile、docs_contract_gate通过，实际canonical bootstrap/resolve/render、MCP、decode、HTTP/浏览器为对应验证，不宣称完整工程回归。Implementation Risk Gate NATIVE_REVIEW_NOT_REQUIRED，媒体按适用open-video独立review要求另取证。record-ai-video-session记录本稳定剪辑交付，distill-ai-video-learning评估no_candidate：仍是同一macro修复链、无controlled seed或多独立模型实验；software单例仅复用已有兼容参数，不升级默认配置或学习规则。
 
 同一native只读reviewer `/root/macro720_review`、profile reviewer_high完成有据有限扩展第4轮／上限4；前三轮保留，扩展原因是用户新指认HD R03并改为一版确定性本地剪辑，不开启连续模型重试。Reviewer独立核验exact SHA、查看28帧并直接解码输出frame103/104：R03叠影在候选中未重现，未发现新增视觉问题；未连续原速观看或听验。SHZ-EDIT-R04 non_blocking指出boundary-index没有标明它是原片取帧，4.5秒源叠影可能被误认作输出；Parent CONFIRMED，补原片exact path/SHA、source_pts_seconds及显著ORIGINAL_HD_SOURCE_BOUNDARIES_NOT_EDITED_OUTPUT说明，另指输出frame-index。不改媒体bytes，证据标签修正无需新审查。Parent将原R03局部问题判为OBSOLETE_AFTER_CHANGE，整片节奏/声音仍NOT_EVALUATED；`qa/independent-media-review.json`记录闭合及范围。经验跟进检索返回fresh advisory，命中既有S03 sweep_static/software恢复，已重开当前记录与参数验证；未为此重建索引或扩建共享工程。
+
+## Second Generation Unit — Stair Event
+
+用户“开始第二个shot”对应原分镜第二个完整事件组MC03–MC05，不是重做已包含MC02的市政组。既有scenario-identity-library、scenario-seedance-storyboard及seedance-authoring用于来源保留的准备：逐张查看董文慧identity-v1及L01-r1、L01-X、L02、L02-O-r1、L03-r2、L04，SHA／PNG尺寸1672×941均核验。实际视频仅绑定六张干净场景图，L01承担人物锚点，L04补侧脸；原四视身份板只作审查/父来源，不作为多人拼格输入。身份父SHA53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458保持；本场灰褐外套、深灰裤，不移入第二集场次的包本。没有补图、改剧情、B6、字体或音乐。六图顺序、hash、职责归MC03-05/reference-input-plan.json，实际compiled/resolved image_bindings再次逐项一致。
+
+起先严格保留前段剪辑片NOT_EVALUATED并仅准备，不以“开始下一镜”冒充完整听验。用户随后在本次明确回答“已完整看听，可以保留”，针对exact6.83秒剪辑版及其切镜/动作/声音。新predecessor-media-clearance.json封存原片SHAb3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d、原video-analysis字节SHA、逐项Parent/人工证据和用户原话；原raw及剪辑NE记录不覆盖，不重新资格化原始1080p v3。predecessor-assembly-user-accepted.json保留这一真实human证据，verify-assembly最终PASS；最初仍用explicit_evaluator强度时返回NE，随后按实际用户证据使用human，未把Agent播放/取帧冒充用户。start曾在assembly强度核对完成前创建request，尚无外部submit；修正caller再要求assembly PASS后才发唯一POST。只认可本exact片，不代表全开场Final Acceptance。
+
+新单位outputs/shizhen-episode01/macro-opening-video-20261027/MC03-05与runs/shizhen-macro-opening-20261027/MC03-05。按完整下行、开门显露、停步核对定12秒，依用户≤15秒用2.0、2.0默认1080p规则，选seedance_2.0_vip／multimodal4／16:9／native audio。当前native config现场核验12000ms和1080p支持；新空节点node_746f5r0dr5，不复用上轮aborted空节点。纯中文实际正文526字、六个image markers、右手门槛/开门/无对白配乐/不叠化约束均经编译与lint核验；526高于官方建议500的创作指导而低于现场4000字符上限，不宣称任何长度保证质量。Typed主运镜改为向下短跟随并与正文一致，不沿用市政locked定义。新bootstrap首次因Storyboard残留市政scene_id在strict preflight拒绝，无发布/付费副作用；修正本任务数据后由committer正常bootstrap、graph、schema2.14、QA封存，未改共享源码或放宽检查。
+
+operator-bound封存前三宏观known fetched attempt/Manifest/原片SHA及前一bound，单次内部1500CRD上限（非报价），累计由3→最多4、内部上限4500→6000CRD，本轮最多1次、零自动重抽。2026-10-27T08:40:02.855743Z唯一canonical VideoGenerationService.submit_once提交被接受，正常查询同一任务直至成功后fetch，不重试、不重铸permit；宏观真实累计4次。原S05 UNKNOWN保持隔离，不用其历史permit/消费或尝试恢复。付费已执行1次，实际积分/金额未取得结算，不能用预算或native quote充账单。
+
+落盘原片SHA43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528，33,005,511bytes，1920×1080，container12.065秒，video12.016667秒／289帧，AAC44.1k双声道。r_frame_rate60/1仅nominal metadata，avg17340/721，按actual PTS观察、不当60fps或retime。原样副本为失帧-楼梯异常-1080p-2.0-原片01.mp4；播放页index-stairs-v1.html已交用户并标已知失败。服务沿既有8883user systemd Range托管；exact copy/SHA、全声画decode、Range206、独立Chromium1x原声开启播至结尾均通过，无pageerror，仍非媒体验收。
+
+显式project-local video-analysis MCP绑定本exact片、25张实际PTS帧及额外本地scene候选。MCP漏报内部切镜、scene_count1；实际顺序是0–1.4秒先见门已开与异常结果，1.5–2.5秒下行，约3–4秒反向上楼，再于4.5秒到关门前；不能拿scene_count当单镜证明。5–7秒实际把门拉向人物/摄影机，身体后退，和指定向内推门相反。仅删头不能改变拉门方向或证明完整下行到达，故没有制造“纯剪辑已修好”的成片。
+
+同一只读native reviewer /root/macro720_review、reviewer_high完成新楼梯组一次actual-media审查，宏观累计第5轮／本次有据扩展上限5，前4轮保留；新用户任务/不同事件支持仅一轮扩展，不设机械resample。Reviewer核验SHA及全部25帧，独立提出SHZ-STAIR-R05提前揭示、R06下行变上行、R07拉代推三个blocking_candidate，Parent全部CONFIRMED；未连续原速看听，不签human接受。qa/independent-media-review.json及qa/post-media-gate.json保存：action/camera/space FAIL、performance/sound NE，identity/art仅对应已查看有限属性。当前单位STOP，无下一Shot、自动重抽、Production activation/P6/Final Acceptance；尚不把本段并入“全部合格镜头”的正式连续版。
+
+完整音轨一次盲audio-understand、fresh一用operatorunit、source/audio SHA绑定、HTTP200，观察硬地脚步、门开/把手、微弱室内环境，无语音片段；不能证明定位滴水、门前后声场差异或逐动作同步。内部0.05USD上限非报价，实际结算待确认，不重复分析换取通过。旧原片认可不继承到新12秒片。
+
+核验receipt为MC03-05/verification.json；任务脚本py_compile与docs_contract_gate通过，没改共享engine，未跑完整工程回归。Implementation Risk Gate NATIVE_REVIEW_NOT_REQUIRED；适用Skill要求的单名实际媒体复核已完成且blocker诚实保留。两次任务相关经验检索只得部分stale/无适用精确解法，未等待重建或把其他Mini/Ark白模案例移植成Jimeng保证；核对官方2.0来源只支持多模态/多镜能力边界，不以宣传签动作通过。当前实际六图、正文及失败链已保存，可供后续Director重新判断，未生成付费repair。record-ai-video-session记录这一有界首片交付/质量阻断，distill-ai-video-learning评估no_candidate：不同事件的单次结果与前组修复不能隔离多参考、长度、分辨率等变量，不据此改Skill/Policy/Gate或建立普遍模型结论。源媒体按ignore本地保存，Git仅推任务说明、caller、审看页和来源/QA metadata，不夹带并行修改。

@@ -51,6 +51,7 @@ def require_predecessor_clearance():
  assert {x['requirement_id'] for x in doc['required_findings']}=={'identity','action','camera','performance','art','space','sound'} and all(x['verdict']=='PASS' for x in doc['required_findings'])
  assert doc['explicit_project_video_analysis_sha256']==hashlib.sha256((V.parent/'MC01-02-edit-v4/qa/video-analysis.json').read_bytes()).hexdigest()
  assert doc['human_evidence'] and doc['unresolved_blockers']==[]
+ assert json.loads((V/'predecessor-assembly-verdict.json').read_text())['verdict']=='pass'
 
 def main(action):
  s=stack();service=VideoGenerationService(committer=s['committer'],provider=s['provider'])

@@ -1,0 +1,50 @@
+{
+  "source_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC03-05/state/video-generation/fetch/files/43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528.mp4",
+  "source_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "size_bytes": 33005511,
+  "review_copy": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/失帧-楼梯异常-1080p-2.0-原片01.mp4",
+  "probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "aac",
+        "codec_type": "audio",
+        "sample_rate": "44100",
+        "channels": 2,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "duration": "12.063991",
+        "nb_frames": "522"
+      },
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "60/1",
+        "avg_frame_rate": "17340/721",
+        "duration": "12.016667",
+        "nb_frames": "289"
+      }
+    ],
+    "format": {
+      "duration": "12.065000",
+      "size": "33005511"
+    }
+  },
+  "full_decode": true,
+  "original_rate_preserved": true,
+  "detected_scene_change_pts": [
+    1.41667,
+    1.5,
+    2.5,
+    3.08333,
+    3.3,
+    3.5,
+    4.08333,
+    4.13333
+  ],
+  "fps_note": "r_frame_rate is not measured playback rate; source timestamps are retained",
+  "quality": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

@@ -1,0 +1,61 @@
+{
+  "reviewer": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "permissions": "read-only",
+  "cumulative_macro_review_round": 5,
+  "bounded_macro_review_ceiling": 5,
+  "second_event_review_round": 1,
+  "extension_reason": "New explicit user-requested distinct stair event; one actual-media review, prior4 macro rounds retained, no retry loop",
+  "candidate_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+  "evidence_scope": [
+    "ExactSHA verified",
+    "All25 actualPTS frames viewed"
+  ],
+  "continuous_normal_speed_viewing": "NOT_EVALUATED",
+  "actual_listening": "NOT_EVALUATED",
+  "findings": [
+    {
+      "id": "SHZ-STAIR-R05",
+      "severity": "blocking_candidate",
+      "time_seconds": [
+        0,
+        1.4
+      ],
+      "observation": "Opening already at open door with extinguisher and old pipe marks; ordinary pipe platform introduced later",
+      "parent_adjudication": "CONFIRMED",
+      "impact": "Premature reveal and repeated door event",
+      "local_edit_limit": "Removing head could hide early reveal but not repair other failures"
+    },
+    {
+      "id": "SHZ-STAIR-R06",
+      "severity": "blocking_candidate",
+      "time_seconds": [
+        1.5,
+        4.5
+      ],
+      "observation": "Back-facing descent1.5–2.5 then face-camera upward walk3–4 before closed-door arrival4.5",
+      "parent_adjudication": "CONFIRMED",
+      "impact": "Lower-platform progression unclear; opposite travel and return-like impression",
+      "local_edit_limit": "Need complete normal-speed usable source-window validation; none claimed"
+    },
+    {
+      "id": "SHZ-STAIR-R07",
+      "severity": "blocking_candidate",
+      "time_seconds": [
+        5,
+        7
+      ],
+      "observation": "Door moves toward woman/camera and she backs left while holding handle, a pull instead of prescribed inward push",
+      "parent_adjudication": "CONFIRMED",
+      "impact": "Wrong door-action direction and physical staging",
+      "local_edit_limit": "Trimming cannot turn the pull into a push"
+    }
+  ],
+  "unresolved_blockers": [
+    "SHZ-STAIR-R05",
+    "SHZ-STAIR-R06",
+    "SHZ-STAIR-R07"
+  ],
+  "next_shot_submit": "STOP",
+  "no_extra_review_or_generation": true
+}
