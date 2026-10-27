@@ -78,3 +78,21 @@ L03-r2允许自然侧移前倾随把手，撤回Agent附加的脚位冻结和固
 seedance-authoring现有8项检查通过；8秒2.0 VIP的五张原图SHA、时长／图片数／字节／尺寸与1080p能力检查通过。exact Skill commit为8cf1c000eab2c28e2c2c66f2b22f68230391e365。初次staged Harness纳入并行暂存路径而缺映射；改用精确Skill commit range后，docs_contract与Skill检查通过，但Harness自身测试319 passed／2 failed，失败为complete-cross-check coverage和unmapped-owned-files。涉及本任务未修改的policy/source映射，不改动其并行工作、不冒充Harness通过或完整回归。
 
 失败receipt：`.agent/harness/runs/seedance-duration-rule-range-20261027/receipt.json`；本次输入核验记录：`outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-video-preflight-20261027/verification.json`。这是用户明确规则更改，不是学习Claim adoption；learning为no_candidate，未产生视频或付费调用。
+
+## First Video Generation — Current Checkpoint
+
+用户随后明确要求“生成視頻”，取代上方旧的等待执行授权状态。本轮实际完成MC01–MC02首个8秒事件的一次Jimeng `seedance_2.0_vip`／multimodal／1080p／16:9资格试片提交。新画布`e09b617d-5af1-40ee-9136-d36a7422d40c`，新空视频节点；实际五张参考按M01、M02、M03、D0、D1顺序绑定，最终544字纯中文正文只加入必要image引用语法。引用SHA、模型实际配置、适配、lint、intent与exact request见`outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/`。
+
+通过既有`ProductionStateCommitter` bootstrap/QA激活、`GenerationFeedbackOrchestrator`、`VideoGenerationService`与`JimengBrowserTransport`完成start→一次submit→poll→fetch。没有裸POST、Production activation、P6或伪造正式资格。准备时修补缺失的audio/output字段、逐人物表演声明和非连续字符串片段映射；这些是submit前的输入修正，零额外付费尝试，旧QA revision及prepare阻断记录保留。首次新建画布按钮被遮挡，读回确认无变化；卡片随后进入本地画布。加节点后ensureProject无参数调用报错，但节点和画布已正常自动持久化；按实际project/node读回继续，没有再建第二节点或生成重试。
+
+实际受理时间2026-10-27T06:03:25.800592Z。输出SHA `bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4`，24,508,531字节，1920×1080，容器约8.065秒，193帧，AAC双声道。MCP报告60fps取自r_frame_rate，真实avg_frame_rate为11580/481，未按60fps重定时。原始候选和审看副本逐字节相同，副本`outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-8秒-Seedance2.0-候选01.mp4`；审看入口`http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index.html`。
+
+当前逐镜Gate为**FAIL**：停灯后门继续向右滑动、正确两段索路、同侧切近景和工人保持安全距离已出现；连接底板在近景里仍大致平直，未清楚表现逐渐有限拱起。`video-analysis` MCP已显式调用；末段原尺寸帧与正常1.0x浏览器播放记录已保存。自动scene阈值漏掉了实际切镜，Parent按序列辨认，不伪造MCP结论。
+
+声音盲分析另外消费一个development operator unit，exact MP4和完整PCM派生SHA绑定，Gemini3.8Flash HTTP200。分析器返回保龄球滚动／碰撞等描述；这与创作目标不吻合，也不足以断言原片真实存在保龄球声音。声音语义为`NOT_EVALUATED`，走`EVIDENCE_REPAIR_FIRST`，不以重新生成视频来修补听音证据。未进行human listening/acceptance。
+
+`MC01-02/qa/post-media-gate.json`按全部七项要求裁决，当前attempt执行STOP，未提交任何后续Shot。完整冷开场尚未完成，本片只作为未通过的首段候选供审看。原B6、字体、配乐、人物剧情均未修改，B6 SHA仍为`d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a`。
+
+当前有限单元为1次视频，已消费1次；预配置内部单次1500CRD上限不是报价，未取得实际结算金额。声音分析内部0.05USD上限同样不是报价，实际费用待确认。严格reader审计先前24个视频attempt；原S05 UNKNOWN保持不动，不重试、不清零、不退款或复用旧permit。本次为独立宏观首段的新任务，观察cohort累计25个，不声称这是账单统计。
+
+核验receipt：`outputs/shizhen-episode01/macro-opening-video-20261027/verification.json`；含exact copy/SHA、全片声画decode、Range206、浏览器原速播放到结尾、B6保护核验。docs_contract_gate通过，任务脚本py_compile通过；未改共享源码，不额外跑全套或把技术检查当作质量通过。旧规则Harness的并行policy映射失败仍按上节保留。Risk Gate为NATIVE_REVIEW_NOT_REQUIRED：只新增任务数据及调用既有owner，无修改凭据、权限、恢复或共享执行行为，Parent已核验实际证据。record-ai-video-session记录本稳定质量阻断；distill-ai-video-learning评估no_candidate，一次新片及其音频观察不构成独立多实验，不改Skill/Policy/Gate。

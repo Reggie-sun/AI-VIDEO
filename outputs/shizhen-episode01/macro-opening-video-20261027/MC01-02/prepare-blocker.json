@@ -1,0 +1,2049 @@
+{
+  "decision": {
+    "snapshot_hash": "b79c96f3bb03990f0d73f8c4b72fc3a7edd7d2845d6dea6e9de416140a7de908",
+    "disposition": "GENERATE_ONCE",
+    "selected_candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+    "assessments": [
+      {
+        "candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+        "scope_hash": "43a4db6b8dfa5b2a3c352c3387bd91e27f72ab91efc433031da328280ba91914",
+        "fit": "unknown",
+        "compatible": true,
+        "executable": true,
+        "supported_dimensions": [],
+        "failed_dimensions": [],
+        "unknown_dimensions": [
+          "action",
+          "art",
+          "camera",
+          "identity",
+          "performance",
+          "sound",
+          "space"
+        ],
+        "evidence_hashes": [],
+        "ignored_evidence_hashes": [],
+        "sample_count": 0,
+        "pass_count": 0,
+        "fail_count": 0,
+        "not_evaluated_count": 0,
+        "runtime_failure_count": 0,
+        "unknown_outcome_count": 0,
+        "not_submitted_count": 0,
+        "reasons": [],
+        "empirical": {
+          "version": "generation-cohort/1",
+          "supported_artifacts": [],
+          "failed_artifacts": [],
+          "incomplete_artifacts": [],
+          "evidence_hashes": [],
+          "exclusions": [],
+          "failed_requirements": [],
+          "observed_success_fraction": null,
+          "interval_95": null,
+          "limitations": [
+            "observational cohort; selection and intervention confounding remain",
+            "unknown action complexity and hand/prop interaction are not matched",
+            "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+          ]
+        }
+      }
+    ],
+    "diagnosis": null,
+    "intervention": null,
+    "runtime_repair": null,
+    "routing": {
+      "decision": {
+        "target_shot_id": "MC01-02",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "0139f35d73321b5ef425d45556bfbe35c981abff61fe3278440efdf68911ec3a",
+        "continuity_mode": "none",
+        "semantic_continuity_state": null,
+        "required_mode": "reference_to_video",
+        "selected_mode": "reference_to_video",
+        "required_binding_roles": [
+          "reference",
+          "reference",
+          "reference",
+          "reference",
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "character_reference",
+            "asset_id": "MC01-02-ref-1",
+            "asset_sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "character",
+            "canonical_owner_id": "municipal-worker",
+            "canonical_owner_content_hash": "4005849243d1fafa3a4196c17a9fb25c022518456a52d6bccb9891bfe7bf0a91",
+            "mime_type": "image/png",
+            "size_bytes": 2689606,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-2",
+            "asset_sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2714219,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-3",
+            "asset_sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2808301,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-4",
+            "asset_sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2988617,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-5",
+            "asset_sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2850279,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "provider_name": "jimeng",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/7660942dae99e856934fd91e0317afe5818c959a20322e53b3ae5ec58ebddda4.json",
+          "profile_sha256": "7660942dae99e856934fd91e0317afe5818c959a20322e53b3ae5ec58ebddda4"
+        },
+        "provider_capabilities_fingerprint": "a4e4fa3add6a83b868e7246155d5a8dbfd3587a89f38e79d80087e71da4616d8",
+        "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "selected_capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "requirement_hash": "5a9a75a4636aad77b823f90af2a3159d401f8df360e2930badc4afb355a3d0e5",
+        "continuity_transition_policy_hash": null,
+        "previous_provider_bound_request_hash": null,
+        "continuity_provider_route_binding_hash": null,
+        "execution_kind": "remote",
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 8,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "reason_codes": [
+          "CANONICAL_REFERENCES_ENABLE_R2V"
+        ],
+        "rationale": "Bind the verified neutral requirement to the exact capability.",
+        "policy": {
+          "policy_id": "shizhen-cold-open-qualification",
+          "policy_version": "1",
+          "policy_sha256": "a5a7aba41a5b53ea6e08e434fe5bee65f358f7bc835f1941bdeabd865640339d"
+        },
+        "outcome": "selected",
+        "semantic_routing_hash": "19a57fc4211e0ca6e32c1f8be133e1f769c667cd26625b7668b28b5e4074b8df",
+        "audit_decision_hash": "0a62918d342326bef9b854887fa6a22718bbfdb1d0d7e7e644764fff1d957f56"
+      },
+      "provider_bound_request": {
+        "plan_hash": "a1cb426b3219a74a87fa4abf61c40c067fcb2f15911c376da65b2ed577943ea1",
+        "requirement_hash": "5a9a75a4636aad77b823f90af2a3159d401f8df360e2930badc4afb355a3d0e5",
+        "verified_projection_hash": "801ffec581e9418f6f0374a8ffe2c87cd2f273054f18753be198dd060e36dfa3",
+        "target_shot_id": "MC01-02",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "0139f35d73321b5ef425d45556bfbe35c981abff61fe3278440efdf68911ec3a",
+        "semantic_routing_hash": "19a57fc4211e0ca6e32c1f8be133e1f769c667cd26625b7668b28b5e4074b8df",
+        "audit_decision_hash": "0a62918d342326bef9b854887fa6a22718bbfdb1d0d7e7e644764fff1d957f56",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.0_vip",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/7660942dae99e856934fd91e0317afe5818c959a20322e53b3ae5ec58ebddda4.json",
+          "profile_sha256": "7660942dae99e856934fd91e0317afe5818c959a20322e53b3ae5ec58ebddda4"
+        },
+        "capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "execution_kind": "remote",
+        "billing_kind": "metered",
+        "mode": "reference_to_video",
+        "binding_roles": [
+          "reference",
+          "reference",
+          "reference",
+          "reference",
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "character_reference",
+            "asset_id": "MC01-02-ref-1",
+            "asset_sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "character",
+            "canonical_owner_id": "municipal-worker",
+            "canonical_owner_content_hash": "4005849243d1fafa3a4196c17a9fb25c022518456a52d6bccb9891bfe7bf0a91",
+            "mime_type": "image/png",
+            "size_bytes": 2689606,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-2",
+            "asset_sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2714219,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-3",
+            "asset_sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2808301,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-4",
+            "asset_sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2988617,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "MC01-02-ref-5",
+            "asset_sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+            "source_registry_revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "municipal-entrance",
+            "canonical_owner_content_hash": "845e18d89dae44585bad113fd617be0205fcce010b6460a0ce0778b885038692",
+            "mime_type": "image/png",
+            "size_bytes": 2850279,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 8,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "lifecycle": {
+          "generation_id": "canvas-generation-371943aeee06a1c356eec24ed189d1d0",
+          "target_asset_role": "primary_visual",
+          "base_project": {
+            "path": "state/projects/project.1.151c5da762742b7048de1a993be0c6fb1ec51ac7c99b223742755b078d50d5e1.yaml",
+            "revision": 1,
+            "content_hash": "151c5da762742b7048de1a993be0c6fb1ec51ac7c99b223742755b078d50d5e1",
+            "file_sha256": "c33dcecc8a072851639620d36360d09aa72dec204975a2b39188f491d349ac33"
+          },
+          "base_registry": {
+            "path": "assets/registry.11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe.json",
+            "revision_id": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "content_hash": "11b954705d80c64db1600e50d96641ef710a053428b073bb4cb1e2f1f8666ffe",
+            "file_sha256": "479b7a6c6a8c3cc0863eedefbd0dac646da575e68aee7047be1f8d7a5d888071"
+          },
+          "base_dependency_graph": {
+            "revision_id": "5d7acdbaaf5e6873165fff7d2a060462b2b606b8f58db16d4badc44d9e90fece",
+            "content_hash": "5d7acdbaaf5e6873165fff7d2a060462b2b606b8f58db16d4badc44d9e90fece",
+            "path": "state/dependency_graph.5d7acdbaaf5e6873165fff7d2a060462b2b606b8f58db16d4badc44d9e90fece.json",
+            "file_sha256": "e09ac889ce23aa482e9cde57f8277a5acabfb46fb3699f4da3189590aef7bbea"
+          },
+          "input_artifact_ids": [
+            "shizhen-macro-MC01-02-shot",
+            "shizhen-macro-MC01-02-scene",
+            "shizhen-macro-MC01-02-character-municipal-worker",
+            "MC01-02-ref-1",
+            "MC01-02-ref-2",
+            "MC01-02-ref-3",
+            "MC01-02-ref-4",
+            "MC01-02-ref-5"
+          ],
+          "output_asset_id": "canvas-video-371943aeee06a1c356eec24ed189d1d0",
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false
+        },
+        "compiler_contract": {
+          "compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+          "compiler_version": "1",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49"
+        },
+        "expression_strength": "semantic_prompt_allowed",
+        "generation_recipe": {
+          "contract_version": "generation-recipe/1",
+          "seed": {
+            "kind": "uncontrolled",
+            "value": null
+          },
+          "profile_sha256": "7660942dae99e856934fd91e0317afe5818c959a20322e53b3ae5ec58ebddda4",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+          "requirement_hash": "5a9a75a4636aad77b823f90af2a3159d401f8df360e2930badc4afb355a3d0e5",
+          "rubric_hash": "e0439cd8205b245d37c8928f74ad18aec79131fd93b44b08341b1cb1cc4603b3",
+          "acceptance_policy": {
+            "domain_id": "original-drama",
+            "profile_id": "shizhen-macro-MC01-02-raw",
+            "profile_version": "2",
+            "profile_content_hash": "e0439cd8205b245d37c8928f74ad18aec79131fd93b44b08341b1cb1cc4603b3",
+            "profile_payload": {
+              "content_hash": "e0439cd8205b245d37c8928f74ad18aec79131fd93b44b08341b1cb1cc4603b3",
+              "domain_id": "original-drama",
+              "generation_requirements": [
+                {
+                  "dimension": "action",
+                  "intent_paths": [
+                    "generation_intent.open_state.kind",
+                    "generation_intent.open_state.state_text",
+                    "generation_intent.open_state.required_change",
+                    "generation_intent.close_state.kind",
+                    "generation_intent.close_state.state_text",
+                    "generation_intent.close_state.required_change",
+                    "generation_intent.scene_continuity.scene_id",
+                    "generation_intent.scene_continuity.time_of_day",
+                    "generation_intent.scene_continuity.mood",
+                    "generation_intent.scene_continuity.state_constraints.0",
+                    "generation_intent.scene_continuity.state_constraints.1",
+                    "generation_intent.scene_continuity.state_constraints.2",
+                    "generation_intent.subject_action.start_state",
+                    "generation_intent.subject_action.progression",
+                    "generation_intent.subject_action.endpoint.state_text",
+                    "generation_intent.subject_action.endpoint.required_change",
+                    "generation_intent.motion_envelope.onset",
+                    "generation_intent.motion_envelope.peak",
+                    "generation_intent.motion_envelope.settle",
+                    "generation_intent.motion_envelope.direction",
+                    "generation_intent.motion_envelope.amplitude_class",
+                    "generation_intent.pacing.cadence",
+                    "generation_intent.pacing.tempo_class",
+                    "generation_intent.pacing.shot_duration_seconds"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "工人见门接近限位，右手按下停止控制，工作灯熄灭、马达声停止，路灯和雨夜交通继续。镜头先不切，门仍沿导轨向右滑动，抵住固定限位。工人先确认控制箱，再看向仍受力的牵引点，不靠近钢索。注意方向建立后，同侧切到素材4、5的连接近景：门边已被限位挡住，钢索依然绷紧，四螺栓底板中部逐渐小幅拱起，出现可辨的弯曲和阴影间隙，连接不断裂。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.scene_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.time_of_day"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.mood"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.2"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.start_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.progression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.onset"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.peak"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.settle"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.cadence"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.tempo_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.shot_duration_seconds"
+                      }
+                    ],
+                    "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255"
+                  },
+                  "observable": "控制灯与马达停止后门在同镜继续右移，到固定限位；连接底板渐进有限弯曲而不断裂",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "action",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "identity",
+                  "intent_paths": [
+                    "generation_intent.identity_continuity.character_ids.0",
+                    "generation_intent.identity_continuity.preservation"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "参考素材1{{image:0}}只负责正常作业时的同一工人、设备、亮着的工作灯和开场构图；素材2{{image:1}}只负责停止控制后的灯态与门的少量右移；素材3{{image:2}}只负责门抵住右侧固定限位后的空间与工人注意；素材4{{image:3}}、素材5{{image:4}}只负责同一牵引连接近景由平直到有限弯曲的前后差异，不复制成拼图。\n全程同一工人、设备、受力方向和雨夜"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.character_ids.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.preservation"
+                      }
+                    ],
+                    "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255"
+                  },
+                  "observable": "同一工人、服装、设备及五张参考对应状态，无换脸或设备漂移",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "identity",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "space",
+                  "intent_paths": [
+                    "generation_intent.space_continuity.subject_position",
+                    "generation_intent.space_continuity.screen_direction",
+                    "generation_intent.space_continuity.crossing_policy"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "钢索只有绞盘到右侧滑轮、右滑轮折返到门牵引耳两段，不增加左绞盘直连门的第三条索。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.subject_position"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.screen_direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.crossing_policy"
+                      }
+                    ],
+                    "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255"
+                  },
+                  "observable": "绞盘到右侧滑轮再折返到门的两段索路，门始终向右，工人不跨索",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "space",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "camera",
+                  "intent_paths": [
+                    "generation_intent.axis_continuity.camera_axis",
+                    "generation_intent.axis_continuity.framing_continuity",
+                    "generation_intent.axis_continuity.crossing_policy",
+                    "generation_intent.camera_intent.movement",
+                    "generation_intent.camera_intent.stability",
+                    "generation_intent.camera_intent.framing_intent",
+                    "generation_intent.camera_intent.expression_strength",
+                    "generation_intent.camera_endpoint.start_framing",
+                    "generation_intent.camera_endpoint.end_framing",
+                    "generation_intent.camera_endpoint.position_lock",
+                    "generation_intent.camera_endpoint.orientation_lock",
+                    "generation_intent.primary_camera_motion.movement_kind",
+                    "generation_intent.primary_camera_motion.direction",
+                    "generation_intent.primary_camera_motion.amplitude_class",
+                    "generation_intent.primary_camera_motion.speed_class",
+                    "generation_intent.primary_camera_motion.start_motion_state",
+                    "generation_intent.primary_camera_motion.end_motion_state",
+                    "generation_intent.camera_subject_relation.subject_id",
+                    "generation_intent.camera_subject_relation.relation_kind",
+                    "generation_intent.camera_subject_relation.start_relation",
+                    "generation_intent.camera_subject_relation.end_relation"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "先用稳定斜侧中远景同时看见控制箱旁工人、固定绞盘、钢索、滑门和后景正常道路。",
+                    "镜头先不切，门仍沿导轨向右滑动，抵住固定限位。工人先确认控制箱，再看向仍受力的牵引点，不靠近钢索。注意方向建立后，同侧切到素材4、5的连接近景：门边已被限位挡住，钢索依然绷紧，四螺栓底板中部逐渐小幅拱起，出现可辨的弯曲和阴影间隙，连接不断裂。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.camera_axis"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.framing_continuity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.crossing_policy"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_intent.movement"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_intent.stability"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_intent.framing_intent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_intent.expression_strength"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.start_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.end_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.position_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.orientation_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.movement_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.speed_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.start_motion_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.subject_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.relation_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.start_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.end_relation"
+                      }
+                    ],
+                    "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255"
+                  },
+                  "observable": "停机与继续滑移同一中远景清楚，再同侧有动机切连接近景",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "camera",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "performance",
+                  "intent_paths": [
+                    "generation_intent.performance_intent.trigger",
+                    "generation_intent.performance_intent.visible_response",
+                    "generation_intent.performance_intent.gaze_target",
+                    "generation_intent.performance_intent.body_behavior",
+                    "generation_intent.performance_intent.hand_behavior",
+                    "generation_intent.performance_intent.terminal_performance_state",
+                    "generation_intent.performance_intent.character_directions.0.character_id",
+                    "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "generation_intent.performance_intent.character_directions.0.role",
+                    "generation_intent.performance_intent.character_directions.0.visibility",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "工人先确认控制箱，再看向仍受力的牵引点，不靠近钢索。",
+                    "工人见门接近限位，右手按下停止控制，工作灯熄灭、马达声停止",
+                    "动作与反应完整、节奏自然"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.visible_response"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.body_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.hand_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.character_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.visibility"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                      }
+                    ],
+                    "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255"
+                  },
+                  "observable": "工人右手停止，先确认控制箱再看牵引点，保持安全距离，反应自然",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "performance",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "art",
+                  "intent_paths": [
+                    "generation_intent.visual_treatment.medium_look",
+                    "generation_intent.visual_treatment.palette",
+                    "generation_intent.visual_treatment.material_treatment",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                    "generation_intent.lighting_intent.motivated_source",
+                    "generation_intent.lighting_intent.direction",
+                    "generation_intent.lighting_intent.exposure_priority",
+                    "generation_intent.lighting_intent.continuity_state"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜市政检修入口，正常速度的真人摄影质感。动作与反应完整、节奏自然，不用慢动作、闪屏、黑屏、鬼影、火花或爆炸代替异常。全程同一工人、设备、受力方向和雨夜；无片名、字幕、说明文字或分格。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.medium_look"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.palette"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.material_treatment"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.motivated_source"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.exposure_priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.continuity_state"
+                      }
+                    ],
+                    "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255"
+                  },
+                  "observable": "真人摄影质感、雨夜光线连续，无慢动作、黑屏、鬼影、火花爆炸、片名字幕拼格",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "art",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "sound",
+                  "intent_paths": [
+                    "generation_intent.ambience_intent.environment_bed",
+                    "generation_intent.ambience_intent.foley_cues.0",
+                    "generation_intent.ambience_intent.explicitly_silent",
+                    "generation_intent.dialogue_intent.mode",
+                    "generation_intent.dialogue_intent.lip_sync_required",
+                    "generation_intent.music_intent.mode"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "马达保持停止，雨、交通和持续受力的金属摩擦声可听；无对白、配乐或惊吓重击。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.environment_bed"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.foley_cues.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.explicitly_silent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.mode"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.lip_sync_required"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.music_intent.mode"
+                      }
+                    ],
+                    "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255"
+                  },
+                  "observable": "马达停止；雨、车流及受力金属摩擦持续，无对白、配乐或惊吓重击",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "sound",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                }
+              ],
+              "measurement_contract_version": "1",
+              "profile_id": "shizhen-macro-MC01-02-raw",
+              "profile_version": "2",
+              "required_requirement_ids": [
+                "action",
+                "identity",
+                "space",
+                "camera",
+                "performance",
+                "art",
+                "sound"
+              ]
+            },
+            "measurement_contract_version": "1",
+            "required_requirement_ids": [
+              "action",
+              "identity",
+              "space",
+              "camera",
+              "performance",
+              "art",
+              "sound"
+            ]
+          },
+          "expressions": [
+            {
+              "requirement_id": "action",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "action",
+              "observable": "控制灯与马达停止后门在同镜继续右移，到固定限位；连接底板渐进有限弯曲而不断裂",
+              "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.open_state.kind",
+                "generation_intent.open_state.state_text",
+                "generation_intent.open_state.required_change",
+                "generation_intent.close_state.kind",
+                "generation_intent.close_state.state_text",
+                "generation_intent.close_state.required_change",
+                "generation_intent.scene_continuity.scene_id",
+                "generation_intent.scene_continuity.time_of_day",
+                "generation_intent.scene_continuity.mood",
+                "generation_intent.scene_continuity.state_constraints.0",
+                "generation_intent.scene_continuity.state_constraints.1",
+                "generation_intent.scene_continuity.state_constraints.2",
+                "generation_intent.subject_action.start_state",
+                "generation_intent.subject_action.progression",
+                "generation_intent.subject_action.endpoint.state_text",
+                "generation_intent.subject_action.endpoint.required_change",
+                "generation_intent.motion_envelope.onset",
+                "generation_intent.motion_envelope.peak",
+                "generation_intent.motion_envelope.settle",
+                "generation_intent.motion_envelope.direction",
+                "generation_intent.motion_envelope.amplitude_class",
+                "generation_intent.pacing.cadence",
+                "generation_intent.pacing.tempo_class",
+                "generation_intent.pacing.shot_duration_seconds"
+              ],
+              "native_text": [
+                "工人见门接近限位，右手按下停止控制，工作灯熄灭、马达声停止，路灯和雨夜交通继续。镜头先不切，门仍沿导轨向右滑动，抵住固定限位。工人先确认控制箱，再看向仍受力的牵引点，不靠近钢索。注意方向建立后，同侧切到素材4、5的连接近景：门边已被限位挡住，钢索依然绷紧，四螺栓底板中部逐渐小幅拱起，出现可辨的弯曲和阴影间隙，连接不断裂。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.open_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.scene_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.time_of_day",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.mood",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.2",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.start_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.progression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.onset",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.peak",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.settle",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.cadence",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.tempo_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.shot_duration_seconds",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "art",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "art",
+              "observable": "真人摄影质感、雨夜光线连续，无慢动作、黑屏、鬼影、火花爆炸、片名字幕拼格",
+              "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.visual_treatment.medium_look",
+                "generation_intent.visual_treatment.palette",
+                "generation_intent.visual_treatment.material_treatment",
+                "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                "generation_intent.lighting_intent.motivated_source",
+                "generation_intent.lighting_intent.direction",
+                "generation_intent.lighting_intent.exposure_priority",
+                "generation_intent.lighting_intent.continuity_state"
+              ],
+              "native_text": [
+                "雨夜市政检修入口，正常速度的真人摄影质感。动作与反应完整、节奏自然，不用慢动作、闪屏、黑屏、鬼影、火花或爆炸代替异常。全程同一工人、设备、受力方向和雨夜；无片名、字幕、说明文字或分格。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.visual_treatment.medium_look",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.palette",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.material_treatment",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.motivated_source",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.exposure_priority",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.continuity_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "camera",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "camera",
+              "observable": "停机与继续滑移同一中远景清楚，再同侧有动机切连接近景",
+              "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.axis_continuity.camera_axis",
+                "generation_intent.axis_continuity.framing_continuity",
+                "generation_intent.axis_continuity.crossing_policy",
+                "generation_intent.camera_intent.movement",
+                "generation_intent.camera_intent.stability",
+                "generation_intent.camera_intent.framing_intent",
+                "generation_intent.camera_intent.expression_strength",
+                "generation_intent.camera_endpoint.start_framing",
+                "generation_intent.camera_endpoint.end_framing",
+                "generation_intent.camera_endpoint.position_lock",
+                "generation_intent.camera_endpoint.orientation_lock",
+                "generation_intent.primary_camera_motion.movement_kind",
+                "generation_intent.primary_camera_motion.direction",
+                "generation_intent.primary_camera_motion.amplitude_class",
+                "generation_intent.primary_camera_motion.speed_class",
+                "generation_intent.primary_camera_motion.start_motion_state",
+                "generation_intent.primary_camera_motion.end_motion_state",
+                "generation_intent.camera_subject_relation.subject_id",
+                "generation_intent.camera_subject_relation.relation_kind",
+                "generation_intent.camera_subject_relation.start_relation",
+                "generation_intent.camera_subject_relation.end_relation"
+              ],
+              "native_text": [
+                "先用稳定斜侧中远景同时看见控制箱旁工人、固定绞盘、钢索、滑门和后景正常道路。",
+                "镜头先不切，门仍沿导轨向右滑动，抵住固定限位。工人先确认控制箱，再看向仍受力的牵引点，不靠近钢索。注意方向建立后，同侧切到素材4、5的连接近景：门边已被限位挡住，钢索依然绷紧，四螺栓底板中部逐渐小幅拱起，出现可辨的弯曲和阴影间隙，连接不断裂。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.axis_continuity.camera_axis",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.framing_continuity",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.movement",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.stability",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.framing_intent",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.expression_strength",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.start_framing",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.end_framing",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.position_lock",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.orientation_lock",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.movement_kind",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.direction",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.amplitude_class",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.speed_class",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.start_motion_state",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.subject_id",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.relation_kind",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.start_relation",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.end_relation",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "identity",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "identity",
+              "observable": "同一工人、服装、设备及五张参考对应状态，无换脸或设备漂移",
+              "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.identity_continuity.character_ids.0",
+                "generation_intent.identity_continuity.preservation"
+              ],
+              "native_text": [
+                "参考素材1{{image:0}}只负责正常作业时的同一工人、设备、亮着的工作灯和开场构图；素材2{{image:1}}只负责停止控制后的灯态与门的少量右移；素材3{{image:2}}只负责门抵住右侧固定限位后的空间与工人注意；素材4{{image:3}}、素材5{{image:4}}只负责同一牵引连接近景由平直到有限弯曲的前后差异，不复制成拼图。\n全程同一工人、设备、受力方向和雨夜"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.identity_continuity.character_ids.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.identity_continuity.preservation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "performance",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "performance",
+              "observable": "工人右手停止，先确认控制箱再看牵引点，保持安全距离，反应自然",
+              "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.performance_intent.trigger",
+                "generation_intent.performance_intent.visible_response",
+                "generation_intent.performance_intent.gaze_target",
+                "generation_intent.performance_intent.body_behavior",
+                "generation_intent.performance_intent.hand_behavior",
+                "generation_intent.performance_intent.terminal_performance_state",
+                "generation_intent.performance_intent.character_directions.0.character_id",
+                "generation_intent.performance_intent.character_directions.0.screen_identity",
+                "generation_intent.performance_intent.character_directions.0.role",
+                "generation_intent.performance_intent.character_directions.0.visibility",
+                "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+              ],
+              "native_text": [
+                "工人先确认控制箱，再看向仍受力的牵引点，不靠近钢索。",
+                "工人见门接近限位，右手按下停止控制，工作灯熄灭、马达声停止",
+                "动作与反应完整、节奏自然"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.performance_intent.trigger",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.visible_response",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.gaze_target",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.body_behavior",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.hand_behavior",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.character_id",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.role",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.visibility",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "sound",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "sound",
+              "observable": "马达停止；雨、车流及受力金属摩擦持续，无对白、配乐或惊吓重击",
+              "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.ambience_intent.environment_bed",
+                "generation_intent.ambience_intent.foley_cues.0",
+                "generation_intent.ambience_intent.explicitly_silent",
+                "generation_intent.dialogue_intent.mode",
+                "generation_intent.dialogue_intent.lip_sync_required",
+                "generation_intent.music_intent.mode"
+              ],
+              "native_text": [
+                "马达保持停止，雨、交通和持续受力的金属摩擦声可听；无对白、配乐或惊吓重击。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.ambience_intent.environment_bed",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.foley_cues.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.explicitly_silent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.lip_sync_required",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.music_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "space",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "space",
+              "observable": "绞盘到右侧滑轮再折返到门的两段索路，门始终向右，工人不跨索",
+              "tolerance": "逐项满足原分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.space_continuity.subject_position",
+                "generation_intent.space_continuity.screen_direction",
+                "generation_intent.space_continuity.crossing_policy"
+              ],
+              "native_text": [
+                "钢索只有绞盘到右侧滑轮、右滑轮折返到门牵引耳两段，不增加左绞盘直连门的第三条索。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "22feeffbbd49a708216ce5ebbbf59ea55af4d6b57ff4d669e103410d93eab255",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.space_continuity.subject_position",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.screen_direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "editorial_operations": [],
+          "comparison": null
+        },
+        "provider_bound_request_hash": "a918e84ecd5a6cf4a3ef3c8930ba32c6cdce96f631c8487c39b63c39af4de9ae"
+      }
+    },
+    "rationale": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1: unknown; one bounded attempt, no quality guarantee",
+      "evidence and policy affect audit identity, not unrelated media semantics"
+    ],
+    "revalidate_requirements": [
+      "action",
+      "art",
+      "camera",
+      "identity",
+      "performance",
+      "sound",
+      "space"
+    ]
+  },
+  "compilation": {
+    "outcome": "unsupported",
+    "requirement_hash": "5a9a75a4636aad77b823f90af2a3159d401f8df360e2930badc4afb355a3d0e5",
+    "provider_bound_request_hash": "a918e84ecd5a6cf4a3ef3c8930ba32c6cdce96f631c8487c39b63c39af4de9ae",
+    "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+    "reason": "PROMPT_EXPRESSION_UNSUPPORTED",
+    "unsupported_field_paths": [
+      "art",
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "identity"
+    ],
+    "retryable": false,
+    "prompt_text": null,
+    "payload": null,
+    "input_expression_report": {
+      "prompt_text": "参考素材1{{image:0}}只负责正常作业时的同一工人、设备、亮着的工作灯和开场构图；素材2{{image:1}}只负责停止控制后的灯态与门的少量右移；素材3{{image:2}}只负责门抵住右侧固定限位后的空间与工人注意；素材4{{image:3}}、素材5{{image:4}}只负责同一牵引连接近景由平直到有限弯曲的前后差异，不复制成拼图。\n雨夜市政检修入口，正常速度的真人摄影质感。先用稳定斜侧中远景同时看见控制箱旁工人、固定绞盘、钢索、滑门和后景正常道路。工人见门接近限位，右手按下停止控制，工作灯熄灭、马达声停止，路灯和雨夜交通继续。镜头先不切，门仍沿导轨向右滑动，抵住固定限位。工人先确认控制箱，再看向仍受力的牵引点，不靠近钢索。注意方向建立后，同侧切到素材4、5的连接近景：门边已被限位挡住，钢索依然绷紧，四螺栓底板中部逐渐小幅拱起，出现可辨的弯曲和阴影间隙，连接不断裂。钢索只有绞盘到右侧滑轮、右滑轮折返到门牵引耳两段，不增加左绞盘直连门的第三条索。马达保持停止，雨、交通和持续受力的金属摩擦声可听；无对白、配乐或惊吓重击。动作与反应完整、节奏自然，不用慢动作、闪屏、黑屏、鬼影、火花或爆炸代替异常。全程同一工人、设备、受力方向和雨夜；无片名、字幕、说明文字或分格。",
+      "prompt_sha256": "27ef96e15d21e92b4e88c0479ae0d1580112f3c3a4fc3e7c4707b5c8763c8c8f",
+      "missing_requirement_paths": [
+        "art",
+        "generation_intent.identity_continuity.character_ids.0",
+        "generation_intent.identity_continuity.preservation",
+        "generation_intent.lighting_intent.continuity_state",
+        "generation_intent.lighting_intent.direction",
+        "generation_intent.lighting_intent.exposure_priority",
+        "generation_intent.lighting_intent.motivated_source",
+        "generation_intent.visual_treatment.material_treatment",
+        "generation_intent.visual_treatment.medium_look",
+        "generation_intent.visual_treatment.palette",
+        "generation_intent.visual_treatment.prohibited_visual_drift.0",
+        "generation_intent.visual_treatment.prohibited_visual_drift.1",
+        "identity"
+      ],
+      "coverage_source": "selected_qa_final_text",
+      "rejected_coverage_source": "inherited_automatic_prose",
+      "actual_quality": "NOT_EVALUATED"
+    }
+  }
+}

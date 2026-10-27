@@ -1,0 +1,17 @@
+{
+  "authorization_quote": "生成視頻",
+  "selected_model_id": "seedance_2.0_vip",
+  "first_event": "MC01-MC02",
+  "duration_seconds": 8,
+  "resolution": "1080p",
+  "ratio": "16:9",
+  "max_submit_count_initial": 1,
+  "automatic_retries": 0,
+  "qualification_preview_only": true,
+  "production_activation": false,
+  "new_canvas_required": true,
+  "historical_bound_source": "outputs/shizhen-episode01/cold-open-execution-20261026/video/operator-bound-cross-window.json",
+  "historical_bound_sha256": "337cf97b905f2b5fcf60777afc0edece24fc1a89159ecdc7bbb067b39269460f",
+  "per_call_internal_credit_upper_bound": 1500,
+  "bound_note": "沿预配置sealed operator内部单次上限；新任务授权与当前有效期另封存，非市场报价；不覆盖旧授权或计数"
+}

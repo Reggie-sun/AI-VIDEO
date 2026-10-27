@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+  "size_bytes": 2850279,
+  "width": 1672,
+  "height": 941,
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "fictional_characters": true,
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Parent selected and viewed in reference preparation; video quality NOT_EVALUATED",
+  "source_path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D1-r1.png",
+  "reference_role": "M03-D1"
+}

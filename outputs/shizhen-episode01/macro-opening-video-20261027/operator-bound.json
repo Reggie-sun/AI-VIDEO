@@ -1,0 +1,28 @@
+{
+  "authority": "current-task-parent-bounded-operator",
+  "authorization_quote": "生成視頻",
+  "model_id": "seedance_2.0_vip",
+  "provider": "jimeng",
+  "scope": "New independent macro opening first event MC01-MC02 only; 8s 1080p multimodal; one qualification submission",
+  "predecessor_bound_path": "outputs/shizhen-episode01/cold-open-execution-20261026/video/operator-bound-cross-window.json",
+  "predecessor_bound_sha256": "337cf97b905f2b5fcf60777afc0edece24fc1a89159ecdc7bbb067b39269460f",
+  "preconfigured_per_call_credit_upper_bound": 1500,
+  "per_call_credit_upper_bound": 1500,
+  "project_credit_upper_bound": 1500,
+  "currency": "CRD",
+  "issued_at": "2026-10-27T05:53:53.364691+00:00",
+  "expires_at": "2026-10-27T07:53:53.364691+00:00",
+  "max_submit_count": 1,
+  "automatic_retries": 0,
+  "historical_audit_sha256": "1b9963f6a5a9153f8ffb34a26298bbf1b45af091b1a7353ebae3dfe62264e023",
+  "historical_unique_attempt_count": 24,
+  "new_macro_attempts_before": 0,
+  "observed_cohort_after_authorized_one": 25,
+  "historical_unknown_attempts_preserved": [
+    "shizhen-S05-qualification-attempt-006"
+  ],
+  "no_old_profile_or_permit_reuse": true,
+  "no_historical_count_reset_or_refund": true,
+  "market_quote_claim": false,
+  "production_activation": false
+}

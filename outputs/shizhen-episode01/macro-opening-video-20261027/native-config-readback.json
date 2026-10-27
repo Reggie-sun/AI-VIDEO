@@ -1,0 +1,13 @@
+{
+  "runtime_config": {
+    "audioCommercePreflightEnabled": true,
+    "generationDraftWriterEnabled": true
+  },
+  "store_keys": [
+    "snapshot",
+    "service",
+    "cachedRegistry",
+    "projected",
+    "generationConfigAvailability"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "artifact_path": "outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-8秒-Seedance2.0-候选01.mp4",
+  "source_artifact_path": "runs/shizhen-macro-opening-20261027/MC01-02/state/video-generation/fetch/files/bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4.mp4",
+  "artifact_sha256": "bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4",
+  "size_bytes": 24508531,
+  "exact_copy": true,
+  "decoded_full_video_and_audio": true,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "duration_seconds": 8.063991,
+  "original_rate_preserved": true,
+  "raw_r_frame_rate": "60/1",
+  "raw_avg_frame_rate": "11580/481",
+  "frame_count": 193,
+  "timing_note": "MCP fps60 is r_frame_rate; actual average about24.07, no retiming applied",
+  "range_seek": 206,
+  "playback_receipt": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/qa/playback.json",
+  "post_media_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/qa/post-media-gate.json",
+  "protected_B6_sha256_unchanged": true,
+  "human_acceptance": "NOT_EVALUATED",
+  "quality": "FAIL",
+  "billable_video_calls": 1,
+  "audio_analysis_calls": 1,
+  "actual_charges": "NOT_CONFIRMED",
+  "new_shots_after_fail": 0,
+  "publication": "local review only; no Production activation",
+  "native_review_risk_gate": "NATIVE_REVIEW_NOT_REQUIRED: task data and canonical calls only, no source/runtime/permission changes"
+}

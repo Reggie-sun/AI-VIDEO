@@ -1,0 +1,491 @@
+{
+  "discovery_scope": "existing Shizhen episode and accepted opening source project roots",
+  "strictly_loaded_projects": [
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation/project",
+      "manifest_sha256": "8fc46c44f8f532898481fab2e1bef43f64e142e83b7ffe9c06dd728acbf8571a",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-003",
+          "status": "running",
+          "paid_phase": null,
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation/project"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation-002/project",
+      "manifest_sha256": "f96b7c38559313e3b9d6b7ddcd16e33fb0cbe9b9ce2a3ab4ac6c2c01f619c5a9",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation-002/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation-002/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-003",
+          "status": "running",
+          "paid_phase": null,
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation-002/project"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005/project",
+      "manifest_sha256": "e938862c4bb79d98993f71575fc5c30ecb8f34a70b90db0d08098e968656be85",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-003",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-004",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005/project"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005-2/project",
+      "manifest_sha256": "d4ebb989078a67e7155eea8fe736c6e9f65c9dc58bbea749fc2338491d174c95",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005-2/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005-2/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-003",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005-2/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-004",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005-2/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-005",
+          "status": "running",
+          "paid_phase": null,
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005-2/project"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A1",
+      "manifest_sha256": "350c3b08292d1a6482e037996e3223bf44b3d43c6fc476001f90ead3d039e98a",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-CO-A1-qualification-001",
+          "status": "running",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A1"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2",
+      "manifest_sha256": "83a2f4f584967f66bd82023b508c5b9a3e2d631801c8cb22bc2e4cf064ba40bf",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-CO-A2-qualification-001",
+          "status": "running",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3",
+      "manifest_sha256": "5fc1b3078b43df0ee3750cc79c265757b2499467c6d5b2b9cd884574d645c4ef",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-CO-A3-qualification-001",
+          "status": "running",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/coverage-validation-004/project",
+      "manifest_sha256": "780eea755ffcd05b33f49b29eb4c0353404a5e4443782bfe2a6b5372695b84f5",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/coverage-validation-004/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/coverage-validation-004/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-003",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/coverage-validation-004/project"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-004",
+          "status": "running",
+          "paid_phase": null,
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/coverage-validation-004/project"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3",
+      "manifest_sha256": "99c45f4f8c713554eb697415e65e554ef4d6a2c29833bfd2537c7f809c708433",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-003",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-004",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-005",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-006",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+        },
+        {
+          "attempt_id": "shizhen-S01-qualification-attempt-007",
+          "status": "running",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S02-v1",
+      "manifest_sha256": "53ae48a2fd3cb825407a1396bdfa9323bf7422f483dca44ed39b9bbba554c295",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S02-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S02-v1"
+        },
+        {
+          "attempt_id": "shizhen-S02-qualification-attempt-002",
+          "status": "running",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S02-v1"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2",
+      "manifest_sha256": "54387fe5bb74d65993507b677c74e899a76804f8eb031188bd61b76b66eaaf03",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S03-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+        },
+        {
+          "attempt_id": "shizhen-S03-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+        },
+        {
+          "attempt_id": "shizhen-S03-qualification-attempt-003",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+        },
+        {
+          "attempt_id": "shizhen-S03-qualification-attempt-004",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+        },
+        {
+          "attempt_id": "shizhen-S03-qualification-attempt-005",
+          "status": "running",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S04-v1",
+      "manifest_sha256": "00f76c710f059e553b544479ef152d5f9c9687bf208878ba5baa198c3f95fceb",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S04-qualification-attempt-001",
+          "status": "running",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S04-v1"
+        }
+      ]
+    },
+    {
+      "root": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1",
+      "manifest_sha256": "82c92c39593d416a1996bdf8a86389ddb68cd6e1ae9e3bea3e3d94ed1f9aeb59",
+      "attempts": [
+        {
+          "attempt_id": "shizhen-S05-qualification-attempt-001",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+        },
+        {
+          "attempt_id": "shizhen-S05-qualification-attempt-002",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+        },
+        {
+          "attempt_id": "shizhen-S05-qualification-attempt-003",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+        },
+        {
+          "attempt_id": "shizhen-S05-qualification-attempt-004",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+        },
+        {
+          "attempt_id": "shizhen-S05-qualification-attempt-005",
+          "status": "failed",
+          "paid_phase": "accepted",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+        },
+        {
+          "attempt_id": "shizhen-S05-qualification-attempt-006",
+          "status": "outcome_unknown",
+          "paid_phase": "outcome_unknown",
+          "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+        }
+      ]
+    }
+  ],
+  "strict_unique_video_attempts": [
+    {
+      "attempt_id": "shizhen-S01-qualification-attempt-001",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation/project"
+    },
+    {
+      "attempt_id": "shizhen-S01-qualification-attempt-002",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation/project"
+    },
+    {
+      "attempt_id": "shizhen-S01-qualification-attempt-003",
+      "status": "running",
+      "paid_phase": null,
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/D-revision-validation/project"
+    },
+    {
+      "attempt_id": "shizhen-S01-qualification-attempt-004",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005/project"
+    },
+    {
+      "attempt_id": "shizhen-S01-qualification-attempt-005",
+      "status": "running",
+      "paid_phase": null,
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/HD-validation-005-2/project"
+    },
+    {
+      "attempt_id": "shizhen-CO-A1-qualification-001",
+      "status": "running",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A1"
+    },
+    {
+      "attempt_id": "shizhen-CO-A2-qualification-001",
+      "status": "running",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2"
+    },
+    {
+      "attempt_id": "shizhen-CO-A3-qualification-001",
+      "status": "running",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3"
+    },
+    {
+      "attempt_id": "shizhen-S01-qualification-attempt-006",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+    },
+    {
+      "attempt_id": "shizhen-S01-qualification-attempt-007",
+      "status": "running",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S01-v3"
+    },
+    {
+      "attempt_id": "shizhen-S02-qualification-attempt-001",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S02-v1"
+    },
+    {
+      "attempt_id": "shizhen-S02-qualification-attempt-002",
+      "status": "running",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S02-v1"
+    },
+    {
+      "attempt_id": "shizhen-S03-qualification-attempt-001",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+    },
+    {
+      "attempt_id": "shizhen-S03-qualification-attempt-002",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+    },
+    {
+      "attempt_id": "shizhen-S03-qualification-attempt-003",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+    },
+    {
+      "attempt_id": "shizhen-S03-qualification-attempt-004",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+    },
+    {
+      "attempt_id": "shizhen-S03-qualification-attempt-005",
+      "status": "running",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2"
+    },
+    {
+      "attempt_id": "shizhen-S04-qualification-attempt-001",
+      "status": "running",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S04-v1"
+    },
+    {
+      "attempt_id": "shizhen-S05-qualification-attempt-001",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+    },
+    {
+      "attempt_id": "shizhen-S05-qualification-attempt-002",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+    },
+    {
+      "attempt_id": "shizhen-S05-qualification-attempt-003",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+    },
+    {
+      "attempt_id": "shizhen-S05-qualification-attempt-004",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+    },
+    {
+      "attempt_id": "shizhen-S05-qualification-attempt-005",
+      "status": "failed",
+      "paid_phase": "accepted",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+    },
+    {
+      "attempt_id": "shizhen-S05-qualification-attempt-006",
+      "status": "outcome_unknown",
+      "paid_phase": "outcome_unknown",
+      "source": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S05-v1"
+    }
+  ],
+  "unique_attempt_count": 24,
+  "strict_load_failures": [],
+  "historical_outcomes_not_changed": true,
+  "new_macro_submissions": 0
+}

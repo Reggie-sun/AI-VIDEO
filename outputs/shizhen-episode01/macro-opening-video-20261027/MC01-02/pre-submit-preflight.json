@@ -1,0 +1,82 @@
+{
+  "selected_skill": "seedance-authoring + shared and2.0 overlay; current memory retrieval and open-video already applied",
+  "source_scope": "existing approved shotboard MC01-MC02; technical reference marker adaptation only",
+  "open_state": {
+    "kind": "typed_text",
+    "state_ref": null,
+    "state_text": "雨夜市政检修入口，工作灯亮着，工人站在控制箱旁，绞盘沿正确索路牵引滑门向右靠近固定限位。",
+    "state_hash": null,
+    "required_change": false
+  },
+  "close_state": {
+    "kind": "typed_text",
+    "state_ref": null,
+    "state_text": "工作灯熄灭、马达停止；门已抵住右侧固定限位，索仍绷紧，四螺栓底板中部有限拱起而不断裂。",
+    "state_hash": null,
+    "required_change": true
+  },
+  "axis": {
+    "camera_axis": "设备斜侧同侧",
+    "framing_continuity": "中远景读清停机后门仍移动，再同侧切连接近景",
+    "crossing_policy": "同侧切近景，不越轴"
+  },
+  "camera_endpoint": {
+    "start_framing": "斜侧中远景",
+    "end_framing": "同侧牵引连接近景",
+    "position_lock": false,
+    "orientation_lock": false
+  },
+  "references": [
+    {
+      "asset_id": "MC01-02-ref-1",
+      "asset_sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33",
+      "size_bytes": 2689606
+    },
+    {
+      "asset_id": "MC01-02-ref-2",
+      "asset_sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+      "size_bytes": 2714219
+    },
+    {
+      "asset_id": "MC01-02-ref-3",
+      "asset_sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008",
+      "size_bytes": 2808301
+    },
+    {
+      "asset_id": "MC01-02-ref-4",
+      "asset_sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077",
+      "size_bytes": 2988617
+    },
+    {
+      "asset_id": "MC01-02-ref-5",
+      "asset_sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+      "size_bytes": 2850279
+    }
+  ],
+  "prompt_adaptation": "insert five native image markers; no story, character, camera or sound redesign",
+  "native_prompt_sha256": "27ef96e15d21e92b4e88c0479ae0d1580112f3c3a4fc3e7c4707b5c8763c8c8f",
+  "lint": {
+    "five_exact_references": true,
+    "five_bound_markers": true,
+    "pure_chinese_body": true,
+    "exact_authored_prompt": true,
+    "no_dialogue_music": true,
+    "correct_cable": true,
+    "duration8": true,
+    "1080p": true,
+    "native_audio": true
+  },
+  "qualification_only": true,
+  "new_submit_ceiling": 1,
+  "prior_unknown_untouched": true,
+  "post_media_required_ids": [
+    "action",
+    "identity",
+    "space",
+    "camera",
+    "performance",
+    "art",
+    "sound"
+  ],
+  "terminal_handoff": "first independent event, no prior media source; next Shot blocked until exact MP4 findings PASS"
+}

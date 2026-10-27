@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+  "size_bytes": 2714219,
+  "width": 1672,
+  "height": 941,
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "fictional_characters": true,
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Parent selected and viewed in reference preparation; video quality NOT_EVALUATED",
+  "source_path": "referces/shizhen/macro-opening-20261027/repair-02/M02.png",
+  "reference_role": "M02"
+}

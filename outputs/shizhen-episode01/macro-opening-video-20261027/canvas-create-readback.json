@@ -1,0 +1,39 @@
+{
+  "pages": [
+    "https://jimeng.jianying.com/ai-tool/home/",
+    "https://jimeng.jianying.com/ai-tool/ai-canvas/1d9c7d6f-7a36-43bb-bf6b-b475cfb4031d",
+    "https://jimeng.jianying.com/ai-tool/ai-canvas/f25d6070-5936-44a7-b8af-10f81e9d0511"
+  ],
+  "buttons": [
+    {
+      "rect": {
+        "x": 200,
+        "y": 438.375,
+        "w": 24,
+        "h": 24
+      },
+      "visible": true,
+      "top": {
+        "tag": "DIV",
+        "text": "全部",
+        "aria": null
+      },
+      "disabled": false
+    },
+    {
+      "rect": {
+        "x": 14,
+        "y": 451.375,
+        "w": 36,
+        "h": 36
+      },
+      "visible": true,
+      "top": {
+        "tag": "DIV",
+        "text": "未命名画布",
+        "aria": null
+      },
+      "disabled": false
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4\",\n  \"source_size_bytes\": 24508531,\n  \"audio_sha256\": \"4f74a8f021971c224ea9dafe16f06b79078a0232e7f6dc3ae1344bc80b81e685\",\n  \"audio_size_bytes\": 1425532,\n  \"duration_seconds\": 8.080544217687075,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"87c69458cef82bfdc1398a46d45079348b7adad60353e73666f05fa457892b94\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"c1208213b6192b1e4657225cd8ae74523c5bcfd8d8153bbdcc2c7d8cf696279c\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"bowling ball rolling along a lane\",\n      \"bowling ball striking pins with a crash\",\n      \"bowling pins clattering and falling\",\n      \"mechanical sounds of a bowling alley\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02/state/video-generation/fetch/files/bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

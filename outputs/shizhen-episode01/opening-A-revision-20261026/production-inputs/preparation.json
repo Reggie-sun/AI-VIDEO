@@ -7,15 +7,15 @@
   "native_prompt_language": "zh",
   "director_input": "MACRO-SHOTBOARD-20261027.md",
   "references": "macro-reference-review-20261027/preparation-report.json",
-  "mode": "REQUIRES_FRESH_SELECTION_AND_SEALED_PROFILE",
-  "runtime_profile": "NOT_SEALED",
+  "mode": "multimodal",
+  "runtime_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/profile.json",
   "execute_ready": false,
   "blocking_prerequisites": [
-    "用户授权首段一次新增付费生成并给出当前积分上限",
-    "fresh exact account/node/model/mode/profile/request/reference binding",
-    "adapter native preview/lint、budget reservation、egress、durable intent和一用permit"
+    "MC01-02底板渐进形变未达标；same-Shot修复后完整复验",
+    "声音语义EVIDENCE_REPAIR_FIRST；未取得合格听音证据",
+    "首段未通过前，后续Shot不提交"
   ],
-  "paid_generation_calls": 0,
+  "paid_generation_calls": 1,
   "production_activation": false,
   "previous_preparation": {
     "selected_provider": "jimeng",
@@ -44,5 +44,20 @@
   "creative_reference_stage": "12静态状态职责已有对应图；不代表视频通过",
   "selected_model_id": "seedance_2.0_vip",
   "first_event_duration_seconds": 8,
-  "version_selection_rule": "15秒及以内（含15秒）使用2.0；超过15秒使用2.5；用户明确指定优先"
+  "version_selection_rule": "15秒及以内（含15秒）使用2.0；超过15秒使用2.5；用户明确指定优先",
+  "previous_start_readiness": {
+    "runtime_profile": "NOT_SEALED",
+    "execute_ready": false,
+    "blocking_prerequisites": [
+      "用户授权首段一次新增付费生成并给出当前积分上限",
+      "fresh exact account/node/model/mode/profile/request/reference binding",
+      "adapter native preview/lint、budget reservation、egress、durable intent和一用permit"
+    ],
+    "paid_generation_calls": 0
+  },
+  "execution_status": "FIRST_EVENT_FETCHED_POST_MEDIA_FAIL",
+  "execution_root": "outputs/shizhen-episode01/macro-opening-video-20261027",
+  "authorization_quote": "生成視頻",
+  "first_event_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/qa/post-media-gate.json",
+  "first_event_review": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index.html"
 }

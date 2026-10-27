@@ -1,0 +1,62 @@
+{
+  "shot_id": "MC01-02",
+  "attempt_id": "shizhen-macro-MC01-02-qualification-001",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02/state/video-generation/fetch/files/bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4.mp4",
+  "artifact_sha256": "bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4",
+  "artifact_size_bytes": 24508531,
+  "intent_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/row.json",
+  "required_findings": [
+    {
+      "requirement_id": "action",
+      "verdict": "FAIL",
+      "evidence": "qa/frames/frame-13.png; qa/frames/frame-16.png",
+      "reason": "灯熄灭后门仍向右滑移已出现，但近景底板整体保持平直，未清楚呈现持续受力导致的渐进有限弯曲"
+    },
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "evidence": "qa/video-analysis.json; qa/frames",
+      "reason": "工人安全帽、工作服、场地与设备保持同一身份和布局，未见换脸换设备"
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "PASS",
+      "evidence": "qa/frames/frame-01.png; qa/frames/frame-09.png",
+      "reason": "可辨绞盘到右滑轮再折返到门的两段路径，门向右，工人位于索路外"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "evidence": "qa/frames/frame-11.png; qa/frames/frame-12.png",
+      "reason": "停灯和继续滑门同一稳定中远景，随后同侧切向连接处；MCP的scene阈值未捕获该实际切镜，Parent按画面序列辨认"
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "PASS",
+      "evidence": "qa/frames/frame-01.png through frame-11.png",
+      "reason": "工人操作控制后确认并观察受力点，保持安全距离；中段再次确认控制，未靠近钢索"
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "evidence": "qa/video-analysis.json; qa/frames",
+      "reason": "雨夜真人摄影质感连续，无闪屏鬼影爆炸及说明性字幕；保留平台AI生成标识"
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/native-audio-result.json",
+      "reason": "盲音频分析返回保龄球滚动碰撞等描述，与目标环境语义不一致，不能据此证明雨/交通/马达停机及持续金属摩擦；不把模型描述当作真实保龄球声结论，human listening未完成"
+    }
+  ],
+  "verdict": "FAIL",
+  "execution_disposition": "STOP_CURRENT_ATTEMPT_NO_NEXT_SHOT",
+  "failure_class": "VISUAL_REQUIRED_STATE_CHANGE_MISSING_AND_AUDIO_EVIDENCE_UNRESOLVED",
+  "next_action": "先保留原片供原速审看；底板形变为same-Shot修复目标，声音走EVIDENCE_REPAIR_FIRST，不以重生视频修声音证据",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_acceptance": false,
+  "production_activation": false,
+  "new_video_submissions": 1,
+  "new_audio_analysis_calls": 1,
+  "billing_settlement": "NOT_CONFIRMED"
+}
