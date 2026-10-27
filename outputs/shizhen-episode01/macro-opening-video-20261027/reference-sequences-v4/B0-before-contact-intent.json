@@ -1,0 +1,10 @@
+{
+  "prompt_path": "referces/shizhen/macro-opening-20261027/action-sequences-04/B0-before-contact.prompt.zh.txt",
+  "references": [
+    "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+    "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png"
+  ],
+  "call_number": 4,
+  "reason": "Known static handoff gap: A-arrival hand free to B-closed already gripping; add before-contact state within sealed four-call ceiling",
+  "boundary": "static only; no video submission"
+}

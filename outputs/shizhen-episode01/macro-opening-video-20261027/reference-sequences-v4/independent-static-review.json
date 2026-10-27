@@ -1,0 +1,52 @@
+{
+  "reviewer": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "permissions": "read-only",
+  "cumulative_macro_review_round": 8,
+  "bounded_cumulative_review_ceiling": 8,
+  "new_unit_review_count": 1,
+  "reason": "New user-authorized reference regrouping; one static review, prior7 rounds retained; no actual-media re-review or generation",
+  "exact_sources": [
+    {
+      "review_id": "A0",
+      "path": "referces/shizhen/macro-opening-20261027/L01-X.png",
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50"
+    },
+    {
+      "review_id": "A1",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A1-descent.png",
+      "sha256": "945a1b50359d3ce8fccc0bac15c7a70578f067613a82e62765d16310d11815ce"
+    },
+    {
+      "review_id": "A2",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A2-arrival.png",
+      "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6"
+    },
+    {
+      "review_id": "B0",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/B0-before-contact.png",
+      "sha256": "1e1313c0b320ee92d2fe0edf2e175f1c5bfbca9dfd95d2c82d3756658f8656c3"
+    },
+    {
+      "review_id": "B1",
+      "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876"
+    },
+    {
+      "review_id": "B2",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/B1-contact-push.png",
+      "sha256": "dfb02d063df65f536008d64f32ab79d108b3d904fd8de01349b701d25575a51e"
+    },
+    {
+      "review_id": "B3",
+      "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+      "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648"
+    }
+  ],
+  "findings": [],
+  "reviewer_statement": "本轮静态finding集合为空；已查看并核验七张图，未发现A2→B0或B组之间可明确证实的空间、手别、接触状态或门扇方向矛盾",
+  "parent_adjudication": "No concrete static contradiction observed; candidate handoff retains closed door/free right hand and same landing landmarks. Does not qualify motion or submitted video.",
+  "dynamic_review": "NOT_EVALUATED",
+  "audio_review": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

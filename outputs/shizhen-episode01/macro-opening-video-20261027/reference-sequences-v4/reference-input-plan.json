@@ -1,0 +1,185 @@
+{
+  "scope": "Static reference candidates and planned roles; not Registry, timeline, upload or video binding",
+  "identity_parent": {
+    "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+    "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+  },
+  "images": [
+    {
+      "review_id": "A0",
+      "title": "下楼起态",
+      "path": "referces/shizhen/macro-opening-20261027/L01-X.png",
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50",
+      "size_bytes": 2361971,
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "origin": "reuse",
+      "purpose": "背对摄影机朝下方关门行进；正常平台的灭火器与管道同框",
+      "future_group": "descent_arrival",
+      "current_video_binding": false,
+      "human_acceptance": "NOT_EVALUATED",
+      "dynamic_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "review_id": "A1",
+      "title": "继续下降",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A1-descent.png",
+      "sha256": "945a1b50359d3ce8fccc0bac15c7a70578f067613a82e62765d16310d11815ce",
+      "size_bytes": 2308505,
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "origin": "new",
+      "purpose": "同机位、更低且更远；双脚分处下行台阶，不回身",
+      "future_group": "descent_arrival",
+      "current_video_binding": false,
+      "human_acceptance": "NOT_EVALUATED",
+      "dynamic_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "review_id": "A2",
+      "title": "到达下平台",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A2-arrival.png",
+      "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6",
+      "size_bytes": 2359244,
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "origin": "new",
+      "purpose": "双脚已落在关门前平地；双手空着，尚未碰把手",
+      "future_group": "descent_arrival",
+      "current_video_binding": false,
+      "human_acceptance": "NOT_EVALUATED",
+      "dynamic_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "review_id": "B0",
+      "title": "伸手之前",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/B0-before-contact.png",
+      "sha256": "1e1313c0b320ee92d2fe0edf2e175f1c5bfbca9dfd95d2c82d3756658f8656c3",
+      "size_bytes": 2106375,
+      "width": 1671,
+      "height": 941,
+      "mode": "RGB",
+      "origin": "new",
+      "purpose": "换至门外近处机位，门仍关闭、右手仍空着",
+      "future_group": "contact_push_reveal",
+      "current_video_binding": false,
+      "human_acceptance": "NOT_EVALUATED",
+      "dynamic_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "review_id": "B1",
+      "title": "接触把手",
+      "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876",
+      "size_bytes": 2126384,
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "origin": "reuse",
+      "purpose": "右手接触把手；门仍关闭，人物留在门槛外",
+      "future_group": "contact_push_reveal",
+      "current_video_binding": false,
+      "human_acceptance": "NOT_EVALUATED",
+      "dynamic_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "review_id": "B2",
+      "title": "向内半开",
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/B1-contact-push.png",
+      "sha256": "dfb02d063df65f536008d64f32ab79d108b3d904fd8de01349b701d25575a51e",
+      "size_bytes": 2092118,
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "origin": "new",
+      "purpose": "右手仍接触把手；门自由边向门内退，线索开始显露",
+      "future_group": "contact_push_reveal",
+      "current_video_binding": false,
+      "human_acceptance": "NOT_EVALUATED",
+      "dynamic_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "review_id": "B3",
+      "title": "打开并扶住",
+      "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+      "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648",
+      "size_bytes": 2111259,
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "origin": "reuse",
+      "purpose": "门向内开得更大，右手保持扶门；灭火器、旧卡箍印可见",
+      "future_group": "contact_push_reveal",
+      "current_video_binding": false,
+      "human_acceptance": "NOT_EVALUATED",
+      "dynamic_acceptance": "NOT_EVALUATED"
+    }
+  ],
+  "prompts": [
+    {
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A1-descent.prompt.zh.txt",
+      "sha256": "661a6d27c5832058913085c5700a3d51ae5e2f0bdd6ac8e36ac1f670da72ba50",
+      "pure_chinese": true
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A2-arrival.prompt.zh.txt",
+      "sha256": "1a74d49393b584e5d2cfab6ec233625d5badf252835faa8ba22eb5f70276f679",
+      "pure_chinese": true
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/B0-before-contact.prompt.zh.txt",
+      "sha256": "889d8ec3abcbf93e1cdc3af9f619eda73d273f9b611f92936460c8fd73fc2a87",
+      "pure_chinese": true
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/action-sequences-04/B1-contact-push.prompt.zh.txt",
+      "sha256": "ca134b14133d4212c62b3cbb757fd23a96854be0a33a5079de6e491cf7f73e4e",
+      "pure_chinese": true
+    }
+  ],
+  "new_builtin_image_calls": 4,
+  "macro_builtin_image_calls_before": 22,
+  "macro_builtin_image_calls_after": 26,
+  "new_video_calls": 0,
+  "macro_video_calls_unchanged": 5,
+  "old_media_findings_retained": true,
+  "proposed_groups": [
+    {
+      "id": "descent_arrival",
+      "sequence": [
+        "A0",
+        "A1",
+        "A2"
+      ],
+      "scope": "normal clue establishment and full visible-flight downward arrival; no door opening"
+    },
+    {
+      "id": "contact_push_reveal",
+      "sequence": [
+        "B0",
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "scope": "reach/contact, one inward push and held-door reaction; no stairs"
+    }
+  ],
+  "handoff": {
+    "from": "A2",
+    "to": "B0",
+    "type": "same_place_view_change",
+    "preserve": [
+      "closed door",
+      "free right hand",
+      "feet on lower landing before threshold"
+    ],
+    "review_note": "Different camera distances explain subject scale; source/cut continuity and reach timing require actual generated media"
+  },
+  "future_input_caution": "These are intended group references, not current submitted images. Any video request must choose supported mode and explicitly bind all selected control references; two-slot first/last mode cannot silently claim to contain intermediate states. Image order alone does not establish motion timing. No fixed5s cut prescribed.",
+  "dynamic_status": "NOT_EVALUATED",
+  "human_status": "NOT_EVALUATED",
+  "actual_charges": "NOT_CONFIRMED"
+}

@@ -1,0 +1,9 @@
+{
+  "tool": "builtin-imagegen",
+  "source": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-1c20072b-fa69-4eb9-8eb7-eed9b96222a1.png",
+  "destination": "referces/shizhen/macro-opening-20261027/action-sequences-04/A2-arrival.png",
+  "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6",
+  "known_outcome": true,
+  "call_number": 2,
+  "human_acceptance": "NOT_EVALUATED"
+}

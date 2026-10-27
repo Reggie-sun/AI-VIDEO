@@ -1,0 +1,86 @@
+{
+  "scope": "static reference package only; no video acceptance",
+  "images_checked": 7,
+  "new_images": 4,
+  "reused_images": 3,
+  "all_png_integrity_and_exact_SHA": true,
+  "all_sources_http200_exact_SHA": [
+    "A0",
+    "A1",
+    "A2",
+    "B0",
+    "B1",
+    "B2",
+    "B3"
+  ],
+  "new_prompt_count": 4,
+  "all_actual_prompt_bodies_chinese": true,
+  "browser_verification": "browser-verification.json",
+  "independent_static_review": "independent-static-review.json",
+  "static_verdict": "REVIEWED_CANDIDATE",
+  "dynamic_acceptance": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED",
+  "new_video_calls": 0,
+  "macro_video_calls_still": 5,
+  "new_builtin_image_calls": 4,
+  "macro_builtin_image_calls": 26,
+  "automatic_unknown_retry": false,
+  "prior_failed_media_and_gates_unchanged": true,
+  "B6_SHA_unchanged": true,
+  "image_dimensions": [
+    {
+      "review_id": "A0",
+      "width": 1672,
+      "height": 941,
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50"
+    },
+    {
+      "review_id": "A1",
+      "width": 1672,
+      "height": 941,
+      "sha256": "945a1b50359d3ce8fccc0bac15c7a70578f067613a82e62765d16310d11815ce"
+    },
+    {
+      "review_id": "A2",
+      "width": 1672,
+      "height": 941,
+      "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6"
+    },
+    {
+      "review_id": "B0",
+      "width": 1671,
+      "height": 941,
+      "sha256": "1e1313c0b320ee92d2fe0edf2e175f1c5bfbca9dfd95d2c82d3756658f8656c3"
+    },
+    {
+      "review_id": "B1",
+      "width": 1672,
+      "height": 941,
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876"
+    },
+    {
+      "review_id": "B2",
+      "width": 1672,
+      "height": 941,
+      "sha256": "dfb02d063df65f536008d64f32ab79d108b3d904fd8de01349b701d25575a51e"
+    },
+    {
+      "review_id": "B3",
+      "width": 1672,
+      "height": 941,
+      "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648"
+    }
+  ],
+  "implicit_resize_crop": false,
+  "product_state_mutation": false,
+  "production_activation": false,
+  "publication": "NOT_PUBLISHED; local review only",
+  "actual_charges": "NOT_CONFIRMED",
+  "new_paid_video_cost": 0,
+  "task_py_compile": "PASS",
+  "docs_contract_gate": "PASS",
+  "shared_engineering_changes_by_this_task": false,
+  "full_engineering_tests": "NOT_RUN_NO_SHARED_ENGINEERING_CHANGE",
+  "record_evaluation": "recorded",
+  "learning_evaluation": "no_candidate"
+}

@@ -1,0 +1,56 @@
+{
+  "board_url": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/reference-sequences-v4/index.html",
+  "images": [
+    {
+      "alt": "下楼起态",
+      "width": 1672,
+      "height": 941,
+      "loaded": true
+    },
+    {
+      "alt": "继续下降",
+      "width": 1672,
+      "height": 941,
+      "loaded": true
+    },
+    {
+      "alt": "到达下平台",
+      "width": 1672,
+      "height": 941,
+      "loaded": true
+    },
+    {
+      "alt": "伸手之前",
+      "width": 1671,
+      "height": 941,
+      "loaded": true
+    },
+    {
+      "alt": "接触把手",
+      "width": 1672,
+      "height": 941,
+      "loaded": true
+    },
+    {
+      "alt": "向内半开",
+      "width": 1672,
+      "height": 941,
+      "loaded": true
+    },
+    {
+      "alt": "打开并扶住",
+      "width": 1672,
+      "height": 941,
+      "loaded": true
+    }
+  ],
+  "open_original": {
+    "width": 1672,
+    "height": 941,
+    "url": "http://127.0.0.1:8883/referces/shizhen/macro-opening-20261027/L01-X.png"
+  },
+  "errors": [],
+  "desktop_screenshot": "board.png",
+  "mobile_screenshot": "board-mobile.png",
+  "image_acceptance": "Static review separate; no dynamic or human acceptance inferred"
+}

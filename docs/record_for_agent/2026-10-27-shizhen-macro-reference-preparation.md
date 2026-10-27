@@ -8,7 +8,7 @@ learning_eligibility: ineligible
 
 Date: 2026-10-27
 
-> **Current Update:** 市政6.833秒剪辑版已获用户完整看听认可。第二事件楼梯原片及首尾帧修订02均已实际生成，修订02消除提前揭示，但仍反向上楼、门动作反复且短暂脱离右手接触，Post-Media Gate FAIL。宏观视频累计5次，本修复单元上限1次已用，停止本单元与下一Shot，未改B6或签Production/最终验收。详见 First/Last Stair Repair 与该单位 verification.json。
+> **Current Update:** 市政6.833秒剪辑版已获用户完整看听认可。第二事件楼梯原片及首尾帧修订02均已实际生成，修订02消除提前揭示，但仍反向上楼、门动作反复且短暂脱离右手接触，Post-Media Gate FAIL。宏观视频累计5次，本修复单元上限1次已用，停止本单元与下一Shot，未改B6或签Production/最终验收。最新参考重整已补4张并复用3张，七张静态候选审看板已可访问；本轮没有新视频提交。详见 Action Reference Sequence Regrouping、First/Last Stair Repair 及对应 verification.json。
 
 > **Historical Update — HD Regeneration:** 用户已明确认可720p试片02并要求同方案1080p，本轮1080p版03已真实生成、可播放。新片约4.5–5.5秒出现基线没有的叠化，已标注新片未通过项，待用户审看；旧AI意见与720p用户认可分别保留。另按用户指令改为Seedance2.0默认1080p，2.5保持480p先审。未提交下一Shot、未改B6或签Production验收。
 
@@ -224,3 +224,18 @@ record-ai-video-session更新同一topic历史与当前阻断，distill-ai-video
 
 
 同一reviewer完成本单位唯一actual-media审查累计第7轮／封存上限7，核验SHA、查看25帧与技术元数据，未连续原速观看或聆听。独立确认SHZ-STAIR-R06反向上楼、R07门外摆回关后手脱离把手仍继续内开；Parent以原尺寸frame15、18、19、20再次核对，两个blocking_candidate全部CONFIRMED。8.5–9秒门无接触继续运动是新可见细节，不能仅删除外摆/关门就将尾部签为完整推门。qa/independent-media-review.json记录具体时段、影响、裁剪限制及Parent裁决，没有额外review或Provider调用。
+
+
+## Action Reference Sequence Regrouping
+
+用户问“是不是referces沒做好”，Parent重开实际输入、两张端点及失败帧后承认准备/使用缺口：整个12秒从楼梯到门后仅绑定首尾，中途到达和接触缺乏约束；新关门图仅审看未送模型。该诊断不证明参考是唯一原因，也不把向内终态静态图本身说成已画错。用户“可以”批准分别建立下楼到达和接触推门参考。本新单位封存参考图上限4、视频提交上限0、一次静态独立复核；没有自动恢复旧视频attempt或更改旧预算/消费/UNKNOWN。
+
+使用已有scenario-identity-library、scenario-seedance-storyboard及builtin imagegen，先实际查看董文慧identity-v1、L01-X、关门和开门参考并按各自职责绑定；原身份SHA53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458与灰褐外套/深灰裤保留，不继承身份图灰背景、多人排版或E02服装。新图归referces/shizhen/macro-opening-20261027/action-sequences-04/：A1-descent逐级向下的中途状态，A2-arrival关门前低平台手空终态，B1-contact-push右手持续接触的向内半开态。观察三张输出后发现A2手空而旧关门图已握把，故在既定第四次上限内补B0-before-contact关门前未伸手起态，避免把缺失的伸手直接交给接镜跳过。四次调用均known outcome，没有自动重抽或fallback；宏观builtin制图计数22→26，宏观视频仍5，图像真实结算待确认，本轮视频费用为零。
+
+审看板的review IDs与实际文件名明确映射在reference-sequences-v4/reference-input-plan.json：A0旧L01-X→A1新下降→A2新到达；B0新未接触→B1旧关门接触→B2新半开接触→B3旧开门扶住，共7张。两组分别承担下行到达和接触推门，拟用途不冒充actual image bindings。A2→B0换机位保留门关闭、右手空着、人物在平台门外，不预设五秒剪点；未来需选择真正可容纳选用状态图的已核验2.0模式，核对actual request，不能把审看板上的中间态等同送入模型。没有在本轮修改Production Shot、Registry或Manifest，没有视频submit/activation/P6/final acceptance。
+
+七张PNG全部逐张查看、完整性/SHA与HTTP200字节核验；四条实际制图提示词为纯中文。实测新B0-before-contact原宽1671，其余宽1672，均高941；未暗中resize/crop或声明像素保护。A组人物因走远变小，不能把这种设计硬填成同subject-scale匹配。独立Chromium桌面与手机布局载入七图、点击原图链接成功，无pageerror；board.png和board-mobile.png为真实网页截图，不是模型合板或视频首帧。审看入口http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/reference-sequences-v4/index.html，沿原Range服务提供；干净单图不包含审看编号或箭头。
+
+同一native只读reviewer /root/macro720_review、reviewer_high完成新用户批准静态包的一次独立复核，宏观累计第8轮／本单位有限上限8，前7轮保留。查看并核验7张图，finding为空，未发现A2→B0或B组可明确证实的空间、手别、接触状态或门扇方向矛盾。Parent对照同一门/窗/栏杆、电箱、手空到接触及门自由边后，保留为REVIEWED_CANDIDATE；不将此写成自然下楼、持续握把、一次推门或细微听辨的动态PASS。动态、声音和human接受均NOT_EVALUATED，原两条楼梯失败视频与Gate字节/FAIL状态不变，B6 exact SHA仍d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a。
+
+新单位来源/用途、图片意图与结果、独立复核、浏览器和核验receipt均归outputs/shizhen-episode01/macro-opening-video-20261027/reference-sequences-v4/，主receipt verification.json。没有共享工程变更；任务脚本py_compile、docs_contract_gate和diff检查为对应验证，未跑完整工程测试或新增验收规则。record-ai-video-session继续同一topic记录，distill-ai-video-learning评估no_candidate：本轮是静态准备改善，没有新的受控动态实验或可提升为普遍模型结论的证据。PNG和网页截图本地保留，Git推送提示词、来源/用途及核验metadata，未发布影片。

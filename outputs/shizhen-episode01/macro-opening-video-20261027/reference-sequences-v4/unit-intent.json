@@ -1,0 +1,26 @@
+{
+  "user_quote": "可以",
+  "scope": "Reorganize MC03-05 references into descent-arrival and contact-push groups; clean stills and review board first",
+  "predecessor_video_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+  "prior_macro_video_calls": 5,
+  "new_video_submit_limit_this_unit": 0,
+  "prior_macro_builtin_image_calls": 22,
+  "planned_new_images": 3,
+  "max_new_builtin_image_calls": 4,
+  "repair_limit": 1,
+  "automatic_unknown_retry": false,
+  "scope_preserved": [
+    "same identity",
+    "same story",
+    "same wardrobe",
+    "same stair architecture",
+    "right-hand inward push",
+    "B6/fonts/music untouched"
+  ],
+  "created_at": "2026-10-27T10:23:03.200698+00:00",
+  "acceptance": "static review only; dynamic/human NOT_EVALUATED",
+  "fourth_call_reason": "Targeted correction of missing no-contact doorway entry, after observing three initial outputs",
+  "media_review_rounds_before": 7,
+  "new_static_review_limit": 1,
+  "cumulative_review_ceiling": 8
+}

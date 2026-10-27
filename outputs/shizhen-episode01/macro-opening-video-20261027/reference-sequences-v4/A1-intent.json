@@ -1,0 +1,9 @@
+{
+  "prompt_path": "referces/shizhen/macro-opening-20261027/action-sequences-04/A1-descent.prompt.zh.txt",
+  "references": [
+    "referces/shizhen/macro-opening-20261027/L01-X.png",
+    "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png"
+  ],
+  "role": "descent intermediate state; static only",
+  "call": 1
+}
