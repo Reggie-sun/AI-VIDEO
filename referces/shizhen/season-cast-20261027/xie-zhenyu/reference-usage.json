@@ -1,0 +1,19 @@
+{
+  "character": "谢振宇",
+  "selected_identity": "xie-zhenyu/identity/identity-v1.png",
+  "selected_identity_sha256": "2352a38a7e440d395df846a506fddaca48628343cbb14b4726133d964bf8c446",
+  "selected_scene": "xie-zhenyu/scene/scene-v1.png",
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}

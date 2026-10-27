@@ -1,0 +1,327 @@
+{
+  "scope": "16新角色身份参考及4套主要人物场次参考",
+  "selected_images": [
+    {
+      "character": "周竞",
+      "layer": "identity",
+      "path": "zhou-jing/identity/identity-v1.png",
+      "sha256": "feeeb882c9c761c95635f07e8b91ec9972242d1b9370758e3b99c3feeb3df9ec",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "四视角面孔、短寸发和体态连续，面貌略成熟；选择为39岁角色的身份基线，具体年龄感待用户审看"
+    },
+    {
+      "character": "周竞",
+      "layer": "scene",
+      "path": "zhou-jing/scene/scene-v3.png",
+      "sha256": "9ebcc59703c2d4a530cbd3b9089f8b051267bc208c102a053d01c6a29c89f41e",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "三格均角色右手持夹、左手空手；先低头、再看外侧、最后左掌示意，服装面容延续。以右手为本场选定状态，非剧情身份硬要求"
+    },
+    {
+      "character": "谢振宇",
+      "layer": "identity",
+      "path": "xie-zhenyu/identity/identity-v1.png",
+      "sha256": "2352a38a7e440d395df846a506fddaca48628343cbb14b4726133d964bf8c446",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "decode_valid": true,
+      "visual_observation": "四个角度面孔和发际线连续；完整全身，细瘦体态与维修攀爬经历相符，手脚无明显异常"
+    },
+    {
+      "character": "谢振宇",
+      "layer": "scene",
+      "path": "xie-zhenyu/scene/scene-v1.png",
+      "sha256": "1ffa06a44030d7d5fde50ca7a80229bf16341a3b5da93f55fdd841cc3c75c744",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "同一面孔、煤灰夹克和右肩包带连续，扶带再松手可辨；照片不证明动态攀爬或能力效果"
+    },
+    {
+      "character": "陆建平",
+      "layer": "identity",
+      "path": "lu-jianping/identity/identity-v1.png",
+      "sha256": "36c8e7aba9c685e4cd508f7dbbc43176cd50685b6c0e4cb785cc9307ebf7cae9",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "四视角中年面貌一致，普通体态，未带夸张反派符号；与周竞短寸、谢振宇瘦长脸有区别"
+    },
+    {
+      "character": "陆建平",
+      "layer": "scene",
+      "path": "lu-jianping/scene/scene-v1.png",
+      "sha256": "7e15d613a740bccec49a27b29f4a9aa56ffeee00107c1cfbdedd5311912e83f2",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "同一面孔和灰褐外套；三格左手拿米棕夹、右手空手，核对再解释可辨；第三格右手自然解释手势而非完全放下，选为解释状态"
+    },
+    {
+      "character": "许家良（老许）",
+      "layer": "identity",
+      "path": "xu-jialiang/identity/identity-v1.png",
+      "sha256": "a5183e47da54ad15ed14d12d2b1fa30164a219a37aeb240c3a85c0ee4ca60bb2",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "四视角圆方脸与较年轻年龄感一致，全身普通结实；暂无已成片老许人像可比对"
+    },
+    {
+      "character": "邵庆国",
+      "layer": "identity",
+      "path": "shao-qingguo/identity/identity-v1.png",
+      "sha256": "9a6da1c013f3172846e5f8eb050d11172a165b2458d9e4a632d5885a79b295a3",
+      "dimensions": [
+        1981,
+        793
+      ],
+      "decode_valid": true,
+      "visual_observation": "五十余岁宽圆脸、后退发际线及微胖体态一致，四角度与手脚可辨"
+    },
+    {
+      "character": "梁秀琴",
+      "layer": "identity",
+      "path": "liang-xiuqin/identity/identity-v1.png",
+      "sha256": "d8502c9e859c4b4c2fb6ea7290cbb34ef670b121043b23d993629f0b1072a6c7",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "四十多岁短发面貌一致，眼鼻及下颌连续，普通体态，不带组织符号"
+    },
+    {
+      "character": "韩启良",
+      "layer": "identity",
+      "path": "han-qiliang/identity/identity-v1.png",
+      "sha256": "fa1bd2af1aa4d943dd641d819595668c6d69c1d38e27e876b41d443d06efe10d",
+      "dimensions": [
+        1942,
+        809
+      ],
+      "decode_valid": true,
+      "visual_observation": "四视角精干方瘦脸、短硬发一致，紧绷感适度；眉尾稀疏不明显，不作为身份硬锚点"
+    },
+    {
+      "character": "宋秋萍",
+      "layer": "identity",
+      "path": "song-qiuping/identity/identity-v1.png",
+      "sha256": "30af82e8c4c31bae3dff3a6629f95d8dd94f33c1b859993c5c7f5fbe70de6f8f",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "四视角长椭圆脸与年龄感一致，全身比例完整；工具生成低盘发而非原提案中短发，选择低盘发作为本次造型，可随场次变化"
+    },
+    {
+      "character": "孟昭",
+      "layer": "identity",
+      "path": "meng-zhao/identity/identity-v1.png",
+      "sha256": "05437bd404277bd3d8bfca27051a750c3b733d4cc42f2df47f23b1f9e67b107a",
+      "dimensions": [
+        1942,
+        809
+      ],
+      "decode_valid": true,
+      "visual_observation": "灰白头发、瘦长脸及自然颈纹一致，清瘦体态清楚，未戴眼镜可清楚辨脸"
+    },
+    {
+      "character": "何志刚",
+      "layer": "identity",
+      "path": "he-zhigang/identity/identity-v1.png",
+      "sha256": "c250253367d2f9df64645194d6e6cc450178ff11751cece6d09f911c7e70bfd6",
+      "dimensions": [
+        1942,
+        809
+      ],
+      "decode_valid": true,
+      "visual_observation": "四十八岁外勤工程师脸部与粗糙皮肤连续，宽下颌、短发和结实体态可辨"
+    },
+    {
+      "character": "邹美玲",
+      "layer": "identity",
+      "path": "zou-meiling/identity/identity-v2.png",
+      "sha256": "525dd6f0c4f26b4eb10013327da99b9322a27701f842cecf48637b276dcddf7c",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "decode_valid": true,
+      "visual_observation": "短发、偏细眼、较宽鼻翼和下颌四视角连续；与林晚马尾、少女椭圆脸有可辨区别；选择v2身份基线"
+    },
+    {
+      "character": "何淑兰",
+      "layer": "identity",
+      "path": "he-shulan/identity/identity-v1.png",
+      "sha256": "7b8e93d75b894a48e52da366c1dfbcb9ee970cc1d7cd54f239cc032a2fb5d81f",
+      "dimensions": [
+        1942,
+        809
+      ],
+      "decode_valid": true,
+      "visual_observation": "五十七岁自然灰发、宽脸和眼周纹理一致，略丰满体态完整；身体虚弱不写进永久身份"
+    },
+    {
+      "character": "冯有年",
+      "layer": "identity",
+      "path": "feng-younian/identity/identity-v1.png",
+      "sha256": "0b7555402d7d8faac8eb1d33fa23f8e301e009a357b36f6cb7b18c4c3cc538ea",
+      "dimensions": [
+        1942,
+        809
+      ],
+      "decode_valid": true,
+      "visual_observation": "稀疏发际线、眼鼻和下唇关系四视角一致，中年体态完整；暂无救援虚弱状态"
+    },
+    {
+      "character": "赵明霞",
+      "layer": "identity",
+      "path": "zhao-mingxia/identity/identity-v1.png",
+      "sha256": "153675fb81a745e0e76b00fb455fe9a457741b709dd62581d6b348b9e6f23055",
+      "dimensions": [
+        1942,
+        809
+      ],
+      "decode_valid": true,
+      "visual_observation": "同一宽颧下颌、低马尾与四十多岁年龄感一致，完整体态；明确生前身份，不含救回情节"
+    },
+    {
+      "character": "乔立文",
+      "layer": "identity",
+      "path": "qiao-liwen/identity/identity-v1.png",
+      "sha256": "28a5585c8260b8d13c2da4e675e2b77fff709691d1a5766c8eea809b5807f5a4",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "圆方脸、自然卷短发和微胖体态四视角一致，温和生活感；四十多岁属于此次外观补全，并非文档规定年龄"
+    },
+    {
+      "character": "林晚",
+      "layer": "identity",
+      "path": "lin-wan/identity/identity-v1.png",
+      "sha256": "005e791f1f39c182457ff8b168387553de32f9e178ee7f71b172fecef8bc2c92",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "decode_valid": true,
+      "visual_observation": "四视角年轻女性同一脸型、鼻唇关系与低马尾一致，全身体态完整，选择为19岁外观基线；未声称来自既有录像演员"
+    },
+    {
+      "character": "林晚",
+      "layer": "scene",
+      "path": "lin-wan/scene/scene-v1.png",
+      "sha256": "b4fd138b1bd60a0654bb2ce8e7b395a86923bc9a66172499437bb899af604e0e",
+      "dimensions": [
+        2048,
+        768
+      ],
+      "decode_valid": true,
+      "visual_observation": "同一19岁面孔延续；米白卫衣领口蓝补线与角色右侧黑发夹三格一致；闭嘴、说话、转头可辨，无实时通话界面"
+    }
+  ],
+  "imagegen_calls": 23,
+  "known_returns": 23,
+  "unknown_outcomes": 0,
+  "chinese_only_actual_prompts": true,
+  "source_documents_sha256": {
+    "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md": "2f0903f829e4007499e059890a3a849206523bc94fd1815824b9aa1a637e4e0e",
+    "docs/superpowers/artifacts/drama/shizhen-episode-01/season-01-outline.md": "565a58628203f70e714234f7ff3e8d4761544f1d124e273be9af2796388c91a8"
+  },
+  "static_visual_review": "已逐张查看全部生成原图；未选历史不作为后续锚点",
+  "human_acceptance": "NOT_EVALUATED",
+  "video_model_consumption_and_motion": "NOT_EVALUATED",
+  "production_mutation": "NOT_PERFORMED",
+  "cost": "NOT_EXPOSED",
+  "engineering_harness": "NOT_EVALUATED: reference archive metadata, no runtime code changes",
+  "independent_review": "NATIVE_REVIEW_NOT_REQUIRED: reversible reference assets only, no production-state write",
+  "metadata_sha256": {
+    "README.md": "f59a99bfc1df276498194f7fd1afb58d69d2131aa23acf758e5652368d211b35",
+    "batch-manifest.json": "f1b02f37c2a27b43a1dfb155483fe6b6edc51375c7fbb039a61ab8111e42de32",
+    "feng-younian/README.md": "3bcf6b0bc552cc77812c8b9ebf8185b7b37b80e5ba8bc09cb23c48a1a77686b8",
+    "feng-younian/prompts/identity-v1.txt": "004b9ffb00e37a882d349fbfbd600bd2c1b2542a2aa0fb50c856181c996baa60",
+    "feng-younian/reference-usage.json": "e15ac67fb7e95cde4bdba24a6b72b532102b79a0e7e802aff12c1bb2c55ea13d",
+    "han-qiliang/README.md": "d5bd52eaec34c4d06b4eff7ef59002a7baef5a278fc1d010fdac242c4ec134f9",
+    "han-qiliang/prompts/identity-v1.txt": "ebda87e541d5341bd06594ada6f9c3c82512e04867d2182df6655ba3cbae01cc",
+    "han-qiliang/reference-usage.json": "0dc8d71045d607744a1eb21d72736e1d492db9713734e43785ee5fb0a7e33f8a",
+    "he-shulan/README.md": "8143d9555d6c3e0be7ef5ebfea0f35c8e38909c38e45093df37fe094525be1d1",
+    "he-shulan/prompts/identity-v1.txt": "f86df79e94bcfa04604672605212f0b0ddf30afd0e56e6434206e13b87cb218e",
+    "he-shulan/reference-usage.json": "f67ae714f224c702f737d644f8f86b5ee30e439fccf22bb5b28fc99edba73477",
+    "he-zhigang/README.md": "cbca2d3b13ef8831473bc43c9d5801eb2a3d2bce695bce053fdeef75aa5c5fb6",
+    "he-zhigang/prompts/identity-v1.txt": "cf6d655e46dad0c524aba8ecd4add4543f3ca5e3620d84d71a4ab51e8126fb58",
+    "he-zhigang/reference-usage.json": "04197b1fc836fca15e97b7796b022b77d61b9c55bc01d291b5516d1acbab4b6d",
+    "index.html": "9d9f300ea2f08f854f1d02147037f6d024ff462d8f9015f08b6bf053177dd68a",
+    "liang-xiuqin/README.md": "f22fd3dc9cfda4391293653b38f692ec9a90cfb0dfbb80b58b26a7775e07c227",
+    "liang-xiuqin/prompts/identity-v1.txt": "892fb03df0166ffc517e11db653e15abdbbdf019bdd2aa2b45b5849172275c93",
+    "liang-xiuqin/reference-usage.json": "cb99c2fa868e5d91f3536f17c8c950844c5a2b1fff3d9ba0494e226fb4fcd70b",
+    "lin-wan/README.md": "5b7d40b2204a56e81f969e8c643e2db4614300950126b71428b33c2c9efd88a5",
+    "lin-wan/prompts/identity-v1.txt": "29d4819399d6fef2379d76259d988e3a0837201ef7500776fdea680dc34f7fa9",
+    "lin-wan/prompts/scene-v1.txt": "7a291f309bffcbcd89ee990cc5c43a4ee5cc2d64108025bf75f4bcd12490e786",
+    "lin-wan/reference-usage.json": "7592400c9d31c0d1b2bc0cadfca980b539c835e5f8e60288885f15665cbd61c4",
+    "lu-jianping/README.md": "e9ef316265f585a6b8436b5b1b65d9d4b0e01d7e9c64d39d84050830ca2ea6dd",
+    "lu-jianping/prompts/identity-v1.txt": "4c94d3883a7b108a477490742f31f0a19ce09228f37b75614a35ca1e010e383c",
+    "lu-jianping/prompts/scene-v1.txt": "8fd80d7d673244fe5e0584287cf18a361b2684b65542dbc514ecc8f0a3f3806c",
+    "lu-jianping/reference-usage.json": "d9a9e998d03d2826a8a00476ca58f4a53bd8418fb64f89b2df3380b125cb4a62",
+    "meng-zhao/README.md": "81286e1f38d2bca74ce1fb9bdffc6103f790712e69a431a6eb9dfb19f73127b5",
+    "meng-zhao/prompts/identity-v1.txt": "887226031c4a7b73bc1e61234b27e2da989e93b0ab605e3303688b93e2e0f667",
+    "meng-zhao/reference-usage.json": "f066ba842ad902f948b6ddc1f87860b11df337714abd65fd209f854d7ecf64c0",
+    "qiao-liwen/README.md": "257507c325d861cccde7fc31ef81fc33b80071b11d1406d121b94ff6f9ce81dd",
+    "qiao-liwen/prompts/identity-v1.txt": "479536e9f1ed65c750ee2b3f7d6468bcb4c41d69da79e502a6a9ee25940c6f62",
+    "qiao-liwen/reference-usage.json": "86982c09556b6459a7828566536e4593657c16572e1da957699a1dbfcdace8ca",
+    "shao-qingguo/README.md": "208d1d3cb05b14c2c7d83528a51ccd082d9eb03b0c1892ae4794e71e0b669184",
+    "shao-qingguo/prompts/identity-v1.txt": "14f69967766212d090d20a4a80bf145be6827c51f2ce9bbef5c2f030fb09d645",
+    "shao-qingguo/reference-usage.json": "9593374893a8f842e93a7807e0021a45a9d6cfe59b6bbc08e150bb96d81f9d4e",
+    "song-qiuping/README.md": "18d71782f07b2d9b34622e7b6ae1a418e41d88e421696155f79f0e894e522769",
+    "song-qiuping/prompts/identity-v1.txt": "2616d0eb87d13c866a2db8001b7a2f47b6d9e41ec5cbd2583aa26676a0d67663",
+    "song-qiuping/reference-usage.json": "b044d3226916b192fa97159901af3811e691aa3913fefa31202f800e376cf9e2",
+    "xie-zhenyu/README.md": "dbb07516539ce274f9b6de79c0db45412815fc93ebd24fc1d7db4c50e46b2e7b",
+    "xie-zhenyu/prompts/identity-v1.txt": "262531b4ee81f438a3db20b2b3fd066e22aefdfcb2a19c5bd865a1655d40933c",
+    "xie-zhenyu/prompts/scene-v1.txt": "f03c10b8c65f6baf344220e42208371eebf1b60a7151caa821af0510386b2266",
+    "xie-zhenyu/reference-usage.json": "217a811316584a0207d2ad5bfed3b752c15f6892c681ac02417faba9f205ed09",
+    "xu-jialiang/README.md": "a3c6e04f00c002c9b09dc9748ec0dc0ec4785725f892a8f0dfabc4867ccd629d",
+    "xu-jialiang/prompts/identity-v1.txt": "ec0616b2bfbe0c71bffb9d8fce9631869dc378fca6dbf5f4cf3cca7ae82b9e94",
+    "xu-jialiang/reference-usage.json": "47debb9ae436f4be15f253394de8aa594b5e366495e13e9dbdb83b174afa75cc",
+    "zhao-mingxia/README.md": "2a4b8432d91ba6353d66feb8e669ab342cebbaf2385ba835ae8b9aeefcba9215",
+    "zhao-mingxia/prompts/identity-v1.txt": "eeff8718805ba8395055206414d36640481f7e38d0b62b3f29caecb9601f28d2",
+    "zhao-mingxia/reference-usage.json": "1b1e75b04c23aaaac0a486ae4c911282a2bbd62791ec3da6f0cc121065fd40cd",
+    "zhou-jing/README.md": "ca31de67b6dcd457ef6b379073d39b2f19b8af75e920add1e2f524711a35d6f7",
+    "zhou-jing/prompts/identity-v1.txt": "2bdb7b861b8a26239daa6a4f414c0d772671f5e141261eb19c2f13a5c0bd75ea",
+    "zhou-jing/prompts/scene-v1.txt": "4fac9cc4d939ddfc56a96cd07d1c29a3e17f7f94899854af6595b1090709cc6b",
+    "zhou-jing/prompts/scene-v2.txt": "20a3082b0d39f0b3b12c517f3e812eadde5464fb9147509be7417f770e08e236",
+    "zhou-jing/prompts/scene-v3.txt": "e99d21e8710cff0c109412a7de128f1330c6e6cc20161d6e893326ec9739a3e7",
+    "zhou-jing/reference-usage.json": "cfc411693a6607fac8e85b38f694fbb2edaaaa6636c9f6392e84be5ebfc16e19",
+    "zou-meiling/README.md": "f214c99995aabd17ee44450da75a6c294eab9cf8cd0a0f332003d78963b542ed",
+    "zou-meiling/prompts/identity-v1.txt": "f2283a84959713221f0c590a9f626125c66a40ca7211de7dc7dbb7fbb691df37",
+    "zou-meiling/prompts/identity-v2.txt": "f14d170c6b51df7e9e2ff09c9dc6341b69d6de35f3f7d62a48e015cd1a660133",
+    "zou-meiling/reference-usage.json": "438ac6b53a2487030b45086109ad0f14c31f4be719d8c08890d9e02057736168"
+  },
+  "gallery_links_resolve": true,
+  "all_23_returned_images_hashed": true,
+  "gallery_render_review": {
+    "method": "local headless Chrome, actual screenshot viewed",
+    "screenshot": "/tmp/shizhen-season-cast-gallery.png",
+    "result": "身份与场次并列显示，导航和图片可见；全部链接另经存在性核对"
+  }
+}

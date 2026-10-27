@@ -1,0 +1,19 @@
+{
+  "character": "乔立文",
+  "selected_identity": "qiao-liwen/identity/identity-v1.png",
+  "selected_identity_sha256": "28a5585c8260b8d13c2da4e675e2b77fff709691d1a5766c8eea809b5807f5a4",
+  "selected_scene": null,
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}

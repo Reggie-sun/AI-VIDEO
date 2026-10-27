@@ -1,0 +1,19 @@
+{
+  "character": "梁秀琴",
+  "selected_identity": "liang-xiuqin/identity/identity-v1.png",
+  "selected_identity_sha256": "d8502c9e859c4b4c2fb6ea7290cbb34ef670b121043b23d993629f0b1072a6c7",
+  "selected_scene": null,
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}

@@ -1,0 +1,19 @@
+{
+  "character": "孟昭",
+  "selected_identity": "meng-zhao/identity/identity-v1.png",
+  "selected_identity_sha256": "05437bd404277bd3d8bfca27051a750c3b733d4cc42f2df47f23b1f9e67b107a",
+  "selected_scene": null,
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}

@@ -1,0 +1,824 @@
+{
+  "scope": "第一季尚缺参考的角色，先主要人物再次要人物；不替换已有人像",
+  "max_new_calls": 23,
+  "unknown_policy": "单个结果未知即停止该角色，不重复调用",
+  "roles": [
+    {
+      "id": "zhou-jing",
+      "name": "周竞",
+      "story_and_design": "39岁男性，堤务处现场负责人，原城市应急救援指挥员。脸略宽、眉骨平实、短寸发有少量灰丝，颌面结实但不过分健壮，约一米七八。承担现场责任，安静直接，普通现场工作者的疲惫，不是特种兵或秘密警察。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "outputs": {
+        "identity": {
+          "path": "zhou-jing/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-3769263e-6dc6-42b0-95ca-8b4fbbd4a9a5.png",
+          "sha256": "feeeb882c9c761c95635f07e8b91ec9972242d1b9370758e3b99c3feeb3df9ec",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "四视角面孔、短寸发和体态连续，面貌略成熟；选择为39岁角色的身份基线，具体年龄感待用户审看",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "zhou-jing/prompts/identity-v1.txt",
+          "prompt_sha256": "2bdb7b861b8a26239daa6a4f414c0d772671f5e141261eb19c2f13a5c0bd75ea",
+          "references": []
+        },
+        "scene_history_v1": {
+          "path": "zhou-jing/scene/scene-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-0d0ea534-21ab-4df1-8371-29bdf1e62138.png",
+          "sha256": "2c25cf697e65f6f51bd50ba4e41b1d344cf3df213decd6a603ead3a04768c2ad",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "面孔和服装一致，但第二第三格纸夹换到角色右手，第三格举起左手；动作参考不合格，保留待一次修复",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED"
+        },
+        "scene": {
+          "path": "zhou-jing/scene/scene-v3.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-e866a106-c411-4a92-b903-4f70ff819c89.png",
+          "sha256": "9ebcc59703c2d4a530cbd3b9089f8b051267bc208c102a053d01c6a29c89f41e",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "三格均角色右手持夹、左手空手；先低头、再看外侧、最后左掌示意，服装面容延续。以右手为本场选定状态，非剧情身份硬要求",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "zhou-jing/prompts/scene-v3.txt",
+          "prompt_sha256": "e99d21e8710cff0c109412a7de128f1330c6e6cc20161d6e893326ec9739a3e7",
+          "references": [
+            {
+              "path": "zhou-jing/scene/scene-v2.png",
+              "sha256": "b5ba32e9e7a25a1e60e9e230033f67837a7c844dea323dda1f8fb5041b9dd790",
+              "role": "修复底图"
+            }
+          ]
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用",
+      "tier": "main_identity_and_scene"
+    },
+    {
+      "id": "xie-zhenyu",
+      "name": "谢振宇",
+      "story_and_design": "29岁男性，曾做高空设备维护，熟悉检修梯、屋顶。偏长窄脸，清楚颧骨、略深眼窝，黑色短碎发，瘦而有实际攀爬肌肉，约一米七六；急切、善应急、难等待，目光有持续睡眠不足的疲惫。不是偶像、刺客或夸张疯子。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "outputs": {
+        "identity": {
+          "path": "xie-zhenyu/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-3f9e1f5a-405d-4f27-892e-6cdb03c4c6e9.png",
+          "sha256": "2352a38a7e440d395df846a506fddaca48628343cbb14b4726133d964bf8c446",
+          "size": [
+            1536,
+            1024
+          ],
+          "visual_review": "四个角度面孔和发际线连续；完整全身，细瘦体态与维修攀爬经历相符，手脚无明显异常",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "xie-zhenyu/prompts/identity-v1.txt",
+          "prompt_sha256": "262531b4ee81f438a3db20b2b3fd066e22aefdfcb2a19c5bd865a1655d40933c",
+          "references": []
+        },
+        "scene": {
+          "path": "xie-zhenyu/scene/scene-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-18af5fb6-94a0-41c5-87ec-70ff75ee4216.png",
+          "sha256": "1ffa06a44030d7d5fde50ca7a80229bf16341a3b5da93f55fdd841cc3c75c744",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "同一面孔、煤灰夹克和右肩包带连续，扶带再松手可辨；照片不证明动态攀爬或能力效果",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "xie-zhenyu/prompts/scene-v1.txt",
+          "prompt_sha256": "f03c10b8c65f6baf344220e42208371eebf1b60a7151caa821af0510386b2266",
+          "references": [
+            {
+              "path": "xie-zhenyu/identity/identity-v1.png",
+              "sha256": "2352a38a7e440d395df846a506fddaca48628343cbb14b4726133d964bf8c446",
+              "role": "唯一人物身份参考"
+            }
+          ]
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用",
+      "tier": "main_identity_and_scene"
+    },
+    {
+      "id": "lu-jianping",
+      "name": "陆建平",
+      "story_and_design": "外表四十岁上下男性，夜间市政承包队事故复核员。长方脸，稍宽鼻翼、嘴角平直，浓密短发侧分但不精致，普通中等体型略厚腰，约一米七四。熟悉外勤、会照顾普通人的体面成年人，目光专注，面貌可信不画邪笑、鬼脸、反派疤痕。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "outputs": {
+        "identity": {
+          "path": "lu-jianping/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-3026fb9d-0de2-4db0-a9a2-96f123f45433.png",
+          "sha256": "36c8e7aba9c685e4cd508f7dbbc43176cd50685b6c0e4cb785cc9307ebf7cae9",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "四视角中年面貌一致，普通体态，未带夸张反派符号；与周竞短寸、谢振宇瘦长脸有区别",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "lu-jianping/prompts/identity-v1.txt",
+          "prompt_sha256": "4c94d3883a7b108a477490742f31f0a19ce09228f37b75614a35ca1e010e383c",
+          "references": []
+        },
+        "scene": {
+          "path": "lu-jianping/scene/scene-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-201b3962-e10c-44d7-8654-e4f03fcb938e.png",
+          "sha256": "7e15d613a740bccec49a27b29f4a9aa56ffeee00107c1cfbdedd5311912e83f2",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "同一面孔和灰褐外套；三格左手拿米棕夹、右手空手，核对再解释可辨；第三格右手自然解释手势而非完全放下，选为解释状态",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "lu-jianping/prompts/scene-v1.txt",
+          "prompt_sha256": "8fd80d7d673244fe5e0584287cf18a361b2684b65542dbc514ecc8f0a3f3806c",
+          "references": [
+            {
+              "path": "lu-jianping/identity/identity-v1.png",
+              "sha256": "36c8e7aba9c685e4cd508f7dbbc43176cd50685b6c0e4cb785cc9307ebf7cae9",
+              "role": "唯一人物身份参考"
+            }
+          ]
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用",
+      "tier": "main_identity_and_scene"
+    },
+    {
+      "id": "xu-jialiang",
+      "name": "许家良（老许）",
+      "story_and_design": "三十余岁男性，电路维修与视频备份的小生意合伙人。圆方脸、较宽鼻头、细长眼，短发自然微乱，普通略壮体型约一米七一，长期伏案手部有轻微工作痕迹。务实、守时、关心订单，对技术可重复性有偏信。与周竞、谢振宇面貌明确不同，不画黑客刻板符号。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "outputs": {
+        "identity": {
+          "path": "xu-jialiang/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-f147168c-0125-46c5-875c-3b3a1f016c8c.png",
+          "sha256": "a5183e47da54ad15ed14d12d2b1fa30164a219a37aeb240c3a85c0ee4ca60bb2",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "四视角圆方脸与较年轻年龄感一致，全身普通结实；暂无已成片老许人像可比对",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "xu-jialiang/prompts/identity-v1.txt",
+          "prompt_sha256": "ec0616b2bfbe0c71bffb9d8fce9631869dc378fca6dbf5f4cf3cca7ae82b9e94",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用",
+      "tier": "supporting_identity_only"
+    },
+    {
+      "id": "shao-qingguo",
+      "name": "邵庆国",
+      "story_and_design": "五十余岁男性，堤务处统筹副负责人，普通人。宽圆脸、双眼皮较窄，梳整齐的短发与后移发际线，略厚颈部，中等偏胖体型。多年行政和应急组织工作的成熟形象，谨慎权衡，不是黑帮头目。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "shao-qingguo/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-b648b1ae-bab0-4437-a540-cc3ce03ac177.png",
+          "sha256": "9a6da1c013f3172846e5f8eb050d11172a165b2458d9e4a632d5885a79b295a3",
+          "size": [
+            1981,
+            793
+          ],
+          "visual_review": "五十余岁宽圆脸、后退发际线及微胖体态一致，四角度与手脚可辨",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "shao-qingguo/prompts/identity-v1.txt",
+          "prompt_sha256": "14f69967766212d090d20a4a80bf145be6827c51f2ce9bbef5c2f030fb09d645",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "liang-xiuqin",
+      "name": "梁秀琴",
+      "story_and_design": "46岁女性，失踪者家属、望归社温和派组织者。圆椭圆脸、鼻梁平缓、嘴唇略厚，齐颈黑色短发少量灰丝，普通中等体型。长期接待家属、务实有耐心，也能坚定阻止别人送死，不靠苦脸装可怜。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "liang-xiuqin/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-b0bceca4-71e6-410c-8b78-0580232d5eef.png",
+          "sha256": "d8502c9e859c4b4c2fb6ea7290cbb34ef670b121043b23d993629f0b1072a6c7",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "四十多岁短发面貌一致，眼鼻及下颌连续，普通体态，不带组织符号",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "liang-xiuqin/prompts/identity-v1.txt",
+          "prompt_sha256": "892fb03df0166ffc517e11db653e15abdbbdf019bdd2aa2b45b5849172275c93",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "han-qiliang",
+      "name": "韩启良",
+      "story_and_design": "34岁男性，前现场调查员，望归社激进路线组织者。偏方瘦脸、粗直眉、短硬发，右眉尾自然稍稀，精干普通体型。行动果断、对痛苦敏感又习惯给同伴施压，克制中有紧绷，不画恶人脸、不展示武器。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "han-qiliang/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-42c47b92-0f77-4d5d-9397-6a0dc3a0f5f5.png",
+          "sha256": "fa1bd2af1aa4d943dd641d819595668c6d69c1d38e27e876b41d443d06efe10d",
+          "size": [
+            1942,
+            809
+          ],
+          "visual_review": "四视角精干方瘦脸、短硬发一致，紧绷感适度；眉尾稀疏不明显，不作为身份硬锚点",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "han-qiliang/prompts/identity-v1.txt",
+          "prompt_sha256": "ebda87e541d5341bd06594ada6f9c3c82512e04867d2182df6655ba3cbae01cc",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "song-qiuping",
+      "name": "宋秋萍",
+      "story_and_design": "外表36岁女性，具有社区护士真实职业技能，保护当下的照护关系。偏长椭圆脸、眼距略宽、温和细眉，黑色中短发耳后别起，普通体型。耐心、警觉、能作出明确拒绝，不画超自然瞳孔或天使光环。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "song-qiuping/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-e45283a1-cc48-41ab-bf9b-812284be6dc8.png",
+          "sha256": "30af82e8c4c31bae3dff3a6629f95d8dd94f33c1b859993c5c7f5fbe70de6f8f",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "四视角长椭圆脸与年龄感一致，全身比例完整；工具生成低盘发而非原提案中短发，选择低盘发作为本次造型，可随场次变化",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "song-qiuping/prompts/identity-v1.txt",
+          "prompt_sha256": "2616d0eb87d13c866a2db8001b7a2f47b6d9e41ec5cbd2583aa26676a0d67663",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "meng-zhao",
+      "name": "孟昭",
+      "story_and_design": "56岁男性，未然组负责人，普通人。长脸、偏高额头、较瘦双颊、短发灰白约半，微驼但自然站立的清瘦体型。不戴眼镜以便清楚看五官。熟悉模型与机构联络的研究管理者，专注、有控制倾向，不画疯狂科学家。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "meng-zhao/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-c258759e-66d8-4ed3-ac81-7cc729aa1887.png",
+          "sha256": "05437bd404277bd3d8bfca27051a750c3b733d4cc42f2df47f23b1f9e67b107a",
+          "size": [
+            1942,
+            809
+          ],
+          "visual_review": "灰白头发、瘦长脸及自然颈纹一致，清瘦体态清楚，未戴眼镜可清楚辨脸",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "meng-zhao/prompts/identity-v1.txt",
+          "prompt_sha256": "887226031c4a7b73bc1e61234b27e2da989e93b0ab605e3303688b93e2e0f667",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "he-zhigang",
+      "name": "何志刚",
+      "story_and_design": "48岁男性，原封闭工程师。宽下颌、厚眉、较大耳廓、低短发带少量灰白，皮肤有长期外勤粗糙感，中等结实体型。实际设施经验、会迟疑也会承认责任，不用白大褂或科学怪人造型。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "he-zhigang/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-2c6c8ff0-861c-4e25-956e-7f28ecc48ce7.png",
+          "sha256": "c250253367d2f9df64645194d6e6cc450178ff11751cece6d09f911c7e70bfd6",
+          "size": [
+            1942,
+            809
+          ],
+          "visual_review": "四十八岁外勤工程师脸部与粗糙皮肤连续，宽下颌、短发和结实体态可辨",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "he-zhigang/prompts/identity-v1.txt",
+          "prompt_sha256": "cf6d655e46dad0c524aba8ecd4add4543f3ca5e3620d84d71a4ab51e8126fb58",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "zou-meiling",
+      "name": "邹美玲",
+      "story_and_design": "失踪时27岁女性，谢振宇伴侣，普通悬置者，有急救护理与组织照护技能。偏圆小脸、弧形鼻尖、自然单眼皮，黑色直发到肩、低束，普通偏瘦体型。坚韧、会独立作选择、不依附伴侣，不画幽灵或苍白病容。身份底图是健康中性基线，悬置疲劳另作场次状态。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity_history_v1": {
+          "path": "zou-meiling/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-262f342f-cb93-42ed-8ffe-55aeefd0df93.png",
+          "sha256": "a412922fc37a09b7fa98fc577bad8ec260adc8553356c5383f1c6ee8405fcddc",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "四视角内部一致，但与林晚的年轻脸和发型过近，暂不固定为身份锚点，需一次角色区分修复",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED"
+        },
+        "identity": {
+          "path": "zou-meiling/identity/identity-v2.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-4aea84f5-7a8f-46f9-b174-01ddbf92f30a.png",
+          "sha256": "525dd6f0c4f26b4eb10013327da99b9322a27701f842cecf48637b276dcddf7c",
+          "size": [
+            1672,
+            941
+          ],
+          "visual_review": "短发、偏细眼、较宽鼻翼和下颌四视角连续；与林晚马尾、少女椭圆脸有可辨区别；选择v2身份基线",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "zou-meiling/prompts/identity-v2.txt",
+          "prompt_sha256": "f14d170c6b51df7e9e2ff09c9dc6341b69d6de35f3f7d62a48e015cd1a660133",
+          "references": []
+        }
+      },
+      "selected_visual_design": "选择齐下巴短发与较宽下颌版本，取代最初马尾候选；角色故事与关系不变",
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "he-shulan",
+      "name": "何淑兰",
+      "story_and_design": "57岁女性，2024年被悬置的护工。宽椭圆脸、明显笑纹、略下垂眼尾，花白短发自然后梳，身材较矮、普通略丰满体型。长期护理劳动的朴实温厚和有主见，身份底图健康自然，身体虚弱另作救援场次版本，不夸张衰老。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "he-shulan/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-7cb23826-932e-4b2d-afec-34eebaa7a42f.png",
+          "sha256": "7b8e93d75b894a48e52da366c1dfbcb9ee970cc1d7cd54f239cc032a2fb5d81f",
+          "size": [
+            1942,
+            809
+          ],
+          "visual_review": "五十七岁自然灰发、宽脸和眼周纹理一致，略丰满体态完整；身体虚弱不写进永久身份",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "he-shulan/prompts/identity-v1.txt",
+          "prompt_sha256": "f86df79e94bcfa04604672605212f0b0ddf30afd0e56e6434206e13b87cb218e",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "feng-younian",
+      "name": "冯有年",
+      "story_and_design": "53岁男性，2025年被悬置的夜班保安。略长的方脸、细眼、低鼻梁、较厚下唇、后退发际线和稀疏短灰发，普通偏瘦、有稍松腹部的中年体型。熟悉门和手动机构、坚持边界，不画年轻硬汉，不展示制服道具。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "feng-younian/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-1752af16-8027-41cc-a59a-366614db99c8.png",
+          "sha256": "0b7555402d7d8faac8eb1d33fa23f8e301e009a357b36f6cb7b18c4c3cc538ea",
+          "size": [
+            1942,
+            809
+          ],
+          "visual_review": "稀疏发际线、眼鼻和下唇关系四视角一致，中年体态完整；暂无救援虚弱状态",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "feng-younian/prompts/identity-v1.txt",
+          "prompt_sha256": "004b9ffb00e37a882d349fbfbd600bd2c1b2542a2aa0fb50c856181c996baa60",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "zhao-mingxia",
+      "name": "赵明霞",
+      "story_and_design": "46岁女性，事故后清场工，被无同意用于承载。宽脸、清楚颧骨、略方下巴、浓眉，黑发有少量早白、实用低马尾，中等结实体型，皮肤有户外劳动纹理。稳重、留意同伴安全的普通劳动者。此为生前身份基线，不画尸体、复活或病床，不改变文中无法救回的结局。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "zhao-mingxia/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-5bf8a058-7155-49b7-b1fb-b2dfe1f2705e.png",
+          "sha256": "153675fb81a745e0e76b00fb455fe9a457741b709dd62581d6b348b9e6f23055",
+          "size": [
+            1942,
+            809
+          ],
+          "visual_review": "同一宽颧下颌、低马尾与四十多岁年龄感一致，完整体态；明确生前身份，不含救回情节",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "zhao-mingxia/prompts/identity-v1.txt",
+          "prompt_sha256": "eeff8718805ba8395055206414d36640481f7e38d0b62b3f29caecb9601f28d2",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "qiao-liwen",
+      "name": "乔立文",
+      "story_and_design": "闻素芬的普通伴侣，文档未指定年龄，视觉补全为四十多岁男性。柔和圆方脸、眼尾浅纹、中等鼻梁、短发略卷和自然鬓角，普通微胖体型。耐心、温和但有生活边界，要求对方承认当下认不出自己，不画神秘组织人员。年龄和外貌是此次创作选择。",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "tier": "supporting_identity_only",
+      "outputs": {
+        "identity": {
+          "path": "qiao-liwen/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-3d86026b-90b5-46b2-a146-a3d53fdbf3d1.png",
+          "sha256": "28a5585c8260b8d13c2da4e675e2b77fff709691d1a5766c8eea809b5807f5a4",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "圆方脸、自然卷短发和微胖体态四视角一致，温和生活感；四十多岁属于此次外观补全，并非文档规定年龄",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "qiao-liwen/prompts/identity-v1.txt",
+          "prompt_sha256": "479536e9f1ed65c750ee2b3f7d6468bcb4c41d69da79e502a6a9ee25940c6f62",
+          "references": []
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    },
+    {
+      "id": "lin-wan",
+      "name": "林晚",
+      "story_and_design": "19岁中国女性，林序的妹妹，失踪时19岁，录像中仍近似19岁。年轻自然的椭圆脸，直眉、清楚的眼鼻关系、略圆的下巴，黑色直发到肩，朴素低马尾，普通偏瘦体型。曾在社区学习和兼职，习惯把坏东西修好再用，能照护同伴，也会坚持自己的选择。自然未化妆皮肤，有独立、认真、警觉的神情，不画儿童、偶像精修或幽灵。外貌是基于文档的新设计，不复制其他女性角色。身份图干净中性；米白卫衣、领口蓝补线、旧黑发夹属于后续录像场次参考。",
+      "tier": "main_identity_and_scene",
+      "status": "SELECTED_BY_DELEGATED_JUDGMENT",
+      "outputs": {
+        "identity": {
+          "path": "lin-wan/identity/identity-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-0a9e6e0a-4c8d-4224-beb0-9fdd6aba4269.png",
+          "sha256": "005e791f1f39c182457ff8b168387553de32f9e178ee7f71b172fecef8bc2c92",
+          "size": [
+            1774,
+            887
+          ],
+          "visual_review": "四视角年轻女性同一脸型、鼻唇关系与低马尾一致，全身体态完整，选择为19岁外观基线；未声称来自既有录像演员",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "lin-wan/prompts/identity-v1.txt",
+          "prompt_sha256": "29d4819399d6fef2379d76259d988e3a0837201ef7500776fdea680dc34f7fa9",
+          "references": []
+        },
+        "scene": {
+          "path": "lin-wan/scene/scene-v1.png",
+          "source": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-0ba1f55c-0154-40bd-9ffc-56821121d4f8.png",
+          "sha256": "b4fd138b1bd60a0654bb2ce8e7b395a86923bc9a66172499437bb899af604e0e",
+          "size": [
+            2048,
+            768
+          ],
+          "visual_review": "同一19岁面孔延续；米白卫衣领口蓝补线与角色右侧黑发夹三格一致；闭嘴、说话、转头可辨，无实时通话界面",
+          "human_review": "NOT_EVALUATED",
+          "runtime_consumption": "NOT_EVALUATED",
+          "prompt": "lin-wan/prompts/scene-v1.txt",
+          "prompt_sha256": "7a291f309bffcbcd89ee990cc5c43a4ee5cc2d64108025bf75f4bcd12490e786",
+          "references": [
+            {
+              "path": "lin-wan/identity/identity-v1.png",
+              "sha256": "005e791f1f39c182457ff8b168387553de32f9e178ee7f71b172fecef8bc2c92",
+              "role": "唯一人物身份参考"
+            }
+          ]
+        }
+      },
+      "identity_selection_authority": "用户授权继续生成并自主选择；Codex实际看图后选用"
+    }
+  ],
+  "sources": [
+    "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md",
+    "docs/superpowers/artifacts/drama/shizhen-episode-01/season-01-outline.md"
+  ],
+  "cost": "NOT_EXPOSED",
+  "production_import": "NOT_PERFORMED",
+  "bound_adjustment": {
+    "old": 20,
+    "new": 21,
+    "reason": "已知周竞场次换手失败，一次针对性修复，保留历史；不重复未知调用"
+  },
+  "repairs": [
+    {
+      "role": "zhou-jing",
+      "output": "zhou-jing/scene/scene-v2.png",
+      "sha256": "b5ba32e9e7a25a1e60e9e230033f67837a7c844dea323dda1f8fb5041b9dd790",
+      "verdict": "KNOWN_FAIL",
+      "observation": "只改变第一格空手，第二三格仍右手持夹，三格仍换手；不可作为连续动作参考"
+    }
+  ],
+  "bound_adjustment_final": {
+    "old": 21,
+    "new": 22,
+    "reason": "已知第一次修复未解决；最后一次只将第一格改为与其余两格相同的右手拿夹，左右手本无剧情硬要求，保留全部失败图"
+  },
+  "cast_distinction_repair": {
+    "role": "zou-meiling",
+    "reason": "已知输出与林晚年轻脸发型过近，一次更换面貌设计；旧图保留，不更改人物事实",
+    "limit": 1
+  },
+  "summary": {
+    "characters": 16,
+    "selected_identity_boards": 16,
+    "selected_scene_boards": 4,
+    "actual_imagegen_calls": 23,
+    "returned_images": 23,
+    "unknown_outcomes": 0,
+    "new_video_or_audio_calls": 0,
+    "human_media_acceptance": "NOT_EVALUATED",
+    "video_model_effect": "NOT_EVALUATED",
+    "publication": "images_local_only_metadata_versioned"
+  },
+  "source_sha256": {
+    "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md": "2f0903f829e4007499e059890a3a849206523bc94fd1815824b9aa1a637e4e0e",
+    "docs/superpowers/artifacts/drama/shizhen-episode-01/season-01-outline.md": "565a58628203f70e714234f7ff3e8d4761544f1d124e273be9af2796388c91a8"
+  },
+  "attempts": [
+    {
+      "id": "feng-younian-identity-v1",
+      "prompt": "feng-younian/prompts/identity-v1.txt",
+      "prompt_sha256": "004b9ffb00e37a882d349fbfbd600bd2c1b2542a2aa0fb50c856181c996baa60",
+      "referenced_images": [],
+      "output": "feng-younian/identity/identity-v1.png",
+      "output_sha256": "0b7555402d7d8faac8eb1d33fa23f8e301e009a357b36f6cb7b18c4c3cc538ea",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "han-qiliang-identity-v1",
+      "prompt": "han-qiliang/prompts/identity-v1.txt",
+      "prompt_sha256": "ebda87e541d5341bd06594ada6f9c3c82512e04867d2182df6655ba3cbae01cc",
+      "referenced_images": [],
+      "output": "han-qiliang/identity/identity-v1.png",
+      "output_sha256": "fa1bd2af1aa4d943dd641d819595668c6d69c1d38e27e876b41d443d06efe10d",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "he-shulan-identity-v1",
+      "prompt": "he-shulan/prompts/identity-v1.txt",
+      "prompt_sha256": "f86df79e94bcfa04604672605212f0b0ddf30afd0e56e6434206e13b87cb218e",
+      "referenced_images": [],
+      "output": "he-shulan/identity/identity-v1.png",
+      "output_sha256": "7b8e93d75b894a48e52da366c1dfbcb9ee970cc1d7cd54f239cc032a2fb5d81f",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "he-zhigang-identity-v1",
+      "prompt": "he-zhigang/prompts/identity-v1.txt",
+      "prompt_sha256": "cf6d655e46dad0c524aba8ecd4add4543f3ca5e3620d84d71a4ab51e8126fb58",
+      "referenced_images": [],
+      "output": "he-zhigang/identity/identity-v1.png",
+      "output_sha256": "c250253367d2f9df64645194d6e6cc450178ff11751cece6d09f911c7e70bfd6",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "liang-xiuqin-identity-v1",
+      "prompt": "liang-xiuqin/prompts/identity-v1.txt",
+      "prompt_sha256": "892fb03df0166ffc517e11db653e15abdbbdf019bdd2aa2b45b5849172275c93",
+      "referenced_images": [],
+      "output": "liang-xiuqin/identity/identity-v1.png",
+      "output_sha256": "d8502c9e859c4b4c2fb6ea7290cbb34ef670b121043b23d993629f0b1072a6c7",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "lin-wan-identity-v1",
+      "prompt": "lin-wan/prompts/identity-v1.txt",
+      "prompt_sha256": "29d4819399d6fef2379d76259d988e3a0837201ef7500776fdea680dc34f7fa9",
+      "referenced_images": [],
+      "output": "lin-wan/identity/identity-v1.png",
+      "output_sha256": "005e791f1f39c182457ff8b168387553de32f9e178ee7f71b172fecef8bc2c92",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "lin-wan-scene-v1",
+      "prompt": "lin-wan/prompts/scene-v1.txt",
+      "prompt_sha256": "7a291f309bffcbcd89ee990cc5c43a4ee5cc2d64108025bf75f4bcd12490e786",
+      "referenced_images": [
+        {
+          "path": "lin-wan/identity/identity-v1.png",
+          "sha256": "005e791f1f39c182457ff8b168387553de32f9e178ee7f71b172fecef8bc2c92"
+        }
+      ],
+      "output": "lin-wan/scene/scene-v1.png",
+      "output_sha256": "b4fd138b1bd60a0654bb2ce8e7b395a86923bc9a66172499437bb899af604e0e",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "lu-jianping-identity-v1",
+      "prompt": "lu-jianping/prompts/identity-v1.txt",
+      "prompt_sha256": "4c94d3883a7b108a477490742f31f0a19ce09228f37b75614a35ca1e010e383c",
+      "referenced_images": [],
+      "output": "lu-jianping/identity/identity-v1.png",
+      "output_sha256": "36c8e7aba9c685e4cd508f7dbbc43176cd50685b6c0e4cb785cc9307ebf7cae9",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "lu-jianping-scene-v1",
+      "prompt": "lu-jianping/prompts/scene-v1.txt",
+      "prompt_sha256": "8fd80d7d673244fe5e0584287cf18a361b2684b65542dbc514ecc8f0a3f3806c",
+      "referenced_images": [
+        {
+          "path": "lu-jianping/identity/identity-v1.png",
+          "sha256": "36c8e7aba9c685e4cd508f7dbbc43176cd50685b6c0e4cb785cc9307ebf7cae9"
+        }
+      ],
+      "output": "lu-jianping/scene/scene-v1.png",
+      "output_sha256": "7e15d613a740bccec49a27b29f4a9aa56ffeee00107c1cfbdedd5311912e83f2",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "meng-zhao-identity-v1",
+      "prompt": "meng-zhao/prompts/identity-v1.txt",
+      "prompt_sha256": "887226031c4a7b73bc1e61234b27e2da989e93b0ab605e3303688b93e2e0f667",
+      "referenced_images": [],
+      "output": "meng-zhao/identity/identity-v1.png",
+      "output_sha256": "05437bd404277bd3d8bfca27051a750c3b733d4cc42f2df47f23b1f9e67b107a",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "qiao-liwen-identity-v1",
+      "prompt": "qiao-liwen/prompts/identity-v1.txt",
+      "prompt_sha256": "479536e9f1ed65c750ee2b3f7d6468bcb4c41d69da79e502a6a9ee25940c6f62",
+      "referenced_images": [],
+      "output": "qiao-liwen/identity/identity-v1.png",
+      "output_sha256": "28a5585c8260b8d13c2da4e675e2b77fff709691d1a5766c8eea809b5807f5a4",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "shao-qingguo-identity-v1",
+      "prompt": "shao-qingguo/prompts/identity-v1.txt",
+      "prompt_sha256": "14f69967766212d090d20a4a80bf145be6827c51f2ce9bbef5c2f030fb09d645",
+      "referenced_images": [],
+      "output": "shao-qingguo/identity/identity-v1.png",
+      "output_sha256": "9a6da1c013f3172846e5f8eb050d11172a165b2458d9e4a632d5885a79b295a3",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "song-qiuping-identity-v1",
+      "prompt": "song-qiuping/prompts/identity-v1.txt",
+      "prompt_sha256": "2616d0eb87d13c866a2db8001b7a2f47b6d9e41ec5cbd2583aa26676a0d67663",
+      "referenced_images": [],
+      "output": "song-qiuping/identity/identity-v1.png",
+      "output_sha256": "30af82e8c4c31bae3dff3a6629f95d8dd94f33c1b859993c5c7f5fbe70de6f8f",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "xie-zhenyu-identity-v1",
+      "prompt": "xie-zhenyu/prompts/identity-v1.txt",
+      "prompt_sha256": "262531b4ee81f438a3db20b2b3fd066e22aefdfcb2a19c5bd865a1655d40933c",
+      "referenced_images": [],
+      "output": "xie-zhenyu/identity/identity-v1.png",
+      "output_sha256": "2352a38a7e440d395df846a506fddaca48628343cbb14b4726133d964bf8c446",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "xie-zhenyu-scene-v1",
+      "prompt": "xie-zhenyu/prompts/scene-v1.txt",
+      "prompt_sha256": "f03c10b8c65f6baf344220e42208371eebf1b60a7151caa821af0510386b2266",
+      "referenced_images": [
+        {
+          "path": "xie-zhenyu/identity/identity-v1.png",
+          "sha256": "2352a38a7e440d395df846a506fddaca48628343cbb14b4726133d964bf8c446"
+        }
+      ],
+      "output": "xie-zhenyu/scene/scene-v1.png",
+      "output_sha256": "1ffa06a44030d7d5fde50ca7a80229bf16341a3b5da93f55fdd841cc3c75c744",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "xu-jialiang-identity-v1",
+      "prompt": "xu-jialiang/prompts/identity-v1.txt",
+      "prompt_sha256": "ec0616b2bfbe0c71bffb9d8fce9631869dc378fca6dbf5f4cf3cca7ae82b9e94",
+      "referenced_images": [],
+      "output": "xu-jialiang/identity/identity-v1.png",
+      "output_sha256": "a5183e47da54ad15ed14d12d2b1fa30164a219a37aeb240c3a85c0ee4ca60bb2",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "zhao-mingxia-identity-v1",
+      "prompt": "zhao-mingxia/prompts/identity-v1.txt",
+      "prompt_sha256": "eeff8718805ba8395055206414d36640481f7e38d0b62b3f29caecb9601f28d2",
+      "referenced_images": [],
+      "output": "zhao-mingxia/identity/identity-v1.png",
+      "output_sha256": "153675fb81a745e0e76b00fb455fe9a457741b709dd62581d6b348b9e6f23055",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "zhou-jing-identity-v1",
+      "prompt": "zhou-jing/prompts/identity-v1.txt",
+      "prompt_sha256": "2bdb7b861b8a26239daa6a4f414c0d772671f5e141261eb19c2f13a5c0bd75ea",
+      "referenced_images": [],
+      "output": "zhou-jing/identity/identity-v1.png",
+      "output_sha256": "feeeb882c9c761c95635f07e8b91ec9972242d1b9370758e3b99c3feeb3df9ec",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "zhou-jing-scene-v1",
+      "prompt": "zhou-jing/prompts/scene-v1.txt",
+      "prompt_sha256": "4fac9cc4d939ddfc56a96cd07d1c29a3e17f7f94899854af6595b1090709cc6b",
+      "referenced_images": [
+        {
+          "path": "zhou-jing/identity/identity-v1.png",
+          "sha256": "feeeb882c9c761c95635f07e8b91ec9972242d1b9370758e3b99c3feeb3df9ec"
+        }
+      ],
+      "output": "zhou-jing/scene/scene-v1.png",
+      "output_sha256": "2c25cf697e65f6f51bd50ba4e41b1d344cf3df213decd6a603ead3a04768c2ad",
+      "outcome": "RETURNED_KNOWN",
+      "selected": false
+    },
+    {
+      "id": "zhou-jing-scene-v2",
+      "prompt": "zhou-jing/prompts/scene-v2.txt",
+      "prompt_sha256": "20a3082b0d39f0b3b12c517f3e812eadde5464fb9147509be7417f770e08e236",
+      "referenced_images": [
+        {
+          "path": "zhou-jing/scene/scene-v1.png",
+          "sha256": "2c25cf697e65f6f51bd50ba4e41b1d344cf3df213decd6a603ead3a04768c2ad"
+        }
+      ],
+      "output": "zhou-jing/scene/scene-v2.png",
+      "output_sha256": "b5ba32e9e7a25a1e60e9e230033f67837a7c844dea323dda1f8fb5041b9dd790",
+      "outcome": "RETURNED_KNOWN",
+      "selected": false
+    },
+    {
+      "id": "zhou-jing-scene-v3",
+      "prompt": "zhou-jing/prompts/scene-v3.txt",
+      "prompt_sha256": "e99d21e8710cff0c109412a7de128f1330c6e6cc20161d6e893326ec9739a3e7",
+      "referenced_images": [
+        {
+          "path": "zhou-jing/scene/scene-v2.png",
+          "sha256": "b5ba32e9e7a25a1e60e9e230033f67837a7c844dea323dda1f8fb5041b9dd790"
+        }
+      ],
+      "output": "zhou-jing/scene/scene-v3.png",
+      "output_sha256": "9ebcc59703c2d4a530cbd3b9089f8b051267bc208c102a053d01c6a29c89f41e",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    },
+    {
+      "id": "zou-meiling-identity-v1",
+      "prompt": "zou-meiling/prompts/identity-v1.txt",
+      "prompt_sha256": "f2283a84959713221f0c590a9f626125c66a40ca7211de7dc7dbb7fbb691df37",
+      "referenced_images": [],
+      "output": "zou-meiling/identity/identity-v1.png",
+      "output_sha256": "a412922fc37a09b7fa98fc577bad8ec260adc8553356c5383f1c6ee8405fcddc",
+      "outcome": "RETURNED_KNOWN",
+      "selected": false
+    },
+    {
+      "id": "zou-meiling-identity-v2",
+      "prompt": "zou-meiling/prompts/identity-v2.txt",
+      "prompt_sha256": "f14d170c6b51df7e9e2ff09c9dc6341b69d6de35f3f7d62a48e015cd1a660133",
+      "referenced_images": [],
+      "output": "zou-meiling/identity/identity-v2.png",
+      "output_sha256": "525dd6f0c4f26b4eb10013327da99b9322a27701f842cecf48637b276dcddf7c",
+      "outcome": "RETURNED_KNOWN",
+      "selected": true
+    }
+  ]
+}

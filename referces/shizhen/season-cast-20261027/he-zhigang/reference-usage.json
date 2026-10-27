@@ -1,0 +1,19 @@
+{
+  "character": "何志刚",
+  "selected_identity": "he-zhigang/identity/identity-v1.png",
+  "selected_identity_sha256": "c250253367d2f9df64645194d6e6cc450178ff11751cece6d09f911c7e70bfd6",
+  "selected_scene": null,
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}

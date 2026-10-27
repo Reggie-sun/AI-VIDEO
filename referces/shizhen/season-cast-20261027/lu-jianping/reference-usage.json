@@ -1,0 +1,19 @@
+{
+  "character": "陆建平",
+  "selected_identity": "lu-jianping/identity/identity-v1.png",
+  "selected_identity_sha256": "36c8e7aba9c685e4cd508f7dbbc43176cd50685b6c0e4cb785cc9307ebf7cae9",
+  "selected_scene": "lu-jianping/scene/scene-v1.png",
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}

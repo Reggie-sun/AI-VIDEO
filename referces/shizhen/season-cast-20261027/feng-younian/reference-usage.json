@@ -1,0 +1,19 @@
+{
+  "character": "冯有年",
+  "selected_identity": "feng-younian/identity/identity-v1.png",
+  "selected_identity_sha256": "0b7555402d7d8faac8eb1d33fa23f8e301e009a357b36f6cb7b18c4c3cc538ea",
+  "selected_scene": null,
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}

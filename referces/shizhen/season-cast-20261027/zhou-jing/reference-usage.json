@@ -1,0 +1,19 @@
+{
+  "character": "周竞",
+  "selected_identity": "zhou-jing/identity/identity-v1.png",
+  "selected_identity_sha256": "feeeb882c9c761c95635f07e8b91ec9972242d1b9370758e3b99c3feeb3df9ec",
+  "selected_scene": "zhou-jing/scene/scene-v3.png",
+  "selection": "Codex受托自主选择，已逐张查看",
+  "inherit": [
+    "脸部结构和五官关系",
+    "发际线和体型比例基线",
+    "自然年龄感"
+  ],
+  "do_not_permanently_inherit": [
+    "灰底和中性打底服",
+    "场次服装、物件、背景、姿势",
+    "伤势、雨湿及临时年龄状态"
+  ],
+  "human_image_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED"
+}
