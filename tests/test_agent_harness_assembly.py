@@ -40,6 +40,9 @@ def answers(assembly, tmp_path):
             viewing_mode="full_playback", viewing_speed_milli=1000)
         for value in finding["action_review"].values():
             value.update(verdict="pass", observation="正常速度核对此项，未见问题")
+        finding["editing_intent"] = editing_intent()
+        for value in finding["editing_review"].values():
+            value.update(verdict="pass", observation="显式离线夹具，非真实媒体验收")
     path = tmp_path / "answers.json"
     path.write_text(json.dumps(data))
     return path, data
@@ -171,3 +174,80 @@ def test_success_binds_exact_answer_bytes_and_evaluator(assembly, tmp_path):
     assert result["answers_sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
     assert result["evaluator_name"] == data["evaluator_name"]
     assert result["strength"] == "human"
+
+
+def editing_intent():
+    return dict(narrative_type="drama", technique="cut_on_action",
+        reason="切到接收者确认交接", expected_effect="观众理解支撑已转移",
+        outgoing_phase="原持有者松手", incoming_phase="接收者承重后收手",
+        axis_eyeline_space="保持柜台两侧和对视关系，不能只比较脸朝向",
+        scale_reaction="中景到手部近景，保留接收者确认反应",
+        rhythm_reveal="动作完成后留出理解时间，不按固定秒数切镜",
+        continuity_risks=["可能重复交接"], audio_treatment="sync",
+        audio_reason="保留完整原句和环境声", audio_track_ids=[], pickup_requirement=None)
+
+
+def test_new_template_exposes_source_in_out_and_missing_intent_cannot_pass(assembly, tmp_path):
+    template = prepare_assembly(**assembly)
+    assert template["schema_version"] == "assembly-review/2"
+    assert template["junction_findings"][0]["source_selection"] is not None
+    path, data = answers(assembly, tmp_path)
+    data["junction_findings"][0]["editing_intent"] = None
+    path.write_text(json.dumps(data))
+    result = verify_assembly(**assembly, answers=path)
+    assert result["verdict"] == "not_evaluated"
+    assert "missing_editing_intent" in result["junction_review"]["evidence_gaps"]
+
+
+@pytest.mark.parametrize("mutation", ["source_out", "source_in", "source_sha", "audio_bridge", "pickup", "axis_fail"])
+def test_editing_intent_is_bound_to_real_sources_audio_and_findings(assembly, tmp_path, mutation):
+    path, data = answers(assembly, tmp_path)
+    cut = data["junction_findings"][0]
+    if mutation == "source_out": cut["source_selection"]["source_out_frame_exclusive"] += 1
+    elif mutation == "source_in": cut["source_selection"]["source_in_frame"] += 1
+    elif mutation == "source_sha": cut["source_selection"]["outgoing"]["asset_sha256"] = "f" * 64
+    elif mutation == "audio_bridge":
+        cut["editing_intent"].update(audio_treatment="j_cut", audio_track_ids=["nonexistent"])
+    elif mutation == "pickup": cut["editing_intent"]["pickup_requirement"] = "缺少松手到承重衔接镜，须回Director"
+    else: cut["editing_review"]["axis_eyeline_space"]["verdict"] = "fail"
+    path.write_text(json.dumps(data))
+    result = verify_assembly(**assembly, answers=path)
+    assert result["verdict"] == "fail"
+
+
+@pytest.mark.parametrize("mutation", ["missing_review", "unevaluated_axis", "missing_sources", "legacy_version"])
+def test_new_editing_requirements_cannot_be_waived_by_old_or_incomplete_answers(assembly, tmp_path, mutation):
+    path, data = answers(assembly, tmp_path)
+    cut = data["junction_findings"][0]
+    if mutation == "missing_review": cut.pop("editing_review")
+    elif mutation == "unevaluated_axis": cut["editing_review"]["axis_eyeline_space"]["verdict"] = "not_evaluated"
+    elif mutation == "missing_sources": cut.pop("source_selection")
+    else:
+        data["schema_version"] = "assembly-review/1"
+        for key in ("editing_review", "editing_intent", "source_selection"): cut.pop(key)
+    path.write_text(json.dumps(data))
+    assert verify_assembly(**assembly, answers=path)["verdict"] == "not_evaluated"
+
+
+def test_real_resolved_crossing_audio_is_necessary_but_not_semantic_proof(assembly, tmp_path):
+    from ai_video.production.junction_review import derive_junction_inventory
+    from ai_video.production.models import ResolvedTimeline
+    from production_project_factory import make_p4_composition_fixture
+    loaded, spec = make_p4_composition_fixture(tmp_path / "with-audio")
+    timeline = resolve_composition(loaded, spec, "0.7.103")
+    _make_video(tmp_path / "with-audio.mp4", frames=timeline.total_frames)
+    assembly["video"] = tmp_path / "with-audio.mp4"
+    assembly["timeline"].write_text(timeline.model_dump_json())
+    assembly["render_report"].write_text(json.dumps(_report(assembly["video"], timeline)))
+    timeline = ResolvedTimeline.model_validate_json(assembly["timeline"].read_bytes())
+    cut = derive_junction_inventory(timeline)[0]
+    crossing = [s.track_id for s in cut.audio_spans if s.start_sample < cut.sample < s.start_sample + s.duration_samples]
+    assert crossing, "standard Composition fixture must provide the global music crossing"
+    path, data = answers(assembly, tmp_path)
+    finding = data["junction_findings"][0]
+    finding["editing_intent"].update(audio_treatment="sound_bridge", audio_track_ids=crossing)
+    path.write_text(json.dumps(data))
+    assert verify_assembly(**assembly, answers=path)["verdict"] == "pass"
+    finding["editing_review"]["sound_bridge"]["verdict"] = "not_evaluated"
+    path.write_text(json.dumps(data))
+    assert verify_assembly(**assembly, answers=path)["verdict"] == "not_evaluated"

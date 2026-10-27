@@ -1,0 +1,12 @@
+{
+  "status": "fulfilled",
+  "value": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"video_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/失帧-第一集-S05-Seedance2.5-005-接点连续性修复-原声-20秒.mp4\",\n  \"threshold\": 0.1,\n  \"total_scenes\": 1,\n  \"scenes\": [\n    {\n      \"scene_number\": 1,\n      \"start_time\": 0.0,\n      \"start_hms\": \"00:00:00.000\",\n      \"end_time\": 20.065,\n      \"end_hms\": \"00:00:20.065\",\n      \"duration_seconds\": 20.065,\n      \"confidence\": null\n    }\n  ]\n}"
+      }
+    ],
+    "isError": false
+  }
+}

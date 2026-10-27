@@ -67,6 +67,8 @@ For object handling, placement, transfer, loss of support or collision, apply
 before authoring, even when duration and generation grouping are unchanged.
 
 For editing or assembling footage, including approved sources, apply
+[Shot-to-Shot Editing Decisions](references/shot-to-shot-editing.md) to record motivated cuts,
+actual source in/out, audiovisual treatment, missing coverage and final-film observations, and
 [Cut Relationships And Reused Footage](references/creative-completion.md#cut-relationships-and-reused-footage):
 establish a perceptible reason for the cut and review actual action continuity, including internal cuts;
 source approval and technically smooth playback do not approve the assembled sequence.

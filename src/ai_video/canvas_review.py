@@ -5,6 +5,7 @@ import hashlib
 from ai_video.production.final_output_contracts import FinalOutputContract, FinalOutputRequirement
 from ai_video.production.final_output_review import FinalOutputObservation
 from ai_video.production.hashing import canonical_sha256, seal_artifact
+from ai_video.production.junction_review import ShotEditingIntent
 from ai_video.production.models import (
     EvidenceStrength, QaLayer, ReviewEvidence, ReviewEvidencePointer, ReviewReceipt,
     ReviewRequest, SourceReference, StateCommitStatus,
@@ -26,7 +27,7 @@ def canvas_cut_contract(direction):
         raise ValueError("cut_requirements must cover every actual edited junction in composition order")
     requirements = []
     for index, cut in enumerate(cuts):
-        if set(cut) != {"from_occurrence_id", "to_occurrence_id", "kind", "checks"}:
+        if set(cut) - {"editing_intent"} != {"from_occurrence_id", "to_occurrence_id", "kind", "checks"}:
             raise ValueError("cut requirement needs exact occurrences, kind and selected checks")
         if cut["kind"] not in {"continuous", "insert", "scene_reset"}:
             raise ValueError("cut kind must describe continuous action, an insert, or an intentional scene reset")
@@ -39,6 +40,22 @@ def canvas_cut_contract(direction):
             requirements.append(FinalOutputRequirement(requirement_id=f"cut-{index}-{dimension}",
                 observable=f"{cut['from_occurrence_id']} → {cut['to_occurrence_id']} ({cut['kind']}): {observable}",
                 proof="evaluator"))
+        if "editing_intent" in cut:
+            intent = ShotEditingIntent.model_validate(cut["editing_intent"])
+            for dimension, observable in {
+                "purpose": f"{intent.narrative_type}/{intent.technique}: {intent.reason}；预期效果：{intent.expected_effect}",
+                "action_match": f"出态：{intent.outgoing_phase}；入态：{intent.incoming_phase}",
+                "axis_eyeline_space": intent.axis_eyeline_space,
+                "scale_reaction": intent.scale_reaction,
+                "rhythm_reveal": intent.rhythm_reveal,
+                "sound_bridge": f"{intent.audio_treatment}: {intent.audio_reason}；实际音轨：{intent.audio_track_ids}",
+                "risks": "逐项核对：" + "；".join(intent.continuity_risks),
+                **({"pickup": "补足缺失覆盖后核对：" + intent.pickup_requirement}
+                   if intent.pickup_requirement else {}),
+            }.items():
+                requirements.append(FinalOutputRequirement(requirement_id=f"cut-{index}-editing-{dimension}",
+                    observable=f"{cut['from_occurrence_id']} → {cut['to_occurrence_id']}: {observable}",
+                    proof="evaluator"))
     requirements.append(FinalOutputRequirement(requirement_id="whole-playback",
         observable="User watches and hears the exact complete final film at 1.0x and accepts it", proof="human"))
     return FinalOutputContract(goal_id=f"canvas-{direction['project_id']}", goal_version=canonical_sha256({"cuts": cuts}),

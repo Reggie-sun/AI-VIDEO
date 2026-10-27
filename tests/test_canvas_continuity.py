@@ -14,6 +14,26 @@ from test_canvas_production import runtime, submit_and_fetch, pass_evaluation
 from test_generation_feedback_review import Session
 
 
+def test_editing_intent_reaches_final_film_requirements_and_changes_goal_identity(tmp_path):
+    from test_agent_harness_assembly import editing_intent
+    service, _, _, _ = runtime(tmp_path)
+    direction = deepcopy(service.direction)
+    direction["cut_requirements"] = [{"from_occurrence_id": "a", "to_occurrence_id": "b",
+        "kind": "continuous", "checks": {"action": "完整交接只发生一次"}}]
+    legacy = canvas_cut_contract(direction)
+    direction["cut_requirements"][0]["editing_intent"] = editing_intent()
+    contract = canvas_cut_contract(direction)
+    assert contract.goal_version != legacy.goal_version
+    requirements = {r.requirement_id: r for r in contract.requirements}
+    assert requirements["cut-0-editing-purpose"].proof == "evaluator"
+    assert "观众理解支撑已转移" in requirements["cut-0-editing-purpose"].observable
+    assert "柜台两侧" in requirements["cut-0-editing-axis_eyeline_space"].observable
+    assert requirements["whole-playback"].proof == "human"
+    direction["cut_requirements"][0]["editing_intent"]["reason"] = "   "
+    with pytest.raises(ValueError):
+        canvas_cut_contract(direction)
+
+
 def accept_current(service, provider, limits, auth):
     submit_and_fetch(service, provider, limits, auth)
     def all_fixture_findings(review):
@@ -587,7 +607,7 @@ def test_cut_contract_rejects_missing_ambiguous_or_inapplicable_checks(tmp_path,
         canvas_cut_contract(data)
 
 
-def render_final(tmp_path, monkeypatch, *, insert=False):
+def render_final(tmp_path, monkeypatch, *, insert=False, editing=False):
     from dataclasses import replace
     import subprocess
     from production_e2e_support import DeterministicHyperFramesRunner, require_audio_toolchain
@@ -595,6 +615,9 @@ def render_final(tmp_path, monkeypatch, *, insert=False):
     from test_canvas_render import _executable
     service, provider, limits, auth = runtime(tmp_path)
     data = cut_data(service)
+    if editing:
+        from test_agent_harness_assembly import editing_intent
+        data["cut_requirements"][0]["editing_intent"] = editing_intent()
     if insert:
         from test_canvas_sequence_packet import document
         from scripts.canvas_sequence_packet import build_sequence_packet
@@ -665,7 +688,13 @@ def test_insert_is_composed_between_generated_dependents_from_canonical_spans(tm
 
 def test_final_cut_review_missing_human_proof_is_not_evaluated_and_replay_is_zero_effect(tmp_path, monkeypatch):
     from ai_video.production.models import QaVerdict
-    service = render_final(tmp_path, monkeypatch)
+    service = render_final(tmp_path, monkeypatch, editing=True)
+    packet = service.cut_packet()
+    assert packet["cuts"][0]["editing_intent"]["reason"] == "切到接收者确认交接"
+    assert packet["cuts"][0]["evidence"]["from"]["source_last_frame"] == 23
+    assert packet["cuts"][0]["evidence"]["to"]["source_start_frame"] == 0
+    assert any(r["requirement_id"] == "cut-0-editing-rhythm_reveal"
+               for r in packet["contract"]["requirements"])
     session = Session()
     def adjudicate(packet, request, raw):
         return {"contract_hash": service._load().qa_policy.final_output.contract_hash,

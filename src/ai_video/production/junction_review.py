@@ -78,6 +78,114 @@ class JunctionActionReview(StrictModel):
     pacing: JunctionActionObservation
 
 
+class ShotEditingIntent(StrictModel):
+    """Director advice for one cut; never a timeline or an execution permit."""
+
+    narrative_type: Literal["drama", "advertisement", "opening", "other"]
+    technique: Literal["hard_cut", "cut_on_action", "match_cut", "reaction", "reveal", "scene_reset"]
+    reason: str = Field(min_length=1)
+    expected_effect: str = Field(min_length=1)
+    outgoing_phase: str = Field(min_length=1)
+    incoming_phase: str = Field(min_length=1)
+    axis_eyeline_space: str = Field(min_length=1)
+    scale_reaction: str = Field(min_length=1)
+    rhythm_reveal: str = Field(min_length=1)
+    continuity_risks: tuple[str, ...] = Field(min_length=1)
+    audio_treatment: Literal["sync", "j_cut", "l_cut", "sound_bridge", "silence"]
+    audio_reason: str = Field(min_length=1)
+    audio_track_ids: tuple[str, ...] = ()
+    pickup_requirement: str | None = Field(default=None, min_length=1)
+
+    @field_validator("reason", "expected_effect", "outgoing_phase", "incoming_phase",
+                     "axis_eyeline_space", "scale_reaction", "rhythm_reveal", "audio_reason",
+                     "pickup_requirement")
+    @classmethod
+    def _nonblank(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("editing intent text must not be blank")
+        return value
+
+    @field_validator("continuity_risks", "audio_track_ids")
+    @classmethod
+    def _named_items(cls, values: tuple[str, ...]) -> tuple[str, ...]:
+        if any(not value.strip() for value in values) or len(set(values)) != len(values):
+            raise ValueError("editing items must be nonblank and unique")
+        return values
+
+
+class JunctionSourceSelection(StrictModel):
+    outgoing: JunctionVisualSpan
+    incoming: JunctionVisualSpan
+    source_out_frame_exclusive: int = Field(strict=True, gt=0)
+    source_in_frame: int = Field(strict=True, ge=0)
+
+
+class JunctionEditingReview(StrictModel):
+    action_match: JunctionActionObservation
+    axis_eyeline_space: JunctionActionObservation
+    scale_reaction: JunctionActionObservation
+    rhythm_reveal: JunctionActionObservation
+    sound_bridge: JunctionActionObservation
+
+
+def junction_source_selection(cut: JunctionInventory) -> JunctionSourceSelection | None:
+    """Expose exact resolved windows; never guess among composited visual layers."""
+    outgoing = [s for s in cut.visual_spans if s.shot_id == cut.from_shot_id]
+    incoming = [s for s in cut.visual_spans if s.shot_id == cut.to_shot_id]
+    if len(outgoing) != 1 or len(incoming) != 1:
+        return None
+    before, after = outgoing[0], incoming[0]
+    return JunctionSourceSelection(outgoing=before, incoming=after,
+        source_out_frame_exclusive=before.trim_start_frame + (before.trim_duration_frames or before.duration_frames),
+        source_in_frame=after.trim_start_frame)
+
+
+def _editing_gaps(cut: JunctionInventory, finding: JunctionFinding) -> tuple[list[str], bool]:
+    gaps, failed = [], False
+    intent, selection, review = finding.editing_intent, finding.source_selection, finding.editing_review
+    if intent is None:
+        gaps.append("missing_editing_intent")
+    else:
+        if intent.pickup_requirement is not None:
+            gaps.append("pickup_required_return_to_director")
+            failed = True
+        if intent.audio_treatment in {"j_cut", "l_cut", "sound_bridge"}:
+            crossing = {s.track_id for s in cut.audio_spans
+                if s.start_sample < cut.sample < s.start_sample + s.duration_samples}
+            if not intent.audio_track_ids or not set(intent.audio_track_ids) <= crossing:
+                gaps.append("audio_bridge_not_resolved_across_cut")
+                failed = True
+        if intent.audio_treatment == "silence" and cut.audio_spans:
+            gaps.append("editing_silence_has_resolved_audio")
+            failed = True
+    if selection is None:
+        gaps.append("missing_source_selection")
+    else:
+        before, after = selection.outgoing, selection.incoming
+        outgoing = [s for s in cut.visual_spans if s.shot_id == cut.from_shot_id]
+        incoming = [s for s in cut.visual_spans if s.shot_id == cut.to_shot_id]
+        if (before not in outgoing or after not in incoming
+                or before.start_frame + before.duration_frames != max(
+                    (s.start_frame + s.duration_frames for s in outgoing), default=-1)
+                or after.start_frame != cut.frame
+                or selection.source_out_frame_exclusive != before.trim_start_frame
+                    + (before.trim_duration_frames or before.duration_frames)
+                or selection.source_in_frame != after.trim_start_frame):
+            gaps.append("editing_source_selection_mismatch")
+            failed = True
+    if review is None:
+        gaps.append("missing_editing_review")
+    else:
+        for name in JunctionEditingReview.model_fields:
+            observation = getattr(review, name)
+            if observation.verdict == "fail":
+                gaps.append(f"editing_{name}_failed")
+                failed = True
+            elif observation.verdict != "pass":
+                gaps.append(f"editing_{name}_not_evaluated")
+    return gaps, failed
+
+
 class JunctionFinding(StrictModel):
     """One evaluator's explicit decision and separate audio/visual observations."""
 
@@ -94,6 +202,9 @@ class JunctionFinding(StrictModel):
     viewing_mode: Literal["sampled_frames", "full_playback"] | None = None
     viewing_speed_milli: int | None = Field(default=None, strict=True, gt=0)
     action_review: JunctionActionReview | None = None
+    editing_intent: ShotEditingIntent | None = None
+    source_selection: JunctionSourceSelection | None = None
+    editing_review: JunctionEditingReview | None = None
 
     @field_validator("edit_reason", "visual_observation", "audio_observation")
     @classmethod
@@ -120,6 +231,9 @@ class JunctionCutResult(StrictModel):
     viewing_mode: Literal["sampled_frames", "full_playback"] | None
     viewing_speed_milli: int | None = Field(default=None, strict=True, gt=0)
     evidence_gaps: tuple[str, ...] = ()
+    editing_intent: ShotEditingIntent | None = None
+    source_selection: JunctionSourceSelection | None = None
+    editing_review: JunctionEditingReview | None = None
 
 
 class JunctionReviewResult(StrictModel):
@@ -368,6 +482,7 @@ def evaluate_junction_review(
     inventory_sha256: str,
     strength: EvidenceStrength,
     require_action_review: bool = False,
+    require_editing_review: bool = False,
 ) -> JunctionReviewResult:
     """Adjudicate only explicit per-cut answers; technical bindings never imply a pass."""
 
@@ -463,6 +578,18 @@ def evaluate_junction_review(
                             gaps.append(f"action_{name}_failed")
                         elif observation.verdict != "pass":
                             gaps.append(f"action_{name}_not_evaluated")
+            if require_editing_review or any((finding.editing_intent, finding.source_selection, finding.editing_review)):
+                editing_gaps, editing_failed = _editing_gaps(item, finding)
+                gaps.extend(editing_gaps)
+                if editing_failed:
+                    audio_failures = {"audio_bridge_not_resolved_across_cut",
+                        "editing_silence_has_resolved_audio", "editing_sound_bridge_failed"}
+                    if audio_failures.intersection(editing_gaps):
+                        audio = "fail"
+                    if any(gap.endswith("_failed") and gap not in audio_failures
+                           or gap in {"editing_source_selection_mismatch", "pickup_required_return_to_director"}
+                           for gap in editing_gaps):
+                        visual = "fail"
         if decision == "trim" or visual == "fail" or audio == "fail":
             verdict = "fail"
         elif (
@@ -492,6 +619,9 @@ def evaluate_junction_review(
             viewing_mode=viewing_mode,
             viewing_speed_milli=viewing_speed_milli,
             evidence_gaps=tuple(dict.fromkeys(gaps)),
+            editing_intent=finding.editing_intent if finding else None,
+            source_selection=finding.source_selection if finding else None,
+            editing_review=finding.editing_review if finding else None,
         ))
         global_gaps.extend(gaps)
     if not inventory:

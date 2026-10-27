@@ -1,0 +1,12 @@
+{
+  "status": "fulfilled",
+  "value": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"video_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/失帧-第一集-S04-接点剪辑修正版-1080p-9.875秒-原声.mp4\",\n  \"analysis_summary\": {\n    \"duration_hms\": \"00:00:09.875\",\n    \"resolution\": \"1920x1080\",\n    \"has_audio\": true,\n    \"estimated_speaking_duration_seconds\": 0.0,\n    \"scene_count\": 1,\n    \"frames_extracted\": 10\n  },\n  \"quality_metrics\": {\n    \"duration_seconds\": 9.875,\n    \"fps\": 24.0,\n    \"resolution\": \"1920x1080\",\n    \"scene_count\": 1,\n    \"sampled_frame_count\": 473,\n    \"unique_frame_count\": 473,\n    \"unique_frame_ratio\": 1.0,\n    \"has_audio\": true,\n    \"estimated_speaking_duration_seconds\": 0.0\n  },\n  \"issues\": []\n}"
+      }
+    ],
+    "isError": false
+  }
+}

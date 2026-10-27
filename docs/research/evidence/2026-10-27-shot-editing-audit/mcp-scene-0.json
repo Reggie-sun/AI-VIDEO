@@ -1,0 +1,12 @@
+{
+  "status": "fulfilled",
+  "value": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"video_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/失帧-第一集-S01-S02-S03-去重复扫码-1080p-33.875秒-原声.mp4\",\n  \"threshold\": 0.1,\n  \"total_scenes\": 1,\n  \"scenes\": [\n    {\n      \"scene_number\": 1,\n      \"start_time\": 0.0,\n      \"start_hms\": \"00:00:00.000\",\n      \"end_time\": 33.875,\n      \"end_hms\": \"00:00:33.875\",\n      \"duration_seconds\": 33.875,\n      \"confidence\": null\n    }\n  ]\n}"
+      }
+    ],
+    "isError": false
+  }
+}

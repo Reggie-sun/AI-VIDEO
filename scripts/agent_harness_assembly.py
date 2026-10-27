@@ -17,12 +17,13 @@ from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.junction_review import (
     JunctionFinding, derive_junction_inventory, evaluate_junction_review,
     junction_inventory_sha256, validate_timeline_and_report,
+    junction_source_selection,
 )
 from ai_video.production.models import EvidenceStrength
 
 
 class AssemblyReviewAnswers(StrictModel):
-    schema_version: Literal["assembly-review/1"] = "assembly-review/1"
+    schema_version: Literal["assembly-review/1", "assembly-review/2"] = "assembly-review/2"
     authority: Literal["development_only"] = "development_only"
     video_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     timeline_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -61,13 +62,22 @@ def prepare_assembly(*, video: Path, timeline: Path, render_report: Path) -> dic
         "state_continuity": "检查动作阶段、人物视线、持物与接触支撑是否合理衔接。",
         "pacing": "检查动作速度、重复停顿、响应时机及切镜节奏。",
     }
+    editing_instructions = {
+        "action_match": "核对实际出入动作阶段、方向、速度和重复；Match Cut 须有可见对应。",
+        "axis_eyeline_space": "对照场景地理、机位工作侧、视线对象及过轴重定位，不能只看脸朝向。",
+        "scale_reaction": "景别改变是否给出所需信息，反应是否可读，是否近似机位跳切。",
+        "rhythm_reveal": "原速检查完整事件、情绪停顿、悬念及揭示时机，是否实现切镜理由。",
+        "sound_bridge": "实际聆听原句、呼吸和环境声；J/L 声桥的来源及方向须与意图一致。",
+    }
     findings = tuple(JunctionFinding(
         junction_id=cut.junction_id, inventory_sha256=identity["inventory_sha256"],
         edit_decision=None, edit_reason="待审看后决定修剪或说明保留理由",
         visual_verdict="not_evaluated", visual_observation="待正常速度观看前后完整行动与反应",
         audio_verdict="not_evaluated", audio_observation="待实际聆听接点是否重复、截断或跳变",
         audio_basis="not_listened", action_review={key: dict(verdict="not_evaluated", observation=value)
-            for key, value in action_instructions.items()}) for cut in cuts)
+            for key, value in action_instructions.items()}, source_selection=junction_source_selection(cut),
+        editing_review={key: dict(verdict="not_evaluated", observation=value)
+            for key, value in editing_instructions.items()}) for cut in cuts)
     return AssemblyReviewAnswers(**identity, evaluator_name="pending",
         strength=EvidenceStrength.EXPLICIT_EVALUATOR, junction_findings=findings).model_dump(mode="json")
 
@@ -88,7 +98,8 @@ def verify_assembly(*, video: Path, timeline: Path, render_report: Path,
         strength, findings = review.strength, review.junction_findings
         evaluator = review.evaluator_name
     result = evaluate_junction_review(cuts, findings,
-        inventory_sha256=identity["inventory_sha256"], strength=strength, require_action_review=True)
+        inventory_sha256=identity["inventory_sha256"], strength=strength,
+        require_action_review=True, require_editing_review=True)
     # Reopen current bytes again; a concurrent export cannot inherit an old result.
     if _current(**paths)[0] != identity:
         raise ValueError("Assembly inputs changed during verification")

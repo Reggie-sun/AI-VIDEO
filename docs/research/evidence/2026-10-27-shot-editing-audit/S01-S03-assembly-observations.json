@@ -1,0 +1,204 @@
+{
+  "schema_version": "assembly-review/2",
+  "authority": "development_only",
+  "video_sha256": "45fb4e45f815bbe00f42165429dd5f19335e2dbf60ef4206710e09755308f233",
+  "timeline_sha256": "01529c49e9523177a7223681201d5cd35f68996ff7c85539d57b0939e0e89981",
+  "render_report_sha256": "6f5e889b9c6907dc3c14dc9eaec0e24b88c0b918ef112ab366aeddd8fc1c359f",
+  "inventory_sha256": "3d7bd74a8d0f6e7349ad46859dea794280305433663fd1bd0842f113511e798a",
+  "evaluator_name": "Codex sampled exact encoded frames; no human listening",
+  "strength": "explicit_evaluator",
+  "junction_findings": [
+    {
+      "junction_id": "866ca749a705d79a0c5afd203c3f6b19192c15c89ee5e9d95bcc2c29960b7798",
+      "inventory_sha256": "3d7bd74a8d0f6e7349ad46859dea794280305433663fd1bd0842f113511e798a",
+      "edit_decision": "retain_with_reason",
+      "edit_reason": "林序微笑回应后转回店员，让交易进入下一行动",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "已检查exact编码画面接点前后抽帧；原速完整表演尚未人工验收",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未实际听验，不以音轨存在或波形代替听感",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "检查前后完整动作是否重复；对有意复现记录叙事理由。"
+        },
+        "state_continuity": {
+          "verdict": "not_evaluated",
+          "observation": "检查动作阶段、人物视线、持物与接触支撑是否合理衔接。"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "检查动作速度、重复停顿、响应时机及切镜节奏。"
+        }
+      },
+      "editing_intent": {
+        "narrative_type": "drama",
+        "technique": "hard_cut",
+        "reason": "林序微笑回应后转回店员，让交易进入下一行动",
+        "expected_effect": "从回应过渡到收银行动",
+        "outgoing_phase": "林序低头微笑",
+        "incoming_phase": "店员抬眼回应后拿瓶",
+        "axis_eyeline_space": "按柜台、门与人物视线对象核对；截图不能独立证明完整空间连续",
+        "scale_reaction": "保留必要线索与反应；不因生成片段结束机械切镜",
+        "rhythm_reveal": "围绕交易或消失事件，完整声画节奏待1x听看",
+        "continuity_risks": [
+          "完整表演与声音尚未听验"
+        ],
+        "audio_treatment": "sync",
+        "audio_reason": "当前各段原声同窗直切，未使用J/L桥",
+        "audio_track_ids": [],
+        "pickup_requirement": null
+      },
+      "source_selection": {
+        "outgoing": {
+          "layer_id": "native-S01",
+          "shot_id": "S01",
+          "asset_id": "S01-live-native-source",
+          "asset_sha256": "e65f369828e8e00a311157c7d60abb5f6b0a62e9a5b9245e1695a21e44799691",
+          "start_frame": 0,
+          "duration_frames": 384,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 384,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "incoming": {
+          "layer_id": "native-S02",
+          "shot_id": "S02",
+          "asset_id": "S02-live-native-source",
+          "asset_sha256": "15d6d73ed9dfe01392d024ebeefddef30b5419766dce853b50575b2c8f264ff8",
+          "start_frame": 384,
+          "duration_frames": 117,
+          "trim_start_frame": 18,
+          "trim_duration_frames": 117,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "source_out_frame_exclusive": 384,
+        "source_in_frame": 18
+      },
+      "editing_review": {
+        "action_match": {
+          "verdict": "not_evaluated",
+          "observation": "核对实际出入动作阶段、方向、速度和重复；Match Cut 须有可见对应。"
+        },
+        "axis_eyeline_space": {
+          "verdict": "not_evaluated",
+          "observation": "对照场景地理、机位工作侧、视线对象及过轴重定位，不能只看脸朝向。"
+        },
+        "scale_reaction": {
+          "verdict": "not_evaluated",
+          "observation": "景别改变是否给出所需信息，反应是否可读，是否近似机位跳切。"
+        },
+        "rhythm_reveal": {
+          "verdict": "not_evaluated",
+          "observation": "原速检查完整事件、情绪停顿、悬念及揭示时机，是否实现切镜理由。"
+        },
+        "sound_bridge": {
+          "verdict": "not_evaluated",
+          "observation": "实际聆听原句、呼吸和环境声；J/L 声桥的来源及方向须与意图一致。"
+        }
+      }
+    },
+    {
+      "junction_id": "af9b9fddcdbf14d4cc00a3e2ebcbf4f43c8c09d691889ad64660c3dd81a93e01",
+      "inventory_sha256": "3d7bd74a8d0f6e7349ad46859dea794280305433663fd1bd0842f113511e798a",
+      "edit_decision": "trim",
+      "edit_reason": "扫码准备切到实际扫码，当前动作高低不匹配须修剪",
+      "visual_verdict": "fail",
+      "visual_observation": "已检查exact编码画面接点前后抽帧；原速完整表演尚未人工验收",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未实际听验，不以音轨存在或波形代替听感",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "检查前后完整动作是否重复；对有意复现记录叙事理由。"
+        },
+        "state_continuity": {
+          "verdict": "fail",
+          "observation": "f500扫码枪仍举高，f501入镜枪已到瓶旁低位；同一动作阶段不匹配"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "检查动作速度、重复停顿、响应时机及切镜节奏。"
+        }
+      },
+      "editing_intent": {
+        "narrative_type": "drama",
+        "technique": "cut_on_action",
+        "reason": "扫码准备切到实际扫码，当前动作高低不匹配须修剪",
+        "expected_effect": "只保留一次可理解的扫码过程",
+        "outgoing_phase": "店员将扫码枪举高",
+        "incoming_phase": "店员在瓶旁低位持枪",
+        "axis_eyeline_space": "按柜台、门与人物视线对象核对；截图不能独立证明完整空间连续",
+        "scale_reaction": "保留必要线索与反应；不因生成片段结束机械切镜",
+        "rhythm_reveal": "围绕交易或消失事件，完整声画节奏待1x听看",
+        "continuity_risks": [
+          "动作阶段跳变"
+        ],
+        "audio_treatment": "sync",
+        "audio_reason": "当前各段原声同窗直切，未使用J/L桥",
+        "audio_track_ids": [],
+        "pickup_requirement": null
+      },
+      "source_selection": {
+        "outgoing": {
+          "layer_id": "native-S02",
+          "shot_id": "S02",
+          "asset_id": "S02-live-native-source",
+          "asset_sha256": "15d6d73ed9dfe01392d024ebeefddef30b5419766dce853b50575b2c8f264ff8",
+          "start_frame": 384,
+          "duration_frames": 117,
+          "trim_start_frame": 18,
+          "trim_duration_frames": 117,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "incoming": {
+          "layer_id": "native-S03",
+          "shot_id": "S03",
+          "asset_id": "S03-live-native-source",
+          "asset_sha256": "51bf0aaea2deaa8f02fb2a8f3f4f2666a8cd6304e5f9f80f5598fd7eab87368f",
+          "start_frame": 501,
+          "duration_frames": 312,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 312,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "source_out_frame_exclusive": 135,
+        "source_in_frame": 0
+      },
+      "editing_review": {
+        "action_match": {
+          "verdict": "fail",
+          "observation": "当前切点跨过落枪过程，不能称Cut on Action已匹配"
+        },
+        "axis_eyeline_space": {
+          "verdict": "not_evaluated",
+          "observation": "对照场景地理、机位工作侧、视线对象及过轴重定位，不能只看脸朝向。"
+        },
+        "scale_reaction": {
+          "verdict": "not_evaluated",
+          "observation": "景别改变是否给出所需信息，反应是否可读，是否近似机位跳切。"
+        },
+        "rhythm_reveal": {
+          "verdict": "not_evaluated",
+          "observation": "原速检查完整事件、情绪停顿、悬念及揭示时机，是否实现切镜理由。"
+        },
+        "sound_bridge": {
+          "verdict": "not_evaluated",
+          "observation": "实际聆听原句、呼吸和环境声；J/L 声桥的来源及方向须与意图一致。"
+        }
+      }
+    }
+  ]
+}

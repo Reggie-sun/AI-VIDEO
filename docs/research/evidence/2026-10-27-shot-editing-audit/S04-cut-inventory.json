@@ -1,0 +1,134 @@
+[
+  {
+    "junction_id": "abc727b6f09d642443498406dd192d2207e025ab56ef38a3721118ea1e74528c",
+    "from_shot_id": "S04A",
+    "to_shot_id": "S04B",
+    "transition_kind": "cut",
+    "transition_duration_frames": 0,
+    "frame": 84,
+    "time_ms": 3500,
+    "sample": 168000,
+    "visual_spans": [
+      {
+        "layer_id": "native-S04A",
+        "shot_id": "S04A",
+        "asset_id": "S04A-live-native-source",
+        "asset_sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+        "start_frame": 0,
+        "duration_frames": 84,
+        "trim_start_frame": 0,
+        "trim_duration_frames": 84,
+        "opacity_milli": 1000,
+        "z_index": 0
+      },
+      {
+        "layer_id": "native-S04B",
+        "shot_id": "S04B",
+        "asset_id": "S04B-live-native-source",
+        "asset_sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+        "start_frame": 84,
+        "duration_frames": 51,
+        "trim_start_frame": 87,
+        "trim_duration_frames": 51,
+        "opacity_milli": 1000,
+        "z_index": 0
+      }
+    ],
+    "audio_window_start_sample": 120000,
+    "audio_window_end_sample": 216000,
+    "audio_spans": [
+      {
+        "track_id": "native-mix-S04A",
+        "audio_kind": "dialogue",
+        "asset_id": "S04A-original-native-mix",
+        "asset_sha256": "7d4dbbc0858f64a58bb6e54ff1ada4799484c9d0631195f642c2ccf977c1dd18",
+        "start_sample": 0,
+        "duration_samples": 168000,
+        "source_start_sample": 0,
+        "source_duration_samples": 168000,
+        "gain_millidb": 0,
+        "fade_in_samples": 0,
+        "fade_out_samples": 0
+      },
+      {
+        "track_id": "native-mix-S04B",
+        "audio_kind": "dialogue",
+        "asset_id": "S04B-original-native-mix",
+        "asset_sha256": "7d4dbbc0858f64a58bb6e54ff1ada4799484c9d0631195f642c2ccf977c1dd18",
+        "start_sample": 168000,
+        "duration_samples": 102000,
+        "source_start_sample": 174000,
+        "source_duration_samples": 102000,
+        "gain_millidb": 0,
+        "fade_in_samples": 0,
+        "fade_out_samples": 0
+      }
+    ]
+  },
+  {
+    "junction_id": "ec6f9cc28e96e5e23c0cd5a1fa19bdfb660a5d98f734c85d3c074caa50531e81",
+    "from_shot_id": "S04B",
+    "to_shot_id": "S04C",
+    "transition_kind": "cut",
+    "transition_duration_frames": 0,
+    "frame": 135,
+    "time_ms": 5625,
+    "sample": 270000,
+    "visual_spans": [
+      {
+        "layer_id": "native-S04B",
+        "shot_id": "S04B",
+        "asset_id": "S04B-live-native-source",
+        "asset_sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+        "start_frame": 84,
+        "duration_frames": 51,
+        "trim_start_frame": 87,
+        "trim_duration_frames": 51,
+        "opacity_milli": 1000,
+        "z_index": 0
+      },
+      {
+        "layer_id": "native-S04C",
+        "shot_id": "S04C",
+        "asset_id": "S04C-live-native-source",
+        "asset_sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+        "start_frame": 135,
+        "duration_frames": 102,
+        "trim_start_frame": 138,
+        "trim_duration_frames": 102,
+        "opacity_milli": 1000,
+        "z_index": 0
+      }
+    ],
+    "audio_window_start_sample": 222000,
+    "audio_window_end_sample": 318000,
+    "audio_spans": [
+      {
+        "track_id": "native-mix-S04B",
+        "audio_kind": "dialogue",
+        "asset_id": "S04B-original-native-mix",
+        "asset_sha256": "7d4dbbc0858f64a58bb6e54ff1ada4799484c9d0631195f642c2ccf977c1dd18",
+        "start_sample": 168000,
+        "duration_samples": 102000,
+        "source_start_sample": 174000,
+        "source_duration_samples": 102000,
+        "gain_millidb": 0,
+        "fade_in_samples": 0,
+        "fade_out_samples": 0
+      },
+      {
+        "track_id": "native-mix-S04C",
+        "audio_kind": "dialogue",
+        "asset_id": "S04C-original-native-mix",
+        "asset_sha256": "7d4dbbc0858f64a58bb6e54ff1ada4799484c9d0631195f642c2ccf977c1dd18",
+        "start_sample": 270000,
+        "duration_samples": 204000,
+        "source_start_sample": 276000,
+        "source_duration_samples": 204000,
+        "gain_millidb": 0,
+        "fade_in_samples": 0,
+        "fade_out_samples": 0
+      }
+    ]
+  }
+]

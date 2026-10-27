@@ -1,0 +1,9 @@
+{
+  "verdict": "not_evaluated",
+  "authority": "development_only",
+  "production_acceptance": "NOT_EVALUATED",
+  "error": "assembly_review_input_invalid",
+  "reason": "Existing HyperFrames check warning_count=1; exact historical report retained",
+  "video_sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+  "render_report_sha256": "1449136d60267160a6998759ef07a7017e541883c1082bf2dc07329d4d921d57"
+}

@@ -1,0 +1,15 @@
+{
+  "level": "focused",
+  "tests": 132,
+  "failures": 0,
+  "errors": 0,
+  "source_sha256": {
+    ".agents/skills/open-video/SKILL.md": "ee88be056e73980c3105b7b4747148aaf6ef89bc748ba96fd3b7851d84aba371",
+    "scripts/agent_harness_assembly.py": "430737fe23b30e1b04d7886fe48755b98ca7453ab6295187bd828509e204b0b1",
+    "src/ai_video/canvas_review.py": "8a2b5823b59071e0695666ca932957a3cf9f0eca00ec3995a5291e3c2fddcae0",
+    "src/ai_video/production/junction_review.py": "b82f635de7d1cf82f6212ed6d5637ee1e0c22517b6e09a16a4de04b53d769611",
+    "tests/test_agent_harness_assembly.py": "067f886529bb37cba5c6789ee24b6e4b96fbbaf9fc8fba18baa878de52605163",
+    "tests/test_canvas_continuity.py": "7322d595428bb17b793338db920b6c57d27f2df76607cc8c3bcb1c9281fa4ce9"
+  },
+  "limitation": "Tests are offline fixtures; no artistic or human media acceptance"
+}
