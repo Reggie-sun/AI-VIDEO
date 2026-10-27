@@ -1,0 +1,118 @@
+{
+  "scope": "MC01-MC02 first complete event, one proposed remote submission",
+  "model_id": "seedance_2.0_vip",
+  "proposed_mode": "multimodal",
+  "native_mode": 4,
+  "proposed_duration_seconds": 8,
+  "resolution": "1080p",
+  "aspect_ratio": "16:9",
+  "surface": "existing Jimeng workflow",
+  "runtime_profile": "NOT_SEALED",
+  "native_request_preview": "NOT_PREPARED",
+  "execution_binding": "NOT_PREPARED",
+  "one_use_permit": "NOT_ISSUED",
+  "new_paid_authorization": "MISSING_USER_PREVIOUSLY_FORBADE_UNAUTHORIZED_NEW_PAID_GENERATION",
+  "operator_credit_ceiling": "REQUIRES_CURRENT_EXPLICIT_BOUND; old 1500 CRD profile is historical, not reused",
+  "max_proposed_submissions": 1,
+  "automatic_retries": 0,
+  "new_submissions_consumed": 0,
+  "refs": [
+    {
+      "input_order": 1,
+      "reference_role": "M01",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M01-r3.png",
+      "sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33",
+      "size_bytes": 2689606,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "video_binding": "NOT_YET_BOUND"
+    },
+    {
+      "input_order": 2,
+      "reference_role": "M02",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M02.png",
+      "sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+      "size_bytes": 2714219,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "video_binding": "NOT_YET_BOUND"
+    },
+    {
+      "input_order": 3,
+      "reference_role": "M03",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M03.png",
+      "sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008",
+      "size_bytes": 2808301,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "video_binding": "NOT_YET_BOUND"
+    },
+    {
+      "input_order": 4,
+      "reference_role": "M03-D0",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D0.png",
+      "sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077",
+      "size_bytes": 2988617,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "video_binding": "NOT_YET_BOUND"
+    },
+    {
+      "input_order": 5,
+      "reference_role": "M03-D1",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D1-r1.png",
+      "sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+      "size_bytes": 2850279,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "video_binding": "NOT_YET_BOUND"
+    }
+  ],
+  "source_audio_intent": "native environment audio required; no dialogue or music; actual support and compiler binding not verified",
+  "execute_ready": false,
+  "ready_stage": "CREATIVE_DRAFT_AND_LOCAL_REFERENCE_CHECK_ONLY",
+  "requirements": [
+    "控制停止与门继续移动同一中远景可读",
+    "门沿同一正确索路向右到固定限位",
+    "同侧有动机切到连接近景",
+    "底板出现有限渐进形变而不断裂",
+    "工人先确认控制再观察异常，保持安全距离",
+    "马达停止、雨/交通/金属摩擦继续，无对白或新增配乐",
+    "同角色设备/轴线/原速，视频后逐项MCP裁决"
+  ],
+  "protected_B6_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "prompt_path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-video-preflight-20261027/first-event-prompt.zh.txt",
+  "prompt_sha256": "b563c87688c47371e37e285e2169da3b9508f7e6f4fbdcea0539c922a4f8562b",
+  "prompt_chars": 487,
+  "authoring_lint": {
+    "five_reference_jobs_declared": true,
+    "control_before_load_continues": true,
+    "same_side_detail_cut": true,
+    "no_dialogue_or_music": true,
+    "body_is_chinese": true
+  },
+  "version_family": "2.0",
+  "version_selection_rule": "actual submitted duration <=15s (inclusive) ->2.0; >15s ->2.5 unless user explicitly selects otherwise",
+  "prior_draft_model_id": "seedance_2.5",
+  "selection_source": "用户：8s就用seedance2.0；15s内的shot就用2.0",
+  "capability_checks": {
+    "duration_limit_seconds": 15,
+    "reference_count": 5,
+    "image_limit": 9,
+    "image_bytes_limit": 52428800,
+    "resolution_and_ratio": "PASS_LOCAL_REGISTRY",
+    "mode_native_value": 4,
+    "all_five_local_reference_hashes": "PASS",
+    "actual_platform_session_and_profile": "NOT_EVALUATED"
+  }
+}

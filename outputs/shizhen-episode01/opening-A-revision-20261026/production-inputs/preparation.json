@@ -1,1 +1,48 @@
-{"selected_provider":"jimeng","selected_model_family":"seedance_2.5","surface":"existing Jimeng workflow","resolution":"1080p","aspect_ratio":"16:9","native_prompt_language":"zh","director_input":"CO-WORLD.director.zh.txt","references":"reference-manifest.json","mode":"REQUIRES_FRESH_SELECTION","runtime_profile":"NOT_SEALED","execute_ready":false,"blocking_prerequisites":["same-street macro visual reference","live-action identity/look agreement","fresh exact model/mode/reference bindings and preview/lint","explicit authorization for new paid generation and current budget/permit"],"paid_generation_calls":0,"production_activation":false}
+{
+  "selected_provider": "jimeng",
+  "selected_model_family": "seedance_2.0",
+  "surface": "existing Jimeng workflow",
+  "resolution": "1080p",
+  "aspect_ratio": "16:9",
+  "native_prompt_language": "zh",
+  "director_input": "MACRO-SHOTBOARD-20261027.md",
+  "references": "macro-reference-review-20261027/preparation-report.json",
+  "mode": "REQUIRES_FRESH_SELECTION_AND_SEALED_PROFILE",
+  "runtime_profile": "NOT_SEALED",
+  "execute_ready": false,
+  "blocking_prerequisites": [
+    "用户授权首段一次新增付费生成并给出当前积分上限",
+    "fresh exact account/node/model/mode/profile/request/reference binding",
+    "adapter native preview/lint、budget reservation、egress、durable intent和一用permit"
+  ],
+  "paid_generation_calls": 0,
+  "production_activation": false,
+  "previous_preparation": {
+    "selected_provider": "jimeng",
+    "selected_model_family": "seedance_2.5",
+    "surface": "existing Jimeng workflow",
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "native_prompt_language": "zh",
+    "director_input": "CO-WORLD.director.zh.txt",
+    "references": "reference-manifest.json",
+    "mode": "REQUIRES_FRESH_SELECTION",
+    "runtime_profile": "NOT_SEALED",
+    "execute_ready": false,
+    "blocking_prerequisites": [
+      "same-street macro visual reference",
+      "live-action identity/look agreement",
+      "fresh exact model/mode/reference bindings and preview/lint",
+      "explicit authorization for new paid generation and current budget/permit"
+    ],
+    "paid_generation_calls": 0,
+    "production_activation": false
+  },
+  "current_reference_usage": "referces/shizhen/macro-opening-20261027/repair-02/current-reference-usage.json",
+  "first_event_draft": "macro-video-preflight-20261027/first-event-input-draft.json",
+  "proposed_mode": "multimodal",
+  "creative_reference_stage": "12静态状态职责已有对应图；不代表视频通过",
+  "selected_model_id": "seedance_2.0_vip",
+  "first_event_duration_seconds": 8,
+  "version_selection_rule": "15秒及以内（含15秒）使用2.0；超过15秒使用2.5；用户明确指定优先"
+}

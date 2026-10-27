@@ -57,3 +57,24 @@ L03-r2允许自然侧移前倾随把手，撤回Agent附加的脚位冻结和固
 当前六镜12项静态职责都有对应图，仍不证明持续运动、声音因果、渐进形变、步速、跨镜接点、Provider输入准入或人工接受。B6 exact SHA保持`d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a`，未改B6、字体、音乐、Registry或Manifest。当前板只列选用图，原部分交付页和receipt分别保留为initial-partial-review.html、verification-initial.json。
 
 本轮为同一修复链的继续，不足以当独立多实验；distill-ai-video-learning为no_candidate，不改Skill/Policy/Gate。Risk Gate仍NATIVE_REVIEW_NOT_REQUIRED，无代码或Production持久状态变化。核验结果与publication以当前verification.json及最终回读为准。
+
+
+## Initial Video Start Readiness — Superseded Version Choice
+
+用户再次询问能否开始视频后，只完成MC01–MC02首个完整事件的可审看输入草稿：Seedance 2.5／建议multimodal／8秒／1080p／16:9，五张actual参考文件SHA已重验；提示词与验收项位于production-inputs/macro-video-preflight-20261027。当前代码支持的模型与模式不证明当前session/profile已就绪，native request preview、execution binding、预算、permit均未封存。
+
+旧“未经授权不新增付费生成”仍有效。本轮无付费调用、上传或视频提交，旧1500 CRD历史profile未复用。等待用户明确首段一次付费授权及本次积分上限，之后仍走既有runtime owner与fresh preview/permit。preparation.json保留旧准备快照并更新当前缺口；execute_ready保持false，不能把静态参考齐全表述成可直接扣费提交。此次为同主题准备状态，learning继续no_candidate。
+
+
+## Duration-Based Seedance Selection
+
+用户明确要求“8s就用seedance2.0”，并要求将规则改为“15s内的shot就用2.0”。选模原则写入现有seedance-authoring入口：按实际单次生成时长，15秒及以内（含15秒）用2.0，超过15秒用2.5，用户另有明确指定时优先；先按完整事件定时长，不为阈值拆戏。此为用户直接选择规则，不是从媒体单例归纳出的学习Claim，不改运行时router或profile schema。
+
+当前首段草稿由2.5改为seedance_2.0_vip，仍为8秒／multimodal／1080p／16:9，五张参考不变。当前code registry的时长、图片数、总素材数、尺寸、字节上限与原图SHA已核验；2.0 overlay替代2.5 overlay，未混用30秒能力。实际runtime profile/native preview/permit仍未封存，无视频提交或新付费调用。
+
+
+## Rule Verification
+
+seedance-authoring现有8项检查通过；8秒2.0 VIP的五张原图SHA、时长／图片数／字节／尺寸与1080p能力检查通过。exact Skill commit为8cf1c000eab2c28e2c2c66f2b22f68230391e365。初次staged Harness纳入并行暂存路径而缺映射；改用精确Skill commit range后，docs_contract与Skill检查通过，但Harness自身测试319 passed／2 failed，失败为complete-cross-check coverage和unmapped-owned-files。涉及本任务未修改的policy/source映射，不改动其并行工作、不冒充Harness通过或完整回归。
+
+失败receipt：`.agent/harness/runs/seedance-duration-rule-range-20261027/receipt.json`；本次输入核验记录：`outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-video-preflight-20261027/verification.json`。这是用户明确规则更改，不是学习Claim adoption；learning为no_candidate，未产生视频或付费调用。

@@ -1,0 +1,34 @@
+{
+  "scope": "authoring rule and first-event draft only",
+  "selection": "duration <=15 seconds, including 15 ->Seedance 2.0; above15 ->2.5 unless user explicitly selects otherwise",
+  "current_draft_model": "seedance_2.0_vip",
+  "duration_seconds": 8,
+  "resolution": "1080p",
+  "input_references": 5,
+  "local_capability_and_reference_checks": "PASS",
+  "skill_tests": {
+    "command": "python -m pytest -p no:cacheprovider tests/test_seedance_authoring_skill.py -q",
+    "passed": 8,
+    "failed": 0
+  },
+  "harness": {
+    "level": "focused",
+    "scope": "exact Skill commit range",
+    "status": "FAILED",
+    "receipt": ".agent/harness/runs/seedance-duration-rule-range-20261027/receipt.json",
+    "failure_tests": [
+      "test_production_policy_declares_only_complete_cross_check_coverage",
+      "test_repository_policy_audit_has_no_unmapped_owned_files"
+    ],
+    "harness_tests": {
+      "passed": 319,
+      "failed": 2
+    },
+    "note": "failures concern policy coverage and unmapped repository sources, neither modified by this rule change; no full-regression claim"
+  },
+  "execute_ready": false,
+  "paid_submissions": 0,
+  "live_platform_verification": "NOT_EVALUATED",
+  "new_paid_authorization": "NOT_GRANTED",
+  "rule_commit": "8cf1c000eab2c28e2c2c66f2b22f68230391e365"
+}
