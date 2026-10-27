@@ -6,7 +6,7 @@
 
 版本：2026-10-27，整合完整世界观 V1 与后续“活过今晚”创作修订，按用户最新指令仅写第一季。核心命题：**每一个消失的人，都在替这座城市偿还一段不存在的时间。** 叙事发动机：**当整个世界决定你不应该存在时，你要怎样活过今晚？**
 
-这是当前《失帧》项目内的系列创作开发稿，文档正式落盘不等于新设定获准用于制作。没有改写原剧本、生成提示词、认可媒体或 Production state。后续创作先读本页和 [Canon Review](canon-review.md)，避免把旧试片、作者推断及本轮推荐混为一谈。
+这是当前《失帧》项目内的系列创作开发稿，文档正式落盘不等于新设定获准用于制作。后续用户已授权修改第一集尚未制作的剧情，现已并入screenplay；已做Shot、S06准备、生成提示词、媒体和Production state不改。后续创作先读本页和 [Canon Review](canon-review.md)，避免把旧试片、作者推断及新增推荐混为一谈。
 
 | Label | Meaning |
 | --- | --- |
@@ -29,7 +29,7 @@
 | [Timeline](timeline.md) | 作者历史顺序、实际历史与候选段的时间关系；不是制作 ResolvedTimeline |
 | [Series Outline](series-outline.md) | 第一季定位、四段结构、季内闭合与配角终态；不规划后续季 |
 | [Season 1 Outline](season-01-outline.md) | 12集短季的完整因果、求生行动、损失、信息与伏笔回收 |
-| [Episode 01 Survival Revision](episode-01-survival-revision.md) | 经本轮明确授权提出的第一集求生增补：插入位置、可演出的新场戏与保护清单；不替换原剧本 |
+| [Episode 01 Survival Revision](episode-01-survival-revision.md) | 第一集改稿说明、插入位置与已做Shot保护清单；场戏正文统一归screenplay，不并行维护第二套剧本 |
 | [Canon Review](canon-review.md) | 来源目录、批准粒度、现有连续性、历史方案与冲突审查 |
 | [Creative Decisions](creative-decisions.md) | V1全部输入对照、重大变更、开放选择、可持续性与交叉审查结果 |
 
@@ -58,3 +58,9 @@
 第一季林序从P0走到可核验的P2，E12仅一次有共同来源与外部支撑的P3类接应，失去老许的旧合作关系确认。六人各有独立成长，不要求都获得攻击或P5；R不与P配对，后来人的认知类型仍独立。完整取舍见 [V2 Decisions](creative-decisions.md#v2-integration-decisions)，当季落点见 [Progression Ledger](season-01-outline.md#season-one-v2-progression-ledger)。不新增未来季剧情、Provider调用或媒体替换。
 
 本轮文本核对身份见 [V2 Verification](v2-verification.json)。前轮命名／世界Bible核对JSON均保留历史身份，不证明这批V2字节或任何成片已被接受。
+
+## Episode 01 Survival Rewrite
+
+按后续“已经做了的shot就别改了”，已把店外强拖、实体门自救、报警、持续左腕伤与工作室求助并入 [Screenplay](screenplay.md) 的未制作Scene03／03A／03B／04。Scene01–02及Scene05–06正文保持原字节；实际已做片段与后续用户修订仍高于早期文本。S06虽未出片，本轮也保护其已封存准备，不改原五轮与入场。
+
+本集只建立真实生命威胁与明日身份悬念；P/R和次夜具体删除风险不提前讲解。新增对白与动作尚待实际制作检验，不提交任何新生成。变化、物件和伤口衔接见上表改稿owner；当前核对身份见 [Episode Revision Verification](episode-01-revision-verification.json)，此前验证JSON保留各轮历史身份。

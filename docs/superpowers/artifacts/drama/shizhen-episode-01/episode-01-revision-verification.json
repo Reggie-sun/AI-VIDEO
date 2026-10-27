@@ -1,0 +1,813 @@
+{
+  "schema": "shizhen-episode01-rewrite-check/1",
+  "date": "2026-10-27",
+  "scope": "unmade_story_scenes_only_preserve_all_existing_shots",
+  "creative_status": "PROPOSED_CANON",
+  "authority": "text_and_byte_identity_only",
+  "source_commit": "9f6f5e2215db7e12c353a6ee8ba12ef791826132",
+  "documents": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/screenplay.md",
+      "sha256": "df0c83efbe03e8a997ce6ffbd57cbd4467f53c3fb5ea5c43ff2e1dda9aee0fa5"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/episode-01-survival-revision.md",
+      "sha256": "cf8f946740e449f5378170fa2fe6f3bc916bf2a5713c2f48a6f8f488c8536771"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/series-index.md",
+      "sha256": "85b80c4e177c7fd3410b2d3fd41f33df8e7dd62cbcd67a38c993d4ee5e57c7d9"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/canon-review.md",
+      "sha256": "7554f5405fb42a398bfb598d9b070a3dba86a5f470d471e93c9c9396fd880bce"
+    },
+    {
+      "path": "docs/record_for_agent/2026-10-27-shizhen-episode01-survival-rewrite.md",
+      "sha256": "88efb4530cf59ae151482f1c02a6e09b9283fe64c0692eddcedf8afc18b0f247"
+    }
+  ],
+  "preserved_script_sections": [
+    {
+      "section": "Scene 01 — Convenience Store / Night",
+      "sha256": "2b08d218b4a04eb29e99c1bb6e36e435e41a0ccba937e240821fb64d92a6ce83",
+      "unchanged": true
+    },
+    {
+      "section": "Scene 02 — Back of Counter / Same Night",
+      "sha256": "f0856fc1a9b4821c40b6637ba376e6365454ed40ea9f575e7b6e6aeb9e2f1af7",
+      "unchanged": true
+    },
+    {
+      "section": "Scene 05 — Sister's Video / Studio",
+      "sha256": "687ca8a9d4b7e9e39753a075d94d7a301470ca9aa21c135a6666744a6297a533",
+      "unchanged": true
+    },
+    {
+      "section": "Scene 06 — Frame Repair / Pre-Dawn",
+      "sha256": "b7cd8c91301b500c990e70108ae59ed4dfbfad31a323415c8100d11066d5e339",
+      "unchanged": true
+    }
+  ],
+  "protected_sources": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/README.md",
+      "sha256": "2cded3d08034a2cd179b626bb803fc5af8d95eb194a7fa1c35d691f7d1ebd933",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/director-coverage.json",
+      "sha256": "ba483e4c2b40e3f0fdaad5e2c0f589a5763077a5bd857243dd2a406ca76ff2dc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/native-prompt.zh.txt",
+      "sha256": "e4f0b86ea8dc2a93f1a65e67c1ebd37ee5026f16ceb5f5d8b3cd4ccaed6b6c36",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-preparation/README.md",
+      "sha256": "52c4c636498c1af539a05860766d67ef15215311215b8c650aa3e64c56a71095",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-preparation/director-coverage.json",
+      "sha256": "790b9c70f1c25ffa6b3936b8b06856f865828cf121d88c1dff1773a18fb547ee",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-preparation/native-prompt.zh.txt",
+      "sha256": "c2ed9aa150a874bae26d0a7356386326310882cce2d94bce0f8b4743b323d4e2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-revision-02/README.md",
+      "sha256": "83ba0d5e8ec229833d3ad87ee587e6d2840dd46779e42837ff74df94d9e344fb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-revision-02/native-prompt.zh.txt",
+      "sha256": "2fe4af16123bfbc663dd4bc91c0962846680753635a5f266c3c35d668dc35860",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/README.md",
+      "sha256": "ef40a02bbead8104e5d0f39ed8363e0d8d5d19dbe6b6c2f37179f8874fe95b00",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/assets/S01-frame-provenance.json",
+      "sha256": "21b989a6879059d528d5dc3e50331fd14bca070c5efaf7da8320fc25b97f98c5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/assets/title-provenance.json",
+      "sha256": "03099a5acd1eef4cbfc42d0986e592fe4c3e88ca139f7abd07b1ccfe74488ad2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/composition-handoff.md",
+      "sha256": "1175f374aeaf4e88f90be304a61403d6f7389ff77d84e1b40b124c080b94d15c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/creative-input.txt",
+      "sha256": "2b1c4bc7b3205ecf575a76b25df53de419d2cf08582351189186237bf8fca8d5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/director-coverage.json",
+      "sha256": "3aac019401b2cd8e98af36f972794d21c98cdf945472206a9ee0c282783f9f70",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/director-treatment.md",
+      "sha256": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/briefs.json",
+      "sha256": "01f27db01361b864258131e74897b8190882846660c4cef07328f65fe28714bb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/dry-run.argv.json",
+      "sha256": "4d72c6b6510a3a3396107f26a0384be45aa1cc711041702f79ac56a74bbf1222",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/dry-run.result.json",
+      "sha256": "d87581ee66c8a2957d67b27d6ea2fdcc464ffa6584a4ddc081bbdd45fc2fca38",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/exclude.txt",
+      "sha256": "a35646b52c3ee69881a6d582be78e1395252483cd32db865328b809c7edab424",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/handoff.json",
+      "sha256": "c6ffb5e63db1a085137e16f54cd0200906a055443932d27ccbeae455aac8f671",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/qa-preparation.json",
+      "sha256": "7324ca5eac56bb87598c238a09157ea803b284f84f6474280f24382b5a2bff4d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/style.txt",
+      "sha256": "6489351a9493eb8ec7711c9206bb6c54f7fa6d058f0a2e4313c7938c333cd46a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/directions.json",
+      "sha256": "8a618f9844c212861c0d78c88eacedabd9ab5d1936483c49cb6f0b0ecc25c01d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music-and-sound.md",
+      "sha256": "07b7f1a18300867d95533f2e79b00adba7493515fe85f7c5d77c20e8ba2cdabd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/creative-input.txt",
+      "sha256": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/director-coverage.json",
+      "sha256": "8d3f05e827e56b00e2956b1a120a89c220577a60a3f048c9eb7e8d2e8d443806",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/director-revision.md",
+      "sha256": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/verification.json",
+      "sha256": "0d9bfffca43f17af2861e695eb712d925d448e026d190d641e9cd0b74009e8cb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/shot-cards.md",
+      "sha256": "c560e36fd489a5fbc8057ea1bb67908ca868c6cc368c1d680a6cd8b9764dde34",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/S01-mcp-observation.json",
+      "sha256": "0c6a19acc4e2fd6e3193f262649e3f422b15c9a87c2e8213b1067326e600ffe5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/S01-probe.json",
+      "sha256": "fe28821a6d0dad2b05be90af9e3be5f7758e2a0c91cc4422e65e01d9c1452e05",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/coverage-validation.json",
+      "sha256": "e0008adaa9af53d11b2a00a705dc65f4495d5cb21cb4dc917b691b27990f2aa8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/existing-engineering-blockers.json",
+      "sha256": "49c8e347a20fecf654f420e1bcc572cfe9563337ba09b84d7df803199d35c7dd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/preparation-receipt.json",
+      "sha256": "91d4b46702be68f3944bd8312b8dc6de13340e49c6d314b190d1823e4ac33cb3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/source-identities.json",
+      "sha256": "a45972ca9ac2dd40f07768c0ec018638de775980124a93959ee7bf26c0260c72",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/creative-input.txt",
+      "sha256": "c2585d78d376e254e033aef097fc2c4d92178ada9650b36b12a3cd46f669a866",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "sha256": "46c2f253c44ea87dd382af48bb28b69c5b0304adba637d03698318de88850464",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/final-output-contract.json",
+      "sha256": "b235b3e167ab6b9aa2b4fdf63fa2b7c920d6eb88a570b425314bd98866740e98",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/goal-binding.json",
+      "sha256": "d0851133f9d5a5b567b182088af76c33684d77952e284114e8a25ba591f959e7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/cli-skill-repair-verification.json",
+      "sha256": "e0905b33b682cca65d082baa30810a9dbdd82e86be97309847f953a356420eea",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/spotting-and-evaluation.md",
+      "sha256": "501e12da6c717642f2169f00f7ed7ca0a3119966f2dd62e14f5059be66581d5e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/production-design.md",
+      "sha256": "4e36e38762bfd55ae6a4ae449c2f07dcb2b572f062058f79f3155ac9e33b0d87",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/shot-prompts.md",
+      "sha256": "14e34cb0368ea4611cc6b8f67e8239e5b7e8f9825580c9eb26973c70a0832c53",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/cold-open-execution-20261026/失帧-两位冷开场加S01-1080p审看版.mp4",
+      "sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S04-接点剪辑修正版-1080p-9.875秒-原声.mp4",
+      "sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S05-Seedance2.5-005-接点连续性修复-原声-20秒.mp4",
+      "sha256": "89497e155e872792dece88eb44db1e165bf44e0213bf04dc6c43dffe6c34b02b",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S02-1080p中英双语字幕版-8秒.mp4",
+      "sha256": "0f475578968d21c23ff593b0a79932caf0bb7391d946793de54db3d9c9b361de",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-真人版-1080p原片-16秒-007.mp4",
+      "sha256": "e65f369828e8e00a311157c7d60abb5f6b0a62e9a5b9245e1695a21e44799691",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S05-Seedance2.5-004-收手与完整取景修复-原声-20秒.mp4",
+      "sha256": "34cfb8fdc2177657670b236acd7c63e0c72ebb2e856d584cfce7ffacf0ad7772",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S03-1080p原片-10秒-待审.mp4",
+      "sha256": "2cb77aa66bdad904c7000dd3142779f0f25e75fca336ddc9976617211bef0788",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S05-Seedance2.5-001-原声-20秒.mp4",
+      "sha256": "2155df692f9ae6fd2e72198f74a4dad53a33d8e70709c7505d7858e6d7231d31",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02-真人连续版-1080p-24秒-无字幕.mp4",
+      "sha256": "3bf9e46f0d64e890adf0c436faadc2a1a8136c6002964416f6372261647a138e",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/失帧-两位冷开场加S01-1080p审看版.mp4",
+      "sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/cumulative-S01-S02-v3/render-002/output/S01-S02-1080p-bilingual-review.mp4",
+      "sha256": "ce7e03ebe8569b3054aa6918eb4006fffb5a6f34c12af813ef44ecb0905e1442",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S03-Seedance2.0-重做005-原声-13秒.mp4",
+      "sha256": "51bf0aaea2deaa8f02fb2a8f3f4f2666a8cd6304e5f9f80f5598fd7eab87368f",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p字幕版-16秒.mp4",
+      "sha256": "ea09423b8e4edda2eb66ebbeb4aceccb9c16cbae63e9a331f209a4c051d9c90d",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02-S03-去重复扫码-1080p-33.875秒-原声.mp4",
+      "sha256": "45fb4e45f815bbe00f42165429dd5f19335e2dbf60ef4206710e09755308f233",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/caption-review-005/bilingual-v4/render-002/output/S01-1080p-caption-review.mp4",
+      "sha256": "3bbf15995bac0e91033be3689b12f16ad1e09f9eb8a78d53a80cb2724a0d16a1",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-D版-Seedance2.5-16秒.mp4",
+      "sha256": "ea0dad2e3ea4a4c964d3a7cdf731d1e96c36a64358b3427dda7adf3aed12cbbc",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p中英双语字幕版-16秒.mp4",
+      "sha256": "3bbf15995bac0e91033be3689b12f16ad1e09f9eb8a78d53a80cb2724a0d16a1",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S02-真人版-1080p原片-8秒-002.mp4",
+      "sha256": "15d6d73ed9dfe01392d024ebeefddef30b5419766dce853b50575b2c8f264ff8",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/caption-review-005/render-004/output/S01-1080p-caption-review.mp4",
+      "sha256": "c5986fff2d0e4400f45db1eac3739fb081682d96c07eda32dcbb4471952bc8e6",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/render-001/output/S01-S02-S03-edit01-review.mp4",
+      "sha256": "588d13ee6efdd406ca5e37c355f461cd520a2726a7bee74a3fd85dcb64b6dee1",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/render-001/verified.mp4",
+      "sha256": "588d13ee6efdd406ca5e37c355f461cd520a2726a7bee74a3fd85dcb64b6dee1",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/render-001/source/assets/4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce.mp4",
+      "sha256": "4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/render-001/source/assets/15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b.mp4",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/render-001/source/assets/9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003.mp4",
+      "sha256": "9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/source/S01-original.mp4",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/project/assets/files/4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce.mp4",
+      "sha256": "4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/project/assets/files/15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b.mp4",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/editorial-repair-01/project/assets/files/9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003.mp4",
+      "sha256": "9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02-S03-真人连续审看版-1080p-43.25秒-待修复.mp4",
+      "sha256": "93a4781380d5983713037964ee65d8eb33fbf37a03448f87bda2a29f0cb0dd89",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/join-S01-S02-S03-006-scan-trim/render-001/output/S01-S02-S03-006-scan-trim.mp4",
+      "sha256": "45fb4e45f815bbe00f42165429dd5f19335e2dbf60ef4206710e09755308f233",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S04-Seedance2.0-001-原声-10秒.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S02-1080p原片-8秒-待审.mp4",
+      "sha256": "4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/cumulative-S01-S02-v1/render-001/output/S01-S02-1080p-bilingual-review.mp4",
+      "sha256": "a7c9782275cb2eaab861cce7413f5bbbe87a73c07282a42422ade7550eccd568",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/caption-review-S02-001/render-001/output/S02-1080p-caption-review.mp4",
+      "sha256": "0f475578968d21c23ff593b0a79932caf0bb7391d946793de54db3d9c9b361de",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S03-真人重生成004-原声-20秒.mp4",
+      "sha256": "4255225065ff4c9a34932d14f94472fb64719533a0cedf7a4f8143fa46b1c353",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S03-真人原声-20秒-待修复.mp4",
+      "sha256": "fb70d66ac802ed1133afffae2b9f4af8b9be0be0493bc2b3119be9866f632c28",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S05-Seedance2.5-003-多镜近景重做-原声-20秒.mp4",
+      "sha256": "760c14af792e466e88a9ac427e1ee2abb3c47ff5f0de35ec4fa183c654a5b801",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-切镜重拍版-Seedance2.5-16秒.mp4",
+      "sha256": "06168bd113436e755cfca82c198677544f95cd82c76c216c65a131a6c59170a3",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-真人版-1080p原片-16秒-006.mp4",
+      "sha256": "27b065ee05b87622265b76484f98cd4390110d375256f26fe304781993f83252",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/caption-review-005/render-005/output/S01-1080p-caption-review.mp4",
+      "sha256": "ea09423b8e4edda2eb66ebbeb4aceccb9c16cbae63e9a331f209a4c051d9c90d",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/join-S01-S02-S03-005/render-001/output/S01-S02-S03-005-native-review.mp4",
+      "sha256": "fbc9b34f583dabb6d86b21a2f1412243ddfea717cb83cf98fd4afdfb5c2d3e9a",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S05-Seedance2.5-002-焦急求证重做-原声-20秒.mp4",
+      "sha256": "67fac2bf925127b257486cf3f359aac56155c038b709e5d4b2da6b0b2a1f1ed0",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02-S03-真人连续版-1080p-36.25秒-原声.mp4",
+      "sha256": "fbc9b34f583dabb6d86b21a2f1412243ddfea717cb83cf98fd4afdfb5c2d3e9a",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02-真人连续版-接点修正版-1080p-23.25秒.mp4",
+      "sha256": "689f019bfd018bf796e59429b03b4badf4320d660644b35cf65bb52bbecdecf7",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02连续版-1080p中英双语-剪辑修正版.mp4",
+      "sha256": "ce7e03ebe8569b3054aa6918eb4006fffb5a6f34c12af813ef44ecb0905e1442",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02连续版-1080p中英双语-24秒.mp4",
+      "sha256": "a7c9782275cb2eaab861cce7413f5bbbe87a73c07282a42422ade7550eccd568",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-001/project/assets/files/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-004/render-001/output/S04-edit-004.mp4",
+      "sha256": "d4d6ca9f1a23b83741c795a2786f1aa1d3b64fde8c70681bab7ad3f909cac81a",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-004/render-001/verified.mp4",
+      "sha256": "d4d6ca9f1a23b83741c795a2786f1aa1d3b64fde8c70681bab7ad3f909cac81a",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-003/render-001/output/S04-edit-003.mp4",
+      "sha256": "b226dd12705dedecfe94c4699958ce810ea70bdb9f8a801e5d3e07135e8b70b6",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-003/render-001/verified.mp4",
+      "sha256": "b226dd12705dedecfe94c4699958ce810ea70bdb9f8a801e5d3e07135e8b70b6",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-004/render-001/source/assets/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-003/render-001/source/assets/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-004/project/assets/files/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/join-S01-S02-S03-live-01/render-001/output/S01-S02-S03-live-native-review.mp4",
+      "sha256": "93a4781380d5983713037964ee65d8eb33fbf37a03448f87bda2a29f0cb0dd89",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-003/project/assets/files/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/join-S01-S02-03/render-004/output/S01-S02-live-native-review.mp4",
+      "sha256": "689f019bfd018bf796e59429b03b4badf4320d660644b35cf65bb52bbecdecf7",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/join-S01-S02-02/render-001/output/S01-S02-live-native-review.mp4",
+      "sha256": "3bf9e46f0d64e890adf0c436faadc2a1a8136c6002964416f6372261647a138e",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-005/render-001/output/S04-edit-005.mp4",
+      "sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-005/render-001/verified.mp4",
+      "sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-005/render-001/source/assets/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-005/project/assets/files/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-002/render-001/output/S04-edit-002.mp4",
+      "sha256": "79858b1227bb81b35f7ca6cb5034a52c073df3409e4c9a1b8f936e71868c9da0",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-002/render-001/verified.mp4",
+      "sha256": "79858b1227bb81b35f7ca6cb5034a52c073df3409e4c9a1b8f936e71868c9da0",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-002/render-001/source/assets/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04-edit-002/project/assets/files/9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff.mp4",
+      "sha256": "9ffd9ef405fbc683ba49dd6044c3653218d525bcbe5cb0e7342c77e6cfc8dbff",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/S06-intent.json",
+      "sha256": "c50adb3b55c3436bb3b7e891a63179d9cf4fa4a9b71e5ca163dfc156ee48e702",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/historical-paid-readback.json",
+      "sha256": "98ec57545a3155b49b64e04ed23c26af7f06ad14406ff22fb60bd30f622ef937",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/native-prompt.draft.zh.txt",
+      "sha256": "d6804adc05733846980242d433108cdb6a2df459109381ede7093077a748cd84",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/bootstrap_preparation.py",
+      "sha256": "3ca27c2aa357530ce0605d2726d772dfd67dd2fb77d8d64bb6c107410ac29583",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/creative-input.txt",
+      "sha256": "09e4fa537850a21df747057a130eba87ec94c965d640ffc41f717049a72de9ae",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/director-validation.json",
+      "sha256": "a10074e8e8d445b21fa44009f7b2434267ca9e4893e447d5d7378e2969a511bb",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/preparation-verification.json",
+      "sha256": "a21851ac37c24a7eef70124e648d92791236858204227dacb8e90a2a08931360",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/predecessor-exact-mcp.json",
+      "sha256": "e15d514b81621201a5cef9e7466ec1ad61d3bb158eed9167fd3cad213381e00d",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/authoring-decisions.txt",
+      "sha256": "d04d1a302555a13250a9a3d3c61179862efc2f0ab2d1916d04faf55dcbd7cdd9",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/canonical-preparation-receipt.json",
+      "sha256": "7582301a824523cce8c95b1d3d57b7b8295c32fd214bc9dab78a17d9ea2fffc0",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/README.md",
+      "sha256": "255d9ac9f6bebf6789da7c49ead52c9cf32983df951c8059f233ea3d2ec2f58a",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/seal_preparation.py",
+      "sha256": "eac62470c4febd144ff343c9ec4a9f294946dc0d4896bbd0597aa03b73af9ef4",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/predecessor-ffprobe.json",
+      "sha256": "5245afc58457dc8782c9f436db34b03b9d14e9a6c9bd5df4a592fb956b20b037",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/reference-evidence.json",
+      "sha256": "c4ad31c223ba8a125b2f34c5fd17a650d0fe6a6396082dbe54c5f3a8d2c9d038",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/prepare_assets.py",
+      "sha256": "bb29417316ad1a8e1790a1c9d72fdcd90a64544cecb7ef66ae16ed01de3c9513",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/image-unit-intent.json",
+      "sha256": "5d716b0c2b33db6e4f468013dc99c3644ac17f22abaf419dfdcb1a03ccdd97ac",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/director-coverage.json",
+      "sha256": "807852e12df0163b7c8bfe97f0a12ca324306192344b4342d73d8c82c9340751",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/inspect_predecessor.py",
+      "sha256": "301e98d7278f3a2bcae23d5294733265c0d0d465c09b167c4d1135a07ea6bc8a",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/authoring-self-review.json",
+      "sha256": "118288678d0c950c63a14265e6e306ee162549a960f484b229249a9e2f744ad2",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/predecessor-current-gate.json",
+      "sha256": "a5b0468ecbfd64cc900430810c860de4715e912f90e13559fe4328cf39d5225f",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/__pycache__/bootstrap_preparation.cpython-313.pyc",
+      "sha256": "eaf640c18b615bf2fff3704e7f039a3d912a8e9975716e6a77f5a5885087d3ee",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/__pycache__/seal_preparation.cpython-313.pyc",
+      "sha256": "84ceadcae03e9cc88d2f70a02f2609286534b2f5b84e88d6a9c665e033ebe122",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/__pycache__/prepare_assets.cpython-313.pyc",
+      "sha256": "794f80d79d553552e0af34d5e8d93081f75498d1dff6d5db710273f692579c5a",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/__pycache__/inspect_predecessor.cpython-313.pyc",
+      "sha256": "a4f9117b0c779123ad0cfb7f427e46d1e7e7dfe962e08d7af6553900176a90c8",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/04-three-person-entry.png",
+      "sha256": "447516b55774be403989512c48385ac9812cc71cad28298fb45aeb88d34fefb0",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/03-linxu-proof-close.source.json",
+      "sha256": "8dd032fb7d4da6b84ca527fc687efe9edd97ef55124ce62906f83920bab33495",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/02-tangjie-medium.source.json",
+      "sha256": "9044ed003ba0bec2f84a35e4b775a263ff9706bdd01ca26f627baa325f5724c9",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/03-linxu-proof-close.png",
+      "sha256": "8e0418fc93c9d875b7f427b7e8a2c6129606d1d61b0550e9ead02537243d6562",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/04-three-person-entry.request.json",
+      "sha256": "f461f27762ef3f7edf310a363b5cd0b0815275f2a321926bdb58dc16d2ea58a5",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/02-tangjie-medium.request.json",
+      "sha256": "1f78442eae4b7c1f9d6b981c595ad0b8b90c56f4cd98820e46743763e0f8785c",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/03-linxu-proof-close.request.json",
+      "sha256": "8fbb46b7423dce4d01f19acfed9c444a3123f8021a1961b7d26351056dc9f2e0",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/01-S05-actual-terminal.png",
+      "sha256": "b5f205fd58d67702aae433828914f1e665dd8c23b5781772c4e4b167eaaa427c",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/02-tangjie-medium.png",
+      "sha256": "96912ed29e644b7667de2fe0d46e121ee299fed3389b7959ddf210fb924f093c",
+      "unchanged": true
+    },
+    {
+      "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S06/references/04-three-person-entry.source.json",
+      "sha256": "9173665b98d7a4d36dde98e785a9521132521f30341579c57d13aab5630b65d8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-27-shizhen-S06-production.md",
+      "sha256": "f236404e03e1ae4773741f8dab7597d979df3ede0fafab3992040d9210b62dc2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/record_for_agent/2026-10-27-shizhen-S06-preparation.md",
+      "sha256": "bf27998605751f6f8db1180a73b1d8db6273b3a3acece3d54cb8a657509149cf",
+      "unchanged": true
+    }
+  ],
+  "checks": {
+    "preserved_sections": 4,
+    "protected_source_count": 146,
+    "protected_mp4_count": 67,
+    "protected_byte_drift": [],
+    "local_links_checked": 51,
+    "broken_links": [],
+    "scene_count": 8,
+    "new_scene_ids": [
+      "Scene03A",
+      "Scene03B"
+    ],
+    "old_shot_ids_reassigned": 0,
+    "left_wrist_injury_and_right_hand_preserved": true,
+    "food_and_phone_continuity_reviewed": true,
+    "original_face_evidence_and_ending_preserved": true,
+    "media_generation_calls": 0,
+    "media_files_modified_by_this_task": 0,
+    "director_coverage_and_prompts_modified": 0,
+    "production_state_writes": 0,
+    "docs_contract": "PASS"
+  },
+  "limits": [
+    "No new media QA or audience acceptance",
+    "New contact action, total runtime, continuity and sound remain NOT_EVALUATED",
+    "Existing FAIL and UNKNOWN outcomes remain owned by production workflow",
+    "Prior creative verification files retain historical hashes"
+  ],
+  "document_package_sha256": "ff11b49ca994d25ce84f570fe8c7ddc344dbc9f2d8b4e54d89f6d8607e5eec5a"
+}

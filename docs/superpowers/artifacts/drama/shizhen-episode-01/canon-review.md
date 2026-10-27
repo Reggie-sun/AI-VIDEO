@@ -6,11 +6,21 @@
 
 状态：既有事实为注明来源的 CONFIRMED CANON；本轮新设定为 PROPOSED CANON，AUTHOR SECRET 不改变待确认等级。
 
-2026-10-27创作开发审查。不是重新签署媒体接受，也不修改 ProductionProject、Registry、Manifest、原剧本或原认可媒体。状态词见 [Series Index](series-index.md)。`source-review-snapshot.json`保存本轮来源清单和读取时字节身份；历史记录为advisory，快照不能把摘要变成用户原话。
+2026-10-27创作开发审查。原世界观／命名／V2轮未修改原剧本；后续用户授权第一集未制作后半改写，适用下方最新增补。不是重新签署媒体接受，也不修改ProductionProject、Registry、Manifest或原认可媒体。状态词见 [Series Index](series-index.md)。`source-review-snapshot.json`保存前轮来源清单和读取时字节身份；历史记录为advisory，快照不能把摘要变成用户原话。
 
 阅读包含第一集全文、制作设计、原始brief、Director coverage与提示词，冷开场剧情／音乐／交接，相关计划与制作／反馈记录。对历史反馈优先打开保存的原话；缺少原对话时明确使用记录转述。本轮通过project-local video-analysis实际重读S01 HD-005与《两位》组合片抽帧；帧样本不等于全片原速观看或声音聆听。没有调用付费／remote识音，也没有重试任何旧UNKNOWN。
 
+## Episode 01 Rewrite Addendum — Existing Shots Frozen
+
+最新用户指令：“那第一集的剧情是不是要修改下,不过已经做了的shot就别改了”。本轮将尚未制作的Scene03–04更新，并新增Scene03A／03B；不触及已产出S01–S05任何版本、S06封存准备、冷开场、片头、原声或旧评价。正文的Scene01–02及Scene05–06逐字保留，前半演出继续以最新真实镜头／用户即时受惊修订为准，不按旧文本重做。
+
+新伤明确为左腕，右手原动作不改；食品掉落不捡回，小票与手机在衣袋，工作室不凭空恢复咖啡。报警和老许接应真实发生，下一集须承接。男人与林序／陆建平身份区别，不是小程复活，也不新增跨街瞬移、光驱鬼、名字即死或第二次主失帧。
+
+唯一场戏正文归screenplay；episode-01-survival-revision现只维护改稿／保护说明。`source-review-snapshot.json`中的screenplay旧哈希自此属于改前来源，不刷新历史去伪装未改；本轮保护与新稿身份见`episode-01-revision-verification.json`。旧V2和命名审读不能自动证明新稿或新媒体通过。本次没有新exact成片、MCP媒体审看或付费生成，以下既有媒体观察保持历史范围。
+
 ## V2 Continuity Addendum
+
+以下为V2整合轮的历史边界；后续未制作剧本改写按上一节最新授权执行，不把这里的“未改”扩展成此后永久禁止修改文本。
 
 P0–P5、R1–R5、帧债与遗帧是后续用户提出的待确认扩展。本轮只写开发文档，不改原第一集、冷开场、coverage、字幕与媒体；编号和名称不成为角色已知事实。林序第一集仍是亲历留忆、职业核查与普通自救，暗帧中的脸仍须原本存在。
 
@@ -23,7 +33,7 @@ E05在本轮细分为P1主动读取，E06才有P2类当下门动作，替代前�
 | Source | Role / current use | Authority limit |
 | --- | --- | --- |
 | [creative-input.txt](creative-input.txt) | 第一集用户原始题材、人物、十一秒与本人反转 | 不包含本轮组织、觉醒、实验起源 |
-| [screenplay.md](screenplay.md) | 完整六场、对白、日期、知识与因果 | 已完成文本，不等于整集已拍；后续用户明确修订优先 |
+| [screenplay.md](screenplay.md) | 原六场与后续店外增补，现行对白、日期、知识与因果 | 四场原正文保留；新增与修改限未制作后半，不等于整集已拍；真实Shot与后续用户修订优先 |
 | [production-design.md](production-design.md) | 原人物锚、空间、道具、声音、D选型史 | 当前文件仍含旧CG／005待审状态，须对照后续记录；不得仅取该页判当前状态 |
 | [director-coverage.json](director-coverage.json)、[shot-prompts.md](shot-prompts.md) | 原ordered coverage与selected-model表达 | 未因本轮Bible新增设定而改动；不是系列世界规则owner |
 | [冷开场原文](cold-open-preparation/creative-input.txt)、[导演稿](cold-open-preparation/director-treatment.md)、[声音稿](cold-open-preparation/music-and-sound.md) | 《两位》、前一夜、独立事件价值、配乐边界 | 含历史准备状态，不作最新完成证据 |
