@@ -1,0 +1,43 @@
+{
+  "source_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-720p-v2/state/video-generation/fetch/files/d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424.mp4",
+  "source_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "size_bytes": 16125077,
+  "review_copy": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-720p-2.0-试片02.mp4",
+  "probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "aac",
+        "codec_type": "audio",
+        "sample_rate": "44100",
+        "channels": 2,
+        "r_frame_rate": "0/0",
+        "avg_frame_rate": "0/0",
+        "duration": "8.096009",
+        "nb_frames": "351"
+      },
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1280,
+        "height": 720,
+        "r_frame_rate": "60/1",
+        "avg_frame_rate": "11580/481",
+        "duration": "8.016667",
+        "nb_frames": "193"
+      }
+    ],
+    "format": {
+      "duration": "8.097000",
+      "size": "16125077"
+    }
+  },
+  "full_decode": true,
+  "original_rate_preserved": true,
+  "detected_scene_change_pts": [
+    3.71667
+  ],
+  "fps_note": "r_frame_rate is not measured playback rate; source timestamps are retained",
+  "quality": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

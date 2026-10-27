@@ -1,0 +1,21 @@
+{
+  "user_quote": "那你就用720p,2.0",
+  "model_id": "seedance_2.0_vip",
+  "resolution": "720p",
+  "duration_seconds": 8,
+  "input_mode": "multimodal",
+  "predecessor_root": "runs/shizhen-macro-opening-20261027/MC01-02",
+  "predecessor_attempt_id": "shizhen-macro-MC01-02-qualification-001",
+  "predecessor_artifact_sha256": "bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4",
+  "predecessor_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/qa/post-media-gate.json",
+  "cut_feedback": "outputs/shizhen-episode01/macro-opening-video-20261027/cut-repair-02/cut-review.json",
+  "known_old_outcome": "FETCHED with visual FAIL and sound NOT_EVALUATED; retained",
+  "explicit_new_output_scope": true,
+  "new_submissions_authorized": 1,
+  "macro_paid_submits_before": 1,
+  "macro_cumulative_ceiling": 2,
+  "no_history_reset": true,
+  "no_unknown_retry": true,
+  "hd_upgrade_authorized": false,
+  "production_activation": false
+}

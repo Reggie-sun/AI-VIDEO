@@ -1,0 +1,42 @@
+{
+  "source_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "source_size_bytes": 16125077,
+  "review_copy": "outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-720p-2.0-试片02.mp4",
+  "resolution": [
+    1280,
+    720
+  ],
+  "duration_seconds": 8.096009,
+  "requested_seconds": 8,
+  "full_video_audio_decode": true,
+  "exact_copy": true,
+  "range_seek_status": 206,
+  "normal_speed_browser_playback": {
+    "ended": true,
+    "rate": 1,
+    "muted": false,
+    "human_hearing": "NOT_EVALUATED"
+  },
+  "native_prompt_lint": {
+    "five_exact_references": true,
+    "five_bound_markers": true,
+    "pure_chinese_body": true,
+    "exact_authored_prompt": true,
+    "no_dialogue_music": true,
+    "correct_cable": true,
+    "duration8": true,
+    "720p": true,
+    "native_audio": true
+  },
+  "post_media_gate": "qa/post-media-gate.json",
+  "independent_review": "qa/independent-media-review.json",
+  "B6_sha256_unchanged": true,
+  "video_calls_this_unit": 1,
+  "macro_cumulative_video_calls": 2,
+  "audio_analysis_calls_this_unit": 1,
+  "actual_charges": "NOT_CONFIRMED",
+  "quality": "FAIL",
+  "publication": "local diagnostic preview only; no activation/acceptance",
+  "next_shot_submitted": false,
+  "shared_runtime_code_changed": false
+}

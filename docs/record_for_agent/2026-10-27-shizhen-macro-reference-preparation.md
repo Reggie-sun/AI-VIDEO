@@ -8,7 +8,7 @@ learning_eligibility: ineligible
 
 Date: 2026-10-27
 
-> **Current Update:** 用户要求继续后，本轮补齐六镜12项静态状态职责。L03/L04与市政组旧阻断已有替代图；下文原检查点保留为历史，最新事实见末尾Continuation 02。视频/平台/人工仍未评估。
+> **Current Update:** 六镜12项静态职责已补齐。随后实际完成首段1080p试片及用户明确选择的720p／Seedance2.0试片02；两版均有已知媒体质量失败，720p版切镜和固定底板形变仍未通过，声音语义未完整确认。下文检查点按时间保留，最新事实见末尾720p段；未提交后续Shot、未改B6、未作人工/Production验收。
 
 ## Initial Scope And Result
 
@@ -108,3 +108,22 @@ seedance-authoring现有8项检查通过；8秒2.0 VIP的五张原图SHA、时�
 MC01/MC02镜头依据已修订：停机与继续滑移同镜不变；待手收回、目光交到牵引点、门到限位后再切，不硬钉第5秒；近景继承中右连接耳、朝右索向、门边限位与同一次受力阶段，在镜内从平直到有限拱起，不接静止细节图等到结束。D0/D1只承担形变前后职责，不自动批准旧构图。此为repair authoring，尚无新媒体，修订效果NOT_EVALUATED；不以转场、变速或冻结假装修复。
 
 现有preparation和审看页同步当前480p要求、切镜失败与能力阻断。seedance-authoring精准测试8项通过，docs_contract_gate通过；切点按exact原片SHA/实际PTS与前后全尺寸帧核对，无新增共享代码行为，不运行完整工程套件。现有Harness policy的并行映射问题仍按旧段保留。record-ai-video-session更新本稳定规则/阻断检查点；distill-ai-video-learning为no_candidate：本次是用户直接规则和同片新观察，不是独立多实验或Skill学习adoption。Risk Gate仍NATIVE_REVIEW_NOT_REQUIRED，由Parent核验规则diff与实际帧；不改并行dirty AGENTS、Provider源码/文档或他人暂存。
+
+
+## User-Selected 720p Seedance 2.0 Preview
+
+用户明确选择“那你就用720p,2.0”，解除前段480p与当前即梦2.0渠道的规格冲突；只覆盖当前试片规格，不构成1080p认可。沿用Seedance2.0指导，生成首段8秒／720p／16:9／multimodal／原生环境声音轨，五张exact参考不换脸或设备。修订重点为收手与视线后的动机切镜、连接耳位置继承、底板固定端与中部曲率；不改剧情、B6、字体或配乐。
+
+当前显式720p规格作为一个新的有界qualification试片单元保存，root为`runs/shizhen-macro-opening-20261027/MC01-02-720p-v2`，任务输入和工具调用器位于`outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2`。经既有bootstrap/committer、GenerationFeedbackOrchestrator、VideoGenerationService、Paid Gate、独立reservation与一用permit执行；没有更改共享源码或模型Production资格。旧1080proot、paid receipt、failed Gate、原片及历史UNKNOWN不变；新封套绑定旧Manifest／原片／预算上限SHA、旧宏观调用1次与新有限单元1次，宏观累计上限2次，未重用旧permit或把历史消费清零。预配置内部上限仍单次1500CRD，宏观两个单元累计上限3000CRD，均非报价；真实扣费尚未结算确认。本轮无自动retry。
+
+同一画布新空视频节点`node_qd3b1733rt`；当前native model config、profile、compiled与resolved输出均明确720p。07:02:51.951138Z接受一次submit，随后poll成功、fetch落盘，视频SHA `d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424`，16,125,077字节，1280×720，约8.097秒，193帧，AAC44.1kHz双声道。审看副本`outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-720p-2.0-试片02.mp4`逐字节一致。播放入口`http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index-720p-v2.html`；保留旧版入口，无直接mux、retime或假装为完整冷开场。
+
+显式project-local video-analysis MCP已调用。精确PTS取帧与本地scene检测定位切点3.71667秒；MCP scene列表依然只报1场，未把工具漏检冒充无切镜。新片工人收手更完整，灯灭后门继续向右、两段索路及同一设备仍可辨；但近景仍把连接耳从约70%画宽跳到41%，未落实中右位置继承。4–8秒有渐进几何变化，因此不再写成“静止底板”；画面更像整块底板右缘翘离，未清楚表现螺栓固定而中部独立拱曲。七项Gate中action/camera FAIL、sound NOT_EVALUATED；后续Shot不提交，1080p未生成。
+
+按当前open-video Creative Completion要求启用一个native只读`reviewer_high`，任务`/root/macro720_review`，无nested delegation。先独立检查五张参考和意图，再检查actual MP4 SHA与17张exact PTS帧；没有把Parent结论或工具成功当输入。R1提出参考可能导致整板翘离；actual R2提出SHZ720-R01（4–8秒整板翘离）与SHZ720-R02（3.71667秒位置重置），Parent均CONFIRMED。其能力限制是静态序列，未完成原速连续观看／听音；不宣称human或独立正常速度验收，记录归qa/independent-concept-review.json、independent-media-review.json。
+
+当前新MP4另外执行一次带exact SHA的盲音频理解development unit，HTTP200，Gemini3.8Flash实际返回持续风／气流、金属碰撞和低环境轰鸣，无语音片段。观察不能可靠证明雨／交通／马达停声及持续摩擦的因果时序，human listening仍未完成，sound保留NOT_EVALUATED。只对新源分析一次，未重复旧UNKNOWN或旧音频unit；0.05USD为内部保护上限，非报价，实际结算待确认。
+
+验证包括源／副本SHA、1280×720输出、全声画decode、17张实际源PTS帧、Range206、独立Chromium1.0x原声开启播放到结尾、B6保护SHA不变。receipt为`outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/verification.json`，逐项裁决为`qa/post-media-gate.json`。任务调用脚本py_compile、docs_contract_gate通过，无共享实现变更，不追加完整工程回归，也不把技术成功当媒体PASS。候选仍FAIL，Production activation/P6/Final Acceptance均无。下一修复应先解决参考主导的近景构图及固定端几何，声音走EVIDENCE_REPAIR_FIRST，不再仅改秒点或重复同Prompt。
+
+record-ai-video-session记录本稳定交付／失败检查点；distill-ai-video-learning评估no_candidate：同一来源修复链中同时改变了分辨率与创作表达，不能归因于版本或分辨率，也没有足够独立证据采纳通用规则。代码Implementation Risk Gate为NATIVE_REVIEW_NOT_REQUIRED；媒体所需独立只读复核已完成，但未解决blocker，不能称镜头或完整开场已完成验收。

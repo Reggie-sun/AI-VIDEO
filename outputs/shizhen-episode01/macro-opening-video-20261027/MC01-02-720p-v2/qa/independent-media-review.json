@@ -1,0 +1,34 @@
+{
+  "agent_task": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "round": 2,
+  "authority": "read_only_advisory",
+  "source_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "actual_scope": "Verified SHA and viewed all17 existing source-PTS frames; no normal-speed full viewing or hearing",
+  "findings": [
+    {
+      "id": "SHZ720-R01",
+      "severity": "blocking_candidate",
+      "time_window": [
+        4,
+        8
+      ],
+      "observation": "Plate right edge develops gap over its full height; upper/lower right bolts move with plate; central bow between fixed anchors is not distinct",
+      "parent_disposition": "CONFIRMED",
+      "reason": "Actual frames09→17 support whole-plate separation rather than clearly anchored middle curvature"
+    },
+    {
+      "id": "SHZ720-R02",
+      "severity": "blocking_candidate",
+      "time_window": [
+        3.5,
+        4.0
+      ],
+      "cut_pts_seconds": 3.71667,
+      "observation": "Connection moves from about70% frame width to41%; cut resets the target location despite same rope direction and visible stop",
+      "parent_disposition": "CONFIRMED",
+      "reason": "Camera has again adopted close-reference layout instead of the authored match; user-rejected abrupt spatial jump remains"
+    }
+  ],
+  "acceptance": false
+}

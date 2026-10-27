@@ -1,0 +1,66 @@
+{
+  "shot_id": "MC01-02",
+  "attempt_id": "shizhen-macro-MC01-02-720p-preview-002",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-720p-v2/state/video-generation/fetch/files/d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424.mp4",
+  "artifact_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "artifact_size_bytes": 16125077,
+  "resolution": [
+    1280,
+    720
+  ],
+  "intent_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/row.json",
+  "required_findings": [
+    {
+      "requirement_id": "action",
+      "verdict": "FAIL",
+      "evidence": "qa/frames/frame-09.png through frame-17.png; qa/independent-media-review.json",
+      "reason": "本版确有渐进几何变化，但更像底板整体翘离，未清楚区分螺栓固定与中部独立拱曲"
+    },
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "evidence": "qa/frames; qa/video-analysis.json",
+      "reason": "同一工人、服装、设备及雨夜场地，未见身份替换"
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "PASS",
+      "evidence": "qa/frames/frame-01.png through frame-08.png",
+      "reason": "门同镜向右，两段正确索路，工人未进入索路"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "FAIL",
+      "evidence": "qa/frame-index.json; qa/technical-probe.json; qa/independent-media-review.json",
+      "reason": "切点3.71667秒；收手比首版完整，但连接耳仍由画面中右跳到中左，近景位置继承未实现，不能称原切镜问题已修好"
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "PASS",
+      "evidence": "qa/frames/frame-02.png through frame-08.png",
+      "reason": "操作停止后手收回，再观察设备，未再次反复按控制，保持安全距离；不等于人工自然表演认可"
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "evidence": "qa/video-analysis.json; qa/frames",
+      "reason": "1280x720原生输出，雨夜实拍质感连续，平台AI生成标识保留，未见爆炸/鬼影/片名字幕"
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/native-audio-result.json",
+      "reason": "盲分析观察到持续风/气流、金属撞击及低环境轰鸣，无语音片段；未可靠区分雨/车流/马达停机及持续摩擦时序，human listening未完成"
+    }
+  ],
+  "verdict": "FAIL",
+  "execution_disposition": "STOP_CURRENT_UNIT_NO_NEXT_SHOT",
+  "reason": "User-authorized single720p preview finished; cut and anchored-deformation requirements still fail",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "new_video_calls_this_unit": 1,
+  "macro_video_calls_cumulative": 2,
+  "new_audio_analysis_calls": 1,
+  "actual_charges": "NOT_CONFIRMED",
+  "next_repair_target": "Reference-driven close-view framing and anchored plate geometry, before another paid preview; audio EVIDENCE_REPAIR_FIRST"
+}

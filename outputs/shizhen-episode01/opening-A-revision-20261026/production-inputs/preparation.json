@@ -2,20 +2,21 @@
   "selected_provider": "jimeng",
   "selected_model_family": "seedance_2.0",
   "surface": "existing Jimeng workflow",
-  "resolution": "480p",
+  "resolution": "720p",
   "aspect_ratio": "16:9",
   "native_prompt_language": "zh",
   "director_input": "MACRO-SHOTBOARD-20261027.md",
   "references": "macro-reference-review-20261027/preparation-report.json",
   "mode": "multimodal",
-  "runtime_profile": "NOT_SEALED_FOR_REQUESTED_480P",
+  "runtime_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/profile.json",
   "execute_ready": false,
   "blocking_prerequisites": [
-    "用户要求先480p且保留2.0；当前即梦2.0全模态没有480p档位，不能提交",
-    "约5.2167秒切镜已被用户否定，按修订分镜重新建立切前视线、连接位置与受力阶段",
-    "底板渐进形变和声音语义仍未通过；保留上一attempt，不自动提交下一Shot"
+    "720p试片02切点3.71667秒，近景仍重置连接耳位置，切镜问题未通过",
+    "底板出现渐进变化但更像整体翘离；需固定端与中部曲率的清楚区别",
+    "声音语义仍NOT_EVALUATED，先EVIDENCE_REPAIR_FIRST",
+    "本轮有界一次720p已消费，后续Shot未提交；1080p仍须用户明确认可"
   ],
-  "paid_generation_calls": 1,
+  "paid_generation_calls": 2,
   "production_activation": false,
   "previous_preparation": {
     "selected_provider": "jimeng",
@@ -55,11 +56,11 @@
     ],
     "paid_generation_calls": 0
   },
-  "execution_status": "PREVIEW_REQUIRED_CAPABILITY_GAP",
+  "execution_status": "USER_720P_PREVIEW_FETCHED_POST_MEDIA_FAIL",
   "execution_root": "outputs/shizhen-episode01/macro-opening-video-20261027",
   "authorization_quote": "生成視頻",
-  "first_event_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/qa/post-media-gate.json",
-  "first_event_review": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index.html",
+  "first_event_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/qa/post-media-gate.json",
+  "first_event_review": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index-720p-v2.html",
   "previous_resolution_preparation": {
     "resolution": "1080p",
     "runtime_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/profile.json",
@@ -73,5 +74,17 @@
   "model_switch_authorized": false,
   "hd_upgrade_authorized": false,
   "cut_revision": "outputs/shizhen-episode01/macro-opening-video-20261027/cut-repair-02/cut-review.json",
-  "last_generated_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/profile.json"
+  "last_generated_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/profile.json",
+  "previous_480p_readiness": {
+    "resolution": "480p",
+    "runtime_profile": "NOT_SEALED_FOR_REQUESTED_480P",
+    "execution_status": "PREVIEW_REQUIRED_CAPABILITY_GAP",
+    "blocking_prerequisites": [
+      "用户要求先480p且保留2.0；当前即梦2.0全模态没有480p档位，不能提交",
+      "约5.2167秒切镜已被用户否定，按修订分镜重新建立切前视线、连接位置与受力阶段",
+      "底板渐进形变和声音语义仍未通过；保留上一attempt，不自动提交下一Shot"
+    ]
+  },
+  "user_resolution_exception": "那你就用720p,2.0",
+  "current_attempt_evidence": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2"
 }

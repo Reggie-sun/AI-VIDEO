@@ -1,0 +1,239 @@
+{
+  "shot": {
+    "shot_id": "MC01-02",
+    "scene_id": "municipal-entrance",
+    "storyboard_beat_id": "municipal-load-persists",
+    "intent": "参考素材1{{image:0}}负责同一工人、设备、工作灯亮着的起态与中远景构图；素材2{{image:1}}负责停机后灯灭而门继续右移；素材3{{image:2}}负责门到右侧限位后的设备位置。素材4{{image:3}}与素材5{{image:4}}只指导同一四螺栓底板由平直到有限拱起的几何差异，不照搬两张细节图的取景，不拼图。\n雨夜市政检修入口，真人实拍质感。先以稳定斜侧中远景看清控制箱旁戴黄色安全帽的深蓝工作服工人、左前固定绞盘、右侧滑轮、滑门与后景正常车流。门接近限位，工人右手按下停止按钮，亮着的工作灯熄灭、马达停声，随后收回手。保持这个画面，让观众清楚看见灯灭之后门仍沿导轨向右滑动，直到抵住固定限位。工人眉头稍收，呼吸平稳，先确认控制箱，再将视线转向被拉紧的牵引连接，停在安全距离，不再反复按按钮，也不走向钢索。\n等门确已抵住限位、工人视线落到牵引点，再顺着他的注视切入同侧连接近景，不按固定秒数切。连接耳仍在画面中右，钢索仍朝右延伸，门边固定限位与部分门体同框，能立即认出前镜的同一处；不突然换到反侧，不把连接耳跳到画面左边。切前后的门处于同一个已到限位的阶段，不重新滑动或重复反应。\n近景起初四螺栓底板仍平直；绷紧钢索继续拉住牵引耳，底板上、下螺栓固定，中部在镜内缓慢但清楚地向外拱起，边缘出现可辨的阴影间隙，有限形变而不断裂。形变是金属几何发生改变，不只是灯光反射或雨水流动，不能用一张静止连接图结束。\n钢索只有绞盘到右侧滑轮、右滑轮折返到门牵引耳两段，不增加绞盘直接连门的第三条索。雨声和正常车流一直存在，按停止后马达保持安静，受力金属低沉摩擦继续；无对白、配乐或惊吓重击。全程自然原速、同一人物设备与雨夜灯光，不慢动作、闪屏、黑屏、鬼影、火花、爆炸、片名、字幕或说明文字。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 8
+    },
+    "character_ids": [
+      "municipal-worker"
+    ],
+    "continuity_constraints": [
+      "保持原分镜宏观事件与五张参考状态",
+      "停机后门仍移动须同中远景读清",
+      "只在注意方向建立后同侧切连接近景",
+      "不改B6、字体、音乐与后续剧情"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "用户明确选720p、Seedance2.0，首段8秒有界试片；修复原5.2167秒突兀切镜及未发生的底板形变"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "character_reference",
+        "asset_id": "MC01-02-ref-1",
+        "owner_id": "municipal-worker"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "MC01-02-ref-2"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "MC01-02-ref-3"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "MC01-02-ref-4"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "MC01-02-ref-5"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "雨夜市政检修入口，工作灯亮着，工人站在控制箱旁，绞盘沿正确索路牵引滑门向右靠近固定限位。",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "工作灯熄灭、马达停止；门已抵住右侧固定限位，索仍绷紧，四螺栓底板中部有限拱起而不断裂。",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "municipal-worker"
+        ],
+        "preservation": "exact",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "municipal-entrance",
+        "time_of_day": "雨夜",
+        "mood": "城市正常运作中出现不可解释的持续受力",
+        "state_constraints": [
+          "同一工人、设备、索路及雨夜",
+          "两段索路，无绞盘直连门的第三索",
+          "不加机制、鬼影、爆炸、字幕或音乐"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "工人位于控制箱旁，绞盘左前，固定滑轮右侧，滑门沿导轨向右",
+        "screen_direction": "滑门向右至固定限位，不镜像",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "工人不靠近或跨越绷紧钢索"
+      },
+      "axis_continuity": {
+        "camera_axis": "设备斜侧同侧",
+        "framing_continuity": "切前后连接耳维持画面中右、索向朝右、门边限位同框；切后继承门已到限位阶段再呈现底板拱起",
+        "crossing_policy": "同侧切近景，不越轴"
+      },
+      "subject_action": {
+        "start_state": "雨夜市政检修入口，工作灯亮着，工人站在控制箱旁，绞盘沿正确索路牵引滑门向右靠近固定限位。",
+        "progression": "门接近限位，工人右手按下停止按钮，亮着的工作灯熄灭、马达停声，随后收回手。保持这个画面，让观众清楚看见灯灭之后门仍沿导轨向右滑动，直到抵住固定限位。工人眉头稍收，呼吸平稳，先确认控制箱，再将视线转向被拉紧的牵引连接，停在安全距离，不再反复按按钮，也不走向钢索。\n等门确已抵住限位、工人视线落到牵引点，再顺着他的注视切入同侧连接近景，不按固定秒数切。连接耳仍在画面中右，钢索仍朝右延伸，门边固定限位与部分门体同框，能立即认出前镜的同一处；不突然换到反侧，不把连接耳跳到画面左边。切前后的门处于同一个已到限位的阶段，不重新滑动或重复反应。\n近景起初四螺栓底板仍平直；绷紧钢索继续拉住牵引耳，底板上、下螺栓固定，中部在镜内缓慢但清楚地向外拱起，边缘出现可辨的阴影间隙，有限形变而不断裂。形变是金属几何发生改变，不只是灯光反射或雨水流动，不能用一张静止连接图结束。\n",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "工作灯熄灭、马达停止；门已抵住右侧固定限位，索仍绷紧，四螺栓底板中部有限拱起而不断裂。",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "右手按停止，工作灯与马达停止",
+        "peak": "滑门继续向右至固定限位",
+        "settle": "底板中部向外有限拱起，螺栓固定、连接不断裂",
+        "direction": "同一索路向右",
+        "amplitude_class": "小幅但清晰可辨"
+      },
+      "pacing": {
+        "cadence": "停机、继续滑移、工人确认与注视、同侧切近景看有限形变",
+        "tempo_class": "自然原速，完整行动与反应",
+        "shot_duration_seconds": 8.0
+      },
+      "camera_intent": {
+        "movement": "中远景停机与继续右移清楚后，沿工人视线切同侧近景",
+        "stability": "稳定",
+        "framing_intent": "切前后连接耳维持画面中右、索向朝右、门边限位同框；切后继承门已到限位阶段再呈现底板拱起",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "斜侧中远景",
+        "end_framing": "同侧连接近景，连接耳中右，门边限位同框",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "按下停止后门仍继续受力移动",
+        "visible_response": "先确认控制箱，再看向仍受力的牵引点",
+        "gaze_target": "控制箱后牵引点",
+        "body_behavior": "保持安全距离，不靠近钢索",
+        "hand_behavior": "右手按停止后收回，不反复按按钮",
+        "terminal_performance_state": "注意落到受力连接，不夸张惊吓",
+        "character_directions": [
+          {
+            "character_id": "municipal-worker",
+            "screen_identity": "控制箱旁工人",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "右手按下停止控制，工作灯熄灭、马达声停止",
+                "emotion": "普通作业中发现停止后仍有受力，克制疑惑",
+                "intensity": "subtle",
+                "facial_expression": "眉头稍收",
+                "gaze_target": "先确认控制箱，再看牵引连接",
+                "breathing": "呼吸平稳",
+                "body_behavior": "右手按停止后收回，目光交到牵引连接，保持安全距离，不反复按按钮"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "正常速度的真人摄影质感",
+        "palette": "雨夜冷灰与实用灯",
+        "material_treatment": "湿地、金属、雨水与真实工作服",
+        "prohibited_visual_drift": [
+          "慢动作、闪屏、黑屏、鬼影、火花或爆炸",
+          "片名、字幕、说明文字或分格"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "工作灯与道路路灯",
+        "direction": "同参考雨夜实用光",
+        "exposure_priority": "控制灯态、滑移、索路及底板弯曲可读",
+        "continuity_state": "工作灯熄灭，路灯与雨夜交通继续"
+      },
+      "ambience_intent": {
+        "environment_bed": "持续雨声、正常道路车流，马达在按停止后停止",
+        "foley_cues": [
+          "持续受力的金属摩擦声"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "municipal-worker",
+        "relation_kind": "fixed_frame",
+        "start_relation": "工人、设备、钢索与滑门同框",
+        "end_relation": "连接近景表现有限形变"
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 8,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424\",\n  \"source_size_bytes\": 16125077,\n  \"audio_sha256\": \"1bfbe9ab030bfffc3784222075fec345d0827ef771c4e263ed07aa491cc4927f\",\n  \"audio_size_bytes\": 1429628,\n  \"duration_seconds\": 8.103764172335602,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"c065810dc387bdff69a8f133a80cdd3bfdc08e2e786830487c014af0619de4fd\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"68b8c81a359fae24ac8eb1c98b7f187edbe588a3b5d00b6d6177f3e1e308f0e5\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"continuous wind or air rushing noise\",\n      \"sharp metallic latch or car door slamming sound\",\n      \"low ambient environmental rumble\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-720p-v2/state/video-generation/fetch/files/d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}
