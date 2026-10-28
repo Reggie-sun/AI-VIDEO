@@ -6,6 +6,8 @@ learning_eligibility: ineligible
 
 # Shizhen Macro Reference Preparation
 
+> **Current Update — 2026-10-28:** 用户认可停止完整城市白模，改用位置总图和写实参考。新包见 `MC00-reference-revision-20261028/`；四次制图全部 known，当前只作静态候选，站棚形制及工人动作仍有限制。总览已同步唯一市政原片末态；旧 proxy FAIL、楼梯 FAIL、正式视频准入及原速声画验收缺口保持。期间先完成 OMX 图片 stdin 热修复，见独立 runtime record。
+
 Date: 2026-10-27
 
 > **Current Update — City Reveal Move Confirmed:** 用户追问运镜质感后认可“屋檐滴雨→横移揭示城市→沿路网下降→减速交给钢索、工人与控制盒”的方向，回复“可以”。两稿已据此修订MC00，保留六镜及B6。确认仅限运镜方向，不冒充真实连续运动、最终Production Shot或全段事件一镜到底的批准；本轮没有生成媒体。详见 City Reveal Move Revision。
@@ -398,3 +400,21 @@ native executor在`outputs/shizhen-episode01/macro-opening-video-20261028/MC00-c
 用户否定白模后不继续扩大准入工程：这版不能证明照片到轨迹的可达性，创建新schema也不能把失败输入变成PASS。当前制作目标尚未完成。下一步须从写实首尾与中间城市参考重新建立可信空间和摄影对应；真实可达性不足保持NOT_EVALUATED，再决定现有owner所需的最小变更。MC03旧FAIL、原市政与B6保护继续有效。
 
 本轮新平台节点0、upload0、generation POST0、付费生成0、消费积分0；240仅为读取报价。没有新图像／正式视频生成，也没有Production activation／P6／Final Acceptance。所有当前文件是失败证据或未提交草稿，不能按prepare脚本exit0声称可以提交。record-ai-video-session记录稳定FAIL检查点，distill-ai-video-learning为no_candidate：单次被否定代理预演不是模型规律或成熟工作流证据，不改Skill／Policy。其他窗口dirty/staged源码与测试保持原状。
+
+## City Map And Photographic Revision — 2026-10-28
+
+用户问是否有必要做白模，Parent建议停止完整城市白模，改用城市总图、连贯写实参考及确有必要时的局部几何验证；用户回复“可以”。这只更改制作准备方式，保留屋檐外转角揭示、同路缓弧下降、地标显露与市政精确落点，不删除连续镜头要求。既有失败 blend／proxy 保留，不作为新参考输入或实际路径依据。
+
+本轮在 `referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/` 制作可编辑 SVG 位置总图、Chromium 直接渲染 PNG、三种摄影位置候选和市政原片末态对照。位置图为新设计，图中方向／高度是估计，不从原片或退回白模推导既有地理事实。屋檐建筑在道路西侧，近处住宅、站棚、市政区沿东侧依次展开；市政前方设计为与街面相连的开放铺地，路线从站棚北端接近，停在牵引线外。箭头并不证明实际运动可行。
+
+内置 image_gen 新单元上限四次、45分钟：城市展开、一次针对高台／围墙及住宅纵深的有界修订、屋檐和下降。全部 known 返回，原始 PNG exact copy 保存，无 retry／fallback／unknown；费用和具体模型 ID 未暴露。首张 `01-city-reveal-v1.png` 仍有高台围墙，保留 FAIL；`01-city-reveal-v2.png` 消除明显横断高墙和高台，近住宅回到画边，站棚北端到作业区左前方可见连续铺地。其他两图是 `02-eave-start-v1.png` 与 `03-descent-v1.png`。图像实际宽1672、高940或941、RGB，未暗中归一成1080p；四份纯中文实际 prompt、引用顺序、exact SHA、文件规格归 generation-intent／verification，真实调用次数不并入视频额度。
+
+Parent与独立 native executor实际看图后，只接受为有限静态构图／位置候选：道路侧别与地标近远关系可读，未见明显高台或横断墙重新出现；不能证明精确海拔、全程净空、逐建筑对应或地标实际显露。城市图和下降图的站棚仍有广告板、厚顶檐／框架，与B6透明玻璃形制不一致，提示词虽要求修正也不能据此签已执行。下降图工人前臂伸向控制盒区域，静图不能判定是否按停，不作为动作末态。远景索端不足以精核，机械细节仍以MC01真实锚点为准。没有继续生图掩盖这些已知限制，四次有限单元已关闭。
+
+完整 MC00–06＋B6 总览同步新的四个 MC00 展示槽；第四槽直接用 `MC01-normal.png`，不再把旧近同构生成图叫末态。其他17项与完整B6未替换，旧MC00条目和旧验证字段保留历史。市政MP4 SHA与B6 SHA本轮重验一致。城市、旧白模与总览README补充当前路线，详细分镜只同步制作方式，不改剧情或切点。
+
+因用户要求“先修复”，制作中暂停处理全局 OMX `native_hook_stdin_oversized`：当前0.21.38 stdin 1MiB不足以容纳多张图base64返回，有限上限改32MiB并保持拒绝语义；补丁、真实图片字节复现及针对性测试见[独立记录](2026-10-28-omx-native-hook-image-stdin.md)。这是本机安装热修复，不是媒体通过，也不改变 Production Gate。
+
+当前新视频0、平台视频提交0、音乐0，未创建新Production／permit或把新图自动替换进正式草稿。2.5首尾模式不能实际绑定整包中间图，既有不同景别 compatibility 缺口保持，七项未签真；不修改 shared contract、Gate 或视频预算。连续运动、声音、精确市政接点和人工验收均 NOT_EVALUATED，旧楼梯 FAIL 保持。按 record-ai-video-session 续记同主题，自动 distill-ai-video-learning 评估 no_candidate：单组同源静态参考修订不足以推导通用模型服从规则。
+
+实际浏览器验证了修订页7张图片和完整总览21张图片全部解码，桌面1440px及手机390px无横向溢出；相对图片／页面链接均可解析。21项总览的exact SHA与各自源文件重新比较一致，四次实际引用和纯中文prompt的hash一致，文档contract通过。这里只验证参考归档与静态页面，不执行视频Gate或将未见的动态／声音项目签为通过。

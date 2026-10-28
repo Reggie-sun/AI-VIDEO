@@ -1,5 +1,9 @@
 # MC00 City Static Reference Candidates
 
+## Superseded Route — 2026-10-28
+
+本目录保留早期白模静态历史。后续白模视频已被用户退回、判 FAIL，完整城市白模停止；当前转为[城市位置总图与写实参考](../MC00-reference-revision-20261028/README.md)。不把这里的布局或旧静帧评语继承为新路线的可行性通过。
+
 ## Review
 
 打开[index.html](index.html)依次查看空间总图、城市总览、屋檐起幅、揭示后视野、住宅／站棚位置、接近市政及末态，再与已认可MC01第0帧比较。图像、颜色与工人均为几何proxy，只有07图为已认可源视频抽帧。新城市设计尚未获用户确认。

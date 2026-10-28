@@ -14,8 +14,26 @@
   "static_image_count": 21,
   "image_checks": [
     {
-      "file": "MC00-02-eave-start-v1.png",
-      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+      "file": "../MC00-reference-revision-20261028/02-eave-start-v1.png",
+      "sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68",
+      "dimensions": [
+        1672,
+        940
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "../MC00-reference-revision-20261028/01-city-reveal-v2.png",
+      "sha256": "369dace30bde62a9378d2f019f0ae9d4ff225dd7cbdab324b141bffdba87360c",
+      "dimensions": [
+        1672,
+        940
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "../MC00-reference-revision-20261028/03-descent-v1.png",
+      "sha256": "fd124857eaf1c8ac6b96c2cac29037248661c3dbfbfe24fd30c256e257565654",
       "dimensions": [
         1672,
         941
@@ -23,29 +41,11 @@
       "source_bytes_match": true
     },
     {
-      "file": "MC00-01-city-reveal-v1.png",
-      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "file": "MC01-normal.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
       "dimensions": [
-        1672,
-        941
-      ],
-      "source_bytes_match": true
-    },
-    {
-      "file": "MC00-03-descent-v2.png",
-      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
-      "dimensions": [
-        1672,
-        941
-      ],
-      "source_bytes_match": true
-    },
-    {
-      "file": "MC00-04-site-end-v1.png",
-      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
-      "dimensions": [
-        1672,
-        941
+        1920,
+        1080
       ],
       "source_bytes_match": true
     },
@@ -406,5 +406,45 @@
   ],
   "validation_level": "task-local static assets, source identity, page and documentation only",
   "verdict": "FULL_REFERENCE_CATALOGUE_READY_FOR_USER_REVIEW",
-  "learning_outcome": "no_candidate"
+  "learning_outcome": "no_candidate",
+  "previous_mc00_checks_20261027": [
+    {
+      "file": "MC00-02-eave-start-v1.png",
+      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC00-01-city-reveal-v1.png",
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC00-03-descent-v2.png",
+      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC00-04-site-end-v1.png",
+      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    }
+  ],
+  "updated_at": "2026-10-28T18:52:12.520069+00:00",
+  "changed_scope": "MC00 reference slots only; all other shots retained"
 }

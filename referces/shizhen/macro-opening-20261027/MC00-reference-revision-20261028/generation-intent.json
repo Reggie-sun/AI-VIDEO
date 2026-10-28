@@ -1,0 +1,127 @@
+{
+  "purpose": "MC00 reference revision without full-city whitebox",
+  "provider": "image_gen.imagegen built-in",
+  "max_calls": 4,
+  "primary_views": [
+    "city-reveal",
+    "eave",
+    "descent"
+  ],
+  "repair_allowance": 1,
+  "time_bound_minutes": 45,
+  "started_epoch_seconds": 1793212876.978765,
+  "actual_model_id": "NOT_EXPOSED",
+  "actual_billing": "NOT_EXPOSED",
+  "video_calls": 0,
+  "unknown_outcome_rule": "STOP; no retry or fallback",
+  "calls": [
+    {
+      "id": "01-reveal",
+      "status": "KNOWN_OUTPUT",
+      "prompt": "01-reveal-prompt.zh.txt",
+      "prompt_sha256": "b37c1b3e4294a03a52be24b7f3717de8f0011e89bace2affba4036c3d438538f",
+      "inputs": [
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/city-map.png",
+          "sha256": "de2e58e9ea9416acc1ada1137bac62e72e513774f5a62e4b1f777bae9c6ef73a"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-v1.png",
+          "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+          "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/B6-entry.png",
+          "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812"
+        }
+      ],
+      "output": "01-city-reveal-v1.png",
+      "sha256": "c239ae68277afc0e8e73a632dc005959eee28c1e04872140f533d1d3ca9aae36",
+      "verdict": "FAIL: raised site platform and wrong residence depth"
+    },
+    {
+      "id": "01-reveal-repair",
+      "status": "KNOWN_OUTPUT",
+      "prompt": "01-reveal-repair-prompt.zh.txt",
+      "prompt_sha256": "6ebd3009565d28edb80098c87f10fa703a000642e00b1ba98b77fa8563e4e050",
+      "inputs": [
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/01-city-reveal-v1.png",
+          "sha256": "c239ae68277afc0e8e73a632dc005959eee28c1e04872140f533d1d3ca9aae36"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/city-map.png",
+          "sha256": "de2e58e9ea9416acc1ada1137bac62e72e513774f5a62e4b1f777bae9c6ef73a"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+          "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/B6-entry.png",
+          "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812"
+        }
+      ],
+      "output": "01-city-reveal-v2.png",
+      "sha256": "369dace30bde62a9378d2f019f0ae9d4ff225dd7cbdab324b141bffdba87360c",
+      "verdict": "LIMITED_LAYOUT_ONLY; platform/wall addressed, shelter gap remains"
+    },
+    {
+      "id": "02-eave",
+      "status": "KNOWN_OUTPUT",
+      "prompt": "02-eave-prompt.zh.txt",
+      "prompt_sha256": "cadfde2fb9e695d582fcc5534d41dc030c74153942a737d5c0c481bdab1fb3d9",
+      "inputs": [
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/01-city-reveal-v2.png",
+          "sha256": "369dace30bde62a9378d2f019f0ae9d4ff225dd7cbdab324b141bffdba87360c"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
+          "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/city-map.png",
+          "sha256": "de2e58e9ea9416acc1ada1137bac62e72e513774f5a62e4b1f777bae9c6ef73a"
+        }
+      ],
+      "output": "02-eave-start-v1.png",
+      "verdict": "STATIC_CANDIDATE_ONLY; same-city motion NOT_EVALUATED",
+      "sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68"
+    },
+    {
+      "id": "03-descent",
+      "status": "KNOWN_OUTPUT",
+      "prompt": "03-descent-prompt.zh.txt",
+      "prompt_sha256": "eb81d95001e58f5fa7ddbf8c9f91a8cb409376fe03996f39a82308a545009289",
+      "inputs": [
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/01-city-reveal-v2.png",
+          "sha256": "369dace30bde62a9378d2f019f0ae9d4ff225dd7cbdab324b141bffdba87360c"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+          "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/B6-entry.png",
+          "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812"
+        },
+        {
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/city-map.png",
+          "sha256": "de2e58e9ea9416acc1ada1137bac62e72e513774f5a62e4b1f777bae9c6ef73a"
+        }
+      ],
+      "output": "03-descent-v1.png",
+      "verdict": "LIMITED_LAYOUT_ONLY; shelter and raised forearm gaps remain",
+      "sha256": "fd124857eaf1c8ac6b96c2cac29037248661c3dbfbfe24fd30c256e257565654"
+    }
+  ],
+  "status": "BOUNDED_UNIT_CLOSED_ALL_OUTCOMES_KNOWN",
+  "actual_calls": 4,
+  "remaining_calls": 0,
+  "unknown_outcomes": 0
+}

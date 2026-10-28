@@ -4,43 +4,45 @@
   "items": [
     {
       "shot": "MC00",
-      "file": "MC00-02-eave-start-v1.png",
-      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
-      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
-      "title": "屋檐滴雨与遮挡起幅",
-      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "file": "../MC00-reference-revision-20261028/02-eave-start-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/02-eave-start-v1.png",
+      "sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68",
+      "title": "屋檐滴雨与外转角起幅",
+      "basis": "新写实候选；遮挡与城市一角共存，连续横移待验",
       "copy": "EXACT_BYTES",
       "production_binding": false
     },
     {
       "shot": "MC00",
-      "file": "MC00-01-city-reveal-v1.png",
-      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-v1.png",
-      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "file": "../MC00-reference-revision-20261028/01-city-reveal-v2.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/01-city-reveal-v2.png",
+      "sha256": "369dace30bde62a9378d2f019f0ae9d4ff225dd7cbdab324b141bffdba87360c",
       "title": "横移后城市展开",
-      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "basis": "修正高台／围墙；站棚外形仍有偏差，仅作位置参考",
       "copy": "EXACT_BYTES",
       "production_binding": false
     },
     {
       "shot": "MC00",
-      "file": "MC00-03-descent-v2.png",
-      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/03-descent-v2.png",
-      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
-      "title": "沿路下降与地标定位",
-      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "file": "../MC00-reference-revision-20261028/03-descent-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/03-descent-v1.png",
+      "sha256": "fd124857eaf1c8ac6b96c2cac29037248661c3dbfbfe24fd30c256e257565654",
+      "title": "沿同一主路下降接近",
+      "basis": "开放地面与地标位置候选；工人动作、站棚身份未通过",
       "copy": "EXACT_BYTES",
       "production_binding": false
     },
     {
       "shot": "MC00",
-      "file": "MC00-04-site-end-v1.png",
-      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/04-site-end-v1.png",
-      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
-      "title": "市政正常末态",
-      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "file": "MC01-normal.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "title": "唯一末态：市政原片第0帧",
+      "basis": "原片真实锚点，未重画；接点仍须原速视频验证",
       "copy": "EXACT_BYTES",
-      "production_binding": false
+      "production_binding": false,
+      "source_frame": 0,
+      "source_fps": 24
     },
     {
       "shot": "MC01",
@@ -234,5 +236,49 @@
   "retained_not_selected": [
     "MC03-descent-side-v1.png",
     "MC03-exit-v1.png"
-  ]
+  ],
+  "previous_mc00_items_20261027": [
+    {
+      "shot": "MC00",
+      "file": "MC00-02-eave-start-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
+      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+      "title": "屋檐滴雨与遮挡起幅",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC00",
+      "file": "MC00-01-city-reveal-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-v1.png",
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "title": "横移后城市展开",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC00",
+      "file": "MC00-03-descent-v2.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/03-descent-v2.png",
+      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+      "title": "沿路下降与地标定位",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC00",
+      "file": "MC00-04-site-end-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/04-site-end-v1.png",
+      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
+      "title": "市政正常末态",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    }
+  ],
+  "updated_at": "2026-10-28T18:52:12.520069+00:00",
+  "changed_scope": "MC00 reference slots only; all other shots retained"
 }

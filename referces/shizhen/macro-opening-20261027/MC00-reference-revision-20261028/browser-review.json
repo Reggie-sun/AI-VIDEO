@@ -1,0 +1,197 @@
+{
+  "checks": [
+    {
+      "url": "http://127.0.0.1:8883/referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/index.html",
+      "title": "失帧 · MC00 城市参考修订",
+      "images": [
+        {
+          "src": "02-eave-start-v1.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 940
+        },
+        {
+          "src": "01-city-reveal-v2.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 940
+        },
+        {
+          "src": "03-descent-v1.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "../full-opening-references-20261027/MC01-normal.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "city-map.png",
+          "loaded": true,
+          "width": 1400,
+          "height": 1000
+        },
+        {
+          "src": "../full-opening-references-20261027/B6-entry.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "01-city-reveal-v1.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 940
+        }
+      ],
+      "horizontalOverflow": false,
+      "video": []
+    },
+    {
+      "url": "http://127.0.0.1:8883/referces/shizhen/macro-opening-20261027/full-opening-references-20261027/index.html",
+      "title": "失帧 完整宏观开场参考",
+      "images": [
+        {
+          "src": "../MC00-reference-revision-20261028/02-eave-start-v1.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 940
+        },
+        {
+          "src": "../MC00-reference-revision-20261028/01-city-reveal-v2.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 940
+        },
+        {
+          "src": "../MC00-reference-revision-20261028/03-descent-v1.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC01-normal.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "MC01-normal.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "MC01-control-off.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "MC01-limit.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "MC02-force-before.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "MC02-force-after.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "MC03-descent-side-v2.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC03-arrival-reuse.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC04-before-contact.png",
+          "loaded": true,
+          "width": 1671,
+          "height": 941
+        },
+        {
+          "src": "MC04-contact-closed.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC04-half-open.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC04-reveal-open.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC05-reaction.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC06-wide-reuse.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        },
+        {
+          "src": "MC06-B6-entry-comparison.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "B6-entry.png",
+          "loaded": true,
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "src": "Dong-Wenhui-identity.png",
+          "loaded": true,
+          "width": 1536,
+          "height": 1024
+        },
+        {
+          "src": "straight-stair-geometry.png",
+          "loaded": true,
+          "width": 1672,
+          "height": 941
+        }
+      ],
+      "horizontalOverflow": false,
+      "video": [
+        "../../../../outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4"
+      ]
+    },
+    {
+      "mobile": true,
+      "width": 390,
+      "documentWidth": 390,
+      "horizontalOverflow": false
+    }
+  ],
+  "scope": "Static reference pages only; no video playback or audiovisual acceptance"
+}

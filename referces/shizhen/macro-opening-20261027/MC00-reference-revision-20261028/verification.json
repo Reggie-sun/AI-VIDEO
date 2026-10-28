@@ -1,0 +1,78 @@
+{
+  "scope": "STATIC_REFERENCE_PREPARATION_ONLY",
+  "generated_image_calls": 4,
+  "new_video_calls": 0,
+  "protected_source_hashes_unchanged": true,
+  "image_checks": [
+    {
+      "file": "city-map.png",
+      "sha256": "de2e58e9ea9416acc1ada1137bac62e72e513774f5a62e4b1f777bae9c6ef73a",
+      "bytes": 198467,
+      "dimensions": [
+        1400,
+        1000
+      ],
+      "png_colour_type": 2
+    },
+    {
+      "file": "01-city-reveal-v1.png",
+      "sha256": "c239ae68277afc0e8e73a632dc005959eee28c1e04872140f533d1d3ca9aae36",
+      "bytes": 3005482,
+      "dimensions": [
+        1672,
+        940
+      ],
+      "png_colour_type": 2
+    },
+    {
+      "file": "01-city-reveal-v2.png",
+      "sha256": "369dace30bde62a9378d2f019f0ae9d4ff225dd7cbdab324b141bffdba87360c",
+      "bytes": 2930944,
+      "dimensions": [
+        1672,
+        940
+      ],
+      "png_colour_type": 2
+    },
+    {
+      "file": "02-eave-start-v1.png",
+      "sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68",
+      "bytes": 2558971,
+      "dimensions": [
+        1672,
+        940
+      ],
+      "png_colour_type": 2
+    },
+    {
+      "file": "03-descent-v1.png",
+      "sha256": "fd124857eaf1c8ac6b96c2cac29037248661c3dbfbfe24fd30c256e257565654",
+      "bytes": 3163688,
+      "dimensions": [
+        1672,
+        941
+      ],
+      "png_colour_type": 2
+    }
+  ],
+  "static_review": {
+    "reviewer": "independent Codex executor plus parent actual image inspection",
+    "visible_platform_wall": "REMOVED_IN_V2; exact elevation NOT_EVALUATED",
+    "road_landmark_relations": "READABLE_AS_NEW_DESIGN; not source-proven geography",
+    "shelter_identity": "FAIL: advertising panels and thick framing differ from B6",
+    "worker_action": "NOT_EVALUATED: descent forearm reaches control area; static image cannot prove absence of pressing",
+    "precise_mechanical_connections": "NOT_EVALUATED: follow exact MC01 anchor",
+    "dynamic_reveal": "NOT_EVALUATED",
+    "whole_move_and_handoff": "NOT_EVALUATED",
+    "sound": "NOT_EVALUATED",
+    "model_obedience": "NOT_EVALUATED",
+    "human_acceptance": "NOT_EVALUATED"
+  },
+  "no_final_media_acceptance": true,
+  "browser_review": "browser-review.json",
+  "page_images_loaded": {
+    "revision": 7,
+    "full_opening": 21
+  },
+  "mobile_and_desktop_horizontal_overflow": false
+}

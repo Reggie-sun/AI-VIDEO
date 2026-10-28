@@ -1,16 +1,20 @@
 # Full Opening Reference Review
 
+## Current MC00 Revision — 2026-10-28
+
+MC00 当前四个展示槽已同步[城市总图与写实参考修订](../MC00-reference-revision-20261028/index.html)：屋檐、城市展开、下降，以及唯一末态 `MC01-normal.png`。完整城市白模已退回并停止；新图仅供静态位置／构图审看，站棚外形与工人动作仍有缺口，不宣称一镜到底或接点通过。旧 MC00 条目与核验保留在 JSON 的 `previous_mc00_*_20261027` 字段，原图片不覆盖。MC01–06、身份／结构图和完整 B6 未替换。
+
 ## Scope
 
 本页承接用户“不够,我不是只要一个shot的”，按既有分镜一次覆盖MC00–MC06及完整保留B6。打开[index.html](index.html)按顺序审看，导航可直接跳到各Shot。21张当前图片包含19张场景／状态／源入点参考和2张辅助身份／结构图，不把同一Shot的多张图计成新Shot。
 
-当前为静态参考审看阶段，尚未生成任何新视频。图像职责与来源见[references.json](references.json)，每项保留原路径、SHA及拟用途；复制不裁切、不重采样、不清除原来源标识。`package_references.py`只按现有素材建立本地副本与页面，不调用Provider，不建立Production state或另一条执行链。
+当前为静态参考审看阶段，本轮未生成新视频。曾制作的本地白模视频已 FAIL 退回，不作正式输入或可行性依据。图像职责与来源见[references.json](references.json)，每项保留原路径、SHA及拟用途；复制不裁切、不重采样、不清除原来源标识。历史 `package_references.py` 对应初次打包；当前 MC00 修订已另行逐项同步，不应重跑旧脚本覆盖新图索引。它不调用 Provider、不建立 Production state。
 
 ## Coverage
 
 | Shot | Current reference coverage | Basis |
 | --- | --- | --- |
-| MC00 | 屋檐、城市展开、沿路下降、市政正常末态 | 前轮4张写实候选；高差／接近路线仍待核。2026-10-28用户选落点方案A：末态唯一锚点改为`MC01-normal.png`（已认可市政片第0帧），`MC00-04-site-end-v1.png`与其构图近似但不一致，降为接近路线参考；页面图题沿旧打包未改，以[分镜](../../../../outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md#mc00--one-city-one-continuous-move)为准 |
+| MC00 | 新屋檐、城市展开v2、下降、真实市政末态 | 高台与围墙已修正，站棚和动作仍有限制；唯一末态为`MC01-normal.png`。旧近同构生成末态不采用，参见[分镜](../../../../outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md#mc00--one-city-one-continuous-move) |
 | MC01 | 起始、控制断开、门到限位 | 已认可exact市政MP4第0／40／103帧 |
 | MC02 | 连接前态与有限形变后态 | 同一已认可MP4第104／163帧 |
 | MC03 | 新斜侧直梯修订02；另附已有到达站位 | 身份固定，直梯结构候选；不是已通过的下楼视频 |

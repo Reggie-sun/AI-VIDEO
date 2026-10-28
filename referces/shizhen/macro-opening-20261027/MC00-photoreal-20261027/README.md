@@ -1,5 +1,9 @@
 # MC00 Photoreal Reference Candidates
 
+## Current Revision — 2026-10-28
+
+本目录是早期候选历史，当前 MC00 展示转到[城市位置总图与写实参考修订](../MC00-reference-revision-20261028/README.md)。原片第0帧仍为唯一末态；本目录生成末态与高台／围墙布局不作为当前选图。不覆盖旧原件和计数。
+
 ## Review
 
 打开[index.html](index.html)，按屋檐起幅→城市展开→沿路下降→市政末态查看四张写实候选。另附已认可MC01第0帧对照。用户要求“先不要开始生成视频,生成之前给我看referces”继续有效；本轮没有生成Blender连续视频、没有提交模型视频，没有把参考审看当作视频准入或人工接受。
