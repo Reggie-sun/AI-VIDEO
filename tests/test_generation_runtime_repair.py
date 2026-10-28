@@ -1029,7 +1029,8 @@ def test_runtime_repair_requires_runtime_failure_evidence(tmp_path):
     service.submit_local_once(attempt_id="repair-failed")
     service.refresh_local_once(attempt_id="repair-failed")
     assert _attempt(committer, "repair-failed").status is StateCommitStatus.FAILED
-    with pytest.raises(AiVideoError, match="durable runtime failure evidence"):
+    # 5473a4c 将 evidence 检查拆为三级；未评估的失败 attempt 在首级被拒。
+    with pytest.raises(AiVideoError, match="durable attempt evidence"):
         committer.record_runtime_repair_authorization(
             attempt_id="repair-failed", repair_basis=REPAIR_BASIS, actor=ACTOR)
 
