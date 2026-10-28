@@ -1,0 +1,57 @@
+{
+  "scope": "MC00 photoreal static reference package only",
+  "provider": "builtin image_gen.imagegen",
+  "model_identity": "NOT_EXPOSED",
+  "max_calls": 5,
+  "initial_unit_max_calls": 1,
+  "continuation_unit_max_calls": 3,
+  "repair_reserve_max_calls": 1,
+  "auto_retries": 0,
+  "video_calls": 0,
+  "stop_on_unknown": true,
+  "transparent_background": false,
+  "status": "UNIT_COMPLETE_KNOWN_OUTPUTS_STATIC_REVIEW_ONLY",
+  "actual_calls": 5,
+  "production_binding": false,
+  "user_reference_acceptance": "PENDING",
+  "billing": "NOT_EXPOSED",
+  "initial_unit_observation": "Photoreal rainy city, designed road side and shelter-site order visible; candidate only, no exact pixel/metric continuity claim",
+  "continuation_unit_status": "SEALED_UP_TO_3_CALLS_AFTER_KNOWN_INITIAL_OUTPUT",
+  "prompt_record_correction": {
+    "previous_file_sha256": "1b8d87094897c9f0a0f2660a973bce4e7fbf78a51f5a7e6c0fad634a88fc22d1",
+    "reason": "remove terminal LF in saved first prompt to match literal submitted prompt; no new call"
+  },
+  "initial_attempt": {
+    "prompt_path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-prompt.txt",
+    "prompt_sha256": "41b536f820cdf14980579b894e0287a95e0e34c13ebe91ac367af5100c236e7f",
+    "references": [
+      {
+        "path": "referces/shizhen/macro-opening-20261027/MC00-city-layout-20261027/03-city-reveal.png",
+        "sha256": "475750050b26c285cb514d04fb00e146c3f1e16eb405206bac19a2d29831be2f",
+        "duty": "composition and designed geography only"
+      },
+      {
+        "path": "outputs/shizhen-episode01/MC00-previs-20261027/anchor/MC01-frame000.png",
+        "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+        "duty": "accepted night-rain art, worker and equipment"
+      },
+      {
+        "path": "outputs/shizhen-episode01/MC00-previs-20261027/anchor/B6-frame000.png",
+        "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812",
+        "duty": "shelter form only; no characters or event"
+      }
+    ],
+    "output_path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-v1.png",
+    "output_sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+    "output_dimensions": [
+      1672,
+      941
+    ],
+    "actual_calls": 1,
+    "status": "KNOWN_OUTPUT_SAVED"
+  },
+  "continuation_unit_actual_calls": 3,
+  "repair_unit_actual_calls": 1,
+  "remaining_calls": 0,
+  "all_outcomes_known": true
+}

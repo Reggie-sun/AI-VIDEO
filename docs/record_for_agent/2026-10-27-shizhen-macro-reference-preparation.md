@@ -350,3 +350,19 @@ record-ai-video-session继续同一主题；distill-ai-video-learning为no_candi
 连续遮挡揭示、住宅／站棚实际阅读次序、下降和减速自然度、钢索入画节奏、MC00→MC01原速接点、声音、模型服从与人工接受均NOT_EVALUATED。楼梯结构FAIL保持，不绕过逐镜Gate。新增Blender静态参考只证明空间候选；本轮无新MP4、生图／视频Provider调用、付费或Production mutation。工程验证仅任务脚本语法、保存工程重开／数据审计、PNG exact copy及文档检查，不涉及产品代码，不把它写成全套回归PASS。
 
 按record-ai-video-session更新同一主题；distill-ai-video-learning评估no_candidate：同一确定性场景的一次静态修订不是独立模型实验，不升级为通用模型服从或质量规则。用户指令暂停视频的边界保留在参考README和verification；其他窗口的staged合成源码、测试、音频和through-S05材料保持原状。
+
+## MC00 Photoreal Reference Candidates
+
+用户指出“为什么别的都是草图”，Parent明确前轮交的是空间白模、没有达到正式美术参考层级；用户随后“开始”，授权将同一布局制作成写实参考，视频禁令保持。按imagegen与scenario-seedance-storyboard、open-video的reference-continuity职责制作，不重开故事／摄影设计，不扩展音乐、B6或已认可市政原视频。
+
+首个有界单元1次：白模城市展开图只负责构图／新地理，exact市政第0帧负责雨夜实拍质感、工人及机械，B6第0帧只负责棚体形制；实际纯中文正文及三个引用SHA先封存后调用内置image_gen。城市图known落盘并看图后，再封存最多3次不同视角的有限单元：屋檐、下降、市政末态，全部实际引用同一新城市母图与各自机位／原市政锚点。没有把图放在目录就称作已输入，五份意图均记录真实引用顺序与SHA。
+
+4个视角返回后，Parent与同一native executor只读参考核验发现下降图v1多余长索股和右门柱外柜体。使用预留的最后1次same-image修复，只改机械一致性，参考优先使用新末态与原MC01；原v1保留。修订02实际去掉多余索股与柜体，保留道路、住宅窗格、棚、工人和灯。总计5次内置生图、全部known，自动重试0，UNKNOWN0，视频／音乐0；工具未提供模型身份及结算金额，费用待确认，不能记为免费。旧宏观真实视频累计仍6，旧下楼／推门有限单元和FAIL保持。
+
+新素材保存于`referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/`，原始PNG均1672×941 RGB、无resize/crop。当前选图为02屋檐、01城市展开、03-descent-v2下降、04末态；index.html按摄影次序展示，并附原MC01第0帧exact copy对照。所有原输入／输出、纯中文prompt、来源／用途与实测SHA归generation-intent、各attempt intent、references.json及verification.json；图片留本地，Git不纳入二进制参考图。内置authoring不新增Product Provider adapter、执行器、timeline或registry。
+
+实际静态观察：檐口近景左侧遮挡、城市右侧持续可见；城市与下降图均保持道路右侧的住宅／站棚／市政场地，暖窗与冷白路灯雨夜风格一致；末态贴近已认可MC01的观察侧、门／绞盘／右前滑轮与双索拓扑，工人手垂下离按钮、灯亮。近处机械以04和原片为准，不用远景小手部或接头签动作／拓扑PASS。
+
+尚有设计缺口：01／03生成了站棚后矮墙并使作业区明显高出人行道；04只提供局部原场地，未证明新挡墙与开放入口如何连接。该高差与接近路径明确NOT_EVALUATED，后续应在同一布局／相机工程修正和核验；不能从几张漂亮图推断连续相机成立，也不能开始正式视频让模型猜路径。建筑逐构件、地标遮挡显露、速度自然、末段交接、完整声音、模型服从和human接受同样未验。新图无正式视频绑定、无Production activation／P6／Final Acceptance，不移除楼梯FAIL或真实submit gates。
+
+本轮只验证PNG decode／RGB／SHA、原bytes复制、prompt纯中文／hash、实际引用不漂移、静态图观察、参考页图片readback、protected MP4身份及文档检查，不冒充工程related/full或媒体Gate。用户参考先审的阶段终点保持。沿record-ai-video-session更新同主题，distill-ai-video-learning为no_candidate：四个不同视角加一次同源局部修复不是隔离变量的多臂实验，也不证明多参考通用服从率；不修改Skill／Policy／Gate。其他窗口工程与音频材料保留。

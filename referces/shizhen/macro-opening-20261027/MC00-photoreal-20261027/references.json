@@ -1,0 +1,51 @@
+{
+  "status": "STATIC_PHOTOREAL_REFERENCE_CANDIDATES",
+  "selected": [
+    {
+      "file": "02-eave-start-v1.png",
+      "role": "eave_start",
+      "purpose": "屋檐近景及遮挡起幅",
+      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+      "actual_video_binding": false,
+      "user_accepted": false
+    },
+    {
+      "file": "01-city-reveal-v1.png",
+      "role": "city_reveal",
+      "purpose": "城市尺度、风格与相对地理，非机械细节",
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "actual_video_binding": false,
+      "user_accepted": false
+    },
+    {
+      "file": "03-descent-v2.png",
+      "role": "descent",
+      "purpose": "下降视角及定位，机械修订02，高差与入口待核",
+      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+      "actual_video_binding": false,
+      "user_accepted": false
+    },
+    {
+      "file": "04-site-end-v1.png",
+      "role": "normal_site_endpoint",
+      "purpose": "近处机械主参考；手离按钮，灯亮",
+      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
+      "actual_video_binding": false,
+      "user_accepted": false
+    },
+    {
+      "file": "05-accepted-MC01-entry.png",
+      "role": "accepted_source_comparison",
+      "purpose": "原市政第0帧对照，非本轮生成",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "actual_video_binding": false,
+      "user_accepted": false
+    }
+  ],
+  "retained_failed_candidate": {
+    "file": "03-descent-v1.png",
+    "sha256": "af934b6f047e48678d5cd689313756e8c99185c6ae1aa80342f1343ca18692cb",
+    "reason": "extra long cable strands and extra gray cabinet; replaced by v2 for current review"
+  },
+  "no_production_mutation": true
+}

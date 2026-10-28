@@ -1,0 +1,37 @@
+{
+  "scope": "one bounded same-image mechanical consistency repair",
+  "provider": "builtin image_gen.imagegen",
+  "prior_known_call_count": 4,
+  "total_unit_ceiling": 5,
+  "max_calls": 1,
+  "elapsed_limit_seconds": 600,
+  "auto_retries": 0,
+  "created_at": "2026-10-28T03:12:52.927099+00:00",
+  "prompt_file": "03-descent-repair-prompt.txt",
+  "prompt_sha256": "b6ecc6e81130199be2a7445573764b0f89355cff16ffd3196ae3cc1104c284a8",
+  "references": [
+    {
+      "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/03-descent-v1.png",
+      "sha256": "af934b6f047e48678d5cd689313756e8c99185c6ae1aa80342f1343ca18692cb"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/04-site-end-v1.png",
+      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8"
+    },
+    {
+      "path": "outputs/shizhen-episode01/MC00-previs-20261027/anchor/MC01-frame000.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+    }
+  ],
+  "status": "KNOWN_OUTPUT_SAVED",
+  "actual_calls": 1,
+  "video_calls": 0,
+  "production_binding": false,
+  "output_path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/03-descent-v2.png",
+  "output_sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+  "output_dimensions": [
+    1672,
+    941
+  ],
+  "billing": "NOT_EXPOSED"
+}

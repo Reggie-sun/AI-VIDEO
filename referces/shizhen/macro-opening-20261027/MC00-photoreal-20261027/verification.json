@@ -1,0 +1,160 @@
+{
+  "scope": "STATIC_PHOTOREAL_REFERENCE_PREPARATION_ONLY",
+  "created_at": "2026-10-28T03:18:03.994282+00:00",
+  "actual_image_calls": 5,
+  "all_known": true,
+  "unknown_count": 0,
+  "auto_retries": 0,
+  "video_calls": 0,
+  "music_calls": 0,
+  "billing": "NOT_EXPOSED_AMOUNT_PENDING",
+  "image_copy_checks": [
+    {
+      "file": "01-city-reveal-v1.png",
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "source_path": "/home/reggie/.codex/generated_images/01a1803e-4df1-7640-ac80-5afed8182f57/exec-440a55c2-6062-4067-a767-c6bb01c12c11.png",
+      "exact_copy": true
+    },
+    {
+      "file": "02-eave-start-v1.png",
+      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "source_path": "/home/reggie/.codex/generated_images/01a1803e-4df1-7640-ac80-5afed8182f57/exec-360a4325-1240-40d8-acdf-1b26faec67e6.png",
+      "exact_copy": true
+    },
+    {
+      "file": "03-descent-v1.png",
+      "sha256": "af934b6f047e48678d5cd689313756e8c99185c6ae1aa80342f1343ca18692cb",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "source_path": "/home/reggie/.codex/generated_images/01a1803e-4df1-7640-ac80-5afed8182f57/exec-47631972-31a1-46ea-b623-d895eefe207a.png",
+      "exact_copy": true
+    },
+    {
+      "file": "04-site-end-v1.png",
+      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "source_path": "/home/reggie/.codex/generated_images/01a1803e-4df1-7640-ac80-5afed8182f57/exec-76d63e87-1d98-43f2-9fe0-4db190655112.png",
+      "exact_copy": true
+    },
+    {
+      "file": "03-descent-v2.png",
+      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "source_path": "/home/reggie/.codex/generated_images/01a1803e-4df1-7640-ac80-5afed8182f57/exec-a4c23190-266d-4da6-a101-cad81eb4cfdf.png",
+      "exact_copy": true
+    }
+  ],
+  "prompt_and_reference_checks": [
+    {
+      "path": "02-eave-start-intent.json",
+      "sha256": "c78d24052b1ff9caa0e792de88df15dd8932208446a4af36cb391dd1f25ca2b6",
+      "known_outcome": true
+    },
+    {
+      "path": "03-descent-intent.json",
+      "sha256": "78569a5e1d1f8913d1e8ad6f7715523511ed2420707f78149173897a12d9b264",
+      "known_outcome": true
+    },
+    {
+      "path": "03-descent-repair-intent.json",
+      "sha256": "cd5e32baa9746e0e9a55edeeb507b5602b923759c3a8eee06455d496e8d82ea8",
+      "known_outcome": true
+    },
+    {
+      "path": "04-site-end-intent.json",
+      "sha256": "e3b672cb7c83bc4ea42e5b93a39bc8dbc08f0fd7b1b0b85380ae1b13566ffe40",
+      "known_outcome": true
+    }
+  ],
+  "initial_prompt_sha256": "41b536f820cdf14980579b894e0287a95e0e34c13ebe91ac367af5100c236e7f",
+  "gallery_readback": [
+    {
+      "file": "index.html",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "02-eave-start-v1.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "01-city-reveal-v1.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "03-descent-v2.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "04-site-end-v1.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "05-accepted-MC01-entry.png",
+      "status": 200,
+      "bytes_match": true
+    }
+  ],
+  "protected_sources": [
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+      "sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+      "unchanged": true
+    }
+  ],
+  "native_read_only_review": {
+    "agent": "/root/mc00_spatial_review",
+    "role": "executor",
+    "scope": "static reference set plus one same-image mechanical correction",
+    "descent_v2_sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+    "result": "extra cable strands and gray cabinet removed; major visual anchors retained; no new obvious static issue"
+  },
+  "remaining_static_design_issue": "site grade and wall/access relationship between city/descent and close endpoint not established; must reconcile before continuous motion use",
+  "not_evaluated": [
+    "user reference acceptance",
+    "actual continuous camera motion",
+    "complete building identity",
+    "collision-free approach",
+    "sequential landmark reveal",
+    "natural speed and deceleration",
+    "MC00-to-MC01 audiovisual junction",
+    "sound",
+    "model obedience",
+    "Production acceptance"
+  ],
+  "verdict": "READY_TO_SHOW_WITH_SCOPE_AND_GEOGRAPHY_LIMITS",
+  "production_binding": false,
+  "film_publication": "NOT_PUBLISHED",
+  "learning_outcome": "no_candidate",
+  "verification_level": "task-local PNG/prompt/reference/gallery/protected-source checks; not product harness full"
+}

@@ -1,0 +1,33 @@
+{
+  "provider": "builtin image_gen.imagegen",
+  "scope": "static photoreal reference only",
+  "max_calls": 1,
+  "auto_retries": 0,
+  "prompt_file": "02-eave-start-prompt.txt",
+  "prompt_sha256": "d4e804ac1d2cce0ef3536e278c7fd91a5016c030aa7b0cbf957ef223da97a24d",
+  "references": [
+    {
+      "path": "referces/shizhen/macro-opening-20261027/MC00-city-layout-20261027/02-eave-start.png",
+      "sha256": "845548aa19cb79274c0a0dda87dacb3f738e51a697e3cceee0dfe246ef7040ff"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-v1.png",
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c"
+    },
+    {
+      "path": "outputs/shizhen-episode01/MC00-previs-20261027/anchor/MC01-frame000.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+    }
+  ],
+  "status": "KNOWN_OUTPUT_SAVED",
+  "actual_calls": 1,
+  "production_binding": false,
+  "video_calls": 0,
+  "output_path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
+  "output_sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+  "output_dimensions": [
+    1672,
+    941
+  ],
+  "billing": "NOT_EXPOSED"
+}
