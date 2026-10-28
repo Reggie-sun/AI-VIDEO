@@ -177,6 +177,7 @@ def _resolved_preview_fixture(*, source_video_sha="d" * 64, audio_end=768_000):
     )
     spec = SimpleNamespace(
         schema_version="2.3",
+        graphic_layer_ids=(),
         shot_ids=("shot-s01",),
         layers=(layer,),
         audio_tracks=(track,),
@@ -191,6 +192,40 @@ def _resolved_preview_fixture(*, source_video_sha="d" * 64, audio_end=768_000):
         delivery_profile=SimpleNamespace(fps=24),
     )
     return project, spec, timeline, {"shot-s01": SimpleNamespace(shot_id="shot-s01")}
+
+
+@pytest.mark.parametrize("failure", [None, "missing_primary", "wrong_source", "short_audio"])
+def test_captured_audio_checks_primary_video_under_raster_overlay(monkeypatch, failure):
+    import ai_video.production.repair_input_admission as admission
+
+    monkeypatch.setattr(admission, "allows_repair_preview_layer", lambda *_: True)
+    monkeypatch.setattr(admission, "verify_repair_input", lambda *_: SimpleNamespace(
+        preview_use=SimpleNamespace(scope="replacement_audio_preview"),
+    ))
+    project, spec, timeline, shots = _resolved_preview_fixture()
+    spec.graphic_layer_ids = ("background-patch",)
+    spec.layers += (SimpleNamespace(layer_id="background-patch", shot_id="shot-s01"),)
+    timeline.visual_spans += (SimpleNamespace(
+        layer_id="background-patch", start_sample=0, duration_samples=768_000,
+    ),)
+    if failure == "missing_primary":
+        spec.layers = spec.layers[1:]
+    elif failure == "wrong_source":
+        project.registry.assets[1].audio_metadata.source.input_fingerprint = "f" * 64
+    elif failure == "short_audio":
+        timeline.audio_spans[0].duration_samples -= 1
+
+    def check():
+        _validate_captured_dialogue_preview(
+            project, spec, timeline, shots, dialogue_tracks=spec.audio_tracks,
+            invalid=lambda message, *_: ValueError(message),
+        )
+
+    if failure is None:
+        check()
+    else:
+        with pytest.raises(ValueError):
+            check()
 
 
 def test_captured_dialogue_must_match_video_provenance_and_full_visual_window(monkeypatch):

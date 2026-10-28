@@ -255,10 +255,13 @@ def _speech_free_visual_shots(project, spec, shots_by_id):
 
 def _captured_dialogue_layout_valid(spec, dialogue_tracks, *, silent_image_shots=frozenset()) -> bool:
     """Every captured video retains its exact dialogue; silent B-roll adds no voices."""
+    primary_layers = tuple(
+        layer for layer in spec.layers if layer.layer_id not in spec.graphic_layer_ids
+    )
     count = len(spec.shot_ids)
     captured_shots = set(spec.shot_ids) - silent_image_shots
     if (not count or len(set(spec.shot_ids)) != count
-            or len(spec.layers) != count or len(dialogue_tracks) != len(captured_shots)
+            or len(primary_layers) != count or len(dialogue_tracks) != len(captured_shots)
             or not captured_shots
             or any(track.audio_kind not in {AudioKind.DIALOGUE, AudioKind.BGM,
                                            AudioKind.SFX, AudioKind.AMBIENCE}
@@ -267,7 +270,7 @@ def _captured_dialogue_layout_valid(spec, dialogue_tracks, *, silent_image_shots
     tracks = {track.track_id: track for track in dialogue_tracks}
     if (len(tracks) != len(captured_shots)
             or {track.shot_id for track in dialogue_tracks} != captured_shots
-            or {layer.shot_id for layer in spec.layers} != set(spec.shot_ids)):
+            or {layer.shot_id for layer in primary_layers} != set(spec.shot_ids)):
         return False
     for binding in spec.caption_tracks:
         track = tracks.get(binding.source_audio_track_id)
@@ -297,12 +300,14 @@ def _validate_captured_dialogue_preview(
             )):
         raise invalid("Captured dialogue requires one exact source per Shot with captions bound to its own audio in a development audio preview.")
     intervals = sorted((span.start_sample, span.start_sample + span.duration_samples)
-                       for span in timeline.visual_spans)
+                       for span in timeline.visual_spans
+                       if span.layer_id not in spec.graphic_layer_ids)
     if (len(intervals) != len(spec.shot_ids) or intervals[0][0] != 0
             or intervals[-1][1] != timeline.total_samples
             or any(left[1] != right[0] for left, right in zip(intervals, intervals[1:]))):
         raise invalid("Captured dialogue visuals must cover the complete contiguous preview interval.")
-    layers = {layer.shot_id: layer for layer in spec.layers}
+    layers = {layer.shot_id: layer for layer in spec.layers
+              if layer.layer_id not in spec.graphic_layer_ids}
     for track in dialogue_tracks:
         _validate_captured_dialogue_source(project, spec, timeline, shots_by_id,
             layer=layers[track.shot_id], track=track, invalid=invalid)

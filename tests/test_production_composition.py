@@ -314,6 +314,55 @@ def test_commercial_typography_defaults_preserve_legacy_serialization(tmp_path):
     assert type(timeline).model_validate_json(timeline.model_dump_json()) == timeline
 
 
+def test_neutral_raster_overlay_resolves_over_video_without_ad_plan(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    payload = spec.model_dump(mode="python")
+    payload.update(
+        commercial_graphics=(), graphic_layer_animations=(),
+        ad_creative_plan_id=None, ad_creative_plan_hash=None,
+    )
+    spec = seal_artifact(CompositionSpec.model_validate(payload))
+
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+
+    spans = [s for s in timeline.visual_spans if s.shot_id == "shot-1"]
+    assert [(s.asset_mime_type, s.start_frame, s.duration_frames)
+            for s in spans] == [("video/mp4", 0, 48), ("image/png", 0, 48)]
+    assert spans[0].trim_start_frame == 12
+    assert spans[1].z_index == 10
+    assert not timeline.commercial_graphics
+    assert not timeline.audio_spans
+    assert timeline.total_frames == 96
+    assert CompositionSpec.model_validate_json(spec.model_dump_json()) == spec
+
+
+def test_raster_overlay_does_not_remove_commercial_plan_requirement(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    _, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    payload = spec.model_dump(mode="python")
+    payload.update(ad_creative_plan_id=None, ad_creative_plan_hash=None)
+
+    with pytest.raises(ValueError, match="exact AdCreativePlan identity"):
+        CompositionSpec.model_validate(payload)
+
+
+def test_neutral_raster_overlay_still_requires_bound_image_role(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    payload = spec.model_dump(mode="python")
+    payload.update(
+        commercial_graphics=(), graphic_layer_animations=(),
+        ad_creative_plan_id=None, ad_creative_plan_hash=None,
+    )
+    spec = seal_artifact(CompositionSpec.model_validate(payload))
+    loaded = _replace_shot(
+        loaded, 0, required_asset_roles=loaded.shots[0].required_asset_roles[:1],
+    )
+
+    _assert_invalid(loaded, spec)
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [

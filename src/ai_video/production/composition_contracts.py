@@ -208,6 +208,7 @@ class CompositionSpec(VersionedArtifact):
     audio_tracks: tuple[AudioTrackSpec, ...] = ()
     caption_tracks: tuple[CaptionTrackBinding, ...] = ()
     voice_sources: tuple[VoiceCompositionSource, ...] = ()
+    # Registered raster overlays; commercial treatments still require an exact plan.
     graphic_layer_ids: tuple[str, ...] = ()
     graphic_layer_animations: tuple[GraphicLayerAnimation, ...] = ()
     commercial_graphics: tuple[GraphicTreatment, ...] = ()
@@ -339,11 +340,7 @@ class CompositionSpec(VersionedArtifact):
             raise ValueError("ad creative plan identity must be all-or-none")
         if (
             self.schema_version in {"2.2", "2.3", "2.4"}
-            and (
-                self.graphic_layer_ids
-                or self.commercial_graphics
-                or self.advertising_sound_cues
-            )
+            and (self.commercial_graphics or self.advertising_sound_cues)
             and self.ad_creative_plan_id is None
         ):
             raise ValueError("ad graphics require exact AdCreativePlan identity")
