@@ -1,0 +1,71 @@
+{
+  "status": "STATIC_REFERENCE_CANDIDATE",
+  "new_city_geography": true,
+  "video_generated": false,
+  "model_submission": false,
+  "items": [
+    {
+      "file": "00-city-plan.png",
+      "sha256": "95f5adb2dfa01612ce9210822ea2b96d47ea9d7a03415efdf0659a120298f901",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/scene-audit-v2.json",
+      "role": "由保存的blend实际包围盒与相机采样绘制的技术地图",
+      "production_binding": false
+    },
+    {
+      "file": "01-city-overview.png",
+      "sha256": "9f7a193ce599798bfc25e4da2317c9dedf76da31b0691e41aef981e1236fb4a6",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/views-v2/city-overview.png",
+      "role": "城市体块总览，不是正式美术",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "file": "02-eave-start.png",
+      "sha256": "845548aa19cb79274c0a0dda87dacb3f738e51a697e3cceee0dfe246ef7040ff",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/views-v2/camera-0001.png",
+      "role": "屋檐起幅与转角遮挡",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "file": "03-city-reveal.png",
+      "sha256": "475750050b26c285cb514d04fb00e146c3f1e16eb405206bac19a2d29831be2f",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/views-v2/camera-0121.png",
+      "role": "横移后城市与同一主路",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "file": "04-residence-and-shelter.png",
+      "sha256": "72d63ac523297e8c6c774a6dec0fd8b2edfe3d33f5d2ec13050cedea8f809e84",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/views-v2/camera-0193.png",
+      "role": "下降阶段住宅及站棚位置",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "file": "05-site-approach.png",
+      "sha256": "83f9e7a4270532736345f69ea1160f60c65be16220904ae27c0a285f1cfab1b7",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/views-v2/camera-0337.png",
+      "role": "街面接近与设备落点",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "file": "06-site-end.png",
+      "sha256": "3eef2ffe5b2cbfa9b99235431fa1ca16e7cfdb45312b67f58be210cb7853c828",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/views-v2/camera-0480.png",
+      "role": "同侧市政末态候选，不是精确匹配",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "file": "07-accepted-MC01-entry.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "source": "outputs/shizhen-episode01/MC00-previs-20261027/anchor/MC01-frame000.png",
+      "role": "已认可市政第0帧，比较基准",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    }
+  ]
+}

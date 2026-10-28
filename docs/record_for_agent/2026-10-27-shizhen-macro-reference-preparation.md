@@ -334,3 +334,19 @@ Parent先尝试不新增生成的静态背景补片：同源frame144／6秒、�
 工程Risk Gate仍NATIVE_REVIEW_NOT_REQUIRED：只改创作文本与记录。复用原native reviewer_high进行城市文本概念第2次、仅针对本轮实质运镜修订的只读检查，保留初审1次及既有11轮媒体复核历史，不增加媒体review或重置计数。文档、链接、diff与B6字节身份为本轮验证范围；运动、质量与最终声画仍NOT_EVALUATED。既有staged合成源码／测试和其他窗口audio文件不纳入本轮提交。
 
 record-ai-video-session继续同一主题；distill-ai-video-learning为no_candidate：这是用户直接选定的运镜方向，没有新增媒体或跨尝试对照，不把文字改进升级为已验证的模型规律或Skill/Gate adoption。
+
+## MC00 Static Spatial Reference Preparation
+
+本窗口承接MC00，最先核对已认可市政剪辑SHA `b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d`及`MC03-descent-v1/predecessor-media-clearance.json`、`predecessor-assembly-user-accepted.json`。实际审看第0帧，按工人／控制盒左、铁门右、右前回转滑轮和双索折返建立空间候选，没有沿早稿的简化单直索误改已认可市政段。B6 exact SHA仍为`d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a`；仅抽第0帧观察站棚类型，不改其中人物、事件、声音和片名。
+
+使用retrieve-ai-video-memory的experience查询重开本记录City Reveal Move Revision，并按open-video、Blender routing、scenario-blender-expert/blockout/previs-storyboard/animation准备本地轻量参考。Blender 5.2.1 headless独立场景：道路西侧屋檐建筑、东侧旧住宅、较北的站棚及市政入口；地理与尺寸均为新设计，不声称源视频证明位置相邻。工程与可复现脚本保存在`outputs/shizhen-episode01/MC00-previs-20261027/`。
+
+初版静态检查与native executor只读空间核验发现：近处注视目标插到远处导致首秒约63度／秒转向；末态门过正、滑轮出框；总图被摄影marker覆盖。保留v1工程及失败视图，v2改为单位方向插值、起始2.5秒方向固定、末段机位向右移动、补门后空口，并在总图渲染时解绑摄影marker。实际审看v2关键帧和总图，末态滑轮完整、双索可解释，工人和控制盒保持源同侧。仍比MC01宽、门透视较平，不签精确机位匹配。
+
+用户随后明确“先不要开始生成视频,生成之前给我看referces”。这是当前阶段终点：只交静态参考，未启动Blender animation渲染，未submit任何Provider视频；宏观真实视频累计仍6，旧下楼／推门有限单元不转作MC00。连续动态目标保持待办，不标制作准备／动态预演全部完成。
+
+静态参考页在`referces/shizhen/macro-opening-20261027/MC00-city-layout-20261027/index.html`，包含由实际工程包围盒绘制的地图、同一场景总览和起幅／沿途／末态，以及exact市政第0帧。复制图片保持原bytes，来源／用途与SHA归`references.json`；所有图片为STATIC_REFERENCE_CANDIDATE、未绑定正式模型请求。`MC00-city-v2.blend`可重开，`camera-samples-v2.json`保留480帧／24fps／固定28mm／当前20秒设计；不是模型时长合同，也未为15秒上限加速。工程重开审计为相机中心未进入两处具名建筑包围盒、出索线side同号、起始2.5秒旋转0；这些仅是设计采样，不证明完整碰撞净空或实际运动通过。
+
+连续遮挡揭示、住宅／站棚实际阅读次序、下降和减速自然度、钢索入画节奏、MC00→MC01原速接点、声音、模型服从与人工接受均NOT_EVALUATED。楼梯结构FAIL保持，不绕过逐镜Gate。新增Blender静态参考只证明空间候选；本轮无新MP4、生图／视频Provider调用、付费或Production mutation。工程验证仅任务脚本语法、保存工程重开／数据审计、PNG exact copy及文档检查，不涉及产品代码，不把它写成全套回归PASS。
+
+按record-ai-video-session更新同一主题；distill-ai-video-learning评估no_candidate：同一确定性场景的一次静态修订不是独立模型实验，不升级为通用模型服从或质量规则。用户指令暂停视频的边界保留在参考README和verification；其他窗口的staged合成源码、测试、音频和through-S05材料保持原状。

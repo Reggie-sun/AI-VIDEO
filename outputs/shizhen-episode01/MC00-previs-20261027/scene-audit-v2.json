@@ -1,0 +1,589 @@
+{
+  "authority": "LOCAL_STATIC_REFERENCE_AND_DESIGN_AUDIT_ONLY",
+  "asset": "MC00-city-v2.blend",
+  "asset_sha256": "46d4fa0f92aa965cf197fcce77c749f2814f26520e232b2c694ad96234e97ee0",
+  "blender_version": "5.2.1 LTS",
+  "scene": "MC00_LOCAL_PREVIS",
+  "fps": 24,
+  "frames": 480,
+  "resolution": [
+    1280,
+    720
+  ],
+  "lens_mm": 28.0,
+  "camera_marker_count": 1,
+  "objects": {
+    "ENV_eave_building": {
+      "position_m": [
+        -27.0,
+        -59.0,
+        9.0
+      ],
+      "dimensions_m": [
+        14.0,
+        18.0,
+        18.0
+      ],
+      "min_m": [
+        -34.0,
+        -68.0,
+        0.0
+      ],
+      "max_m": [
+        -20.0,
+        -50.0,
+        18.0
+      ]
+    },
+    "ENV_residence": {
+      "position_m": [
+        1.0,
+        -30.0,
+        6.0
+      ],
+      "dimensions_m": [
+        10.0,
+        14.0,
+        12.0
+      ],
+      "min_m": [
+        -4.0,
+        -37.0,
+        0.0
+      ],
+      "max_m": [
+        6.0,
+        -23.0,
+        12.0
+      ]
+    },
+    "ENV_shelter_roof": {
+      "position_m": [
+        -5.199999809265137,
+        -9.0,
+        2.700000047683716
+      ],
+      "dimensions_m": [
+        2.299999952316284,
+        6.599999904632568,
+        0.2199999988079071
+      ],
+      "min_m": [
+        -6.349999904632568,
+        -12.300000190734863,
+        2.5900001525878906
+      ],
+      "max_m": [
+        -4.049999713897705,
+        -5.699999809265137,
+        2.809999942779541
+      ]
+    },
+    "ENV_gate": {
+      "position_m": [
+        1.7999999523162842,
+        4.0,
+        1.7000000476837158
+      ],
+      "dimensions_m": [
+        5.599999904632568,
+        0.1599999964237213,
+        3.4000000953674316
+      ],
+      "min_m": [
+        -1.0,
+        3.9200000762939453,
+        0.0
+      ],
+      "max_m": [
+        4.599999904632568,
+        4.079999923706055,
+        3.4000000953674316
+      ]
+    },
+    "PRP_winch_plinth": {
+      "position_m": [
+        -4.0,
+        0.0,
+        0.25
+      ],
+      "dimensions_m": [
+        2.200000047683716,
+        1.5,
+        0.5
+      ],
+      "min_m": [
+        -5.099999904632568,
+        -0.75,
+        0.0
+      ],
+      "max_m": [
+        -2.9000000953674316,
+        0.75,
+        0.5
+      ]
+    },
+    "PRP_return_base": {
+      "position_m": [
+        7.0,
+        -3.0,
+        0.20000000298023224
+      ],
+      "dimensions_m": [
+        1.100000023841858,
+        1.100000023841858,
+        0.4000000059604645
+      ],
+      "min_m": [
+        6.449999809265137,
+        -3.549999952316284,
+        0.0
+      ],
+      "max_m": [
+        7.550000190734863,
+        -2.450000047683716,
+        0.4000000059604645
+      ]
+    },
+    "PRP_control": {
+      "position_m": [
+        -5.400000095367432,
+        3.0,
+        1.1200000047683716
+      ],
+      "dimensions_m": [
+        0.6000000238418579,
+        0.41999998688697815,
+        2.240000009536743
+      ],
+      "min_m": [
+        -5.700000286102295,
+        2.7899999618530273,
+        0.0
+      ],
+      "max_m": [
+        -5.099999904632568,
+        3.2100000381469727,
+        2.240000009536743
+      ]
+    }
+  },
+  "camera_inside_named_building": [],
+  "traction_outgoing_side_range": [
+    -590.1780011558533,
+    -55.053924264907835
+  ],
+  "camera_path_length_m": 59.263366023805034,
+  "speed_mps_max": 4.13876396497999,
+  "speed_mps_last": 0.06650201130732146,
+  "angular_degrees_per_second_first_2_5s_max": 0.0,
+  "angular_degrees_per_second_max": 22.47057360985419,
+  "sampled_center_projection_only": {
+    "1": {
+      "ENV_eave_building": {
+        "u": 6.4820146560668945,
+        "v": 10.069581031799316,
+        "depth": -1.380922794342041,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 2.17726469039917,
+        "v": -0.6767269968986511,
+        "depth": 12.646032333374023,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": 1.1975650787353516,
+        "v": 0.048600777983665466,
+        "depth": 34.48036575317383,
+        "center_in_frame": false
+      },
+      "ENV_gate": {
+        "u": 1.2738254070281982,
+        "v": 0.1429339498281479,
+        "depth": 43.14203643798828,
+        "center_in_frame": false
+      },
+      "PRP_winch_plinth": {
+        "u": 1.1612547636032104,
+        "v": 0.08433518558740616,
+        "depth": 42.29121017456055,
+        "center_in_frame": false
+      },
+      "PRP_return_base": {
+        "u": 1.4940532445907593,
+        "v": -0.04506819322705269,
+        "depth": 34.833763122558594,
+        "center_in_frame": false
+      },
+      "PRP_control": {
+        "u": 1.1161625385284424,
+        "v": 0.15252074599266052,
+        "depth": 45.46177673339844,
+        "center_in_frame": false
+      }
+    },
+    "61": {
+      "ENV_eave_building": {
+        "u": 2.4141616821289062,
+        "v": 3.0117645263671875,
+        "depth": -5.499918460845947,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 2.721605062484741,
+        "v": -1.3154692649841309,
+        "depth": 8.527036666870117,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": 1.2175323963165283,
+        "v": -0.032388947904109955,
+        "depth": 30.361370086669922,
+        "center_in_frame": false
+      },
+      "ENV_gate": {
+        "u": 1.297410249710083,
+        "v": 0.08987811952829361,
+        "depth": 39.023040771484375,
+        "center_in_frame": false
+      },
+      "PRP_winch_plinth": {
+        "u": 1.1732182502746582,
+        "v": 0.023773623630404472,
+        "depth": 38.17221450805664,
+        "center_in_frame": false
+      },
+      "PRP_return_base": {
+        "u": 1.553551435470581,
+        "v": -0.1376875340938568,
+        "depth": 30.714765548706055,
+        "center_in_frame": false
+      },
+      "PRP_control": {
+        "u": 1.1227160692214966,
+        "v": 0.10339701175689697,
+        "depth": 41.34278106689453,
+        "center_in_frame": false
+      }
+    },
+    "121": {
+      "ENV_eave_building": {
+        "u": 0.7992935180664062,
+        "v": 1.439935326576233,
+        "depth": -19.431934356689453,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 1.2344368696212769,
+        "v": -0.22758494317531586,
+        "depth": 14.532779693603516,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": 0.5733752250671387,
+        "v": 0.251554399728775,
+        "depth": 33.956478118896484,
+        "center_in_frame": true
+      },
+      "ENV_gate": {
+        "u": 0.6181098222732544,
+        "v": 0.3972043991088867,
+        "depth": 47.95405960083008,
+        "center_in_frame": true
+      },
+      "PRP_winch_plinth": {
+        "u": 0.5442315936088562,
+        "v": 0.3008773922920227,
+        "depth": 43.33074188232422,
+        "center_in_frame": true
+      },
+      "PRP_return_base": {
+        "u": 0.7518908381462097,
+        "v": 0.2919344902038574,
+        "depth": 42.766719818115234,
+        "center_in_frame": true
+      },
+      "PRP_control": {
+        "u": 0.5078146457672119,
+        "v": 0.3562953770160675,
+        "depth": 45.6683349609375,
+        "center_in_frame": true
+      }
+    },
+    "193": {
+      "ENV_eave_building": {
+        "u": 0.6625654697418213,
+        "v": 1.076127529144287,
+        "depth": -31.423480987548828,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 3.625699281692505,
+        "v": -2.1987950801849365,
+        "depth": 3.2544777393341064,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": 0.5600814819335938,
+        "v": 0.2249130755662918,
+        "depth": 22.157793045043945,
+        "center_in_frame": true
+      },
+      "ENV_gate": {
+        "u": 0.6105638146400452,
+        "v": 0.44493600726127625,
+        "depth": 36.2422981262207,
+        "center_in_frame": true
+      },
+      "PRP_winch_plinth": {
+        "u": 0.5140444040298462,
+        "v": 0.3111371099948883,
+        "depth": 31.491853713989258,
+        "center_in_frame": true
+      },
+      "PRP_return_base": {
+        "u": 0.7962773442268372,
+        "v": 0.30758345127105713,
+        "depth": 31.42348289489746,
+        "center_in_frame": true
+      },
+      "PRP_control": {
+        "u": 0.4641699194908142,
+        "v": 0.3863663375377655,
+        "depth": 33.698883056640625,
+        "center_in_frame": true
+      }
+    },
+    "265": {
+      "ENV_eave_building": {
+        "u": 0.5630277395248413,
+        "v": 0.8080114126205444,
+        "depth": -43.58075714111328,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": -0.9192320704460144,
+        "v": 1.2288997173309326,
+        "depth": -7.336557865142822,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": 0.5458247065544128,
+        "v": 0.1375231146812439,
+        "depth": 10.733705520629883,
+        "center_in_frame": true
+      },
+      "ENV_gate": {
+        "u": 0.5920266509056091,
+        "v": 0.4836466312408447,
+        "depth": 25.127716064453125,
+        "center_in_frame": true
+      },
+      "PRP_winch_plinth": {
+        "u": 0.4535861611366272,
+        "v": 0.2876512408256531,
+        "depth": 19.956239700317383,
+        "center_in_frame": true
+      },
+      "PRP_return_base": {
+        "u": 0.8821808695793152,
+        "v": 0.30474981665611267,
+        "depth": 20.725780487060547,
+        "center_in_frame": true
+      },
+      "PRP_control": {
+        "u": 0.37660282850265503,
+        "v": 0.3964078724384308,
+        "depth": 22.0527400970459,
+        "center_in_frame": true
+      }
+    },
+    "337": {
+      "ENV_eave_building": {
+        "u": 0.719438374042511,
+        "v": 0.6373283267021179,
+        "depth": -50.74336242675781,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 0.15600934624671936,
+        "v": 0.6368526220321655,
+        "depth": -16.8502254486084,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": -0.2622307240962982,
+        "v": -0.1420619636774063,
+        "depth": 2.8016271591186523,
+        "center_in_frame": false
+      },
+      "ENV_gate": {
+        "u": 0.5723722577095032,
+        "v": 0.5284270644187927,
+        "depth": 16.86114501953125,
+        "center_in_frame": true
+      },
+      "PRP_winch_plinth": {
+        "u": 0.28675198554992676,
+        "v": 0.27025672793388367,
+        "depth": 12.159974098205566,
+        "center_in_frame": true
+      },
+      "PRP_return_base": {
+        "u": 1.0486598014831543,
+        "v": 0.23122595250606537,
+        "depth": 11.398550033569336,
+        "center_in_frame": false
+      },
+      "PRP_control": {
+        "u": 0.21827086806297302,
+        "v": 0.43673479557037354,
+        "depth": 14.618431091308594,
+        "center_in_frame": true
+      }
+    },
+    "385": {
+      "ENV_eave_building": {
+        "u": 1.2784537076950073,
+        "v": 0.42441195249557495,
+        "depth": -40.99843978881836,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 0.7880032062530518,
+        "v": 0.40169626474380493,
+        "depth": -19.095766067504883,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": -1.6436245441436768,
+        "v": 0.5879814028739929,
+        "depth": 2.9863905906677246,
+        "center_in_frame": false
+      },
+      "ENV_gate": {
+        "u": 0.588208019733429,
+        "v": 0.525758683681488,
+        "depth": 14.05316162109375,
+        "center_in_frame": true
+      },
+      "PRP_winch_plinth": {
+        "u": 0.1680845320224762,
+        "v": 0.3306770324707031,
+        "depth": 11.659954071044922,
+        "center_in_frame": true
+      },
+      "PRP_return_base": {
+        "u": 1.1286765336990356,
+        "v": 0.053860876709222794,
+        "depth": 6.220777988433838,
+        "center_in_frame": false
+      },
+      "PRP_control": {
+        "u": 0.2035767138004303,
+        "v": 0.4768390357494354,
+        "depth": 14.8034086227417,
+        "center_in_frame": true
+      }
+    },
+    "433": {
+      "ENV_eave_building": {
+        "u": 1.9428431987762451,
+        "v": 0.2952209413051605,
+        "depth": -28.752582550048828,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 1.246694564819336,
+        "v": 0.3021523356437683,
+        "depth": -15.746932983398438,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": -0.9323725700378418,
+        "v": 0.6437224745750427,
+        "depth": 5.935379505157471,
+        "center_in_frame": false
+      },
+      "ENV_gate": {
+        "u": 0.5694970488548279,
+        "v": 0.5250584483146667,
+        "depth": 14.29249382019043,
+        "center_in_frame": true
+      },
+      "PRP_winch_plinth": {
+        "u": 0.17160186171531677,
+        "v": 0.37188956141471863,
+        "depth": 13.533400535583496,
+        "center_in_frame": true
+      },
+      "PRP_return_base": {
+        "u": 0.8554308414459229,
+        "v": 0.04911841079592705,
+        "depth": 5.823960781097412,
+        "center_in_frame": true
+      },
+      "PRP_control": {
+        "u": 0.24147115647792816,
+        "v": 0.48911869525909424,
+        "depth": 16.764188766479492,
+        "center_in_frame": true
+      }
+    },
+    "480": {
+      "ENV_eave_building": {
+        "u": 2.605595588684082,
+        "v": 0.18991388380527496,
+        "depth": -21.398740768432617,
+        "center_in_frame": false
+      },
+      "ENV_residence": {
+        "u": 1.5999884605407715,
+        "v": 0.24326995015144348,
+        "depth": -13.046656608581543,
+        "center_in_frame": false
+      },
+      "ENV_shelter_roof": {
+        "u": -0.6426875591278076,
+        "v": 0.622037947177887,
+        "depth": 7.979918956756592,
+        "center_in_frame": false
+      },
+      "ENV_gate": {
+        "u": 0.572928786277771,
+        "v": 0.5204496383666992,
+        "depth": 14.820935249328613,
+        "center_in_frame": true
+      },
+      "PRP_winch_plinth": {
+        "u": 0.204762265086174,
+        "v": 0.38594791293144226,
+        "depth": 14.899720191955566,
+        "center_in_frame": true
+      },
+      "PRP_return_base": {
+        "u": 0.7159696817398071,
+        "v": 0.07181654870510101,
+        "depth": 6.245704174041748,
+        "center_in_frame": true
+      },
+      "PRP_control": {
+        "u": 0.27991339564323425,
+        "v": 0.49121594429016113,
+        "depth": 18.091583251953125,
+        "center_in_frame": true
+      }
+    }
+  },
+  "not_proven": [
+    "actual video motion",
+    "subject visibility between stills",
+    "occlusion-free entire camera volume",
+    "sound",
+    "model compliance",
+    "MC00-to-MC01 dynamic junction",
+    "human acceptance"
+  ],
+  "new_mp4_count": 0
+}

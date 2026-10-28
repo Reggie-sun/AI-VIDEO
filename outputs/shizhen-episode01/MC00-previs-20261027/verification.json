@@ -1,0 +1,64 @@
+{
+  "scope": "STATIC_REFERENCE_PREPARATION_ONLY",
+  "user_override": "先不要开始生成视频,生成之前给我看referces",
+  "head_observed": "679975e560a4b8ea8520b785280f9b61f3977452",
+  "script_checks": [
+    {
+      "path": "outputs/shizhen-episode01/MC00-previs-20261027/build_previs.py",
+      "syntax": "PASS",
+      "sha256": "61e01fea31283fa2bf72ad789e6d09293e0470f7f30ca02fedaca18bbfa7a6d2"
+    },
+    {
+      "path": "outputs/shizhen-episode01/MC00-previs-20261027/audit_scene.py",
+      "syntax": "PASS",
+      "sha256": "45acf604eba88b675a34d71097ae2526e192deee86ba165b01879b50c3ef1391"
+    },
+    {
+      "path": "outputs/shizhen-episode01/MC00-previs-20261027/make_reference_review.py",
+      "syntax": "PASS",
+      "sha256": "ad9acda76d739f0644ad75e6e0b5f3a8b8346430161b90b7991b64958971239a"
+    }
+  ],
+  "static_images_verified": 8,
+  "reference_manifest_sha256": "f076003fb207aed85e66283e17cc041ff4ce84a87b0059e625b90242e512f0e5",
+  "blend_sha256": "46d4fa0f92aa965cf197fcce77c749f2814f26520e232b2c694ad96234e97ee0",
+  "scene_audit_sha256": "8c61f36e47e87af012ea7b79d00dae1b5f22bc4f38a68d51d376f71732692004",
+  "camera_samples_sha256": "13fb3557e5dc7380510ac000425c0bd80a8eb1aff80fad70b97e883c074af1c9",
+  "new_mp4_count": 0,
+  "new_provider_submit_count": 0,
+  "new_paid_call_count": 0,
+  "protected_sources": [
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+      "sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+      "unchanged": true
+    }
+  ],
+  "validation_level": "task-local asset and documentation checks; not product harness focused/related/full",
+  "native_read_only_review": {
+    "agent": "/root/mc00_spatial_review",
+    "role": "executor",
+    "scope": "v1 diagnosis and v2 static reference review",
+    "finding": "v2 no blocking static geometry error; end remains wider and gate perspective flatter than MC01",
+    "no_dynamic_pass": true
+  },
+  "verdict": "STATIC_REFERENCE_CANDIDATES_READY_TO_SHOW",
+  "not_evaluated": [
+    "human reference acceptance",
+    "actual continuous video",
+    "speed naturalness",
+    "sequential landmark reveal",
+    "full collision volume",
+    "exact MC01 dynamic junction",
+    "sound",
+    "model compliance",
+    "Production qualification",
+    "Final Acceptance"
+  ],
+  "publication": "LOCAL_REFERENCE_CANDIDATES_ONLY_NO_FILM"
+}
