@@ -210,6 +210,11 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
     facade = importlib.import_module("ai_video.production.state_commit")
     feedback = importlib.import_module("ai_video.production._state_commit_generation_feedback")
     assert facade.ProductionStateCommitter.record_generation_experience.__module__ == feedback.__name__
+    for name in ("record_local_video_submit_intent", "record_local_video_submit_result",
+                 "record_local_video_status_observation", "record_local_video_fetch_result"):
+        assert getattr(facade.ProductionStateCommitter, name).__module__ == (
+            "ai_video.production._state_commit_video_local"
+        )
     assert tuple(
         owner.__name__ for owner in facade.ProductionStateCommitter.__mro__[1:-1]
     ) == (
@@ -218,6 +223,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitCommercialSourceMixin",
         "_StateCommitCommercialSourceRecoveryMixin",
         "_StateCommitVideoMixin",
+        "_StateCommitLocalVideoMixin",
         "_StateCommitAdMixin",
         "_StateCommitGenerationFeedbackMixin",
         "_StateCommitGenerationRejectionMixin",
