@@ -6,6 +6,8 @@ learning_eligibility: ineligible
 
 # Shizhen Macro Reference Preparation
 
+> **Latest Status — 2026-10-28:** 后续已实际提交一次 MC00 首尾帧试片，exact SHA `af1507969bb88b6be6379bfd991c8ba26864fd11a334e66144a4de371b8df5b2`，Post-Media Gate 为 FAIL。用户要求停止；制作保持停止。完整用户反馈、Agent 处理过程及实际输入见[过程记录](2026-10-28-shizhen-mc00-process-and-user-feedback.md)。本文后文“新视频0／尚未提交”等为当时历史阶段，不再代表最新状态。
+
 > **Current Update — 2026-10-28:** 用户认可停止完整城市白模，改用位置总图和写实参考。新包见 `MC00-reference-revision-20261028/`；四次制图全部 known，当前只作静态候选，站棚形制及工人动作仍有限制。总览已同步唯一市政原片末态；旧 proxy FAIL、楼梯 FAIL、正式视频准入及原速声画验收缺口保持。期间先完成 OMX 图片 stdin 热修复，见独立 runtime record。
 
 Date: 2026-10-27
