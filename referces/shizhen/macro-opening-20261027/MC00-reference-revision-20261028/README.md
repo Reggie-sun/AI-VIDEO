@@ -28,3 +28,7 @@
 住宅、站棚与市政在三张图中的逐构件对应和真实显露顺序没有动态证据；雨线、车流、工人手势、门速与尾帧如何连续衔接仍 `NOT_EVALUATED`。静态画面不能判定工人是否提前按停，更不能证明没有重复动作。未新增或延续白模视频，未伪造连续预演。下阶段需要先解决实际输入条件及必要的模型控制缺口，不能凭图漂亮就提交。
 
 当前选定 2.5 首尾帧模式只实际接受首／尾两图，不能把城市中间图、位置图或失败 proxy 视频悄悄作为额外控制。新增图未消除既有 conditioning 的景别兼容性缺口；七项兼容性证据仍未签真，不修改共享 contract 绕过。楼梯原 FAIL 继续阻止后续正式视频推进。
+
+## Verification Boundary
+
+四次输入／输出 SHA、纯中文 prompt、21 项总览 exact 源与页面本地链接已核对；浏览器实际加载7／21张图，桌面与手机无横向溢出，文档 contract 通过。对本次 exact commit range 尝试 Harness focused 后，因 `referces/` 的提示词、SVG、HTML、JSON 无 module mapping 而在执行前拒绝，未取得该范围的 focused receipt。此项明确为验证映射缺口，不扩大运行无关全套测试、不调整 Gate 放行，也不冒称工程或媒体验收通过。实际已完成的素材／页面检查见本目录 verification 与 browser-review。

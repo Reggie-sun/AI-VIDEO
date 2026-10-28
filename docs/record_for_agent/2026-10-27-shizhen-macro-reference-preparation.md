@@ -418,3 +418,5 @@ Parent与独立 native executor实际看图后，只接受为有限静态构图�
 当前新视频0、平台视频提交0、音乐0，未创建新Production／permit或把新图自动替换进正式草稿。2.5首尾模式不能实际绑定整包中间图，既有不同景别 compatibility 缺口保持，七项未签真；不修改 shared contract、Gate 或视频预算。连续运动、声音、精确市政接点和人工验收均 NOT_EVALUATED，旧楼梯 FAIL 保持。按 record-ai-video-session 续记同主题，自动 distill-ai-video-learning 评估 no_candidate：单组同源静态参考修订不足以推导通用模型服从规则。
 
 实际浏览器验证了修订页7张图片和完整总览21张图片全部解码，桌面1440px及手机390px无横向溢出；相对图片／页面链接均可解析。21项总览的exact SHA与各自源文件重新比较一致，四次实际引用和纯中文prompt的hash一致，文档contract通过。这里只验证参考归档与静态页面，不执行视频Gate或将未见的动态／声音项目签为通过。
+
+最新 Harness 事实：Hook 归档 exact owned range `5833762^..5833762` 的 focused 校验通过，receipt 为 `.agent/harness/runs/omx-native-hook-stdin-owned-range-20261028/receipt.json`。城市参考 range `5833762..13fd16a` 的 focused 尝试在执行前明确拒绝：`referces/` 中提示词、SVG、HTML、JSON 缺少 module mapping，故未取得该范围的 focused receipt。未沿用历史阻断说法，也没有扩跑无关全套、修改 Harness 规则或把手工素材检查冒称工程通过；该缺口与媒体未验分开保留。

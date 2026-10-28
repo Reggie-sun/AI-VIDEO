@@ -74,5 +74,12 @@
     "revision": 7,
     "full_opening": 21
   },
-  "mobile_and_desktop_horizontal_overflow": false
+  "mobile_and_desktop_horizontal_overflow": false,
+  "harness_focused": {
+    "status": "NOT_EVALUATED_MAPPING_MISSING",
+    "attempted_commit_range": "5833762..13fd16a",
+    "receipt": null,
+    "reason": "referces prompts/SVG/HTML/JSON have no module mapping; verification rejected before checks",
+    "no_policy_or_gate_change": true
+  }
 }
