@@ -1,0 +1,41 @@
+{
+  "scope": "Full opening reference package; MC03 straight-stair and side-face static repair only",
+  "max_new_image_calls": 3,
+  "planned_new_views": 2,
+  "repair_reserve": 1,
+  "elapsed_limit_seconds": 1800,
+  "auto_retries": 0,
+  "video_calls": 0,
+  "prompt_file": "MC03-start-prompt.txt",
+  "prompt_sha256": "47c4eb8114775eb4928bec37ad0e3c77effe5d445568c40d502a8ede6e4162c2",
+  "references": [
+    {
+      "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/L01-r1.png",
+      "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/stair-structure-white-v1.png",
+      "sha256": "8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876"
+    }
+  ],
+  "created_at": "2026-10-28T03:42:06.106046+00:00",
+  "status": "KNOWN_OUTPUT_SAVED",
+  "actual_calls": 1,
+  "production_binding": false,
+  "output_path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v1.png",
+  "output_sha256": "84ac8a4b7ebaf67ab7c3af4347b79525d45c9dca489744c5659a9798f8285db1",
+  "output_dimensions": [
+    1672,
+    941
+  ],
+  "billing": "NOT_EXPOSED",
+  "observation": "side-face and body visible; straight main flight visible; woman is already partway down, not literal first/second step; lower-door path still needs continuity verification"
+}

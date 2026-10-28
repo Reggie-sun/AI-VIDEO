@@ -1,0 +1,39 @@
+{
+  "scope": "one MC03 spatial layout correction; lock lower narrow-window door",
+  "package_image_ceiling": 3,
+  "prior_known_calls": 2,
+  "max_calls": 1,
+  "auto_retries": 0,
+  "status": "KNOWN_OUTPUT_SAVED",
+  "actual_calls": 1,
+  "prompt_file": "MC03-side-repair-prompt.txt",
+  "prompt_sha256": "e995a7a1ef8f39b98cd5141ba14f36c30bc02af7174248c1dde11a8748b60672",
+  "references": [
+    {
+      "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/stair-structure-white-v1.png",
+      "sha256": "8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e"
+    },
+    {
+      "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v1.png",
+      "sha256": "84ac8a4b7ebaf67ab7c3af4347b79525d45c9dca489744c5659a9798f8285db1"
+    }
+  ],
+  "video_calls": 0,
+  "production_binding": false,
+  "output_path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+  "output_sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868",
+  "output_dimensions": [
+    1672,
+    941
+  ],
+  "billing": "NOT_EXPOSED",
+  "observation": "side-face and straight stairs with narrow-window closed-door landing; woman remains midflight, not literal first/second step; exact dynamic continuity not established"
+}

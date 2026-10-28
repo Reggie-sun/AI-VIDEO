@@ -1,0 +1,410 @@
+{
+  "scope": "FULL_OPENING_STATIC_REFERENCE_CATALOGUE_ONLY",
+  "created_at": "2026-10-28T03:58:23.954537+00:00",
+  "coverage": [
+    "MC00",
+    "MC01",
+    "MC02",
+    "MC03",
+    "MC04",
+    "MC05",
+    "MC06",
+    "B6"
+  ],
+  "static_image_count": 21,
+  "image_checks": [
+    {
+      "file": "MC00-02-eave-start-v1.png",
+      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC00-01-city-reveal-v1.png",
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC00-03-descent-v2.png",
+      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC00-04-site-end-v1.png",
+      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC01-normal.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC01-control-off.png",
+      "sha256": "fa0c8fc852998f13493dce5cb2d43fc631b7fcf7ddd39ecb91c49170bbd4c2d3",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC01-limit.png",
+      "sha256": "67a288aea2b44f6e187601839bc312f660d8692098e9fadea3a6c19980e2eeb2",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC02-force-before.png",
+      "sha256": "cc4410babb9db28775586dc76931d9532817af4983491a694c242c1de27889cc",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC02-force-after.png",
+      "sha256": "3d461331069e5505af70b6e18e36b0ec05098890f181146e775d8df90dae55fb",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC03-descent-side-v2.png",
+      "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC03-arrival-reuse.png",
+      "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC04-before-contact.png",
+      "sha256": "1e1313c0b320ee92d2fe0edf2e175f1c5bfbca9dfd95d2c82d3756658f8656c3",
+      "dimensions": [
+        1671,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC04-contact-closed.png",
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC04-half-open.png",
+      "sha256": "dfb02d063df65f536008d64f32ab79d108b3d904fd8de01349b701d25575a51e",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC04-reveal-open.png",
+      "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC05-reaction.png",
+      "sha256": "fb9fbda5bc6e3dd9babfbc0098b0c6cad83c2b422e98e3d1ade70e1b69ec3491",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC06-wide-reuse.png",
+      "sha256": "e922c151f9b4532cf5d5ec26546efe03c3f0d5c299e36c229b62d4cd2d98a270",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "MC06-B6-entry-comparison.png",
+      "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "B6-entry.png",
+      "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "Dong-Wenhui-identity.png",
+      "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "source_bytes_match": true
+    },
+    {
+      "file": "straight-stair-geometry.png",
+      "sha256": "8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "source_bytes_match": true
+    }
+  ],
+  "new_image_calls": 3,
+  "known_outcomes": 3,
+  "unknown": 0,
+  "auto_retries": 0,
+  "new_video_calls": 0,
+  "billing": "NOT_EXPOSED_AMOUNT_PENDING",
+  "intent_checks": [
+    {
+      "file": "MC03-exit-intent.json",
+      "sha256": "b16db87d4d7882dc7814bece14ea4be1a4c9d9618318bd3ba3395356e3c5e330",
+      "actual_calls": 1,
+      "outcome": "KNOWN"
+    },
+    {
+      "file": "MC03-side-repair-intent.json",
+      "sha256": "6d5c1296d063091daf3178e6a28fb43e413ef0e6ff5da7f5530b40eb2de823bf",
+      "actual_calls": 1,
+      "outcome": "KNOWN"
+    },
+    {
+      "file": "MC03-start-intent.json",
+      "sha256": "953bcb32bbe12b884b77565ed237af7a104b6c8b5e5d7ae720ee6ff9ebb71e48",
+      "actual_calls": 1,
+      "outcome": "KNOWN"
+    }
+  ],
+  "selected_new_static_image": "MC03-descent-side-v2.png",
+  "retained_not_selected": [
+    "MC03-descent-side-v1.png",
+    "MC03-exit-v1.png"
+  ],
+  "native_static_review": {
+    "agent": "/root/mc00_spatial_review",
+    "role": "executor",
+    "verdict": "side-v2 static main reference candidate, not dynamic acceptance",
+    "observations": [
+      "straight flight to flat area before narrow-window closed door",
+      "face, body and feet visible",
+      "no precise step count or action-phase pass"
+    ]
+  },
+  "protected_sources": [
+    {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+      "sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+      "unchanged": true
+    }
+  ],
+  "source_frame_extraction": {
+    "media": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+    "fps": "24/1",
+    "source_frames": [
+      0,
+      40,
+      103,
+      104,
+      163
+    ],
+    "method": "ffmpeg decoded frame selection; no crop/resize"
+  },
+  "b6": {
+    "entire_original_source": true,
+    "duration_seconds": 21.875,
+    "frames": 525,
+    "range_readback": {
+      "status": 206,
+      "content_range": "bytes 0-31/24390940",
+      "bytes": 32,
+      "identity_match": true
+    },
+    "not_reencoded": true
+  },
+  "gallery_readbacks": [
+    {
+      "file": "index.html",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC00-02-eave-start-v1.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC00-01-city-reveal-v1.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC00-03-descent-v2.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC00-04-site-end-v1.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC01-normal.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC01-control-off.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC01-limit.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC02-force-before.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC02-force-after.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC03-descent-side-v2.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC03-arrival-reuse.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC04-before-contact.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC04-contact-closed.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC04-half-open.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC04-reveal-open.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC05-reaction.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC06-wide-reuse.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "MC06-B6-entry-comparison.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "B6-entry.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "Dong-Wenhui-identity.png",
+      "status": 200,
+      "bytes_match": true
+    },
+    {
+      "file": "straight-stair-geometry.png",
+      "status": 200,
+      "bytes_match": true
+    }
+  ],
+  "new_production_binding": false,
+  "old_stair_media_gate": "FAIL_RETAINED",
+  "not_evaluated": [
+    "human reference acceptance",
+    "MC00 grade and approach",
+    "MC03 exact action phase and full path",
+    "MC04-MC05 motion junction",
+    "MC06-B6 actual audiovisual entry",
+    "new model compliance",
+    "new media sound",
+    "whole-film final acceptance"
+  ],
+  "validation_level": "task-local static assets, source identity, page and documentation only",
+  "verdict": "FULL_REFERENCE_CATALOGUE_READY_FOR_USER_REVIEW",
+  "learning_outcome": "no_candidate"
+}

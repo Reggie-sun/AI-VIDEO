@@ -1,0 +1,238 @@
+{
+  "scope": "Full independent cold-opening static reference catalogue, MC00-MC06 and protected B6",
+  "status": "CANDIDATES_FOR_USER_REVIEW",
+  "items": [
+    {
+      "shot": "MC00",
+      "file": "MC00-02-eave-start-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
+      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+      "title": "屋檐滴雨与遮挡起幅",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC00",
+      "file": "MC00-01-city-reveal-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-v1.png",
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c",
+      "title": "横移后城市展开",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC00",
+      "file": "MC00-03-descent-v2.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/03-descent-v2.png",
+      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a",
+      "title": "沿路下降与地标定位",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC00",
+      "file": "MC00-04-site-end-v1.png",
+      "source": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/04-site-end-v1.png",
+      "sha256": "4251a11fcc78c4487af405f1ae59ef6276f0ca0c7b298550b771422ad4d88ca8",
+      "title": "市政正常末态",
+      "basis": "本窗口既有写实候选；高差与连续运镜待验证",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC01",
+      "file": "MC01-normal.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/municipal-normal-000.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "title": "起始状态",
+      "basis": "已认可市政原片第0帧，不重生成",
+      "copy": "EXACT_BYTES",
+      "production_binding": false,
+      "source_frame": 0,
+      "source_fps": 24
+    },
+    {
+      "shot": "MC01",
+      "file": "MC01-control-off.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/municipal-source-01.png",
+      "sha256": "fa0c8fc852998f13493dce5cb2d43fc631b7fcf7ddd39ecb91c49170bbd4c2d3",
+      "title": "控制断开后，工作灯已灭",
+      "basis": "已认可市政原片第40帧；静态图不证明先后动作",
+      "copy": "EXACT_BYTES",
+      "production_binding": false,
+      "source_frame": 40,
+      "source_fps": 24
+    },
+    {
+      "shot": "MC01",
+      "file": "MC01-limit.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/municipal-source-02.png",
+      "sha256": "67a288aea2b44f6e187601839bc312f660d8692098e9fadea3a6c19980e2eeb2",
+      "title": "门到限位，工人观察",
+      "basis": "已认可市政原片第103帧",
+      "copy": "EXACT_BYTES",
+      "production_binding": false,
+      "source_frame": 103,
+      "source_fps": 24
+    },
+    {
+      "shot": "MC02",
+      "file": "MC02-force-before.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/municipal-source-03.png",
+      "sha256": "cc4410babb9db28775586dc76931d9532817af4983491a694c242c1de27889cc",
+      "title": "连接处近景前态",
+      "basis": "已认可市政原片第104帧",
+      "copy": "EXACT_BYTES",
+      "production_binding": false,
+      "source_frame": 104,
+      "source_fps": 24
+    },
+    {
+      "shot": "MC02",
+      "file": "MC02-force-after.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/municipal-source-04.png",
+      "sha256": "3d461331069e5505af70b6e18e36b0ec05098890f181146e775d8df90dae55fb",
+      "title": "持续受力后的连接处",
+      "basis": "已认可市政原片第163帧；变化由原视频证明",
+      "copy": "EXACT_BYTES",
+      "production_binding": false,
+      "source_frame": 163,
+      "source_fps": 24
+    },
+    {
+      "shot": "MC03",
+      "file": "MC03-descent-side-v2.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+      "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868",
+      "title": "斜侧下行，人物侧脸、直梯与窄窗门前平台",
+      "basis": "本轮新空间修订候选；仍在梯段中间，不签精确起止或动态修复",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC03",
+      "file": "MC03-arrival-reuse.png",
+      "source": "referces/shizhen/macro-opening-20261027/action-sequences-04/A2-arrival.png",
+      "sha256": "4191820288ee311b6cc3cb9ec985ca66d13215ed7ef9a434ed8e30c4506bfac6",
+      "title": "既有下平台到达状态",
+      "basis": "旧静态候选，只供到达站位；不作为新直梯结构母图",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC04",
+      "file": "MC04-before-contact.png",
+      "source": "referces/shizhen/macro-opening-20261027/action-sequences-04/B0-before-contact.png",
+      "sha256": "1e1313c0b320ee92d2fe0edf2e175f1c5bfbca9dfd95d2c82d3756658f8656c3",
+      "title": "到达后，尚未触门",
+      "basis": "既有静态场次候选",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC04",
+      "file": "MC04-contact-closed.png",
+      "source": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876",
+      "title": "右手接触关闭把手",
+      "basis": "复用门向修订03，非原早期外拉图",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC04",
+      "file": "MC04-half-open.png",
+      "source": "referces/shizhen/macro-opening-20261027/action-sequences-04/B1-contact-push.png",
+      "sha256": "dfb02d063df65f536008d64f32ab79d108b3d904fd8de01349b701d25575a51e",
+      "title": "右手向内推门，中间态",
+      "basis": "既有静态候选；门角度与接触动态待验",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC04",
+      "file": "MC04-reveal-open.png",
+      "source": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L03-push-open.png",
+      "sha256": "eca6dc03ff3869c9d9e0eb3cf7327b56771fd5d092ae8231f7dcf3d17c806648",
+      "title": "门后灭火器与旧卡箍印显露",
+      "basis": "既有门向修订03候选，不证明空间异常已动态成立",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC05",
+      "file": "MC05-reaction.png",
+      "source": "referces/shizhen/macro-opening-20261027/repair-02/L04.png",
+      "sha256": "fb9fbda5bc6e3dd9babfbc0098b0c6cad83c2b422e98e3d1ade70e1b69ec3491",
+      "title": "同侧扶门，核对而非解释",
+      "basis": "既有反应候选；右手、门角度及动作接点需原速核对",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC06",
+      "file": "MC06-wide-reuse.png",
+      "source": "referces/shizhen/macro-opening-20261027/T01.png",
+      "sha256": "e922c151f9b4532cf5d5ec26546efe03c3f0d5c299e36c229b62d4cd2d98a270",
+      "title": "站棚远景，两人仍在",
+      "basis": "既有T01候选，不是B6实际第0帧",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "MC06",
+      "file": "MC06-B6-entry-comparison.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/B6-exact-first-frame.png",
+      "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812",
+      "title": "与B6实际首帧比较",
+      "basis": "保护文件第0帧；保留原AI来源标识",
+      "copy": "EXACT_BYTES",
+      "production_binding": false,
+      "source_frame": 0,
+      "source_fps": 24
+    },
+    {
+      "shot": "B6",
+      "file": "B6-entry.png",
+      "source": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/B6-exact-first-frame.png",
+      "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812",
+      "title": "完整B6的实际入点",
+      "basis": "原片复用，21.875秒、525帧，声画与片名原样保留",
+      "copy": "EXACT_BYTES",
+      "production_binding": false,
+      "source_frame": 0,
+      "source_fps": 24
+    },
+    {
+      "shot": "SUPPORT",
+      "file": "Dong-Wenhui-identity.png",
+      "source": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+      "title": "董文慧身份母图",
+      "basis": "身份候选；不采用第二集scene-v3服装",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    },
+    {
+      "shot": "SUPPORT",
+      "file": "straight-stair-geometry.png",
+      "source": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/stair-structure-white-v1.png",
+      "sha256": "8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e",
+      "title": "独立直梯结构依据",
+      "basis": "结构辅助，不能直接当人物动作首帧",
+      "copy": "EXACT_BYTES",
+      "production_binding": false
+    }
+  ],
+  "new_image_calls_this_scope": 3,
+  "new_video_calls": 0,
+  "all_input_and_generated_images_only_candidates": true,
+  "media_gate_not_closed": true,
+  "retained_not_selected": [
+    "MC03-descent-side-v1.png",
+    "MC03-exit-v1.png"
+  ]
+}

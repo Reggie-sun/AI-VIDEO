@@ -1,0 +1,39 @@
+{
+  "scope": "same MC03 straight stair lower-stage static reference",
+  "package_image_ceiling": 3,
+  "prior_known_calls": 1,
+  "max_calls": 1,
+  "auto_retries": 0,
+  "status": "KNOWN_OUTPUT_SAVED",
+  "actual_calls": 1,
+  "prompt_file": "MC03-exit-prompt.txt",
+  "prompt_sha256": "d991f2f51d075720822181569cd0eeef3bec14c5af3f507807d80741dc830f81",
+  "references": [
+    {
+      "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v1.png",
+      "sha256": "84ac8a4b7ebaf67ab7c3af4347b79525d45c9dca489744c5659a9798f8285db1"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/stair-structure-white-v1.png",
+      "sha256": "8f877405bd8f8432779c42e113177279e1d060be8ebd946a7297509cae0efa1e"
+    },
+    {
+      "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/door-push-repair-03/L02-push-closed.png",
+      "sha256": "dddd6247249094a0af985a1e0c86502bd6fc13a74b4356df127a4a007340b876"
+    }
+  ],
+  "video_calls": 0,
+  "production_binding": false,
+  "output_path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-exit-v1.png",
+  "output_sha256": "6643df93bfecb357be6eeb5947ce0c12e17e554d35bdb90a7b49da7b254f0978",
+  "output_dimensions": [
+    1672,
+    941
+  ],
+  "billing": "NOT_EXPOSED",
+  "observation": "body faces lower closed door, step edges appear straight; not yet last-step landing, no exact predecessor geometry or timing proof"
+}

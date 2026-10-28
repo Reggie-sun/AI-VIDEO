@@ -366,3 +366,17 @@ record-ai-video-session继续同一主题；distill-ai-video-learning为no_candi
 尚有设计缺口：01／03生成了站棚后矮墙并使作业区明显高出人行道；04只提供局部原场地，未证明新挡墙与开放入口如何连接。该高差与接近路径明确NOT_EVALUATED，后续应在同一布局／相机工程修正和核验；不能从几张漂亮图推断连续相机成立，也不能开始正式视频让模型猜路径。建筑逐构件、地标遮挡显露、速度自然、末段交接、完整声音、模型服从和human接受同样未验。新图无正式视频绑定、无Production activation／P6／Final Acceptance，不移除楼梯FAIL或真实submit gates。
 
 本轮只验证PNG decode／RGB／SHA、原bytes复制、prompt纯中文／hash、实际引用不漂移、静态图观察、参考页图片readback、protected MP4身份及文档检查，不冒充工程related/full或媒体Gate。用户参考先审的阶段终点保持。沿record-ai-video-session更新同主题，distill-ai-video-learning为no_candidate：四个不同视角加一次同源局部修复不是隔离变量的多臂实验，也不证明多参考通用服从率；不修改Skill／Policy／Gate。其他窗口工程与音频材料保留。
+
+## Full Opening Reference Catalogue
+
+用户纠正“不够,我不是只要一个shot的”，本轮扩展当前参考交付范围为整段MC00–MC06＋完整保留B6，视频禁令不变。前轮四张MC00继续作为其自身参考，不再冒充整段包。native explore最小盘点确认此前MC04闭门／接触／半开／开门、MC05侧面反应与MC06远景已有写实候选；优先复用，不按镜号重抽已存在图片。身份索引确认董文慧scene-v3属于第二集白天服务口，不能用于宏观楼梯；宏观保持identity-v1与灰褐连帽外套、深灰裤、黑鞋、低马尾、空手。
+
+市政直接从已认可exact剪辑片选0、40、103、104、163帧，覆盖MC01正常／断控／到限位与MC02近景前后态，PNG保留原标识。没有重生成原市政异常，human接受只归原MP4。MC06复用既有T01较远图并与B6实际第0帧对照，不把原第8帧冒充第0帧。完整B6原21.875秒／525帧以保护文件直接嵌入参考页，未裁剪、混音、重编码或重做字幕／音乐／片名。
+
+MC03当前分镜要求斜侧可见脸与身体、开始下行；旧真实测试为固定背向俯视完整8秒下楼，不能宣称覆盖同一摄影职责。新单元上限3次builtin imagegen、1800秒，绑定身份、宏观衣着／材质、白底直梯及窄窗关门平台，实际3次known。首图side-v1侧脸可辨但出现另一梯段；第二图exit-v1方向可读但门左窗变宽、非末级。native executor只读复核指出两图不能封为同段严格首尾，均保留问题历史并从当前选图移出。最后一次side-v2修正为同一直跑通向窄竖窗关门平台，侧脸／身体／平直踏步可见；人物仍在梯段中间，不伪称prompt第一／第二级精确执行。旧到达图仅作站位，仍不作为几何母图或硬首尾绑定。新图不关闭旧楼梯FAIL；没有继续正式视频。
+
+整段入口`referces/shizhen/macro-opening-20261027/full-opening-references-20261027/index.html`，当前21张图片覆盖8个镜头／保留段分组及辅助图，不把图数当Shot数。每张保留来源、SHA、职责与候选边界；任务本地package脚本只复制和建立页面，不新建生产执行框架。原市政与B6 SHA在当前verification重新核对。PNG本体留本地，Git保存prompt、来源／用途、核验与说明。
+
+仍未证明：MC00高差与入口、MC03完整下行路径／动作阶段／跨机位几何、MC04–05实际持门和反应接点、MC06→B6原速入点、全段声音、模型服从及human接受。新scope生图3、自动retry0、未知0、视频0，费用及模型身份工具未暴露。旧宏观真实视频计数仍6，旧下楼／推门有限单元不挪用，楼梯FAIL保持。其他窗口的合成／声音／commercial execution等dirty/staged工作保持。
+
+按record-ai-video-session续记同主题，distill-ai-video-learning评估no_candidate：本次是完整参考汇总与同源静态空间修订，未形成模型受控对照或通过的动态实验，不提炼通用质量规则，不改Skill／Policy／Gate。文档、图像、exact来源与静态观察只按所测层级报告，不冒充工程related/full或媒体Gate通过。
