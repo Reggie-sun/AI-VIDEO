@@ -296,8 +296,13 @@ def test_canonical_routing_keeps_learning_in_development_governance() -> None:
     roadmap = _read(ROOT / "docs" / "v0.2-agentic-production-roadmap.md")
     retrieval = _read(RETRIEVE_SKILL_PATH)
 
-    assert "## Experience Learning Routing" in agents
-    assert "`distill-ai-video-learning` after stable record" in agents
+    # a350c82 将独立的 Experience Learning Routing 章节并入 Completion Standard；
+    # 断言其语义仍由 constitution 常驻，而非仅存在于 advisory playbook。
+    completion = agents.split("## Completion Standard", 1)[1].split("\n## ", 1)[0]
+    assert "`distill-ai-video-learning`" in completion
+    assert "pending advisory claim" in completion
+    assert "exact confirmation" in completion
+    assert "`ADOPTED`" in completion
     assert "### Experience Learning And Confirmation" in playbook
     assert "| Experience Learning And Confirmation |" in matrix
     assert "Q1 automatic recommendation" in baseline
