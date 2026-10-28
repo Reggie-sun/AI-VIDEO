@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-10-27
 
+> **Supersession notice（2026-10-28）**：下文"Gate 与旧 fixture"中 `test_production_ecommerce_job_e2e.py` 7 例
+> 及两例"未细分"中的 `[fail]` 例已确认为产品契约缺口并修复（`97f6161`、`639476e`、`2f8a826`），见
+> [Ecommerce Commercial Performance Review](2026-10-28-ecommerce-commercial-performance-review.md)。
+> 剩余基线失败为：环境 1、Architecture 1、Seedance compiler/4 1、Seedream revision 1。
+> Claude 侧 session-record hooks 已按用户要求于 `d57f85b` 移除，下文所述 Claude hook 接线为历史状态。
+
 ## Purpose
 
 用户要求 Claude Code 接手 Codex 建成的项目 skill 与 Harness，适配并可优化。
