@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-10-05
 
+## Supersession Notice — 2026-10-27
+
+下述 SUBAGENTS Risk Gate、固定角色及审查流程为历史 checkpoint；用户已要求迁移至
+全局 OMX，当前 owner 与验证限制见 [OMX migration](2026-10-27-omx-global-harness-migration.md)。
+历史 findings、消费、receipts 和 Product 安全边界保留；此通知不恢复外部 Agent 授权。
+
 ## Purpose And Authority
 
 用户明确要求将 AI-VIDEO 的旧并行双审默认同步为低频、单 reviewer 的有界流程。

@@ -65,8 +65,7 @@ Model-quality uncertainty 主导且有安全、有界、已授权或 local exemp
 Creative intent 归 Codex + approved Character/Scene/Shot；schema/revision 归 `ProductionProject`，asset identity/provenance 归 Registry，mutable lifecycle/active pointers 归 Manifest；v2 writes/activation/recovery 只归 `ProductionStateCommitter`。
 `ResolvedTimeline` 独占 order/frame/sample/timing/source trim，Dependency Graph/resolver 独占 desired fingerprint、precise invalidation、rebuild frontier；不得复制推导。Render 归 HyperFrames，Generation 经 selected adapter + gates，QA/repair/acceptance 归 receipts + Manifest lifecycle。详细 surface/API/禁止旁路只由 [matrix](docs/agent-primary-contract-matrix.md) 维护。
 
-Fetch/render/analysis/generation success 不构成 activation、QA acceptance 或 delivery。External Skills
-只有 advisory authority，不拥有 Product/Agent runtime 或 canonical state；`runtime_skill_calls = 0`。
+工具成功不构成 activation、QA acceptance 或 delivery；External Skills 不拥有 Production runtime/canonical state，`runtime_skill_calls = 0`；OMX 只管理 Agent workflow state。
 
 ## Task Routing
 
@@ -81,8 +80,7 @@ Blender 资产/参考制作先读 [routing](docs/blender-routing.md)；媒体实
 
 ## Agent Workflow Routing
 
-Native Codex 默认 primary，Skill 不自动拥有 lifecycle。流程选择前读 [Workflow Operations](.agent/context/control-plane-playbook.md#agent-workflow-operations)；authorized written spec 自动触发 `superpowers:writing-plans`，Spec/Plan 默认 Parent self-review。
-Engineering delegation/review 全部使用 Codex 原生子代理，不调用/探测 Kimi 或先等两次失败；用户以后明确重新启用 external subagent 前不自动换其他 provider。完成与改动影响相称的局部验证后，按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断独立审查；未触发由 Parent 完成，触发仅一名 read-only native reviewer。Parent 裁决/修复，exact snapshot、有限轮次与 re-review 由该 owner 独占；required review/unresolved blocker 不得绕过，旧历史不重置。额外 reviewer 仅按用户新的明确要求。
+编排、planning、roles/review 遵循全局 OMX，见 [Workflow Operations](.agent/context/control-plane-playbook.md#agent-workflow-operations)。仅用 Codex 原生 Agent；Parent 负责集成与验证，Product gates 不变。
 
 ## Change Rules
 

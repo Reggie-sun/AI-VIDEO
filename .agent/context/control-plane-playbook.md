@@ -183,7 +183,7 @@ learning evaluation。Trivial/unfinished 明确 no_record；无合格学习 evid
 ## Agent Workflow Operations
 
 ### Workflow Selection
-Native Codex 默认 primary；settled bounded task 直接实施与 focused verification，不因 documentation、configuration、Harness 或多文件强制 full workflow。重大未决 architecture/contract 才先设计，必要时 research；authorized written spec 自动使用 `superpowers:writing-plans`。Spec/Plan 默认 Parent self-review；paid/credential/recovery/QA 的严格 gates 保留，review 按下文 Risk Gate，不自动双审。
+Agent workflow owner 为全局 OMX `~/.codex/AGENTS.md` 及当前安装的 OMX Skills。明确有界任务直接 understand → execute → verify → report；需要规划时用 `$plan`，明确要求自主编排时用 `$autopilot`，持续多目标用 `$ultragoal`，确有多 lane 协调价值时用 `$team`；调用前读对应 Skill。旧 Superpowers 自动 planning 与 SUBAGENTS profile/review 路由退役；Harness 保留测试、exact snapshot 和 receipt 职责，paid/credential/recovery/QA gates 保留。
 
 ### Cognition Tools
 结构关系使用 CodeGraph；职责/语义确有缺口才加 AOCI，简单局部任务禁止机械调用。源码/LSP/tests/runtime 与 canonical contracts 是事实，AOCI 永远 advisory；不符时修正索引，不能覆盖源码。正式认知归 `aoci.txt`、`aoci.meta.txt`、`aoci.code.txt`，语义由模型基于当前 source/contract evidence 编写；状态、维护顺序和安全停点遵从项目 MCP 的 `aoci_rules`、实时 Guide、工具返回及官方文档。稳定后按官方流程维护，不把未对齐索引称为完整认知。
@@ -194,17 +194,13 @@ Native Codex 默认 primary；settled bounded task 直接实施与 focused verif
 仅 staged 清单+时间不能证明 immutable bytes；原生 reviewer 绑定 exact target，read-only，不 nested delegation。
 
 ### Implementation Review
-以相关局部验证为前提，按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断；需要的最终 Harness 留到候选稳定后。
-T3、Spec/Plan 存在、diff 大小或 agent 可用都不自动触发；未触发由 Codex Parent 正常完成。
-触发时只增加一名 native adversarial read-only reviewer，Parent 是 orchestrator/fixer/adjudicator；
-不叠加 Kimi 或第二 reviewer。最低充分 package 绑定 exact snapshot、适用 Spec/Plan、AC 与 verification。
-Native profile/权限/执行证据按 SUBAGENTS.md 核验，不伪造 external/Docker 资格；PARSED/exit0/LGTM 不代替验收，不探测/重试 Kimi。
+按 OMX 当前 workflow 与适用项目合同选择相称 review；不再按旧 SUBAGENTS Risk Gate、固定 profile 或轮数启动另一套流程。
+需要 review 时使用 Codex 原生 OMX `code-reviewer` / `verifier` 等已安装角色，明确只读 scope，Parent 负责集成与裁决。
+交接绑定 exact snapshot、适用 Spec/Plan、AC 与实际 verification；历史 reviewer 意见不证明新字节。
+不调用外部 Agent，不伪造 external/Docker 或媒体资格；PARSED/exit0/LGTM 不代替项目验收。
 
 ### Adjudication
 
-Native review → Parent 调查/裁决 → confirmed blocker 修复 → 受影响局部验证 → 必要 native re-review。
-Parent 用 source、contracts、tests/Harness 和 runtime evidence 关闭 findings，不投票或为争取共识反复调用。
-Semantic fix 绑定新 target；isolated boundary 用 targeted re-review，广域语义变更用 full re-review。
-有限轮次、升级与接手由 SUBAGENTS.md 独占；旧 findings/失败与轮次保留，不得自动第四轮或叠加 reviewer。
-没有 unresolved blocker 才具 completion eligibility，Parent 拥有最终决定；不得降低 AC 以消除 findings。
-旧 Spec/Plan 的双审默认已失效；保留历史，不冒称新 snapshot 已审。
+OMX review findings 由 Parent 以 source、contracts、tests/Harness 和 runtime evidence 裁决；confirmed blocker 修复后重跑受影响验证，语义变化按需复审新 target。
+保留旧 findings、失败/unknown 结果和真实消耗，不以更换流程重置历史或降低 AC；没有 unresolved blocker 且适用验收证据齐备才可完成。
+旧 Spec/Plan 的固定双审流程已退役；其 Product requirements 与用户明确的 approval gate 继续有效。

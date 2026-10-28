@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-10-07
 
+## Supersession Notice — 2026-10-27
+
+下文 preservation map 中的自动 Superpowers planning 与 SUBAGENTS review owner 已退役，
+当前 Agent 编排采用 [OMX migration](2026-10-27-omx-global-harness-migration.md)。
+历史测量、receipts 和 Product requirements 保留，不证明当前流程或媒体验收。
+
 ## Scope
 
 用户选择直接精简 `AGENTS.md`，保留重要约束，详细内容归现有 owner，并授权 commit/push。
