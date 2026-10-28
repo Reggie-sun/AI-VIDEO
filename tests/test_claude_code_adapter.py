@@ -167,6 +167,12 @@ def test_claude_mcp_servers_mirror_codex_project_servers() -> None:
     denied = set(settings.get("permissions", {}).get("deny", []))
     repo_root = "/home/reggie/vscode_folder/AI-VIDEO"
 
+    # Codex 显式停用的 server 不得在 Claude 侧被重新暴露。
+    for name, expected in codex.items():
+        if expected.get("enabled") is False:
+            assert name not in claude, f"{name} is disabled in Codex"
+    codex = {name: server for name, server in codex.items() if server.get("enabled", True)}
+
     # Agent 切换 runtime 不得丢失 CodeGraph/AOCI/Blender 等项目工具面。
     assert set(codex) <= set(claude)
     for name, expected in codex.items():

@@ -300,6 +300,7 @@ def test_canonical_routing_keeps_learning_in_development_governance() -> None:
     # 断言其语义仍由 constitution 常驻，而非仅存在于 advisory playbook。
     completion = agents.split("## Completion Standard", 1)[1].split("\n## ", 1)[0]
     assert "`distill-ai-video-learning`" in completion
+    assert "Record 后自动评估 `distill-ai-video-learning`" in completion  # 先 record 后学习
     assert "pending advisory claim" in completion
     assert "exact confirmation" in completion
     assert "`ADOPTED`" in completion
