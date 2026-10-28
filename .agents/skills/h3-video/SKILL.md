@@ -28,11 +28,14 @@ are not part of this repository; do not invoke or install them from this Skill.
 
 ### Prompt language
 
-`AGENTS.md` requires Chinese-only submitted prompts. A profile with `"prompt_language": "zh"`
-(currently `workflows/profiles/minimax_h3_t8_i2va_turbo_native_v2_zh.json`) compiles grammar
+`AGENTS.md` requires Chinese-only submitted prompts. Select the `<lane>_zh.json` sibling of an
+H3 profile in `workflows/profiles/` (Stock20 quality, T8 T2VA quality/turbo and every T8-native
+turbo lane). A profile with `"prompt_language": "zh"` compiles grammar
 `h3-three-field-zh-v1`: only the three field headers, `[Shot 1]`, `<d>[Language]…</d>`, `S1` and
 `<Picture N>` / `<Audio N>` stay in native form. All other compiler text is Chinese. Profiles
 without the field keep the sealed English grammar `h3-three-field-v1` byte-for-byte for replay.
+Legacy Stock20 `minimax_h3_fl2va.json` has no native H3 prompt, so it has no zh sibling, and a zh
+profile rejects a legacy `/1` requirement instead of falling back to English.
 The compiler only translates its own connectives: authored Shot fields must also be written in
 Chinese. A Chinese H3 prompt has no media A/B evidence yet, so its quality is `NOT_EVALUATED`
 until an exact local attempt passes the per-Shot Gate.

@@ -10,11 +10,31 @@ Validation stays with ``_h3_prompt``; this module only renders validated intent.
 from __future__ import annotations
 
 import re
+from typing import Literal
+
+from pydantic import BaseModel, model_serializer
 
 from ai_video.production.performance_direction import render_performance_direction
 
 H3_ZH_GRAMMAR_CONTRACT = "h3-three-field-zh-v1"
 H3_GRAMMAR_CONTRACTS = frozenset({"h3-three-field-v1", H3_ZH_GRAMMAR_CONTRACT})
+
+
+class H3PromptLanguageProfile(BaseModel):
+    """Sealed H3 profile prompt language; English profiles keep their legacy bytes."""
+
+    prompt_language: Literal["en", "zh"] = "en"
+
+    @model_serializer(mode="wrap")
+    def _omit_default_prompt_language(self, handler):
+        data = handler(self)
+        if isinstance(data, dict) and data.get("prompt_language") == "en":
+            data.pop("prompt_language")
+        return data
+
+    @property
+    def h3_grammar_contract(self) -> str:
+        return H3_ZH_GRAMMAR_CONTRACT if self.prompt_language == "zh" else "h3-three-field-v1"
 
 
 def h3_prompt_language(native_prompt) -> str:
@@ -305,6 +325,7 @@ def render_h3_t2va_zh(requirement, *, endpoint_text: str, dialogue_language: str
 
 
 __all__ = [
+    "H3PromptLanguageProfile",
     "H3_GRAMMAR_CONTRACTS",
     "H3_ZH_GRAMMAR_CONTRACT",
     "ZH_NO_DIALOGUE_SPEECH_CUE",

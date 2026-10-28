@@ -29,7 +29,6 @@ from ai_video.production.comfy_t8_native_turbo_profile import (
 )
 from ai_video.production.comfy_t8_video import ComfyUIT8VideoProvider
 from ai_video.production._h3_prompt import H3PromptCompilation, compile_h3_prompt
-from ai_video.production._h3_prompt_zh import H3_ZH_GRAMMAR_CONTRACT
 from ai_video.production.local_video import (
     DurableLocalVideoSubmitPermit,
     LocalVideoSubmitIntent,
@@ -546,8 +545,7 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
                 prompt = _long_reference_prompt(prompt, provider_bound, requirement,
                     language=language)
             native_prompt = ProviderNativePrompt(
-                grammar_contract=(H3_ZH_GRAMMAR_CONTRACT if language == "zh"
-                                  else "h3-three-field-v1"),
+                grammar_contract=self.profile.h3_grammar_contract,
                 prompt_text=prompt.prompt_text,
                 prompt_sha256=prompt.prompt_sha256,
                 expressed_control_paths=prompt.expressed_control_paths,

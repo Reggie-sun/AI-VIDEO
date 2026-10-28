@@ -14,7 +14,7 @@ from pydantic import Field, field_validator, model_validator
 
 from ai_video.comfy_client import ComfyClient
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production._h3_prompt import H3PromptCompilation, compile_h3_prompt
+from ai_video.production._h3_prompt import H3PromptCompilation, H3PromptLanguageProfile, compile_h3_prompt
 from ai_video.production.comfy_image import (
     _missing_required_node_inputs,
     validate_loopback_endpoint,
@@ -147,7 +147,7 @@ class T8TurboLoraComponent(StrictModel):
     low_vram: Literal[False]
 
 
-class T8TurboExecutionProfile(StrictModel):
+class T8TurboExecutionProfile(H3PromptLanguageProfile, StrictModel):
     schema_version: Literal["1"]
     lane_id: Literal["minimax_h3_t8_t2va_turbo_local"]
     adapter_contract_version: Literal["1"]
@@ -601,7 +601,7 @@ class ComfyUIT8TurboVideoProvider(ComfyUIT8VideoProvider):
         if unsupported is not None:
             return unsupported
         prompt = compile_h3_prompt(requirement, provider_bound=provider_bound,
-                continuity_expression=continuity_expression)
+                continuity_expression=continuity_expression, language=self.profile.prompt_language)
         if not isinstance(prompt, H3PromptCompilation):
             return ProviderRequirementUnsupported(
                 requirement_hash=requirement.requirement_hash,
@@ -618,7 +618,7 @@ class ComfyUIT8TurboVideoProvider(ComfyUIT8VideoProvider):
             capabilities=self.capabilities(),
             continuity_expression=continuity_expression,
             native_prompt=ProviderNativePrompt(
-                grammar_contract="h3-three-field-v1",
+                grammar_contract=self.profile.h3_grammar_contract,
                 prompt_text=prompt.prompt_text,
                 prompt_sha256=prompt.prompt_sha256,
                 expressed_control_paths=prompt.expressed_control_paths,

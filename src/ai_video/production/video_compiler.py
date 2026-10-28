@@ -492,8 +492,7 @@ def compile_provider_video_request(
 
         if native_prompt is not None and native_prompt.grammar_contract in H3_GRAMMAR_CONTRACTS:
             if compiler_id not in {"comfy-local-h3-video-compiler", "comfy-local-h3-t8-video-compiler",
-                    "comfy-local-h3-t8-turbo-video-compiler", "comfy-local-h3-t8-native-turbo-video-compiler"} or (
-                    h3_language == "zh" and compiler_id != "comfy-local-h3-t8-native-turbo-video-compiler"):
+                    "comfy-local-h3-t8-turbo-video-compiler", "comfy-local-h3-t8-native-turbo-video-compiler"}:
                 return _unsupported(provider_bound, requirement,
                     ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED, ("native_prompt.grammar_contract",))
             from ai_video.production._h3_prompt import compile_h3_prompt

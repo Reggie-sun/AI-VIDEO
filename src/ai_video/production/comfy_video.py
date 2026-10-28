@@ -19,8 +19,7 @@ from ai_video.production.comfy_image import (
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production._h3_prompt import (
-    H3PromptCompilation,
-    compile_h3_prompt,
+    H3PromptCompilation, H3PromptLanguageProfile, compile_h3_prompt,
 )
 from ai_video.production.local_video import (
     DurableLocalVideoSubmitPermit,
@@ -113,7 +112,7 @@ class LocalVideoModelComponent(StrictModel):
         return value
 
 
-class LocalVideoExecutionProfile(StrictModel):
+class LocalVideoExecutionProfile(H3PromptLanguageProfile, StrictModel):
     schema_version: Literal["1"]
     lane_id: Literal["minimax_h3_fl2va_local"]
     adapter_contract_version: Literal["1"]
@@ -622,9 +621,10 @@ class ComfyUIVideoProvider:
             requirement.contract_version
             == "provider-neutral-video-requirement/4"
         )
-        if is_v4 and not isinstance(
+        if (is_v4 and not isinstance(
             self.profile, LocalVideoQualityExecutionProfile
-        ):
+        )) or (not is_v4 and self.profile.prompt_language == "zh"):
+            # Legacy /1 has no H3 native prompt; zh never falls back to English.
             return ProviderRequirementUnsupported(
                 requirement_hash=requirement.requirement_hash,
                 provider_bound_request_hash=provider_bound.provider_bound_request_hash,
@@ -659,7 +659,7 @@ class ComfyUIVideoProvider:
         native_prompt = None
         if compiler_version == "2":
             result = compile_h3_prompt(requirement, provider_bound=provider_bound,
-                continuity_expression=continuity_expression)
+                continuity_expression=continuity_expression, language=self.profile.prompt_language)
             if not isinstance(result, H3PromptCompilation):
                 return ProviderRequirementUnsupported(
                     requirement_hash=requirement.requirement_hash,
@@ -673,7 +673,7 @@ class ComfyUIVideoProvider:
                     unsupported_field_paths=result.unsupported_field_paths,
                 )
             native_prompt = ProviderNativePrompt(
-                grammar_contract="h3-three-field-v1",
+                grammar_contract=self.profile.h3_grammar_contract,
                 prompt_text=result.prompt_text,
                 prompt_sha256=result.prompt_sha256,
                 expressed_control_paths=result.expressed_control_paths,

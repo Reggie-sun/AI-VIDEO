@@ -257,3 +257,43 @@ def test_prompt_language_keeps_legacy_profile_hashes_and_seals_zh() -> None:
     assert zh.prompt_language == "zh"
     assert zh.capability_id == legacy.capability_id
     assert zh.profile_content_hash != legacy.profile_content_hash
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "minimax_h3_fl2va_quality",
+        "minimax_h3_t8_t2va_quality",
+        "minimax_h3_t8_t2va_turbo",
+        "minimax_h3_t8_t2va_turbo_native_v2",
+        "minimax_h3_t8_i2va_turbo_native_v2",
+        "minimax_h3_t8_fl2va_turbo_native_v2",
+        "minimax_h3_t8_ref2va_turbo_native_v2",
+        "minimax_h3_t8_ref2va_turbo_native_17s_v3",
+    ],
+)
+def test_every_zh_profile_differs_from_its_lane_only_by_prompt_language(name: str) -> None:
+    from ai_video.production.comfy_t8_turbo_video import load_t8_turbo_video_execution_profile
+    from ai_video.production.comfy_t8_video import load_t8_video_execution_profile
+    from ai_video.production.comfy_video import load_local_video_execution_profile
+
+    load = (
+        load_local_video_execution_profile
+        if name.startswith("minimax_h3_fl2va")
+        else load_t8_turbo_video_execution_profile
+        if name == "minimax_h3_t8_t2va_turbo"
+        else load_t8_video_execution_profile
+        if name == "minimax_h3_t8_t2va_quality"
+        else load_t8_native_turbo_execution_profile
+    )
+    profiles = REPO_ROOT / "workflows/profiles"
+    en = load(profiles / f"{name}.json", artifact_root=REPO_ROOT)
+    zh = load(profiles / f"{name}_zh.json", artifact_root=REPO_ROOT)
+
+    assert (en.prompt_language, en.h3_grammar_contract) == ("en", "h3-three-field-v1")
+    assert (zh.prompt_language, zh.h3_grammar_contract) == ("zh", "h3-three-field-zh-v1")
+    assert type(zh) is type(en)
+    assert zh.model_dump(mode="json", exclude={"prompt_language", "profile_content_hash"}) == (
+        en.model_dump(mode="json", exclude={"profile_content_hash"})
+    )
+    assert zh.profile_content_hash != en.profile_content_hash

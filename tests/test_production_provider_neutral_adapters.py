@@ -618,13 +618,18 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
     assert provider.resolve(compiled.request) == resolved
 
 
+@pytest.mark.parametrize("language", ["en", "zh"])
 @pytest.mark.parametrize("with_last_frame", [False, True], ids=["i2va", "fl2va"])
 def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
     tmp_path: Path,
     with_last_frame: bool,
+    language: str,
 ) -> None:
     artifact_root, comfy_root, profile = _profile_and_comfy_root(
-        tmp_path, QUALITY_PROFILE_PATH
+        tmp_path,
+        QUALITY_PROFILE_PATH
+        if language == "en"
+        else QUALITY_PROFILE_PATH.with_name("minimax_h3_fl2va_quality_zh.json"),
     )
     image_root = tmp_path / "images-v4"
     image_root.mkdir()
@@ -776,6 +781,7 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
     assert compiled.provider_native_prompt.count("[Shot 1]") == 1
     assert "integrated_multimodal_description:" in compiled.provider_native_prompt
     assert "generation_mode=" not in compiled.provider_native_prompt
+    assert ("时长：" in compiled.provider_native_prompt) is (language == "zh")
 
     mismatched_bound = routing.provider_bound_request.model_copy(
         update={
@@ -840,10 +846,14 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
     assert unsupported.unsupported_field_paths == ("provider_profile",)
 
 
-def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -> None:
+@pytest.mark.parametrize("language", ["en", "zh"])
+def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution(
+    language: str,
+) -> None:
     root = Path(__file__).resolve().parents[1]
+    suffix = "" if language == "en" else "_zh"
     profile = load_t8_video_execution_profile(
-        root / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
+        root / f"workflows/profiles/minimax_h3_t8_t2va_quality{suffix}.json",
         artifact_root=root,
     )
     quality_provider = ComfyUIT8VideoProvider(
@@ -856,7 +866,7 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
         transport=object(),
     )
     turbo_profile = load_t8_turbo_video_execution_profile(
-        root / "workflows/profiles/minimax_h3_t8_t2va_turbo.json",
+        root / f"workflows/profiles/minimax_h3_t8_t2va_turbo{suffix}.json",
         artifact_root=root,
     )
     turbo_provider = ComfyUIT8TurboVideoProvider(
@@ -981,6 +991,8 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
         assert "non_diegetic_music:" in compiled.provider_native_prompt
         assert "generation_mode=" not in compiled.provider_native_prompt
         assert "scene_mood={" not in compiled.provider_native_prompt
+        assert ("时长：" in compiled.provider_native_prompt) is (language == "zh")
+        assert ("duration " in compiled.provider_native_prompt) is (language == "en")
         assert compiled.request.image_bindings == ()
         assert compiled.request.media_bindings == ()
         resolved = family.resolve(compiled.request)
@@ -1021,10 +1033,14 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
         assert "generation_intent.open_state" in unsupported.unsupported_field_paths
 
 
-def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_field_leakage() -> None:
+@pytest.mark.parametrize("language", ["en", "zh"])
+def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_field_leakage(
+    language: str,
+) -> None:
     root = Path(__file__).resolve().parents[1]
+    suffix = "" if language == "en" else "_zh"
     profile = load_t8_video_execution_profile(
-        root / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
+        root / f"workflows/profiles/minimax_h3_t8_t2va_quality{suffix}.json",
         artifact_root=root,
     )
     provider = ComfyUIT8VideoProvider(
@@ -1118,6 +1134,7 @@ def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_f
     assert "generation_mode=" not in compiled.provider_native_prompt
     assert "scene_mood=" not in compiled.provider_native_prompt
     assert "scene_constraints=" not in compiled.provider_native_prompt
+    assert ("时长：" in compiled.provider_native_prompt) is (language == "zh")
 
     malformed_requirement = projection.requirement.model_copy(
         update={"generation_intent": "oops"}

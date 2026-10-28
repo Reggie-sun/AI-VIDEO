@@ -13,6 +13,7 @@ from ai_video.production._video_intent_validation import (
 )
 from ai_video.production.models import StrictModel
 from ai_video.production._h3_prompt_zh import (
+    H3PromptLanguageProfile,
     ZH_NO_DIALOGUE_SPEECH_CUE,
     ZH_RESERVED_TRANSITION_INSTRUCTION,
     render_h3_t2va_zh,
@@ -656,6 +657,7 @@ def _compile_h3_t2va_prompt(
 
 __all__ = [
     "H3PromptCompilation",
+    "H3PromptLanguageProfile",
     "H3PromptResult",
     "H3PromptUnsupported",
     "compile_h3_prompt",
