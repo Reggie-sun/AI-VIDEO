@@ -139,3 +139,21 @@ Commits `935edf4`、`ea8bd3e`、`450cb7c`、`807fbd5`（base `0c3be7d`）：
 - 发布：`60be371`、`65e1706` 已在 origin/main（随后续提交一并 push，核验 `merge-base --is-ancestor` 成立）。
   剩余已知基线失败：仅 libass 环境 1 项。
 
+## Environment Repair: libass（2026-10-28）
+
+用户要求继续修复环境。
+
+- 先试升级 conda base freetype：`--freeze-installed` 与 `--no-deps` 均因 base 不一致（`packaging`/`requests` 非 conda
+  登记）在事务校验 `RemoveError` 失败，base 未改动（freetype 仍 2.10.4）。补齐 base 需连带升级 conda 本体，未做。
+- 实际修复（仓库外、不进 Git）：`uv python install 3.13.5`（python-build-standalone，`lib/` 仅含 libpython），
+  将 `.venv/bin/python` 与 `pyvenv.cfg` `home` 改指 `~/.local/share/uv/python/cpython-3.13.5-linux-x86_64-gnu`；
+  版本与 SOABI（`cpython-313-x86_64-linux-gnu`）不变，site-packages 未重装。备份
+  `.venv/pyvenv.cfg.miniconda-backup-20261028`、`.venv/bin/.python-symlink.miniconda-backup-20261028`，恢复二者即回滚。
+- 验证：libass 加载（version `24121344`）；site-packages 全部 `.so` 无 `not found`；`uv pip check` 通过；numpy/PIL/
+  chromadb/grpc/ssl/sqlite3 等导入正常；libass 相关 3 文件 43 passed / 4 skipped（opt-in real media pilot）；
+  `production_contract_tests`（policy argv，干净 worktree @`2a42cd8`，affected-module 级，无 receipt）
+  4582 passed / 0 failed / 13 skipped（修复前 4541 passed / 1 failed / 23 skipped）。
+- 未变：`uv sync --locked --check` 报既有 extras 漂移（chromadb 等不在默认 sync 集），与解释器无关，未执行 sync；
+  ComfyUI、ffmpeg 仍直接用 miniconda，不受影响；修复前已启动的 `.venv` 进程需重启才用新解释器。
+- 已知基线失败清零（以本次所跑范围为限；full regression 未运行）。
+
