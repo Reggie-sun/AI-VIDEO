@@ -1,0 +1,78 @@
+{
+  "package_version": "0.21.38",
+  "package_root": "/home/reggie/.nvm/versions/node/v22.21.0/lib/node_modules/oh-my-codex",
+  "original_files": [
+    {
+      "path": "src/scripts/hook-payload-guard.ts",
+      "sha256": "abb0c48b0e66336adab6fb2034140f7f6174f337cd82ed75cf2da8e4a31737d2",
+      "applied_sha256": "a84433bd0409fe0a8647bd7c09430f82ba8093825a8401f80c9bfc515d74a7de"
+    },
+    {
+      "path": "dist/scripts/hook-payload-guard.js",
+      "sha256": "5d2e489250726b160893b72ca91d6df068ea8310678cfd8a425e15c5cb1e23cf",
+      "applied_sha256": "6a3f0a56ea80c581a00cb6f7b0f12aaec5d02e2be3cf5d16f950244d91ec060e"
+    },
+    {
+      "path": "plugins/oh-my-codex/hooks/codex-native-hook.mjs",
+      "sha256": "f650fbb2c5c6c39aca37b1f4f7f58f2717acf7efffcf13a55e9f0fa8ba4d81bc",
+      "applied_sha256": "fe4a255f53c8fc3463b96fdd30505c09833ec7e0613a19397ddd5c07aca164bd"
+    },
+    {
+      "path": "src/scripts/__tests__/codex-native-hook.test.ts",
+      "sha256": "5155e09a98522d1a20037e22a00ae00d603377fe2a190abeb0d5090460c3fea8",
+      "applied_sha256": "ff3e0b96c9248a47f7915e406fba45dd66d8e367de5ada1060c2efd83a63637f"
+    },
+    {
+      "path": "dist/scripts/__tests__/codex-native-hook.test.js",
+      "sha256": "5884354ddb473b53a4f219bc69090504916f46c49d2657d922c4c713b0c59f88",
+      "applied_sha256": "a8993877dfe5f8278d4d9dfd56985de98f3b9a5b408d836d41eb1ef88c5f4aea"
+    },
+    {
+      "path": "src/scripts/smoke-packed-install.ts",
+      "sha256": "a8db228123bd2abd5480789dc3a8f66d2d119b4b339573565bb4af6e6482e39c",
+      "applied_sha256": "f953a498c565c90aae3560edf2403d4dfc2e072c8f04072521cc0e77fcf7f0c6"
+    },
+    {
+      "path": "dist/scripts/smoke-packed-install.js",
+      "sha256": "b107a5696d775ce07e7a65769400980371262d8e57b9236d6b60cce7be57a51e",
+      "applied_sha256": "cdce7934addd9219bf1fc348b6c598af79d2da8d85d2f01ad91cd44f90208510"
+    },
+    {
+      "path": "dist/cli/__tests__/codex-plugin-layout.test.js",
+      "sha256": "1c2f601419b46a6c60ebb18fc67d498903e4d33bc5110fc983997417300a1a99",
+      "applied_sha256": "ed50ab8305d0eca00cd975ffb94375e24cb1f804d4947d75d8f7fbd5cf483c10"
+    }
+  ],
+  "limit_before_bytes": 1048576,
+  "limit_after_bytes": 33554432,
+  "installed_entry": "dist/scripts/codex-native-hook.js",
+  "hook_config_sha256": "c367e2df799e8e531cd73d0fc9d7e3a8fe2a8ffd805f8828ca14fc203cfb47a3",
+  "hook_config_modified": false,
+  "review": "Independent native code-reviewer: no blocking findings",
+  "test_results": {
+    "custom_cli": {
+      "passed": 9,
+      "failed": 0
+    },
+    "native_targeted": {
+      "passed": 25,
+      "failed": 0
+    },
+    "plugin_targeted": {
+      "passed": 15,
+      "failed": 0
+    },
+    "native_protocol_full": {
+      "passed": 21,
+      "failed": 0
+    }
+  },
+  "actual_host_callback_readback": "NOT_EVALUATED",
+  "image_response_canary": {
+    "existing_file_bytes": 4098545,
+    "returned_in_tool_result": true,
+    "new_media_generated": false
+  },
+  "full_omx_build": "NOT_RUN: installed npm package has partial source tree",
+  "reinstallation_may_overwrite": true
+}

@@ -1,0 +1,181 @@
+TAP version 13
+# Subtest: codex native hook dispatch
+    # Subtest: emits Stop-schema-safe block JSON when unidentifiable malformed stdin has native Stop runtime surface
+    ok 1 - emits Stop-schema-safe block JSON when unidentifiable malformed stdin has native Stop runtime surface
+      ---
+      duration_ms: 107.424693
+      type: 'test'
+      ...
+    # Subtest: preserves non-Stop fail-closed JSON when malformed stdin identifies a non-Stop hook
+    ok 2 - preserves non-Stop fail-closed JSON when malformed stdin identifies a non-Stop hook
+      ---
+      duration_ms: 99.722439
+      type: 'test'
+      ...
+    # Subtest: redacts unterminated prompt-like malformed stdin fields
+    ok 3 - redacts unterminated prompt-like malformed stdin fields
+      ---
+      duration_ms: 101.215041
+      type: 'test'
+      ...
+    # Subtest: logs a bounded redacted raw stdin prefix when CLI stdin is malformed
+    ok 4 - logs a bounded redacted raw stdin prefix when CLI stdin is malformed
+      ---
+      duration_ms: 103.109403
+      type: 'test'
+      ...
+    # Subtest: emits Stop-schema-safe block JSON when malformed stdin still identifies Stop
+    ok 5 - emits Stop-schema-safe block JSON when malformed stdin still identifies Stop
+      ---
+      duration_ms: 93.076297
+      type: 'test'
+      ...
+    # Subtest: synthesizes a deny for malformed explicit PreToolUse blocks instead of downgrading systemMessage to advisory (\#3497: hard PreToolUse gate removed — advisory only)
+    ok 6 - synthesizes a deny for malformed explicit PreToolUse blocks instead of downgrading systemMessage to advisory (\#3497: hard PreToolUse gate removed — advisory only)
+      ---
+      duration_ms: 0.138933
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON for oversized Stop stdin without parsing or creating inactive state
+    ok 7 - emits no-op JSON for oversized Stop stdin without parsing or creating inactive state
+      ---
+      duration_ms: 310.887044
+      type: 'test'
+      ...
+    # Subtest: drains oversized stdin without breaking the parent writer pipe
+    ok 8 - drains oversized stdin without breaking the parent writer pipe
+      ---
+      duration_ms: 358.814594
+      type: 'test'
+      ...
+    # Subtest: blocks oversized Stop stdin when current session autopilot is active
+    ok 9 - blocks oversized Stop stdin when current session autopilot is active
+      ---
+      duration_ms: 320.615899
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON for oversized Stop stdin for unrelated root autopilot state
+    ok 10 - emits no-op JSON for oversized Stop stdin for unrelated root autopilot state
+      ---
+      duration_ms: 296.508832
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON for oversized Stop stdin when terminal run-state shadows stale autopilot state
+    ok 11 - emits no-op JSON for oversized Stop stdin when terminal run-state shadows stale autopilot state
+      ---
+      duration_ms: 268.073254
+      type: 'test'
+      ...
+    # Subtest: accepts exact UTF-8 byte-limit PreToolUse and PostToolUse payloads and rejects only larger input
+    ok 12 - accepts exact UTF-8 byte-limit PreToolUse and PostToolUse payloads and rejects only larger input
+      ---
+      duration_ms: 2440.725967
+      type: 'test'
+      ...
+    # Subtest: fails closed for oversized non-Stop stdin before parsing
+    ok 13 - fails closed for oversized non-Stop stdin before parsing
+      ---
+      duration_ms: 339.586461
+      type: 'test'
+      ...
+    # Subtest: does not crash Stop hook dispatch when the exec follow-up queue is malformed
+    ok 14 - does not crash Stop hook dispatch when the exec follow-up queue is malformed
+      ---
+      duration_ms: 26.845978
+      type: 'test'
+      ...
+    # Subtest: suppresses malformed or public-only Team identity across SessionStart and PreToolUse
+    ok 15 - suppresses malformed or public-only Team identity across SessionStart and PreToolUse
+      ---
+      duration_ms: 21.603577
+      type: 'test'
+      ...
+    # Subtest: keeps authoritative worker payload scope independent of malformed selected-pointer evidence
+    ok 16 - keeps authoritative worker payload scope independent of malformed selected-pointer evidence
+      ---
+      duration_ms: 31.976964
+      type: 'test'
+      ...
+    # Subtest: falls back to the canonical session id for malformed HUD owner ids
+    ok 17 - falls back to the canonical session id for malformed HUD owner ids
+      ---
+      duration_ms: 151.650593
+      type: 'test'
+      ...
+    # Subtest: lets the current session native leader beat a malformed canonical subagent entry
+    ok 18 - lets the current session native leader beat a malformed canonical subagent entry
+      ---
+      duration_ms: 62.657034
+      type: 'test'
+      ...
+    # Subtest: still blocks Bash omx question when an inherited OMX_QUESTION_RETURN_PANE value is malformed (\#3497: hard PreToolUse gate removed — advisory only)
+    ok 19 - still blocks Bash omx question when an inherited OMX_QUESTION_RETURN_PANE value is malformed (\#3497: hard PreToolUse gate removed — advisory only)
+      ---
+      duration_ms: 0.340256
+      type: 'test'
+      ...
+    # Subtest: rejects foreign explicit worker roots for completed Stop/PostToolUse and ignores malformed internal identity
+    ok 20 - rejects foreign explicit worker roots for completed Stop/PostToolUse and ignores malformed internal identity
+      ---
+      duration_ms: 7.649104
+      type: 'test'
+      ...
+    1..20
+ok 1 - codex native hook dispatch
+  ---
+  duration_ms: 5148.356191
+  type: 'suite'
+  ...
+# Subtest: codex native hook triage integration
+    # Subtest: skips triage state persistence for malformed explicit session ids without writing root state
+    ok 1 - skips triage state persistence for malformed explicit session ids without writing root state
+      ---
+      duration_ms: 7.840141
+      type: 'test'
+      ...
+    1..1
+ok 2 - codex native hook triage integration
+  ---
+  duration_ms: 8.15317
+  type: 'suite'
+  ...
+# Subtest: native hook protocol compatibility
+    # Subtest: keeps malformed tracker authority bytes intact and returns CLI no-op with a diagnostic
+    ok 1 - keeps malformed tracker authority bytes intact and returns CLI no-op with a diagnostic
+      ---
+      duration_ms: 122.733204
+      type: 'test'
+      ...
+    # Subtest: ignores absent, malformed, conflicting, foreign, or leader identities without creating tracking state
+    ok 2 - ignores absent, malformed, conflicting, foreign, or leader identities without creating tracking state
+      ---
+      duration_ms: 9.879481
+      type: 'test'
+      ...
+    # Subtest: does not apply leader Stop behavior to malformed SubagentStop input
+    ok 3 - does not apply leader Stop behavior to malformed SubagentStop input
+      ---
+      duration_ms: 91.241666
+      type: 'test'
+      ...
+    # Subtest: does not block an oversized SubagentStop completion
+    ok 4 - does not block an oversized SubagentStop completion
+      ---
+      duration_ms: 285.454468
+      type: 'test'
+      ...
+    1..4
+ok 3 - native hook protocol compatibility
+  ---
+  duration_ms: 510.389874
+  type: 'suite'
+  ...
+1..3
+# tests 25
+# suites 3
+# pass 25
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6282.074463

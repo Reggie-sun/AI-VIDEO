@@ -1,0 +1,127 @@
+--- a/src/scripts/hook-payload-guard.ts
++++ b/src/scripts/hook-payload-guard.ts
+@@ -2 +2,2 @@
+-export const MAX_NATIVE_STDIN_JSON_BYTES = 1024 * 1024;
++// Native tool responses may contain several base64-encoded reference images.
++export const MAX_NATIVE_STDIN_JSON_BYTES = 32 * 1024 * 1024;
+--- a/dist/scripts/hook-payload-guard.js
++++ b/dist/scripts/hook-payload-guard.js
+@@ -2 +2,2 @@
+-export const MAX_NATIVE_STDIN_JSON_BYTES = 1024 * 1024;
++// Native tool responses may contain several base64-encoded reference images.
++export const MAX_NATIVE_STDIN_JSON_BYTES = 32 * 1024 * 1024;
+@@ -112 +113 @@
+-//# sourceMappingURL=hook-payload-guard.js.map
+\ No newline at end of file
++//# sourceMappingURL=hook-payload-guard.js.map
+--- a/plugins/oh-my-codex/hooks/codex-native-hook.mjs
++++ b/plugins/oh-my-codex/hooks/codex-native-hook.mjs
+@@ -14 +14,2 @@
+-const MAX_WRAPPER_STDIN_BYTES = 1024 * 1024;
++// Keep aligned with src/scripts/hook-payload-guard.ts for native image responses.
++const MAX_WRAPPER_STDIN_BYTES = 32 * 1024 * 1024;
+@@ -362 +363 @@
+-  const systemMessage = 'OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.';
++  const systemMessage = `OMX native hook rejected oversized stdin JSON before parsing; maxBytes=${MAX_WRAPPER_STDIN_BYTES}.`;
+--- a/src/scripts/__tests__/codex-native-hook.test.ts
++++ b/src/scripts/__tests__/codex-native-hook.test.ts
+@@ -147 +147 @@
+-const OVERSIZED_STDIN_SYSTEM_MESSAGE = "OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.";
++const OVERSIZED_STDIN_SYSTEM_MESSAGE = `OMX native hook rejected oversized stdin JSON before parsing; maxBytes=${MAX_NATIVE_STDIN_JSON_BYTES}.`;
+--- a/dist/scripts/__tests__/codex-native-hook.test.js
++++ b/dist/scripts/__tests__/codex-native-hook.test.js
+@@ -88 +88 @@
+-const OVERSIZED_STDIN_SYSTEM_MESSAGE = "OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.";
++const OVERSIZED_STDIN_SYSTEM_MESSAGE = `OMX native hook rejected oversized stdin JSON before parsing; maxBytes=${MAX_NATIVE_STDIN_JSON_BYTES}.`;
+@@ -21303 +21303 @@
+-//# sourceMappingURL=codex-native-hook.test.js.map
+\ No newline at end of file
++//# sourceMappingURL=codex-native-hook.test.js.map
+--- a/src/scripts/smoke-packed-install.ts
++++ b/src/scripts/smoke-packed-install.ts
+@@ -33,0 +34 @@
++import { MAX_NATIVE_STDIN_JSON_BYTES } from './hook-payload-guard.js';
+@@ -2612,2 +2613,2 @@
+-      const input = JSON.stringify({ hook_event_name: eventName, session_id: sessionId, unicode: '😀é', padding: 'x'.repeat(1_048_577 - Buffer.byteLength(base, 'utf8')) });
+-      if (Buffer.byteLength(input, 'utf8') !== 1_048_577 || input.length === Buffer.byteLength(input, 'utf8')) {
++      const input = JSON.stringify({ hook_event_name: eventName, session_id: sessionId, unicode: '😀é', padding: 'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1 - Buffer.byteLength(base, 'utf8')) });
++      if (Buffer.byteLength(input, 'utf8') !== MAX_NATIVE_STDIN_JSON_BYTES + 1 || input.length === Buffer.byteLength(input, 'utf8')) {
+@@ -2627 +2628 @@
+-      const systemMessage = 'OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.';
++      const systemMessage = `OMX native hook rejected oversized stdin JSON before parsing; maxBytes=${MAX_NATIVE_STDIN_JSON_BYTES}.`;
+@@ -2637 +2638 @@
+-      `{"hook_event_name":"PreToolUse","transcript":"${'x'.repeat(1_048_577)}"}`,
++      `{"hook_event_name":"PreToolUse","transcript":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}"}`,
+--- a/dist/scripts/smoke-packed-install.js
++++ b/dist/scripts/smoke-packed-install.js
+@@ -13,0 +14 @@
++import { MAX_NATIVE_STDIN_JSON_BYTES } from './hook-payload-guard.js';
+@@ -2240,2 +2241,2 @@
+-            const input = JSON.stringify({ hook_event_name: eventName, session_id: sessionId, unicode: '😀é', padding: 'x'.repeat(1_048_577 - Buffer.byteLength(base, 'utf8')) });
+-            if (Buffer.byteLength(input, 'utf8') !== 1_048_577 || input.length === Buffer.byteLength(input, 'utf8')) {
++            const input = JSON.stringify({ hook_event_name: eventName, session_id: sessionId, unicode: '😀é', padding: 'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1 - Buffer.byteLength(base, 'utf8')) });
++            if (Buffer.byteLength(input, 'utf8') !== MAX_NATIVE_STDIN_JSON_BYTES + 1 || input.length === Buffer.byteLength(input, 'utf8')) {
+@@ -2255 +2256 @@
+-            const systemMessage = 'OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.';
++            const systemMessage = `OMX native hook rejected oversized stdin JSON before parsing; maxBytes=${MAX_NATIVE_STDIN_JSON_BYTES}.`;
+@@ -2265 +2266 @@
+-            `{"hook_event_name":"PreToolUse","transcript":"${'x'.repeat(1_048_577)}"}`,
++            `{"hook_event_name":"PreToolUse","transcript":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}"}`,
+@@ -5003 +5004 @@
+-//# sourceMappingURL=smoke-packed-install.js.map
+\ No newline at end of file
++//# sourceMappingURL=smoke-packed-install.js.map
+--- a/dist/cli/__tests__/codex-plugin-layout.test.js
++++ b/dist/cli/__tests__/codex-plugin-layout.test.js
+@@ -254 +254,2 @@
+-const OVERSIZED_STDIN_SYSTEM_MESSAGE = 'OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.';
++const MAX_NATIVE_STDIN_JSON_BYTES = 32 * 1024 * 1024;
++const OVERSIZED_STDIN_SYSTEM_MESSAGE = `OMX native hook rejected oversized stdin JSON before parsing; maxBytes=${MAX_NATIVE_STDIN_JSON_BYTES}.`;
+@@ -423 +424 @@
+-                prompt: 'x'.repeat(2 * 1024 * 1024),
++                prompt: 'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1),
+@@ -434 +435 @@
+-                const result = runPluginNativeHook(cachePluginRoot, buildExactBytePluginHookPayload(eventName, `plain-${eventName}`, 1024 * 1024 + 1), { OMX_ENTRY_PATH: '', OMX_CODEX_LAUNCH_ID: '', OMX_NATIVE_HOOK_COMMAND: commandPath });
++                const result = runPluginNativeHook(cachePluginRoot, buildExactBytePluginHookPayload(eventName, `plain-${eventName}`, MAX_NATIVE_STDIN_JSON_BYTES + 1), { OMX_ENTRY_PATH: '', OMX_CODEX_LAUNCH_ID: '', OMX_NATIVE_HOOK_COMMAND: commandPath });
+@@ -442 +443 @@
+-                padding: 'x'.repeat(2 * 1024 * 1024),
++                padding: 'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1),
+@@ -468 +469 @@
+-                padding: 'x'.repeat(2 * 1024 * 1024),
++                padding: 'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1),
+@@ -577 +578 @@
+-                const result = runPluginNativeHook(cachePluginRoot, buildExactBytePluginHookPayload(eventName, `nested-${eventName}`, 1024 * 1024 + 1), inheritedEnv);
++                const result = runPluginNativeHook(cachePluginRoot, buildExactBytePluginHookPayload(eventName, `nested-${eventName}`, MAX_NATIVE_STDIN_JSON_BYTES + 1), inheritedEnv);
+@@ -1104 +1105 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1118 +1119 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1139 +1140 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1160 +1161 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1175 +1176 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1197 +1198 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1211 +1212 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1228 +1229 @@
+-            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(1024 * 1024 + 1)}`;
++            const oversizedStop = `{"hook_event_name":"Stop","cwd":"${cachePluginRoot}","session_id":"${sessionId}","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`;
+@@ -1258 +1259 @@
+-                for (const byteLength of [1024 * 1024 - 1, 1024 * 1024]) {
++                for (const byteLength of [MAX_NATIVE_STDIN_JSON_BYTES - 1, MAX_NATIVE_STDIN_JSON_BYTES]) {
+@@ -1272 +1273 @@
+-                const input = buildExactBytePluginHookPayload(eventName, sessionId, 1024 * 1024 + 1);
++                const input = buildExactBytePluginHookPayload(eventName, sessionId, MAX_NATIVE_STDIN_JSON_BYTES + 1);
+@@ -1289 +1290 @@
+-            const result = runPluginNativeHook(cachePluginRoot, `{"hook_event_name":"UserPromptSubmit","session_id":"sess-plugin-oversized-non-stop","padding":"${'x'.repeat(1024 * 1024 + 1)}`);
++            const result = runPluginNativeHook(cachePluginRoot, `{"hook_event_name":"UserPromptSubmit","session_id":"sess-plugin-oversized-non-stop","padding":"${'x'.repeat(MAX_NATIVE_STDIN_JSON_BYTES + 1)}`);

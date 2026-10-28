@@ -1,0 +1,143 @@
+TAP version 13
+# Subtest: native hook protocol compatibility
+    # Subtest: applies the SubagentStop lifecycle policy for {"verbosity":"session","includeChildAgents":true}
+    ok 1 - applies the SubagentStop lifecycle policy for {"verbosity":"session","includeChildAgents":true}
+      ---
+      duration_ms: 104.315469
+      type: 'test'
+      ...
+    # Subtest: applies the SubagentStop lifecycle policy for {"verbosity":"agent"}
+    ok 2 - applies the SubagentStop lifecycle policy for {"verbosity":"agent"}
+      ---
+      duration_ms: 86.234623
+      type: 'test'
+      ...
+    # Subtest: applies the SubagentStop lifecycle policy for {"verbosity":"verbose"}
+    ok 3 - applies the SubagentStop lifecycle policy for {"verbosity":"verbose"}
+      ---
+      duration_ms: 86.042314
+      type: 'test'
+      ...
+    # Subtest: applies the SubagentStop lifecycle policy for {"verbosity":"session"}
+    ok 4 - applies the SubagentStop lifecycle policy for {"verbosity":"session"}
+      ---
+      duration_ms: 5.865615
+      type: 'test'
+      ...
+    # Subtest: applies the SubagentStop lifecycle policy for {"verbosity":"minimal"}
+    ok 5 - applies the SubagentStop lifecycle policy for {"verbosity":"minimal"}
+      ---
+      duration_ms: 6.20185
+      type: 'test'
+      ...
+    # Subtest: deduplicates interleaved child and turn replays independently
+    ok 6 - deduplicates interleaved child and turn replays independently
+      ---
+      duration_ms: 124.735294
+      type: 'test'
+      ...
+    # Subtest: deduplicates lifecycle hooks when legacy Stop and SubagentStop report the same child turn
+    ok 7 - deduplicates lifecycle hooks when legacy Stop and SubagentStop report the same child turn
+      ---
+      duration_ms: 98.928366
+      type: 'test'
+      ...
+    # Subtest: does not deduplicate separate SubagentStop completions when turn IDs are absent
+    ok 8 - does not deduplicate separate SubagentStop completions when turn IDs are absent
+      ---
+      duration_ms: 80.265174
+      type: 'test'
+      ...
+    # Subtest: does not treat missing turn IDs as proof of a duplicate completion
+    ok 9 - does not treat missing turn IDs as proof of a duplicate completion
+      ---
+      duration_ms: 1.028776
+      type: 'test'
+      ...
+    # Subtest: keeps malformed tracker authority bytes intact and returns CLI no-op with a diagnostic
+    ok 10 - keeps malformed tracker authority bytes intact and returns CLI no-op with a diagnostic
+      ---
+      duration_ms: 98.480062
+      type: 'test'
+      ...
+    # Subtest: returns CLI no-op without dispatch or mutation when the tracker lock stays held
+    ok 11 - returns CLI no-op without dispatch or mutation when the tracker lock stays held
+      ---
+      duration_ms: 2040.224693
+      type: 'test'
+      ...
+    # Subtest: rejects unbound identities before opted-in SubagentStop lifecycle dispatch
+    ok 12 - rejects unbound identities before opted-in SubagentStop lifecycle dispatch
+      ---
+      duration_ms: 8.146386
+      type: 'test'
+      ...
+    # Subtest: keeps setup, bounded input parsing, dispatch, plugin, and packed smoke event rosters aligned
+    ok 13 - keeps setup, bounded input parsing, dispatch, plugin, and packed smoke event rosters aligned
+      ---
+      duration_ms: 1.159576
+      type: 'test'
+      ...
+    # Subtest: records the child, accepts nullable optional fields, and never changes the leader pointer or grants authority
+    ok 14 - records the child, accepts nullable optional fields, and never changes the leader pointer or grants authority
+      ---
+      duration_ms: 10.300838
+      type: 'test'
+      ...
+    # Subtest: completes the child in every existing correlated tracker partition
+    ok 15 - completes the child in every existing correlated tracker partition
+      ---
+      duration_ms: 8.602893
+      type: 'test'
+      ...
+    # Subtest: deduplicates replays and legacy Stop for the same child turn, but records a new turn
+    ok 16 - deduplicates replays and legacy Stop for the same child turn, but records a new turn
+      ---
+      duration_ms: 16.22866
+      type: 'test'
+      ...
+    # Subtest: ignores absent, malformed, conflicting, foreign, or leader identities without creating tracking state
+    ok 17 - ignores absent, malformed, conflicting, foreign, or leader identities without creating tracking state
+      ---
+      duration_ms: 6.536255
+      type: 'test'
+      ...
+    # Subtest: does not promote a legacy child Stop without thread_id into its own leader session
+    ok 18 - does not promote a legacy child Stop without thread_id into its own leader session
+      ---
+      duration_ms: 13.151107
+      type: 'test'
+      ...
+    # Subtest: does not bootstrap a root session from a standalone SubagentStop
+    ok 19 - does not bootstrap a root session from a standalone SubagentStop
+      ---
+      duration_ms: 0.693304
+      type: 'test'
+      ...
+    # Subtest: does not apply leader Stop behavior to malformed SubagentStop input
+    ok 20 - does not apply leader Stop behavior to malformed SubagentStop input
+      ---
+      duration_ms: 106.769603
+      type: 'test'
+      ...
+    # Subtest: does not block an oversized SubagentStop completion
+    ok 21 - does not block an oversized SubagentStop completion
+      ---
+      duration_ms: 291.60494
+      type: 'test'
+      ...
+    1..21
+ok 1 - native hook protocol compatibility
+  ---
+  duration_ms: 3197.390574
+  type: 'suite'
+  ...
+1..1
+# tests 21
+# suites 1
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3319.406507

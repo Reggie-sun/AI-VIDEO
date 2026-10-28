@@ -1,0 +1,76 @@
+{
+  "schema": "omx-native-hook-stdin-reproduction/1",
+  "package_root": "/home/reggie/.nvm/versions/node/v22.21.0/lib/node_modules/oh-my-codex",
+  "expected_limit_bytes": 33554432,
+  "media_payload_bytes": 17077084,
+  "image_inputs": [
+    {
+      "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+      "bytes": 4098545,
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/01-city-reveal-v1.png",
+      "bytes": 3059420,
+      "sha256": "ca92cf239a60db33e03f4de688daf2488055be0506caac9315017df5a660781c"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/03-descent-v2.png",
+      "bytes": 2979487,
+      "sha256": "61e0cf87beab57d016b15c707a60177fd187c2e5e23959af44e780b3fa2a407a"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
+      "bytes": 2670100,
+      "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61"
+    }
+  ],
+  "checks": [
+    {
+      "name": "four actual PNG responses reach normal PostToolUse dispatch",
+      "verdict": "FAIL",
+      "reason": "Expected \"actual\" to be strictly unequal to: false"
+    },
+    {
+      "name": "PreToolUse accepts 33554431 UTF-8 bytes",
+      "verdict": "FAIL",
+      "reason": "The input was expected to not match the regular expression /oversized/. Input:\n\n'{\"systemMessage\":\"OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.\",\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.\"}}'\n"
+    },
+    {
+      "name": "PreToolUse accepts 33554432 UTF-8 bytes",
+      "verdict": "FAIL",
+      "reason": "The input was expected to not match the regular expression /oversized/. Input:\n\n'{\"systemMessage\":\"OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.\",\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.\"}}'\n"
+    },
+    {
+      "name": "PreToolUse rejects 33554433 UTF-8 bytes",
+      "verdict": "FAIL",
+      "reason": "The input did not match the regular expression /maxBytes=33554432/. Input:\n\n'OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.'\n"
+    },
+    {
+      "name": "PostToolUse accepts 33554431 UTF-8 bytes",
+      "verdict": "FAIL",
+      "reason": "The input was expected to not match the regular expression /oversized/. Input:\n\n'{\"continue\":false,\"stopReason\":\"native_hook_stdin_oversized\",\"systemMessage\":\"OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.\"}'\n"
+    },
+    {
+      "name": "PostToolUse accepts 33554432 UTF-8 bytes",
+      "verdict": "FAIL",
+      "reason": "The input was expected to not match the regular expression /oversized/. Input:\n\n'{\"continue\":false,\"stopReason\":\"native_hook_stdin_oversized\",\"systemMessage\":\"OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.\"}'\n"
+    },
+    {
+      "name": "PostToolUse rejects 33554433 UTF-8 bytes",
+      "verdict": "FAIL",
+      "reason": "The input did not match the regular expression /maxBytes=33554432/. Input:\n\n'OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.'\n"
+    },
+    {
+      "name": "malformed input above old 1 MiB limit still fails JSON parsing",
+      "verdict": "FAIL",
+      "reason": "The input did not match the regular expression /malformed JSON/. Input:\n\n'OMX native hook rejected oversized stdin JSON before parsing; maxBytes=1048576.'\n"
+    },
+    {
+      "name": "small PostToolUse still dispatches",
+      "verdict": "PASS"
+    }
+  ],
+  "passed": false,
+  "boundary": "Isolated CLI subprocess tests; no actual host callback or media acceptance claim"
+}

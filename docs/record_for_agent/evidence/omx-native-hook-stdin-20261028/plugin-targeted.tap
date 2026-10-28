@@ -1,0 +1,107 @@
+TAP version 13
+# Subtest: official Codex plugin layout
+    # Subtest: emits a JSON no-op for oversized plugin SubagentStop input
+    ok 1 - emits a JSON no-op for oversized plugin SubagentStop input
+      ---
+      duration_ms: 390.729456
+      type: 'test'
+      ...
+    # Subtest: no-ops plugin hooks for nested plain Codex sessions that inherit omx launch env
+    ok 2 - no-ops plugin hooks for nested plain Codex sessions that inherit omx launch env
+      ---
+      duration_ms: 1338.449422
+      type: 'test'
+      ...
+    # Subtest: replaces oversized Stop child stdout with fallback Stop JSON
+    ok 3 - replaces oversized Stop child stdout with fallback Stop JSON
+      ---
+      duration_ms: 44.837405
+      type: 'test'
+      ...
+    # Subtest: emits Stop JSON for malformed Stop-looking stdin before invalid launcher failure
+    ok 4 - emits Stop JSON for malformed Stop-looking stdin before invalid launcher failure
+      ---
+      duration_ms: 48.223692
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON for oversized plugin Stop stdin when no active workflow state is present
+    ok 5 - emits no-op JSON for oversized plugin Stop stdin when no active workflow state is present
+      ---
+      duration_ms: 264.058869
+      type: 'test'
+      ...
+    # Subtest: blocks oversized plugin Stop stdin when current session autopilot state is active
+    ok 6 - blocks oversized plugin Stop stdin when current session autopilot state is active
+      ---
+      duration_ms: 282.166734
+      type: 'test'
+      ...
+    # Subtest: does not let unrelated terminal run-state suppress active plugin Autopilot oversized Stop blocking
+    ok 7 - does not let unrelated terminal run-state suppress active plugin Autopilot oversized Stop blocking
+      ---
+      duration_ms: 283.86045
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON for oversized plugin Stop stdin when terminal Autopilot run-state shadows stale active state
+    ok 8 - emits no-op JSON for oversized plugin Stop stdin when terminal Autopilot run-state shadows stale active state
+      ---
+      duration_ms: 279.158106
+      type: 'test'
+      ...
+    # Subtest: detects active plugin Autopilot state for oversized Stop under OMX_ROOT
+    ok 9 - detects active plugin Autopilot state for oversized Stop under OMX_ROOT
+      ---
+      duration_ms: 292.214778
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON for oversized plugin Stop stdin when terminal OMX_ROOT Autopilot state overrides stale cwd active state
+    ok 10 - emits no-op JSON for oversized plugin Stop stdin when terminal OMX_ROOT Autopilot state overrides stale cwd active state
+      ---
+      duration_ms: 304.064885
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON for oversized plugin Stop stdin when Autopilot state is active but terminal by phase
+    ok 11 - emits no-op JSON for oversized plugin Stop stdin when Autopilot state is active but terminal by phase
+      ---
+      duration_ms: 268.985506
+      type: 'test'
+      ...
+    # Subtest: emits no-op JSON when stale plugin session state cwd does not match oversized Stop cwd
+    ok 12 - emits no-op JSON when stale plugin session state cwd does not match oversized Stop cwd
+      ---
+      duration_ms: 285.193038
+      type: 'test'
+      ...
+    # Subtest: delegates exact UTF-8 under-limit plugin tool-hook input and locally rejects only oversized owned input
+    ok 13 - delegates exact UTF-8 under-limit plugin tool-hook input and locally rejects only oversized owned input
+      ---
+      duration_ms: 3974.934585
+      type: 'test'
+      ...
+    # Subtest: fails oversized non-Stop plugin stdin without Stop JSON
+    ok 14 - fails oversized non-Stop plugin stdin without Stop JSON
+      ---
+      duration_ms: 254.805658
+      type: 'test'
+      ...
+    # Subtest: forwards under-cap plugin hook stdin bytes unchanged to the delegated command
+    ok 15 - forwards under-cap plugin hook stdin bytes unchanged to the delegated command
+      ---
+      duration_ms: 61.876737
+      type: 'test'
+      ...
+    1..15
+ok 1 - official Codex plugin layout
+  ---
+  duration_ms: 8375.836892
+  type: 'suite'
+  ...
+1..1
+# tests 15
+# suites 1
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8459.775609
