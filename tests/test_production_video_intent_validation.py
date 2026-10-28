@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+import pytest
+from pydantic import ValidationError
+
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production._conditioning_scale_transition import (
+    ScaleTransitionEvidence,
+    scale_transition_camera_intent_hash,
+)
 from ai_video.production._video_intent_validation import (
     ConditioningCompatibilityEvidence,
     ConditioningLane,
@@ -156,3 +164,145 @@ def test_incompatible_fl2va_anchor_reports_exact_failed_dimensions() -> None:
         "conditioning_compatibility.same_subject_scale",
         "conditioning_compatibility.action_endpoint_reachable",
     )
+
+
+def _scale_transition(intent=None, **updates) -> ScaleTransitionEvidence:
+    intent = intent or _complete_intent()
+    data = dict(
+        first_anchor_id="anchor-first", first_anchor_sha256="1" * 64,
+        last_anchor_id="anchor-last", last_anchor_sha256="2" * 64,
+        camera_intent_hash=scale_transition_camera_intent_hash(intent),
+        available_duration_seconds=intent.pacing.shot_duration_seconds,
+        sources=(
+            dict(source_id="geometry", kind="anchor_geometry_review",
+                 evidence_ref="evidence/anchor-review.json", sha256="a" * 64),
+            dict(source_id="trajectory", kind="trajectory",
+                 evidence_ref="evidence/path.json", sha256="b" * 64),
+        ),
+        findings=tuple(dict(
+            finding_id=name, verdict="PASS", rationale="Exact sources reviewed prospectively",
+            source_ids=("geometry",) if name == "anchor_correspondence" else ("trajectory",),
+        ) for name in ("anchor_correspondence", "scale_fov_continuity",
+                       "duration_reachable", "continuous_camera_path")),
+    )
+    data.update(updates)
+    return ScaleTransitionEvidence.create(**data)
+
+
+def test_same_scale_legacy_bytes_and_hash_are_unchanged() -> None:
+    evidence = _compatible_fl2va()
+    assert "scale_transition" not in evidence.model_dump(mode="json")
+    assert canonical_sha256(evidence) == "3ac5b6e0fd4e1c48470838bca1bc494c978be5923dd92ed48097d35fbf7dec79"
+
+
+def test_scale_transition_requires_complete_bound_prospective_evidence() -> None:
+    intent = _complete_intent()
+    evidence = _compatible_fl2va().model_copy(update={
+        "same_subject_scale": False, "scale_transition": _scale_transition(intent),
+    })
+    assert validate_conditioning_compatibility(
+        evidence, generation_intent=intent, output_duration_seconds=124 / 24,
+    ) == ()
+    assert validate_conditioning_compatibility(evidence)
+    changed = intent.model_copy(update={"camera_endpoint": CameraEndpoint(
+        start_framing="wide", end_framing="close",
+    )})
+    assert "conditioning_compatibility.scale_transition.camera_intent_hash" in validate_conditioning_compatibility(
+        evidence, generation_intent=changed, output_duration_seconds=124 / 24,
+    )
+
+
+@pytest.mark.parametrize("verdict", ["FAIL", "NOT_EVALUATED"])
+def test_scale_transition_nonpassing_review_is_recordable_but_not_admissible(verdict) -> None:
+    extension = _scale_transition()
+    findings = [f.model_dump(mode="json") for f in extension.findings]
+    findings[0]["verdict"] = verdict
+    extension = _scale_transition(findings=findings)
+    evidence = _compatible_fl2va().model_copy(update={
+        "same_subject_scale": False, "scale_transition": extension,
+    })
+    assert "conditioning_compatibility.scale_transition.findings" in validate_conditioning_compatibility(
+        evidence, generation_intent=_complete_intent(), output_duration_seconds=124 / 24,
+    )
+
+
+def test_scale_transition_rejects_hash_tampering_and_incomplete_sources() -> None:
+    extension = _scale_transition()
+    bad = extension.model_dump(mode="json")
+    bad["last_anchor_sha256"] = "3" * 64
+    with pytest.raises(ValidationError, match="content_hash"):
+        ScaleTransitionEvidence.model_validate(bad)
+    with pytest.raises(ValidationError, match="four"):
+        _scale_transition(findings=extension.findings[:-1])
+    with pytest.raises(ValidationError, match="source"):
+        _scale_transition(sources=[dict(source_id="trajectory", kind="proxy",
+                                      evidence_ref="proxy.blend", sha256="c" * 64)])
+    findings = [f.model_dump(mode="json") for f in extension.findings]
+    findings[0]["source_ids"] = ["trajectory"]
+    with pytest.raises(ValidationError, match="source"):
+        _scale_transition(findings=findings)
+
+
+def test_scale_transition_missing_unknown_and_unusable_evidence_fails_closed() -> None:
+    intent = _complete_intent()
+    for value in (False, None):
+        evidence = _compatible_fl2va().model_copy(update={"same_subject_scale": value})
+        assert "conditioning_compatibility.same_subject_scale" in validate_conditioning_compatibility(
+            evidence, generation_intent=intent, output_duration_seconds=124 / 24,
+        )
+    extension = _scale_transition()
+    findings = [item.model_dump(mode="json") for item in extension.findings]
+    findings[0]["source_ids"] = ["unknown"]
+    with pytest.raises(ValidationError, match="unknown source"):
+        _scale_transition(findings=findings)
+    findings[0]["source_ids"] = ["geometry"]
+    findings[0]["rationale"] = "  "
+    with pytest.raises(ValidationError, match="blank"):
+        _scale_transition(findings=findings)
+    with pytest.raises(ValidationError):
+        _scale_transition(available_duration_seconds=float("inf"))
+    extension = extension.model_copy(update={"content_hash": "d" * 64})
+    evidence = _compatible_fl2va().model_copy(update={
+        "same_subject_scale": False, "scale_transition": extension,
+    })
+    assert validate_conditioning_compatibility(
+        evidence, generation_intent=intent, output_duration_seconds=124 / 24,
+    ) == ("conditioning_compatibility.scale_transition.content_hash",)
+
+
+@pytest.mark.parametrize("locked", [False, True])
+def test_scale_transition_cannot_attest_missing_or_locked_camera_motion(locked) -> None:
+    motion = CameraMotionContract(
+        movement_kind=CameraMovementKind.LOCKED, direction="none",
+        amplitude_class=CameraAmplitudeClass.SUBTLE, speed_class=CameraSpeedClass.VERY_SLOW,
+        start_motion_state=CameraMotionStartState.STATIONARY,
+        end_motion_state=CameraMotionEndState.SETTLED,
+    ) if locked else None
+    intent = _complete_intent().model_copy(update={"primary_camera_motion": motion})
+    evidence = _compatible_fl2va().model_copy(update={
+        "same_subject_scale": False, "scale_transition": _scale_transition(intent),
+    })
+    assert "conditioning_compatibility.scale_transition.primary_camera_motion" in validate_conditioning_compatibility(
+        evidence, generation_intent=intent, output_duration_seconds=124 / 24,
+    )
+
+
+@pytest.mark.parametrize("field", ["composition_compatible", "screen_order_compatible", "axis_compatible",
+                                   "camera_path_reachable", "character_prop_state_reachable", "action_endpoint_reachable"])
+def test_scale_transition_does_not_relax_other_compatibility_dimensions(field) -> None:
+    evidence = _compatible_fl2va().model_copy(update={
+        "same_subject_scale": False, "scale_transition": _scale_transition(), field: False,
+    })
+    assert f"conditioning_compatibility.{field}" in validate_conditioning_compatibility(
+        evidence, generation_intent=_complete_intent(), output_duration_seconds=124 / 24,
+    )
+
+
+@pytest.mark.parametrize("same_scale,lane", [(True, "fl2va"), (None, "fl2va"), (False, "i2va")])
+def test_scale_transition_rejects_contradictory_or_single_anchor_lanes(same_scale, lane) -> None:
+    data = _compatible_fl2va().model_dump(mode="json")
+    data.update(same_subject_scale=same_scale, lane=lane, scale_transition=_scale_transition())
+    if lane == "i2va":
+        data["last_anchor_id"] = None
+    with pytest.raises(ValidationError, match="scale_transition"):
+        ConditioningCompatibilityEvidence.model_validate(data)

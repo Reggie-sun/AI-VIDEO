@@ -23,6 +23,7 @@ from ai_video.production.video_requirement import (
     GenerationMode,
     ProviderNeutralVideoRequirement,
     SemanticReferenceRole,
+    ScaleTransitionEvidence,
 )
 
 
@@ -107,15 +108,18 @@ def validate_camera_subject_relation(
 
 def validate_conditioning_compatibility(
     evidence: ConditioningCompatibilityEvidence | None,
+    *,
+    generation_intent: GenerationIntent | None = None,
+    output_duration_seconds: float | None = None,
 ) -> tuple[str, ...]:
     if evidence is None:
         return ("conditioning_compatibility",)
+    extension = evidence.scale_transition
     if evidence.lane is ConditioningLane.I2VA:
-        return ()
+        return () if extension is None else ("conditioning_compatibility.scale_transition",)
     diagnostics = [
         f"conditioning_compatibility.{field}"
         for field in (
-            "same_subject_scale",
             "composition_compatible",
             "screen_order_compatible",
             "axis_compatible",
@@ -125,6 +129,18 @@ def validate_conditioning_compatibility(
         )
         if getattr(evidence, field) is not True
     ]
+    if evidence.same_subject_scale is False and extension is not None:
+        from ai_video.production._conditioning_scale_transition import validate_scale_transition_binding
+        diagnostics.extend(validate_scale_transition_binding(
+            extension, first_anchor_id=evidence.first_anchor_id,
+            last_anchor_id=evidence.last_anchor_id,
+            available_duration_seconds=evidence.available_duration_seconds,
+            generation_intent=generation_intent, output_duration_seconds=output_duration_seconds,
+        ))
+    elif evidence.same_subject_scale is not True:
+        diagnostics.insert(0, "conditioning_compatibility.same_subject_scale")
+    if extension is not None and evidence.same_subject_scale is not False:
+        diagnostics.append("conditioning_compatibility.scale_transition")
     return tuple(diagnostics)
 
 
@@ -183,7 +199,16 @@ def validate_requirement_conditioning_compatibility(
             ):
                 diagnostics.append("asset_evidence.source_video")
         return tuple(diagnostics)
-    diagnostics = list(validate_conditioning_compatibility(evidence))
+    output = requirement.output_need
+    output_duration = (
+        output.frame_count / output.fps
+        if output.frame_count is not None and output.fps is not None
+        else output.duration_seconds
+    )
+    diagnostics = list(validate_conditioning_compatibility(
+        evidence, generation_intent=requirement.generation_intent,
+        output_duration_seconds=output_duration,
+    ))
     if evidence is None:
         return tuple(diagnostics)
     if requirement.generation_mode not in {GenerationMode.IMAGE_TO_VIDEO, GenerationMode.FIRST_LAST_FRAME_VIDEO}:
@@ -226,6 +251,12 @@ def validate_requirement_conditioning_compatibility(
             diagnostics.append("capability_need.needs_last_frame")
         if len(first_assets) == 1 and len(last_assets) == 1:
             first, last = first_assets[0], last_assets[0]
+            extension = evidence.scale_transition
+            if isinstance(extension, ScaleTransitionEvidence):
+                if first.asset_sha256 != extension.first_anchor_sha256:
+                    diagnostics.append("conditioning_compatibility.scale_transition.first_anchor_sha256")
+                if last.asset_sha256 != extension.last_anchor_sha256:
+                    diagnostics.append("conditioning_compatibility.scale_transition.last_anchor_sha256")
             if (
                 first.width is None
                 or first.height is None
@@ -235,12 +266,6 @@ def validate_requirement_conditioning_compatibility(
             ):
                 diagnostics.append("asset_evidence.anchor_geometry")
 
-    output = requirement.output_need
-    output_duration = (
-        output.frame_count / output.fps
-        if output.frame_count is not None and output.fps is not None
-        else output.duration_seconds
-    )
     intent_duration = requirement.generation_intent.pacing.shot_duration_seconds
     for path, duration in (
         ("output_need.duration", output_duration),

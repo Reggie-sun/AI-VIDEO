@@ -1589,6 +1589,7 @@ categories:
     patterns:
       - src/ai_video/production/video_requirement.py
       - src/ai_video/production/_video_intent_validation.py
+      - src/ai_video/production/_conditioning_scale_transition.py
       - src/ai_video/production/_h3_prompt.py
       - src/ai_video/production/_video_requirement_routing.py
       - src/ai_video/production/video_compiler.py

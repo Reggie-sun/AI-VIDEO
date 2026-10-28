@@ -472,6 +472,122 @@ def test_v4_conditioning_rejects_anchor_identity_or_duration_drift() -> None:
         ProviderNeutralVideoRequirement.create(**payload)
 
 
+def _scale_transition_requirement_kwargs() -> dict[str, object]:
+    from tests.test_production_video_intent_validation import _compatible_fl2va, _scale_transition
+
+    payload = _v4_requirement_kwargs()
+    intent = payload["generation_intent"]
+    payload.update(
+        generation_mode=GenerationMode.FIRST_LAST_FRAME_VIDEO,
+        asset_evidence=(_asset(asset_id="anchor-first"),
+                        _asset("last_frame", "anchor-last").model_copy(update={"asset_sha256": "2" * 64})),
+        semantic_reference_roles=(SemanticReferenceRole.FIRST_FRAME, SemanticReferenceRole.LAST_FRAME),
+        capability_need=CapabilityNeed(needs_first_frame=True, needs_last_frame=True),
+        conditioning_compatibility=_compatible_fl2va().model_copy(update={
+            "same_subject_scale": False, "available_duration_seconds": 3.0,
+            "scale_transition": _scale_transition(intent),
+        }),
+    )
+    return payload
+
+
+def test_scale_transition_roundtrips_through_projection_and_exact_requirement() -> None:
+    requirement = ProviderNeutralVideoRequirement.create(**_scale_transition_requirement_kwargs())
+    projection = ProviderNeutralGenerationIntentProjection.create(
+        generation_intent=requirement.generation_intent,
+        conditioning_compatibility=requirement.conditioning_compatibility,
+        output_need=requirement.output_need,
+        audio_need=requirement.audio_need,
+        quality_need=requirement.quality_need,
+    )
+    assert ProviderNeutralVideoRequirement.model_validate_json(requirement.model_dump_json()) == requirement
+    assert ProviderNeutralGenerationIntentProjection.model_validate_json(projection.model_dump_json()) == projection
+    assert projection.conditioning_compatibility.same_subject_scale is False
+    assert requirement.conditioning_compatibility.scale_transition.content_hash
+
+
+@pytest.mark.parametrize("position,field,value", [
+    (0, "asset_sha256", "3" * 64), (1, "asset_sha256", "3" * 64),
+    (0, "asset_id", "wrong-first"), (1, "asset_id", "wrong-last"),
+    (1, "width", 1280),
+])
+def test_scale_transition_checks_actual_anchor_evidence(position, field, value) -> None:
+    payload = _scale_transition_requirement_kwargs()
+    assets = list(payload["asset_evidence"])
+    assets[position] = assets[position].model_copy(update={field: value})
+    payload["asset_evidence"] = tuple(assets)
+    with pytest.raises(ValidationError, match="anchor"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
+@pytest.mark.parametrize("drift", ["camera", "duration", "anchor_ids", "copied_hash", "none_scale"])
+def test_scale_transition_projection_and_requirement_reject_stale_binding(drift) -> None:
+    from ai_video.production._conditioning_scale_transition import ScaleTransitionEvidence
+
+    payload = _scale_transition_requirement_kwargs()
+    evidence = payload["conditioning_compatibility"]
+    extension = evidence.scale_transition
+    if drift == "camera":
+        payload["generation_intent"] = payload["generation_intent"].model_copy(update={
+            "camera_endpoint": CameraEndpoint(start_framing="different", end_framing="different"),
+        })
+    elif drift == "duration":
+        payload["output_need"] = payload["output_need"].model_copy(update={"duration_seconds": 4.0})
+    elif drift == "anchor_ids":
+        data = extension.model_dump(exclude={"content_hash"})
+        data["first_anchor_id"] = "different-first"
+        extension = ScaleTransitionEvidence.create(**data)
+    elif drift == "copied_hash":
+        extension = extension.model_copy(update={"last_anchor_sha256": "4" * 64})
+    else:
+        evidence = evidence.model_copy(update={"same_subject_scale": None})
+    payload["conditioning_compatibility"] = evidence.model_copy(update={"scale_transition": extension})
+    with pytest.raises(ValidationError, match="conditioning|scale_transition"):
+        ProviderNeutralGenerationIntentProjection.create(
+            generation_intent=payload["generation_intent"],
+            conditioning_compatibility=payload["conditioning_compatibility"],
+            output_need=payload["output_need"], audio_need=payload["audio_need"],
+            quality_need=payload["quality_need"],
+        )
+    with pytest.raises(ValidationError):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_legacy_v4_requirement_hash_is_unchanged() -> None:
+    requirement = ProviderNeutralVideoRequirement.create(**_v4_requirement_kwargs())
+    assert requirement.requirement_hash == "e410378982624bb058447a4d8cf5d969b7d73bdb1335a06494d6b023da1fe243"
+
+
+def test_scale_transition_locked_camera_rejects_even_resealed_all_pass_review() -> None:
+    from tests.test_production_video_intent_validation import _scale_transition
+
+    payload = _scale_transition_requirement_kwargs()
+    intent = payload["generation_intent"].model_copy(update={
+        "primary_camera_motion": CameraMotionContract(
+            movement_kind=CameraMovementKind.LOCKED, direction="none",
+            amplitude_class=CameraAmplitudeClass.SUBTLE, speed_class=CameraSpeedClass.VERY_SLOW,
+            start_motion_state=CameraMotionStartState.STATIONARY,
+            end_motion_state=CameraMotionEndState.SETTLED,
+        ),
+    })
+    evidence = payload["conditioning_compatibility"].model_copy(update={
+        "scale_transition": _scale_transition(intent),
+    })
+    with pytest.raises(ValidationError, match="scale_transition.primary_camera_motion"):
+        ProviderNeutralGenerationIntentProjection.create(
+            generation_intent=intent, conditioning_compatibility=evidence,
+            output_need=payload["output_need"], audio_need=payload["audio_need"],
+            quality_need=payload["quality_need"],
+        )
+    payload.update(generation_intent=intent, conditioning_compatibility=evidence,
+                   generation_intent_hash=canonical_sha256({
+                       "schema": "provider-neutral-generation-intent/2",
+                       "generation_intent": intent.model_dump(mode="json"),
+                   }))
+    with pytest.raises(ValidationError, match="scale_transition.primary_camera_motion"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
 def test_locked_camera_requires_stationary_to_settled() -> None:
     with pytest.raises(ValidationError, match="locked camera"):
         CameraMotionContract(

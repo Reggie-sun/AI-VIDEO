@@ -22,6 +22,12 @@ from ai_video.production.voice_routing_contracts import VoiceRoutingRequirement
 from ai_video.production.video_transition import CausalDimension
 from ai_video.production.performance_direction import PerformanceIntent
 from ai_video.production.reference_planning_contracts import ReferencePlanningIntent
+from ai_video.production._conditioning_scale_transition import (
+    ScaleTransitionEvidence,
+    ScaleTransitionFinding,
+    ScaleTransitionSource,
+    scale_transition_camera_intent_hash,
+)
 
 
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
@@ -173,9 +179,21 @@ class ConditioningCompatibilityEvidence(StrictModel):
     character_prop_state_reachable: bool | None = None
     action_endpoint_reachable: bool | None = None
     available_duration_seconds: float = Field(gt=0)
+    scale_transition: ScaleTransitionEvidence | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_scale_transition(self, handler):
+        data = handler(self)
+        if self.scale_transition is None:
+            data.pop("scale_transition", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_lane_shape(self) -> "ConditioningCompatibilityEvidence":
+        if self.scale_transition is not None and (
+            self.lane is not ConditioningLane.FL2VA or self.same_subject_scale is not False
+        ):
+            raise ValueError("scale_transition requires FL2VA with same_subject_scale=False")
         if self.lane is ConditioningLane.I2VA:
             if self.last_anchor_id is not None:
                 raise ValueError("I2VA cannot carry a last anchor")
@@ -908,7 +926,13 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
                 )
             if self.generation_operation is not GenerationOperation.TEXT_TO_VIDEO and not reference_only:
                 conditioning_diagnostics = validate_conditioning_compatibility(
-                    self.conditioning_compatibility
+                    self.conditioning_compatibility,
+                    generation_intent=self.generation_intent,
+                    output_duration_seconds=(
+                        self.output_need.frame_count / self.output_need.fps
+                        if self.output_need.frame_count is not None and self.output_need.fps is not None
+                        else self.output_need.duration_seconds
+                    ),
                 )
                 if conditioning_diagnostics:
                     raise ValueError(
@@ -1447,6 +1471,10 @@ __all__ = [
     "CapabilityNeed",
     "ConditioningCompatibilityEvidence",
     "ConditioningLane",
+    "ScaleTransitionEvidence",
+    "ScaleTransitionFinding",
+    "ScaleTransitionSource",
+    "scale_transition_camera_intent_hash",
     "ContinuityMode",
     "ContinuityStateKind",
     "DialogueIntent",
