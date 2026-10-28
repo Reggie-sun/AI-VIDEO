@@ -77,6 +77,15 @@ Commits `935edf4`、`ea8bd3e`、`450cb7c`、`807fbd5`（base `0c3be7d`）：
   - Revision Gate 与旧 fixture（1）：`test_seedream_remote_image.py` `source revision required for a changed prompt input`。
   - 未细分（2）：`test_generation_runtime_repair.py::test_cross_provider_canvas_reopen_after_paid_intent_uses_consumed_lineage`、
     `test_production_ecommerce_job_e2e.py::test_canonical_two_shot_job_closes_offline_and_replays_without_effect[fail]`。
+- 机械类修复（用户选择）于 `2a61e62`：handoff schema 在干净 HEAD worktree 由 `schema_text()` 重新生成
+  （排除他人 staged `composition_contracts.py`）；runtime-repair 测试改匹配 5473a4c 拆分后的首级文案，
+  拒绝行为不变。复现后上述 2 个"未细分"均归入 Gate 与旧 fixture 类（Seedance compiler/4 final-text QA
+  前置；performance acceptance 前置），未修，待产品判断。
+  Focused receipt `.agent/harness/runs/baseline-mechanical-fixes-focused-20261027/receipt.json`（`284ddc6..2a61e62`）
+  status `failed`：`generation_feedback_tests` 仅既有 cross-provider 例失败后停止。其余 focused check 于干净
+  worktree @`2a61e62` 直跑：docs_contract passed、`ecommerce_ad_workflow_skill_tests` 95 passed、
+  `harness_tests` 324 passed、`ecommerce_production_job_tests` 7 failed（均为既有 performance acceptance 例）。
+  剩余基线失败 11 个：环境 1、Architecture 1、Gate 与旧 fixture 9。
 - 审计观察（未处理，待用户决定）：policy.yaml 1847 行人工映射易持续漏登；规则文档被字节预算
   压缩影响可读性；文档标题字符串断言脆弱；Stop hook 在等待后台任务时反复要求 record 评估；
   `.claude/agents/kfc/spec-*` 的 "use PROACTIVELY" 与已退役自动 planning 冲突；
