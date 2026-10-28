@@ -33,8 +33,8 @@ those contracts in the session record.
 
 ## Handle Project Hook Requests
 
-The project-local hook (Codex `.codex/hooks.json` or Claude Code
-`.claude/settings.json`, same script) may inject a request containing a
+The project-local Codex hook (`.codex/hooks.json`; Claude Code does not register
+it) may inject a request containing a
 `capture_request_id`. Treat it as a one-time request to evaluate this skill's
 stable-boundary rule, not as proof that a record is required.
 

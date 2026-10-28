@@ -43,46 +43,20 @@ def test_claude_md_is_thin_adapter_importing_agents_md() -> None:
     assert "## Verification Contract" not in text
 
 
-def test_claude_settings_wire_session_record_hooks_on_shared_script() -> None:
+def test_claude_settings_do_not_register_session_record_hooks() -> None:
+    # 用户 2026-10-28 要求移除 Claude 侧 record 评估 hook（Stop 反复阻断）；
+    # Codex 侧 `.codex/hooks.json` 不变，record 评估仍按 AGENTS.md Completion Standard 主动执行。
     settings = json.loads(CLAUDE_SETTINGS.read_text(encoding="utf-8"))
-    hooks = settings["hooks"]
-    assert set(hooks) >= {"SessionStart", "PostToolUse", "PreCompact", "Stop"}
-
-    def session_hook_commands() -> list[str]:
-        commands: list[str] = []
-        for registrations in hooks.values():
-            for registration in registrations:
-                for hook in registration["hooks"]:
-                    if "session_record_hook.py" in hook["command"]:
-                        commands.append(hook["command"])
-        return commands
-
-    commands = session_hook_commands()
-    assert len(commands) == 4  # SessionStart/PostToolUse/PreCompact/Stop 各一条
-    assert len(set(commands)) == 1  # 同一脚本同一命令
-    # settings.json 记录的是宿主绝对路径；断言仓库相对后缀以便在
-    # detached harness worktree 中同样成立。
-    assert commands[0].endswith(
-        "/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\""
-    )
-
-    post_tool = hooks["PostToolUse"]
-    session_registration = next(
-        registration
-        for registration in post_tool
-        if any(
-            "session_record_hook.py" in hook["command"]
-            for hook in registration["hooks"]
-        )
-    )
-    for tool_name in WRITE_TOOL_NAMES:
-        assert tool_name in session_registration["matcher"]
-    # 既有 video-analysis hook 仍然保留
-    assert any(
-        "ai_video_mcp.analysis_hook" in hook["command"]
-        for registration in post_tool
+    hooks = settings.get("hooks", {})
+    commands = [
+        hook["command"]
+        for registrations in hooks.values()
+        for registration in registrations
         for hook in registration["hooks"]
-    )
+    ]
+    assert not any("session_record_hook.py" in command for command in commands)
+    # 既有 video-analysis hook 仍然保留
+    assert any("ai_video_mcp.analysis_hook" in command for command in commands)
 
 
 def test_hook_script_recognizes_claude_write_tools() -> None:

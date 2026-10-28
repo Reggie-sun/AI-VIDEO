@@ -8,7 +8,7 @@
 
 ## Claude Runtime Notes
 
-- Session-record hooks 接线在 `.claude/settings.json`，与 `.codex/hooks.json` 共用同一 `.agents/skills/record-ai-video-session/scripts/session_record_hook.py`。
+- Claude 侧不注册 session-record hooks（用户 2026-10-28 要求移除）；仅 `.codex/hooks.json` 接线。Claude 下 record/learning 评估按 `AGENTS.md` Completion Standard 主动执行，无 hook 不免除。
 - 项目 skill 唯一实体在 `.agents/skills/`；`.claude/skills/` 只是逐一指向它们的 symlink 接缝，新增 skill 须同步建链（`tests/test_claude_code_adapter.py` 校验全量对齐），不得在 `.claude/skills/` 维护第二份正文。
 - Project MCP 在 `.mcp.json`，与 `.codex/config.toml` 的 `mcp_servers` 同名对齐；首次加载需用户在 Claude Code 中批准。Codex `enabled_tools` 白名单在 `.claude/settings.json` 以 `permissions.deny` 表达；Codex 的 per-server timeout 无对应字段，由 Claude 全局 MCP timeout 承担。可用不等于授权，外部效果仍按 `AGENTS.md` 判定。
 - 保持 cwd 在仓库根：OMC 按 cwd 写 `.omc/` 状态，`cd` 进子目录会生成游离 `.omc/`。
