@@ -13,6 +13,8 @@ Date: 2026-10-27
 > [Ecommerce Commercial Performance Review](2026-10-28-ecommerce-commercial-performance-review.md)。
 > 剩余基线失败为：环境 1、Architecture 1、Seedance compiler/4 1、Seedream revision 1。
 > Claude 侧 session-record hooks 已按用户要求于 `d57f85b` 移除，下文所述 Claude hook 接线为历史状态。
+>
+> **Supersession notice（2026-10-28，baseline cleanup）**：其余基线失败已处理，见下节 "Baseline Cleanup"。
 
 ## Purpose
 
@@ -109,3 +111,31 @@ Commits `935edf4`、`ea8bd3e`、`450cb7c`、`807fbd5`（base `0c3be7d`）：
 
 `distill-ai-video-learning` 评估为 `no_candidate`：本次是配置适配与基线修复，非重复媒体实验。
 未刷新 RAG index，未执行 Provider/媒体生成，未读取 credential。
+
+## Baseline Cleanup（2026-10-28）
+
+用户授权自行判断，过时测试可删除。Commits `60be371`、`65e1706`：
+
+- Seedream：`test_seedream_image_activates_in_canvas_authoring_graph` 改为对每个 prompt 输入变化的 Shot 声明
+  `canvas-source-revision/1`（116260e 起必需），原断言全部保留。
+- 删除 `test_cross_provider_canvas_reopen_after_paid_intent_uses_consumed_lineage`：其前提（新建 legacy compiler 的
+  Seedance source attempt）自 5473a4c 起被 `require_fresh_seedance_request` 禁止；所测路径为
+  `generation_runtime_repair.py` 硬编码的单例 seedance→metaso_h3 4s 480p→768P retarget，授权已消费；
+  授权精确性与已消费不可复用仍由相邻测试覆盖。迁移需将 canvas fixture 换成真实 compiler/4 并补齐 intent/QA 映射，未做。
+- Architecture ARCH002：`_state_commit_video.py` 有效 LOC 1534 > 1500。四个 `record_local_video_*` 原样移入
+  `_StateCommitLocalVideoMixin`（`_state_commit_video_local.py`），MRO 紧随 `_StateCommitVideoMixin`；行为不变。
+  Architecture gate PASS（0 error），原模块 1161（WARN）。结构测试固定 MRO 位置与方法归属模块。
+- harfbuzz/libass：**未修复，环境问题**。`.venv/bin/python` → miniconda base python，其 RPATH 使 libass 依赖解析到
+  miniconda `libfreetype.so.6.17.4`，缺 `FT_Get_Transform`；系统 `/usr/bin/python3` 加载正常。修复需升级共享的
+  miniconda base freetype（≥2.11）或以系统 python 重建 `.venv`，影响全局环境，留待用户决定。
+- 验证：related receipt `.agent/harness/runs/baseline-cleanup-related-20261028/receipt.json`（`59e80dd..65e1706`）
+  status `failed`，原因 `source scope changed during verification`（并发会话 14:14 提交 `ef6401d`）；前 11 项 passed，
+  含 `generation_feedback_tests`（624 passed，基线失败已消除）与 `production_video_provider_tests`。被跳过 7 项于干净
+  worktree @`65e1706` 按 policy argv 直跑，结果（affected-module 级，非 full regression，无 receipt）：
+  `production_state_tests` 962、`seedream_image_tests` 38、`seedance_local_video_tests` 195、`production_vidu_tests` 191、
+  `provider_neutral_video_requirement_tests` 473、`cli_config_tests` 15 全部 passed；`production_contract_tests`
+  4541 passed / 1 failed，唯一失败 `test_production_subtitle_ass.py::test_version_mismatch_and_inexact_word_partition_fail_before_render`
+  于主工作区复现为 `libass runtime is unavailable`，即上文 harfbuzz/libass 环境问题，非本次改动引入。
+- 发布：`60be371`、`65e1706` 已在 origin/main（随后续提交一并 push，核验 `merge-base --is-ancestor` 成立）。
+  剩余已知基线失败：仅 libass 环境 1 项。
+
