@@ -1,0 +1,18 @@
+{
+  "account_matches": true,
+  "state_status": "allowed",
+  "state_keys": [
+    "status",
+    "activation",
+    "quote"
+  ],
+  "benefit_fields": {},
+  "quote": {
+    "credits": 240,
+    "priceDisplayStatus": "available",
+    "isFree": false,
+    "requiredVipLevel": "standard",
+    "policyVersion": "8"
+  },
+  "balance_sufficient_for_240": true
+}

@@ -1,0 +1,33 @@
+{
+  "frames": 480,
+  "fps": 24,
+  "seconds": 20,
+  "camera_position_source": "camera-samples-v3.json",
+  "traction_sides": [
+    [
+      -330.9280011558533,
+      -30.099999999999994
+    ],
+    [
+      15.643383402824401,
+      87.78276195526121
+    ]
+  ],
+  "neither_line_crossed": true,
+  "speed_max_mps": 4.138763988080144,
+  "final_0_5s_max_mps": 0.0,
+  "final_position": [
+    -1.0,
+    -7.0,
+    1.75
+  ],
+  "final_aim": [
+    3.744297504425049,
+    31.816978454589844,
+    -6.660346031188965
+  ],
+  "last_source_anchor": "MC01-normal.png",
+  "photographic_tail_match": false,
+  "sound": "NOT_EVALUATED",
+  "source_footage_regenerated": false
+}

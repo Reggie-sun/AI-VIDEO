@@ -380,3 +380,21 @@ MC03当前分镜要求斜侧可见脸与身体、开始下行；旧真实测试�
 仍未证明：MC00高差与入口、MC03完整下行路径／动作阶段／跨机位几何、MC04–05实际持门和反应接点、MC06→B6原速入点、全段声音、模型服从及human接受。新scope生图3、自动retry0、未知0、视频0，费用及模型身份工具未暴露。旧宏观真实视频计数仍6，旧下楼／推门有限单元不挪用，楼梯FAIL保持。其他窗口的合成／声音／commercial execution等dirty/staged工作保持。
 
 按record-ai-video-session续记同主题，distill-ai-video-learning评估no_candidate：本次是完整参考汇总与同源静态空间修订，未形成模型受控对照或通过的动态实验，不提炼通用质量规则，不改Skill／Policy／Gate。文档、图像、exact来源与静态观察只按所测层级报告，不冒充工程related/full或媒体Gate通过。
+
+## Rejected MC00 Proxy Previs — 2026-10-28
+
+用户告知另一Agent改完并允许开始。Parent先核对HEAD `59e80dd`：用户选MC00落点方案A，唯一尾帧改为已认可市政第0帧；旧近似市政末态降为接近路线参考。原市政内部剪辑不变，音频旧记录与后续人工接受各自保留，不由本轮文字复述重签。
+
+本轮产出本地20秒、24fps／480帧、1280×720、无音轨代理预演，路径与场景保存在`outputs/shizhen-episode01/MC00-previs-20261028/`。初次静态落点不合适，修订机位与回转滑轮代理位置；第二个本地job完成静图后，Blender5.2在未设`image_settings.media_type='VIDEO'`时拒绝`FFMPEG`格式，属已知未输出MP4。保留旧／新本地job边界2→3及理由后，只从已知保存的场景导出一次，没有重设历史计数。最终MP4 SHA `c9ac5e2975cef56f9df4f9a144f1c6c222cd85167e957fde15778415c2f6488a`，1,962,276bytes。
+
+显式project-local video-analysis MCP probe／scene检测为20秒、480帧、一个检测场景、无音轨；全decode、实际0/24/48等帧取样、相机采样显示末0.5秒速度为0，两条代理牵引线水平side未变号。这些只证明所测代理轨迹与技术事实，不能证明真实城市、照片端点、自然观看或接点通过。Parent实际审看取帧后仍存在末态设备裁切、代理构图不匹配；没有把原照片插到灰模结尾伪造无缝。
+
+用户直接否定“你這白模不是一拖史嗎”。Parent接受此质量否决，exact预演记`FAIL`，仅保留失败诊断，不作为正式模型输入或可行性PASS依据。`qa/rejected-previs.json`逐项记录城市／地标表现弱、设备裁切、与照片端点未建立映射；原decode、scene检测、零尾速不覆盖用户否决。页面同步标“已退回”，没有改成完成或通过。
+
+只读核对当前即梦同一account hash的已登录canvas：2.5原生mode3仍支持20秒／480p、exact两张首尾图，不能同时塞中间图或motion视频；当前只读quote为240CRD且可用余额足够。已认可市政第0帧被指定last，屋檐写实图为first。DevTools plugin连接占用后，使用既有Jimeng owner连接同一配置的确切CDP profile作只读核验，没有关闭用户浏览器或扫描其他凭据。模型配置只保留白名单字段，来源签名图片地址不保存在产物。quote是当时读取，不是消费或长期价格保证。
+
+native executor在`outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v1/`准备380字纯中文prompt、row/data、exact首尾来源与离线准备脚本，没有bootstrap run或创建平台节点。标准PNG／Shot／intent结构检查通过；兼容性七项保持null，projection明确拒绝，未伪填True。native architect只读核对确认`same_subject_scale`指画面主体尺度，不是世界物理尺寸，当前FL2VA全True规则不支持这组不同景别首尾。它提出可在现有owner添加绑定actual anchors、intent／duration、trajectory与专门审查的typed分支，但纯proxy不足以签该审查；当前未修改任何shared contract、src、Gate或测试，也未用R2V／省略rich intent等方法绕过。
+
+用户否定白模后不继续扩大准入工程：这版不能证明照片到轨迹的可达性，创建新schema也不能把失败输入变成PASS。当前制作目标尚未完成。下一步须从写实首尾与中间城市参考重新建立可信空间和摄影对应；真实可达性不足保持NOT_EVALUATED，再决定现有owner所需的最小变更。MC03旧FAIL、原市政与B6保护继续有效。
+
+本轮新平台节点0、upload0、generation POST0、付费生成0、消费积分0；240仅为读取报价。没有新图像／正式视频生成，也没有Production activation／P6／Final Acceptance。所有当前文件是失败证据或未提交草稿，不能按prepare脚本exit0声称可以提交。record-ai-video-session记录稳定FAIL检查点，distill-ai-video-learning为no_candidate：单次被否定代理预演不是模型规律或成熟工作流证据，不改Skill／Policy。其他窗口dirty/staged源码与测试保持原状。

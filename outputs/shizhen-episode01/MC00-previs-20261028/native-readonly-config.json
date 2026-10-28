@@ -1,0 +1,454 @@
+{
+  "account_matches_previous_profile": true,
+  "model": {
+    "description": "最强模型，支持 50个参考，新增视频编辑、超长生成",
+    "displayName": "即梦 Seedance 2.5",
+    "modelName": "seedance_2.5",
+    "modes": {
+      "1": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000,
+            16000,
+            17000,
+            18000,
+            19000,
+            20000,
+            21000,
+            22000,
+            23000,
+            24000,
+            25000,
+            26000,
+            27000,
+            28000,
+            29000,
+            30000
+          ]
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [],
+          "maxCount": 0,
+          "minCount": 0,
+          "promptRequired": true,
+          "requiresRole": false,
+          "roles": []
+        },
+        "mode": 1,
+        "promptMaxCharacters": 15000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "toolKinds": [
+          "style",
+          "palette",
+          "camera_motion"
+        ],
+        "toolMaxCounts": {
+          "camera_motion": 5
+        },
+        "supportsPromptEnhancement": true
+      },
+      "2": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000,
+            16000,
+            17000,
+            18000,
+            19000,
+            20000,
+            21000,
+            22000,
+            23000,
+            24000,
+            25000,
+            26000,
+            27000,
+            28000,
+            29000,
+            30000
+          ]
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [
+            2
+          ],
+          "maxCount": 1,
+          "minCount": 1,
+          "promptRequired": false,
+          "requiresRole": true,
+          "roles": [
+            1
+          ]
+        },
+        "mode": 2,
+        "promptMaxCharacters": 15000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "toolKinds": [
+          "style",
+          "palette",
+          "camera_motion"
+        ],
+        "toolMaxCounts": {
+          "camera_motion": 5
+        },
+        "supportsPromptEnhancement": true
+      },
+      "3": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000,
+            16000,
+            17000,
+            18000,
+            19000,
+            20000,
+            21000,
+            22000,
+            23000,
+            24000,
+            25000,
+            26000,
+            27000,
+            28000,
+            29000,
+            30000
+          ]
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [
+            2
+          ],
+          "maxCount": 2,
+          "minCount": 2,
+          "promptRequired": false,
+          "requiresRole": true,
+          "roles": [
+            1,
+            2
+          ]
+        },
+        "mode": 3,
+        "promptMaxCharacters": 15000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "toolKinds": [
+          "style",
+          "palette",
+          "camera_motion"
+        ],
+        "toolMaxCounts": {
+          "camera_motion": 5
+        },
+        "supportsPromptEnhancement": true
+      },
+      "4": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000,
+            16000,
+            17000,
+            18000,
+            19000,
+            20000,
+            21000,
+            22000,
+            23000,
+            24000,
+            25000,
+            26000,
+            27000,
+            28000,
+            29000,
+            30000
+          ]
+        },
+        "editSource": {
+          "minMs": 4000,
+          "maxMs": 30000
+        },
+        "extendSource": {
+          "minSourceMs": 1800,
+          "maxSourceMs": 30200,
+          "extendDurationValuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000,
+            16000,
+            17000,
+            18000,
+            19000,
+            20000,
+            21000,
+            22000,
+            23000,
+            24000,
+            25000,
+            26000,
+            27000,
+            28000,
+            29000,
+            30000
+          ],
+          "defaultExtendDurationMs": 5000,
+          "billableInputDurationCapMs": 30000
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [
+            2,
+            3,
+            4
+          ],
+          "maxCount": 50,
+          "minCount": 1,
+          "promptRequired": false,
+          "requiresRole": false,
+          "roles": []
+        },
+        "mode": 4,
+        "promptMaxCharacters": 15000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "toolKinds": [
+          "style",
+          "palette",
+          "camera_motion"
+        ],
+        "toolMaxCounts": {
+          "camera_motion": 5
+        },
+        "supportsPromptEnhancement": true
+      }
+    },
+    "source": "by seed"
+  },
+  "mode": {
+    "aspectRatioDefault": "16:9",
+    "aspectRatios": [
+      "21:9",
+      "16:9",
+      "4:3",
+      "1:1",
+      "3:4",
+      "9:16"
+    ],
+    "count": {
+      "defaultValue": 1,
+      "maxValue": 4
+    },
+    "duration": {
+      "defaultMs": 4000,
+      "valuesMs": [
+        4000,
+        5000,
+        6000,
+        7000,
+        8000,
+        9000,
+        10000,
+        11000,
+        12000,
+        13000,
+        14000,
+        15000,
+        16000,
+        17000,
+        18000,
+        19000,
+        20000,
+        21000,
+        22000,
+        23000,
+        24000,
+        25000,
+        26000,
+        27000,
+        28000,
+        29000,
+        30000
+      ]
+    },
+    "longVideo": {
+      "defaultValue": false,
+      "supported": false
+    },
+    "materials": {
+      "acceptedTypes": [
+        2
+      ],
+      "maxCount": 2,
+      "minCount": 2,
+      "promptRequired": false,
+      "requiresRole": true,
+      "roles": [
+        1,
+        2
+      ]
+    },
+    "mode": 3,
+    "promptMaxCharacters": 15000,
+    "resolutionDefault": "720p",
+    "resolutions": [
+      "480p",
+      "720p",
+      "1080p"
+    ],
+    "toolKinds": [
+      "style",
+      "palette",
+      "camera_motion"
+    ],
+    "toolMaxCounts": {
+      "camera_motion": 5
+    },
+    "supportsPromptEnhancement": true
+  },
+  "validation": {
+    "reason": "model",
+    "status": "invalid"
+  },
+  "addVideoNodeSignature": "async addVideoNode(e,t,i){return this.documentActions.addVideoNode(e,t,i)}",
+  "validation_note": "Call used an unverified method signature; invalid result is diagnostic only, not a capability conclusion"
+}

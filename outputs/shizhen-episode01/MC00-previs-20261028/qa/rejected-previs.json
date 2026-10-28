@@ -1,0 +1,35 @@
+{
+  "scope": "exact local MC00 proxy previs review",
+  "artifact_path": "outputs/shizhen-episode01/MC00-previs-20261028/MC00-previs-v3.mp4",
+  "artifact_sha256": "c9ac5e2975cef56f9df4f9a144f1c6c222cd85167e957fde15778415c2f6488a",
+  "verdict": "FAIL",
+  "user_feedback": "你這白模不是一拖史嗎",
+  "recorded_at": "2026-10-28T18:10:19.735480+00:00",
+  "findings": [
+    {
+      "id": "city_and_landmarks",
+      "verdict": "FAIL",
+      "reason": "Proxy masses do not establish a credible city or sufficiently readable residence/shelter relationship matching the photoreal references"
+    },
+    {
+      "id": "endpoint_framing",
+      "verdict": "FAIL",
+      "reason": "Proxy final composition crops equipment and does not match the approved municipal frame0"
+    },
+    {
+      "id": "pre_generation_photo_to_path_feasibility",
+      "verdict": "NOT_EVALUATED",
+      "reason": "No valid mapping from the exact photoreal anchors to this proxy trajectory"
+    }
+  ],
+  "technical_checks_do_not_override_quality": true,
+  "allowed_use": "diagnostic history only",
+  "formal_generation_input": false,
+  "formal_submit_count": 0,
+  "must_not_do": [
+    "treat one-scene detection or decode as quality acceptance",
+    "use this proxy to sign camera-path or scale-transition PASS",
+    "start paid generation based on this proxy"
+  ],
+  "next_work": "Re-establish credible spatial geography from exact photoreal references and approved municipal frame0 before further movement or submit"
+}

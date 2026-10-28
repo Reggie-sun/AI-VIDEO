@@ -1,0 +1,51 @@
+{
+  "scope": "MC00 continuous local spatial rehearsal, followed by bounded formal generation readiness",
+  "source_revision": "59e80dde2e5e91bf118109fe58bcf26be8535828",
+  "user_authorization": "另一個agent改完了,你可以開始了",
+  "landing_plan": "A",
+  "formal_last_frame": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+  "formal_last_frame_sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+  "protected_municipal_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "protected_b6_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "local_render_ceiling": 2,
+  "local_elapsed_limit_seconds": 1800,
+  "local_render_wall_clock_limit_seconds": 600,
+  "formal_provider_submit_count": 0,
+  "intended_formal_route_pending_live_profile": {
+    "model_id": "seedance_2.5",
+    "input_mode": "first_last_frame",
+    "duration_seconds": 20,
+    "resolution": "480p",
+    "first_frame": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
+    "last_frame": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+    "middle_images_actual_input": false,
+    "motion_video_actual_input": false
+  },
+  "proxy_limit": "Local geometry and endpoint composition are proxies; no photographic tail match is asserted and no real frame is inserted to fake a continuous move",
+  "required_observations": [
+    "lateral eave move actually reveals city without full occlusion",
+    "same main road and recognizable residence/shelter",
+    "continuous descent without geometry deformation or collision",
+    "deceleration to stationary camera before handoff",
+    "outgoing and return traction lines stay on the same observation side",
+    "worker does not press stop in MC00",
+    "formal endpoint must be exact approved MC01 frame 0",
+    "sound and actual formal junction remain separately unverified"
+  ],
+  "no_generation_retry": true,
+  "old_MC03_gate": "FAIL_RETAINED",
+  "publication": "LOCAL_PREVIS_ONLY",
+  "local_bound_renewal": {
+    "old_job_ceiling": 2,
+    "known_jobs_consumed": 2,
+    "known_mp4_outputs_before": 0,
+    "reason": "Second job completed revised stills but failed before animation at Blender5.2 media_type setting; no unknown effect; export saved exact scene once",
+    "new_job_ceiling": 3,
+    "new_job_count": 1,
+    "issued_at": "2026-10-28T17:54:21.638627+00:00",
+    "old_geometry_history_preserved": true
+  },
+  "status": "REJECTED_PROXY_DIAGNOSTIC_ONLY",
+  "user_verdict": "FAIL",
+  "must_not_use_as_feasibility_pass": true
+}

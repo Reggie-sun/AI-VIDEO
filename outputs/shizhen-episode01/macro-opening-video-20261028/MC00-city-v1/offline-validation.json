@@ -1,0 +1,60 @@
+{
+  "scope": "task-local offline authoring preparation only",
+  "status": "DRAFT_BLOCKED_NOT_EXECUTABLE",
+  "prompt_chars": 380,
+  "pure_chinese_prompt": true,
+  "planned_actual_inputs": 2,
+  "standard_png_preparation_in_memory": "PASS",
+  "generation_intent_fields": "PASS",
+  "shot_structure_in_memory": "PASS",
+  "overall_projection_expected_rejection": "PASS",
+  "conditioning_blockers": [
+    "conditioning_compatibility.same_subject_scale",
+    "conditioning_compatibility.composition_compatible",
+    "conditioning_compatibility.screen_order_compatible",
+    "conditioning_compatibility.axis_compatible",
+    "conditioning_compatibility.camera_path_reachable",
+    "conditioning_compatibility.character_prop_state_reachable",
+    "conditioning_compatibility.action_endpoint_reachable"
+  ],
+  "files": [
+    {
+      "path": "conditioning-review-pending.json",
+      "sha256": "8899382cd9fcc562e1552c7257867371d6bfca1190bf3c58abfd034417f0cdfc"
+    },
+    {
+      "path": "data.json",
+      "sha256": "a0b93f9b3732a70bdea0081d622977ed5d518914ae299a6d2483122f8fda05a2"
+    },
+    {
+      "path": "live-profile-required.json",
+      "sha256": "12e4f1b61217bbb2eb2ea6f36cf589e2b221dfed0dcbc87ccb711378733838dd"
+    },
+    {
+      "path": "reference-first_frame-source.json",
+      "sha256": "05b406fce0729ec78f24cca1f2b01c44d16a919c99e09f7985049e90e40e2b69"
+    },
+    {
+      "path": "reference-last_frame-source.json",
+      "sha256": "65f54d931583c67c6fab6a3c835e830881830e93ab029162ca0462fae68df9cd"
+    },
+    {
+      "path": "row.json",
+      "sha256": "822d37559cc5d6966526b86e86c34be5a32f3d0e0ca10cdc88e345e271c52df4"
+    }
+  ],
+  "prompt_sha256": "3345e8590cfe8a47751610475b1d85bfac7497b813230610bcdde75f8b10aa41",
+  "new_run_present_at_validation": false,
+  "run_writes_by_this_script": 0,
+  "platform_calls_by_this_script": 0,
+  "new_permit_by_this_script": false,
+  "not_proven": [
+    "live profile identity",
+    "native quote",
+    "conditioning compatibility",
+    "camera path feasibility",
+    "actual endpoint pixels",
+    "sound or original-speed junction",
+    "production qualification"
+  ]
+}

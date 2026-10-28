@@ -1,0 +1,16 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-v1.png",
+  "sha256": "38af8b4fa48bba43acc98df2740367669290b3c257f1e2b7c917890dd7fb9b61",
+  "size_bytes": 2670100,
+  "width": 1672,
+  "height": 941,
+  "reference_role": "first_frame",
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Static authoring source only; no generated video or junction acceptance",
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "source_intent_path": "referces/shizhen/macro-opening-20261027/MC00-photoreal-20261027/02-eave-start-intent.json",
+  "fictional_characters": true,
+  "source_intent_sha256": "c78d24052b1ff9caa0e792de88df15dd8932208446a4af36cb391dd1f25ca2b6"
+}

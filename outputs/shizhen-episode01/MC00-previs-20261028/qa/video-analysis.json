@@ -1,0 +1,60 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/MC00-previs-20261028/MC00-previs-v3.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/MC00-previs-20261028/MC00-previs-v3.mp4",
+      "size_bytes": 1962276,
+      "size_mb": 1.87,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 20.0,
+      "duration_hms": "00:00:20.000",
+      "bit_rate_kbps": 785
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1280,
+      "height": 720,
+      "aspect_ratio": "16:9",
+      "fps": 24.0,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 784,
+      "frame_count": 480
+    },
+    "audio_stream": null,
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "date": "2026/10/28 13:54:22",
+      "encoder": "Lavf62.12.100"
+    }
+  },
+  "frames": null,
+  "transcription": null,
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/MC00-previs-20261028/MC00-previs-v3.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0.0,
+        "start_hms": "00:00:00.000",
+        "end_time": 20.0,
+        "end_hms": "00:00:20.000",
+        "duration_seconds": 20.0,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:20.000",
+    "resolution": "1280x720",
+    "has_audio": false,
+    "estimated_speaking_duration_seconds": 0.0,
+    "scene_count": 1,
+    "frames_extracted": 0
+  }
+}

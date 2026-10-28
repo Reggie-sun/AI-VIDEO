@@ -1,0 +1,11 @@
+{
+  "ended": true,
+  "currentTime": 20,
+  "duration": 20,
+  "playbackRate": 1,
+  "videoWidth": 1280,
+  "videoHeight": 720,
+  "muted": false,
+  "decodedFrames": 480,
+  "droppedFrames": 3
+}
