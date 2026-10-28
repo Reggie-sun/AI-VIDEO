@@ -334,6 +334,10 @@ def test_seedream_image_activates_in_canvas_authoring_graph(tmp_path):
                 if node["id"] == "a":
                     draft["references"] = [{"slotId": "anchor", "nodeId": "anchor", "role": "firstFrame"}]
         source["nodes"].append({"id": "anchor", "type": "image", "data": {"resourceId": request.output_asset_id}})
+        from copy import deepcopy
+        from ai_video.canvas_source_revision import _prompt_parts, effective_prompt_sha256
+        from ai_video.production.hashing import canonical_sha256
+        baseline_packet, baseline_rows = service.packet, deepcopy(service.direction["shots"])
         service.packet = build_sequence_packet(source, {"node_ids": ["a", "b"]})
         asset = next(a for a in result.registry.assets if a.asset_id == request.output_asset_id)
         parts = [{"type": "text", "text": "Enter the road"}]
@@ -344,6 +348,27 @@ def test_seedream_image_activates_in_canvas_authoring_graph(tmp_path):
         row["shot"].update(preserved_source_expression=expression, intent=adapted_canvas_prompt(expression))
         row["shot"]["required_asset_roles"][-1]["asset_ids"] = [asset.asset_id]
         row["generation"]["references"] = [{"role": "approved_keyframe", "asset_id": asset.asset_id}]
+        # 116260e: every changed prompt input declares its revision against the approved baseline.
+        def unit_for(packet, occurrence_id):
+            return next(u for u in packet["units"] if u["occurrence_id"] == occurrence_id)
+        for current_row, baseline_row in zip(service.direction["shots"], baseline_rows, strict=True):
+            old_unit = unit_for(baseline_packet, baseline_row["occurrence_id"])
+            new_unit = unit_for(service.packet, current_row["occurrence_id"])
+            old_parts, new_parts = _prompt_parts(old_unit), _prompt_parts(new_unit)
+            if (old_parts == new_parts and old_unit["source_text"] == new_unit["source_text"]
+                    and effective_prompt_sha256(baseline_row) == effective_prompt_sha256(current_row)):
+                continue
+            current_row["source_revision"] = {
+                "contract_version": "canvas-source-revision/1",
+                "baseline_source_snapshot_sha256": baseline_packet["source_snapshot_sha256"],
+                "baseline_prompt_parts_sha256": canonical_sha256({"parts": old_parts}),
+                "baseline_effective_prompt_sha256": effective_prompt_sha256(baseline_row),
+                "reason": "Rebind the Shot to the anchored Seedream source draft.",
+                "sections": [{"section_id": "seedream-anchor-source", "parts": new_parts}],
+                "dispositions": [{"part_index": index, "part_sha256": canonical_sha256(part),
+                                  "disposition": "superseded", "reason": "Replaced by the anchored source."}
+                                 for index, part in enumerate(old_parts)],
+            }
         before = (root / "state/manifest.json").read_bytes()
         assert service.author(registry=result.registry).registry == result.registry
         assert (root / "state/manifest.json").read_bytes() == before
