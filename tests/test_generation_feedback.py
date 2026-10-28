@@ -46,6 +46,59 @@ def feedback_setup():
     return setup, provider, current, history, orchestrator
 
 
+def _conditioning_conflicts(requirement):
+    from types import SimpleNamespace
+    from ai_video.production.generation_feedback import derive_generation_interventions
+
+    setup = setup_decision()
+    projection = SimpleNamespace(requirement=requirement, projection_hash="f" * 64)
+    interventions, conflicts = derive_generation_interventions(
+        projection=projection, candidates=setup["inputs"].candidates,
+        history=GenerationHistory(), policy=DecisionPolicy(),
+    )
+    assert interventions == ()
+    return conflicts
+
+
+def test_feedback_does_not_reject_canonical_scale_transition_as_boolean_conflict():
+    from tests.test_production_video_requirement import _scale_transition_requirement_kwargs
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+
+    requirement = ProviderNeutralVideoRequirement.create(**_scale_transition_requirement_kwargs())
+    assert requirement.conditioning_compatibility.same_subject_scale is False
+    assert _conditioning_conflicts(requirement) == ()
+
+
+@pytest.mark.parametrize("mutation,expected", [
+    ("missing_scale_evidence", "same_subject_scale"),
+    ("failed_axis", "axis_compatible"),
+    ("wrong_anchor_sha", "last_anchor_sha256"),
+])
+def test_feedback_preserves_canonical_conditioning_conflicts(mutation, expected):
+    from tests.test_production_video_requirement import _scale_transition_requirement_kwargs
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+
+    requirement = ProviderNeutralVideoRequirement.create(**_scale_transition_requirement_kwargs())
+    conditioning = requirement.conditioning_compatibility
+    if mutation == "missing_scale_evidence":
+        conditioning = conditioning.model_copy(update={"scale_transition": None})
+    elif mutation == "failed_axis":
+        conditioning = conditioning.model_copy(update={"axis_compatible": False})
+    else:
+        assets = list(requirement.asset_evidence)
+        last = next(i for i, asset in enumerate(assets) if asset.role.value == "last_frame")
+        assets[last] = assets[last].model_copy(update={"asset_sha256": "5" * 64})
+        requirement = requirement.model_copy(update={"asset_evidence": tuple(assets)})
+    requirement = requirement.model_copy(update={"conditioning_compatibility": conditioning})
+
+    conflicts = _conditioning_conflicts(requirement)
+
+    assert len(conflicts) == 1
+    assert conflicts[0].kind == "reference"
+    assert conflicts[0].next_owner == "shot_authoring"
+    assert expected in conflicts[0].observation
+
+
 def _acceptance_with_reordered_inventory(setup, kind):
     from ai_video.production.domain_acceptance import DomainAcceptancePolicy
     from ai_video.production.generation_input_control import GenerationInputControl

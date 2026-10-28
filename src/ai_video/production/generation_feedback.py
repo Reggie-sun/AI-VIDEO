@@ -173,7 +173,11 @@ def derive_generation_interventions(*, projection, candidates, history, policy,
     conflicts = ()
     conditioning = projection.requirement.conditioning_compatibility
     if conditioning is not None:
-        failed = tuple(name for name, value in conditioning.model_dump().items() if value is False)
+        from ai_video.production._video_intent_validation import (
+            validate_requirement_conditioning_compatibility,
+        )
+
+        failed = validate_requirement_conditioning_compatibility(projection.requirement)
         if failed:
             conflicts = (InputConflict(kind="reference", source_sha256=projection.projection_hash,
                          observation="conditioning compatibility failed: " + ", ".join(failed),
