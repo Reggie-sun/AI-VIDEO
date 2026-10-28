@@ -264,6 +264,8 @@ technical probe、recipe hint、diagnostic 或只覆盖视线的条目不能代�
 Shot 实际有人物时该 ID 必须列入 `applicable_requirement_ids`（新执行绑定创建时 `require_commercial_performance_review` 拒绝缺项，reopen 不查），
 selected QA 中同 ID 的 raw 条目 `intent_paths` 绑定 `generation_intent.performance_intent`，proof 与商业评审一致；
 放在 `shot.*` 之外的表演条目虽可通过新生成检查，但商业失败评审无法给出其结论，修复会停止。
+当前电商 profile 必须定义该 ID（Qingyan v2 起）；沿用 v1 或其他未定义该 ID 的 profile 时，有人物的商业 Shot 新生成/修复
+均 fail closed，须显式修订 profile 并重新封存 QA policy 后继续；reopen、replay 与已封存历史不受影响。
 
 rich remote/local H3 编译器将同一表演方向机械转为原生文字。preserved-source 路线必须先在新作者版本中
 显式写入完整确定性表演段落，并保留 coarse 六字段的原句；pure

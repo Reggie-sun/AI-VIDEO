@@ -227,7 +227,7 @@ def require_commercial_performance_review(requirement, commercial_binding) -> No
 
     if (
         commercial_binding is None
-        or not tuple(getattr(requirement, "characters", ()) or ())
+        or not requirement.characters
         or SHOT_PERFORMANCE_REQUIREMENT_ID in commercial_binding.applicable_requirement_ids
     ):
         return
@@ -236,7 +236,9 @@ def require_commercial_performance_review(requirement, commercial_binding) -> No
         user_message=(
             "Commercial Shot with cast must list "
             f"{SHOT_PERFORMANCE_REQUIREMENT_ID} in its applicable requirements "
-            "so commercial review covers the authored character performance."
+            "so commercial review covers the authored character performance. "
+            "The active ecommerce profile must define it (Qingyan v2+); projects "
+            "on an older profile need an explicit profile and QA policy revision."
         ),
     )
 
