@@ -446,6 +446,9 @@ class GenerationDecisionExecutionBinding(StrictModel):
         recipe = bound.generation_recipe if bound is not None else None
         require_performance_authoring(projection.requirement,
             recipe.acceptance_policy if recipe is not None else None)
+        from ai_video.production.commercial_execution import require_commercial_performance_review
+
+        require_commercial_performance_review(projection.requirement, compiled_request.commercial_binding)
         cls._require_fresh_seedance_expression(projection=projection, inputs=inputs, decision=decision,
             compiled_request=compiled_request, continuity_routing=continuity_routing, source_project=source_project)
         values: dict[str, object] = {

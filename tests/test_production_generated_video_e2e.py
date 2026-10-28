@@ -57,6 +57,7 @@ from ai_video.production.ecommerce_ad_coordinator import (
 from ai_video.production.ecommerce_media_acceptance import (
     CommercialShotEvaluationIntent,
     EcommerceRequirementFinding,
+    SHOT_PERFORMANCE_REQUIREMENT_ID,
     GeneratedCommercialShotEvidence,
     create_qingyan_ecommerce_acceptance_profile,
 )
@@ -554,6 +555,7 @@ def _runtime(
             profile_content_hash=commercial_profile.content_hash,
             applicable_requirement_ids=(
                 (
+                    SHOT_PERFORMANCE_REQUIREMENT_ID,
                     "shot.product.packaging_identity",
                     "shot.product.interaction",
                 )
@@ -561,6 +563,7 @@ def _runtime(
                 else (
                     commercial_profile.shot_requirement_ids[0],
                     commercial_profile.shot_requirement_ids[1],
+                    SHOT_PERFORMANCE_REQUIREMENT_ID,
                 )
             ),
             product_truth_hashes=(

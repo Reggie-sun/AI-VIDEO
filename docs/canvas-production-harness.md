@@ -261,7 +261,7 @@ Agent 制作有人物的镜头时，必须在 `generation.generation_intent.perf
 technical probe、recipe hint、diagnostic 或只覆盖视线的条目不能代替完整表演验收。
 按组件生成时，表演映射必须进入所选组件的 generation acceptance；顶层 QA 清单不能替代该组件的验收。
 电商商业 Shot（`commercial_binding`）的表演验收由电商 profile 的 `shot.performance.character_direction` 承担：
-有人物时该 ID 必须列入 `applicable_requirement_ids`（`project_generated_commercial_shot_binding` 拒绝缺项），
+Shot 实际有人物时该 ID 必须列入 `applicable_requirement_ids`（新执行绑定创建时 `require_commercial_performance_review` 拒绝缺项，reopen 不查），
 selected QA 中同 ID 的 raw 条目 `intent_paths` 绑定 `generation_intent.performance_intent`，proof 与商业评审一致；
 放在 `shot.*` 之外的表演条目虽可通过新生成检查，但商业失败评审无法给出其结论，修复会停止。
 

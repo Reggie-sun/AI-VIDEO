@@ -28,6 +28,7 @@ from ai_video.production.models import (
 )
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
 from ai_video.production.ecommerce_media_acceptance import (
+    SHOT_PERFORMANCE_REQUIREMENT_ID,
     create_qingyan_ecommerce_acceptance_profile,
 )
 from ai_video.production.ecommerce_ad_coordinator import (
@@ -269,6 +270,7 @@ def _runtime(
             applicable_requirement_ids=(
                 commercial_profile.shot_requirement_ids[0],
                 commercial_profile.shot_requirement_ids[1],
+                SHOT_PERFORMANCE_REQUIREMENT_ID,
             ),
             expected_actor_ids=("qingyan-miao-girl", "qingyan-elder"),
             output_asset_id="local-h3-video-1",

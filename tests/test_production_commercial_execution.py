@@ -209,26 +209,36 @@ def test_generated_commercial_binding_rejects_requirement_outside_profile() -> N
         )
 
 
-def test_generated_commercial_binding_with_cast_requires_performance_review() -> None:
-    projection = next(
-        item
-        for item in production.project_commercial_executions(_plan())
-        if item.target_shot_id == "shot-03"
+@pytest.mark.parametrize(
+    ("cast", "applicable", "binding_present", "rejected"),
+    (
+        (("talent",), ("shot.identity.main_character", "shot.motion.required"), True, True),
+        ((), ("shot.motion.required",), True, False),
+        (("talent",), ("shot.identity.main_character", "shot.performance.character_direction"), True, False),
+        (("talent",), (), False, False),
+    ),
+    ids=("cast-missing-performance", "no-cast", "cast-with-performance", "no-commercial-binding"),
+)
+def test_commercial_performance_review_follows_the_shot_cast(
+    cast, applicable, binding_present, rejected
+) -> None:
+    # 按 Shot 实际 cast 判定（同 performance Gate），而非整片 protagonist 列表；
+    # 否则新生成可过 Gate，商业失败评审却无表演结论而无法修复。
+    from types import SimpleNamespace
+
+    from ai_video.errors import AiVideoError
+
+    requirement = SimpleNamespace(
+        characters=tuple(SimpleNamespace(character_id=item) for item in cast)
     )
-    assert projection.character_requirement_ids
-    # 否则新生成可过 performance Gate，失败后却因商业评审无表演结论而无法修复。
-    with pytest.raises(ValueError, match="authored character performance"):
-        commercial_execution.project_generated_commercial_shot_binding(
-            projection,
-            profile=create_qingyan_ecommerce_acceptance_profile(),
-            applicable_requirement_ids=(
-                "shot.identity.main_character",
-                "shot.motion.required",
-            ),
-            approved_source=None,
-            expected_actor_ids=("character-qingyan", "elder-qingyan"),
-            output_asset_id="generated-shot-03",
-        )
+    binding = (
+        SimpleNamespace(applicable_requirement_ids=applicable) if binding_present else None
+    )
+    if rejected:
+        with pytest.raises(AiVideoError, match="shot.performance.character_direction"):
+            commercial_execution.require_commercial_performance_review(requirement, binding)
+    else:
+        commercial_execution.require_commercial_performance_review(requirement, binding)
 
 
 def test_current_ad_plan_rejects_legacy_source_evidence_as_readiness() -> None:

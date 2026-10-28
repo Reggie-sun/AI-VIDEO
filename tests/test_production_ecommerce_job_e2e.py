@@ -1681,6 +1681,28 @@ def test_unknown_local_submit_remains_stopped_after_explicit_recovery_without_pr
     assert (tmp_path / "state/manifest.json").read_bytes() == recovered_bytes
 
 
+def test_cast_commercial_shot_without_performance_review_stops_before_binding(
+    tmp_path: Path,
+) -> None:
+    handoff, _plan, compiled = _handoff_and_compiled()
+    _bootstrap(tmp_path, handoff, compiled.composition_spec)
+    # Gate 可由 QA 中非 shot.* 表演条目满足，但商业失败评审只给 shot.* 结论；
+    # 缺表演条目的有人物商业 Shot 须在执行绑定创建前停止，而非失败后无法修复。
+    with pytest.raises(AiVideoError, match=SHOT_PERFORMANCE_REQUIREMENT_ID):
+        _real_input(
+            root=tmp_path,
+            execution=SimpleNamespace(handoff=compiled),
+            shot_id="shot-proof",
+            composition_spec=compiled.composition_spec,
+            output=OUTPUT,
+            artifact_bytes=VIDEO.read_bytes(),
+            commercial_requirement_ids=(
+                "shot.identity.main_character",
+                "shot.motion.required",
+            ),
+        )
+
+
 def test_commercial_failure_without_frozen_generation_mapping_stops(
     tmp_path: Path,
 ) -> None:
