@@ -173,7 +173,7 @@ checks:
   repair_input_admission_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_repair_input_admission.py, tests/test_qualification_preview_input.py, -q]
     cwd: .
-    description: Verify development-only failed-video provenance admission, no qualification, and exact bootstrap replay without Provider effects.
+    description: Verify development-only failed-video provenance admission, qualification-trial preview input capture, no qualification, and exact bootstrap replay without Provider effects.
   video_cleanup_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_video_cleanup_pixels.py, tests/test_video_cleanup_media.py, tests/test_video_cleanup_viewing.py, tests/test_video_cleanup_admission.py, -q]
     cwd: .

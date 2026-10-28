@@ -130,23 +130,86 @@ def test_project_skills_visible_through_claude_skills_junction() -> None:
         assert "description:" in head
 
 
+# Codex `enabled_tools` 白名单在 Claude 侧以 settings deny 表达；deny 需枚举，
+# 故绑定 pinned 版本的完整工具清单，升级版本时必须重新盘点。
+PINNED_MCP_TOOL_INVENTORIES = {
+    "blender": (
+        "blender-mcp==1.8.7",
+        {
+            "disable_telemetry", "download_polyhaven_asset",
+            "download_sketchfab_model", "execute_blender_code",
+            "generate_hunyuan3d_model", "generate_hyper3d_model_via_images",
+            "generate_hyper3d_model_via_text", "get_addon_status",
+            "get_hunyuan3d_status", "get_hyper3d_status", "get_object_info",
+            "get_polyhaven_categories", "get_polyhaven_status", "get_scene_info",
+            "get_sketchfab_model_preview", "get_sketchfab_status",
+            "get_viewport_screenshot", "import_generated_asset",
+            "import_generated_asset_hunyuan", "poll_hunyuan_job_status",
+            "poll_rodin_job_status", "record_trajectory_feedback",
+            "search_polyhaven_assets", "search_sketchfab_models", "set_texture",
+        },
+    ),
+}
+
+
+def _claude_launch(server: dict) -> tuple[str | None, str, list[str]]:
+    """Return (cwd, command, args), unwrapping `/usr/bin/env --chdir=<cwd>`."""
+    command, args = server["command"], list(server.get("args", []))
+    if command == "/usr/bin/env" and args and args[0].startswith("--chdir="):
+        return args[0].removeprefix("--chdir="), args[1], args[2:]
+    return server.get("cwd"), command, args
+
+
 def test_claude_mcp_servers_mirror_codex_project_servers() -> None:
-    codex = tomllib.loads(CODEX_CONFIG.read_text(encoding="utf-8"))
-    claude = json.loads(CLAUDE_MCP_CONFIG.read_text(encoding="utf-8"))
-    codex_servers = set(codex.get("mcp_servers", {}))
-    claude_servers = set(claude["mcpServers"])
+    codex = tomllib.loads(CODEX_CONFIG.read_text(encoding="utf-8"))["mcp_servers"]
+    claude = json.loads(CLAUDE_MCP_CONFIG.read_text(encoding="utf-8"))["mcpServers"]
+    settings = json.loads(CLAUDE_SETTINGS.read_text(encoding="utf-8"))
+    denied = set(settings.get("permissions", {}).get("deny", []))
+    repo_root = "/home/reggie/vscode_folder/AI-VIDEO"
+
     # Agent 切换 runtime 不得丢失 CodeGraph/AOCI/Blender 等项目工具面。
-    assert codex_servers <= claude_servers
-    for name, server in claude["mcpServers"].items():
+    assert set(codex) <= set(claude)
+    for name, expected in codex.items():
+        cwd, command, args = _claude_launch(claude[name])
+        if Path(expected["command"]).is_absolute():
+            assert command == expected["command"], name
+        else:  # Codex 依赖 PATH，Claude 侧须钉死同名绝对路径
+            assert Path(command).is_absolute(), name
+            assert Path(command).name == expected["command"], name
+        assert args == expected.get("args", []), name
+        assert claude[name].get("env", {}) == expected.get("env", {}), name
+        if expected.get("cwd") not in (None, repo_root):
+            assert cwd == expected["cwd"], name
+
+        enabled = expected.get("enabled_tools")
+        prefix = f"mcp__{name}__"
+        server_denied = {rule.removeprefix(prefix) for rule in denied if rule.startswith(prefix)}
+        if enabled is None:
+            assert not server_denied, name
+            continue
+        assert name in PINNED_MCP_TOOL_INVENTORIES, f"{name} needs a pinned tool inventory"
+        pin, inventory = PINNED_MCP_TOOL_INVENTORIES[name]
+        assert pin in args, f"{name} version changed; re-inventory its tools"
+        assert set(enabled) <= inventory
+        # Claude 可见工具不得超出 Codex 白名单（防止云端生成/下载类工具旁路）。
+        assert server_denied == inventory - set(enabled), name
+
+
+def test_claude_mcp_config_carries_no_inline_secrets() -> None:
+    claude = json.loads(CLAUDE_MCP_CONFIG.read_text(encoding="utf-8"))["mcpServers"]
+    secret_markers = ("KEY", "TOKEN", "SECRET", "PASSWORD", "CREDENTIAL")
+    for name, server in claude.items():
         assert server["command"].startswith("/"), f"{name} must pin an absolute command"
-        serialized = json.dumps(server)
-        for forbidden in ("API_KEY", "TOKEN", "SECRET", "PASSWORD"):
-            assert forbidden not in serialized.upper(), f"{name} leaks {forbidden}"
+        for key in server.get("env", {}):
+            assert not any(m in key.upper() for m in secret_markers), f"{name}: {key}"
+        for arg in server.get("args", []):
+            flag = arg.split("=", 1)[0].upper() if arg.startswith("--") else ""
+            assert not any(m in flag for m in secret_markers), f"{name}: {arg}"
 
 
 def test_claude_md_maps_codex_workflow_terms_to_claude_runtime() -> None:
     text = CLAUDE_MD.read_text(encoding="utf-8")
-    for term in ("OMX", "OMC", "apply_patch", "$<skill>", "oh-my-claudecode:verifier"):
+    for term in ("OMX", "OMC", "apply_patch", "$<skill>", "oh-my-claudecode:verifier", "image_gen.imagegen"):
         assert term in text
     # 已退役路由不得在 adapter 中复活。
     for retired in ("Kimi", "SUBAGENTS.md", "superpowers:writing-plans"):
