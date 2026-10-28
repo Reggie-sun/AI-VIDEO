@@ -64,7 +64,19 @@ Commits `935edf4`、`ea8bd3e`、`450cb7c`、`807fbd5`（base `0c3be7d`）：
 ## Remaining Risks Or Next Work
 
 - 宿主 harfbuzz/freetype 符号不匹配使 libass 字幕测试失败（环境问题，干净 worktree 复现），待修环境后复跑。
-- 用户已选择下一步跑一次 full 基线。
+- Full baseline（用户选择）已运行：`.agent/harness/runs/claude-takeover-full-baseline-20261027/receipt.json`，
+  range `0c3be7d..4f153b7`，status `failed`。前 6 项 check passed；`full_tests` 13 failed、8230 passed、
+  53 skipped（5166s）。本次 commits 未触及 `src/`，失败均为既有基线，未修复、未降低断言：
+  - 环境（1）：`test_production_subtitle_ass.py` libass/harfbuzz `FT_Get_Transform` 符号缺失。
+  - Architecture（1）：`test_architecture_gate.py` ARCH002，`src/ai_video/production/_state_commit_video.py` 超限。
+  - Schema 漂移（1）：`test_ecommerce_ad_workflow_handoff.py` checked-in handoff schema 与 runtime 生成不一致。
+  - 错误文案漂移（1）：`test_generation_runtime_repair.py::test_runtime_repair_requires_runtime_failure_evidence`
+    期望 `durable runtime failure evidence`，实际 `Runtime repair requires durable attempt evidence.`。
+  - 新 Gate 与旧 fixture（6）：`test_production_ecommerce_job_e2e.py` 多例被
+    `performance_intent.character_directions.talent-presenter.acceptance` 前置要求拦截。
+  - Revision Gate 与旧 fixture（1）：`test_seedream_remote_image.py` `source revision required for a changed prompt input`。
+  - 未细分（2）：`test_generation_runtime_repair.py::test_cross_provider_canvas_reopen_after_paid_intent_uses_consumed_lineage`、
+    `test_production_ecommerce_job_e2e.py::test_canonical_two_shot_job_closes_offline_and_replays_without_effect[fail]`。
 - 审计观察（未处理，待用户决定）：policy.yaml 1847 行人工映射易持续漏登；规则文档被字节预算
   压缩影响可读性；文档标题字符串断言脆弱；Stop hook 在等待后台任务时反复要求 record 评估；
   `.claude/agents/kfc/spec-*` 的 "use PROACTIVELY" 与已退役自动 planning 冲突；
