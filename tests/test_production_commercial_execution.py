@@ -181,6 +181,7 @@ def test_interaction_projection_rejects_unapproved_hash_lineage() -> None:
             profile=profile,
             applicable_requirement_ids=(
                 "shot.identity.main_character",
+                "shot.performance.character_direction",
                 "shot.product.packaging_identity",
                 "shot.product.interaction",
                 "shot.motion.required",
@@ -204,6 +205,28 @@ def test_generated_commercial_binding_rejects_requirement_outside_profile() -> N
             applicable_requirement_ids=("shot.unselected",),
             approved_source=None,
             expected_actor_ids=("character-qingyan",),
+            output_asset_id="generated-shot-03",
+        )
+
+
+def test_generated_commercial_binding_with_cast_requires_performance_review() -> None:
+    projection = next(
+        item
+        for item in production.project_commercial_executions(_plan())
+        if item.target_shot_id == "shot-03"
+    )
+    assert projection.character_requirement_ids
+    # 否则新生成可过 performance Gate，失败后却因商业评审无表演结论而无法修复。
+    with pytest.raises(ValueError, match="authored character performance"):
+        commercial_execution.project_generated_commercial_shot_binding(
+            projection,
+            profile=create_qingyan_ecommerce_acceptance_profile(),
+            applicable_requirement_ids=(
+                "shot.identity.main_character",
+                "shot.motion.required",
+            ),
+            approved_source=None,
+            expected_actor_ids=("character-qingyan", "elder-qingyan"),
             output_asset_id="generated-shot-03",
         )
 

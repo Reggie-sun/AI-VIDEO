@@ -76,6 +76,7 @@ def test_qingyan_profile_seals_exact_shot_and_whole_ad_requirements() -> None:
         "shot.identity.main_character",
         "shot.identity.elder",
         "shot.cast.allowed_count",
+        "shot.performance.character_direction",
         "shot.product.presence_window",
         "shot.product.packaging_identity",
         "shot.product.label_fidelity",

@@ -297,6 +297,7 @@ def _product_video_runtime(root):
         projection,
         profile=profile,
         applicable_requirement_ids=(
+            "shot.performance.character_direction",
             "shot.product.packaging_identity",
             "shot.product.interaction",
         ),
@@ -552,6 +553,7 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
         profile=create_qingyan_ecommerce_acceptance_profile(),
         applicable_requirement_ids=(
             "shot.identity.main_character",
+            "shot.performance.character_direction",
             "shot.product.packaging_identity",
             "shot.product.interaction",
             "shot.motion.required",

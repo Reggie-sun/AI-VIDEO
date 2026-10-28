@@ -15,10 +15,16 @@ from ai_video.production.video import GeneratedCommercialShotBinding
 
 MEASUREMENT_CONTRACT_VERSION = "ecommerce-media-acceptance/1"
 
+# Fresh generation of a Shot with cast requires a raw acceptance covering
+# generation_intent.performance_intent (performance_authoring); on the commercial
+# path that acceptance must be a commercial Shot finding, so the profile owns it.
+SHOT_PERFORMANCE_REQUIREMENT_ID = "shot.performance.character_direction"
+
 QINGYAN_SHOT_REQUIREMENT_IDS = (
     "shot.identity.main_character",
     "shot.identity.elder",
     "shot.cast.allowed_count",
+    SHOT_PERFORMANCE_REQUIREMENT_ID,
     "shot.product.presence_window",
     "shot.product.packaging_identity",
     "shot.product.label_fidelity",
@@ -130,7 +136,7 @@ class EcommerceAcceptanceEvidencePayload(StrictModel):
 def create_qingyan_ecommerce_acceptance_profile() -> EcommerceAcceptanceProfile:
     return EcommerceAcceptanceProfile.create(
         profile_id="qingyan-ecommerce",
-        profile_version="1",
+        profile_version="2",
         shot_requirement_ids=QINGYAN_SHOT_REQUIREMENT_IDS,
         required_requirement_ids=QINGYAN_WHOLE_AD_REQUIREMENT_IDS,
         product_first_appearance_start_milliseconds=3_000,

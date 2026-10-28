@@ -2253,6 +2253,7 @@ def _real_input(
         profile=profile,
         applicable_requirement_ids=commercial_requirement_ids or (
             "shot.identity.main_character",
+            "shot.performance.character_direction",
             "shot.motion.required",
             "shot.camera.intent",
         ),

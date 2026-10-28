@@ -223,6 +223,7 @@ def project_generated_commercial_shot_binding(
     """Project exact authoring/profile identities into one video request binding."""
 
     from ai_video.production.ecommerce_media_acceptance import (
+        SHOT_PERFORMANCE_REQUIREMENT_ID,
         EcommerceAcceptanceProfile,
     )
 
@@ -241,6 +242,14 @@ def project_generated_commercial_shot_binding(
     if canonical_requirements != applicable_requirement_ids:
         raise ValueError(
             "Commercial Shot requirements must be exact and ordered by selected profile"
+        )
+    if (
+        selected_projection.character_requirement_ids
+        and SHOT_PERFORMANCE_REQUIREMENT_ID in selected_profile.shot_requirement_ids
+        and SHOT_PERFORMANCE_REQUIREMENT_ID not in selected
+    ):
+        raise ValueError(
+            "Commercial Shot with cast must review its authored character performance"
         )
     if not set(selected_projection.character_requirement_ids).issubset(
         expected_actor_ids

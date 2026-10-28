@@ -82,6 +82,7 @@ from ai_video.production.final_output_review import (
     FinalOutputFinding,
     FinalOutputObservation,
 )
+from ai_video.production.ecommerce_media_acceptance import SHOT_PERFORMANCE_REQUIREMENT_ID
 from ai_video.production.ecommerce_quality_gate import EcommerceWholeAdEvaluationPayload
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
@@ -152,6 +153,12 @@ from test_production_review import _Manifest25ReviewFixture
 from test_production_commercial_visual_review import REVIEW_TOOL
 
 
+# Profile 顺序；有人物的商业 Shot 必须同时评审逐人物表演。
+COMMERCIAL_SHOT_REQUIREMENT_IDS = (
+    "shot.identity.main_character",
+    SHOT_PERFORMANCE_REQUIREMENT_ID,
+    "shot.motion.required",
+)
 VIDEO = Path(__file__).parent / "fixtures/ecommerce_job/vertical-3s.mp4"
 FINAL_VIDEO = Path(__file__).parent / "fixtures/ecommerce_job/vertical-6s-audio.mp4"
 CAPTION_STYLE_BYTES = b'{"font_family":"Inter","schema_version":"1"}'
@@ -697,12 +704,10 @@ def _activate_commercial_generation_policy(
     loaded = load_production_project(root / "project.yaml")
     current = loaded.qa_policy
     assert current is not None
-    requirement_ids = (
-        "shot.identity.main_character",
-        "shot.motion.required",
-    )
+    requirement_ids = COMMERCIAL_SHOT_REQUIREMENT_IDS
     intent_paths = {
         "shot.identity.main_character": ("target_shot.character_ids",),
+        SHOT_PERFORMANCE_REQUIREMENT_ID: ("generation_intent.performance_intent",),
         "shot.motion.required": ("target_shot.generated_video_rationale",),
     }
     commercial_expressions = tuple(
@@ -815,7 +820,7 @@ def test_canonical_two_shot_job_closes_offline_and_replays_without_effect(
         local_batch_limit=2 if first_verdict is QaVerdict.FAIL else 1,
         use_current_generation_acceptance=first_verdict is QaVerdict.FAIL,
         commercial_requirement_ids=(
-            ("shot.identity.main_character", "shot.motion.required")
+            COMMERCIAL_SHOT_REQUIREMENT_IDS
             if first_verdict is QaVerdict.FAIL
             else None
         ),
@@ -1283,9 +1288,7 @@ def test_unclosed_commercial_failure_reopens_after_later_qa_revision(
         output=OUTPUT,
         artifact_bytes=VIDEO.read_bytes(),
         use_current_generation_acceptance=True,
-        commercial_requirement_ids=(
-            "shot.identity.main_character", "shot.motion.required"
-        ),
+        commercial_requirement_ids=COMMERCIAL_SHOT_REQUIREMENT_IDS,
         authored_commercial_prompt=True,
     )
     shots = EcommerceShotExecutionPlan(
@@ -1335,9 +1338,7 @@ def test_tagged_commercial_failure_with_changed_generation_qa_stops_repair(
         output=OUTPUT,
         artifact_bytes=VIDEO.read_bytes(),
         use_current_generation_acceptance=True,
-        commercial_requirement_ids=(
-            "shot.identity.main_character", "shot.motion.required"
-        ),
+        commercial_requirement_ids=COMMERCIAL_SHOT_REQUIREMENT_IDS,
         authored_commercial_prompt=True,
     )
     shots = EcommerceShotExecutionPlan(
@@ -1393,9 +1394,7 @@ def test_commercial_evidence_repair_with_changed_qa_stops_before_effect(
         output=OUTPUT,
         artifact_bytes=VIDEO.read_bytes(),
         use_current_generation_acceptance=True,
-        commercial_requirement_ids=(
-            "shot.identity.main_character", "shot.motion.required"
-        ),
+        commercial_requirement_ids=COMMERCIAL_SHOT_REQUIREMENT_IDS,
         authored_commercial_prompt=True,
     )
     reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.NOT_EVALUATED)
@@ -1444,9 +1443,7 @@ def test_abandoned_commercial_evidence_gap_blocks_reviewer_reentry(
         output=OUTPUT,
         artifact_bytes=VIDEO.read_bytes(),
         use_current_generation_acceptance=True,
-        commercial_requirement_ids=(
-            "shot.identity.main_character", "shot.motion.required"
-        ),
+        commercial_requirement_ids=COMMERCIAL_SHOT_REQUIREMENT_IDS,
         authored_commercial_prompt=True,
     )
     reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.NOT_EVALUATED)
@@ -1491,9 +1488,7 @@ def test_abandoned_commercial_evidence_gap_blocks_reviewer_reentry(
                 verdict="NOT_EVALUATED",
                 observation="Exact commercial evidence is still incomplete.",
             )
-            for requirement_id in (
-                "shot.identity.main_character", "shot.motion.required"
-            )
+            for requirement_id in COMMERCIAL_SHOT_REQUIREMENT_IDS
         ),
     )
     record_attempt_evaluation(
@@ -1564,9 +1559,7 @@ def test_mixed_commercial_findings_repair_evidence_before_media(
         output=OUTPUT,
         artifact_bytes=VIDEO.read_bytes(),
         use_current_generation_acceptance=True,
-        commercial_requirement_ids=(
-            "shot.identity.main_character", "shot.motion.required"
-        ),
+        commercial_requirement_ids=COMMERCIAL_SHOT_REQUIREMENT_IDS,
         authored_commercial_prompt=True,
     )
     first_reviewer = MixedReviewer(verdict=QaVerdict.FAIL)
@@ -1757,10 +1750,7 @@ def test_commercial_failure_abandonment_cannot_authorize_media_repair(
         artifact_bytes=VIDEO.read_bytes(),
         local_batch_limit=2,
         use_current_generation_acceptance=True,
-        commercial_requirement_ids=(
-            "shot.identity.main_character",
-            "shot.motion.required",
-        ),
+        commercial_requirement_ids=COMMERCIAL_SHOT_REQUIREMENT_IDS,
         authored_commercial_prompt=True,
     )
     shots = EcommerceShotExecutionPlan(
