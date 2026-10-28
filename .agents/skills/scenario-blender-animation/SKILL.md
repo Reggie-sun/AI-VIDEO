@@ -6,7 +6,7 @@ license: MIT
 
 # Blender animation (character and object)
 
-Expert animation means every frame on screen is a choice: key poses the audience reads, holds and snaps placed by hand, spacing designed, arcs checked. The Blender Studio stance is to block stepped, spline late and in parts, and judge from the shot camera at real speed. An agent cannot scrub, so it measures instead: per-frame positions, spacing charts, arc checks, framing, an onion-skin image, a curve plot, and a playblast it actually looks at. If a sibling skill named here is missing from your available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and flag the gap.
+Expert animation means every frame on screen is a choice: key poses the audience reads, holds and snaps placed by hand, spacing designed, arcs checked. The Blender Studio stance is to block stepped, spline late and in parts, and judge from the shot camera at real speed. An agent cannot scrub, so it measures instead: per-frame positions, spacing charts, arc checks, framing, an onion-skin image, a curve plot, and a playblast it actually looks at. If a sibling skill named here is missing from your available skills, proceed from tool schemas and flag the gap; do not install skills or add dependencies.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes). Shot planning, cameras and animatics belong to scenario-blender-previs-storyboard; building the rig to scenario-blender-rigging.
 

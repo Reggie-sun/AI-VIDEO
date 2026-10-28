@@ -6,7 +6,7 @@ license: MIT
 
 # Blender expert (router and agent protocol)
 
-Expert-level Blender work is a loop, not a script: build big to small, and at every stage turn the model, measure it and fix it before adding detail. This skill is the protocol every Blender task follows and the map to the domain skills distilled from Blender Studio artists, Blender Conference talks and top instructors (sources in each skill). If a sibling skill named here is missing from your available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and flag the gap.
+Expert-level Blender work is a loop, not a script: build big to small, and at every stage turn the model, measure it and fix it before adding detail. This skill is the protocol every Blender task follows and the map to the domain skills distilled from Blender Studio artists, Blender Conference talks and top instructors (sources in each skill). If a sibling skill named here is missing from your available skills, proceed from tool schemas and flag the gap; do not install skills or add dependencies.
 
 ## 1. Execution channel
 
@@ -54,7 +54,7 @@ Never report a model, rig, animation or render as done without having looked at 
 | Technical artist / procedural                       | scenario-blender-geometry-nodes                                                                                                                                                                            | node-group assets, procedural systems                        |
 | 2D / 2.5D animator                                  | scenario-blender-grease-pencil                                                                                                                                                                             | GP animation                                                 |
 
-Related skills outside this set: scenario-3d (generate meshes to finish here), scenario-textures (AI textures), text-image-to-blender-blockout (camera-locked blockouts for render-to-real video).
+Related skill: scenario-blender-blockout (camera-locked blockouts for render-to-real video). Upstream scenario-3d, scenario-textures, scenario-blender-retopology, scenario-blender-uv-baking, scenario-blender-texturing-shading, scenario-blender-geometry-nodes and scenario-blender-grease-pencil named above are not installed in this project.
 
 ## 4. Shared toolkit (`scripts/`, all tested on 5.2.1)
 

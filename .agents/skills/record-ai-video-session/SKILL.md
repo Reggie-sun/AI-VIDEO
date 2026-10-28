@@ -226,7 +226,8 @@ Use exact repository-relative paths, commit IDs, receipt paths, artifact hashes,
    required supersession notices, and any explicitly requested Skill update.
 4. Follow current repository policy for documentation-only verification. Do not run the full repository suite solely for an agent record.
 5. Stage every task-owned path explicitly. If unrelated files are already staged, use a path-limited commit only when it preserves their index state; otherwise stop and report the conflict.
-6. Never push or release unless the user separately requests it.
+6. After the commit, push to remote `main` and verify the SHA as required by the `AGENTS.md`
+   Completion Standard; never force push. Never release unless the user separately requests it.
 
 ## Report Completion
 

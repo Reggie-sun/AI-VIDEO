@@ -18,9 +18,8 @@ faces, wardrobe, extras, sound). Treat this as intended guidance for motion and 
 that the selected model obeys it. Ambiguity can harm the pass: a bent lamppost can read as a snake,
 loose limb blocks as extra people, an unmarked car driving backward. Fix identity in geometry first,
 in prompt text second, and judge the result on a synced side-by-side of playblast and video, never
-in the viewport alone. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+in the viewport alone. If a sibling skill named here is missing from your available skills, proceed from
+tool schemas and flag the gap; do not install skills or add dependencies.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 Video generation: `scenario-blender` (the plugin's quote, generate and place flow), the `scenario`

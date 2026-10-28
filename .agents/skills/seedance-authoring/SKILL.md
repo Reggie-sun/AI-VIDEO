@@ -55,6 +55,7 @@ compiler表达，再沿原authoring revision、preview、预算和permit执行�
 ## Resolution Defaults And Approval
 
 Seedance 2.0的新生成与修复重生成默认使用1080p；Seedance 2.5保持先480p试片、用户明确认可适用方案并授权后才升1080p。
+商品广告例外：生成与交付固定720p，不适用上述1080p默认与升档流程，见[广告制作要求](../ecommerce-ad-workflow/SKILL.md#fixed-720p-output)。
 用户当次明确指定的分辨率或审批要求优先；具体规则归[制作规格](../../../docs/canvas-continuous-production.md#formal-narrative-output-defaults)。
 所选variant/渠道不支持目标分辨率时报告缺口，不擅自换规格或模型，也不把放大/缩小旧片冒充所选分辨率的原生生成。
 
@@ -66,28 +67,20 @@ Seedance 2.0的新生成与修复重生成默认使用1080p；Seedance 2.5保持
 - deterministic motion graphics、pacing 或 composition -> `video-shotcraft`；
 - capability selection、execution、activation 或 QA -> 当前 AI-VIDEO code 与 contracts。
 
-先按用户目标区分已选来源复刻/原样 baseline、新创作或已授权优化、已知失败 repair；详细边界归
-`open-video` 的 Step 1。尚未导入 approved Shot 不等于创作方案尚未确定，也不自动授权改写。
-已选画布/原 prompt 的来源保留任务先核对 exact source/reference，并构造语义不变的 approved
-Shot Contract，再进入本 Skill；不因缺少项目格式就将其归成任意 draft optimization。
-原样生成文本消费封存原文；必要 Provider grammar 技术适配须展示差异，不能冒称原样 baseline。
-缺来源证据、实质歧义或 contract 无法无损表达时报告缺口，不新增机位/动作来填满制作字段。
-新创作或已授权优化中，尚未形成 approved Shot / ordered coverage 的空白、模糊方向、concept/script、
-reference-led brief 或完整 draft prompt，先作为 `DIRECTOR_PREFLIGHT_REQUEST` route 到 `open-video`
-做 Director optimization；在该设计范围内 prompt presence 不等于 approval。已知失败 repair 绑定失败项、
-完整目标与已满足部分，只做有界对应调整；保留表演不自动锁定机位与剪辑。覆盖、摄影或切点有问题时回到 `open-video`，在已有授权范围内修订 coverage 并走原 authoring revision 与执行准入，不把局部修复的变量限制当成导演要求；用户明确要求先审批或超出授权时仍遵从。
-所有分支仍须 approved Shot 与 selected profile，且不能绕过 Provider/paid/egress/permit/media gates。
-Director design 分支中，`open-video` 必须保留用户明确的 subject、action、style、product facts、references 与 exclusions，
-不得以“优化”为名覆盖 hard constraints；其 validator 只验证 declared constraint inventory 的结构、
-verbatim source anchoring 与 coverage binding，不证明 raw input 的约束已提全或语义保真。进入本 Skill
-前，该 design 分支必须由 Agent 依次 review `raw evidence -> inventory` 与 `inventory -> coverage`。
-Agent 必须在 Director 层根据 narrative beats、action/space progression、camera/blocking trajectory、
-pacing 与 continuity 风险选择 `coverage_strategy=single_take|multi_shot`，不得按时长阈值选择。
-Seedance 2.5 技术性支持单次 `30s` 既不自动证明应当 single-take，也不强制 multi-shot；它只影响
-downstream feasibility。Director validator 不证明 Provider duration/mode capability；这些 exact facts
-仍由 current selected profile owner 校验，若 selected strategy 不可执行则返回 Director 重新判断。
-MUST NOT 为填补空 brief 自动起草 `one uninterrupted shot`、重复慢运镜、`no cut` 或
-`VIDEO_EXTEND` prompt；这些 expression 只能来自已经批准的 `single_take` coverage 与明确 continuity intent。
+`hell-grind-aigc-skill`、`higgsfield`、`video-shotcraft` 是全局 Codex Skills；当前 runtime 未安装时
+报告该 owner 缺失，不由本 Skill 代行其职责。
+
+任务分类（来源复刻 / 新创作或已授权优化 / 已知失败 repair）与 Director 边界唯一归 `open-video`
+Step 1，本 Skill 不重述，只保留进入条件：
+- 来源保留任务消费封存原文；必要 Provider grammar 适配须展示差异，不冒称原样 baseline。
+- 新创作或已授权优化中，尚未形成 approved Shot / ordered coverage 的空白、模糊方向、concept/script、
+  reference-led brief 或完整 draft prompt，先作为 `DIRECTOR_PREFLIGHT_REQUEST` route 到 `open-video`；
+  prompt presence 不等于 approval。`coverage_strategy=single_take|multi_shot` 在 Director 层决定，
+  不得按时长阈值选择；Seedance 2.5 支持 `30s` 只影响 downstream feasibility。
+- repair 只做绑定失败项的有界调整；coverage/摄影/切点问题回到 `open-video`。
+- 所有分支仍须 approved Shot 与 selected profile，不绕过 Provider/paid/egress/permit/media gates。
+- MUST NOT 为填补空 brief 自动起草 `one uninterrupted shot`、重复慢运镜、`no cut` 或
+  `VIDEO_EXTEND` prompt；这些 expression 只能来自已批准的 `single_take` coverage 与明确 continuity intent。
 
 不得猜测 version、mode、surface、asset identity 或 reference job。输入为 unknown, future,
 mixed, or stale 时必须 fail closed，并报告缺失的 deterministic selection。

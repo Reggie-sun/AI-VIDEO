@@ -1,54 +1,30 @@
 ---
 name: h3-video
 description: >
-  OpenVideo skill (v0.0.1): generate high-quality local video with the OpenVideo product
-  (MiniMax H3 backend). Use for OpenVideo install/pull/status/run, official 3-field prompts,
-  T2V/I2V/FL2VA, agent-driven video. Brand is OpenVideo — not a bare ComfyUI workflow.
-  Triggers: OpenVideo, open-video, H3, generate video, T2V, I2V, FL2VA.
+  MiniMax H3 local video authoring for AI-VIDEO: official 3-field prompts, T2V/I2V/FL2VA mode
+  choice, validated local settings, local ComfyUI lifecycle via scripts/comfyui_supervisor.py,
+  and the mandatory per-Shot post-media Gate. Use when a selected route is H3 / MiniMax H3.
+  Triggers: H3, MiniMax H3, T2V, I2V, FL2VA.
 ---
 
-# OpenVideo skill · v0.0.1
+# H3 Video Authoring
 
-**Brand: OpenVideo** (always lead with this). MiniMax H3 is the model OpenVideo drives.
+**Job:** make an agent produce **good H3 video**, not a random diffusion click. Quality comes from
+**prompt craft + correct mode + validated settings**, not secret samplers.
 
-**Job:** use **OpenVideo** so an agent produces **good product video**, not a random diffusion
-click. Quality comes from **prompt craft + correct mode + validated settings**, not secret samplers.
+## 0. AI-VIDEO paths
 
-## 0. Paths (env-first)
+All commands run from the AI-VIDEO repository root.
 
-Recommended sibling layout (any parent dir name; no machine-absolute paths):
-
-```text
-parent/
-├── open-video/       # THIS product — CLI, backends, skills  ← work here
-└── lab/              # ComfyUI + weights (not git)
-```
-
-| What | Path / env |
+| What | Path |
 |---|---|
-| **Product root (CLI, skills)** | `$OPEN_VIDEO_ROOT` (this checkout) |
-| **Install / pull / run** | From product root: `./scripts/install.sh`, `python -m open_video …` |
-| **Lab engine + weights** | `$OPEN_VIDEO_LAB` / `$H3_LAB` (sibling `lab/` with ComfyUI + `h3_models/`) |
-| **Weights env** | `export OPEN_VIDEO_MODELS=$H3_LAB/h3_models` |
-| **ComfyUI URL** | `export OPEN_VIDEO_COMFYUI=http://127.0.0.1:8188` (default) |
+| H3 prompt compiler | `src/ai_video/production/_h3_prompt.py` |
+| Local ComfyUI lifecycle | `scripts/comfyui_supervisor.py` |
+| ComfyUI URL | `http://127.0.0.1:8188` (loopback default) |
 
-**Resolve product root** (never hardcode a machine path):
-
-```bash
-# Prefer env, else directory of this skill → repo root
-export OPEN_VIDEO_ROOT="${OPEN_VIDEO_ROOT:-$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)}"
-cd "$OPEN_VIDEO_ROOT"
-```
-
-Lab harness (same ComfyUI) when you keep a sibling runtime:
-
-```bash
-export OPEN_VIDEO_LAB="${OPEN_VIDEO_LAB:-$OPEN_VIDEO_ROOT/../lab}"
-export H3_LAB="${H3_LAB:-$OPEN_VIDEO_LAB}"
-export OPEN_VIDEO_MODELS="${OPEN_VIDEO_MODELS:-$H3_LAB/h3_models}"
-```
-
-Product = `open-video/` checkout. `lab/` is runtime only — never the product root.
+Generation goes through the selected AI-VIDEO adapter and its gates. The upstream OpenVideo
+product CLI (`python -m open_video`), its install scripts and its `backends/` / `docs/h3/` files
+are not part of this repository; do not invoke or install them from this Skill.
 
 ---
 
@@ -58,10 +34,10 @@ Product = `open-video/` checkout. `lab/` is runtime only — never the product r
 |---|---|---|
 | **1** | **3-field prompt** | Official structure; concrete visible/audible detail; camera type+amplitude+speed; dialogue in `<d>[lang]…</d>` |
 | **2** | **Mode** | T2V / I2V / FL2VA chosen correctly from inputs |
-| **3** | **Resolution / steps** | **1344×768**, **20 steps**, `res_multistep` + `simple` (defaults in harness) |
-| **4** | **Quant** | INT8 on 5090-class; lower VRAM → `recommend-quant` (nf4/w4/int8+lowvram) |
-| **5** | **Duration** | 5–10 s sweet spot (max 15 s / shot); multi-shot via cut times or `open-video` director skill |
-| **6** | **Review** | Watch / extract frames; fix prompt; re-run. Dual vision gate only when shipping |
+| **3** | **Resolution / steps** | **1344×768**, **20 steps**, `res_multistep` + `simple` |
+| **4** | **Quant** | INT8 on 5090-class; lower VRAM → nf4/w4/int8+lowvram; the selected profile owns the exact quant |
+| **5** | **Duration** | 5–10 s sweet spot (max 15 s / shot); multi-shot via cut times or `open-video` Director coverage |
+| **6** | **Review** | Per-Shot post-media Gate (§3F) on the exact MP4 |
 
 **Anti-patterns (low quality):** bare one-liner prompts; abstract mood words only; wrong mode; NVFP4 on 5090; forcing 2K locally; skipping validation.
 
@@ -89,26 +65,19 @@ Order-of-magnitude on a 32 GB class NVIDIA GPU: ~10–15 min / 10 s clip @ 1344�
 
 ### A. Host ready
 
-```bash
-cd "${OPEN_VIDEO_ROOT:?set OPEN_VIDEO_ROOT to this product checkout}"
-python -m open_video status          # or: open-video status / ps
-python -m open_video recommend-quant
-```
-
-- Weights incomplete → `python -m open_video pull h3` (or `OPEN_VIDEO_MODELS=… pull`)
-- ComfyUI down → start the explicit user-systemd service. This keeps the server out of a
-  transient Agent command lifecycle; it never auto-starts or auto-restarts:
+ComfyUI down → start the explicit user-systemd service. This keeps the server out of a
+transient Agent command lifecycle; it never auto-starts or auto-restarts:
 
 ```bash
-export COMFYUI_ROOT="${COMFYUI_ROOT:-${H3_LAB:-$OPEN_VIDEO_ROOT/../lab}/ComfyUI}"
-python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" status
-python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" start
+python scripts/comfyui_supervisor.py status
+python scripts/comfyui_supervisor.py start
 # explicit controls only:
-# python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" logs --lines 100
-# python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" stop
+# python scripts/comfyui_supervisor.py logs --lines 100
+# python scripts/comfyui_supervisor.py stop
 ```
 
-If ComfyUI uses a dedicated interpreter outside `$COMFYUI_ROOT/.venv`, set
+Set `COMFYUI_ROOT` to the local ComfyUI checkout when it is not the supervisor default. If ComfyUI
+uses a dedicated interpreter outside `$COMFYUI_ROOT/.venv`, set
 `COMFYUI_PYTHON=/absolute/path/to/python` before `start`. The supervisor binds only
 `127.0.0.1`, refuses an occupied port, and does not read or mutate long-video job state.
 
@@ -121,7 +90,7 @@ If ComfyUI uses a dedicated interpreter outside `$COMFYUI_ROOT/.venv`, set
 | + first & last image | **FL2VA** (+ alignment line) |
 | Multi-ref identity/style | R2V (needs ref2va weights — not default) |
 
-CLI `--mode` tokens: `t2v` · `i2v` · `flf2v` (FL2VA ↔ `--mode flf2v`). R2V has no CLI token yet.
+The selected adapter/profile owns the exact mode token and support; do not invent one.
 
 ### C. Craft the 3-field prompt (quality lever #1)
 
@@ -142,7 +111,7 @@ non_diegetic_music: <1–3 sentences: instruments, tempo, rhythm — no vague mo
 - Camera prose: e.g. `pushes in with small amplitude at slow speed`.
 - Dialogue: speaker IDs + `<d>[English] verbatim words</d>`.
 - Later shots: **strictly increasing** cut times inside duration.
-- Full grammar: `backends/h3/PROMPT_GRAMMAR.md` (product) or lab `docs/PROMPT_GUIDE.md`.
+- The in-repo compiler `src/ai_video/production/_h3_prompt.py` is the executable grammar owner.
 
 **Expand** casual NL into 3-field; never ship a bare phrase as the only prompt for “high quality.”
 
@@ -163,46 +132,22 @@ non_diegetic_music: <1–3 sentences: instruments, tempo, rhythm — no vague mo
 补拍同时改变 seed，不能据此保证因果改善、成功率或其他场景/模式的效果；不按时长或有无 prompt
 强制 `single_take` / `multi_shot`，不改变 Director、Provider selection、预算/permit 或 Gate ownership。
 
-### D. Dry-run (cheap)
+### D. Validate before GPU spend
 
-```bash
-cd "$OPEN_VIDEO_ROOT"
-python -m open_video run "$(cat prompts/my_shot.txt)" --duration 8 --dry-run
-# optional, only if a lab tree exists at $H3_LAB:
-#   cd "$H3_LAB" && ./venv/bin/python "$OPEN_VIDEO_ROOT/scripts/h3_agent.py" --prompt "$(cat …)" --dry-run
-```
+Review the exact compiled request/preview from the selected adapter and fix validator issues
+before any GPU spend.
 
-Fix validator issues before GPU spend.
+### E. Generate
 
-### E. Generate (product CLI **or** lab agent — both use H3 workflows)
-
-**Preferred product path (OpenVideo harness):**
-
-```bash
-cd "$OPEN_VIDEO_ROOT"
-python -m open_video run "$(cat prompts/my_shot.txt)" \
-  --duration 8 --model h3 --output output/film.mp4
-# aliases: open-video "…", open-video run "…"
-```
-
-I2V / FL2VA (product CLI — supply frames; FL2VA is `--mode flf2v`):
-
-```bash
-python -m open_video run "$(cat prompts/my_shot.txt)" \
-  --mode i2v --first-frame inputs/start.png --duration 8
-python -m open_video run "$(cat prompts/my_shot.txt)" \
-  --mode flf2v --first-frame inputs/start.png --last-frame inputs/end.png --duration 8
-```
-
-**Optional lab path** (only when a lab tree exists — `$H3_LAB` set, with its own venv):
-`cd "$H3_LAB" && ./venv/bin/python "$OPEN_VIDEO_ROOT/scripts/h3_agent.py" --prompt … --width 1344 --height 768 --duration 8 --seed 42` (mp4 → output/, receipt → artifacts/verify/agent_*.json).
+Generate through the selected AI-VIDEO adapter with its exact identity/profile, intent, one-use
+permit and committer, as required by the Local ComfyUI Authorization Exemption in `AGENTS.md`.
 
 ### F. Mandatory per-Shot post-media Gate
 
 For AI-VIDEO multi-Shot work, generation is an atomic loop, never an unattended batch:
 
-1. Set `OPEN_VIDEO_JUDGE_RETRIES=0`, generate exactly one Shot, and fix the exact output path +
-   SHA-256. Internal judge retries must not create un-Gated extra takes.
+1. Generate exactly one Shot with no internal judge retries, and fix the exact output path +
+   SHA-256. Internal retries must not create un-Gated extra takes.
 2. Immediately call the project-local `video-analysis` MCP on that exact MP4. At minimum use
    media probe plus sampled visual review; add audio, scene, lip-sync, or continuity analysis when
    the Shot requires it.
@@ -220,7 +165,7 @@ For AI-VIDEO multi-Shot work, generation is an atomic loop, never an unattended 
    Gate again. When only the MCP/analyzer/evidence failed, use `EVIDENCE_REPAIR_FIRST` and repair
    the evidence path without regenerating otherwise unfailed media.
 
-The background analysis hook, command exit code, file existence, OpenVideo judge score, and the
+The background analysis hook, command exit code, file existence, any judge score, and the
 env-unset auto-PASS stub do not satisfy this Gate. Do not collapse identity, action, product/object,
 camera, prompt adherence, audio, and continuity into one score. Follow the canonical procedure in
 `.agent/context/control-plane-playbook.md` `Per-Shot Post-Media Gate`; MCP evidence remains advisory
@@ -236,53 +181,9 @@ change, or another real blocker. Remote/paid attempts retain their authorization
 For a single-Shot delivery, the same Gate runs before delivery. Shipping/public claims may still
 require the separate human or Production acceptance gates.
 
-### G. Deliver
-
-**Verify before claiming done:** exit code 0 AND `DONE -> <path>` printed, then
-
-```bash
-[ -f "$path" ] && ffprobe -v error -show_entries format=duration -of csv=p=0 "$path"
-```
-
-(or run with `--json` and read `film` + per-shot `verdict`/`judge_score` from the
-final stdout line). Only then tell the user: **path · duration · resolution ·
-seed · mode · wall time** (from receipt).
-
 ---
 
-## 4. Ollama-shaped command cheat sheet
-
-```bash
-# Install (once)
-curl -fsSL https://open-video.ai/install | bash          # Linux/macOS
-# Windows: irm https://open-video.ai/install.ps1 | iex   # prefers WSL for GPU
-
-cd "$OPEN_VIDEO_ROOT"
-python -m open_video pull h3              # download / verify weights
-python -m open_video pull h3 --check-only
-python -m open_video status               # = ps
-python -m open_video recommend-quant
-
-python -m open_video run "<3-field or concept>" --duration 8
-python -m open_video "concept" --dry-run
-python -m open_video list-models
-```
-
-| Env | Meaning |
-|---|---|
-| `OPEN_VIDEO_ROOT` | Product checkout |
-| `OPEN_VIDEO_MODELS` | Weights root (`h3_models` or ComfyUI/models) |
-| `OPEN_VIDEO_COMFYUI` | ComfyUI base URL |
-| `OPEN_VIDEO_MODEL` | Default backend (`h3`) |
-| `H3_LAB` | Optional lab tree with ComfyUI + h3_agent |
-| `OPEN_VIDEO_VLM_URL` | OpenAI-compatible vision endpoint → real judge |
-| `OPEN_VIDEO_VLM_MODEL` | Vision model id for the judge |
-| `OPEN_VIDEO_VLM_KEY` | Bearer token for the judge endpoint (optional) |
-| `OPEN_VIDEO_JUDGE_RETRIES` | Extra takes on REFINE verdicts (default 1; best score kept) |
-
----
-
-## 5. Prompt micro-templates (copy & fill)
+## 4. Prompt micro-templates (copy & fill)
 
 **T2V cinematic single beat**
 
@@ -312,7 +213,7 @@ non_diegetic_music: …
 
 ---
 
-## 6. Hard constraints
+## 5. Hard constraints
 
 | Constraint | Limit |
 |---|---|
@@ -323,32 +224,4 @@ non_diegetic_music: …
 | NVFP4 on 5090 | **Forbidden** (ComfyUI #14157) |
 | License | MiniMax weight terms (region/commercial) + code Apache-2.0 |
 
----
-
-## 7. When to use which skill
-
-| Intent | Skill |
-|---|---|
-| **High-quality H3 clip, agent generate video** | **`h3-video` (this file) — default** |
-| Multi-minute film, judge→refine→stitch | `skill/open-video` (scaffold; not full product) |
-| Website / Pages | separate `open-video-web` repo |
-
----
-
-## 8. Docs (read these, don't invent)
-
-| Doc | Location |
-|---|---|
-| Prompt grammar | `$OPEN_VIDEO_ROOT/backends/h3/PROMPT_GRAMMAR.md` |
-| Prompt guide | `$OPEN_VIDEO_ROOT/docs/h3/PROMPT_GUIDE.md` |
-| Best practices | `$OPEN_VIDEO_ROOT/docs/h3/BEST_PRACTICES.md` |
-| Quants / issues | `$OPEN_VIDEO_ROOT/docs/h3_ecosystem.md` |
-| Quickstart | `$OPEN_VIDEO_ROOT/docs/QUICKSTART.md` |
-
----
-
-## 9. Commit / path hygiene
-
-- Product commits: inside the `open-video` git checkout only.
-- Do not hardcode host-absolute lab paths as the **product** root; use `Path(__file__).resolve()` or `OPEN_VIDEO_ROOT` / `H3_LAB`.
-- Lab scripts should resolve `ROOT` from `__file__` (relative), not a frozen absolute path.
+Multi-Shot direction and coverage belong to `open-video`; this Skill only authors the selected H3 Shot.

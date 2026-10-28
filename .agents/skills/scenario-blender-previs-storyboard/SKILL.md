@@ -11,13 +11,13 @@ license: MIT
 耦合关系时才做连续预演。导演审看 animatic 与模型 motion 输入分开；定格、burn-in 或宫格不能证明
 连续受力，模型输入沿 [Blender routing](../../../docs/blender-routing.md) 交 clean playblast。
 
-Expert previs conveys an idea well enough to be judged, as cheaply as possible: one fact per beat, every shot designed for what the audience must feel, timing found in the edit from stills. The camera is the audience's body; where it stands, how high and through which lens decides the emotion, so every non-neutral choice needs a stated reason. If a sibling skill named here is missing from your available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and flag the gap.
+Expert previs conveys an idea well enough to be judged, as cheaply as possible: one fact per beat, every shot designed for what the audience must feel, timing found in the edit from stills. The camera is the audience's body; where it stands, how high and through which lens decides the emotion, so every non-neutral choice needs a stated reason. If a sibling skill named here is missing from your available skills, proceed from tool schemas and flag the gap; do not install skills or add dependencies.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 
 Toolkit: [`scripts/bx_previs.py`](scripts/bx_previs.py) (tested on 5.2.1): `import sys; sys.path += ["<this skill>/scripts", "<scenario-blender-expert>/scripts"]; import bx_previs as P`.
 
-**Which skill.** This one: story previs and animatics judged by a director and an editor. **text-image-to-blender-blockout** instead when the playblast guides a render-to-real video model (Seedance): saturated color identities, no lens jump on a cut, eased moves, a hand-off sheet; an approved animatic that must become a video guide is rebuilt there. Shared: metric Z-up, roots at the feet, one camera per shot bound to a marker, `to_track_quat('-Z','Y')` look-at. Strokes: scenario-blender-grease-pencil. Animation after layout: scenario-blender-animation. Real rigs: scenario-blender-rigging.
+**Which skill.** This one: story previs and animatics judged by a director and an editor. **scenario-blender-blockout** instead when the playblast guides a render-to-real video model (Seedance): saturated color identities, no lens jump on a cut, eased moves, a hand-off sheet; an approved animatic that must become a video guide is rebuilt there. Shared: metric Z-up, roots at the feet, one camera per shot bound to a marker, `to_track_quat('-Z','Y')` look-at. Strokes: upstream scenario-blender-grease-pencil (not installed in this project). Animation after layout: scenario-blender-animation. Real rigs: scenario-blender-rigging.
 
 ## Stance (the expert delta)
 
