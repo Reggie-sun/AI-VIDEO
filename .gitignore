@@ -17,3 +17,6 @@ node_modules/
 .codegraph-cache/
 # Local Agent Experience Memory index (rebuilt by scripts/agent_memory.py).
 .agent/memory/
+# Agent workflow state (OMX for Codex, OMC for Claude Code); never Product state.
+.omx/
+.omc/

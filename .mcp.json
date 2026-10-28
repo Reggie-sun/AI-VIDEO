@@ -19,6 +19,59 @@
       "env": {
         "PYTHONPATH": "/home/reggie/vscode_folder/AI-VIDEO/src"
       }
+    },
+    "blender": {
+      "command": "/home/reggie/.local/bin/uvx",
+      "args": ["--python", "3.11", "blender-mcp==1.8.7"],
+      "env": {
+        "BLENDER_HOST": "127.0.0.1",
+        "BLENDER_PORT": "9876",
+        "DISABLE_TELEMETRY": "true",
+        "UV_PYTHON_PREFERENCE": "only-managed"
+      }
+    },
+    "gpt-image-2": {
+      "command": "/home/reggie/.local/share/ai-video/gpt-image-2-mcp/launch-chatgpt-web.sh",
+      "args": [],
+      "env": {
+        "GPT_IMAGE_BACKEND": "chatgpt-web",
+        "CHATGPT_WEB_PROFILE_DIR": "/home/reggie/.local/share/ai-video/gpt-image-2-mcp/profile",
+        "CHATGPT_WEB_LOGIN_TIMEOUT_SECONDS": "900",
+        "CHATGPT_HIDE_WINDOW": "0",
+        "CHROME_PATH": "/usr/bin/google-chrome",
+        "XDG_DATA_HOME": "/home/reggie/.local/share/ai-video/gpt-image-2-mcp/data"
+      }
+    },
+    "codegraph": {
+      "command": "/usr/bin/env",
+      "args": [
+        "--chdir=/home/reggie/vscode_folder/MCP/mcp-server-codegraph",
+        "/home/reggie/.local/bin/node",
+        "/home/reggie/vscode_folder/MCP/mcp-server-codegraph/dist/index.js",
+        "/home/reggie/vscode_folder/AI-VIDEO"
+      ],
+      "env": {
+        "CODEGRAPH_INDEX_PATH": "/home/reggie/vscode_folder/AI-VIDEO/.codegraph-cache/index.json"
+      }
+    },
+    "aoci": {
+      "command": "/home/reggie/.local/share/aoci-code/v0.1.0-rc14/aoci",
+      "args": ["--repo", "/home/reggie/vscode_folder/AI-VIDEO", "mcp"]
+    },
+    "playwright": {
+      "command": "/home/reggie/.local/bin/node",
+      "args": [
+        "/home/reggie/.local/share/ai-video/playwright-mcp/node_modules/@playwright/mcp/cli.js",
+        "--browser", "chrome",
+        "--executable-path", "/usr/bin/google-chrome",
+        "--user-data-dir", "/home/reggie/.local/share/ai-video/playwright-mcp/profile",
+        "--output-dir", "/home/reggie/.local/share/ai-video/playwright-mcp/output"
+      ],
+      "env": {
+        "DISPLAY": ":1",
+        "XAUTHORITY": "/run/user/1000/gdm/Xauthority",
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      }
     }
   }
 }

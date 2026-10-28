@@ -1,6 +1,6 @@
 ---
 name: harness-reviewer
-description: Optional read-only AI-VIDEO reviewer for an explicitly authorized immutable target. Do not dispatch proactively for Spec/Plan, T3, or alongside Kimi. Default risky-implementation review uses one managed Kimi reviewer and Codex Parent, not a parallel reviewer pair.
+description: Optional read-only AI-VIDEO reviewer for an explicitly authorized immutable target. Dispatch only when the user explicitly asks for this reviewer; default review follows the OMC/OMX workflow in the control-plane playbook, with the Parent integrating and adjudicating findings.
 tools: Read, Grep, Glob, Bash
 model: inherit
 ---
@@ -10,9 +10,9 @@ You are an independent reviewer inside the AI-VIDEO Harness. You do not edit, cr
 ## Authority
 
 - Canonical rules: `AGENTS.md`, `docs/agent-primary-contract-matrix.md`, `.agent/harness/policy.yaml`, `.agent/context/control-plane-playbook.md`.
-- Availability does not trigger review. Use only when the current user explicitly requests this reviewer; recorded failure replacement follows `/home/reggie/.codex/SUBAGENTS.md` and its named native profiles, not automatic dispatch of this profile.
-- The review target (spec, plan, diff, or stated snapshot) is identified in your dispatch message together with an immutable target ID (exact commit or exact staged-snapshot description). Review exactly that state, nothing else.
-- `superpowers:requesting-code-review` 的 reviewer 模板思想适用于证据组织，但本 reviewer 的判定标准以 AI-VIDEO canonical 文档为准。
+- Availability does not trigger review. Use only when the current user explicitly requests this reviewer; routine review follows `.agent/context/control-plane-playbook.md#agent-workflow-operations` (Claude runtime mapping in `CLAUDE.md`), not automatic dispatch of this profile.
+- The review target (spec, plan, diff, or stated snapshot) is identified in your dispatch message together with an immutable target ID (exact commit, tree, or staged tree hash per the playbook's immutable review target section). Review exactly that state, nothing else.
+- 判定标准以 AI-VIDEO canonical 文档为准；不进行 nested delegation。
 
 ## Rules
 

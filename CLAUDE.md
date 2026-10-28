@@ -9,6 +9,25 @@
 ## Claude Runtime Notes
 
 - Session-record hooks 接线在 `.claude/settings.json`，与 `.codex/hooks.json` 共用同一 `.agents/skills/record-ai-video-session/scripts/session_record_hook.py`。
-- 项目 skill 唯一实体在 `.agents/skills/`；`.claude/skills/` 只是指向它们的可见性接缝（symlink），不得在 `.claude/skills/` 维护第二份正文。
-- `.claude/agents/harness-reviewer.md` 仅为显式授权的可选 reviewer 定义，不主动派发双审；低频 Risk Gate 与 Kimi → Codex Parent 流程见 `AGENTS.md` 的 `Agent Workflow Routing`。
-- Specs / plans 约定：`docs/superpowers/specs|plans/YYYY-MM-DD-<slug>.md`；plan 编写复用 `superpowers:writing-plans`。
+- 项目 skill 唯一实体在 `.agents/skills/`；`.claude/skills/` 只是逐一指向它们的 symlink 接缝，新增 skill 须同步建链（`tests/test_claude_code_adapter.py` 校验全量对齐），不得在 `.claude/skills/` 维护第二份正文。
+- Project MCP 在 `.mcp.json`，与 `.codex/config.toml` 的 `mcp_servers` 同名对齐；首次加载需用户在 Claude Code 中批准。可用不等于授权，外部效果仍按 `AGENTS.md` 判定。
+- 保持 cwd 在仓库根：OMC 按 cwd 写 `.omc/` 状态，`cd` 进子目录会生成游离 `.omc/`。
+- `.claude/agents/harness-reviewer.md` 仅为用户显式要求时的只读 reviewer 定义，不主动派发。
+- Specs / plans 约定：`docs/superpowers/specs|plans/YYYY-MM-DD-<slug>.md`。
+
+## Runtime Term Mapping
+
+`AGENTS.md`、playbook 与 Skill 以 Codex 术语书写；Claude Code 下按此表读取，职责、授权与 Gate 不变。
+
+| Codex 术语 | Claude Code 对应 |
+| --- | --- |
+| Codex / Native Codex / Codex Parent（作为角色） | 当前 Claude 主会话（Parent） |
+| Codex 原生 Agent / 子代理 | Agent tool 的内置与 `oh-my-claudecode:*` 子代理 |
+| 全局 OMX（`~/.codex/AGENTS.md` 与 OMX Skills） | 全局 OMC（`~/.claude/CLAUDE.md` 与 `oh-my-claudecode:*` Skills） |
+| `$plan` / `$autopilot` / `$ultragoal` / `$team` | `/oh-my-claudecode:plan` / `autopilot` / `ultragoal` / `team` |
+| `$<skill>`（如 `$record-ai-video-session`） | Skill tool 调用同名项目 skill |
+| OMX `code-reviewer` / `verifier` | `oh-my-claudecode:code-reviewer` / `oh-my-claudecode:verifier` |
+| `apply_patch` | `Edit` / `Write` / `MultiEdit` / `NotebookEdit` |
+| `.omx/` workflow state | `.omc/` workflow state（不进 Git，不拥有 Product state） |
+
+`omc ask`、外部 CLI 委派（Codex/Gemini 等）属外部 Agent，用户未明确要求不调用。

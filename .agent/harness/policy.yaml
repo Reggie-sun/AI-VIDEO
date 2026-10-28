@@ -171,7 +171,7 @@ checks:
     cwd: .
     description: Verify whole-ad source creation, durable paid intent, bounded task quota, explicit recovery and unaccepted byte download offline.
   repair_input_admission_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_repair_input_admission.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_repair_input_admission.py, tests/test_qualification_preview_input.py, -q]
     cwd: .
     description: Verify development-only failed-video provenance admission, no qualification, and exact bootstrap replay without Provider effects.
   video_cleanup_tests:
@@ -300,7 +300,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ad_creative.py, tests/test_caption_development_preview.py, tests/test_production_composition.py, tests/test_production_video_retime.py, tests/test_production_video_retime_render.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_generated_video_audio.py, tests/test_production_captions.py, tests/test_production_text_design.py, tests/test_production_subtitle_ass.py, tests/test_production_text_visual_render.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ad_creative.py, tests/test_caption_development_preview.py, tests/test_captionless_native_join_preview.py, tests/test_mixed_stock_dialogue_preview.py, tests/test_preview_source_clock.py, tests/test_watermark_preset.py, tests/test_production_composition.py, tests/test_production_video_retime.py, tests/test_production_video_retime_render.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_generated_video_audio.py, tests/test_production_captions.py, tests/test_production_text_design.py, tests/test_production_subtitle_ass.py, tests/test_production_text_visual_render.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify timeline, renderer, audio, voice, and caption contracts.
@@ -454,6 +454,8 @@ checks:
       - repair_input_admission_tests
       - video_cleanup_tests
       - generation_feedback_tests
+      - authored_visual_revision_tests
+      - reference_planning_tests
       - grok_media_provider_tests
       - seedream_image_tests
       - typed_causal_native_expression_tests
@@ -633,7 +635,9 @@ categories:
   repair_input_admission:
     patterns:
       - src/ai_video/production/repair_input_admission.py
+      - src/ai_video/production/qualification_preview_input.py
       - tests/test_repair_input_admission.py
+      - tests/test_qualification_preview_input.py
     focused_check_ids: [repair_input_admission_tests]
     check_ids:
       - repair_input_admission_tests
@@ -816,6 +820,7 @@ categories:
       - src/ai_video/production/generation_authored_retarget.py
       - src/ai_video/production/_generation_authored_prospect.py
       - src/ai_video/production/_qualification_authoring_revision.py
+      - src/ai_video/production/_qualification_quality_repair.py
       - src/ai_video/production/generation_coverage_revision.py
       - src/ai_video/production/generation_resolution_revision.py
       - tests/test_generation_visual_revision.py
@@ -823,6 +828,7 @@ categories:
       - tests/test_generation_authored_retarget.py
       - tests/test_generation_authored_prospect.py
       - tests/test_qualification_visual_revision.py
+      - tests/test_qualification_quality_repair.py
       - tests/test_generation_coverage_revision.py
       - tests/test_generation_coverage_supersession.py
       - tests/test_generation_resolution_revision.py
@@ -998,6 +1004,7 @@ categories:
       - src/ai_video/production/ad_creative_review.py
       - src/ai_video/production/ad_creative_types.py
       - src/ai_video/production/commercial_graphics.py
+      - src/ai_video/production/watermark_preset.py
       - src/ai_video/production/composition_contracts.py
       - src/ai_video/production/composition.py
       - src/ai_video/production/hyperframes.py
@@ -1017,6 +1024,10 @@ categories:
       - tests/test_production_ad_creative.py
       - tests/test_production_composition.py
       - tests/test_caption_development_preview.py
+      - tests/test_captionless_native_join_preview.py
+      - tests/test_mixed_stock_dialogue_preview.py
+      - tests/test_preview_source_clock.py
+      - tests/test_watermark_preset.py
       - tests/test_production_video_retime.py
       - tests/test_production_video_retime_render.py
       - tests/test_production_hyperframes.py

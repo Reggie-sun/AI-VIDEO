@@ -33,7 +33,8 @@ those contracts in the session record.
 
 ## Handle Project Hook Requests
 
-The project-local Codex hook may inject a request containing a
+The project-local hook (Codex `.codex/hooks.json` or Claude Code
+`.claude/settings.json`, same script) may inject a request containing a
 `capture_request_id`. Treat it as a one-time request to evaluate this skill's
 stable-boundary rule, not as proof that a record is required.
 
@@ -66,7 +67,8 @@ stable-boundary rule, not as proof that a record is required.
 - Check the current topic, commits, and existing records before writing so a
   repeated hook request cannot create duplicate records.
 - Hook state follows `ACKED -> PENDING -> ACKED`. `PostToolUse` only attributes
-  paths from this session's `apply_patch` calls or a simple exact
+  paths from this session's `apply_patch` (Codex) or `Edit` / `Write` /
+  `MultiEdit` / `NotebookEdit` (Claude Code) calls or a simple exact
   `git add <specific-files>` adoption command; unrelated HEAD, index, dirty, or
   untracked changes do not reopen an acknowledged checkpoint. Files under
   `docs/record_for_agent/` are excluded so the record cannot trigger itself.
