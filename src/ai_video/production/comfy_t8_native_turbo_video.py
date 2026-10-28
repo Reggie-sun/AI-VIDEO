@@ -29,6 +29,7 @@ from ai_video.production.comfy_t8_native_turbo_profile import (
 )
 from ai_video.production.comfy_t8_video import ComfyUIT8VideoProvider
 from ai_video.production._h3_prompt import H3PromptCompilation, compile_h3_prompt
+from ai_video.production._h3_prompt_zh import H3_ZH_GRAMMAR_CONTRACT
 from ai_video.production.local_video import (
     DurableLocalVideoSubmitPermit,
     LocalVideoSubmitIntent,
@@ -64,6 +65,7 @@ from ai_video.workflow_renderer import _set_path
 
 _PROVIDER_NAME = "comfy-local-h3-t8"
 _COMPILER_ID = "comfy-local-h3-t8-native-turbo-video-compiler"
+_ZH_REFERENCE_KIND = {"character": "人物", "prop": "道具", "scene": "场景", "visual": "画面"}
 _MAX_DETERMINISTIC_SEED = (1 << 63) - 1
 _COMPONENT_DIRS = {
     "diffusion": Path("models/diffusion_models"),
@@ -380,8 +382,11 @@ def _long_reference_prompt(
     prompt: H3PromptCompilation,
     provider_bound: ProviderBoundVideoRequest,
     requirement: ProviderNeutralVideoRequirement,
+    *,
+    language: str = "en",
 ) -> H3PromptCompilation:
     """Name sealed references in the same ordinal order as request compilation."""
+    zh = language == "zh"
     cues = []
     images = sorted(
         (asset for role, asset in zip(
@@ -393,6 +398,9 @@ def _long_reference_prompt(
         owner = asset.canonical_owner_id
         kind = asset.canonical_owner_kind or "visual"
         cues.append(
+            (f"<Picture {ordinal}>是" + (f"{owner}的" if owner is not None else "")
+             + f"{_ZH_REFERENCE_KIND.get(kind, kind)}参考。")
+            if zh else
             f"<Picture {ordinal}> is the {kind} reference"
             + (f" for {owner}." if owner is not None else ".")
         )
@@ -406,14 +414,18 @@ def _long_reference_prompt(
     for ordinal, asset in enumerate(audios, 1):
         if len(audios) == 1 and dialogue is not None and dialogue.mode == "dialogue":
             cues.append(
+                f"说话人S1即{dialogue.speaker_id}，保持<Audio {ordinal}>的嗓音、音色与音域。"
+                if zh else
                 f"Speaker 1 (S1), {dialogue.speaker_id}, preserves the voice, "
                 f"timbre and pitch range of <Audio {ordinal}>."
             )
         else:
-            cues.append(f"<Audio {ordinal}> is reference audio.")
+            cues.append(f"<Audio {ordinal}>是参考音频。" if zh
+                        else f"<Audio {ordinal}> is reference audio.")
     if cues and "[Shot 1] " not in prompt.prompt_text:
         raise _invalid("Native reference cues require the sealed Shot marker.")
-    text = prompt.prompt_text.replace("[Shot 1] ", "[Shot 1] " + " ".join(cues) + " ", 1)
+    text = prompt.prompt_text.replace(
+        "[Shot 1] ", "[Shot 1] " + ("" if zh else " ").join(cues) + ("" if zh else " "), 1)
     return H3PromptCompilation(
         prompt_text=text,
         prompt_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest(),
@@ -519,8 +531,9 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
     ) -> ProviderRequestCompilationResult:
         native_prompt = None
         if requirement.contract_version == "provider-neutral-video-requirement/4":
+            language = self.profile.prompt_language
             prompt = compile_h3_prompt(requirement, provider_bound=provider_bound,
-                continuity_expression=continuity_expression)
+                continuity_expression=continuity_expression, language=language)
             if not isinstance(prompt, H3PromptCompilation):
                 return ProviderRequirementUnsupported(
                     requirement_hash=requirement.requirement_hash,
@@ -530,9 +543,11 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
                     unsupported_field_paths=prompt.unsupported_field_paths,
                 )
             if isinstance(self.profile, T8NativeTurboLongExecutionProfile):
-                prompt = _long_reference_prompt(prompt, provider_bound, requirement)
+                prompt = _long_reference_prompt(prompt, provider_bound, requirement,
+                    language=language)
             native_prompt = ProviderNativePrompt(
-                grammar_contract="h3-three-field-v1",
+                grammar_contract=(H3_ZH_GRAMMAR_CONTRACT if language == "zh"
+                                  else "h3-three-field-v1"),
                 prompt_text=prompt.prompt_text,
                 prompt_sha256=prompt.prompt_sha256,
                 expressed_control_paths=prompt.expressed_control_paths,

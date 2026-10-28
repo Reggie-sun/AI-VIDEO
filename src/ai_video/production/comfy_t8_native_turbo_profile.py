@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_serializer, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.comfy_image import validate_loopback_endpoint
@@ -286,7 +286,16 @@ class T8NativeTurboExecutionProfile(StrictModel):
         Literal["audio/wav", "audio/mpeg", "audio/mp4"], ...
     ]
     max_reference_audio_bytes: int = Field(strict=True, gt=0)
+    prompt_language: Literal["en", "zh"] = "en"
     profile_content_hash: str = Field(pattern=_SHA256)
+
+    @model_serializer(mode="wrap")
+    def _omit_default_prompt_language(self, handler):
+        # Legacy English profiles keep their exact sealed bytes and hash.
+        data = handler(self)
+        if isinstance(data, dict) and data.get("prompt_language") == "en":
+            data.pop("prompt_language")
+        return data
 
     def _canonical_identity(self) -> tuple[str, ...]:
         return _TASK_IDENTITIES[self.task_type]

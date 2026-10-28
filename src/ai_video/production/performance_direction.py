@@ -192,13 +192,54 @@ def performance_direction_issues(intent: object, characters) -> tuple[str, ...]:
     return tuple(issues)
 
 
-def render_performance_direction(performance: object) -> str:
+_ZH_ROLE_LABELS = {"principal": "主要角色", "supporting": "配角", "background": "背景人物"}
+_ZH_VISIBILITY_LABELS = {"visible": "在画内", "offscreen": "在画外"}
+_ZH_PHASE_LABELS = {
+    "opening": "开场时",
+    "response": "反应阶段",
+    "settle": "表演收束时",
+    "throughout": "整个镜头中",
+}
+_ZH_INTENSITY_LABELS = {
+    "none": "不加情绪强调",
+    "subtle": "强度轻微",
+    "moderate": "强度适中",
+    "strong": "强度强烈",
+}
+
+
+def _render_performance_direction_zh(directions: tuple[object, ...]) -> str:
+    actors: list[str] = []
+    for direction in directions:
+        actor = (
+            f"{direction.screen_identity}（{_ZH_ROLE_LABELS[direction.role]}，"
+            f"{_ZH_VISIBILITY_LABELS[direction.visibility]}）"
+        )
+        if direction.visibility == "offscreen":
+            actors.append(f"{actor}：保持在画外，原因是{direction.offscreen_reason}。")
+            continue
+        beats = [
+            f"{_ZH_PHASE_LABELS[beat.phase]}，在{beat.trigger}之后，表现{beat.emotion}，"
+            f"{_ZH_INTENSITY_LABELS[beat.intensity]}；面部表情：{beat.facial_expression}；"
+            f"视线目标：{beat.gaze_target}；呼吸：{beat.breathing}；"
+            f"身体动作：{beat.body_behavior}。"
+            for beat in direction.beats
+        ]
+        actors.append(f"{actor}：" + "".join(beats))
+    return "人物表演指导：" + "".join(actors)
+
+
+def render_performance_direction(performance: object, *, language: str = "en") -> str:
     """Render authored acting direction as readable native prompt prose."""
 
     performance = getattr(performance, "performance_intent", performance)
     directions = tuple(getattr(performance, "character_directions", ()) or ())
+    if language not in {"en", "zh"}:
+        raise ValueError("unsupported performance direction language")
     if not directions:
         return ""
+    if language == "zh":
+        return _render_performance_direction_zh(directions)
 
     actors: list[str] = []
     for direction in directions:

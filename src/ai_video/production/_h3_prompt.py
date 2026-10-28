@@ -12,6 +12,12 @@ from ai_video.production._video_intent_validation import (
     validate_generation_intent_for_continuity,
 )
 from ai_video.production.models import StrictModel
+from ai_video.production._h3_prompt_zh import (
+    ZH_NO_DIALOGUE_SPEECH_CUE,
+    ZH_RESERVED_TRANSITION_INSTRUCTION,
+    render_h3_t2va_zh,
+    render_h3_v4_zh,
+)
 from ai_video.production.performance_direction import render_performance_direction
 from ai_video.production.video_requirement import (
     ContinuityMode,
@@ -136,6 +142,26 @@ def _speech_cue_field_paths(value: object, *, path: str) -> tuple[str, ...]:
     return ()
 
 
+def _zh_pattern_paths(value: object, *, path: str, pattern: re.Pattern[str],
+                      skip_dialogue_text: bool) -> tuple[str, ...]:
+    if isinstance(value, str):
+        if skip_dialogue_text and path.endswith("dialogue_intent.verbatim_text"):
+            return ()
+        return (path,) if pattern.search(value) else ()
+    if isinstance(value, dict):
+        items = ((f"{path}.{key}", item) for key, item in value.items())
+    elif isinstance(value, (list, tuple)):
+        items = ((f"{path}.{index}", item) for index, item in enumerate(value))
+    else:
+        return ()
+    return tuple(
+        field_path
+        for item_path, item in items
+        for field_path in _zh_pattern_paths(
+            item, path=item_path, pattern=pattern, skip_dialogue_text=skip_dialogue_text)
+    )
+
+
 def _state_text(state: object) -> str:
     kind = getattr(state, "kind", None)
     if kind is not None:
@@ -154,8 +180,66 @@ def _h3_dialogue_language(language: str | None) -> str | None:
     return _H3_DIALOGUE_LANGUAGE_BY_PRIMARY_TAG.get(language.split("-", 1)[0])
 
 
+def _performance_controls(performance) -> tuple[str, ...]:
+    return (
+        (
+            "generation_intent.performance_intent",
+            "generation_intent.performance_intent.character_directions",
+        )
+        if performance.character_directions
+        else ()
+    )
+
+
+def _v4_expressed_controls(state_controls, performance) -> tuple[str, ...]:
+    return (
+        *state_controls,
+        *_performance_controls(performance),
+        "generation_intent.primary_camera_motion.movement_kind",
+        "generation_intent.primary_camera_motion.amplitude_class",
+        "generation_intent.primary_camera_motion.speed_class",
+        "generation_intent.primary_camera_motion.start_motion_state",
+        "generation_intent.primary_camera_motion.end_motion_state",
+        "generation_intent.pacing.shot_duration_seconds",
+        "generation_intent.ambience_intent.explicitly_silent",
+        "generation_intent.camera_subject_relation.relation_kind",
+        "generation_intent.dialogue_intent.start_seconds",
+        "generation_intent.dialogue_intent.end_seconds",
+        "generation_intent.dialogue_intent.on_screen",
+        "generation_intent.dialogue_intent.lip_sync_required",
+    )
+
+
+def _t2va_expressed_controls(performance) -> tuple[str, ...]:
+    return (
+        *_performance_controls(performance),
+        "generation_intent.subject_action.endpoint.required_change",
+        "generation_intent.camera_endpoint.position_lock",
+        "generation_intent.camera_endpoint.orientation_lock",
+        "generation_intent.pacing.shot_duration_seconds",
+    )
+
+
+def _finish_h3_prompt(prompt: str, expressed_control_paths: tuple[str, ...]) -> H3PromptResult:
+    if (
+        len(prompt.splitlines()) != 3
+        or prompt.count("[Shot 1]") != 1
+        or prompt.count("integrated_multimodal_description:") != 1
+        or prompt.count("overall_soundscape:") != 1
+        or prompt.count("non_diegetic_music:") != 1
+    ):
+        return H3PromptUnsupported(unsupported_field_paths=("generation_intent",))
+    return H3PromptCompilation(
+        prompt_text=prompt,
+        prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        expressed_control_paths=expressed_control_paths,
+    )
+
+
 def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_bound=None,
-                     continuity_expression=None) -> H3PromptResult:
+                     continuity_expression=None, language: str = "en") -> H3PromptResult:
+    if language not in {"en", "zh"}:
+        raise ValueError("unsupported H3 prompt language")
     dialogue = requirement.generation_intent.dialogue_intent
     if dialogue is not None and dialogue.mode == "conversation":
         return H3PromptUnsupported(
@@ -170,7 +254,8 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_
                 if requirement.contract_version != "provider-neutral-video-requirement/4":
                     raise ValueError("causal expression requires the complete native grammar")
                 state_texts[endpoint] = causal_endpoint_text(requirement, provider_bound,
-                    endpoint=endpoint, opening_expression=continuity_expression)
+                    endpoint=endpoint, opening_expression=continuity_expression,
+                    language=language)
                 state_controls.append(f"generation_intent.{endpoint}.state_hash")
                 if endpoint == "close_state":
                     state_controls.append("generation_intent.close_causal_facts")
@@ -187,7 +272,7 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_
         and requirement.generation_mode is GenerationMode.TEXT_TO_VIDEO
         and requirement.continuity_mode is ContinuityMode.NONE
     ):
-        return _compile_h3_t2va_prompt(requirement)
+        return _compile_h3_t2va_prompt(requirement, language=language)
 
     intent = requirement.generation_intent
     dialogue = intent.dialogue_intent
@@ -219,6 +304,12 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_
         or _RESERVED_TRANSITION_INSTRUCTION.search(requirement.target_shot.intent)
     ):
         diagnostics.append("target_shot.intent")
+    if language == "zh":
+        diagnostics.extend(_zh_pattern_paths(
+            intent.model_dump(mode="python"), path="generation_intent",
+            pattern=ZH_RESERVED_TRANSITION_INSTRUCTION, skip_dialogue_text=True))
+        if ZH_RESERVED_TRANSITION_INSTRUCTION.search(requirement.target_shot.intent):
+            diagnostics.append("target_shot.intent")
     if diagnostics:
         return H3PromptUnsupported(
             unsupported_field_paths=tuple(dict.fromkeys(diagnostics))
@@ -253,6 +344,12 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_
     assert motion is not None
     assert relation is not None
 
+    if language == "zh":
+        prompt = unicodedata.normalize("NFC", render_h3_v4_zh(
+            requirement, state_texts=state_texts,
+            endpoint_text=_state_text(intent.subject_action.endpoint),
+            dialogue_language=dialogue_language))
+        return _finish_h3_prompt(prompt, _v4_expressed_controls(state_controls, performance))
     dialogue_text = "none"
     if dialogue.mode == "dialogue":
         assert dialogue.verbatim_text is not None
@@ -335,47 +432,13 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_
             )
         ),
     )
-    if (
-        len(prompt.splitlines()) != 3
-        or prompt.count("[Shot 1]") != 1
-        or prompt.count("integrated_multimodal_description:") != 1
-        or prompt.count("overall_soundscape:") != 1
-        or prompt.count("non_diegetic_music:") != 1
-    ):
-        return H3PromptUnsupported(
-            unsupported_field_paths=("generation_intent",)
-        )
-    return H3PromptCompilation(
-        prompt_text=prompt,
-        prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-        expressed_control_paths=(
-            *state_controls,
-            *(
-                (
-                    "generation_intent.performance_intent",
-                    "generation_intent.performance_intent.character_directions",
-                )
-                if performance.character_directions
-                else ()
-            ),
-            "generation_intent.primary_camera_motion.movement_kind",
-            "generation_intent.primary_camera_motion.amplitude_class",
-            "generation_intent.primary_camera_motion.speed_class",
-            "generation_intent.primary_camera_motion.start_motion_state",
-            "generation_intent.primary_camera_motion.end_motion_state",
-            "generation_intent.pacing.shot_duration_seconds",
-            "generation_intent.ambience_intent.explicitly_silent",
-            "generation_intent.camera_subject_relation.relation_kind",
-            "generation_intent.dialogue_intent.start_seconds",
-            "generation_intent.dialogue_intent.end_seconds",
-            "generation_intent.dialogue_intent.on_screen",
-            "generation_intent.dialogue_intent.lip_sync_required",
-        ),
-    )
+    return _finish_h3_prompt(prompt, _v4_expressed_controls(state_controls, performance))
 
 
 def _compile_h3_t2va_prompt(
     requirement: ProviderNeutralVideoRequirement,
+    *,
+    language: str = "en",
 ) -> H3PromptResult:
     """Compile the legacy T2V intent into H3's native three-field grammar.
 
@@ -475,6 +538,23 @@ def _compile_h3_t2va_prompt(
             if path != "generation_intent.dialogue_intent"
             for field_path in _speech_cue_field_paths(value, path=path)
         )
+    if language == "zh":
+        diagnostics.extend(
+            field_path
+            for path, value in emitted_values.items()
+            for field_path in _zh_pattern_paths(
+                value, path=path, pattern=ZH_RESERVED_TRANSITION_INSTRUCTION,
+                skip_dialogue_text=True)
+        )
+        if dialogue is not None and dialogue.mode == "none":
+            diagnostics.extend(
+                field_path
+                for path, value in emitted_values.items()
+                if path != "generation_intent.dialogue_intent"
+                for field_path in _zh_pattern_paths(
+                    value, path=path, pattern=ZH_NO_DIALOGUE_SPEECH_CUE,
+                    skip_dialogue_text=False)
+            )
     if diagnostics:
         return H3PromptUnsupported(
             unsupported_field_paths=tuple(dict.fromkeys(diagnostics))
@@ -486,6 +566,11 @@ def _compile_h3_t2va_prompt(
     assert ambience is not None
     assert dialogue is not None
     assert music is not None
+    if language == "zh":
+        prompt = unicodedata.normalize("NFC", render_h3_t2va_zh(
+            requirement, endpoint_text=_state_text(intent.subject_action.endpoint),
+            dialogue_language=dialogue_language))
+        return _finish_h3_prompt(prompt, _t2va_expressed_controls(performance))
     camera = intent.camera_intent
     camera_text = (
         "locked-off camera"
@@ -566,32 +651,7 @@ def _compile_h3_t2va_prompt(
             )
         ),
     )
-    if (
-        len(prompt.splitlines()) != 3
-        or prompt.count("[Shot 1]") != 1
-        or prompt.count("integrated_multimodal_description:") != 1
-        or prompt.count("overall_soundscape:") != 1
-        or prompt.count("non_diegetic_music:") != 1
-    ):
-        return H3PromptUnsupported(unsupported_field_paths=("generation_intent",))
-    return H3PromptCompilation(
-        prompt_text=prompt,
-        prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-        expressed_control_paths=(
-            *(
-                (
-                    "generation_intent.performance_intent",
-                    "generation_intent.performance_intent.character_directions",
-                )
-                if performance.character_directions
-                else ()
-            ),
-            "generation_intent.subject_action.endpoint.required_change",
-            "generation_intent.camera_endpoint.position_lock",
-            "generation_intent.camera_endpoint.orientation_lock",
-            "generation_intent.pacing.shot_duration_seconds",
-        ),
-    )
+    return _finish_h3_prompt(prompt, _t2va_expressed_controls(performance))
 
 
 __all__ = [

@@ -49,7 +49,25 @@ def current_close_facts(requirement):
     return require_current_close_facts(reopened.generation_intent)
 
 
-def render_causal_facts(facts):
+_ZH_DIMENSION_LABELS = {
+    CausalDimension.CHARACTER_PRESENCE: "人物在场",
+    CausalDimension.PROP_IDENTITY: "道具身份",
+    CausalDimension.PROP_HOLDER: "道具持有者",
+    CausalDimension.HAND_CONTACT: "手部接触",
+    CausalDimension.PROP_FUNCTIONAL_STATE: "道具功能状态",
+    CausalDimension.ACTION_PHASE: "动作阶段",
+    CausalDimension.GAZE_TARGET: "视线目标",
+    CausalDimension.DIALOGUE_TURN: "对白轮次",
+    CausalDimension.SCREEN_MOTION_AXIS: "画面运动轴向",
+    CausalDimension.AUDIO_BRIDGE: "声音衔接",
+}
+
+
+def render_causal_facts(facts, *, language="en"):
+    if language == "zh":
+        return "；".join(f"{_ZH_DIMENSION_LABELS[dimension]}：{fact}" for dimension, fact in facts)
+    if language != "en":
+        raise ValueError("unsupported causal expression language")
     return "; ".join(f"{dimension.value.replace('_', ' ')}: {fact}" for dimension, fact in facts)
 
 
@@ -72,7 +90,8 @@ def native_recipe_expression_view(recipe, requirement, expressed_control_paths):
     return recipe
 
 
-def causal_endpoint_text(requirement, provider_bound, *, endpoint, opening_expression=None):
+def causal_endpoint_text(requirement, provider_bound, *, endpoint, opening_expression=None,
+                         language="en"):
     """Separate opening authority from independently authored current closing."""
     from ai_video.production._shot_router_contracts import ProviderBoundVideoRequest
     from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
@@ -93,7 +112,7 @@ def causal_endpoint_text(requirement, provider_bound, *, endpoint, opening_expre
         facts = opening_expression.opening_facts(requirement, bound)
     else:
         facts = current_close_facts(requirement)
-    return render_causal_facts(facts)
+    return render_causal_facts(facts, language=language)
 
 
 def close_evaluation_measurement(rule, requirement):

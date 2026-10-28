@@ -26,6 +26,17 @@ Generation goes through the selected AI-VIDEO adapter and its gates. The upstrea
 product CLI (`python -m open_video`), its install scripts and its `backends/` / `docs/h3/` files
 are not part of this repository; do not invoke or install them from this Skill.
 
+### Prompt language
+
+`AGENTS.md` requires Chinese-only submitted prompts. A profile with `"prompt_language": "zh"`
+(currently `workflows/profiles/minimax_h3_t8_i2va_turbo_native_v2_zh.json`) compiles grammar
+`h3-three-field-zh-v1`: only the three field headers, `[Shot 1]`, `<d>[Language]…</d>`, `S1` and
+`<Picture N>` / `<Audio N>` stay in native form. All other compiler text is Chinese. Profiles
+without the field keep the sealed English grammar `h3-three-field-v1` byte-for-byte for replay.
+The compiler only translates its own connectives: authored Shot fields must also be written in
+Chinese. A Chinese H3 prompt has no media A/B evidence yet, so its quality is `NOT_EVALUATED`
+until an exact local attempt passes the per-Shot Gate.
+
 ---
 
 ## 1. Quality hierarchy (what actually moves the needle)

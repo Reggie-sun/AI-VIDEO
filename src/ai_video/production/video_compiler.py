@@ -15,6 +15,7 @@ from ai_video.production._video_requirement_routing import (
     requirement_mode,
     requirement_output_matches,
 )
+from ai_video.production._h3_prompt_zh import H3_GRAMMAR_CONTRACTS, h3_prompt_language
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.generation_recipe import expression_errors
 from ai_video.production.generation_input_control import NativeTextExpressionReport
@@ -463,13 +464,14 @@ def compile_provider_video_request(
     expressed_hash_endpoints = tuple(endpoint for endpoint in hash_endpoints
         if endpoint == "close_state" or native_prompt is not None
         and f"generation_intent.{endpoint}.state_hash" in native_prompt.expressed_control_paths)
+    h3_language = h3_prompt_language(native_prompt)
     if expressed_hash_endpoints and not preserved_source:
         from ai_video.production._causal_state_expression import causal_endpoint_text
 
         try:
             for endpoint in expressed_hash_endpoints:
                 facts_text = causal_endpoint_text(requirement, provider_bound, endpoint=endpoint,
-                    opening_expression=continuity_expression)
+                    opening_expression=continuity_expression, language=h3_language)
                 if native_prompt is None or facts_text not in native_prompt.prompt_text:
                     raise ValueError("native endpoint is not its authoritative causal column")
         except (AttributeError, TypeError, ValueError):
@@ -483,26 +485,27 @@ def compile_provider_video_request(
     if hash_endpoints and not preserved_source and (native_prompt is None
             or requirement.contract_version == "provider-neutral-video-requirement/4"
             or native_prompt is not None and native_prompt.grammar_contract
-                in {"remote-video-prose-v1", "h3-three-field-v1"}):
+                in {"remote-video-prose-v1", *H3_GRAMMAR_CONTRACTS}):
         # A claimed seal path is not coverage by itself. Reopen the same
         # owner-issued expression even for callers bypassing an adapter.
         from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
 
-        if native_prompt is not None and native_prompt.grammar_contract == "h3-three-field-v1":
+        if native_prompt is not None and native_prompt.grammar_contract in H3_GRAMMAR_CONTRACTS:
             if compiler_id not in {"comfy-local-h3-video-compiler", "comfy-local-h3-t8-video-compiler",
-                    "comfy-local-h3-t8-turbo-video-compiler", "comfy-local-h3-t8-native-turbo-video-compiler"}:
+                    "comfy-local-h3-t8-turbo-video-compiler", "comfy-local-h3-t8-native-turbo-video-compiler"} or (
+                    h3_language == "zh" and compiler_id != "comfy-local-h3-t8-native-turbo-video-compiler"):
                 return _unsupported(provider_bound, requirement,
                     ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED, ("native_prompt.grammar_contract",))
             from ai_video.production._h3_prompt import compile_h3_prompt
 
             expected = compile_h3_prompt(requirement, provider_bound=provider_bound,
-                continuity_expression=continuity_expression)
+                continuity_expression=continuity_expression, language=h3_language)
             if (expected.outcome == "compiled"
                     and compiler_id == "comfy-local-h3-t8-native-turbo-video-compiler"
                     and compiler_version == "3"):
                 from ai_video.production.comfy_t8_native_turbo_video import _long_reference_prompt
 
-                expected = _long_reference_prompt(expected, provider_bound, requirement)
+                expected = _long_reference_prompt(expected, provider_bound, requirement, language=h3_language)
         elif native_prompt is not None and native_prompt.grammar_contract.startswith("jimeng-"):
             from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
             from ai_video.production._remote_video_native_prompt import RemoteVideoPromptCompilation

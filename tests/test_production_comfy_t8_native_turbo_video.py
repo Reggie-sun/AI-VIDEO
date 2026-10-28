@@ -60,10 +60,13 @@ from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
     VideoMediaReferenceBinding,
 )
+from ai_video.production._h3_prompt import compile_h3_prompt
 from ai_video.production.video_compiler import (
     CompiledProviderVideoRequest,
+    ProviderNativePrompt,
     ProviderRequirementUnsupported,
     ProviderRequirementUnsupportedReason,
+    compile_provider_video_request,
 )
 from ai_video.production.video_requirement import (
     AssetEvidence,
@@ -482,13 +485,22 @@ def test_fl2va_compiler_preserves_neutral_first_last_frame_mode(
     )
 
 
+@pytest.mark.parametrize("language", ["en", "zh"])
 @pytest.mark.parametrize("with_close_facts", [False, True])
 def test_i2va_compiler_uses_native_h3_prompt_for_v4_requirement(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     with_close_facts: bool,
+    language: str,
 ) -> None:
-    profile = _load("I2VA")
+    profile = (
+        _load("I2VA")
+        if language == "en"
+        else load_t8_native_turbo_execution_profile(
+            REPO_ROOT / "workflows/profiles/minimax_h3_t8_i2va_turbo_native_v2_zh.json",
+            artifact_root=REPO_ROOT,
+        )
+    )
     seconds = 124 / 24
     intent = _complete_intent()
     intent = intent.model_copy(
@@ -642,14 +654,38 @@ def test_i2va_compiler_uses_native_h3_prompt_for_v4_requirement(
     compiled = provider.compile_request(provider_bound, requirement)
 
     assert isinstance(compiled, CompiledProviderVideoRequest)
-    assert "Speaker 1 (S1), identified as announcer, is off-screen." in compiled.provider_native_prompt
-    assert "Speaker 1 (S1) says exactly and only:" in compiled.provider_native_prompt
-    assert "<d>[Chinese] 林砚，请在终点站下车。</d>" in compiled.provider_native_prompt
-    assert "dolly in with subtle amplitude at slow speed" in compiled.provider_native_prompt
+    prompt = compiled.provider_native_prompt
+    assert "<d>[Chinese] 林砚，请在终点站下车。</d>" in prompt
+    if language == "en":
+        assert "Speaker 1 (S1), identified as announcer, is off-screen." in prompt
+        assert "Speaker 1 (S1) says exactly and only:" in prompt
+        assert "dolly in with subtle amplitude at slow speed" in prompt
+    else:
+        assert "说话人S1即announcer，在画外。" in prompt
+        assert "说话人S1准确且只说：" in prompt
+        assert "运镜：推镜，小幅，慢速" in prompt
+        assert "Speaker 1" not in prompt and "amplitude" not in prompt
+        assert [line.split(":", 1)[0] for line in prompt.splitlines()] == [
+            "integrated_multimodal_description", "overall_soundscape", "non_diegetic_music"]
     assert compiled.request.mode is VideoGenerationMode.IMAGE_TO_VIDEO
     if with_close_facts:
-        assert all(fact in compiled.provider_native_prompt for fact in facts.values())
+        assert all(fact in prompt for fact in facts.values())
         assert intent.close_state.state_hash not in compiled.provider_native_prompt
+        # The sealed grammar label selects the recompile language; a relabel fails closed.
+        relabeled = compile_provider_video_request(
+            provider_bound=provider_bound, requirement=requirement,
+            compiler_id="comfy-local-h3-t8-native-turbo-video-compiler", compiler_version="2",
+            capabilities=t8_native_turbo_capabilities(profile),
+            native_prompt=ProviderNativePrompt(
+                grammar_contract="h3-three-field-v1" if language == "zh" else "h3-three-field-zh-v1",
+                prompt_text=prompt,
+                prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+                expressed_control_paths=compile_h3_prompt(
+                    requirement, provider_bound=provider_bound, language=language
+                ).expressed_control_paths,
+            ),
+        )
+        assert isinstance(relabeled, ProviderRequirementUnsupported)
 
     blocked_intent = intent.model_copy(
         update={
