@@ -10,7 +10,7 @@
 
 | Shot | Current reference coverage | Basis |
 | --- | --- | --- |
-| MC00 | 屋檐、城市展开、沿路下降、市政正常末态 | 前轮4张写实候选；高差／接近路线仍待核 |
+| MC00 | 屋檐、城市展开、沿路下降、市政正常末态 | 前轮4张写实候选；高差／接近路线仍待核。2026-10-28用户选落点方案A：末态唯一锚点改为`MC01-normal.png`（已认可市政片第0帧），`MC00-04-site-end-v1.png`与其构图近似但不一致，降为接近路线参考；页面图题沿旧打包未改，以[分镜](../../../../outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md#mc00--one-city-one-continuous-move)为准 |
 | MC01 | 起始、控制断开、门到限位 | 已认可exact市政MP4第0／40／103帧 |
 | MC02 | 连接前态与有限形变后态 | 同一已认可MP4第104／163帧 |
 | MC03 | 新斜侧直梯修订02；另附已有到达站位 | 身份固定，直梯结构候选；不是已通过的下楼视频 |
