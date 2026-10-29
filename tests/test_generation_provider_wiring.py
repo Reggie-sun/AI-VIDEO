@@ -11,6 +11,7 @@ from ai_video.production.shot_router import AdapterCompilerContract
 from ai_video.production.video_requirement import AmbienceIntent, AudioNeed, OutputNeed, Pacing
 from test_production_generation_decision import setup_decision, acceptance_policy
 from test_production_provider_neutral_adapters import _replace_requirement
+from tests.reference_authoring_fixture import with_fixture_reference_planning
 from tests.test_production_video_intent_validation import _complete_intent
 
 
@@ -28,7 +29,9 @@ def prepare(provider, profile, output, compiler_id, compiler_version="2", author
     })
     if action_progression is not None:
         intent = intent.model_copy(update={"subject_action": intent.subject_action.model_copy(
-            update={"progression": action_progression})})
+            update={"progression": action_progression}),
+            "reference_planning": None})
+    intent = with_fixture_reference_planning(intent)
     conditioning = setup["projection"].requirement.conditioning_compatibility
     if conditioning is not None:
         conditioning = conditioning.model_copy(update={"available_duration_seconds": output.duration_seconds})

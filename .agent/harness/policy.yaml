@@ -95,7 +95,7 @@ fallback_check_ids:
 
 checks:
   reference_planning_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_reference_planning.py, tests/test_reference_planning_integration.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_reference_planning.py, tests/test_reference_planning_integration.py, tests/test_reference_authoring.py, -q]
     cwd: .
     description: Verify semantic reference planning, canonical Canvas handoff, capability constraints and evidence-scoped feedback without Provider effects.
   assembly_review_tests:
@@ -366,7 +366,7 @@ checks:
   generation_feedback_tests:
     execution_priority: 80
     covers_check_ids: [typed_causal_native_expression_tests]
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_input_control.py, tests/test_generation_reference_controls.py, tests/test_production_responsibility_compilers.py, tests/test_generation_feedback.py, tests/test_performance_direction.py, tests/test_performance_authoring.py, tests/test_character_performance_workflow.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_s02_prospective_review.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_runtime_repair.py, tests/test_jimeng_qualification_trial.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_generation_component_quality_rejection.py, tests/test_production_generation_decision.py, tests/test_typed_causal_native_expression.py, tests/test_current_shot_close_expression.py, -q, --durations=20, --durations-min=0.1]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_input_control.py, tests/test_generation_reference_controls.py, tests/test_production_responsibility_compilers.py, tests/test_generation_feedback.py, tests/test_performance_direction.py, tests/test_performance_authoring.py, tests/test_reference_authoring.py, tests/test_character_performance_workflow.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_s02_prospective_review.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_runtime_repair.py, tests/test_jimeng_qualification_trial.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_generation_component_quality_rejection.py, tests/test_production_generation_decision.py, tests/test_typed_causal_native_expression.py, tests/test_current_shot_close_expression.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify evidence-derived decisions, transferable cohorts, execution binding and frozen historical replay without Provider effects.
   typed_causal_native_expression_tests:
@@ -524,6 +524,8 @@ categories:
       - src/ai_video/production/reference_planning.py
       - src/ai_video/production/reference_planning_contracts.py
       - src/ai_video/production/reference_strategy.py
+      - src/ai_video/production/reference_authoring.py
+      - src/ai_video/production/director_coverage.py
       - src/ai_video/planning/_reference_planning.py
       - tests/test_reference_planning.py
       - tests/test_reference_planning_integration.py
@@ -743,10 +745,13 @@ categories:
     patterns:
       - src/ai_video/production/performance_direction.py
       - src/ai_video/production/performance_authoring.py
+      - src/ai_video/production/reference_authoring.py
       - tests/test_performance_direction.py
       - tests/test_performance_authoring.py
+      - tests/test_reference_authoring.py
       - tests/test_character_performance_workflow.py
       - tests/performance_fixture.py
+      - tests/reference_authoring_fixture.py
       - docs/superpowers/artifacts/drama/jieshi-episode-01/s02-prospective-qa-v2.json
       - docs/superpowers/artifacts/drama/jieshi-episode-01/s02-prospective-shadow-v2.json
       - tests/test_s02_prospective_review.py
@@ -1759,10 +1764,12 @@ categories:
     patterns:
       - .agent/context/control-plane-playbook.md
       - .agents/skills/open-video/**
+      - src/ai_video/production/director_coverage.py
       - tests/test_open_video_skill.py
     focused_check_ids: [open_video_skill_tests]
     check_ids:
       - open_video_skill_tests
+      - product_runtime_skill_boundary_tests
       - seedance_authoring_skill_tests
       - task_architecture_gate
   experience_learning:

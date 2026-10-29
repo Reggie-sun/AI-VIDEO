@@ -65,7 +65,7 @@ def _rules(names):
 def _record_candidate_setup(record):
     """Reconstruct one historical source identity without claiming its projection survived."""
     reference = hashlib.sha256(record["id"].encode()).hexdigest()
-    setup = setup_decision(reference_hash=reference)
+    setup = setup_decision(reference_hash=reference, legacy_intent=True)
     projection = _replace_requirement(
         setup["projection"],
         source_request_content_hash=hashlib.sha256(record["requirement_hash"].encode()).hexdigest(),

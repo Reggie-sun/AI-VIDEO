@@ -554,7 +554,15 @@ def test_scale_transition_projection_and_requirement_reject_stale_binding(drift)
 
 
 def test_legacy_v4_requirement_hash_is_unchanged() -> None:
-    requirement = ProviderNeutralVideoRequirement.create(**_v4_requirement_kwargs())
+    # A legacy v4 requirement predates reference planning; it must reopen unchanged.
+    payload = _v4_requirement_kwargs()
+    intent = payload["generation_intent"].model_copy(update={"reference_planning": None})
+    payload["generation_intent"] = intent
+    payload["generation_intent_hash"] = canonical_sha256({
+        "schema": "provider-neutral-generation-intent/2",
+        "generation_intent": intent.model_dump(mode="json"),
+    })
+    requirement = ProviderNeutralVideoRequirement.create(**payload)
     assert requirement.requirement_hash == "e410378982624bb058447a4d8cf5d969b7d73bdb1335a06494d6b023da1fe243"
 
 

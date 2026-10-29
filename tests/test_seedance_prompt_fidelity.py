@@ -172,6 +172,7 @@ def _performance_fixture(final_text=None, *, cast_shape="single", compiler_versi
         "activated_shot": authored_shot,
         "target_shot_content_hash": authored_shot.content_hash,
     })
+    from tests.reference_authoring_fixture import fixture_reference_planning
     base = _verified_requirement(context)
     source = base.requirement.target_shot.intent
     performance = PerformanceIntent(
@@ -189,11 +190,13 @@ def _performance_fixture(final_text=None, *, cast_shape="single", compiler_versi
         subject_action=SubjectAction(progression=source),
         pacing=Pacing(shot_duration_seconds=output.duration_seconds),
         performance_intent=current_performance,
+        reference_planning=fixture_reference_planning(),
     )
     qa_intent = GenerationIntent(
         subject_action=SubjectAction(progression=source),
         pacing=Pacing(shot_duration_seconds=output.duration_seconds),
         performance_intent=qa_performance,
+        reference_planning=fixture_reference_planning(),
     )
     projection = _replace_requirement(
         base,

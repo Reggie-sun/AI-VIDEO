@@ -78,6 +78,7 @@ def fresh_fixture(tmp_path, monkeypatch):
     from ai_video.production.hashing import seal_artifact
     from ai_video.production.models import GenerationEvaluationAuthority
     from performance_fixture import acceptance_with_fixture_performance
+    from reference_authoring_fixture import with_fixture_reference_planning
 
     provider, fixture = metaso_canonical_fixture(tmp_path, monkeypatch)
     request, bound = fixture["request"], fixture["provider_bound"]
@@ -90,6 +91,9 @@ def fresh_fixture(tmp_path, monkeypatch):
         "subject_action": SubjectAction(start_state="actor supports the closed red book",
             progression="actor raises the book with the left hand",
             endpoint=ActionEndpoint(state_text="actor holds the raised book still"))})
+    # The authored action changed, so re-declare planning from this intent
+    # (its composition event must state what the new action shows).
+    intent = with_fixture_reference_planning(intent.model_copy(update={"reference_planning": None}))
     author = ProviderNeutralGenerationIntentProjection.create(**{
         **{name: getattr(author, name) for name in type(author).model_fields if name != "projection_hash"},
         "generation_intent": intent})

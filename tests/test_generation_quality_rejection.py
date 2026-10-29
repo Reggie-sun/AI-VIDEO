@@ -160,13 +160,15 @@ def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path)
     assert tuple(source.schema_version for source in experience.evaluation_sources) == (
         "generation-evaluation/1", "generation-evaluation/1", "generation-evaluation/1",
     )
+    # Freshly authored fixture: fingerprints bind its declared reference_planning
+    # and sealed Director coverage input, like its explicit acting input.
     assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
-        "0709007fb737c6d5178c07c034a97b74fe0cd332fb8be426942751efeeb078e1",
-        "16597ee4ebe53f56e8f11854c73ef44fc768d7f1505619285da4922ab2086676",
-        "53332622ceb3527a363137c3418e47a7693f003fecb0b76c757c721d359648ee",
+        "e95ebdf7eada31349c79d87a16a904948efa23d3df47ab9bd5ef27ab3976ce17",
+        "17b3229ff6ebcc773b509d41f3d93e0a947060abcb28c02fd5c9ac1ece81c4bf",
+        "010273e2b71a8610d7fa7571e93886b90a0a4f770407f1d8cc8afb2b1841dd8a",
     )
-    assert experience.evidence[0].evidence_hash == "eddaf22e2c042f5fbf18362929c0d2b86392561212a89e1979e256570dff77f7"
-    assert canonical_sha256(experience.model_dump(mode="json")) == "746400440e280d44e87ca425d84b59a41eca76de82c6ca9362e7ef01369106a9"
+    assert experience.evidence[0].evidence_hash == "b82648ecefb9bf04b5cf252cdc08b2aecbae9c51f72eca7057909565404f7669"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "92251603ca9dd55e6defa94096cf46c338798398c1c190b131eb85373c27d784"
     assert diagnose_exact_result(
         experience.evidence[0], experience.evidence, experience.candidate.recipe
     ).failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")

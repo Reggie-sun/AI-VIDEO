@@ -120,8 +120,9 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
 
 1. 回显 exact selected model/profile identity、version family、mode、surface、Shot identity 和
    输入的 semantic roles。缺少字段时显式标记，不得用 heuristic 补全。
-2. 建立 reference-role map。对每个输入保留现有 identity 与 state：`primary_role`、允许的
-   `transfers` 和 `must_not_transfer` constraints。
+2. 核对 Director 已写入 `generation_intent.reference_planning` 的参考职责（anchors／events／
+   selections）；缺失或与 Shot 冲突时交回 Director，不在本层另建职责表。对每个输入只补充 prompt
+   表达所需的 `transfers` 和 `must_not_transfer` constraints，并保留现有 identity 与 state。
    先核对动作/身份所需参考是否缺失；需要制作图片时交
    [identity preparation](../scenario-identity-library/SKILL.md) 或
    [action-state/storyboard preparation](../scenario-seedance-storyboard/SKILL.md)，返回实际图片后
@@ -156,8 +157,8 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
 ```text
 selected_profile: <从输入回显的 exact model/profile identity + version family + mode + runtime surface>
 prompt_draft: <面向 Seedance 的 authoring draft>
-reference_roles:
-  - <现有 asset identity>: <primary role; transfers; must_not_transfer>
+reference_transfers:
+  - <reference_planning 中的 asset/need identity>: <transfers; must_not_transfer>
 authoring_warnings: <ambiguity、unsupported expression 或 evidence limits>
 repair_note: <诊断失败结果时仅隔离一个 authoring change>
 runtime_handoff: <现有 capability/provider path 必须验证的 facts>

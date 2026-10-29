@@ -4,6 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from ai_video.production.hashing import canonical_sha256
+from tests.reference_authoring_fixture import with_fixture_reference_planning
 from ai_video.production._conditioning_scale_transition import (
     ScaleTransitionEvidence,
     scale_transition_camera_intent_hash,
@@ -42,7 +43,7 @@ from ai_video.production.video_requirement import (
 
 
 def _complete_intent() -> GenerationIntent:
-    return GenerationIntent(
+    return with_fixture_reference_planning(GenerationIntent(
         open_state=TypedStateReference(
             kind=ContinuityStateKind.TYPED_TEXT,
             state_text="hero standing at screen left holding the prop",
@@ -106,7 +107,7 @@ def _complete_intent() -> GenerationIntent:
             start_framing="medium shot",
             end_framing="medium close-up",
         ),
-    )
+    ))
 
 
 def _compatible_fl2va() -> ConditioningCompatibilityEvidence:

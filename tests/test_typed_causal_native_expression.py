@@ -304,6 +304,7 @@ def metaso_canonical_fixture(tmp_path, monkeypatch, *, target_acceptance=False):
     from ai_video.production.video import VideoGenerationRequest, VideoImageReferenceBinding
     from ai_video.production.video_requirement import AudioNeed, OutputNeed
     from production_generation_execution_factory import NativeFixtureVideoProvider, prepare_generation_execution
+    from reference_authoring_fixture import with_fixture_reference_planning
 
     def forbidden(*args, **kwargs):
         pytest.fail("canonical pre-submit must not access credentials or transport")
@@ -322,6 +323,7 @@ def metaso_canonical_fixture(tmp_path, monkeypatch, *, target_acceptance=False):
         intent = seed.generation_intent
         authored = ProviderNeutralGenerationIntentProjection.create(**{
             **{n: getattr(intent, n) for n in type(intent).model_fields if n != "projection_hash"},
+            "generation_intent": with_fixture_reference_planning(intent.generation_intent),
             "output_need": OutputNeed(timing_mode="content_driven", duration_seconds=6, geometry_policy="adaptive",
                 aspect_ratio="adaptive", fps=24, container_mime="video/mp4"), "audio_need": AudioNeed.REQUIRED})
         return VideoPlanningRequest.create(**{

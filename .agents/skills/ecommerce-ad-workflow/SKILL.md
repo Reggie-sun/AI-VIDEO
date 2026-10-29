@@ -32,6 +32,10 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
 设计人物互动和连续性，仍保留商业目标与广告验收，不因有故事而误分为独立 episode。
 此处是 Native Codex 的按需知识读取，不是本 Skill 调用其他执行工作流或 fallback。
 
+电商的导演层就是本 package 及其 AdCreativePlan：每个 Provider Shot 的 generation intent 仍须写共享的
+`reference_planning`（facets、参考职责；机位移动时至少一个说明“让观众看见什么”的 `composition` event），
+导演证据由 commercial binding 的 `ad_creative_plan_hash` 承担，不挂 open-video 的 `director_coverage`。
+
 按 G0→G7 顺序执行，先读取当前阶段列出的 reference，再按具体创意疑点读取上方专项；blocking finding 立即返回 exact gate、diagnostic code、evidence gap 与所需决定，不继续伪造 ready package。
 
 | Gate | Required result | Read |

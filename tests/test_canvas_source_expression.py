@@ -130,6 +130,8 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
         parts.append({"type": "text", "text": " " + authored_deadline_text})
     data = direction()
     data["delivery_profile"] = {"width": 1280, "height": 720, "fps": 24}
+    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_reference_planning
+    data["director_coverages"] = [fixture_director_coverage()]
     if scenario:
         data["scenes"][0]["location"] = space
     data["characters"] = [{"character_id": "robot", "name": character, "identity": character,
@@ -161,6 +163,14 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
             "audio_need": "required", "quality_need": {}}
         if performance is not None:
             row["generation"]["generation_intent"]["performance_intent"] = performance.model_dump(mode="json")
+        # Two identity candidates share one owner, so the Director names each duty;
+        # each purpose is text the authored prompt already carries.
+        row["generation"]["generation_intent"]["reference_planning"] = fixture_reference_planning(
+            anchors=({"anchor_id": "main-id", "role": "identity", "purpose": "图片2", "owner_id": "robot"},
+                     {"anchor_id": "aux-id", "role": "identity", "purpose": "图片1", "owner_id": "robot"}),
+            selections=({"need_id": "main-id", "asset_id": "robot-main"},
+                        {"need_id": "aux-id", "asset_id": "robot-aux"}),
+        ).model_dump(mode="json")
         if generation_output_duration_seconds is not None:
             output_need = {"duration_seconds": generation_output_duration_seconds,
                 "geometry_policy": generation_output_geometry_policy, "fps": 24,

@@ -37,6 +37,7 @@ from test_production_generation_decision import acceptance_policy, setup_decisio
 from test_production_h3_prompt import _requirement as h3_prompt_requirement
 from test_production_provider_neutral_adapters import _replace_requirement
 from test_production_shot_router import _asset, _context, _lifecycle, _verified_requirement
+from tests.reference_authoring_fixture import with_fixture_reference_planning
 from tests.test_production_video_intent_validation import _compatible_fl2va
 
 
@@ -119,6 +120,12 @@ def _prepare(*, provider, profile, compiler, output, setup, projection):
                 "schema": "provider-neutral-generation-intent/2",
                 "generation_intent": intent.model_dump(mode="json"),
             }))
+    declared = with_fixture_reference_planning(projection.requirement.generation_intent)
+    projection = _replace_requirement(
+        projection, generation_intent=declared, generation_intent_hash=canonical_sha256({
+            "schema": "provider-neutral-generation-intent/2",
+            "generation_intent": declared.model_dump(mode="json"),
+        }))
     lifecycle = setup["lifecycle"]
     if projection.requirement.generation_mode is GenerationMode.IMAGE_TO_VIDEO:
         first = setup["context"].shot_keyframe

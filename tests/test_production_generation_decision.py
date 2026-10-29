@@ -47,11 +47,13 @@ def recipe_with_rules(recipe, rules):
                                      "rubric_hash": policy.profile_content_hash})
 
 
-def setup_decision(*, remote=False, seed_supported=True, reference_hash=None):
+def setup_decision(*, remote=False, seed_supported=True, reference_hash=None, legacy_intent=False):
+    """``legacy_intent`` keeps the pre-reference-planning requirement shape for frozen replay hashes."""
     from test_production_shot_router import _asset, _first_frame_projection
     keyframe = _asset("first_frame", "frame", reference_hash) if reference_hash else None
     context = _context(continuity=ContinuityMode.NONE, important=False, keyframe=keyframe)
-    projection = _first_frame_projection(context) if reference_hash else _verified_requirement(context)
+    projection = (_first_frame_projection(context, legacy_intent=legacy_intent) if reference_hash
+                  else _verified_requirement(context, legacy_intent=legacy_intent))
     compiler = AdapterCompilerContract.create(compiler_id="test-native", compiler_version="2")
     variant = _variant(VideoGenerationMode.IMAGE_TO_VIDEO if reference_hash else VideoGenerationMode.TEXT_TO_VIDEO,
                        execution_kind=VideoExecutionKind.REMOTE if remote else VideoExecutionKind.LOCAL)

@@ -21,6 +21,7 @@ from test_production_generated_video_e2e import _runtime
 from production_generation_execution_factory import fixture_generation_expression
 from test_production_generation_decision import acceptance_policy
 from test_production_video import _paid_preview, _paid_authorization
+from tests.reference_authoring_fixture import fixture_director_coverage, fixture_reference_planning
 
 
 def runtime(tmp_path, *, status_events=(VideoTaskState.SUCCEEDED,), native_media=None):
@@ -45,6 +46,8 @@ def runtime(tmp_path, *, status_events=(VideoTaskState.SUCCEEDED,), native_media
     root.mkdir()
     data = direction()
     data["delivery_profile"] = {"width": 64, "height": 64, "fps": 24}
+    # Drama Director coverage is sealed with the Project so each fresh generation binds it.
+    data["director_coverages"] = [fixture_director_coverage()]
     source = inputs.project.registry.assets[0]
     source = source.model_copy(update={"input_artifact_ids": ()})
     registry = AssetRegistrySnapshot(revision_id="0" * 64, content_hash="0" * 64, assets=(source,))
@@ -53,7 +56,8 @@ def runtime(tmp_path, *, status_events=(VideoTaskState.SUCCEEDED,), native_media
     for row in data["shots"]:
         row["shot"]["required_asset_roles"].append({"role": "first_frame", "asset_ids": [source.asset_id],
                                                     "allowed_asset_types": ["image"]})
-        row["generation"] = {"generation_intent": {"subject_action": {"progression": "walk into the road"}},
+        row["generation"] = {"generation_intent": {"subject_action": {"progression": "walk into the road"},
+                "reference_planning": fixture_reference_planning(camera_moves=False).model_dump(mode="json")},
             "audio_need": "required" if native_media is not None else "forbidden", "quality_need": {},
             "references": [{"role": "approved_keyframe", "asset_id": source.asset_id}],
             "intent_evidence": {"character_action_required": True}}

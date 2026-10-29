@@ -2,7 +2,9 @@
 
 ## Ownership And Data Flow
 
-Director 在既有 `generation.generation_intent.reference_planning` 中声明组合特征、视觉事件和参考职责。该字段随 `ProviderNeutralGenerationIntentProjection`、`VideoPlanningRequest`、neutral requirement 的既有 hashes 封存；不会新建 Production artifact 或 mutable lifecycle。未提供该字段的历史数据继续原执行行为，读取时给出明确标注 `legacy_advisory` 的建议。
+Director 在既有 `generation.generation_intent.reference_planning` 中声明组合特征、视觉事件和参考职责。该字段随 `ProviderNeutralGenerationIntentProjection`、`VideoPlanningRequest`、neutral requirement 的既有 hashes 封存；不会新建 Production artifact 或 mutable lifecycle。历史数据重开、读取与 replay 不变，缺该字段时读取给出明确标注 `legacy_advisory` 的建议。
+
+**新生成的声明义务（`reference_authoring.py`）。** 在 `GenerationDecisionExecutionBinding.create`（fresh creation，排在既有表演／commercial／Seedance 表达检查之后，保留原错误优先级；`GenerationFeedbackOrchestrator.prepare` 经此创建）检查，不在历史读取运行：缺 `reference_planning` 阻断；机位非 `locked` 时至少一个 `composition` event，用 `visual_state/purpose` 说明移动让观众看见什么（编译器随后要求其进入实际 prompt）；导演证据按领域分开：剧情须有 `director_coverage={coverage_hash, unit_id}`，且当前 Project 已供给时，该 hash 必须是 Project／Shot provenance 中封存的 content-addressed authoring input，bytes 经 `director_coverage.py` 结构校验并含该 unit；电商（`commercial_execution_class` 或 commercial binding）的导演层是 AdCreativePlan，执行绑定创建时须有含 `ad_creative_plan_hash` 的 commercial binding（由既有 commercial owners 核对计划），不得挂剧情 coverage。共享的 `reference_planning` 与机位 composition 义务两个领域都适用。程序只核对声明存在与证据一致，不判断镜头类型、参考数量、白模取舍或移动是否有戏；这些仍归 Director Skill。Canvas 项目经 `direction.director_coverages` 封存；非 Canvas 项目用 `reference_authoring.director_coverage_authoring_input()` 取得 artifact，随生成 Shot 的修订一起经 `ProductionStateCommitter` 提交，并把该引用写入 Shot `source_provenance`。Runtime 只做结构校验，不核对 coverage 由哪个 Skill 产出（作者检查只在 open-video 入口脚本）；门禁只读结构化 `primary_camera_motion`，仅写自由文本运镜不会触发 composition 义务。
 
 ```mermaid
 flowchart LR

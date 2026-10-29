@@ -154,6 +154,39 @@
                   ]
                 }
               ]
+            },
+            "reference_planning": {
+              "facets": [
+                "stable"
+              ],
+              "anchors": [
+                {
+                  "anchor_id": "main-id",
+                  "role": "identity",
+                  "purpose": "图片2",
+                  "owner_id": "robot"
+                },
+                {
+                  "anchor_id": "aux-id",
+                  "role": "identity",
+                  "purpose": "图片1",
+                  "owner_id": "robot"
+                }
+              ],
+              "selections": [
+                {
+                  "need_id": "main-id",
+                  "asset_id": "robot-main"
+                },
+                {
+                  "need_id": "aux-id",
+                  "asset_id": "robot-aux"
+                }
+              ],
+              "director_coverage": {
+                "coverage_hash": "2943e0cd523c68e2fe9b9786a9c746e3acfdd5ee9d1758a5c0824df178d6b940",
+                "unit_id": "one"
+              }
             }
           },
           "audio_need": "required",
@@ -250,6 +283,39 @@
                   ]
                 }
               ]
+            },
+            "reference_planning": {
+              "facets": [
+                "stable"
+              ],
+              "anchors": [
+                {
+                  "anchor_id": "main-id",
+                  "role": "identity",
+                  "purpose": "图片2",
+                  "owner_id": "robot"
+                },
+                {
+                  "anchor_id": "aux-id",
+                  "role": "identity",
+                  "purpose": "图片1",
+                  "owner_id": "robot"
+                }
+              ],
+              "selections": [
+                {
+                  "need_id": "main-id",
+                  "asset_id": "robot-main"
+                },
+                {
+                  "need_id": "aux-id",
+                  "asset_id": "robot-aux"
+                }
+              ],
+              "director_coverage": {
+                "coverage_hash": "2943e0cd523c68e2fe9b9786a9c746e3acfdd5ee9d1758a5c0824df178d6b940",
+                "unit_id": "two"
+              }
             }
           },
           "audio_need": "required",
@@ -296,6 +362,52 @@
           "camera": "摄影关系保持可读",
           "audio": "实际声音接续"
         }
+      }
+    ],
+    "director_coverages": [
+      {
+        "schema_version": "3",
+        "request": {
+          "creative_input_kind": "missing",
+          "creative_input_evidence": null,
+          "creative_constraints": [],
+          "target_duration_seconds": 30,
+          "coverage_strategy": "multi_shot",
+          "strategy_source": "agent_directed",
+          "director_decision_rationale": "Two stable Shots let the arrival read first and the robot's action land second; the scene reset is an explicit cut.",
+          "strategy_request_evidence": null,
+          "director_skill": "open-video"
+        },
+        "coverage_units": [
+          {
+            "unit_id": "one",
+            "duration_seconds": 15,
+            "beat_function": "establish",
+            "objective": "Establish the robot in the room.",
+            "open_state": "The robot stands in the room.",
+            "close_state": "The robot has begun its authored action.",
+            "shot_scale": "medium",
+            "camera_treatment": "static",
+            "camera_intent": "Hold a stable frame on the robot so its action reads clearly.",
+            "visible_change": "The robot starts moving in a readable stable frame.",
+            "transition_out": "cut",
+            "constraint_ids": []
+          },
+          {
+            "unit_id": "two",
+            "duration_seconds": 15,
+            "beat_function": "payoff",
+            "objective": "Complete the robot's authored action.",
+            "open_state": "The robot continues the authored action.",
+            "close_state": "The robot settles in a stable posture.",
+            "shot_scale": "medium",
+            "camera_treatment": "static",
+            "camera_intent": "Hold a stable frame on the robot so its action reads clearly.",
+            "visible_change": "The authored action completes and the robot settles.",
+            "transition_out": "end",
+            "constraint_ids": []
+          }
+        ]
       }
     ]
   },

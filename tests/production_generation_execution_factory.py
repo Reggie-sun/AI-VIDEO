@@ -89,6 +89,10 @@ from tests.performance_fixture import (
     fixture_performance_expression,
     fixture_performance_intent,
 )
+from tests.reference_authoring_fixture import (
+    fixture_director_coverage_artifact,
+    fixture_reference_planning,
+)
 
 
 @dataclass(frozen=True)
@@ -319,11 +323,19 @@ def activate_generated_video_shot(
         if require_first_frame
         else None
     )
+    # Seal the fixture Director coverage with the Shot so fresh generations can
+    # reopen the exact bytes their reference_planning binds.
+    coverage_artifact = fixture_director_coverage_artifact()
+    coverage_reference = SourceReference(kind="user_input",
+        reference=coverage_artifact.relative_path.as_posix(),
+        content_hash=coverage_artifact.relative_path.stem)
     generated_shot = seal_artifact(
         authored_shot.model_copy(
             update={
                 "revision": authored_shot.revision + 1,
                 "content_hash": "0" * 64,
+                "source_provenance": tuple(dict.fromkeys(
+                    (*authored_shot.source_provenance, coverage_reference))),
                 "visual_strategy": VisualStrategy.GENERATED_VIDEO,
                 "generated_video_rationale": "fixture lifecycle generation",
                 "required_asset_roles": (
@@ -422,6 +434,7 @@ def activate_generated_video_shot(
                         shot_bytes,
                         hashlib.sha256(shot_bytes).hexdigest(),
                     ),
+                    coverage_artifact,
                 ),
                 key=lambda item: item.relative_path.as_posix(),
             )
@@ -532,6 +545,8 @@ def prepare_generation_execution(
                 breathing="quiet, even breathing",
                 body_behavior="stands at ease and settles weight subtly",
             ) if shot.character_ids else None,
+            # Ecommerce binds its AdCreativePlan via commercial_binding, not drama coverage.
+            reference_planning=fixture_reference_planning(ecommerce=request.commercial_binding is not None),
         ),
         semantic_reference_roles=(
             (SemanticReferenceRole.FIRST_FRAME,) if source is not None else ()

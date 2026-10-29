@@ -38,6 +38,7 @@ from production_generation_execution_factory import (
 from test_production_generation_decision import setup_decision
 from tests.test_production_video_intent_validation import _complete_intent
 from tests.performance_fixture import fixture_performance_intent
+from tests.reference_authoring_fixture import with_fixture_reference_planning
 
 
 def _register_remote_inputs(*, root, inputs, project, bindings, input_bytes):
@@ -159,6 +160,7 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
         **({"ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True)}
            if not output.native_audio else {}),
     })
+    intent = with_fixture_reference_planning(intent)
     if request.mode is VideoGenerationMode.REFERENCE_TO_VIDEO:
         role = SemanticReferenceRole.SCENE
         image = request.image_bindings[0]

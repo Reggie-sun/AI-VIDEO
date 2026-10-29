@@ -83,7 +83,8 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     """
     packet, direction = deepcopy(packet), deepcopy(direction)
     allowed = {"project_id", "title", "language", "brief", "story", "characters", "scenes",
-               "storyboard", "shots", "delivery_profile", "composition_order", "cut_requirements"}
+               "storyboard", "shots", "delivery_profile", "composition_order", "cut_requirements",
+               "director_coverages"}
     if set(direction) - allowed:
         raise ValueError("unknown director input fields")
     if packet.get("authority") != "development_preparation_only_not_production_state":
@@ -107,6 +108,13 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     from ai_video.production.authoring_input import PREFIX, prepared_authoring_input_references
     asset_sources = [] if previous is None else [r for r in previous.project.source_provenance
                                                if r.reference.startswith(PREFIX)]
+    # Drama Director coverage is sealed as its own content-addressed input so a
+    # Shot's reference_planning.director_coverage can bind its exact bytes.
+    from ai_video.production.reference_authoring import director_coverage_authoring_input
+    coverage_artifacts = tuple({a.relative_path: a for a in (director_coverage_authoring_input(coverage)[1]
+                               for coverage in direction.get("director_coverages", ()))}.values())
+    asset_artifacts = (*asset_artifacts, *(a for a in coverage_artifacts if a.relative_path not in
+                                             {item.relative_path for item in asset_artifacts}))
     for reference in prepared_authoring_input_references(asset_artifacts):
         if reference not in asset_sources:
             asset_sources.append(reference)

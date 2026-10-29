@@ -99,6 +99,9 @@ def _planning(loaded, shot, changes, *, roles=(SemanticReferenceRole.FIRST_FRAME
             facial_expression="attentive eyes and an unforced neutral mouth",
             gaze_target="the authored walking direction", breathing="gentle breathing while walking",
             body_behavior="balanced posture through the authored release and walk")})
+    from tests.reference_authoring_fixture import with_fixture_reference_planning
+
+    intent = with_fixture_reference_planning(intent)
     return VideoPlanningRequest.create(request_id=f"sequence-input-{shot.shot_id}",
         target_shot=shot, character_context=tuple(c for c in loaded.characters if c.character_id in shot.character_ids),
         scene_context=next(s for s in loaded.scenes if s.scene_id == shot.scene_id),

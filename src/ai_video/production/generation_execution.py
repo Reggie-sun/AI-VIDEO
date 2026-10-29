@@ -451,6 +451,10 @@ class GenerationDecisionExecutionBinding(StrictModel):
         require_commercial_performance_review(projection.requirement, compiled_request.commercial_binding)
         cls._require_fresh_seedance_expression(projection=projection, inputs=inputs, decision=decision,
             compiled_request=compiled_request, continuity_routing=continuity_routing, source_project=source_project)
+        from ai_video.production.reference_authoring import require_reference_authoring
+
+        require_reference_authoring(projection.requirement, project=source_project,
+            commercial_binding=compiled_request.commercial_binding)
         values: dict[str, object] = {
             "schema_version": "1",
             "projection": projection,

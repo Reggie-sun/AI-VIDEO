@@ -14,7 +14,7 @@ from test_production_generation_decision import evidence, setup_decision
 
 
 def fixture():
-    setup = setup_decision()
+    setup = setup_decision(legacy_intent=True)
     entry = evidence(setup)
     tool = ToolIdentity(name="offline-evaluator", version="1")
     policy = SimpleNamespace(content_hash="a" * 64, semantic_authorities=(tool,),

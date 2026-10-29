@@ -11,6 +11,7 @@ from ai_video.production.jimeng import JimengVideoProvider
 from ai_video.production.jimeng_contracts import JimengProfile
 from ai_video.production.video import VideoProviderCapabilities
 from ai_video.production.video_requirement import AudioNeed, OutputNeed
+from tests.reference_authoring_fixture import fixture_reference_planning
 from test_generation_input_control import _sealed_acceptance
 from test_production_jimeng import FakeBrowser, FakeCommitter, NOW, setup
 from test_production_shot_router import (
@@ -21,6 +22,8 @@ from test_production_video_intent_validation import _complete_intent
 
 
 TEXT = "真人雨夜便利店，人物目光和持物保持连续。林序低声求证，骑手普通回应。先看饭团再抬左手短指，完整收回身侧。参考{{image:0}}只保人物身份。"
+CAMERA_REVEAL = {"event_id": "authored-camera-reveal", "kind": "composition", "phase": "end",
+                 "visual_state": "先看饭团再抬左手短指，完整收回身侧", "purpose": "人物目光和持物保持连续"}
 
 
 def _leaf_paths(value, prefix="generation_intent"):
@@ -42,7 +45,9 @@ def _fixture(monkeypatch, *, missing_path=None, stale_hash=False, fragment=None,
         committer=FakeCommitter(), now=lambda: NOW)
     context = _context(continuity=ContinuityMode.NONE, shot_intent=text)
     intent = _complete_intent()
-    intent = intent.model_copy(update={"pacing": intent.pacing.model_copy(update={"shot_duration_seconds": 6})})
+    intent = intent.model_copy(update={"pacing": intent.pacing.model_copy(update={"shot_duration_seconds": 6}),
+        # The dolly-in names what it reveals in the QA-owned Chinese text itself.
+        "reference_planning": fixture_reference_planning(intent=intent, events=(CAMERA_REVEAL,))})
     projection = _reseal_projection(_identity_reference_projection(context),
         contract_version="provider-neutral-video-requirement/4", continuity_mode="none",
         generation_intent=intent, audio_need=AudioNeed.REQUIRED,

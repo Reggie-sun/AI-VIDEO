@@ -268,7 +268,7 @@ def test_generation_projection_preserves_explicit_native_text_for_opted_rule():
 def test_legacy_recipe_hash_is_unchanged_when_input_control_is_omitted():
     from test_production_generation_decision import setup_decision
 
-    recipe = setup_decision()["inputs"].candidates[0].recipe
+    recipe = setup_decision(legacy_intent=True)["inputs"].candidates[0].recipe
 
     assert recipe.recipe_hash == "fe1a5cc5cba36b686e8da4e9c2c7ec367afeedb06106b871830396403180ff1a"
     assert "input_control" not in recipe.model_dump(mode="json")

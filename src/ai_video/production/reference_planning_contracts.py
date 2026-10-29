@@ -95,6 +95,13 @@ class ReferenceSelection(StrictModel):
     asset_id: Identifier
 
 
+class DirectorCoverageBinding(StrictModel):
+    """Exact Director coverage evidence this Shot realizes; bytes live in authoring input."""
+
+    coverage_hash: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    unit_id: Identifier
+
+
 class ReferencePlanningIntent(StrictModel):
     contract_version: Literal["shot-reference-intent/1"] = "shot-reference-intent/1"
     facets: tuple[ShotFacet, ...] = ()
@@ -105,12 +112,15 @@ class ReferencePlanningIntent(StrictModel):
     selections: tuple[ReferenceSelection, ...] = ()
     natural_generation: tuple[Text, ...] = ()
     motion_reference_policy: Literal["auto", "required"] = "auto"
+    director_coverage: DirectorCoverageBinding | None = None
 
     @model_serializer(mode="wrap")
     def _serialize(self, handler):
         payload = handler(self)
         if self.motion_reference_policy == "auto":
             payload.pop("motion_reference_policy", None)
+        if self.director_coverage is None:
+            payload.pop("director_coverage", None)
         return payload
 
     @field_validator("facets")

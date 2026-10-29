@@ -169,6 +169,15 @@ Validate the evidence before downstream authoring:
 python .agents/skills/open-video/scripts/validate_director_coverage.py <coverage.json>
 ```
 
+结构校验只有一份实现（`ai_video.production.director_coverage`），本脚本仅加 open-video 作者检查。
+通过后把 exact coverage 作为 content-addressed authoring input 封存进 Project／Shot provenance，
+并在该 Shot 的 `generation_intent.reference_planning` 写明判断结果：`facets`、参考职责
+（anchors／events／selections）、`director_coverage={coverage_hash, unit_id}`。机位移动时至少写一个
+`composition` event，用 `visual_state`／`purpose` 说明这次移动让观众看见什么、为什么现在看；
+编译器会要求这两句进入实际 prompt。新生成时程序只核对这些声明存在、bytes 已封存且 unit 存在，
+不评判创作好坏；“移动是否有戏”仍由本 Skill 与独立 Concept Check 负责。电商镜头的导演层是
+`ecommerce-ad-workflow` 的 AdCreativePlan，不写本 coverage 绑定；剧情广告借用本 Skill 方法时同样如此。
+
 ### Requirement-semantics handoff
 
 Schema v3 remains the legacy coverage format and is read under its original rules. New Director

@@ -86,9 +86,10 @@ Seedance 2.0、2.0 Fast 和 2.5 的[官方 API 文档](https://docs.volcengine.c
 | `reference_video` | 用于 R2V、edit 或 extend 的 motion/style/source video。 | 明确 operation 与 protected source properties。 |
 | `reference_audio` | Voice、dialogue、ambience、music 或 timing evidence。 | 只 transfer 被点名的 audio property；不得推断 visual identity。 |
 
-对每个 asset 记录：
+每个 asset 的 dominant job（只能有一个）是 Director 判断，只写入
+`generation_intent.reference_planning` 的 `anchors`／`events`／`selections`，由程序校验数量、
+角色、模式与实际绑定；本 Skill 不另维护第二份职责表。本 Skill 只为 prompt 表达补充：
 
-- `primary_role`：只能有一个 dominant job；
 - `transfers`：允许 prompt 继承的 properties；
 - `must_not_transfer`：必须排除的 properties；
 - `target`：接收 transfer 的 approved subject、object、scene、action、camera 或 audio intent。

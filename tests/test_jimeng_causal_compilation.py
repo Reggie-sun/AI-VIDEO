@@ -15,6 +15,7 @@ from test_production_shot_router import (
     AdapterCompilerContract, ContinuityMode, VideoGenerationResolver,
     _asset, _context, _identity_reference_projection, _lifecycle, _policy, _reseal_projection,
 )
+from tests.reference_authoring_fixture import with_fixture_reference_planning
 from test_production_video_intent_validation import _complete_intent
 
 
@@ -40,8 +41,11 @@ def _causal_reference(monkeypatch, *, long_text=False, oversized=False, video=Fa
         "close_causal_facts": facts,
         "pacing": intent.pacing.model_copy(update={"shot_duration_seconds": 6}),
         **({"subject_action": intent.subject_action.model_copy(update={
-            "progression": "沿指定路径平稳移动。" * 600})} if long_text else {}),
+            "progression": "沿指定路径平稳移动。" * 600}),
+            # The camera purpose names the overridden progression, so re-derive it.
+            "reference_planning": None} if long_text else {}),
     })
+    intent = with_fixture_reference_planning(intent)
     projection = _reseal_projection(_identity_reference_projection(context),
         contract_version="provider-neutral-video-requirement/4", continuity_mode="none",
         generation_intent=intent, audio_need=AudioNeed.REQUIRED,

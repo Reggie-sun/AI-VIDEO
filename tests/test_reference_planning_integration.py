@@ -19,7 +19,10 @@ from tests.test_generation_feedback import NativeFixtureProvider
 from tests.test_production_generation_decision import setup_decision
 
 
-def load_canvas(tmp_path, planning):
+def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True):
+    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_director_coverage_binding
+    if isinstance(planning, dict) and bind_coverage:
+        planning = {"director_coverage": fixture_director_coverage_binding(), **planning}
     raw = document()
     raw["edges"] = []
     for node in raw["nodes"]:
@@ -30,6 +33,8 @@ def load_canvas(tmp_path, planning):
     packet = build_sequence_packet(raw, {"node_ids": ["a", "b"]})
     data = direction()
     data["delivery_profile"] = {"width": 1024, "height": 576, "fps": 24}
+    if seal_coverage:
+        data["director_coverages"] = [fixture_director_coverage()]
     row = data["shots"][0]
     row["shot"]["duration_policy"]["seconds"] = 4
     row["generation"] = {"generation_intent": {
@@ -129,7 +134,9 @@ def motion_preparer(*, supports_video=True, cardinality_conflict=False):
         source_registry_revision_id="f" * 64, mime_type=asset.mime_type, size_bytes=asset.size_bytes,
         width=asset.width, height=asset.height, duration_millis=asset.duration_millis, fps=asset.fps)
     context = _context(important=False, reference_videos=(routed_asset,))
-    authored = intent(facets=("contact_timing",), selections=({"need_id": "auto:motion", "asset_id": "motion"},))
+    from tests.reference_authoring_fixture import fixture_director_coverage_binding
+    authored = intent(facets=("contact_timing",), selections=({"need_id": "auto:motion", "asset_id": "motion"},),
+                      director_coverage=fixture_director_coverage_binding())
     authored = authored.model_copy(update={"subject_action": authored.subject_action.model_copy(
         update={"progression": "Generate 4 seconds."})})
     original = setup["projection"].requirement
@@ -235,3 +242,43 @@ def test_approved_commercial_first_frame_retains_product_duty_without_extra_imag
     assert plan.reference_plan["selected_inputs"] == [{"need_id": "auto:product", "asset_id": approved.keyframe_asset_id}]
     assert plan.reference_plan["execution_gaps"] == []
     assert verified.requirement.capability_need.needs_product_fidelity
+
+
+def _drama_prepare(tmp_path, planning, **load):
+    loaded, row, _ = load_canvas(tmp_path, planning, **load)
+    setup = setup_decision()
+    current = canvas_feedback_context(loaded=loaded, row=row, policy=setup["policy"])
+    candidate = setup["inputs"].candidates[0]
+    current["acceptance"] = candidate.recipe.acceptance_policy
+    current["source_project"] = loaded  # the canonical for_project loader supplies the current Project
+    provider = NativeFixtureProvider(capabilities=candidate.capabilities, artifact_bytes=b"never-submitted")
+    provider.prompt_text = "Generate 4 seconds."
+    orchestrator = GenerationFeedbackOrchestrator(
+        targets=(RegisteredGenerationTarget(provider, candidate.provider_profile,
+            candidate.compiler_contract, candidate.output_requirement),),
+        context_loader=lambda: current, history_loader=GenerationHistory,
+        policy=DecisionPolicy(allow_bounded_exploration=True))
+    return orchestrator.prepare(limits=setup["inputs"].limits), provider
+
+
+def test_drama_director_coverage_sealed_through_canvas_authoring_reaches_execution_binding(tmp_path):
+    prepared, provider = _drama_prepare(tmp_path, {"facets": ["stable"]})
+    assert prepared.decision.disposition == "GENERATE_ONCE"
+    assert prepared.execution_binding is not None and prepared.resolved_request is not None
+    assert provider.call_counts.submit == provider.call_counts.fetch == 0
+
+
+@pytest.mark.parametrize("load,message", [
+    ({"seal_coverage": False}, "director_coverage.coverage_hash"),
+    ({"bind_coverage": False}, "director_coverage"),
+])
+def test_unsealed_or_unbound_drama_coverage_blocks_before_any_effect(tmp_path, load, message):
+    from ai_video.errors import AiVideoError
+    with pytest.raises(AiVideoError, match=message):
+        _drama_prepare(tmp_path, {"facets": ["stable"]}, **load)
+
+
+def test_missing_reference_planning_blocks_fresh_canvas_generation(tmp_path):
+    from ai_video.errors import AiVideoError
+    with pytest.raises(AiVideoError, match="generation_intent.reference_planning"):
+        _drama_prepare(tmp_path, None, seal_coverage=False)

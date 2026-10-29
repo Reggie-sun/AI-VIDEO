@@ -9,8 +9,8 @@ from test_production_generation_decision import (
 )
 
 
-def setup_full_requirements():
-    setup = setup_decision()
+def setup_full_requirements(*, legacy_intent=False):
+    setup = setup_decision(legacy_intent=legacy_intent)
     candidate = setup["inputs"].candidates[0]
     timing = candidate.recipe.expressions[0]
     natural = timing.model_copy(update={"requirement_id": "natural", "proof": "human",
@@ -40,7 +40,7 @@ def test_router_refuses_omitted_protection_and_known_global_regression():
 
 
 def test_legacy_candidate_without_final_output_goal_keeps_its_serialized_identity():
-    setup, baseline, latest = setup_full_requirements()
+    setup, baseline, latest = setup_full_requirements(legacy_intent=True)
     candidate = setup["inputs"].candidates[0]
     payload = candidate.model_dump(mode="json")
 

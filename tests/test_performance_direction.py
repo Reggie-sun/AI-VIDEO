@@ -169,8 +169,13 @@ def test_empty_directions_keep_the_legacy_six_field_hash() -> None:
     assert canonical_sha256(explicit_empty.model_dump(mode="json")) == (
         "b33f58485e4c0f9a2fef257335cac9cc1bc5e39dff589b989ef35aea49310206"
     )
+    # The pre-planning golden is unchanged once the newly declared fixture
+    # reference_planning is the only difference.
+    assert canonical_sha256(
+        _complete_intent().model_copy(update={"reference_planning": None}).model_dump(mode="json")
+    ) == "6c61c0afdc861ff99c956003e4e9d84adb53467560bc25ec5eb578d2d4fc9ed0"
     assert canonical_sha256(_complete_intent().model_dump(mode="json")) == (
-        "6c61c0afdc861ff99c956003e4e9d84adb53467560bc25ec5eb578d2d4fc9ed0"
+        "35802402540570e79a1349c0f21eee8e1594b64ee242170bbf43aed3c62b3bab"
     )
 
 

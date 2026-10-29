@@ -52,6 +52,7 @@ from ai_video.production.video_requirement import (
 )
 from tests.fixtures.planning_factory import make_character, make_scene
 from ai_video.production.video_compiler import compile_provider_video_request
+from tests.reference_authoring_fixture import with_fixture_reference_planning
 from ai_video.production.video import (
     BillingKind,
     ContinuityArtifactIdentity,
@@ -1331,6 +1332,8 @@ def _profile(
 
 def _verified_requirement(
     context: ShotRoutingContext,
+    *,
+    legacy_intent: bool = False,
 ) -> VerifiedGenerationRequirementProjection:
     requirement = ProviderNeutralVideoRequirement.create(
         source_request_content_hash=HASH_A,
@@ -1345,7 +1348,8 @@ def _verified_requirement(
         generation_mode=RequirementGenerationMode.TEXT_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.NONE,
         motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
-        generation_intent=GenerationIntent(),
+        generation_intent=(GenerationIntent() if legacy_intent
+                           else with_fixture_reference_planning(GenerationIntent())),
         output_need=OutputNeed(
             duration_seconds=4,
             width=1024,
@@ -1456,10 +1460,12 @@ def _exact_terminal_projection(
 
 def _first_frame_projection(
     context: ShotRoutingContext,
+    *,
+    legacy_intent: bool = False,
 ) -> VerifiedGenerationRequirementProjection:
     first_frame = context.shot_keyframe
     assert first_frame is not None
-    original = _verified_requirement(context)
+    original = _verified_requirement(context, legacy_intent=legacy_intent)
     requirement = ProviderNeutralVideoRequirement.create(
         **{
             **original.requirement.model_dump(
@@ -1509,7 +1515,7 @@ def _identity_reference_projection(
         generation_mode=RequirementGenerationMode.REFERENCE_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.REFERENCE,
         motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
-        generation_intent=GenerationIntent(),
+        generation_intent=with_fixture_reference_planning(GenerationIntent()),
         semantic_reference_roles=(SemanticReferenceRole.IDENTITY,),
         asset_evidence=(
             AssetEvidence(
