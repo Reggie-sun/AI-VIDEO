@@ -67,8 +67,9 @@ def fixture_reference_planning(*, camera_moves: bool | None = None, ecommerce: b
 
     planning.setdefault("facets", ("stable",))
     if camera_moves is None:
-        motion = getattr(intent, "primary_camera_motion", None)
-        camera_moves = motion is not None and motion.movement_kind.value != "locked"
+        from ai_video.production.reference_authoring import _camera_moves
+
+        camera_moves = intent is not None and _camera_moves(intent)
     if camera_moves and not any(e.get("kind") == "composition" for e in planning.get("events", ())):
         text = _camera_purpose(intent)
         planning["events"] = (*planning.get("events", ()),

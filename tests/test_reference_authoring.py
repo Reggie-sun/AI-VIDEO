@@ -115,3 +115,41 @@ def test_shared_reference_planning_still_applies_to_ecommerce():
     missing = SimpleNamespace(generation_intent=_intent(planning=False), commercial_execution_class="product_interaction")
     with pytest.raises(AiVideoError, match="generation_intent.reference_planning"):
         require_reference_authoring(missing)
+
+
+@pytest.mark.parametrize("movement", ["unspecified", "locked", "locked-off"])
+def test_still_camera_tokens_need_no_composition_without_structured_motion(movement):
+    intent = GenerationIntent.model_validate({"camera_intent": {"movement": movement},
+        "reference_planning": {"facets": ["stable"], "director_coverage": _binding()}})
+    assert reference_authoring_issues(intent) == ()
+
+
+def test_camera_prose_without_structured_motion_must_state_what_it_reveals():
+    prose = {"camera_intent": {"movement": "缓慢推进到门口"}}
+    intent = GenerationIntent.model_validate({**prose,
+        "reference_planning": {"facets": ["stable"], "director_coverage": _binding()}})
+    assert reference_authoring_issues(intent) == ("generation_intent.reference_planning.events[composition]",)
+    with pytest.raises(AiVideoError, match=r"events\[composition\]"):
+        require_reference_authoring(SimpleNamespace(generation_intent=intent))
+    ecommerce = SimpleNamespace(generation_intent=GenerationIntent.model_validate({**prose,
+        "reference_planning": {"facets": ["stable"]}}), commercial_execution_class="product_interaction")
+    with pytest.raises(AiVideoError, match=r"events\[composition\]"):
+        require_reference_authoring(ecommerce, commercial_binding=SimpleNamespace(ad_creative_plan_hash="a" * 64))
+    declared = GenerationIntent.model_validate({**prose,
+        "reference_planning": {"facets": ["stable"], "director_coverage": _binding(), "events": [REVEAL]}})
+    assert reference_authoring_issues(declared) == ()
+
+
+def test_legacy_v1_route_keeps_locked_camera_and_gates_prose_movement():
+    """A real v1 T2VA requirement cannot carry primary_camera_motion; locked stays valid."""
+    from tests.test_production_h3_prompt_zh import _legacy_t2va_requirement
+    planning = {"facets": ["stable"], "director_coverage": _binding()}
+    legacy = _legacy_t2va_requirement()
+    assert legacy.contract_version == "provider-neutral-video-requirement/1"
+    assert legacy.generation_intent.primary_camera_motion is None
+    locked = legacy.generation_intent.model_copy(
+        update={"reference_planning": ReferencePlanningIntent.model_validate(planning)})
+    require_reference_authoring(SimpleNamespace(generation_intent=locked))
+    moving = locked.model_copy(update={"camera_intent": locked.camera_intent.model_copy(
+        update={"movement": "slow push toward the doorway"})})
+    assert reference_authoring_issues(moving) == ("generation_intent.reference_planning.events[composition]",)

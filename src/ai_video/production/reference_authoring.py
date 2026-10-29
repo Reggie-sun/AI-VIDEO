@@ -16,9 +16,22 @@ _ROOT = "generation_intent.reference_planning"
 _UNCOMPILED = object()
 
 
+# Exact tokens the native compilers already accept as a locked or unauthored camera.
+_STILL_CAMERA_TOKENS = frozenset({"unspecified", "locked", "locked-off"})
+
+
 def _camera_moves(intent) -> bool:
+    """Structured motion decides when present; v1-v3 requirements cannot carry it.
+
+    Without ``primary_camera_motion`` any camera prose other than the exact still
+    tokens may describe movement, so the Director must state what it reveals. The
+    prose itself is never parsed for meaning.
+    """
     motion = intent.primary_camera_motion
-    return motion is not None and motion.movement_kind.value != "locked"
+    if motion is not None:
+        return motion.movement_kind.value != "locked"
+    camera = intent.camera_intent
+    return camera is not None and camera.movement not in _STILL_CAMERA_TOKENS
 
 
 def is_ecommerce_requirement(requirement, commercial_binding=None) -> bool:
