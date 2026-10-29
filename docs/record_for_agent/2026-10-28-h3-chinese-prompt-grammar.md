@@ -78,8 +78,8 @@ Date: 2026-10-28
   `GenerationRecipe`（强制可控 seed）与激活的 QA 验收策略；`runs/jieshi-e01-i2v-20260906-attempt01`
   与 `runs/jieshi-s01-h3-horizontal-20260906-001` 的 production root 因历史 MP4 缺失而 fail closed。
   后续实测应走 `GenerationFeedbackOrchestrator`，两组固定同一 seed。
-- `docs/v0.2-runtime-baseline.md` 在本会话期间被其他窗口暂存，未同步本次 runtime 变化，需由
-  baseline owner 后续补记。
+- 已同步 `docs/v0.2-runtime-baseline.md`（2026-10-28 条目）与
+  `docs/agent-primary-contract-matrix.md` 的 Provider-Neutral Generation Requirement 行。
 
 ## Agent Guardrails
 
