@@ -3,7 +3,7 @@ context_max_bytes: 24000
 documents:
   - path: AGENTS.md
     max_lines: 180
-    max_bytes: 14000
+    max_bytes: 16000
   - path: .agent/context/control-plane-playbook.md
     max_lines: 210
     max_bytes: 18000

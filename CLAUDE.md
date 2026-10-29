@@ -17,7 +17,7 @@
 
 ## Runtime Term Mapping
 
-`AGENTS.md`、playbook 与 Skill 以 Codex 术语书写；Claude Code 下按此表读取，职责、授权与 Gate 不变。
+`AGENTS.md` 已用中性术语（主会话 / 子代理 / 编排层）；playbook 与 Skill 仍以 Codex 术语书写，Claude Code 下按此表读取，职责、授权与 Gate 不变。
 
 | Codex 术语 | Claude Code 对应 |
 | --- | --- |
