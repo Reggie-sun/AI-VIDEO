@@ -81,6 +81,7 @@ Capability/model/profile/settings claims 重新核对 selected adapter、sealed 
 | Vidu | `VIDU_API_KEY` | `provider vidu`、`credential VIDU_API_KEY` |
 | MiniMax Speech | `MINIMAX_SPEECH_API_KEY` | `provider minimax-speech`、同名 credential |
 | MiniMax Speech CN | `MINIMAX_SPEECH_CN_API_KEY` | `provider minimax-speech`、同名 credential；仅 `https://api.minimaxi.com` |
+| ElevenLabs | `ELEVENLABS_API_KEY` | `provider elevenlabs`、同名 credential；仅 `https://api.elevenlabs.io` |
 
 不使用 `SEEDANCE_API_KEY` 或跨 Provider fallback；CN 不复制旧引用。细节见
 [Vidu](../../docs/vidu-provider.md)、[Speech](../../docs/minimax-speech.md)。

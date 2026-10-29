@@ -219,7 +219,8 @@ def require_voice_composition(project, spec, timeline):
                     or metadata.speaker_id != speaker.speaker_id
                     or metadata.script_hash != speaker.script_hash
                     or metadata.language != (speaker.language if route.route is VoiceRoute.NATIVE
-                                              else voice_provider_language(speaker.language))):
+                                              else voice_provider_language(speaker.language,
+                                                  handoff.voice_request.provider_kind))):
                 raise ValueError("voice composition asset differs from the selected generation request")
             spans = [s for s in timeline.audio_spans if s.track_id == handoff.track.track_id]
             if len(spans) != 1:

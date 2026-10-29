@@ -324,7 +324,6 @@ def test_valid_submit_maps_exact_request_and_receipts_without_real_network(monke
         "xi-api-key": secret,
     }
     assert json.loads(sent.body) == {
-        "language_code": "fr",
         "model_id": "eleven_multilingual_v2",
         "text": "Café.",
         "voice_settings": {

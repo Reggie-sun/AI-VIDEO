@@ -87,7 +87,9 @@ def _invalid(message: str) -> AiVideoError:
                         user_message=message, retryable=False)
 
 
-def prepare_minimax_speech_test_project(root: Path, batch: MiniMaxSpeechTestBatch) -> None:
+def prepare_minimax_speech_test_project(
+    root: Path, batch: MiniMaxSpeechTestBatch, *, title: str = "MiniMax Speech test",
+) -> None:
     """Create an independent, provenance-bound audio experiment, never copy a ledger."""
     root = Path(root).resolve()
     if (root / "project.yaml").exists():
@@ -105,7 +107,7 @@ def prepare_minimax_speech_test_project(root: Path, batch: MiniMaxSpeechTestBatc
                                  content_hash="0" * 64, creation_receipt_id=batch.policy_id,
                                  source_provenance=provenance, **values))
 
-    brief = artifact(ProductionBrief, "brief", title="MiniMax Speech test",
+    brief = artifact(ProductionBrief, "brief", title=title,
                      objective=batch.model_dump_json(), audience="Development",
                      format="Standalone WAV test", language=batch.language,
                      constraints=("No source project recovery or video acceptance",))
@@ -135,7 +137,7 @@ def prepare_minimax_speech_test_project(root: Path, batch: MiniMaxSpeechTestBatc
     refs = ProjectArtifactRefs(brief=ref(brief), story=ref(story), characters=(),
                                scenes=(ref(scene),), shots=(ref(shot),), storyboard=ref(storyboard))
     project = artifact(ProductionProject, "project", project_id=batch.batch_id,
-                       title="Independent MiniMax Speech test", default_language=batch.language,
+                       title="Independent " + title, default_language=batch.language,
                        delivery_profile=DeliveryProfile(width=1280, height=720, fps=24),
                        renderer_policy=RendererPolicy(), artifacts=refs)
     # A fixed one-pixel canvas satisfies the existing Project visual contract;

@@ -280,7 +280,7 @@ builder 枚举 NATIVE/SEPARATE，`generation_decision.py` 保持唯一 selector�
 旧字段缺省序列化/hash不变；voice route 的稳定 fit scope 不携带 mutable budget/readiness state。
 
 `voice_routing_handoff.py` 在调用既有 `ProductionStateCommitter.generate_voice_asset` 前验证
-当前视频/声音布局与 exact MiniMax request、preview、credential reference 和 materializer；
+当前视频/声音布局与 exact MiniMax / ElevenLabs request、preview、credential reference 和 materializer；
 不拥有 lifecycle、Provider 选择、购买、预算、activation 或 recovery。缺能力/证据、失败与
 unknown 必须停止，不能静音、切路线或混用 count-based voice / monetary video ledger。
 `voice_routing_execution.py` 只拥有 immutable envelope；`ProductionStateCommitter` 在既有

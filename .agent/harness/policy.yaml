@@ -263,6 +263,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_minimax_speech_batch.py, tests/test_production_voice_candidate.py, -q]
     cwd: .
     description: Verify MiniMax speech batch orchestration and voice candidate lifecycle.
+  elevenlabs_speech_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_elevenlabs.py, tests/test_production_elevenlabs_batch.py, tests/test_voice_routing_elevenlabs.py, -q]
+    cwd: .
+    description: Verify ElevenLabs transport, bounded speech execution, and selected voice routing.
   architecture_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_architecture_gate.py, tests/test_architecture_gate_cli.py, -q]
     cwd: .
@@ -476,6 +480,7 @@ checks:
       - harness_tests
       - local_comfyui_supervisor_tests
       - minimax_speech_batch_tests
+      - elevenlabs_speech_tests
       - architecture_tests
       - cli_config_tests
       - workflow_tests
@@ -1792,6 +1797,17 @@ categories:
       - tests/test_production_voice_candidate.py
     focused_check_ids: [minimax_speech_batch_tests]
     check_ids:
+      - minimax_speech_batch_tests
+      - task_architecture_gate
+  elevenlabs_speech:
+    patterns:
+      - scripts/elevenlabs_speech_batch.py
+      - src/ai_video/production/elevenlabs_batch.py
+      - tests/test_production_elevenlabs_batch.py
+      - tests/test_voice_routing_elevenlabs.py
+    focused_check_ids: [elevenlabs_speech_tests]
+    check_ids:
+      - elevenlabs_speech_tests
       - minimax_speech_batch_tests
       - task_architecture_gate
   aoci_project_cognition:

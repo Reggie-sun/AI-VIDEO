@@ -20,9 +20,13 @@ from ai_video.production.voice_routing_contracts import VoiceMode, VoiceRoute
 SHA256 = r"^[0-9a-f]{64}$"
 
 
-def voice_provider_language(language):
-    """Exact supported legacy MiniMax language labels; never guess variants."""
-    return {"en": "English", "zh": "Chinese"}.get(language)
+def voice_provider_language(language, provider_kind="minimax-speech"):
+    """Project language projected to the explicitly selected voice Provider."""
+    if provider_kind == "minimax-speech":
+        return {"en": "English", "zh": "Chinese"}.get(language)
+    if provider_kind == "elevenlabs":
+        return language if language in {"en", "zh"} else None
+    return None
 
 
 class VoiceAudioHandoff(StrictModel):
@@ -378,13 +382,22 @@ def build_voice_readiness(*, source, requirement, candidate, context, generation
         if request is None or preview is None:
             separate.append("EXACT_VOICE_REQUEST_REQUIRED")
             continue
-        if (request.provider_kind != "minimax-speech" or request.script_hash != speaker.script_hash
+        provider_supported = (
+            request.provider_kind == "minimax-speech"
+            and preview.destination in {"https://api.minimaxi.com", "https://api.minimax.io"}
+        ) or (
+            request.provider_kind == "elevenlabs"
+            and request.model_id == "eleven_multilingual_v2"
+            and preview.destination == "https://api.elevenlabs.io"
+            and request.output_sample_rate_hz == 48_000
+            and request.output_channels == 1
+        )
+        if (not provider_supported or request.script_hash != speaker.script_hash
                 or request.speaker_id != speaker.speaker_id
-                or request.language != voice_provider_language(speaker.language)
+                or request.language != voice_provider_language(speaker.language, request.provider_kind)
                 or handoff.track.asset_id != f"voice-{request.attempt_id}"
                 or request.audio_kind != handoff.track.audio_kind
                 or not speaker.voice_id or request.voice_id != speaker.voice_id
-                or preview.destination not in {"https://api.minimaxi.com", "https://api.minimax.io"}
                 or not handoff.credential_reference_id or not preview.timing_supported or not preview.output_supported):
             separate.append("VOICE_REQUEST_OR_CAPABILITY_CONFLICT")
         asset = next((a for a in final.registry.assets if a.asset_id == handoff.track.asset_id), None)
@@ -397,7 +410,7 @@ def build_voice_readiness(*, source, requirement, candidate, context, generation
                     or asset.egress is None or asset.egress.request_fingerprint != request.voice_request_fingerprint
                     or asset.audio_metadata.script_hash != speaker.script_hash
                     or asset.audio_metadata.speaker_id != speaker.speaker_id
-                    or asset.audio_metadata.language != voice_provider_language(speaker.language)
+                    or asset.audio_metadata.language != voice_provider_language(speaker.language, request.provider_kind)
                     or asset.audio_metadata.audio_kind != request.audio_kind
                     or asset.audio_metadata.voice_id != request.voice_id
                     or existing is None or existing.status.value != "succeeded"):

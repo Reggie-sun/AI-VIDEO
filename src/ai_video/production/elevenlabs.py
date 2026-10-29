@@ -647,13 +647,17 @@ class ElevenLabsVoiceProvider:
                 ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,
                 "A current one-use durable voice submit permit is required.",
             )
+        payload = {
+            "text": request.script_text,
+            "model_id": request.model_id,
+            "voice_settings": _voice_settings(request),
+        }
+        # Multilingual v2 detects language from text and does not support this
+        # wire parameter. The intended language remains sealed in the request.
+        if request.model_id != "eleven_multilingual_v2":
+            payload["language_code"] = request.language
         body = json.dumps(
-            {
-                "text": request.script_text,
-                "model_id": request.model_id,
-                "language_code": request.language,
-                "voice_settings": _voice_settings(request),
-            },
+            payload,
             ensure_ascii=False,
             sort_keys=True,
             separators=(",", ":"),
