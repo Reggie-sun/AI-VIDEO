@@ -18,7 +18,7 @@ Date: 2026-10-29
 - 导演证据按领域分开：剧情绑定 `reference_planning.director_coverage={coverage_hash, unit_id}`，当前 Project 供给时须是 Project／Shot provenance 中封存的 content-addressed authoring input 并通过结构校验；电商（`commercial_execution_class` 或 compiled `commercial_binding`）以 `ad_creative_plan_hash` 绑定 AdCreativePlan，禁止携带剧情 coverage。
 - Director coverage 结构校验只有一份实现：`src/ai_video/production/director_coverage.py`；`.agents/skills/open-video/scripts/validate_director_coverage.py` 只薄封装并加 open-video 作者检查（Runtime 不认 Skill 身份）。
 - Canvas `direction.director_coverages` 在 authoring 时封存 coverage；`docs/canvas-projects/subject-reference/project.json` 已按新规则补齐。`seedance-authoring` 不再维护第二份参考职责表；`open-video` 增加“画外声须有画面对应、配音先给用户试听”的规则。
-- 门禁只读结构化 `primary_camera_motion`；只写自由文本运镜不触发 composition 义务（已写入 `docs/shot-reference-planning.md`，列为后续）。提交前不再复核该门禁，与表演门禁先例一致；M0／source qualification 资格试验链不经过它。
+- 运镜判断（提交 `3e2d5f2` 更新）：有结构化 `primary_camera_motion` 时以其非 locked 判断；v1–v3 requirement 不能携带该字段，此时 `camera_intent.movement` 除精确 `unspecified`／`locked`／`locked-off` 外均按运动处理，须声明 composition event。首版曾要求所有运镜文字都声明结构化字段，独立审查发现会阻断 H3 T2VA v1 与 Vidu legacy 的 `locked`，已改为上述规则。提交前不再复核该门禁，与表演门禁先例一致；M0／source qualification 资格试验链不经过它，其产物不得交付属 advisory、暂无 Harness 检查。
 
 ## Session Work And Decisions
 
@@ -49,7 +49,7 @@ Date: 2026-10-29
 ## Remaining Risks Or Next Work
 
 - 宏观开场创作方向未定：用户否定 CITY-RISE 后，主会话提出“对讲每报一起、画面落到对应现场”的多镜方案，尚未获确认，也未按新门禁走 `open-video` 覆盖设计。
-- 自由文本运镜不触发 composition 义务；电商作业链与资格试验链的其他入口未纳入本门禁。
+- 已解决：自由文本运镜的 composition 义务（`3e2d5f2`，full receipt `.agent/harness/runs/20261029T201639076941Z/receipt.json`，8341 passed）。仍未纳入：资格试验链；Canvas preflight 报告尚不投影门禁问题，作者要到执行绑定创建时才发现缺项。
 - 是否在 ccam 共用配置启用 oh-my-claudecode 待用户决定。
 - RAG／检索索引未刷新。
 
