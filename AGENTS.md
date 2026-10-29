@@ -2,10 +2,6 @@
 
 本文件是 repository constitution，常驻 authority、安全、唯一 owner 与 completion；可执行约束归 Harness，细节按需加载。默认中文，path、command、API、schema、Skill 名保持原文。
 
-图像与视频实际提交的提示词必须纯中文，不得混入英文模板或字段标签；仅保留必要技术标识与素材引用语法，按实际请求正文核验。
-
-人物身份参考先读 [referces/README.md](referces/README.md)，由索引查找已有角色的身份底图、场次参考及使用状态；所有出场人物须先准备、查看并固定身份参考，后续制图与视频生成实际绑定并沿用同一身份锚点。
-
 ## Runtime Truth Sources
 
 | Concern | Canonical Source |
@@ -37,13 +33,7 @@
 
 ### Final-output-first / No-regression
 
-以原速声画成片验收，保留已满足的效果；先交片，用户认可后完整验证，通过再 commit/push；详见[成片优先](docs/canvas-continuous-production.md#formal-narrative-output-defaults)。
-
-原片认可后自动制作并验收字幕，句尾不加符号；每个新 Shot 合格后，自动拼接截至该镜的全部合格镜头交用户连续审看。
-
-单段认可不豁免拼接审查：复用素材须核对源时序、动作阶段及跨镜速度变化，接点未验证或已见失败时不得以技术通过替代声画连续性结论。
-
-商品广告生成与最终交付固定使用720p，不得自行升至1080p或4K；具体规格见[广告制作要求](.agents/skills/ecommerce-ad-workflow/SKILL.md#fixed-720p-output)。
+以原速声画成片验收，保留已满足的效果；先交片，用户认可后完整验证，通过再 commit/push。字幕时机与格式、逐镜累积审看和输出规格（含商品广告固定720p）见[成片优先](docs/canvas-continuous-production.md#formal-narrative-output-defaults)；单段认可不豁免拼接审查，接点与复用素材核验归 `open-video`。
 
 ### Empirical Validation Priority
 
@@ -74,9 +64,7 @@ real media/quality、Provider/model、continuity、regression/recovery、prior a
 首次 creative prompt/contract/script 前读取 [Creative Routing And Preflight](.agent/context/control-plane-playbook.md#1-creative-skill-routing-and-preflight)，再实际读取匹配 Skill、声明选择及影响。Live/paid preview/permit/POST 前报告 continuity、handoff、axis/action/camera、prompt adaptation、lint evidence，缺失停止；schema/操作由各 Skill 和 validators 独占。
 Blender 资产/参考制作先读 [routing](docs/blender-routing.md)；媒体实验/Pilot/成片交付先读 [Verification/Pilot](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details)；credential/paid/ceiling 续期先读 [Provider Details](.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)，授权边界仍由下文决定。
 
-每 Shot 按题材、表演/动作/空间/摄影目标、所选模型能力与已有成片证据选择必要的参考条件，不因具备白模制作能力而默认使用白模；选用[白模参考](docs/canvas-production-harness.md#per-shot-whitebox-reference)时核验并实际绑定，白模、参考图或长 Prompt 均不保证导演意图被执行，效果须由 exact 成片验证。
-
-摄影服从叙事与表演，生成按完整行动反应及模型能力分组定长，不默认短段或一镜一段、不强凑上限；修复保留已满足效果，不冻结机位剪辑。
+写图像/视频提示词或安排人物出场前读[提示词语言与人物身份](docs/canvas-continuous-production.md#prompt-language-and-character-identity)。每 Shot 按创作需要选择参考条件、不默认用白模，依据与制作见[参考选择](docs/canvas-production-harness.md#per-shot-whitebox-reference)；镜头覆盖、生成分组定长与修复取舍归 `open-video`。
 
 ## Agent Workflow Routing
 
