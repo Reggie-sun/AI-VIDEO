@@ -6,6 +6,8 @@ learning_eligibility: ineligible
 
 # AGENTS Constitution Routing Phase 1 Record
 
+> **Update（2026-10-28）**：第 2、3 步已完成（`b020b11`），见下文 "Phase 2 And 3"；原 "第 2、3 步未做" 为历史状态。
+
 Date: 2026-10-28
 
 ## Purpose
@@ -69,14 +71,37 @@ commit `69eaa9b` 只改两个文件：
 - 只跑了 focused 级别，未跑 related/full。
 - 已 push，远端 `main` = `69eaa9b7c4e7a15d6ac40079bfc6650c3a305dbd`。
 
+## Phase 2 And 3 — 2026-10-28
+
+同日完成第 2、3 步，commit `b020b11`，只改 `AGENTS.md`、`CLAUDE.md`、`.agent/harness/agent-rules.yaml`：
+
+- 第 2 步：前言定义中性术语「主会话」（Parent）、「子代理」、「编排层」（Codex 为 OMX，Claude Code 为 OMC）；
+  "Creative intent 归 Codex"、"全局 OMX"、"仅用 Codex 原生 Agent"、"OMX 只管理 Agent workflow state" 改为中性表述。
+  `CLAUDE.md` 映射表不缩减：playbook 与多个 Skill 仍用 `$plan`、`全局 OMX`、`Native Codex`、`apply_patch` 等词，
+  只把适用范围说明改为"`AGENTS.md` 已中性；playbook 与 Skill 仍以 Codex 术语书写"。
+- 第 3 步：各节改写为白话并补必要的"为什么"；章节标题保留，`<!-- aoci:begin/end -->` 块未改；
+  "Community Reference And Workflow Improvement" 并入 "Empirical Validation Priority"（两节重叠，仓库内仅历史 record 以文字提及）。
+  测试断言的原文短语保留在新句子里，未改测试。
+- 字节上限：白话版约 14100 bytes，超出 14000；三轮逐句压缩收效很小（中文每字 3 bytes），继续压只能删"为什么"，
+  余量会再次归零。用户选择把 `AGENTS.md` 上限从 14000 提到 16000。结果 153 → 155 行、12966 → 14684 bytes。
+
+## Phase 2 And 3 Verification
+
+- 独立 reviewer（`oh-my-claudecode:critic`，只读）按新旧条款逐条比对：首轮 REQUEST_CHANGES，6 MAJOR + 11 MINOR，
+  均为压缩措辞导致的义务丢失或条件收窄/放宽（如 snapshot/receipt 义务、Empirical 合并后的触发范围、
+  "unrelated" 被写成"别人"、development worktree、No-regression 只剩修复、付费授权去掉"付费"）；全部采纳修复。
+  复审剩 2 处 MINOR（模型质量分支缺"结果可知"、"不得复制推导"范围被缩短），修复后按 reviewer 约定复跑检查即判 APPROVE。
+- `agent_rules_gate` ok；`docs_contract_gate` passed；断言 `AGENTS.md` 的测试与 harness 测试组 361 passed。
+- Harness focused（commit range `5d68c58..b020b11`）passed，receipt `.agent/harness/runs/20261029T012709106196Z/receipt.json`（gitignored，仅本地）。
+  未跑 related/full。
+- 已 push，远端 `main` = `b020b11098dbca1a955e28bd94c7224bf410418e`。
+- 未在 Codex 运行时实际加载验证；仅静态确认前言写明 Codex 编排层为 OMX。
+
 ## Remaining Risks Or Next Work
 
-- 第 2 步（未做）：`AGENTS.md` 改用中性运行时术语，缩短 `CLAUDE.md` 映射表；Codex 直接读取 `AGENTS.md`，两侧都需验证。
-- 第 3 步（未做）：剩余各节改为"做什么 + 为什么"的白话；保持 14000 bytes 上限不变。
-- 以下测试按原文断言 `AGENTS.md`，改写措辞时需同步：`test_distill_ai_video_learning_skill.py`（Completion Standard）、
-  `test_seedance_authoring_skill.py`（Task Routing 两句）、`test_ecommerce_ad_workflow_skill.py`（Per-Shot Gate）。
-- playbook 也已接近上限，规则无法改搬进 playbook；新家只能是按需加载的 Skill 或 docs。
-- OMC 在 `work2` 不可用的问题仍未处理。
+- playbook（17681/18000 bytes）仍用 Codex 术语且接近上限，未处理；`CLAUDE.md` 映射表因此仍需保留。
+- 未保存逐条新旧条款对照表；等价性证据仅为 reviewer 两轮结论与本节摘要。
+- `work2` 的 OMC 问题在本会话后段已由用户修复（会话重启后 OMC agent 可用），未由本任务改动。
 
 ## Agent Guardrails
 
