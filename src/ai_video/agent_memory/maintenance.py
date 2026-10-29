@@ -21,7 +21,6 @@ REFRESHABLE_KINDS = frozenset(
         "current_docs",
         "research",
         "deferred",
-        "run_summaries",
     }
 )
 
@@ -29,7 +28,6 @@ REFRESHABLE_KINDS = frozenset(
 @dataclass(frozen=True)
 class RefreshRequest:
     index_root: str
-    runs_index_path: str
     corpus_roots: Mapping[str, str]
     desired_sources: Mapping[str, str]
     embedding_backend: str
@@ -57,7 +55,6 @@ class RefreshRequest:
             )
         return RefreshRequest(
             index_root=str(Path(self.index_root).resolve()),
-            runs_index_path=str(Path(self.runs_index_path).resolve()),
             corpus_roots=roots,
             desired_sources=desired,
             embedding_backend=self.embedding_backend,

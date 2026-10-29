@@ -16,6 +16,7 @@ from langchain_core.embeddings import Embeddings
 from ai_video.agent_memory.config import DEFAULT_EMBED_BATCH_SIZE
 from ai_video.agent_memory.corpus import CorpusSpec
 from ai_video.agent_memory.index import (
+    EmbeddingBudget,
     build_scoped_index,
     index_activation_lock,
     index_exists,
@@ -152,8 +153,16 @@ def build_project_indexes(
     embedding: Embeddings,
     *,
     batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
+    embedding_budget: EmbeddingBudget | None = None,
+    wait: bool = True,
+    reuse: bool = True,
 ) -> dict[str, int]:
-    """Build requested corpus shards; legacy roots migrate only as a full set."""
+    """Build requested corpus shards; legacy roots migrate only as a full set.
+
+    ``embedding_budget``, ``wait``, and ``reuse`` apply to refreshes of existing
+    shards (see ``build_scoped_index``). A bounded or non-waiting caller never
+    starts a first-time or legacy migration, which always embeds everything.
+    """
     if not corpora:
         raise ValueError("at least one project corpus is required")
     kinds = tuple(item.kind for item in corpora)
@@ -169,6 +178,11 @@ def build_project_indexes(
             raise FileNotFoundError(f"corpus not found: {corpus.root}")
 
     legacy = index_exists(root)
+    if (embedding_budget is not None or not wait) and (legacy or not root.exists()):
+        raise MissingProjectIndexError(
+            f"No sharded Agent Memory index at {root}; a full migration build is required",
+            kinds=kinds,
+        )
     if legacy and set(kinds) != set(PROJECT_CORPUS_KINDS):
         raise LegacyProjectIndexError(
             f"legacy shared Agent Memory index at {root}; "
@@ -183,6 +197,9 @@ def build_project_indexes(
                 shard_path(root, corpus.kind),
                 embedding,
                 batch_size=batch_size,
+                embedding_budget=embedding_budget,
+                wait=wait,
+                reuse=reuse,
             )
         return counts
 

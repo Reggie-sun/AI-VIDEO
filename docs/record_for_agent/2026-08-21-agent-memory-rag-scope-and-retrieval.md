@@ -2,6 +2,13 @@
 
 Date: 2026-08-21
 
+> **Supersession notice（2026-10-29）**：下文的 auto-generated run-summary lane（`.agent/memory/run-summaries`、
+> `--runs-root/--runs-index`、`run_*` Hit 字段）已移除；`docs/superpowers/plans/`、`artifacts/` 与
+> `retrieval: retired` 文档不再索引；"前台不 re-embedding / 不 materialize"已改为最多 64 个新 chunk 的
+> 有界前台增量刷新，超出才走 detached queue；每文档至多返回一个片段。见
+> [Corpus Pruning And Incremental Refresh](2026-10-29-agent-memory-corpus-pruning-and-incremental-refresh.md)。
+> 五个 main corpora、authority、admission gate、scope quota 与 dense calibration 描述仍有效。
+
 ## Purpose
 
 本文记录 AI-VIDEO Agent Memory RAG 的当前定位、触发条件、匹配规则、适用边界与维护

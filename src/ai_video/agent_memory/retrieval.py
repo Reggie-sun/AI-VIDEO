@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from contextlib import ExitStack
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence
@@ -32,7 +31,6 @@ from ai_video.agent_memory.index import (
     validate_index_path,
     validate_library_rebuild_candidate,
     validate_materialized_index,
-    validate_run_summary_index,
     validate_scoped_index,
 )
 from ai_video.agent_memory.layout import (
@@ -65,12 +63,6 @@ class Hit:
     authority: str = "advisory_experience"
     document_kind: str = "experience_record"
     status: str = ""
-    # Auto-generated run-summary fields. ``run_id``/``run_family``/``run_version``
-    # and ``summary_sha256`` are populated only for ``run_summary`` hits.
-    run_id: str = ""
-    run_family: str = ""
-    run_version: int = 0
-    summary_sha256: str = ""
     chunk_id: str = ""
     dense_score: Optional[float] = None
     lexical_score: float = 0.0
@@ -144,8 +136,6 @@ def _authority_label(corpus_kind: str, authority: str) -> str:
         return "authority: current project document advisory; re-open source"
     if corpus_kind == "superpowers":
         return "authority: historical design/plan; not runtime truth"
-    if corpus_kind == "run_summaries":
-        return "authority: auto-generated run summary advisory (not runtime truth)"
     return "authority: advisory experience"
 
 
@@ -256,8 +246,6 @@ def retrieve_project(
     index_root: Path,
     embedding=None,
     allow_stale: bool = False,
-    runs_corpus: Optional[CorpusSpec] = None,
-    runs_index_path: Optional[Path] = None,
 ) -> RetrievalResult:
     """Search canonical per-corpus shards without materializing or enqueueing."""
     if top_k < 1:
@@ -283,23 +271,6 @@ def retrieve_project(
         for corpus in selected
         if not leaves[corpus.kind].exists()
     ]
-    run_spec = (
-        runs_corpus
-        if runs_corpus is not None
-        and scope in {"experience", "all"}
-        and runs_corpus.root.is_dir()
-        else None
-    )
-    run_leaf: Path | None = None
-    if run_spec is not None:
-        run_leaf = Path(runs_index_path or ".agent/memory/run-summaries")
-        validate_index_path(
-            run_leaf,
-            (Path(index_root), run_spec.root, *(item.root for item in selected)),
-            label="run-summary index",
-        )
-        if not run_leaf.exists():
-            missing_kinds.append("run_summaries")
     if missing_kinds:
         raise MissingProjectIndexError(
             f"Missing Agent Memory shard(s): {', '.join(missing_kinds)}",
@@ -307,33 +278,16 @@ def retrieve_project(
         )
     embedding = embedding or build_embedding()
     library_incompatible_kinds: list[str] = []
-    version_leaves = [(item.kind, leaves[item.kind]) for item in selected]
-    if run_spec is not None:
-        assert run_leaf is not None
-        version_leaves.append(("run_summaries", run_leaf))
-    for kind, leaf in version_leaves:
-        matching_corpora = (
-            (run_spec,)
-            if kind == "run_summaries"
-            else tuple(item for item in selected if item.kind == kind)
-        )
+    for corpus in selected:
+        leaf = leaves[corpus.kind]
         with index_activation_lock(leaf, exclusive=False):
             try:
-                if kind == "run_summaries":
-                    assert run_spec is not None
-                    validate_run_summary_index(leaf, run_spec, embedding)
-                else:
-                    validate_scoped_index(matching_corpora, leaf, embedding)
+                validate_scoped_index((corpus,), leaf, embedding)
             except LibraryVersionMismatchError:
-                validate_library_rebuild_candidate(
-                    matching_corpora,
-                    leaf,
-                    embedding,
-                )
-                library_incompatible_kinds.append(kind)
+                validate_library_rebuild_candidate((corpus,), leaf, embedding)
+                library_incompatible_kinds.append(corpus.kind)
             except StaleIndexError:
-                if kind == "run_summaries":
-                    validate_materialized_index(leaf, embedding, (kind,))
+                pass
             finally:
                 release_index_client(leaf)
     if library_incompatible_kinds:
@@ -389,53 +343,6 @@ def retrieve_project(
             finally:
                 release_index_client(leaf)
 
-    if run_spec is not None:
-        assert run_leaf is not None
-        with index_activation_lock(run_leaf, exclusive=False):
-            freshness = "fresh"
-            try:
-                manifest = validate_run_summary_index(run_leaf, run_spec, embedding)
-            except LibraryVersionMismatchError as exc:
-                validate_library_rebuild_candidate((run_spec,), run_leaf, embedding)
-                raise LibraryVersionMismatchError(
-                    kinds=exc.kinds or ("run_summaries",)
-                ) from exc
-            except StaleIndexError:
-                if not allow_stale:
-                    raise
-                try:
-                    manifest = validate_materialized_index(
-                        run_leaf,
-                        embedding,
-                        ("run_summaries",),
-                    )
-                except LibraryVersionMismatchError as exc:
-                    validate_library_rebuild_candidate(
-                        (run_spec,),
-                        run_leaf,
-                        embedding,
-                    )
-                    raise LibraryVersionMismatchError(
-                        kinds=exc.kinds or ("run_summaries",)
-                    ) from exc
-                freshness = "stale"
-                stale_kinds.append("run_summaries")
-            try:
-                run_hits = _query_leaf(
-                    query=query,
-                    query_vector=query_vector,
-                    null_query_vector=null_query_vector,
-                    index_path=run_leaf,
-                    embedding=embedding,
-                    manifest=manifest,
-                    corpus_kind="run_summaries",
-                    limit=top_k,
-                    freshness=freshness,
-                )
-                hits.extend(run_hits)
-            finally:
-                release_index_client(run_leaf)
-
     ordered = sorted(hits, key=_hit_sort_key, reverse=True)[:top_k]
     return RetrievalResult(
         hits=tuple(ordered),
@@ -451,32 +358,11 @@ def search(
     embedding=None,
     scope: str = "experience",
     corpora: Optional[Sequence[CorpusSpec]] = None,
-    *,
-    runs_corpus: Optional[CorpusSpec] = None,
-    runs_index_path: Optional[Path] = None,
 ) -> List[Hit]:
-    """Run the strict leaf-index API under shared activation locks."""
+    """Run the strict leaf-index API under a shared activation lock."""
     idx_path = Path(index_path or ".agent/memory/index")
-    run_path = Path(runs_index_path or ".agent/memory/run-summaries")
-    lock_runs = (
-        runs_corpus is not None
-        and scope in {"experience", "all"}
-        and runs_corpus.root.is_dir()
-    )
-    if lock_runs:
-        protected = [
-            idx_path,
-            runs_corpus.root,
-            *(item.root for item in (corpora or ())),
-        ]
-        if corpus_root is not None:
-            protected.append(Path(corpus_root))
-        validate_index_path(run_path, tuple(protected), label="run-summary index")
     resolved_embedding = embedding or build_embedding()
-    with ExitStack() as locks:
-        locks.enter_context(index_activation_lock(idx_path, exclusive=False))
-        if lock_runs:
-            locks.enter_context(index_activation_lock(run_path, exclusive=False))
+    with index_activation_lock(idx_path, exclusive=False):
         try:
             return _search_unlocked(
                 query,
@@ -486,13 +372,9 @@ def search(
                 embedding=resolved_embedding,
                 scope=scope,
                 corpora=corpora,
-                runs_corpus=runs_corpus,
-                runs_index_path=run_path,
             )
         finally:
             release_index_client(idx_path)
-            if lock_runs:
-                release_index_client(run_path)
 
 
 def _search_unlocked(
@@ -503,9 +385,6 @@ def _search_unlocked(
     embedding=None,
     scope: str = "experience",
     corpora: Optional[Sequence[CorpusSpec]] = None,
-    *,
-    runs_corpus: Optional[CorpusSpec] = None,
-    runs_index_path: Optional[Path] = None,
 ) -> List[Hit]:
     """Return up to top-K hits meeting the inclusive relevance threshold.
 
@@ -514,8 +393,7 @@ def _search_unlocked(
     identity-mismatched indexes fail closed and require an explicit build.
     Corpus freshness is also validated when the caller supplies ``corpora`` or
     ``corpus_root``; root-free legacy calls can validate only manifest identity
-    and physical completeness. Superpowers-only scope never opens the
-    run-summary index.
+    and physical completeness.
     """
     if top_k < 1:
         raise ValueError("top_k must be positive")
@@ -524,9 +402,6 @@ def _search_unlocked(
         raise ValueError(f"unknown Agent Memory scope: {scope!r}")
     embedding = embedding or build_embedding()
     idx_path = Path(index_path or ".agent/memory/index")
-    runs_index_path = Path(
-        runs_index_path or ".agent/memory/run-summaries"
-    )
     allowed_kinds = (
         set(_ALL_SCOPE_ORDER) if scope == "all" else {scope}
     )
@@ -544,42 +419,6 @@ def _search_unlocked(
             idx_path,
             embedding,
             requested_kinds,
-        )
-
-    # Run-summary inclusion is opt-in via an explicit ``runs_corpus``.
-    # When the caller does not provide one we leave the search scoped to
-    # experience / superpowers so historical callers that never asked
-    # for run-summary retrieval keep their previous behaviour.  The CLI
-    # passes the default ``runs_corpus`` explicitly so end users still
-    # benefit from retrieval when an explicit build has materialized that
-    # index; missing roots contribute zero hits. This avoids silently indexing
-    # the repository's real ``runs/`` directory for callers that intentionally
-    # kept their search run-free.
-    run_spec = (
-        runs_corpus
-        if runs_corpus is not None
-        and scope in {"experience", "all"}
-        and runs_corpus.root.is_dir()
-        else None
-    )
-    runs_manifest: IndexManifest | None = None
-    if run_spec is not None:
-        protected_paths = [
-            idx_path,
-            run_spec.root,
-            *(item.root for item in (corpora or ())),
-        ]
-        if corpus_root is not None:
-            protected_paths.append(Path(corpus_root))
-        validate_index_path(
-            runs_index_path,
-            tuple(protected_paths),
-            label="run-summary index",
-        )
-        runs_manifest = validate_run_summary_index(
-            runs_index_path,
-            run_spec,
-            embedding,
         )
 
     try:
@@ -630,23 +469,6 @@ def _search_unlocked(
             raise IndexMismatchError(
                 f"index collection for scope {kind!r} is unavailable; rebuild required"
             ) from exc
-
-    # When the caller opted into run-summary inclusion, query the
-    # separate run-summary index so auto-generated run notes surface
-    # in the same ranked hit list without manual copying.
-    if run_spec is not None:
-        assert runs_manifest is not None
-        hits.extend(
-            _search_runs(
-                query,
-                top_k,
-                runs_index_path,
-                embedding,
-                manifest=runs_manifest,
-                query_vector=query_vector,
-                null_query_vector=null_query_vector,
-            )
-        )
 
     return sorted(hits, key=_hit_sort_key, reverse=True)[:top_k]
 
@@ -824,10 +646,6 @@ def _search_collection(
                 authority=str(md.get("authority", default_authority)),
                 document_kind=str(md.get("document_kind", "")),
                 status=str(md.get("status", "")),
-                run_id=str(md.get("run_id", "")),
-                run_family=str(md.get("run_family", "")),
-                run_version=int(md.get("run_version", 0) or 0),
-                summary_sha256=str(md.get("summary_sha256", "")),
                 chunk_id=chunk_id,
                 dense_score=dense_score,
                 lexical_score=lexical_score,
@@ -852,58 +670,16 @@ def _search_collection(
                 ),
             )
         )
-    return sorted(hits, key=_hit_sort_key, reverse=True)[:limit]
-
-
-def _search_runs(
-    query: str,
-    top_k: int,
-    runs_index_path: Path,
-    embedding,
-    *,
-    manifest: IndexManifest,
-    query_vector: Sequence[float],
-    null_query_vector: Sequence[float],
-) -> List[Hit]:
-    """Search the validated run-summary index or fail closed."""
-    runs_index_path = Path(runs_index_path)
-    if not runs_index_path.exists() or not (
-        runs_index_path / "chroma.sqlite3"
-    ).is_file() or not (runs_index_path / "manifest.json").is_file():
-        raise IndexMismatchError("run-summary index disappeared during search")
-    try:
-        store = load_index(runs_index_path, embedding)
-    except Exception as exc:
-        raise IndexMismatchError(
-            "cannot open the current run-summary index"
-        ) from exc
-    if store is None:
-        raise IndexMismatchError("run-summary index disappeared during search")
-    indexed = {item.kind: item for item in manifest.corpora}
-    item = indexed.get("run_summaries")
-    if item is None:
-        raise IndexMismatchError("run-summary collection is missing from its index")
-    try:
-        collection = store.get_collection(item.collection_name)
-        available = collection.count()
-        if available != item.chunk_count:
-            raise IndexMismatchError("run-summary collection changed during search")
-        if available == 0:
-            return []
-        return _search_collection(
-            query=query,
-            query_vector=query_vector,
-            null_query_vector=null_query_vector,
-            collection=collection,
-            available=available,
-            limit=top_k,
-            corpus_kind="run_summaries",
-            default_authority=item.authority,
-        )
-    except Exception as exc:
-        raise IndexMismatchError(
-            "run-summary index collection is unavailable"
-        ) from exc
+    # One hit per document: callers reopen ``source`` anyway, and repeated
+    # chunks of one file would crowd distinct documents out of the quota.
+    best_per_source: List[Hit] = []
+    seen_sources: set[str] = set()
+    for hit in sorted(hits, key=_hit_sort_key, reverse=True):
+        if hit.source in seen_sources:
+            continue
+        seen_sources.add(hit.source)
+        best_per_source.append(hit)
+    return best_per_source[:limit]
 
 
 def format_text(hits: Iterable[Hit]) -> str:
@@ -936,14 +712,6 @@ def format_text(hits: Iterable[Hit]) -> str:
             lines.append(
                 "   classification only; not evidence independence or admission"
             )
-        if h.corpus_kind == "run_summaries":
-            lines.append(f"   run_id: {h.run_id}")
-            if h.run_family:
-                lines.append(f"   run_family: {h.run_family}")
-            if h.run_version:
-                lines.append(f"   run_version: {h.run_version}")
-            if h.summary_sha256:
-                lines.append(f"   summary_sha256: {h.summary_sha256}")
         breadcrumb = [s for s in (h.h1, h.h2, h.h3) if s]
         if breadcrumb:
             lines.append(f"   section: {' > '.join(breadcrumb)}")

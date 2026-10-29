@@ -10,10 +10,6 @@ DEFAULT_SUPERPOWERS_ROOT: str = "docs/superpowers"
 # through three authority-separated collections.  Current docs are limited to
 # top-level Markdown; research and deferred decisions use their named folders.
 DEFAULT_DOCS_ROOT: str = "docs"
-# Auto-generated runs/<run_id>/SUMMARY.md files live alongside the Legacy
-# runtime. They are indexed into a *separate* derived collection so they
-# never piggyback on the experience corpus or change the main index.
-DEFAULT_RUNS_ROOT: str = "runs"
 DEFAULT_SCOPE: str = "experience"
 VALID_SCOPES: tuple[str, ...] = ("experience", "superpowers", "all")
 
@@ -21,13 +17,10 @@ VALID_SCOPES: tuple[str, ...] = ("experience", "superpowers", "all")
 # contained Chroma shard. The root is derived local state and is never
 # committed to Git (see .gitignore).
 DEFAULT_INDEX_PATH: str = ".agent/memory/index"
-# Run summaries remain a separate one-corpus shard for CLI compatibility.
-DEFAULT_RUNS_INDEX_PATH: str = ".agent/memory/run-summaries"
 
 # Chroma collection name. Stable across rebuilds.
 DEFAULT_COLLECTION: str = "agent_memory_experience"
 SUPERPOWERS_COLLECTION: str = "agent_memory_superpowers"
-RUN_SUMMARIES_COLLECTION: str = "agent_memory_run_summaries"
 
 # Agent-facing Top-N. ``DEFAULT_TOP_K`` remains the public CLI compatibility
 # name for the existing ``--top-k`` option.
@@ -53,6 +46,13 @@ DENSE_NULL_QUERY_CJK: str = "与输入无关的随机问题_68243"
 DENSE_MIN_NULL_EXCESS: float = 0.005
 DENSE_MIN_TOP1_MARGIN: float = 0.0015
 LEXICAL_MIN_QUERY_COVERAGE: float = 0.3
+
+# A search that finds stale shards refreshes them in the foreground only while
+# their new chunks fit this budget, shared across all shards of the search
+# (~0.12 s per chunk on the pinned local model, plus a few seconds per shard to
+# rewrite its staging copy); larger refreshes go to the detached queue and
+# return tagged last-good fragments instead.
+FOREGROUND_REFRESH_MAX_NEW_CHUNKS: int = 64
 
 # Default embedding backend. Choices:
 #   "local" -> LocalOnnxMiniLMEmbeddings (offline, requires the local model dir).

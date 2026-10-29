@@ -12,10 +12,12 @@ import tempfile
 import threading
 import uuid
 from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
 
 import chromadb
+import numpy as np
 from chromadb.api.client import SharedSystemClient
 from chromadb.config import Settings
 from langchain_core.embeddings import Embeddings
@@ -32,11 +34,49 @@ from ai_video.agent_memory.manifest import (
     create_manifest,
     corpus_digest,
     read_manifest,
-    run_summary_digest,
     validate_library_rebuild_candidate_manifest,
     validate_manifest,
     write_manifest,
 )
+
+
+# Chroma accepts large add/get batches; these sizes only bound memory per call.
+_REUSE_FETCH_BATCH = 1000
+_ADD_BATCH = 512
+
+
+class IndexBuildInProgressError(RuntimeError):
+    """Raised when a non-waiting build finds another builder holding the shard."""
+
+
+class RefreshBudgetExceededError(RuntimeError):
+    """Raised before embedding when a bounded refresh needs too many new chunks."""
+
+    def __init__(self, *, new_chunks: int, limit: int) -> None:
+        super().__init__(
+            f"refresh needs {new_chunks} new chunk embeddings; "
+            f"{limit} remain in this refresh budget"
+        )
+        self.new_chunks = new_chunks
+        self.limit = limit
+
+
+@dataclass
+class EmbeddingBudget:
+    """Cap on new chunk embeddings, shared across every shard one caller refreshes."""
+
+    remaining: int
+
+    def reserve(self, new_chunks: int) -> None:
+        if new_chunks > self.remaining:
+            raise RefreshBudgetExceededError(
+                new_chunks=new_chunks,
+                limit=self.remaining,
+            )
+        self.remaining -= new_chunks
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 _IN_PROCESS_ACTIVATION_LOCKS: dict[str, threading.RLock] = {}
@@ -75,13 +115,21 @@ def index_activation_lock(index_path: Path, *, exclusive: bool):
 
 
 @contextmanager
-def _index_build_lock(index_path: Path):
+def _index_build_lock(index_path: Path, *, wait: bool = True):
     """Serialize builders without blocking readers during staging work."""
     index_path = Path(index_path)
     index_path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = index_path.parent / f".{index_path.name}.build.lock"
     with lock_path.open("a+b") as handle:
-        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            fcntl.flock(
+                handle.fileno(),
+                fcntl.LOCK_EX if wait else fcntl.LOCK_EX | fcntl.LOCK_NB,
+            )
+        except BlockingIOError as exc:
+            raise IndexBuildInProgressError(
+                f"another Agent Memory build holds {index_path}"
+            ) from exc
         try:
             yield
         finally:
@@ -100,14 +148,19 @@ def _client(index_path: Path):
 
 
 def _release_cached_client(index_path: Path) -> None:
-    """Stop Chroma's path-scoped system before replacing its SQLite directory."""
+    """Stop Chroma's path-scoped system before replacing its SQLite directory.
+
+    A system that failed to open (for example over a corrupt SQLite file) can
+    raise from ``stop()``; dropping it from the cache is still the only safe
+    outcome, so release never masks the caller's own error or recovery build.
+    """
     identifier = str(Path(index_path))
-    system = SharedSystemClient._identifier_to_system.get(identifier)
+    system = SharedSystemClient._identifier_to_system.pop(identifier, None)
     if system is not None:
         try:
             system.stop()
-        finally:
-            SharedSystemClient._identifier_to_system.pop(identifier, None)
+        except Exception:
+            pass
 
 
 def release_index_client(index_path: Path) -> None:
@@ -124,11 +177,21 @@ def index_exists(index_path: Path) -> bool:
 
 
 def _chunk_id(corpus: CorpusSpec, chunk) -> str:
+    """Hash a chunk by corpus, root-relative path, position, and text.
+
+    ``source`` metadata is relative to the caller's working directory; ids use
+    the corpus-root-relative path so vector reuse survives a different cwd.
+    """
     metadata = chunk.metadata
+    source = Path(str(metadata.get("source", "")))
+    try:
+        locator = source.resolve().relative_to(Path(corpus.root).resolve()).as_posix()
+    except (OSError, ValueError):
+        locator = str(source)
     seed = "\0".join(
         (
             corpus.kind,
-            str(metadata.get("source", "")),
+            locator,
             str(metadata.get("chunk_index", "")),
             chunk.page_content,
         )
@@ -155,44 +218,124 @@ def validate_index_path(
                 f"{label} path must not overlap protected path: "
                 f"{resolved_index} vs {resolved_protected}"
             )
+def _reusable_embeddings(
+    index_path: Path,
+    corpus: CorpusSpec,
+    embedding: Embeddings,
+    chunk_ids: Sequence[str],
+) -> dict[str, np.ndarray]:
+    """Return stored vectors for unchanged chunks of a compatible active shard.
+
+    Chunk ids hash corpus kind, corpus-root-relative path, position, and text,
+    so a stored vector is reusable only when the manifest proves the same
+    schema, embedding model, chunking, and library versions. Any doubt falls
+    back to re-embedding.
+    """
+    index_path = Path(index_path)
+    if not chunk_ids or not index_exists(index_path):
+        return {}
+    try:
+        manifest = read_manifest(index_path)
+        validate_manifest(manifest, (), embedding)
+    except IndexMismatchError as exc:
+        _LOGGER.info("not reusing vectors from %s: %s", index_path, exc)
+        return {}
+    item = {entry.kind: entry for entry in manifest.corpora}.get(corpus.kind)
+    if item is None or item.collection_name != corpus.collection_name:
+        return {}
+    reused: dict[str, np.ndarray] = {}
+    with index_activation_lock(index_path, exclusive=False):
+        try:
+            collection = _client(index_path).get_collection(item.collection_name)
+            for start in range(0, len(chunk_ids), _REUSE_FETCH_BATCH):
+                stored = collection.get(
+                    ids=list(chunk_ids[start : start + _REUSE_FETCH_BATCH]),
+                    include=["embeddings"],
+                )
+                # Chroma returns rows in storage order, so pair each vector
+                # with its returned id rather than the requested position.
+                for chunk_id, vector in zip(stored["ids"], stored["embeddings"]):
+                    reused[str(chunk_id)] = np.asarray(vector, dtype=np.float32)
+        except Exception as exc:
+            _LOGGER.warning(
+                "cannot reuse vectors from %s; re-embedding (%s: %s)",
+                index_path,
+                type(exc).__name__,
+                exc,
+            )
+            return {}
+        finally:
+            _release_cached_client(index_path)
+    return reused
+
+
 def _build_staging_index(
     corpora: Sequence[CorpusSpec],
     staging_path: Path,
     embedding: Embeddings,
     batch_size: int,
+    *,
+    reuse_from: Path | None = None,
+    embedding_budget: EmbeddingBudget | None = None,
 ) -> tuple[int, IndexManifest]:
-    client = _client(staging_path)
-    total = 0
-    chunk_counts: dict[str, int] = {}
-    corpus_identities: dict[str, tuple[str, int]] = {}
+    planned = []
     for corpus in corpora:
-        collection = client.get_or_create_collection(
-            name=corpus.collection_name,
-            metadata={"hnsw:space": "cosine", "corpus_kind": corpus.kind},
-        )
         documents, source_sha256, document_count = load_document_snapshot(
             corpus.root,
             corpus=corpus,
         )
-        corpus_identities[corpus.kind] = (source_sha256, document_count)
         chunks = chunk_documents(documents)
+        ids = [_chunk_id(corpus, item) for item in chunks]
+        reused = (
+            _reusable_embeddings(reuse_from, corpus, embedding, ids)
+            if reuse_from is not None
+            else {}
+        )
+        identity = (source_sha256, document_count)
+        planned.append((corpus, chunks, ids, reused, identity))
+    new_chunks = sum(
+        1
+        for _, _, ids, reused, _ in planned
+        for chunk_id in ids
+        if chunk_id not in reused
+    )
+    if embedding_budget is not None:
+        embedding_budget.reserve(new_chunks)
+
+    client = _client(staging_path)
+    total = 0
+    chunk_counts: dict[str, int] = {}
+    corpus_identities: dict[str, tuple[str, int]] = {}
+    for corpus, chunks, ids, reused, identity in planned:
+        corpus_identities[corpus.kind] = identity
         chunk_counts[corpus.kind] = len(chunks)
         total += len(chunks)
-        for start in range(0, len(chunks), batch_size):
-            batch = chunks[start : start + batch_size]
-            texts = [item.page_content for item in batch]
+        collection = client.get_or_create_collection(
+            name=corpus.collection_name,
+            metadata={"hnsw:space": "cosine", "corpus_kind": corpus.kind},
+        )
+        missing = [
+            index for index, chunk_id in enumerate(ids) if chunk_id not in reused
+        ]
+        vectors = {chunk_id: reused[chunk_id] for chunk_id in ids if chunk_id in reused}
+        for start in range(0, len(missing), batch_size):
+            batch = missing[start : start + batch_size]
+            embedded = embedding.embed_documents(
+                [chunks[index].page_content for index in batch]
+            )
+            for index, vector in zip(batch, embedded):
+                vectors[ids[index]] = np.asarray(vector, dtype=np.float32)
+        for start in range(0, len(chunks), _ADD_BATCH):
+            batch_chunks = chunks[start : start + _ADD_BATCH]
+            batch_ids = ids[start : start + _ADD_BATCH]
             collection.add(
-                ids=[_chunk_id(corpus, item) for item in batch],
-                documents=texts,
-                metadatas=[dict(item.metadata) for item in batch],
-                embeddings=embedding.embed_documents(texts),
+                ids=batch_ids,
+                documents=[item.page_content for item in batch_chunks],
+                metadatas=[dict(item.metadata) for item in batch_chunks],
+                embeddings=[vectors[chunk_id] for chunk_id in batch_ids],
             )
     for corpus in corpora:
-        if corpus.kind == "run_summaries":
-            current = run_summary_digest(corpus.root)
-        else:
-            current = corpus_digest(corpus.root, corpus)
-        if current != corpus_identities[corpus.kind]:
+        if corpus_digest(corpus.root, corpus) != corpus_identities[corpus.kind]:
             raise IndexMismatchError(
                 f"corpus {corpus.kind!r} changed during index build; retry required"
             )
@@ -212,8 +355,18 @@ def build_scoped_index(
     embedding: Embeddings,
     *,
     batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
+    embedding_budget: EmbeddingBudget | None = None,
+    wait: bool = True,
+    reuse: bool = True,
 ) -> int:
-    """Build all requested corpora in staging, then replace the derived index."""
+    """Build all requested corpora in staging, then replace the derived index.
+
+    With ``reuse`` (the default) unchanged chunks keep vectors from the
+    compatible active index, so only new or edited chunks are embedded; pass
+    ``reuse=False`` after changing how embeddings are computed. ``embedding_budget``
+    bounds the new embeddings and ``wait=False`` refuses to queue behind another
+    builder; both fail before the active index is touched.
+    """
     if not corpora:
         raise ValueError("at least one corpus is required")
     if batch_size < 1:
@@ -230,7 +383,7 @@ def build_scoped_index(
         if not Path(corpus.root).is_dir():
             raise FileNotFoundError(f"corpus not found: {corpus.root}")
 
-    with _index_build_lock(index_path):
+    with _index_build_lock(index_path, wait=wait):
         index_path.parent.mkdir(parents=True, exist_ok=True)
         staging_path = Path(
             tempfile.mkdtemp(
@@ -248,6 +401,8 @@ def build_scoped_index(
                 staging_path,
                 embedding,
                 batch_size,
+                reuse_from=index_path if reuse else None,
+                embedding_budget=embedding_budget,
             )
             _release_cached_client(staging_path)
             with index_activation_lock(index_path, exclusive=True):
@@ -260,9 +415,10 @@ def build_scoped_index(
                 shutil.rmtree(backup_path, ignore_errors=True)
             return total
         except Exception:
-            with index_activation_lock(index_path, exclusive=True):
-                if old_moved and not index_path.exists() and backup_path.exists():
-                    os.replace(backup_path, index_path)
+            if old_moved:
+                with index_activation_lock(index_path, exclusive=True):
+                    if not index_path.exists() and backup_path.exists():
+                        os.replace(backup_path, index_path)
             raise
         finally:
             _release_cached_client(staging_path)
@@ -310,7 +466,13 @@ def _validate_index_collections(
     manifest: IndexManifest,
 ) -> None:
     indexed = {item.kind: item for item in manifest.corpora}
-    client = _client(Path(index_path))
+    try:
+        client = _client(Path(index_path))
+    except Exception as exc:
+        raise IndexMismatchError(
+            f"Agent Memory index at {index_path} cannot be opened; "
+            "explicit build required"
+        ) from exc
     for kind in corpus_kinds:
         item = indexed[kind]
         try:
@@ -500,38 +662,11 @@ def validate_scoped_index(
     return manifest
 
 
-def validate_run_summary_index(
-    runs_index_path: Path,
-    runs_corpus: CorpusSpec,
-    embedding: Embeddings,
-) -> IndexManifest:
-    """Validate run-summary identity plus the physical Chroma collection."""
-    runs_index_path = Path(runs_index_path)
-    if not index_exists(runs_index_path):
-        raise IndexMismatchError(
-            "run-summary index is missing; explicit build required"
-        )
-    manifest = read_index_manifest(runs_index_path)
-    validate_manifest(manifest, (runs_corpus,), embedding)
-    if [item.kind for item in manifest.corpora] != ["run_summaries"]:
-        raise IndexMismatchError("run-summary index contains unexpected corpora")
-    item = manifest.corpora[0]
-    try:
-        collection = _client(runs_index_path).get_collection(item.collection_name)
-        actual_chunks = collection.count()
-    except Exception as exc:
-        raise IndexMismatchError(
-            "run-summary collection is unavailable; explicit build required"
-        ) from exc
-    if actual_chunks != item.chunk_count:
-        raise IndexMismatchError(
-            "run-summary collection chunk count mismatch; explicit build required"
-        )
-    return manifest
-
-
 __all__ = [
+    "EmbeddingBudget",
+    "IndexBuildInProgressError",
     "IndexMismatchError",
+    "RefreshBudgetExceededError",
     "build_index",
     "build_scoped_index",
     "index_exists",
@@ -541,6 +676,5 @@ __all__ = [
     "validate_library_rebuild_candidate",
     "validate_materialized_index",
     "validate_manifest",
-    "validate_run_summary_index",
     "validate_scoped_index",
 ]

@@ -1,8 +1,10 @@
 # Superpowers Scope
 
 Use `superpowers` only when the task needs historical architecture, specs,
-plans, tradeoffs, phase intent, or an earlier rejected design recorded under
-`docs/superpowers/`.
+tradeoffs, phase intent, or an earlier rejected design recorded under
+`docs/superpowers/specs/`. Executed implementation plans (`plans/`) and
+work-specific production packages (`artifacts/`) are not indexed; open them
+directly when a task names one.
 
 Do not select this scope merely because the task is large. Current accepted
 contracts, code, tests, runtime baseline, and user instructions remain higher
@@ -29,8 +31,10 @@ python -m scripts.agent_memory --scope superpowers search \
   "<task-specific query>" --top-k 8 --json
 ```
 
-This command queries the dedicated `superpowers` shard. Stale last-good
-fragments are tagged and queue only that shard for detached refresh. Missing or
+This command queries the dedicated `superpowers` shard, refreshing it
+incrementally first when it trails the specs. Stale last-good fragments appear
+only when that bounded refresh cannot run; they are tagged and queue only that
+shard for detached refresh. Missing or
 legacy layout, or a library-incompatible shard, returns exit `3` after queueing
 exact materialization. Follow the parent skill's non-blocking result rules and
 never run a foreground recovery build.

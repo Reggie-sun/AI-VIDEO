@@ -9,13 +9,9 @@ The same scope includes `docs/record_for_agent/learning/**/*.md` as
 answer what the project currently claims to know from multiple exact sources;
 they remain advisory and must expose confirmation/adoption state. Ordinary
 records continue to answer what happened and retain
-`authority=advisory_experience`.
-
-This scope also merges eligible one-level `runs/<run_id>/SUMMARY.md` records
-through the separate run-summary derived index. Run-summary hits use
-`authority=auto_generated_run_summary_advisory` and
-`document_kind=run_summary`, and expose status, `run_id`, `run_family`,
-`run_version`, and `summary_sha256` provenance.
+`authority=advisory_experience`. Records marked `retrieval: retired` are not
+indexed. Auto-generated `runs/<run_id>/SUMMARY.md` files are not indexed; read
+one directly only when a record cites that exact run.
 
 ## Query Shape
 
@@ -38,10 +34,11 @@ python -m scripts.agent_memory --scope experience search \
   "<task-specific query>" --top-k 8 --json
 ```
 
-This command queries the canonical per-corpus shards. Stale last-good fragments
-are explicitly tagged and their exact shards are queued for detached refresh;
-missing/legacy layout or a library-incompatible shard returns exit `3` after
-queueing exact materialization.
+This command queries the experience shard, refreshing it incrementally first
+when it trails the records. Stale last-good fragments appear only when that
+bounded refresh cannot run; they are explicitly tagged and their shard is queued
+for detached refresh. Missing/legacy layout or a library-incompatible shard
+returns exit `3` after queueing exact materialization.
 Follow the parent skill's non-blocking result rules and never run a foreground
 recovery build.
 
@@ -57,8 +54,6 @@ task. Do not broaden merely because the result abstains.
   claim, verify its exact supporting/counter evidence, active/pending lanes,
   candidate checkpoint confirmation, adoption state, supersession, and current
   target before relying on it.
-- `document_kind=run_summary` records an auto-generated run summary; it is not
-  activation, quality acceptance, or delivery truth.
 - Reopen the returned `source` before relying on a specific claim, path,
   receipt, hash, or historical outcome.
 - Recheck current code, tests, manifests, receipts, and runtime evidence before

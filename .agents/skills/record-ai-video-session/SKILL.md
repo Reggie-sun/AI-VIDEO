@@ -161,6 +161,11 @@ misleading when read by itself.
 - A new record that mentions the correction is not sufficient when an older
   file still independently presents `pending`, provisional PASS, or another
   displaced claim as current truth.
+- When newer evidence displaces every current-facing claim of an older record,
+  also add `retrieval: retired` and `superseded_by: <newer record path>` to its
+  frontmatter (create the block if absent). The file stays as history but leaves
+  Agent Memory retrieval, so stale conclusions stop surfacing in searches. Keep
+  partially superseded records retrievable with only the notice.
 - Do not convert a technical metric into a human verdict, or vice versa. State
   exactly which proof layer changed and which historical measurements remain
   valid.

@@ -12,7 +12,6 @@ from typing import Iterable, Mapping, Sequence
 from ai_video.agent_memory.corpus import (
     CorpusSpec,
     iter_corpus_markdown_files,
-    load_run_summary_documents,
 )
 from ai_video.agent_memory.embeddings import EmbeddingIdentity, embedding_identity
 
@@ -86,18 +85,6 @@ def corpus_digest(
     return digest.hexdigest(), len(paths)
 
 
-def run_summary_digest(root: Path) -> tuple[str, int]:
-    """Digest only of the run summaries that will actually be indexed.
-
-    Distinct from :func:`corpus_digest` so that the separate derived index
-    manifest for ``run_summaries`` binds exactly to the bytes that survive
-    the highest-version-per-family filter, not to every file under
-    ``runs/``.  Missing or empty roots return an empty digest.
-    """
-    _, source_sha256, count = load_run_summary_documents(root)
-    return source_sha256, count
-
-
 def _library_versions() -> dict[str, str]:
     output: dict[str, str] = {}
     for package in (
@@ -127,13 +114,7 @@ def create_manifest(
     corpus_items: list[CorpusManifest] = []
     for corpus in corpora:
         if corpus_identities is None:
-            if corpus.kind == "run_summaries":
-                source_sha256, document_count = run_summary_digest(corpus.root)
-            else:
-                source_sha256, document_count = corpus_digest(
-                    corpus.root,
-                    corpus,
-                )
+            source_sha256, document_count = corpus_digest(corpus.root, corpus)
         else:
             source_sha256, document_count = corpus_identities[corpus.kind]
         corpus_items.append(
@@ -270,10 +251,7 @@ def _validate_manifest_contract(
                 "rebuild required"
             )
         if check_source_identity:
-            if corpus.kind == "run_summaries":
-                digest, document_count = run_summary_digest(corpus.root)
-            else:
-                digest, document_count = corpus_digest(corpus.root, corpus)
+            digest, document_count = corpus_digest(corpus.root, corpus)
             if item.source_sha256 != digest or item.document_count != document_count:
                 raise StaleIndexError(
                     f"stale corpus {corpus.kind!r}; rebuild the Agent Memory index"

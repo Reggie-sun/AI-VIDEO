@@ -8,9 +8,9 @@ answers the question, select its narrower scope instead.
 
 At the default Agent-facing Top-N of 8, the five main collections receive a
 stable `2/2/2/1/1` quota for `experience`, `superpowers`, `current_docs`,
-`research`, and `deferred` before the final merge. Eligible run summaries are
-queried through their separate index. The quota preserves visibility; it does
-not make the authority classes equivalent.
+`research`, and `deferred` before the final merge, and each document fills at
+most one slot. The quota preserves visibility; it does not make the authority
+classes equivalent.
 
 ## Query Shape
 
@@ -33,10 +33,11 @@ python -m scripts.agent_memory --scope all search \
   "<task-specific query>" --top-k 8 --json
 ```
 
-This command queries five dedicated main-corpus shards plus the eligible
-run-summary shard. Stale last-good fragments identify their shard via
-`corpus_kind` and `index_freshness=stale`; only those shards are queued for
-detached refresh. Missing or legacy layout returns exit `3` after queueing the
+This command queries five dedicated main-corpus shards, refreshing small stale
+shards incrementally first. Stale last-good fragments appear only for shards
+whose refresh exceeded the foreground bound or was held by another builder; they
+identify their shard via `corpus_kind` and `index_freshness=stale`, and only
+those shards are queued for detached refresh. Missing or legacy layout returns exit `3` after queueing the
 required materialization. Library-incompatible shards also return exit `3`
 after queueing only those exact shards. Follow the parent skill's non-blocking
 result rules and never run a foreground recovery build.

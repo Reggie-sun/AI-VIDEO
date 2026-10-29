@@ -167,7 +167,7 @@ intentional silence；只决定 final-media 是否可进入 P6，不提交下一
 
 检索 scope、fresh/stale、exit code、derived-index queue 与 no-network 行为只由
 [retrieve-ai-video-memory](../../.agents/skills/retrieve-ai-video-memory/SKILL.md) 维护。
-结果保留 authority；不降低 admission、不重复查询、不前台 rebuild、不下载/假 embedding/fallback，不接入 Product state。
+结果保留 authority；不降低 admission、不重复查询、不手动 build（stale shard 只由 CLI 有界增量刷新或排队）、不下载/假 embedding/fallback，不接入 Product state。
 
 ### Experience Learning And Confirmation
 

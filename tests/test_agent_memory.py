@@ -8,9 +8,8 @@ network-free, model-free, and reproducible.  They exercise:
   * Chroma index build + load round-trip
   * top-K retrieval returns the expected known-relevant record
   * text formatter handles both empty and populated hit lists
-  * auto-generated ``runs/<run_id>/SUMMARY.md`` are picked up into a
-    separate derived index with explicit advisory authority, distinct
-    collection name and stable schema-v1 manifest.
+  * excluded subtrees and ``retrieval: retired`` documents stay out of the index
+  * incremental refresh reuses stored vectors and respects its bounds
 
 The local embedding smoke below runs only when the pinned model cache is
 present; the remaining tests intentionally use the deterministic fake backend.
@@ -1133,7 +1132,9 @@ def test_experience_search_projects_allowlisted_record_metadata_without_counting
     )
 
     eligible_hits = [hit for hit in hits if hit.source.endswith("eligible.md")]
-    assert len(eligible_hits) >= 2
+    # Both sections match, but one document yields one hit: chunk count never
+    # becomes apparent evidence volume.
+    assert len(eligible_hits) == 1
     assert {
         (
             hit.record_kind,
@@ -1664,7 +1665,6 @@ def test_cli_builds_and_searches_all_scopes(
     experience, superpowers = scoped_corpora
     docs_root, _ = project_docs_corpora
     idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
     common = [
         "--embedding",
         "fake",
@@ -1678,10 +1678,6 @@ def test_cli_builds_and_searches_all_scopes(
         str(docs_root),
         "--index",
         str(idx),
-        "--runs-root",
-        str(tmp_path / "missing_runs"),
-        "--runs-index",
-        str(runs_idx),
     ]
     assert agent_memory_main([*common, "build"]) == 0
     assert agent_memory_main([*common, "search", "recovery", "--json"]) == 0
@@ -1733,8 +1729,6 @@ def test_cli_all_scope_queues_only_library_incompatible_shards(
         str(docs_root),
         "--index",
         str(idx),
-        "--runs-root",
-        str(tmp_path / "missing_runs"),
     ]
     assert agent_memory_main([*common, "build"]) == 0
     capsys.readouterr()
@@ -1800,8 +1794,6 @@ def test_cli_library_mismatch_does_not_hide_physical_corruption(
         str(docs_root),
         "--index",
         str(idx),
-        "--runs-root",
-        str(tmp_path / "missing_runs"),
     ]
     assert agent_memory_main([*common, "build"]) == 0
 
@@ -1855,8 +1847,6 @@ def test_cli_library_mismatch_race_queues_only_changed_shard(
         str(docs_root),
         "--index",
         str(idx),
-        "--runs-root",
-        str(tmp_path / "missing_runs"),
     ]
     assert agent_memory_main([*common, "build"]) == 0
 
@@ -1918,8 +1908,6 @@ def test_cli_library_mismatch_race_does_not_hide_corruption(
         str(docs_root),
         "--index",
         str(idx),
-        "--runs-root",
-        str(tmp_path / "missing_runs"),
     ]
     assert agent_memory_main([*common, "build"]) == 0
 
@@ -1959,106 +1947,6 @@ def test_cli_library_mismatch_race_does_not_hide_corruption(
     assert agent_memory_main([*common, "search", "recovery", "--json"]) == 2
 
 
-def test_cli_build_materializes_run_summaries_before_search(
-    sample_runs_root: Path, tmp_path: Path, capsys
-) -> None:
-    experience = tmp_path / "record_for_agent"
-    experience.mkdir()
-    (experience / "continuity.md").write_text(
-        "# Continuity\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    common = [
-        "--embedding",
-        "fake",
-        "--scope",
-        "experience",
-        "--corpus",
-        str(experience),
-        "--runs-root",
-        str(sample_runs_root),
-        "--index",
-        str(main_idx),
-        "--runs-index",
-        str(runs_idx),
-    ]
-    assert agent_memory_main([*common, "build"]) == 0
-    capsys.readouterr()
-    assert runs_idx.is_dir()
-
-    assert agent_memory_main(
-        [*common, "search", "continuity failure", "--top-k", "8", "--json"]
-    ) == 0
-    hits = json.loads(capsys.readouterr().out)
-
-    assert any(hit["document_kind"] == "run_summary" for hit in hits)
-    assert runs_idx.is_dir()
-
-
-def test_cli_build_validates_run_index_path_before_main_index_write(
-    sample_runs_root: Path, tmp_path: Path, capsys
-) -> None:
-    experience = tmp_path / "record_for_agent"
-    experience.mkdir()
-    (experience / "continuity.md").write_text(
-        "# Continuity\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    main_idx = tmp_path / "idx"
-
-    assert agent_memory_main(
-        [
-            "--embedding",
-            "fake",
-            "--scope",
-            "experience",
-            "--corpus",
-            str(experience),
-            "--runs-root",
-            str(sample_runs_root),
-            "--index",
-            str(main_idx),
-            "--runs-index",
-            str(main_idx),
-            "build",
-        ]
-    ) == 2
-
-    assert "must not overlap" in capsys.readouterr().err
-    assert not main_idx.exists()
-
-
-def test_search_rejects_missing_run_summary_index_without_build(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    (experience_root / "continuity.md").write_text(
-        "# Continuity\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    experience = corpus_module.CorpusSpec.experience(experience_root)
-    runs = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-
-    with pytest.raises(index_module.IndexMismatchError, match="run-summary index"):
-        search(
-            "continuity failure",
-            scope="experience",
-            corpora=(experience,),
-            runs_corpus=runs,
-            index_path=main_idx,
-            runs_index_path=runs_idx,
-            embedding=fake_embedding,
-        )
-
-    assert not runs_idx.exists()
-
-
 def test_cli_build_reports_changed_corpus_without_traceback(
     scoped_corpora, tmp_path: Path, monkeypatch, capsys
 ) -> None:
@@ -2071,7 +1959,7 @@ def test_cli_build_reports_changed_corpus_without_traceback(
 
     monkeypatch.setattr(
         agent_memory_script,
-        "build_scoped_index",
+        "build_project_indexes",
         reject_changed_corpus,
     )
     result = agent_memory_script.main(
@@ -2119,8 +2007,6 @@ def test_cli_search_fails_closed_when_collection_is_missing(
             str(experience.root),
             "--index",
             str(idx),
-            "--runs-root",
-            str(tmp_path / "missing-runs"),
             "search",
             "continuity",
         ]
@@ -2246,655 +2132,28 @@ def test_local_multilingual_project_corpus_answerability_calibration(
     ) == []
 
 
-# ---------------------------------------------------------------------------
-# run-summary auto-retrieval (separate derived index)
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture
-def sample_runs_root(tmp_path: Path) -> Path:
-    """A repository-shaped ``runs/`` directory with mixed validity."""
-    runs = tmp_path / "runs"
-    runs.mkdir()
-    # Two valid run summaries (different families, status required).
-    (runs / "shot-failure-20260820-v0").mkdir()
-    (runs / "shot-failure-20260820-v0" / "SUMMARY.md").write_text(
-        "# Shot Failure Run v0\n\n"
-        "Status: `TECHNICAL_FAIL__REJECTED`\n\n"
-        "## Summary\nInitial versioned attempt.\n",
-        encoding="utf-8",
-    )
-    (runs / "shot-failure-20260820-v1").mkdir()
-    (runs / "shot-failure-20260820-v1" / "SUMMARY.md").write_text(
-        "# Shot Failure Run v1\n\n"
-        "Status: `TECHNICAL_FAIL__REJECTED`\n\n"
-        "## Summary\nRough cut failed continuity acceptance.\n",
-        encoding="utf-8",
-    )
-    (runs / "shot-failure-20260820-v2").mkdir()
-    (runs / "shot-failure-20260820-v2" / "SUMMARY.md").write_text(
-        "# Shot Failure Run v2\n\n"
-        "Status: `CREATIVE_FAIL__REJECTED_UNACTIVATED`\n\n"
-        "## Summary\nV2 repair also failed continuity.\n",
-        encoding="utf-8",
-    )
-    (runs / "smoke-20260822-v1").mkdir()
-    (runs / "smoke-20260822-v1" / "SUMMARY.md").write_text(
-        "# Smoke Run v1\n\n"
-        "Status: `TECHNICAL_PASS`\n\n"
-        "## Summary\nProvider chain ran end to end without error.\n",
-        encoding="utf-8",
-    )
-    (runs / "legacy-smoke").mkdir()
-    (runs / "legacy-smoke" / "SUMMARY.md").write_text(
-        "# Legacy Smoke Run\n\n"
-        "Status: `TECHNICAL_PASS`\n\n"
-        "## Summary\nUnversioned runs remain individually searchable.\n",
-        encoding="utf-8",
-    )
-    # Nested evidence folder MUST NOT be indexed.
-    (runs / "shot-failure-20260820-v1" / "evidence").mkdir()
-    (runs / "shot-failure-20260820-v1" / "evidence" / "review.md").write_text(
-        "# Nested review\n\nStatus: `TECHNICAL_PASS`\n\nBody.\n",
-        encoding="utf-8",
-    )
-    # Markdown files directly under runs/ MUST NOT be indexed.
-    (runs / "orphan.md").write_text(
-        "# Orphan\n\nStatus: `TECHNICAL_PASS`\n\nBody.\n",
-        encoding="utf-8",
-    )
-    # Two-level directory MUST NOT be indexed.
-    (runs / "deeper").mkdir()
-    (runs / "deeper" / "extra").mkdir()
-    (runs / "deeper" / "extra" / "SUMMARY.md").write_text(
-        "# Too Deep\n\nStatus: `TECHNICAL_PASS`\n\nBody.\n",
-        encoding="utf-8",
-    )
-    # File without Status MUST NOT be indexed.
-    (runs / "no-status-v1").mkdir()
-    (runs / "no-status-v1" / "SUMMARY.md").write_text(
-        "# No Status Summary\n\nNo status line here at all.\n",
-        encoding="utf-8",
-    )
-    # Wrong filename MUST NOT be indexed.
-    (runs / "wrong-name-v1").mkdir()
-    (runs / "wrong-name-v1" / "NOTES.md").write_text(
-        "# Wrong Name\n\nStatus: `TECHNICAL_PASS`\n\nBody.\n",
-        encoding="utf-8",
-    )
-    # Symlink MUST NOT be indexed.
-    target = runs / "shot-failure-20260820-v1" / "SUMMARY.md"
-    (runs / "symlink-v1").mkdir()
-    try:
-        (runs / "symlink-v1" / "SUMMARY.md").symlink_to(target)
-    except (OSError, NotImplementedError):
-        pass
-    return runs
-
-
-def test_iter_run_summary_files_filters_to_one_level_only(
-    sample_runs_root: Path,
-) -> None:
-    iter_run_summary_files = getattr(
-        corpus_module, "iter_run_summary_files", None
-    )
-    assert iter_run_summary_files is not None, (
-        "iter_run_summary_files contract is not implemented"
-    )
-    entries = [item for item in iter_run_summary_files(sample_runs_root)]
-    paths = [item.path for item in entries]
-    names = sorted(p.parent.name for p in paths)
-    # Should include only valid one-level SUMMARY.md files (discovery
-    # itself does not require Status; the Status check lives in the
-    # document loader so the loader can fail closed without polluting
-    # the discovery helper used by tests and external callers).
-    assert "shot-failure-20260820-v1" in names
-    assert "shot-failure-20260820-v2" in names
-    assert "smoke-20260822-v1" in names
-    # Must exclude: wrong-name, deeper, evidence, symlink.
-    assert "wrong-name-v1" not in names
-    assert "deeper" not in names
-    assert "evidence" not in names
-    # Must exclude orphans at top level.
-    assert "orphan.md" not in [p.name for p in paths]
-
-
-def test_iter_run_summary_files_returns_family_and_version(
-    sample_runs_root: Path,
-) -> None:
-    iter_run_summary_files = getattr(
-        corpus_module, "iter_run_summary_files", None
-    )
-    assert iter_run_summary_files is not None
-    results = {
-        item.path: (item.run_family, item.run_version)
-        for item in iter_run_summary_files(sample_runs_root)
-    }
-    # Trailing -vN becomes run_family/run_version.
-    for path, (family, version) in results.items():
-        if path.parent.name == "shot-failure-20260820-v1":
-            assert family == "shot-failure-20260820"
-            assert version == 1
-        elif path.parent.name == "smoke-20260822-v1":
-            assert family == "smoke-20260822"
-            assert version == 1
-
-
-def test_run_summary_corpus_spec_metadata(sample_runs_root: Path) -> None:
-    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
-    load_documents = getattr(corpus_module, "load_documents", None)
-    assert CorpusSpec is not None
-    assert load_documents is not None
-    spec = CorpusSpec.run_summaries(sample_runs_root)
-    assert spec.kind == "run_summaries"
-    assert spec.collection_name == "agent_memory_run_summaries"
-    assert spec.authority == "auto_generated_run_summary_advisory"
-    docs = load_documents(sample_runs_root, corpus=spec)
-    sources = {doc.metadata["source"] for doc in docs}
-    # Highest version per family should be indexed; v1 only when no v2 sibling.
-    assert any("shot-failure-20260820-v2" in s for s in sources)
-    assert any("smoke-20260822-v1" in s for s in sources)
-    assert any("legacy-smoke" in s for s in sources)
-    # Lower-version sibling must be skipped by the loader.
-    assert not any(
-        s.endswith("shot-failure-20260820-v1/SUMMARY.md") for s in sources
-    )
-    assert not any(
-        s.endswith("shot-failure-20260820-v0/SUMMARY.md") for s in sources
-    )
-    # Status-less files MUST be skipped by the loader.
-    assert not any(
-        s.endswith("no-status-v1/SUMMARY.md") for s in sources
-    )
-    # Authority and document_kind are bound by corpus, not frontmatter.
-    for doc in docs:
-        assert doc.metadata["authority"] == "auto_generated_run_summary_advisory"
-        assert doc.metadata["corpus_kind"] == "run_summaries"
-        assert doc.metadata["document_kind"] == "run_summary"
-        assert doc.metadata["status"]
-        assert doc.metadata["run_id"]
-        assert doc.metadata["run_family"]
-        assert isinstance(doc.metadata["run_version"], int)
-        assert doc.metadata["summary_sha256"]
-    legacy = next(doc for doc in docs if doc.metadata["run_id"] == "legacy-smoke")
-    assert legacy.metadata["run_family"] == "legacy-smoke"
-    assert legacy.metadata["run_version"] == 0
-
-
-def test_statusless_newer_version_does_not_hide_valid_summary(tmp_path: Path) -> None:
-    runs = tmp_path / "runs"
-    (runs / "camera-check-v1").mkdir(parents=True)
-    (runs / "camera-check-v1" / "SUMMARY.md").write_text(
-        "# Camera Check v1\n\nStatus: `TECHNICAL_PASS`\n\nValid result.\n",
-        encoding="utf-8",
-    )
-    (runs / "camera-check-v2").mkdir()
-    (runs / "camera-check-v2" / "SUMMARY.md").write_text(
-        "# Camera Check v2\n\nIncomplete auto-generated summary.\n",
-        encoding="utf-8",
-    )
-
-    docs = load_documents(runs, corpus=corpus_module.CorpusSpec.run_summaries(runs))
-
-    assert [doc.metadata["run_id"] for doc in docs] == ["camera-check-v1"]
-
-
-def test_run_summaries_search_returns_run_summary_hit(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
-    build_scoped_index = getattr(index_module, "build_scoped_index", None)
-    assert CorpusSpec is not None and build_scoped_index is not None
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    (experience_root / "note.md").write_text(
-        "# Experience Note\n\nGeneral continuity note.\n",
-        encoding="utf-8",
-    )
-    experience = CorpusSpec.experience(experience_root)
-    spec = CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    build_scoped_index(
-        corpora=(experience,),
-        index_path=main_idx,
-        embedding=fake_embedding,
-    )
-    build_scoped_index(
-        corpora=(spec,),
-        index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    hits = search(
-        "continuity failure",
-        top_k=5,
-        scope="experience",
-        corpora=(experience,),
-        runs_corpus=spec,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    assert hits, "expected at least one run-summary hit"
-    hit = next(h for h in hits if "shot-failure" in h.source)
-    assert hit.corpus_kind == "run_summaries"
-    assert hit.document_kind == "run_summary"
-    assert hit.authority == "auto_generated_run_summary_advisory"
-    assert hit.run_id
-    assert hit.run_family
-    assert hit.run_version >= 1
-    assert hit.summary_sha256
-    assert hit.status
-    # Highest version must win (v2 above v1).
-    assert hit.run_version == 2
-    rendered = format_text(hits)
-    assert "auto-generated run summary advisory" in rendered
-
-
-def test_experience_search_includes_run_summary_hits(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
-    build_scoped_index = getattr(index_module, "build_scoped_index", None)
-    assert CorpusSpec is not None and build_scoped_index is not None
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    (experience_root / "continuity.md").write_text(
-        "# Continuity Note\n\n## Fix\nUse exact terminal frame.\n",
-        encoding="utf-8",
-    )
-    experience = CorpusSpec.experience(experience_root)
-    runs = CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    build_scoped_index(
-        corpora=(experience,),
-        index_path=main_idx,
-        embedding=fake_embedding,
-    )
-    build_scoped_index(
-        corpora=(runs,),
-        index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    # Search only queries the run-summary index materialized by build.
-    hits = search(
-        "shot failure continuity",
-        top_k=4,
-        scope="experience",
-        corpora=(experience,),
-        runs_corpus=runs,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    kinds = {hit.corpus_kind for hit in hits}
-    assert "run_summaries" in kinds
-    assert "experience" in kinds
-    assert {
-        item.kind for item in index_module.read_index_manifest(main_idx).corpora
-    } == {"experience"}
-    assert {
-        item.kind for item in index_module.read_index_manifest(runs_idx).corpora
-    } == {"run_summaries"}
-
-
-def test_run_summary_index_path_must_not_overlap_main_index(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    (experience_root / "continuity.md").write_text(
-        "# Continuity Note\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    experience = corpus_module.CorpusSpec.experience(experience_root)
-    runs = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-    manifest_before = (main_idx / "manifest.json").read_bytes()
-
-    with pytest.raises(ValueError, match="must not overlap"):
-        search(
-            "continuity",
-            scope="experience",
-            corpora=(experience,),
-            runs_corpus=runs,
-            index_path=main_idx,
-            runs_index_path=main_idx,
-            embedding=fake_embedding,
-        )
-
-    assert (main_idx / "manifest.json").read_bytes() == manifest_before
-    assert {
-        item.kind for item in index_module.read_index_manifest(main_idx).corpora
-    } == {"experience"}
-
-
-def test_run_summary_index_path_must_not_overlap_source_roots(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    experience_path = experience_root / "continuity.md"
-    experience_path.write_text(
-        "# Continuity Note\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    experience = corpus_module.CorpusSpec.experience(experience_root)
-    runs = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-    summary_path = sample_runs_root / "shot-failure-20260820-v2" / "SUMMARY.md"
-    summary_before = summary_path.read_bytes()
-    experience_before = experience_path.read_bytes()
-
-    for unsafe_path in (
-        sample_runs_root,
-        sample_runs_root / "derived-index",
-        experience_root,
-    ):
-        with pytest.raises(ValueError, match="must not overlap"):
-            search(
-                "continuity",
-                scope="experience",
-                corpora=(experience,),
-                runs_corpus=runs,
-                index_path=main_idx,
-                runs_index_path=unsafe_path,
-                embedding=fake_embedding,
-            )
-
-    assert summary_path.read_bytes() == summary_before
-    assert experience_path.read_bytes() == experience_before
-
-
 def test_scoped_index_path_must_not_overlap_its_corpus(
-    sample_runs_root: Path, fake_embedding
+    sample_corpus: Path, fake_embedding
 ) -> None:
-    runs = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
-    summary_path = sample_runs_root / "shot-failure-20260820-v2" / "SUMMARY.md"
-    summary_before = summary_path.read_bytes()
+    corpus = corpus_module.CorpusSpec.experience(sample_corpus)
+    record_path = sample_corpus / "2026-08-20-h3-continuity.md"
+    record_before = record_path.read_bytes()
 
     with pytest.raises(ValueError, match="must not overlap"):
         index_module.build_scoped_index(
-            (runs,),
-            sample_runs_root / "derived-index",
+            (corpus,),
+            sample_corpus / "derived-index",
             fake_embedding,
         )
 
-    assert summary_path.read_bytes() == summary_before
-
-
-def test_experience_search_rejects_newer_run_version_until_explicit_build(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    (experience_root / "continuity.md").write_text(
-        "# Continuity Note\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    experience = corpus_module.CorpusSpec.experience(experience_root)
-    runs = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
-    manifest_before = (runs_idx / "manifest.json").read_bytes()
-    (sample_runs_root / "shot-failure-20260820-v3").mkdir()
-    (sample_runs_root / "shot-failure-20260820-v3" / "SUMMARY.md").write_text(
-        "# Shot Failure Run v3\n\n"
-        "Status: `CREATIVE_PASS`\n\n"
-        "## Summary\nGimbal yaw correction accepted.\n",
-        encoding="utf-8",
-    )
-
-    with pytest.raises(index_module.IndexMismatchError, match="stale corpus"):
-        search(
-            "gimbal yaw correction accepted",
-            top_k=8,
-            scope="experience",
-            corpora=(experience,),
-            runs_corpus=runs,
-            index_path=main_idx,
-            runs_index_path=runs_idx,
-            embedding=fake_embedding,
-        )
-
-    assert (runs_idx / "manifest.json").read_bytes() == manifest_before
-    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
-    refreshed = search(
-        "gimbal yaw correction accepted",
-        top_k=8,
-        scope="experience",
-        corpora=(experience,),
-        runs_corpus=runs,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-
-    run_sources = [hit.source for hit in refreshed if hit.corpus_kind == "run_summaries"]
-    assert any("shot-failure-20260820-v3/SUMMARY.md" in item for item in run_sources)
-    assert not any("shot-failure-20260820-v2/SUMMARY.md" in item for item in run_sources)
-    staging_prefix = str(runs_idx.parent / f".{runs_idx.name}.staging-")
-    assert not any(
-        identifier.startswith(staging_prefix)
-        for identifier in index_module.SharedSystemClient._identifier_to_system
-    )
-
-
-@pytest.mark.parametrize("corruption", ("missing_collection", "chunk_count"))
-def test_experience_search_rejects_corrupt_run_summary_index(
-    sample_runs_root: Path,
-    tmp_path: Path,
-    fake_embedding,
-    corruption: str,
-) -> None:
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    (experience_root / "continuity.md").write_text(
-        "# Continuity Note\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    experience = corpus_module.CorpusSpec.experience(experience_root)
-    runs = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
-    manifest_before = (runs_idx / "manifest.json").read_bytes()
-    client = index_module.load_index(runs_idx, fake_embedding)
-    collection = client.get_collection(runs.collection_name)
-    if corruption == "missing_collection":
-        client.delete_collection(runs.collection_name)
-    else:
-        first_id = collection.get(limit=1)["ids"][0]
-        collection.delete(ids=[first_id])
-
-    message = (
-        "run-summary collection is unavailable"
-        if corruption == "missing_collection"
-        else "run-summary collection chunk count mismatch"
-    )
-    with pytest.raises(index_module.IndexMismatchError, match=message):
-        search(
-            "continuity failure",
-            top_k=8,
-            scope="experience",
-            corpora=(experience,),
-            runs_corpus=runs,
-            index_path=main_idx,
-            runs_index_path=runs_idx,
-            embedding=fake_embedding,
-        )
-
-    assert (runs_idx / "manifest.json").read_bytes() == manifest_before
-    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
-    repaired = search(
-        "continuity failure",
-        top_k=8,
-        scope="experience",
-        corpora=(experience,),
-        runs_corpus=runs,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-
-    assert any(hit.corpus_kind == "run_summaries" for hit in repaired)
-    manifest = index_module.read_index_manifest(runs_idx)
-    expected_chunks = manifest.corpora[0].chunk_count
-    rebuilt_client = index_module.load_index(runs_idx, fake_embedding)
-    assert rebuilt_client.get_collection(runs.collection_name).count() == expected_chunks
-
-
-def test_superpowers_search_excludes_run_summaries(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
-    build_scoped_index = getattr(index_module, "build_scoped_index", None)
-    assert CorpusSpec is not None and build_scoped_index is not None
-    superpowers_root = tmp_path / "superpowers"
-    superpowers_root.mkdir()
-    (superpowers_root / "specs").mkdir()
-    (superpowers_root / "specs" / "state-commit.md").write_text(
-        "# State Commit Contract\n\n## Recovery\n"
-        "ProductionStateCommitter owns explicit recovery.\n",
-        encoding="utf-8",
-    )
-    superpowers = CorpusSpec.superpowers(superpowers_root)
-    runs = CorpusSpec.run_summaries(sample_runs_root)
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    build_scoped_index(
-        corpora=(superpowers,),
-        index_path=main_idx,
-        embedding=fake_embedding,
-    )
-    hits = search(
-        "recovery",
-        top_k=4,
-        scope="superpowers",
-        corpora=(superpowers,),
-        runs_corpus=runs,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    assert hits, "expected at least one superpowers hit"
-    assert {h.corpus_kind for h in hits} == {"superpowers"}
-    assert not runs_idx.exists()
-
-
-def test_run_summaries_missing_root_returns_no_hits(
-    tmp_path: Path, fake_embedding
-) -> None:
-    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
-    assert CorpusSpec is not None
-    runs = CorpusSpec.run_summaries(tmp_path / "missing_runs")
-    experience_root = tmp_path / "record_for_agent"
-    experience_root.mkdir()
-    (experience_root / "continuity.md").write_text(
-        "# Continuity\n\nUse exact terminal frames.\n",
-        encoding="utf-8",
-    )
-    experience = CorpusSpec.experience(experience_root)
-    main_idx = tmp_path / "idx"
-    runs_idx = tmp_path / "runs_idx"
-    index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-    hits = search(
-        "terminal frames",
-        top_k=3,
-        scope="experience",
-        corpora=(experience,),
-        runs_corpus=runs,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    assert hits
-    assert {hit.corpus_kind for hit in hits} == {"experience"}
-    assert not runs_idx.exists()
-
-
-def test_run_summaries_index_digest_marks_stale(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
-    build_scoped_index = getattr(index_module, "build_scoped_index", None)
-    assert CorpusSpec is not None and build_scoped_index is not None
-    spec = CorpusSpec.run_summaries(sample_runs_root)
-    runs_idx = tmp_path / "runs_idx"
-    build_scoped_index(
-        corpora=(spec,),
-        index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    # Add a new valid run summary AFTER the index was built.
-    (sample_runs_root / "newly-added-v1").mkdir()
-    (sample_runs_root / "newly-added-v1" / "SUMMARY.md").write_text(
-        "# New Run\n\nStatus: `TECHNICAL_PASS`\n\n## Summary\nNew entry.\n",
-        encoding="utf-8",
-    )
-    # Validate_manifest for run-summaries should fail closed because the
-    # corpus changed since the index was built.
-    IndexMismatchError = getattr(index_module, "IndexMismatchError", RuntimeError)
-    with pytest.raises(IndexMismatchError):
-        index_module.validate_manifest(
-            index_module.read_index_manifest(runs_idx),
-            (spec,),
-            fake_embedding,
-        )
-
-
-def test_run_summaries_index_schema_version_remains_one(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
-    build_scoped_index = getattr(index_module, "build_scoped_index", None)
-    read_index_manifest = getattr(index_module, "read_index_manifest", None)
-    assert (
-        CorpusSpec is not None
-        and build_scoped_index is not None
-        and read_index_manifest is not None
-    )
-    spec = CorpusSpec.run_summaries(sample_runs_root)
-    runs_idx = tmp_path / "runs_idx"
-    build_scoped_index(
-        corpora=(spec,),
-        index_path=runs_idx,
-        embedding=fake_embedding,
-    )
-    manifest = read_index_manifest(runs_idx)
-    assert manifest.schema_version == 1
-    kinds = {item.kind for item in manifest.corpora}
-    assert kinds == {"run_summaries"}
+    assert record_path.read_bytes() == record_before
+    assert not (sample_corpus / "derived-index").exists()
 
 
 def test_public_scopes_remain_backward_compatible(fake_embedding) -> None:
     assert VALID_SCOPES == ("experience", "superpowers", "all")
     with pytest.raises(ValueError, match="unknown Agent Memory scope"):
         search("run only", scope="run_summaries", embedding=fake_embedding)
-
-
-def test_run_summary_validation_rejects_embedding_identity_until_explicit_build(
-    sample_runs_root: Path, tmp_path: Path, fake_embedding
-) -> None:
-    spec = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
-    runs_idx = tmp_path / "runs_idx"
-    index_module.build_scoped_index((spec,), runs_idx, fake_embedding)
-    assert index_module.read_index_manifest(runs_idx).embedding.dimension == 64
-
-    replacement = DeterministicFakeEmbeddings(size=32)
-    with pytest.raises(index_module.IndexMismatchError, match="embedding"):
-        index_module.validate_run_summary_index(runs_idx, spec, replacement)
-
-    assert index_module.read_index_manifest(runs_idx).embedding.dimension == 64
-    index_module.build_scoped_index((spec,), runs_idx, replacement)
-
-    assert index_module.read_index_manifest(runs_idx).embedding.dimension == 32
 
 
 # ---------------------------------------------------------------------------
@@ -3178,7 +2437,6 @@ def test_refresh_queue_merges_kinds_and_avoids_duplicate_worker(
     queue_root = tmp_path / "queue"
     request = RefreshRequest(
         index_root=str(tmp_path / "index"),
-        runs_index_path=str(tmp_path / "runs-index"),
         corpus_roots={
             "experience": str(tmp_path / "experience"),
             "superpowers": str(tmp_path / "superpowers"),
@@ -3263,7 +2521,6 @@ def test_refresh_worker_drains_pending_and_records_sanitized_status(
     queue_root = tmp_path / "queue"
     request = RefreshRequest(
         index_root=str(tmp_path / "index"),
-        runs_index_path=str(tmp_path / "runs-index"),
         corpus_roots={"experience": str(tmp_path / "experience")},
         desired_sources={"experience": "v1"},
         embedding_backend="fake",
@@ -3314,7 +2571,6 @@ def test_refresh_worker_failure_drains_request_enqueued_during_build(
     queue_root = tmp_path / "queue"
     request = RefreshRequest(
         index_root=str(tmp_path / "index"),
-        runs_index_path=str(tmp_path / "runs-index"),
         corpus_roots={
             "experience": str(tmp_path / "experience"),
             "superpowers": str(tmp_path / "superpowers"),
@@ -3379,7 +2635,6 @@ def test_refresh_worker_dedupes_same_identity_enqueued_while_in_flight(
     queue_root = tmp_path / "queue"
     request = RefreshRequest(
         index_root=str(tmp_path / "index"),
-        runs_index_path=str(tmp_path / "runs-index"),
         corpus_roots={"experience": str(tmp_path / "experience")},
         desired_sources={"experience": "v1"},
         embedding_backend="fake",
@@ -3432,7 +2687,6 @@ def test_refresh_worker_keeps_new_source_identity_enqueued_while_in_flight(
     queue_root = tmp_path / "queue"
     request = RefreshRequest(
         index_root=str(tmp_path / "index"),
-        runs_index_path=str(tmp_path / "runs-index"),
         corpus_roots={"experience": str(tmp_path / "experience")},
         desired_sources={"experience": "v1"},
         embedding_backend="fake",
@@ -3490,9 +2744,7 @@ def test_cli_refresh_worker_materializes_only_queued_project_shard(
         corpus=str(experience.root),
         superpowers_corpus=str(superpowers.root),
         docs_root=str(docs_root),
-        runs_root=str(tmp_path / "missing-runs"),
         index=str(index_root),
-        runs_index=str(tmp_path / "runs-index"),
         embedding="fake",
         batch_size=8,
     )
@@ -3521,6 +2773,8 @@ def test_cli_refresh_worker_materializes_only_queued_project_shard(
 def test_cli_stale_search_returns_last_good_and_queues_refresh(
     scoped_corpora, tmp_path: Path, capsys, monkeypatch
 ) -> None:
+    """Refreshes that exceed the foreground budget fall back to the queue."""
+    monkeypatch.setattr(agent_memory_script, "FOREGROUND_REFRESH_MAX_NEW_CHUNKS", 0)
     experience, _ = scoped_corpora
     idx = tmp_path / "idx"
     common = [
@@ -3532,8 +2786,6 @@ def test_cli_stale_search_returns_last_good_and_queues_refresh(
         str(experience.root),
         "--index",
         str(idx),
-        "--runs-root",
-        str(tmp_path / "missing-runs"),
     ]
     assert agent_memory_main([*common, "build"]) == 0
     capsys.readouterr()
@@ -3554,7 +2806,94 @@ def test_cli_stale_search_returns_last_good_and_queues_refresh(
     captured = capsys.readouterr()
     assert result == 0
     assert '"index_freshness": "stale"' in captured.out
+    assert "RefreshBudgetExceededError" in captured.err
     assert "tagged last-good" in captured.err
+    assert queued == [("experience",)]
+
+
+def test_cli_stale_search_refreshes_small_change_before_answering(
+    scoped_corpora, tmp_path: Path, capsys, monkeypatch
+) -> None:
+    experience, _ = scoped_corpora
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "experience",
+        "--corpus",
+        str(experience.root),
+        "--index",
+        str(idx),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    capsys.readouterr()
+    (experience.root / "continuity.md").write_text(
+        "# Changed source\n\nexact terminal frame rewritten after the build.\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: pytest.fail("a small change must not be queued"),
+    )
+    counting = _CountingFakeEmbeddings(size=384)
+    monkeypatch.setattr(
+        agent_memory_script, "build_embedding", lambda **kwargs: counting
+    )
+
+    result = agent_memory_main(
+        [*common, "search", "exact terminal frame rewritten", "--json"]
+    )
+
+    captured = capsys.readouterr()
+    assert result == 0
+    hits = json.loads(captured.out)
+    assert hits and all(hit["index_freshness"] == "fresh" for hit in hits)
+    assert any("rewritten after the build" in hit["excerpt"] for hit in hits)
+    assert "refreshed experience incrementally" in captured.err
+    # Only the edited file is embedded; every other chunk reuses its vector.
+    assert len(counting.embedded) == 1
+    assert "rewritten after the build" in counting.embedded[0]
+
+
+def test_cli_stale_search_does_not_wait_for_running_builder(
+    scoped_corpora, tmp_path: Path, capsys, monkeypatch
+) -> None:
+    experience, _ = scoped_corpora
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "experience",
+        "--corpus",
+        str(experience.root),
+        "--index",
+        str(idx),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    capsys.readouterr()
+    (experience.root / "continuity.md").write_text(
+        "# Changed source\n\nNew bytes while a builder is active.\n",
+        encoding="utf-8",
+    )
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+    leaf = idx / "experience"
+    with index_module._index_build_lock(leaf):
+        result = agent_memory_main(
+            [*common, "search", "exact terminal frame", "--json"]
+        )
+
+    captured = capsys.readouterr()
+    assert result == 0
+    assert '"index_freshness": "stale"' in captured.out
+    assert "IndexBuildInProgressError" in captured.err
     assert queued == [("experience",)]
 
 
@@ -3585,8 +2924,6 @@ def test_cli_missing_layout_queues_without_foreground_build(
             str(experience.root),
             "--index",
             str(idx),
-            "--runs-root",
-            str(tmp_path / "missing-runs"),
             "search",
             "continuity",
         ]
@@ -3627,8 +2964,6 @@ def test_cli_missing_embedding_is_broken_and_never_queued(
             str(experience.root),
             "--index",
             str(idx),
-            "--runs-root",
-            str(tmp_path / "missing-runs"),
             "search",
             "continuity",
         ]
@@ -3636,55 +2971,6 @@ def test_cli_missing_embedding_is_broken_and_never_queued(
 
     assert result == 2
     assert "model missing" in capsys.readouterr().err
-
-
-def test_cli_missing_run_shard_queues_only_run_summaries(
-    scoped_corpora,
-    sample_runs_root: Path,
-    tmp_path: Path,
-    capsys,
-    monkeypatch,
-    fake_embedding,
-) -> None:
-    from ai_video.agent_memory.layout import build_project_indexes
-
-    experience, _ = scoped_corpora
-    idx = tmp_path / "index"
-    build_project_indexes((experience,), idx, fake_embedding)
-    queued: list[tuple[str, ...]] = []
-    monkeypatch.setattr(
-        agent_memory_script,
-        "_enqueue",
-        lambda args, kinds: queued.append(tuple(kinds)),
-    )
-    monkeypatch.setattr(
-        agent_memory_script,
-        "build_embedding",
-        lambda **kwargs: pytest.fail("missing run shard must queue before model load"),
-    )
-
-    result = agent_memory_main(
-        [
-            "--embedding",
-            "fake",
-            "--scope",
-            "experience",
-            "--corpus",
-            str(experience.root),
-            "--index",
-            str(idx),
-            "--runs-root",
-            str(sample_runs_root),
-            "--runs-index",
-            str(tmp_path / "missing-runs-index"),
-            "search",
-            "continuity",
-        ]
-    )
-
-    assert result == 3
-    assert queued == [("run_summaries",)]
-    assert "continue with current repository evidence" in capsys.readouterr().err
 
 
 def test_cli_partial_all_layout_queues_all_missing_shards_before_model_load(
@@ -3727,8 +3013,6 @@ def test_cli_partial_all_layout_queues_all_missing_shards_before_model_load(
             str(docs_root),
             "--index",
             str(idx),
-            "--runs-root",
-            str(tmp_path / "missing-runs"),
             "search",
             "recovery",
         ]
@@ -3737,72 +3021,6 @@ def test_cli_partial_all_layout_queues_all_missing_shards_before_model_load(
     assert result == 3
     assert queued == [
         ("superpowers", "current_docs", "research", "deferred")
-    ]
-    assert "continue with current repository evidence" in capsys.readouterr().err
-
-
-def test_cli_legacy_migration_also_queues_missing_eligible_runs(
-    scoped_corpora,
-    project_docs_corpora,
-    sample_runs_root: Path,
-    tmp_path: Path,
-    capsys,
-    monkeypatch,
-    fake_embedding,
-) -> None:
-    experience, superpowers = scoped_corpora
-    docs_root, project_corpora = project_docs_corpora
-    idx = tmp_path / "legacy"
-    index_module.build_scoped_index(
-        (*scoped_corpora, *project_corpora),
-        idx,
-        fake_embedding,
-    )
-    queued: list[tuple[str, ...]] = []
-    monkeypatch.setattr(
-        agent_memory_script,
-        "_enqueue",
-        lambda args, kinds: queued.append(tuple(kinds)),
-    )
-    monkeypatch.setattr(
-        agent_memory_script,
-        "build_embedding",
-        lambda **kwargs: pytest.fail("legacy migration must queue before model load"),
-    )
-
-    result = agent_memory_main(
-        [
-            "--embedding",
-            "fake",
-            "--scope",
-            "experience",
-            "--corpus",
-            str(experience.root),
-            "--superpowers-corpus",
-            str(superpowers.root),
-            "--docs-root",
-            str(docs_root),
-            "--index",
-            str(idx),
-            "--runs-root",
-            str(sample_runs_root),
-            "--runs-index",
-            str(tmp_path / "missing-runs-index"),
-            "search",
-            "continuity",
-        ]
-    )
-
-    assert result == 3
-    assert queued == [
-        (
-            "experience",
-            "superpowers",
-            "current_docs",
-            "research",
-            "deferred",
-            "run_summaries",
-        )
     ]
     assert "continue with current repository evidence" in capsys.readouterr().err
 
@@ -3834,3 +3052,474 @@ def test_legacy_shared_index_requires_full_migration(
     assert read_project_layout(root).layout == "per_corpus"
     assert not (root / "manifest.json").exists()
     assert index_module.index_exists(shard_path(root, "experience"))
+
+
+# ---------------------------------------------------------------------------
+# retrieval exclusions, incremental refresh, and per-document hits
+# ---------------------------------------------------------------------------
+
+
+class _CountingFakeEmbeddings(DeterministicFakeEmbeddings):
+    """Fake embedding that records every document text it had to embed."""
+
+    def __init__(self, size: int = 64, seed: int = 0xC0FFEE) -> None:
+        super().__init__(size=size, seed=seed)
+        self.embedded: list[str] = []
+
+    def embed_documents(self, texts):
+        texts = list(texts)
+        self.embedded.extend(texts)
+        return super().embed_documents(texts)
+
+
+def test_superpowers_plans_and_artifacts_are_not_retrievable(tmp_path: Path) -> None:
+    root = tmp_path / "superpowers"
+    for relative in (
+        "specs/2026-10-01-design.md",
+        "plans/2026-10-01-design.md",
+        "artifacts/drama/show/production-design.md",
+        "notes/specs-adjacent.md",
+    ):
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {relative}\n\nBody.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.superpowers(root)
+
+    sources = sorted(
+        Path(doc.metadata["source"]).relative_to(root.resolve()).as_posix()
+        for doc in load_documents(root, corpus=corpus)
+    )
+
+    assert sources == ["notes/specs-adjacent.md", "specs/2026-10-01-design.md"]
+    _, count = index_module.corpus_digest(root, corpus)
+    assert count == 2
+
+
+@pytest.mark.parametrize("marker", ["retired", '"retired"', "Retired"])
+def test_retired_frontmatter_removes_document_from_every_corpus(
+    tmp_path: Path, marker: str
+) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "current.md").write_text("# Current\n\nStill true.\n", encoding="utf-8")
+    (root / "superseded.md").write_text(
+        f"---\nretrieval: {marker}\nsuperseded_by: current.md\n---\n"
+        "# Superseded\n\nNo longer true.\n",
+        encoding="utf-8",
+    )
+    (root / "kept.md").write_text(
+        "---\nretrieval: active\n---\n# Kept\n\nExplicitly active.\n",
+        encoding="utf-8",
+    )
+    corpus = corpus_module.CorpusSpec.experience(root)
+
+    titles = sorted(doc.metadata["title"] for doc in load_documents(root, corpus=corpus))
+
+    assert titles == ["Current", "Kept"]
+    assert index_module.corpus_digest(root, corpus)[1] == 2
+
+
+def test_rebuild_embeds_only_new_or_edited_chunks(tmp_path: Path) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    for name in ("alpha", "beta", "gamma"):
+        (root / f"{name}.md").write_text(
+            f"# {name}\n\n## Section\n{name} original body.\n", encoding="utf-8"
+        )
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    first = _CountingFakeEmbeddings()
+    index_module.build_scoped_index((corpus,), idx, first)
+    assert len(first.embedded) == 3
+
+    (root / "beta.md").write_text(
+        "# beta\n\n## Section\nbeta edited body.\n", encoding="utf-8"
+    )
+    (root / "delta.md").write_text(
+        "# delta\n\n## Section\ndelta new body.\n", encoding="utf-8"
+    )
+    second = _CountingFakeEmbeddings()
+    total = index_module.build_scoped_index((corpus,), idx, second)
+
+    assert total == 4
+    assert sorted(second.embedded) == sorted(
+        text for text in second.embedded if "beta edited" in text or "delta new" in text
+    )
+    assert len(second.embedded) == 2
+    hits = search(
+        "beta edited body",
+        top_k=4,
+        scope="experience",
+        corpora=(corpus,),
+        index_path=idx,
+        embedding=second,
+    )
+    assert hits[0].source.endswith("beta.md")
+
+
+def test_rebuild_does_not_reuse_vectors_from_another_embedding_identity(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "alpha.md").write_text("# alpha\n\nalpha body.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index((corpus,), idx, _CountingFakeEmbeddings(size=64))
+
+    other = _CountingFakeEmbeddings(size=32)
+    index_module.build_scoped_index((corpus,), idx, other)
+
+    assert len(other.embedded) == 1
+    assert index_module.read_index_manifest(idx).embedding.dimension == 32
+
+
+def test_refresh_budget_is_checked_before_the_active_index_changes(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "alpha.md").write_text("# alpha\n\nalpha body.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    embedding = _CountingFakeEmbeddings()
+    index_module.build_scoped_index((corpus,), idx, embedding)
+    manifest_before = (idx / "manifest.json").read_bytes()
+    for name in ("beta", "gamma"):
+        (root / f"{name}.md").write_text(f"# {name}\n\n{name} body.\n", encoding="utf-8")
+
+    bounded = _CountingFakeEmbeddings()
+    budget = index_module.EmbeddingBudget(1)
+    with pytest.raises(index_module.RefreshBudgetExceededError) as excinfo:
+        index_module.build_scoped_index(
+            (corpus,), idx, bounded, embedding_budget=budget
+        )
+
+    assert (excinfo.value.new_chunks, excinfo.value.limit) == (2, 1)
+    assert budget.remaining == 1
+    assert bounded.embedded == []
+    assert (idx / "manifest.json").read_bytes() == manifest_before
+    assert not list(tmp_path.glob(".idx.staging-*"))
+
+
+def test_non_waiting_build_refuses_a_held_build_lock(tmp_path: Path) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "alpha.md").write_text("# alpha\n\nalpha body.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+
+    with index_module._index_build_lock(idx):
+        with pytest.raises(index_module.IndexBuildInProgressError):
+            index_module.build_scoped_index(
+                (corpus,), idx, _CountingFakeEmbeddings(), wait=False
+            )
+
+    assert not idx.exists()
+
+
+def test_repeated_chunks_of_one_document_do_not_crowd_out_others(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    sections = "".join(
+        f"## Section {index}\nrollback ledger recovery step {index}.\n\n"
+        for index in range(6)
+    )
+    (root / "long.md").write_text(f"# Long\n\n{sections}", encoding="utf-8")
+    (root / "short.md").write_text(
+        "# Short\n\n## Only\nrollback ledger recovery summary.\n", encoding="utf-8"
+    )
+    # Unrelated records keep the query terms rare enough for BM25 admission.
+    for index in range(30):
+        (root / f"unrelated-{index}.md").write_text(
+            f"# Unrelated {index}\n\ncamera lens note {index}.\n", encoding="utf-8"
+        )
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    embedding = DeterministicFakeEmbeddings(size=64)
+    index_module.build_scoped_index((corpus,), idx, embedding)
+
+    hits = search(
+        "rollback ledger recovery",
+        top_k=2,
+        scope="experience",
+        corpora=(corpus,),
+        index_path=idx,
+        embedding=embedding,
+    )
+
+    assert sorted(Path(hit.source).name for hit in hits) == ["long.md", "short.md"]
+
+
+def test_rebuild_recovers_a_shard_whose_database_is_corrupt(tmp_path: Path) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "alpha.md").write_text("# alpha\n\nalpha body.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    embedding = _CountingFakeEmbeddings()
+    index_module.build_scoped_index((corpus,), idx, embedding)
+    (idx / "chroma.sqlite3").write_bytes(b"not a sqlite database" * 64)
+
+    rebuilt = _CountingFakeEmbeddings()
+    assert index_module.build_scoped_index((corpus,), idx, rebuilt) == 1
+
+    assert len(rebuilt.embedded) == 1
+    hits = search(
+        "alpha body",
+        top_k=1,
+        scope="experience",
+        corpora=(corpus,),
+        index_path=idx,
+        embedding=rebuilt,
+    )
+    assert hits and hits[0].source.endswith("alpha.md")
+
+
+def test_incremental_rebuild_stores_the_vector_of_each_chunk(tmp_path: Path) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    for index in range(12):
+        (root / f"note-{index:02d}.md").write_text(
+            f"# Note {index}\n\n## Body\nnote {index} original text.\n",
+            encoding="utf-8",
+        )
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    embedding = DeterministicFakeEmbeddings(size=64)
+    index_module.build_scoped_index((corpus,), idx, embedding)
+    (root / "note-00.md").unlink()
+    (root / "note-05.md").write_text(
+        "# Note 5\n\n## Body\nnote 5 edited text.\n", encoding="utf-8"
+    )
+    (root / "aaa-first.md").write_text(
+        "# First\n\n## Body\nsorted before every reused note.\n",
+        encoding="utf-8",
+    )
+    index_module.build_scoped_index((corpus,), idx, embedding)
+
+    try:
+        stored = (
+            index_module._client(idx)
+            .get_collection(corpus.collection_name)
+            .get(include=["documents", "embeddings"])
+        )
+    finally:
+        index_module._release_cached_client(idx)
+    assert len(stored["ids"]) == 12
+    for text, vector in zip(stored["documents"], stored["embeddings"]):
+        expected = embedding.embed_documents([text])[0]
+        assert max(abs(a - b) for a, b in zip(vector, expected)) < 1e-6
+
+
+def test_rebuild_ignores_vectors_from_other_library_versions(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import ai_video.agent_memory.manifest as manifest_module
+
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "alpha.md").write_text("# alpha\n\nalpha body.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index((corpus,), idx, _CountingFakeEmbeddings())
+    current = manifest_module._library_versions()
+    monkeypatch.setattr(
+        manifest_module,
+        "_library_versions",
+        lambda: {**current, "chromadb": "0.0.0-other"},
+    )
+
+    other = _CountingFakeEmbeddings()
+    index_module.build_scoped_index((corpus,), idx, other)
+
+    assert len(other.embedded) == 1
+
+
+def test_vector_reuse_survives_a_different_working_directory(
+    tmp_path: Path, monkeypatch
+) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "alpha.md").write_text("# alpha\n\nalpha body.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.experience(root)
+    idx = tmp_path / "idx"
+    monkeypatch.chdir(tmp_path)
+    index_module.build_scoped_index((corpus,), idx, _CountingFakeEmbeddings())
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    monkeypatch.chdir(elsewhere)
+
+    moved = _CountingFakeEmbeddings()
+    index_module.build_scoped_index((corpus,), idx, moved)
+
+    assert moved.embedded == []
+
+
+@pytest.mark.parametrize("kwargs", [{"wait": False}, {"embedding_budget": None}])
+def test_bounded_refresh_never_starts_a_full_migration(
+    tmp_path: Path, kwargs: dict
+) -> None:
+    from ai_video.agent_memory.layout import (
+        MissingProjectIndexError,
+        build_project_indexes,
+    )
+
+    if "embedding_budget" in kwargs:
+        kwargs = {"embedding_budget": index_module.EmbeddingBudget(0)}
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "alpha.md").write_text("# alpha\n\nalpha body.\n", encoding="utf-8")
+    corpus = corpus_module.CorpusSpec.experience(root)
+    index_root = tmp_path / "index"
+
+    with pytest.raises(MissingProjectIndexError):
+        build_project_indexes(
+            (corpus,), index_root, _CountingFakeEmbeddings(), **kwargs
+        )
+
+    assert not index_root.exists()
+
+
+def test_cli_build_full_reembeds_instead_of_reusing(
+    scoped_corpora, tmp_path: Path, monkeypatch
+) -> None:
+    experience, _ = scoped_corpora
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "experience",
+        "--corpus",
+        str(experience.root),
+        "--index",
+        str(tmp_path / "idx"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    reused = _CountingFakeEmbeddings(size=384)
+    monkeypatch.setattr(agent_memory_script, "build_embedding", lambda **kwargs: reused)
+    assert agent_memory_main([*common, "build"]) == 0
+    assert reused.embedded == []
+
+    full = _CountingFakeEmbeddings(size=384)
+    monkeypatch.setattr(agent_memory_script, "build_embedding", lambda **kwargs: full)
+    assert agent_memory_main([*common, "build", "--full"]) == 0
+    # continuity.md splits into a title chunk and a "Fix" section chunk.
+    assert len(full.embedded) == 2
+
+
+def test_cli_all_scope_shares_one_foreground_refresh_budget(
+    scoped_corpora, project_docs_corpora, tmp_path: Path, capsys, monkeypatch
+) -> None:
+    experience, superpowers = scoped_corpora
+    docs_root, _ = project_docs_corpora
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "all",
+        "--corpus",
+        str(experience.root),
+        "--superpowers-corpus",
+        str(superpowers.root),
+        "--docs-root",
+        str(docs_root),
+        "--index",
+        str(tmp_path / "idx"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    capsys.readouterr()
+    (experience.root / "continuity.md").write_text(
+        "# Continuity Recovery\n\n## Fix\nUse the edited terminal frame.\n",
+        encoding="utf-8",
+    )
+    # Two research chunks fit a per-shard budget of 2 but not what remains of
+    # one shared budget after the experience edit.
+    for index in range(2):
+        (docs_root / "research" / f"new-{index}.md").write_text(
+            f"# New research {index}\n\nFresh provider note {index}.\n",
+            encoding="utf-8",
+        )
+    monkeypatch.setattr(agent_memory_script, "FOREGROUND_REFRESH_MAX_NEW_CHUNKS", 2)
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script, "_enqueue", lambda args, kinds: queued.append(tuple(kinds))
+    )
+
+    assert agent_memory_main([*common, "search", "terminal frame", "--json"]) == 0
+
+    err = capsys.readouterr().err
+    assert "refreshed experience incrementally" in err
+    assert "research shard not refreshed" in err
+    assert "needs 2 new chunk embeddings" in err
+    assert queued == [("research",)]
+
+
+def test_cli_search_drops_a_newly_retired_document(
+    scoped_corpora, tmp_path: Path, capsys
+) -> None:
+    experience, _ = scoped_corpora
+    obsolete = experience.root / "obsolete.md"
+    obsolete.write_text(
+        "# Obsolete\n\n## Claim\nquartz ledger rollback guidance.\n",
+        encoding="utf-8",
+    )
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "experience",
+        "--corpus",
+        str(experience.root),
+        "--index",
+        str(tmp_path / "idx"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    capsys.readouterr()
+    assert agent_memory_main([*common, "search", "quartz ledger rollback", "--json"]) == 0
+    assert any(
+        hit["source"].endswith("obsolete.md")
+        for hit in json.loads(capsys.readouterr().out)
+    )
+
+    obsolete.write_text(
+        "---\nretrieval: retired  # replaced by continuity.md\n---\n"
+        + obsolete.read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    assert agent_memory_main([*common, "search", "quartz ledger rollback", "--json"]) == 0
+
+    captured = capsys.readouterr()
+    assert "refreshed experience incrementally" in captured.err
+    assert not any(
+        hit["source"].endswith("obsolete.md") for hit in json.loads(captured.out)
+    )
+
+
+def test_cli_search_reports_a_corrupt_database_as_broken(
+    scoped_corpora, tmp_path: Path, capsys, monkeypatch
+) -> None:
+    experience, _ = scoped_corpora
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "experience",
+        "--corpus",
+        str(experience.root),
+        "--index",
+        str(idx),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    (idx / "experience" / "chroma.sqlite3").write_bytes(b"not a sqlite database" * 64)
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: pytest.fail("physical corruption must not enqueue"),
+    )
+
+    assert agent_memory_main([*common, "search", "terminal frame", "--json"]) == 2
+    assert "cannot be opened" in capsys.readouterr().err

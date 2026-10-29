@@ -40,20 +40,15 @@ from ai_video.agent_memory.config import (
     DEFAULT_EMBEDDING,
     DEFAULT_EMBED_BATCH_SIZE,
     DEFAULT_INDEX_PATH,
-    DEFAULT_RUNS_INDEX_PATH,
-    DEFAULT_RUNS_ROOT,
     DEFAULT_SCOPE,
     DEFAULT_SUPERPOWERS_ROOT,
     DEFAULT_TOP_K,
+    FOREGROUND_REFRESH_MAX_NEW_CHUNKS,
     VALID_SCOPES,
 )
 from ai_video.agent_memory.corpus import CorpusSpec
 from ai_video.agent_memory.embeddings import build_embedding
-from ai_video.agent_memory.index import (
-    IndexMismatchError,
-    build_scoped_index,
-    validate_index_path,
-)
+from ai_video.agent_memory.index import EmbeddingBudget, IndexMismatchError
 from ai_video.agent_memory.layout import (
     LegacyProjectIndexError,
     MissingProjectIndexError,
@@ -70,7 +65,6 @@ from ai_video.agent_memory.maintenance import (
 from ai_video.agent_memory.manifest import (
     LibraryVersionMismatchError,
     corpus_digest,
-    run_summary_digest,
 )
 from ai_video.agent_memory.retrieval import format_text, retrieve_project
 
@@ -141,21 +135,12 @@ def _queue_root() -> Path:
 def _refresh_request(args: argparse.Namespace) -> RefreshRequest:
     corpora = _resolve_all_corpora(args)
     roots = {item.kind: str(item.root) for item in corpora}
-    runs_root = _resolve(args.runs_root)
-    if runs_root.is_dir():
-        roots["run_summaries"] = str(runs_root)
     desired_sources: dict[str, str] = {}
     for corpus in corpora:
         digest, count = corpus_digest(corpus.root, corpus)
         desired_sources[corpus.kind] = f"sha256:{digest}:documents:{count}"
-    if "run_summaries" in roots:
-        digest, count = run_summary_digest(runs_root)
-        desired_sources["run_summaries"] = (
-            f"sha256:{digest}:documents:{count}"
-        )
     return RefreshRequest(
         index_root=str(_resolve(args.index)),
-        runs_index_path=str(_resolve(args.runs_index)),
         corpus_roots=roots,
         desired_sources=desired_sources,
         embedding_backend=args.embedding,
@@ -178,59 +163,76 @@ def _enqueue(args: argparse.Namespace, kinds: tuple[str, ...]) -> None:
 
 def cmd_build(args: argparse.Namespace) -> int:
     idx = _resolve(args.index)
-    runs_idx = _resolve(args.runs_index)
     corpora = _resolve_corpora(args)
     for corpus in corpora:
         if not corpus.root.is_dir():
             print(f"corpus not found: {corpus.root}", file=sys.stderr)
             return 2
-    runs_corpus: CorpusSpec | None = None
-    if args.scope in {"experience", "all"}:
-        candidate = CorpusSpec.run_summaries(_resolve(args.runs_root))
-        if candidate.root.is_dir():
-            runs_corpus = candidate
     try:
-        if runs_corpus is not None:
-            validate_index_path(
-                runs_idx,
-                (idx, runs_corpus.root, *(item.root for item in corpora)),
-                label="run-summary index",
-            )
         embedding = build_embedding(backend=args.embedding)
         counts = build_project_indexes(
             corpora=corpora,
             index_root=idx,
             embedding=embedding,
             batch_size=args.batch_size,
+            reuse=not args.full,
         )
-        runs_count = 0
-        if runs_corpus is not None:
-            runs_count = build_scoped_index(
-                corpora=(runs_corpus,),
-                index_path=runs_idx,
-                embedding=embedding,
-                batch_size=args.batch_size,
-            )
     except (FileNotFoundError, IndexMismatchError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
     roots = ", ".join(f"{item.kind}={item.root}" for item in corpora)
     print(f"Indexed {sum(counts.values())} chunks from {roots} into {idx}")
-    if runs_corpus is not None:
-        print(
-            f"Indexed {runs_count} run-summary chunks from "
-            f"{runs_corpus.root} into {runs_idx}"
-        )
     return 0
+
+
+def _refresh_stale_in_foreground(
+    args: argparse.Namespace,
+    corpora: tuple[CorpusSpec, ...],
+    stale_kinds: tuple[str, ...],
+    embedding,
+) -> tuple[str, ...]:
+    """Incrementally refresh small stale shards; return kinds still stale.
+
+    All shards share one bound on new chunk embeddings, and a shard that
+    another builder holds is skipped instead of waited on. Anything left stale
+    falls back to the detached queue while the validated last-good fragments
+    are returned.
+    """
+    budget = EmbeddingBudget(FOREGROUND_REFRESH_MAX_NEW_CHUNKS)
+    refreshed: list[str] = []
+    remaining: list[str] = []
+    for corpus in corpora:
+        if corpus.kind not in stale_kinds:
+            continue
+        try:
+            build_project_indexes(
+                (corpus,),
+                _resolve(args.index),
+                embedding,
+                batch_size=args.batch_size,
+                embedding_budget=budget,
+                wait=False,
+            )
+        except Exception as exc:
+            print(
+                f"Agent Memory {corpus.kind} shard not refreshed before search "
+                f"({type(exc).__name__}: {exc}).",
+                file=sys.stderr,
+            )
+            remaining.append(corpus.kind)
+        else:
+            refreshed.append(corpus.kind)
+    if refreshed:
+        print(
+            f"Agent Memory refreshed {', '.join(refreshed)} incrementally before search.",
+            file=sys.stderr,
+        )
+    return tuple(remaining)
 
 
 def cmd_search(args: argparse.Namespace) -> int:
     idx = _resolve(args.index)
-    runs_idx = _resolve(args.runs_index)
     corpora = _resolve_corpora(args)
-    runs_corpus: CorpusSpec | None = None
-    if args.scope in {"experience", "all"}:
-        runs_corpus = CorpusSpec.run_summaries(_resolve(args.runs_root))
     try:
         # Missing/legacy layout is cheap to classify and queue; do this before
         # loading the local embedding model so first-use migration returns fast.
@@ -240,17 +242,6 @@ def cmd_search(args: argparse.Namespace) -> int:
             for corpus in corpora
             if not shard_path(idx, corpus.kind).exists()
         ]
-        if (
-            runs_corpus is not None
-            and runs_corpus.root.is_dir()
-        ):
-            validate_index_path(
-                runs_idx,
-                (idx, runs_corpus.root, *(item.root for item in corpora)),
-                label="run-summary index",
-            )
-            if not runs_idx.exists():
-                missing_kinds.append("run_summaries")
         if missing_kinds:
             raise MissingProjectIndexError(
                 "Missing Agent Memory shard(s): "
@@ -258,17 +249,28 @@ def cmd_search(args: argparse.Namespace) -> int:
                 kinds=tuple(missing_kinds),
             )
         embedding = build_embedding(backend=args.embedding)
-        result = retrieve_project(
-            args.query,
-            top_k=args.top_k,
-            corpora=corpora,
-            index_root=idx,
-            runs_index_path=runs_idx,
-            runs_corpus=runs_corpus,
-            embedding=embedding,
-            scope=args.scope,
-            allow_stale=True,
-        )
+
+        def retrieve():
+            return retrieve_project(
+                args.query,
+                top_k=args.top_k,
+                corpora=corpora,
+                index_root=idx,
+                embedding=embedding,
+                scope=args.scope,
+                allow_stale=True,
+            )
+
+        result = retrieve()
+        if result.stale_kinds:
+            still_stale = _refresh_stale_in_foreground(
+                args,
+                corpora,
+                result.stale_kinds,
+                embedding,
+            )
+            if len(still_stale) < len(result.stale_kinds):
+                result = retrieve()
     except (MissingProjectIndexError, LegacyProjectIndexError) as exc:
         kinds = (
             PROJECT_CORPUS_KINDS
@@ -279,22 +281,6 @@ def cmd_search(args: argparse.Namespace) -> int:
                 else tuple(item.kind for item in corpora)
             )
         )
-        if (
-            runs_corpus is not None
-            and runs_corpus.root.is_dir()
-            and not runs_idx.exists()
-            and "run_summaries" not in kinds
-        ):
-            try:
-                validate_index_path(
-                    runs_idx,
-                    (idx, runs_corpus.root, *(item.root for item in corpora)),
-                    label="run-summary index",
-                )
-            except ValueError as path_exc:
-                print(str(path_exc), file=sys.stderr)
-                return 2
-            kinds = (*kinds, "run_summaries")
         try:
             _enqueue(args, tuple(kinds))
         except Exception as queue_exc:
@@ -356,7 +342,6 @@ def _corpus_from_refresh(kind: str, root: str) -> CorpusSpec:
         "current_docs": CorpusSpec.current_docs,
         "research": CorpusSpec.research,
         "deferred": CorpusSpec.deferred,
-        "run_summaries": CorpusSpec.run_summaries,
     }
     try:
         return factories[kind](path)
@@ -367,33 +352,16 @@ def _corpus_from_refresh(kind: str, root: str) -> CorpusSpec:
 def cmd_refresh_worker(args: argparse.Namespace) -> int:
     def build(request: RefreshRequest, kinds: tuple[str, ...]) -> dict[str, int]:
         embedding = build_embedding(backend=request.embedding_backend)
-        counts: dict[str, int] = {}
-        main_corpora = tuple(
+        corpora = tuple(
             _corpus_from_refresh(kind, request.corpus_roots[kind])
             for kind in kinds
-            if kind in PROJECT_CORPUS_KINDS
         )
-        if main_corpora:
-            counts.update(
-                build_project_indexes(
-                    main_corpora,
-                    Path(request.index_root),
-                    embedding,
-                    batch_size=request.batch_size,
-                )
-            )
-        if "run_summaries" in kinds:
-            runs = _corpus_from_refresh(
-                "run_summaries",
-                request.corpus_roots["run_summaries"],
-            )
-            counts["run_summaries"] = build_scoped_index(
-                (runs,),
-                Path(request.runs_index_path),
-                embedding,
-                batch_size=request.batch_size,
-            )
-        return counts
+        return build_project_indexes(
+            corpora,
+            Path(request.index_root),
+            embedding,
+            batch_size=request.batch_size,
+        )
 
     return run_refresh_worker(Path(args.queue_dir), build)
 
@@ -403,9 +371,8 @@ def main(argv: list[str] | None = None) -> int:
         prog="agent_memory",
         description=(
             "Agent project knowledge: scoped local RAG over experience records, "
-            "current project docs, advisory research, deferred decisions, "
-            "experience records, Superpowers plans/specs, and auto-generated "
-            "runs/<run_id>/SUMMARY.md summaries. Authority is preserved per hit."
+            "current project docs, advisory research, deferred decisions, and "
+            "Superpowers specs. Authority is preserved per hit."
         ),
     )
     parser.add_argument(
@@ -416,7 +383,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--superpowers-corpus",
         default=DEFAULT_SUPERPOWERS_ROOT,
-        help="Path to the Superpowers plans/specs corpus (default: %(default)s).",
+        help=(
+            "Path to the Superpowers corpus; plans/ and artifacts/ are not "
+            "indexed (default: %(default)s)."
+        ),
     )
     parser.add_argument(
         "--docs-root",
@@ -424,22 +394,6 @@ def main(argv: list[str] | None = None) -> int:
         help=(
             "Path to docs/ for all-scope current, research, and deferred "
             "collections (default: %(default)s)."
-        ),
-    )
-    parser.add_argument(
-        "--runs-root",
-        default=DEFAULT_RUNS_ROOT,
-        help=(
-            "Path to the auto-generated runs/ root. Only exact one-level "
-            "runs/<run_id>/SUMMARY.md files with a Status line are indexed "
-            "into the separate run-summary index."
-        ),
-    )
-    parser.add_argument(
-        "--runs-index",
-        default=DEFAULT_RUNS_INDEX_PATH,
-        help=(
-            "Path to the separate run-summary index directory (default: %(default)s)."
         ),
     )
     parser.add_argument(
@@ -469,9 +423,20 @@ def main(argv: list[str] | None = None) -> int:
         help="Index embedding/add batch size (default: %(default)s).",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser(
+    p_build = sub.add_parser(
         "build",
-        help="Wipe and rebuild the local index from the corpus.",
+        help=(
+            "Rebuild the selected shards, reusing stored vectors for unchanged "
+            "chunks."
+        ),
+    )
+    p_build.add_argument(
+        "--full",
+        action="store_true",
+        help=(
+            "Re-embed every chunk instead of reusing stored vectors; use after "
+            "changing how embeddings are computed."
+        ),
     )
     p_search = sub.add_parser("search", help="Search the local index.")
     p_search.add_argument("query", help="Natural-language query.")

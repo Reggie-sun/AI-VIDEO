@@ -1,3 +1,7 @@
+---
+retrieval: retired
+superseded_by: docs/when_to_do/2026-08-22-continuity-review-coordinator-and-human-evidence-ui-implementation-recap.md
+---
 # Continuity Review Coordinator And Human Evidence UI Plan
 
 ## Status

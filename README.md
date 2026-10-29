@@ -48,11 +48,15 @@ Requirements:
 这里的 `agent_memory` 是历史 CLI/module 名；它是独立于 Codex host memory 和
 Production runtime 的本地 advisory project RAG。索引只是可删除、可重建的 derived
 cache，不保存 canonical project state。默认 `experience` scope 检索
-`docs/record_for_agent/`，并自动合并 eligible run summaries；`superpowers`
-scope 只检索 `docs/superpowers/` 中的历史 specs/plans；`all` 额外检索
-top-level `docs/*.md`、`docs/research/` 与 `docs/when_to_do/`。因此 `docs/`
-下的有效 Markdown 都可检索，但不会被压成同一种 authority；HTML、纯文本与
-其他非 Markdown 文件不会进入 corpus。
+`docs/record_for_agent/`；`superpowers` scope 只检索 `docs/superpowers/` 中的历史
+specs；`all` 额外检索 top-level `docs/*.md`、`docs/research/` 与 `docs/when_to_do/`。
+各 corpus 不会被压成同一种 authority；HTML、纯文本与其他非 Markdown 文件不会进入 corpus。
+
+以下 Markdown 留在 Git 中作为历史，但不进入检索：已执行的
+`docs/superpowers/plans/`、具体作品的 `docs/superpowers/artifacts/`，以及 frontmatter
+声明 `retrieval: retired` 的任何文档（通常同时写 `superseded_by:` 指向取代它的文件）。
+Auto-generated `runs/<run_id>/SUMMARY.md` 不再被索引，其结论以 `docs/record_for_agent/`
+记录为准。
 
 `all` 的五个 main-index corpus 分别是 `experience`、`superpowers`、
 `current_docs`、`research` 与 `deferred`。Current docs 会进一步按路径标记
@@ -60,17 +64,6 @@ top-level `docs/*.md`、`docs/research/` 与 `docs/when_to_do/`。因此 `docs/`
 generic current-project advisory；research 与 when-to-do 则分别保持
 `advisory_research` 与 `deferred_decision_advisory`。这些标签帮助 Agent 解读
 命中，但结果仍必须回到 exact source、current code/tests 与 runtime evidence 核验。
-
-`runs/<run_id>/SUMMARY.md`（auto-generated run summaries）通过独立的 derived
-index `.agent/memory/run-summaries`（collection `agent_memory_run_summaries`，
-authority `auto_generated_run_summary_advisory`）被发现；无需手动复制，
-`experience` / `all` 的显式 `build` 会同时 materialize 该 index；schema
-仍然保持 v1。只有精确的一层 `runs/<run_id>/SUMMARY.md` regular non-symlink
-文件，且带 `Status` 行，trailing `-vN` 解析为 `run_family`/`run_version` 且只
-保留同 family 的最高版本。`superpowers` scope 不会触达 runs；缺失的 runs
-root 不会产生 hit。Run-summary 检索会返回带 `document_kind=run_summary`、
-`run_id`/`run_family`/`run_version`/`summary_sha256` 与显式 formatted
-authority 标签的 `Hit`。
 
 安装 optional dependencies，并显式下载 pinned multilingual E5 ONNX 模型：
 
@@ -112,14 +105,17 @@ python -m scripts.agent_memory --scope superpowers search \
 
 每个 main corpus 现在拥有 `.agent/memory/index/<corpus_kind>/` 独立 Chroma shard；
 manifest 分别绑定该 corpus 的 digest、chunking、embedding identity 与 library versions。
-`build` 在 staging materialize 后只短暂锁住 activation，narrow scope 只替换自己的 shard；
-`experience` / `all` build 也会显式构建 eligible run-summary shard。
+`build` 在 staging materialize 后只短暂锁住 activation，narrow scope 只替换自己的 shard。
+重建时，内容未变的 chunk 直接复用当前 shard 中的向量（manifest 证明 schema、embedding、
+chunking 与 library versions 一致时才复用），只为新增或修改的 chunk 计算 embedding；修改了
+embedding 计算方式（前缀、截断、pooling）后用 `build --full` 全量重算。
 
-Project-level retrieval core 保持 read-only。CLI `search` 遇到 corpus bytes drift 时会先
-返回通过 schema、embedding、authority 与 physical collection 完整性校验的 last-good
-片段，并标记 `index_freshness=stale`，随后只把 stale shard 放入 `.git/agent-memory-refresh/`
-detached queue；前台不等待 corpus re-embedding 或 Chroma materialization，正常 query/null
-embedding 仍在本地查询内执行。首次缺失 sharded layout 或旧 shared layout 需要
+Project-level retrieval core 保持 read-only。CLI `search` 遇到 corpus bytes drift 时，会先在
+前台对 stale shard 做有界增量刷新：本次 search 涉及的所有 shard 合计最多 64 个 chunk 需要新
+embedding、且没有其他 builder 持有该 shard 时，刷新完成后再查询并返回 `fresh` 结果（通常
+5–15 秒，主要是重写 staging 副本与新 chunk embedding）。超出预算或 shard 正被构建时，返回
+通过 schema、embedding、authority 与 physical collection 完整性校验的 last-good 片段，标记
+`index_freshness=stale`，并只把 stale shard 放入 `.git/agent-memory-refresh/` detached queue。首次缺失 sharded layout 或旧 shared layout 需要
 migration 时，CLI queue materialization 后以 exit `3` 快速返回。Schema、embedding、
 chunking/metric、authority/collection contract 或 physical collection 损坏仍以 exit `2`
 strict fail closed，不自动修复。Library identity mismatch 仍拒绝本次读取，但会收集并
@@ -128,8 +124,8 @@ Provider secret、不联网，也不改变 Production state。
 
 Leaf manifest 保持 schema v1，且 collection、authority 与 index 目录相互独立。
 `all` 在默认 `top_n=8` 时为五个 main corpora 分配稳定的 `2/2/2/1/1`
-candidate quota，再与 eligible run-summary hits 统一排序并截取最终 8 个片段；
-每个 collection 的 dense 与 lexical candidate `top_k` 仍为 30。
+candidate quota，再统一排序并截取最终 8 个片段；每个 collection 的 dense 与 lexical
+candidate `top_k` 仍为 30。同一文档只返回分数最高的一个片段，避免重复片段挤占其他文档。
 
 ## Architecture Gate
 
