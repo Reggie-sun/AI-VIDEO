@@ -6,6 +6,8 @@ learning_eligibility: ineligible
 
 # Shizhen MC00 Process And User Feedback
 
+> **Superseded status (2026-10-29):** 停止后的分析、MC00 v4 重做（Gate FAIL）、宏观开场改为 CITY-RISE 调度对讲版（用户否定）及新生成参考规划门禁（提交 `d5c0718`）见 [2026-10-29 记录](2026-10-29-shizhen-macro-opening-redo-and-reference-gate.md)。下文 v3 时间线与测量作为历史证据保留。
+
 Date: 2026-10-28
 
 ## Purpose And Stopped State
