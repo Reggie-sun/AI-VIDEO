@@ -15,6 +15,10 @@ Date: 2026-10-27
 > Claude 侧 session-record hooks 已按用户要求于 `d57f85b` 移除，下文所述 Claude hook 接线为历史状态。
 >
 > **Supersession notice（2026-10-28，baseline cleanup）**：其余基线失败已处理，见下节 "Baseline Cleanup"。
+>
+> **Supersession notice（2026-10-28，constitution routing）**：下文审计观察"规则文档被字节预算压缩影响可读性"
+> 已由用户决定按三步处理；第 1 步（制作细则移出 `AGENTS.md`）已于 `69eaa9b` 完成，第 2、3 步未做，见
+> [AGENTS Constitution Routing Phase 1](2026-10-28-agents-constitution-routing-phase1.md)。其余审计观察状态不变。
 
 ## Purpose
 
