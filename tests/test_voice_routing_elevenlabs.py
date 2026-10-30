@@ -28,7 +28,7 @@ def test_language_projection_is_provider_bound(language, provider, expected):
 
 
 @pytest.mark.parametrize("mutation,language", [(None, "en"), (None, "zh"),
-    ("origin", "en"), ("model", "en"), ("language", "en"), ("provider", "en"), ("rate", "en")])
+    ("v4", "zh"), ("origin", "en"), ("model", "en"), ("language", "en"), ("provider", "en"), ("rate", "en")])
 def test_elevenlabs_exact_separate_handoff_is_selected_or_rejected(tmp_path, monkeypatch, mutation, language):
     import test_voice_routing_integration as fixture
 
@@ -44,7 +44,7 @@ def test_elevenlabs_exact_separate_handoff_is_selected_or_rejected(tmp_path, mon
         speaker.model_copy(update={"language": language}) for speaker in voice.speakers)})
     source = _write_voice_project(root, voice)
     setup, _ = _voice_setup(source.shots[0], mode=VoiceMode.SEPARATE_REQUIRED)
-    changes = {"model": {"model_id": "unqualified-model"},
+    changes = {"model": {"model_id": "unqualified-model"}, "v4": {"model_id": "eleven_v4"},
                "language": {"language": "English"},
                "provider": {"provider_kind": "unknown"},
                "rate": {"output_sample_rate_hz": 44100}}.get(mutation, {})
@@ -69,7 +69,7 @@ def test_elevenlabs_exact_separate_handoff_is_selected_or_rejected(tmp_path, mon
     limits = limits.model_copy(update={"allowed_remote_candidates": tuple(
         item for item in limits.allowed_remote_candidates if item.endswith("/voice-separate"))})
     prepared = orchestrator.prepare(limits=limits)
-    if mutation is None:
+    if mutation in (None, "v4"):
         assert prepared.decision.disposition == "GENERATE_ONCE", prepared.decision.rationale
         assert prepared.resolved_request.effective_output.native_audio is False
         assert prepared.voice_handoffs[0].voice_request == request

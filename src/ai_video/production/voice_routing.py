@@ -387,7 +387,7 @@ def build_voice_readiness(*, source, requirement, candidate, context, generation
             and preview.destination in {"https://api.minimaxi.com", "https://api.minimax.io"}
         ) or (
             request.provider_kind == "elevenlabs"
-            and request.model_id == "eleven_multilingual_v2"
+            and request.model_id in {"eleven_multilingual_v2", "eleven_v4"}
             and preview.destination == "https://api.elevenlabs.io"
             and request.output_sample_rate_hz == 48_000
             and request.output_channels == 1
