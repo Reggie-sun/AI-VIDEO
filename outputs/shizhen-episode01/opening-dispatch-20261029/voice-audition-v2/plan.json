@@ -1,0 +1,9 @@
+{"lines":[
+ {"id":"L1","unit":"municipal","shot_s":3.0,"role":"field","text":"检修口报告，电闸断了，绞盘还在收"},
+ {"id":"L2","unit":"D2","shot_s":5.0,"role":"field","text":"七号楼报，下了三层，还在原来那层"},
+ {"id":"L3","unit":"D3","shot_s":4.5,"role":"field","text":"急诊说，系统里她已经死了，人还躺着"},
+ {"id":"L4","unit":"D4","shot_s":5.0,"role":"field","text":"人民路有人喊救命，在七楼，七楼早就封了"},
+ {"id":"L5","unit":"D5","shot_s":3.0,"role":"dong","text":"记上，第十四起"},
+ {"id":"L6a","unit":"D6","shot_s":3.0,"role":"dong","text":"三号站台"},
+ {"id":"L6b","unit":"D6","shot_s":3.0,"role":"field","text":"暂无报告"}],
+ "voices":{"field":["zm_009","zm_010","zm_029","zm_045"],"dong":["zf_001","zf_017","zf_032","zf_048"]},"speed":1.0}

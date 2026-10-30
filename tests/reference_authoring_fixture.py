@@ -49,6 +49,27 @@ def fixture_director_coverage_artifact(coverage: dict | None = None):
     return director_coverage_authoring_input(coverage or fixture_director_coverage())[1]
 
 
+def fixture_preview_approval(coverage: dict | None = None) -> dict:
+    """Synthetic user approval of the fixture's visual preview, bound to its coverage unit."""
+
+    coverage = coverage or fixture_director_coverage()
+    return {"kind": "user-preview-approval/1", "coverage_hash": canonical_sha256(coverage),
+            "unit_ids": [FIXTURE_UNIT_ID],
+            "preview_artifacts": [{"path": "fixture/preview/keyframe-01.png", "sha256": "f" * 64,
+                                   "role": "decisive keyframe"}],
+            "user_quote": "fixture user approves this preview"}
+
+
+def fixture_preview_approval_binding(approval: dict | None = None) -> dict:
+    return {"approval_hash": canonical_sha256(approval or fixture_preview_approval())}
+
+
+def fixture_preview_approval_artifact(approval: dict | None = None):
+    from ai_video.production.preview_approval import preview_approval_authoring_input
+
+    return preview_approval_authoring_input(approval or fixture_preview_approval())[1]
+
+
 def _camera_purpose(intent):
     """Reuse text the fixture already authors for its camera, never invent new prose."""
 
@@ -76,6 +97,7 @@ def fixture_reference_planning(*, camera_moves: bool | None = None, ecommerce: b
                               {**FIXTURE_REVEAL, "visual_state": text, "purpose": text})
     if not ecommerce:
         planning.setdefault("director_coverage", fixture_director_coverage_binding())
+        planning.setdefault("preview_approval", fixture_preview_approval_binding())
     return ReferencePlanningIntent.model_validate(planning)
 
 
@@ -92,6 +114,9 @@ __all__ = [
     "fixture_director_coverage",
     "fixture_director_coverage_artifact",
     "fixture_director_coverage_binding",
+    "fixture_preview_approval",
+    "fixture_preview_approval_artifact",
+    "fixture_preview_approval_binding",
     "fixture_reference_planning",
     "with_fixture_reference_planning",
 ]

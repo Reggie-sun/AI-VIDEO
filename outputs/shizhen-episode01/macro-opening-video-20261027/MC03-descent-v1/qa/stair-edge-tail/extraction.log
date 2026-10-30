@@ -1,0 +1,56 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'runs/shizhen-macro-opening-20261027/MC03-descent-v1/state/video-generation/fetch/files/326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    LvMetaInfo      : {"data":{"os":"","product":"dreamina","exportType":"generation","videoId":"0"}}
+    UserComment     : {"aigc_label_type":0,"source_info":"dreamina"}
+    com.apple.quicktime.artwork: {"data":{"os":"","product":"dreamina","exportType":"generation","videoId":"0"}}
+    comment         : vid:v02870g10004dbg861q7dld0vanlva30
+    encoder         : Lavf58.76.100
+  Duration: 00:00:08.07, start: 0.000000, bitrate: 14324 kb/s
+    Stream #0:0(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 129 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+    Stream #0:1(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 1920x1080 [SAR 1:1 DAR 16:9], 14270 kb/s, 24.07 fps, 60 tbr, 15360 tbn, 120 tbc (default)
+    Metadata:
+      handler_name    : VideoHandler
+Stream mapping:
+  Stream #0:1 -> #0:0 (h264 (native) -> png (native))
+Press [q] to stop, [?] for help
+[Parsed_showinfo_2 @ 0x584af247b940] config in time_base: 1/15360, frame_rate: 60/1
+[Parsed_showinfo_2 @ 0x584af247b940] config out time_base: 0/0, frame_rate: 0/0
+Output #0, image2, to 'outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-v1/qa/stair-edge-tail/frame-%02d.png':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    LvMetaInfo      : {"data":{"os":"","product":"dreamina","exportType":"generation","videoId":"0"}}
+    UserComment     : {"aigc_label_type":0,"source_info":"dreamina"}
+    com.apple.quicktime.artwork: {"data":{"os":"","product":"dreamina","exportType":"generation","videoId":"0"}}
+    comment         : vid:v02870g10004dbg861q7dld0vanlva30
+    encoder         : Lavf58.45.100
+    Stream #0:0(und): Video: png, rgb24, 650x320 [SAR 1:1 DAR 65:32], q=2-31, 200 kb/s, 60 fps, 60 tbn, 60 tbc (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc58.91.100 png
+[Parsed_showinfo_2 @ 0x584af247b940] n:   0 pts:  92160 pts_time:6       pos: 12039394 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:B checksum:0948770A plane_checksum:[F112407C 4FFCE2C0 DE6C53BF] mean:[86 118 138 ] stdev:[28.1 4.4 3.9 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   1 pts:  96000 pts_time:6.25    pos: 12268618 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:P checksum:A8C13EF0 plane_checksum:[29A9F40B 5F70E61F EC0864A8] mean:[86 118 138 ] stdev:[28.1 4.4 3.9 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   2 pts:  99840 pts_time:6.5     pos: 12577860 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:P checksum:17BD8F8A plane_checksum:[1DD74F97 2302DB62 BA366482] mean:[86 118 138 ] stdev:[28.0 4.4 3.9 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   3 pts: 103680 pts_time:6.75    pos: 12882525 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:P checksum:7104F86E plane_checksum:[0009A903 70B8E11D AAF16E3F] mean:[86 118 138 ] stdev:[27.9 4.4 3.9 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   4 pts: 107520 pts_time:7       pos: 13530363 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:B checksum:C81EAE75 plane_checksum:[413F6AAF CBF6CA24 622D7993] mean:[86 118 138 ] stdev:[28.0 4.5 4.0 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   5 pts: 111360 pts_time:7.25    pos: 13582398 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:P checksum:FA8F20C5 plane_checksum:[877BD275 D439CAAF 59058383] mean:[87 118 138 ] stdev:[27.9 4.5 4.0 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   6 pts: 115200 pts_time:7.5     pos: 14054143 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:B checksum:78782DEA plane_checksum:[F89DE493 1785BDFE DFD08B3B] mean:[87 118 138 ] stdev:[27.8 4.5 4.0 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   7 pts: 119040 pts_time:7.75    pos: 14096465 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:P checksum:14CF36E6 plane_checksum:[B72FE128 55E8C223 505F937D] mean:[87 118 138 ] stdev:[27.8 4.5 4.0 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+[Parsed_showinfo_2 @ 0x584af247b940] n:   8 pts: 122880 pts_time:8       pos: 14384965 fmt:yuv420p sar:1/1 s:650x320 i:P iskey:0 type:P checksum:29EFBBB1 plane_checksum:[E2466F14 1EFABC1A 76699074] mean:[86 118 138 ] stdev:[27.9 4.5 4.0 ]
+[Parsed_showinfo_2 @ 0x584af247b940] color_range:unknown color_space:unknown color_primaries:unknown color_trc:unknown
+frame=    9 fps=0.0 q=-0.0 Lsize=N/A time=00:00:08.01 bitrate=N/A speed=18.2x    
+video:3466kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown

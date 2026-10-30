@@ -18,6 +18,7 @@ _ORIGIN = "https://generativelanguage.googleapis.com"
 _MAX_DURATION_SECONDS = 120.0
 _MAX_REQUEST_BYTES = 20_000_000
 _MAX_RESPONSE_BYTES = 1_000_000
+_END_ROUNDING_TOLERANCE_SECONDS = 0.25
 _MODEL_PATTERN = re.compile(r"gemini-[a-z0-9.-]+\Z")
 _SHA256_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
 _OBSERVATION_PROMPT = (
@@ -425,7 +426,14 @@ def _validate_observations(observations: Any, duration: float) -> None:
         if (isinstance(start, bool) or isinstance(end, bool)
                 or not isinstance(start, (int, float)) or not isinstance(end, (int, float))
                 or not math.isfinite(start) or not math.isfinite(end)
-                or start < 0 or start < last_start or end <= start or end > duration):
+                or start < 0 or start < last_start or start >= duration
+                or end > duration + _END_ROUNDING_TOLERANCE_SECONDS):
+            raise ValueError
+        # Timestamps are estimates and the model pins the last segment to the file end;
+        # clamp a rounding overshoot instead of discarding every observation.
+        if end > duration:
+            end = segment["end_seconds"] = duration
+        if end <= start:
             raise ValueError
         if not isinstance(segment["text"], str) or not segment["text"].strip():
             raise ValueError

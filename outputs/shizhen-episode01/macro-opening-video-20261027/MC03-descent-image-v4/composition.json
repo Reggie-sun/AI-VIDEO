@@ -1,0 +1,127 @@
+{
+  "artifact_id": "descent-static-image-composition",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "5ecf613977b6fb1f0d6940b617b1f5dc5d308d50b769190f07ffbbbbf380798d",
+  "creation_receipt_id": "user-requested-static-background-image",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0be3e7ff3013d46f05abc0630f833a8e7dca88cd32d18e3a779065dfbe74f83a.json",
+      "content_hash": "0be3e7ff3013d46f05abc0630f833a8e7dca88cd32d18e3a779065dfbe74f83a"
+    }
+  ],
+  "composition_id": "descent-static-image-v4",
+  "shot_ids": [
+    "DESCENT-PRE",
+    "DESCENT-TAIL"
+  ],
+  "layers": [
+    {
+      "layer_id": "retained-DESCENT-PRE",
+      "shot_id": "DESCENT-PRE",
+      "asset_role": "primary_visual",
+      "asset_id": "descent-pre-capture",
+      "trim_start_frame": 0,
+      "trim_duration_frames": 144,
+      "source_audio_policy": "KEEP",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    },
+    {
+      "layer_id": "retained-DESCENT-TAIL",
+      "shot_id": "DESCENT-TAIL",
+      "asset_role": "primary_visual",
+      "asset_id": "descent-tail-capture",
+      "trim_start_frame": 144,
+      "trim_duration_frames": 48,
+      "source_audio_policy": "KEEP",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    },
+    {
+      "layer_id": "static-stair-tail",
+      "shot_id": "DESCENT-TAIL",
+      "asset_role": "reference",
+      "asset_id": "static-stair-patch",
+      "trim_start_frame": 0,
+      "trim_duration_frames": null,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 1
+    }
+  ],
+  "transitions": [
+    {
+      "from_shot_id": "DESCENT-PRE",
+      "to_shot_id": "DESCENT-TAIL",
+      "kind": "cut",
+      "duration_frames": 0
+    }
+  ],
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "requested_renderer": "hyperframes",
+  "audio_tracks": [
+    {
+      "track_id": "native-DESCENT-PRE",
+      "audio_kind": "dialogue",
+      "asset_id": "DESCENT-PRE-original-mix",
+      "shot_id": "DESCENT-PRE",
+      "start_sample": null,
+      "trim_start_sample": 0,
+      "trim_duration_samples": 288000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "native-DESCENT-TAIL",
+      "audio_kind": "dialogue",
+      "asset_id": "DESCENT-TAIL-original-mix",
+      "shot_id": "DESCENT-TAIL",
+      "start_sample": null,
+      "trim_start_sample": 288000,
+      "trim_duration_samples": 96000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    }
+  ],
+  "caption_tracks": [],
+  "graphic_layer_ids": [
+    "static-stair-tail"
+  ],
+  "graphic_layer_animations": [],
+  "commercial_graphics": [],
+  "advertising_sound_cues": [],
+  "ad_creative_plan_id": null,
+  "ad_creative_plan_hash": null
+}

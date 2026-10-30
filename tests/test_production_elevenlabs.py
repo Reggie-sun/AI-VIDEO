@@ -1167,3 +1167,11 @@ def test_audio_tags_reject_unsupported_provider_model(provider_kind, model_id):
     with pytest.raises(ValueError):
         _request(provider_kind=provider_kind, model_id=model_id,
                  provider_parameters=VoiceProviderParameters(audio_tags=("quiet",)))
+
+
+def test_untagged_alignment_receipt_keeps_legacy_exact_bytes():
+    import hashlib
+    provider = _provider(_FakeTransport(_response()))
+    request = _request()
+    result = _generate(provider, request, _authorization(provider, request))
+    assert hashlib.sha256(result.alignment_receipt_bytes).hexdigest() == "4aed710295df986e56018b375e2d3b6a06962c32bb1ff1bb5d321c1b5e792f0a"

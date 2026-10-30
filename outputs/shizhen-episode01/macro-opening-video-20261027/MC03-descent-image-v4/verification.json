@@ -1,0 +1,34 @@
+{
+  "output": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/失帧-下楼到达-1080p-台阶静图修订04.mp4",
+  "sha256": "76d27a534fe5e97e2dc39f4833cc1c9e9a6f89639e3fc240e20581e073a7c9b8",
+  "render_check_status": "PASS",
+  "project_video_analysis_called": true,
+  "post_media_gate": "FAIL",
+  "technical_checks": [
+    "192 frames / 24fps / 8s / 1920x1080",
+    "full audio/video decode",
+    "HyperFrames source lint/check zero errors",
+    "Range206",
+    "real Chromium unmuted 1x playback to end",
+    "opaque-region reduced temporal pixel variation",
+    "foot protection alpha zero",
+    "native PCM identical to v3",
+    "B6 exact source SHA preserved"
+  ],
+  "human_full_av_review": "NOT_ACCEPTED: user geometry feedback",
+  "new_generation_calls": 0,
+  "new_remote_audio_calls": 0,
+  "local_hyperframes_renders": 1,
+  "no_production_activation": true,
+  "publication": "NOT_PUBLISHED",
+  "engineering_related_receipt": ".agent/harness/runs/shizhen-raster-overlay-related-20261027/receipt.json",
+  "engineering_related_status": "BLOCKED: unchanged AGENTS.md document budget exceeded",
+  "git_state": "NOT_COMMITTED_NOT_PUSHED; existing governance check failures and human review pending",
+  "full_regression": "NOT_EVALUATED",
+  "current_additional_regression": {
+    "passed": 73,
+    "skipped": 17,
+    "environment": "process-scoped LD_PRELOAD=/lib/x86_64-linux-gnu/libfreetype.so.6; no system mutation"
+  },
+  "geometry_feedback": "qa/human-geometry-feedback.json"
+}

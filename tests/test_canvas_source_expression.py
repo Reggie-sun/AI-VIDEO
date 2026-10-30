@@ -130,8 +130,9 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
         parts.append({"type": "text", "text": " " + authored_deadline_text})
     data = direction()
     data["delivery_profile"] = {"width": 1280, "height": 720, "fps": 24}
-    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_reference_planning
+    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_preview_approval, fixture_reference_planning
     data["director_coverages"] = [fixture_director_coverage()]
+    data["preview_approvals"] = [fixture_preview_approval()]
     if scenario:
         data["scenes"][0]["location"] = space
     data["characters"] = [{"character_id": "robot", "name": character, "identity": character,

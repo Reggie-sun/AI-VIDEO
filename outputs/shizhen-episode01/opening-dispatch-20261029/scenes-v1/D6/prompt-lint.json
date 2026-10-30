@@ -1,0 +1,11 @@
+{
+  "exact_inputs": true,
+  "exact_authored_prompt": true,
+  "pure_chinese_body": true,
+  "no_captions_or_music": true,
+  "no_scene_dialogue": true,
+  "duration": true,
+  "1080p": true,
+  "native_audio": true,
+  "first_last_roles": true
+}

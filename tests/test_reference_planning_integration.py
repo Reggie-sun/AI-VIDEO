@@ -20,7 +20,7 @@ from tests.test_production_generation_decision import setup_decision
 
 
 def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True):
-    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_director_coverage_binding
+    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_preview_approval, fixture_director_coverage_binding
     if isinstance(planning, dict) and bind_coverage:
         planning = {"director_coverage": fixture_director_coverage_binding(), **planning}
     raw = document()
@@ -35,6 +35,7 @@ def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True):
     data["delivery_profile"] = {"width": 1024, "height": 576, "fps": 24}
     if seal_coverage:
         data["director_coverages"] = [fixture_director_coverage()]
+    data["preview_approvals"] = [fixture_preview_approval()]
     row = data["shots"][0]
     row["shot"]["duration_policy"]["seconds"] = 4
     row["generation"] = {"generation_intent": {

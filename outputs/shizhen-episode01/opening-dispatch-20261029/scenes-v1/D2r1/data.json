@@ -1,0 +1,170 @@
+{
+  "objective": "失帧冷开场调度蒙太奇 D2-stair-return：楼梯照常，却回到了原来那层；无对白现场画面",
+  "images": [
+    {
+      "asset_id": "D2r1-first-frame",
+      "node_id": "D2r1-first-frame-node",
+      "resource_id": "D2r1-first-frame-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/codex-image/raw/D2-first-frame-v1.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D2r1/reference-first-frame-source.json",
+        "record_sha256": "df0b5149f684b9cdb82d676bc9339e7860c6e6a1886c83fe35676f7d0466cab9",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "stair-resident",
+      "name": "楼梯住户",
+      "identity": "只露背影的住户，背黄色帆布包",
+      "appearance_bible": "深色外套、黄色帆布包，全程背影",
+      "reference_asset_ids": [
+        "D2r1-first-frame"
+      ]
+    }
+  ],
+  "scene_images": [
+    "D2r1-first-frame"
+  ],
+  "observations": {
+    "action": "雨夜老旧住宅楼梯间，真人实拍质感，构图同首帧。住户沿着扶手旁往下的那段楼梯一级一级走下去，身体逐渐降低，直到完全走出画面。平台空了片刻。随后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只侧面凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。",
+    "camera": "机位全程固定不动，不推拉、不摇移、不切镜，让往下离开和从上方回到原处在同一个画面里完成。",
+    "performance": "人物都不开口，反应克制自然",
+    "space": "住户先沿扶手旁往下的楼梯走出画面，再从右上方楼梯回到平台",
+    "sound": "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。",
+    "art": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字"
+  },
+  "paths": {
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1"
+    ]
+  },
+  "fragments": {
+    "action": [
+      "雨夜老旧住宅楼梯间，真人实拍质感，构图同首帧。住户沿着扶手旁往下的那段楼梯一级一级走下去，身体逐渐降低，直到完全走出画面。平台空了片刻。随后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只侧面凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+    ],
+    "camera": [
+      "机位全程固定不动，不推拉、不摇移、不切镜，让往下离开和从上方回到原处在同一个画面里完成。"
+    ],
+    "performance": [
+      "雨夜老旧住宅楼梯间，真人实拍质感，构图同首帧。住户沿着扶手旁往下的那段楼梯一级一级走下去，身体逐渐降低，直到完全走出画面。平台空了片刻。随后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只侧面凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+    ],
+    "space": [
+      "雨夜老旧住宅楼梯间，真人实拍质感，构图同首帧。住户沿着扶手旁往下的那段楼梯一级一级走下去，身体逐渐降低，直到完全走出画面。平台空了片刻。随后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只侧面凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+    ],
+    "sound": [
+      "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。"
+    ],
+    "art": [
+      "雨夜老旧住宅楼梯间，真人实拍质感，构图同首帧。住户沿着扶手旁往下的那段楼梯一级一级走下去，身体逐渐降低，直到完全走出画面。平台空了片刻。随后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只侧面凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。",
+      "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。"
+    ]
+  },
+  "intent_sha256": "c1ebbe885bde6479043e4da2fcc6f40da93ed24b90ece794d0e18e6898cdf54e",
+  "coverage": {
+    "path": "outputs/shizhen-episode01/opening-dispatch-20261029/director-coverage.v5.json",
+    "sha256": "4b8e8fb0b34f6cb588b67140e66c6ee364e242c9efdff5d125ada14ef389c657",
+    "coverage_hash": "d2a18ec6dcfaeb2afddc048b16b92f86e108d00c075cb135872bf5c115d49702",
+    "unit_id": "D2-stair-return"
+  },
+  "scene": {
+    "scene_id": "stair-loop",
+    "location": "雨夜老旧住宅楼梯间",
+    "mood": "楼梯照常，却回到了原来那层"
+  }
+}

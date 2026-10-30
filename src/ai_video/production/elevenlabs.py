@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import hashlib
 import io
 import json
 import math
@@ -383,7 +384,9 @@ def _parse_json_object(body: bytes, *, surface: str) -> object:
     return payload
 
 
-def _parse_timing_response(body: bytes, script_text: str) -> tuple[bytes, bytes]:
+def _parse_timing_response(
+    body: bytes, script_text: str, *, audio_tags: tuple[str, ...] = (),
+) -> tuple[bytes, bytes]:
     if not body or len(body) > _MAX_RESPONSE_BYTES:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
@@ -411,6 +414,11 @@ def _parse_timing_response(body: bytes, script_text: str) -> tuple[bytes, bytes]
     normalized = _parse_character_alignment(
         payload["normalized_alignment"], name="normalized alignment"
     )
+    from ai_video.production.elevenlabs_performance import project_synthesis_alignment
+    evidence = project_synthesis_alignment(script_text, audio_tags, alignment, normalized)
+    if "synthesis_alignment" in evidence:
+        evidence["synthesis_alignment"]["provider_response_sha256"] = hashlib.sha256(body).hexdigest()
+    alignment, normalized = evidence["alignment"], evidence["normalized_alignment"]
     # Normalized text may be a transliteration (zh returns spaced pinyin, live
     # 2026-10-29), so either the original or the normalized alignment must
     # spell the exact script.
@@ -423,7 +431,7 @@ def _parse_timing_response(body: bytes, script_text: str) -> tuple[bytes, bytes]
             "ElevenLabs alignment does not match the script.",
         )
     receipt = json.dumps(
-        {"alignment": alignment, "normalized_alignment": normalized},
+        evidence,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -737,7 +745,8 @@ class ElevenLabsVoiceProvider:
         parse_stage: str | None = None
         try:
             raw_audio, alignment_receipt = _parse_timing_response(
-                response.body, request.script_text
+                response.body, request.script_text,
+                audio_tags=request.provider_parameters.audio_tags,
             )
             measured_units, provider_request_id, provider_trace_id = _parse_headers(
                 response.headers

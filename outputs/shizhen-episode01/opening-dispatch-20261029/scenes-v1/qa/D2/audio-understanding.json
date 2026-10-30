@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"aa16a094e31597e2249f60040a7d957334587d62f173abd0140a07be742acc0b\",\n  \"source_size_bytes\": 10982950,\n  \"audio_sha256\": \"f1b43f8f959e0f989f62f410258078576a6e6d6bba352364b7eb3f47c7cee1ee\",\n  \"audio_size_bytes\": 1073276,\n  \"duration_seconds\": 6.0836281179138325,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"6a1f1804dc1381ef021d47289aaefef27a8761fe93f774cab804a1e12cad5505\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"f63985d6be07334de8e584557fa180dbb0dcf3bd9b324600b00a91c7d7b28b50\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"rhythmic clapping or footsteps tapping on a hard, hollow surface\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-dispatch-20261030/D2/state/video-generation/fetch/files/aa16a094e31597e2249f60040a7d957334587d62f173abd0140a07be742acc0b.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

@@ -1,0 +1,34 @@
+{
+  "base_commit": "eb972c41bcb3b798de2e1910e8d3b00bedb83aff",
+  "scope": "Prospective camera scale transition only; no paid or media acceptance",
+  "files": [
+    {
+      "path": "src/ai_video/production/video_requirement.py",
+      "sha256": "16044738887e6261dc0c3706e76f2826879ca37f108e354df6f3007d9cfe02ff"
+    },
+    {
+      "path": "src/ai_video/production/_video_intent_validation.py",
+      "sha256": "69b094426c82c97d1a9f64fb897cbe79cb9f5c82debf7a2bc1dedb1f7aad7fc5"
+    },
+    {
+      "path": "src/ai_video/production/_conditioning_scale_transition.py",
+      "sha256": "64bfcb7ff81ab9da12c590571024be0c9eb6f969fe111ea39a5b3087e411dafb"
+    },
+    {
+      "path": "tests/test_production_video_requirement.py",
+      "sha256": "5517f9078dd3ef0da0e00471469f9e9e271ac1fb9ea58102842d02803b16503b"
+    },
+    {
+      "path": "tests/test_production_video_intent_validation.py",
+      "sha256": "026cdef19497718ab70d5d5f9dcf5dc27cc50036cf7cf404ae6afe4ef92d3f0a"
+    },
+    {
+      "path": ".agent/harness/policy.yaml",
+      "sha256": "d4e2252d9386c551e4f47a899394d68ef86106c89aaa8c8b0cc894bdf3a06dff"
+    },
+    {
+      "path": "docs/agent-primary-contract-matrix.md",
+      "sha256": "6067790f33bba00954aec4ccee4b6c6a1bd77cadbbe84eae3fa4928172485ca9"
+    }
+  ]
+}

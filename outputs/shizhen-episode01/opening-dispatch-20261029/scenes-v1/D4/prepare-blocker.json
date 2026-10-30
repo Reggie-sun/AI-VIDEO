@@ -1,0 +1,1718 @@
+{
+  "decision": {
+    "snapshot_hash": "513c36e37ca6514f57994624b20c09a6e0882fdb157519334c84d9ea60a1c4c4",
+    "disposition": "GENERATE_ONCE",
+    "selected_candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+    "assessments": [
+      {
+        "candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+        "scope_hash": "6738cbd8e43210698ba28be0bfa13761de9369fe01c91902c3868b3657e7a60e",
+        "fit": "unknown",
+        "compatible": true,
+        "executable": true,
+        "supported_dimensions": [],
+        "failed_dimensions": [],
+        "unknown_dimensions": [
+          "action",
+          "art",
+          "camera",
+          "performance",
+          "sound",
+          "space"
+        ],
+        "evidence_hashes": [],
+        "ignored_evidence_hashes": [],
+        "sample_count": 0,
+        "pass_count": 0,
+        "fail_count": 0,
+        "not_evaluated_count": 0,
+        "runtime_failure_count": 0,
+        "unknown_outcome_count": 0,
+        "not_submitted_count": 0,
+        "reasons": [],
+        "empirical": {
+          "version": "generation-cohort/1",
+          "supported_artifacts": [],
+          "failed_artifacts": [],
+          "incomplete_artifacts": [],
+          "evidence_hashes": [],
+          "exclusions": [],
+          "failed_requirements": [],
+          "observed_success_fraction": null,
+          "interval_95": null,
+          "limitations": [
+            "observational cohort; selection and intervention confounding remain",
+            "unknown action complexity and hand/prop interaction are not matched",
+            "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+          ]
+        }
+      }
+    ],
+    "diagnosis": null,
+    "intervention": null,
+    "runtime_repair": null,
+    "routing": {
+      "decision": {
+        "target_shot_id": "D4",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "a74f6bfe2ca5d9df856e074a0056c89575c259fd8f04dead940b9d5dd5743f41",
+        "continuity_mode": "none",
+        "semantic_continuity_state": null,
+        "required_mode": "reference_to_video",
+        "selected_mode": "reference_to_video",
+        "required_binding_roles": [
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "scene_reference",
+            "asset_id": "D4-ref-facade",
+            "asset_sha256": "d9599a33f613a39c595fd02f6c08141e76fe862e6145127a9c59fbe222ca2a2e",
+            "source_registry_revision_id": "20168c2e4ed8ec50b61f7baddc6f7b945a973e95955ea88d56e5a2bc81eeb187",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "sealed-building",
+            "canonical_owner_content_hash": "67bc7fda1e7d1106cac31d9e48e0fa8b9f9c4efd5281908b72e96365740af282",
+            "mime_type": "image/png",
+            "size_bytes": 2772266,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "provider_name": "jimeng",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/e40333df394601b089ab1c33206a1bb6b8f67b30fd0c6084fec76aeff3a3f8fe.json",
+          "profile_sha256": "e40333df394601b089ab1c33206a1bb6b8f67b30fd0c6084fec76aeff3a3f8fe"
+        },
+        "provider_capabilities_fingerprint": "a4e4fa3add6a83b868e7246155d5a8dbfd3587a89f38e79d80087e71da4616d8",
+        "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "selected_capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "requirement_hash": "7af645e9ead4e581e1f09cbbbe170473df4d4d0a2dc964f6650cc65856f9b344",
+        "continuity_transition_policy_hash": null,
+        "previous_provider_bound_request_hash": null,
+        "continuity_provider_route_binding_hash": null,
+        "execution_kind": "remote",
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 7,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "reason_codes": [
+          "CANONICAL_REFERENCES_ENABLE_R2V"
+        ],
+        "rationale": "Bind the verified neutral requirement to the exact capability.",
+        "policy": {
+          "policy_id": "shizhen-cold-open-qualification",
+          "policy_version": "1",
+          "policy_sha256": "e94f67d63d81d0fdf1feb7a8858ecfdca1c1c3aee5da51355785a186370a37b9"
+        },
+        "outcome": "selected",
+        "semantic_routing_hash": "854f039490e554b83f31e8f4fb7e081e39be172c16fe65b5884886bce117503c",
+        "audit_decision_hash": "a80ab0e23739fec4a91f51dd459ed4a52e281e1e9372cf0596ee759d11484849"
+      },
+      "provider_bound_request": {
+        "plan_hash": "00bfb454ff786191a523217ac3510ecf559f85a70720a9353bdf9ae33ad94584",
+        "requirement_hash": "7af645e9ead4e581e1f09cbbbe170473df4d4d0a2dc964f6650cc65856f9b344",
+        "verified_projection_hash": "b2bf395b8e1e55b351d9540a9782534475d1ac7298cf05dcd921843544dfa3e3",
+        "target_shot_id": "D4",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "a74f6bfe2ca5d9df856e074a0056c89575c259fd8f04dead940b9d5dd5743f41",
+        "semantic_routing_hash": "854f039490e554b83f31e8f4fb7e081e39be172c16fe65b5884886bce117503c",
+        "audit_decision_hash": "a80ab0e23739fec4a91f51dd459ed4a52e281e1e9372cf0596ee759d11484849",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.0_vip",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/e40333df394601b089ab1c33206a1bb6b8f67b30fd0c6084fec76aeff3a3f8fe.json",
+          "profile_sha256": "e40333df394601b089ab1c33206a1bb6b8f67b30fd0c6084fec76aeff3a3f8fe"
+        },
+        "capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "execution_kind": "remote",
+        "billing_kind": "metered",
+        "mode": "reference_to_video",
+        "binding_roles": [
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "scene_reference",
+            "asset_id": "D4-ref-facade",
+            "asset_sha256": "d9599a33f613a39c595fd02f6c08141e76fe862e6145127a9c59fbe222ca2a2e",
+            "source_registry_revision_id": "20168c2e4ed8ec50b61f7baddc6f7b945a973e95955ea88d56e5a2bc81eeb187",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "sealed-building",
+            "canonical_owner_content_hash": "67bc7fda1e7d1106cac31d9e48e0fa8b9f9c4efd5281908b72e96365740af282",
+            "mime_type": "image/png",
+            "size_bytes": 2772266,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 7,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "lifecycle": {
+          "generation_id": "canvas-generation-dac554a8f51bab2afa18a157bf548b63",
+          "target_asset_role": "primary_visual",
+          "base_project": {
+            "path": "state/projects/project.1.a72fe92bef66866d05e97c2b9f446d67df5cac19edba382e0044d1bd2bf58eee.yaml",
+            "revision": 1,
+            "content_hash": "a72fe92bef66866d05e97c2b9f446d67df5cac19edba382e0044d1bd2bf58eee",
+            "file_sha256": "a0d20313464102c46294563829cad816b1a8697bd39b34ee2c9368d76a6ecf92"
+          },
+          "base_registry": {
+            "path": "assets/registry.20168c2e4ed8ec50b61f7baddc6f7b945a973e95955ea88d56e5a2bc81eeb187.json",
+            "revision_id": "20168c2e4ed8ec50b61f7baddc6f7b945a973e95955ea88d56e5a2bc81eeb187",
+            "content_hash": "20168c2e4ed8ec50b61f7baddc6f7b945a973e95955ea88d56e5a2bc81eeb187",
+            "file_sha256": "0d51cab0c658808670aec2e817ce104b4c2bed7a77cdc58a1882c0ee2e406b0d"
+          },
+          "base_dependency_graph": {
+            "revision_id": "3d70f04b52597a740a3ea1fa2fcd1856e32cd3c762ad39d8dcf18cd6a4e9c75d",
+            "content_hash": "3d70f04b52597a740a3ea1fa2fcd1856e32cd3c762ad39d8dcf18cd6a4e9c75d",
+            "path": "state/dependency_graph.3d70f04b52597a740a3ea1fa2fcd1856e32cd3c762ad39d8dcf18cd6a4e9c75d.json",
+            "file_sha256": "ee15adb776433a107af03c266f72e9ae7cc8f93242d07f822f2e8db707e005c6"
+          },
+          "input_artifact_ids": [
+            "shizhen-dispatch-D4-shot",
+            "shizhen-dispatch-D4-scene",
+            "shizhen-dispatch-D4-character-night-guard",
+            "D4-ref-facade"
+          ],
+          "output_asset_id": "canvas-video-dac554a8f51bab2afa18a157bf548b63",
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false
+        },
+        "compiler_contract": {
+          "compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+          "compiler_version": "1",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49"
+        },
+        "expression_strength": "semantic_prompt_allowed",
+        "generation_recipe": {
+          "contract_version": "generation-recipe/1",
+          "seed": {
+            "kind": "uncontrolled",
+            "value": null
+          },
+          "profile_sha256": "e40333df394601b089ab1c33206a1bb6b8f67b30fd0c6084fec76aeff3a3f8fe",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+          "requirement_hash": "7af645e9ead4e581e1f09cbbbe170473df4d4d0a2dc964f6650cc65856f9b344",
+          "rubric_hash": "54e012e753be5abf6aa0e9b89bd1d56a87ba3cc18f143fbec253c281493bc501",
+          "acceptance_policy": {
+            "domain_id": "original-drama",
+            "profile_id": "shizhen-dispatch-D4-raw",
+            "profile_version": "1",
+            "profile_content_hash": "54e012e753be5abf6aa0e9b89bd1d56a87ba3cc18f143fbec253c281493bc501",
+            "profile_payload": {
+              "content_hash": "54e012e753be5abf6aa0e9b89bd1d56a87ba3cc18f143fbec253c281493bc501",
+              "domain_id": "original-drama",
+              "generation_requirements": [
+                {
+                  "dimension": "action",
+                  "intent_paths": [
+                    "generation_intent.open_state.kind",
+                    "generation_intent.open_state.state_text",
+                    "generation_intent.open_state.required_change",
+                    "generation_intent.close_state.kind",
+                    "generation_intent.close_state.state_text",
+                    "generation_intent.close_state.required_change",
+                    "generation_intent.scene_continuity.scene_id",
+                    "generation_intent.scene_continuity.time_of_day",
+                    "generation_intent.scene_continuity.mood",
+                    "generation_intent.scene_continuity.state_constraints.0",
+                    "generation_intent.scene_continuity.state_constraints.1",
+                    "generation_intent.scene_continuity.state_constraints.2",
+                    "generation_intent.subject_action.start_state",
+                    "generation_intent.subject_action.progression",
+                    "generation_intent.subject_action.endpoint.state_text",
+                    "generation_intent.subject_action.endpoint.required_change",
+                    "generation_intent.motion_envelope.onset",
+                    "generation_intent.motion_envelope.peak",
+                    "generation_intent.motion_envelope.settle",
+                    "generation_intent.motion_envelope.direction",
+                    "generation_intent.motion_envelope.amplitude_class",
+                    "generation_intent.pacing.cadence",
+                    "generation_intent.pacing.tempo_class",
+                    "generation_intent.pacing.shot_duration_seconds"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.scene_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.time_of_day"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.mood"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.2"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.start_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.progression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.onset"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.peak"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.settle"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.cadence"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.tempo_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.shot_duration_seconds"
+                      }
+                    ],
+                    "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b"
+                  },
+                  "observable": "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "action",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "camera",
+                  "intent_paths": [
+                    "generation_intent.axis_continuity.camera_axis",
+                    "generation_intent.axis_continuity.framing_continuity",
+                    "generation_intent.axis_continuity.crossing_policy",
+                    "generation_intent.camera_endpoint.start_framing",
+                    "generation_intent.camera_endpoint.end_framing",
+                    "generation_intent.camera_endpoint.position_lock",
+                    "generation_intent.camera_endpoint.orientation_lock",
+                    "generation_intent.camera_intent.movement",
+                    "generation_intent.camera_intent.stability",
+                    "generation_intent.camera_intent.framing_intent",
+                    "generation_intent.camera_intent.expression_strength",
+                    "generation_intent.camera_subject_relation.subject_id",
+                    "generation_intent.camera_subject_relation.relation_kind",
+                    "generation_intent.camera_subject_relation.start_relation",
+                    "generation_intent.camera_subject_relation.end_relation",
+                    "generation_intent.primary_camera_motion.movement_kind",
+                    "generation_intent.primary_camera_motion.direction",
+                    "generation_intent.primary_camera_motion.amplitude_class",
+                    "generation_intent.primary_camera_motion.speed_class",
+                    "generation_intent.primary_camera_motion.start_motion_state",
+                    "generation_intent.primary_camera_motion.end_motion_state"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.camera_axis"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.framing_continuity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.crossing_policy"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.start_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.end_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.position_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.orientation_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.movement"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.stability"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.framing_intent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.expression_strength"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.subject_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.relation_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.start_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.end_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.movement_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.speed_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.start_motion_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                      }
+                    ],
+                    "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b"
+                  },
+                  "observable": "镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "camera",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "performance",
+                  "intent_paths": [
+                    "generation_intent.performance_intent.trigger",
+                    "generation_intent.performance_intent.visible_response",
+                    "generation_intent.performance_intent.gaze_target",
+                    "generation_intent.performance_intent.body_behavior",
+                    "generation_intent.performance_intent.hand_behavior",
+                    "generation_intent.performance_intent.terminal_performance_state",
+                    "generation_intent.performance_intent.character_directions.0.character_id",
+                    "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "generation_intent.performance_intent.character_directions.0.role",
+                    "generation_intent.performance_intent.character_directions.0.visibility",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.visible_response"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.body_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.hand_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.character_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.visibility"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                      }
+                    ],
+                    "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b"
+                  },
+                  "observable": "人物都不开口，反应克制自然",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "performance",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "space",
+                  "intent_paths": [
+                    "generation_intent.space_continuity.subject_position",
+                    "generation_intent.space_continuity.screen_direction",
+                    "generation_intent.space_continuity.crossing_policy"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.subject_position"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.screen_direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.crossing_policy"
+                      }
+                    ],
+                    "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b"
+                  },
+                  "observable": "保安在楼下前景，楼体在后",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "space",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "sound",
+                  "intent_paths": [
+                    "generation_intent.ambience_intent.environment_bed",
+                    "generation_intent.ambience_intent.foley_cues.0",
+                    "generation_intent.ambience_intent.explicitly_silent",
+                    "generation_intent.dialogue_intent.mode",
+                    "generation_intent.dialogue_intent.lip_sync_required",
+                    "generation_intent.music_intent.mode"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.environment_bed"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.foley_cues.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.explicitly_silent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.mode"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.lip_sync_required"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.music_intent.mode"
+                      }
+                    ],
+                    "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b"
+                  },
+                  "observable": "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "sound",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "art",
+                  "intent_paths": [
+                    "generation_intent.lighting_intent.motivated_source",
+                    "generation_intent.lighting_intent.direction",
+                    "generation_intent.lighting_intent.exposure_priority",
+                    "generation_intent.lighting_intent.continuity_state",
+                    "generation_intent.visual_treatment.medium_look",
+                    "generation_intent.visual_treatment.palette",
+                    "generation_intent.visual_treatment.material_treatment",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。",
+                    "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.motivated_source"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.exposure_priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.continuity_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.medium_look"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.palette"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.material_treatment"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                      }
+                    ],
+                    "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b"
+                  },
+                  "observable": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "art",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                }
+              ],
+              "measurement_contract_version": "1",
+              "profile_id": "shizhen-dispatch-D4-raw",
+              "profile_version": "1",
+              "required_requirement_ids": [
+                "action",
+                "camera",
+                "performance",
+                "space",
+                "sound",
+                "art"
+              ]
+            },
+            "measurement_contract_version": "1",
+            "required_requirement_ids": [
+              "action",
+              "camera",
+              "performance",
+              "space",
+              "sound",
+              "art"
+            ]
+          },
+          "expressions": [
+            {
+              "requirement_id": "action",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "action",
+              "observable": "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.open_state.kind",
+                "generation_intent.open_state.state_text",
+                "generation_intent.open_state.required_change",
+                "generation_intent.close_state.kind",
+                "generation_intent.close_state.state_text",
+                "generation_intent.close_state.required_change",
+                "generation_intent.scene_continuity.scene_id",
+                "generation_intent.scene_continuity.time_of_day",
+                "generation_intent.scene_continuity.mood",
+                "generation_intent.scene_continuity.state_constraints.0",
+                "generation_intent.scene_continuity.state_constraints.1",
+                "generation_intent.scene_continuity.state_constraints.2",
+                "generation_intent.subject_action.start_state",
+                "generation_intent.subject_action.progression",
+                "generation_intent.subject_action.endpoint.state_text",
+                "generation_intent.subject_action.endpoint.required_change",
+                "generation_intent.motion_envelope.onset",
+                "generation_intent.motion_envelope.peak",
+                "generation_intent.motion_envelope.settle",
+                "generation_intent.motion_envelope.direction",
+                "generation_intent.motion_envelope.amplitude_class",
+                "generation_intent.pacing.cadence",
+                "generation_intent.pacing.tempo_class",
+                "generation_intent.pacing.shot_duration_seconds"
+              ],
+              "native_text": [
+                "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.open_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.scene_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.time_of_day",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.mood",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.2",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.start_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.progression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.onset",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.peak",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.settle",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.cadence",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.tempo_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.shot_duration_seconds",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "art",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "art",
+              "observable": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.lighting_intent.motivated_source",
+                "generation_intent.lighting_intent.direction",
+                "generation_intent.lighting_intent.exposure_priority",
+                "generation_intent.lighting_intent.continuity_state",
+                "generation_intent.visual_treatment.medium_look",
+                "generation_intent.visual_treatment.palette",
+                "generation_intent.visual_treatment.material_treatment",
+                "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                "generation_intent.visual_treatment.prohibited_visual_drift.1"
+              ],
+              "native_text": [
+                "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。",
+                "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.lighting_intent.motivated_source",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.direction",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.exposure_priority",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.continuity_state",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.medium_look",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.palette",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.material_treatment",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "camera",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "camera",
+              "observable": "镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.axis_continuity.camera_axis",
+                "generation_intent.axis_continuity.framing_continuity",
+                "generation_intent.axis_continuity.crossing_policy",
+                "generation_intent.camera_endpoint.start_framing",
+                "generation_intent.camera_endpoint.end_framing",
+                "generation_intent.camera_endpoint.position_lock",
+                "generation_intent.camera_endpoint.orientation_lock",
+                "generation_intent.camera_intent.movement",
+                "generation_intent.camera_intent.stability",
+                "generation_intent.camera_intent.framing_intent",
+                "generation_intent.camera_intent.expression_strength",
+                "generation_intent.camera_subject_relation.subject_id",
+                "generation_intent.camera_subject_relation.relation_kind",
+                "generation_intent.camera_subject_relation.start_relation",
+                "generation_intent.camera_subject_relation.end_relation",
+                "generation_intent.primary_camera_motion.movement_kind",
+                "generation_intent.primary_camera_motion.direction",
+                "generation_intent.primary_camera_motion.amplitude_class",
+                "generation_intent.primary_camera_motion.speed_class",
+                "generation_intent.primary_camera_motion.start_motion_state",
+                "generation_intent.primary_camera_motion.end_motion_state"
+              ],
+              "native_text": [
+                "镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.axis_continuity.camera_axis",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.framing_continuity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.start_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.end_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.position_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.orientation_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.movement",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.stability",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.framing_intent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.expression_strength",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.subject_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.relation_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.start_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.end_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.movement_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.speed_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.start_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "performance",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "performance",
+              "observable": "人物都不开口，反应克制自然",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.performance_intent.trigger",
+                "generation_intent.performance_intent.visible_response",
+                "generation_intent.performance_intent.gaze_target",
+                "generation_intent.performance_intent.body_behavior",
+                "generation_intent.performance_intent.hand_behavior",
+                "generation_intent.performance_intent.terminal_performance_state",
+                "generation_intent.performance_intent.character_directions.0.character_id",
+                "generation_intent.performance_intent.character_directions.0.screen_identity",
+                "generation_intent.performance_intent.character_directions.0.role",
+                "generation_intent.performance_intent.character_directions.0.visibility",
+                "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+              ],
+              "native_text": [
+                "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.performance_intent.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.visible_response",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.hand_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.character_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.visibility",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "sound",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "sound",
+              "observable": "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.ambience_intent.environment_bed",
+                "generation_intent.ambience_intent.foley_cues.0",
+                "generation_intent.ambience_intent.explicitly_silent",
+                "generation_intent.dialogue_intent.mode",
+                "generation_intent.dialogue_intent.lip_sync_required",
+                "generation_intent.music_intent.mode"
+              ],
+              "native_text": [
+                "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.ambience_intent.environment_bed",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.foley_cues.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.explicitly_silent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.lip_sync_required",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.music_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "space",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "space",
+              "observable": "保安在楼下前景，楼体在后",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.space_continuity.subject_position",
+                "generation_intent.space_continuity.screen_direction",
+                "generation_intent.space_continuity.crossing_policy"
+              ],
+              "native_text": [
+                "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "382d66dfd435efa4fa62657c78fe1bdff8a07adba799942bea45fda9e683ef6b",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.space_continuity.subject_position",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.screen_direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "editorial_operations": [],
+          "comparison": null
+        },
+        "provider_bound_request_hash": "fa1d2afbc0be011e968f138e4050140f55193a1fd7560c26320b45236b41d66a"
+      }
+    },
+    "rationale": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1: unknown; one bounded attempt, no quality guarantee",
+      "evidence and policy affect audit identity, not unrelated media semantics"
+    ],
+    "revalidate_requirements": [
+      "action",
+      "art",
+      "camera",
+      "performance",
+      "sound",
+      "space"
+    ]
+  },
+  "compilation": {
+    "outcome": "unsupported",
+    "requirement_hash": "7af645e9ead4e581e1f09cbbbe170473df4d4d0a2dc964f6650cc65856f9b344",
+    "provider_bound_request_hash": "fa1d2afbc0be011e968f138e4050140f55193a1fd7560c26320b45236b41d66a",
+    "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+    "reason": "PROMPT_EXPRESSION_UNSUPPORTED",
+    "unsupported_field_paths": [
+      "generation_intent.reference_planning.events.0"
+    ],
+    "retryable": false,
+    "prompt_text": null,
+    "payload": null,
+    "input_expression_report": {
+      "prompt_text": "参考素材1{{image:0}}只负责这栋老旧住宅楼的外立面、被木板钉死的楼层、保安背影和雨夜光色，它是镜头最后停住的画面。\n雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。\n镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。\n声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。",
+      "prompt_sha256": "0f18e08ff094c6045fafd3bf16255fe61c0098a0aa8ddb7844e5070e3508c6e4",
+      "missing_requirement_paths": [
+        "generation_intent.reference_planning.events.0"
+      ],
+      "coverage_source": "selected_qa_final_text",
+      "rejected_coverage_source": "inherited_automatic_prose",
+      "actual_quality": "NOT_EVALUATED"
+    }
+  }
+}

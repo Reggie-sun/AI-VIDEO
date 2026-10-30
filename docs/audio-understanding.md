@@ -22,7 +22,7 @@ Codex上游已于2026-07-18合并[原生audio input转发](https://github.com/op
 
 项目本地`video-analysis` MCP注册`audio_understand`，用Gemini官方音频理解接口补充语音内容、声线/语气和环境声观察。它接收原MP4或PCM WAV；不要求Codex主模型能接收audio content，也不强制Qwen/ComfyUI。`video_transcribe`仍是Whisper转写入口，不能据转写文字推断音色、求证表演或完整聆听。[官方能力](https://ai.google.dev/gemini-api/docs/generate-content/audio)
 
-2026-10-15已通过fresh project-local MCP和下述development operator，在既有4.032s历史WAV完成一次真实`gemini-3.8-flash`请求，HTTP 200，取得对白、声线和广播式语气观察；输入/结果identity与实际边界见[session record](record_for_agent/2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)。这是该单次路线的真实观察，不是Production声音资格或原镜QA通过。官方能力、mocked tests、正常decode和preview均不能代替该实测。模型时间戳仍是估计；精确对白时窗须另有证据，`ResolvedTimeline`独占剪辑/混音时序。用户完整1.0x听看与raw逐镜Gate独立。[研究及限制](research/2026-10-15-audio-understanding-tools.md)
+2026-10-15已通过fresh project-local MCP和下述development operator，在既有4.032s历史WAV完成一次真实`gemini-3.8-flash`请求，HTTP 200，取得对白、声线和广播式语气观察；输入/结果identity与实际边界见[session record](record_for_agent/2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)。这是该单次路线的真实观察，不是Production声音资格或原镜QA通过。官方能力、mocked tests、正常decode和preview均不能代替该实测。模型时间戳仍是估计；末段结束时间超出音轨不超过0.25秒时按音轨时长截齐而不整份判为`EVIDENCE_GAP`，更大越界、起点越界或倒序仍拒绝；精确对白时窗须另有证据，`ResolvedTimeline`独占剪辑/混音时序。用户完整1.0x听看与raw逐镜Gate独立。[研究及限制](research/2026-10-15-audio-understanding-tools.md)
 
 ## MCP Parameters
 

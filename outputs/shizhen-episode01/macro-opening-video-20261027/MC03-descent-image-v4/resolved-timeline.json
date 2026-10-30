@@ -1,0 +1,152 @@
+{
+  "artifact_id": "timeline-descent-static-image-v4",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "02e6d18ec281e2d95c234d5ecc310de39e91f4d812dc690d39c813e3e3dd16ea",
+  "creation_receipt_id": "resolve-5ecf613977b6fb1f0d6940b617b1f5dc5d308d50b769190f07ffbbbbf380798d",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0be3e7ff3013d46f05abc0630f833a8e7dca88cd32d18e3a779065dfbe74f83a.json",
+      "content_hash": "0be3e7ff3013d46f05abc0630f833a8e7dca88cd32d18e3a779065dfbe74f83a"
+    }
+  ],
+  "usage_scope": "development_audio_preview",
+  "timeline_id": "timeline-descent-static-image-v4-r1",
+  "composition_spec_id": "descent-static-image-composition",
+  "composition_spec_revision": 1,
+  "composition_spec_hash": "5ecf613977b6fb1f0d6940b617b1f5dc5d308d50b769190f07ffbbbbf380798d",
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "renderer": {
+    "kind": "hyperframes",
+    "version": "0.7.103"
+  },
+  "visual_spans": [
+    {
+      "layer_id": "retained-DESCENT-PRE",
+      "shot_id": "DESCENT-PRE",
+      "asset_role": "primary_visual",
+      "asset_id": "descent-pre-capture",
+      "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e.mp4",
+      "start_frame": 0,
+      "duration_frames": 144,
+      "start_sample": 0,
+      "duration_samples": 288000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": 144,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": null
+    },
+    {
+      "layer_id": "retained-DESCENT-TAIL",
+      "shot_id": "DESCENT-TAIL",
+      "asset_role": "primary_visual",
+      "asset_id": "descent-tail-capture",
+      "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+      "asset_mime_type": "video/mp4",
+      "materialized_path": "assets/326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e.mp4",
+      "start_frame": 144,
+      "duration_frames": 48,
+      "start_sample": 288000,
+      "duration_samples": 96000,
+      "trim_start_frame": 144,
+      "trim_duration_frames": 48,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": {
+        "from_shot_id": "DESCENT-PRE",
+        "to_shot_id": "DESCENT-TAIL",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    },
+    {
+      "layer_id": "static-stair-tail",
+      "shot_id": "DESCENT-TAIL",
+      "asset_role": "reference",
+      "asset_id": "static-stair-patch",
+      "asset_sha256": "09590726eff3c4758ebe885cf253db020c82297af73cbb4438697c4455a46106",
+      "asset_mime_type": "image/png",
+      "materialized_path": "assets/09590726eff3c4758ebe885cf253db020c82297af73cbb4438697c4455a46106.png",
+      "start_frame": 144,
+      "duration_frames": 48,
+      "start_sample": 288000,
+      "duration_samples": 96000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": null,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 1,
+      "incoming_transition": {
+        "from_shot_id": "DESCENT-PRE",
+        "to_shot_id": "DESCENT-TAIL",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    }
+  ],
+  "audio_spans": [
+    {
+      "track_id": "native-DESCENT-PRE",
+      "audio_kind": "dialogue",
+      "asset_id": "DESCENT-PRE-original-mix",
+      "asset_sha256": "bd2a83850f371a6e947f2616d648f359f6ee32d6079c7b8ff89ea8f41c1f2baa",
+      "start_sample": 0,
+      "duration_samples": 288000,
+      "source_start_sample": 0,
+      "source_duration_samples": 288000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    },
+    {
+      "track_id": "native-DESCENT-TAIL",
+      "audio_kind": "dialogue",
+      "asset_id": "DESCENT-TAIL-original-mix",
+      "asset_sha256": "bd2a83850f371a6e947f2616d648f359f6ee32d6079c7b8ff89ea8f41c1f2baa",
+      "start_sample": 288000,
+      "duration_samples": 96000,
+      "source_start_sample": 288000,
+      "source_duration_samples": 96000,
+      "gain_millidb": 0,
+      "fade_in_samples": 0,
+      "fade_out_samples": 0,
+      "ducking": null
+    }
+  ],
+  "caption_cues": [],
+  "commercial_graphics": [],
+  "total_frames": 192,
+  "total_samples": 384000,
+  "composition_fingerprint": "ee5a81d877daee1ffa358b32df7fa69f6cd4e1561ba996130c865d1ea4f8149d"
+}

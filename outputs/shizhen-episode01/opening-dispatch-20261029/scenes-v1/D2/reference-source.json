@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/codex-image/raw/D2-v1.png",
+  "sha256": "b878175694b760b7f5ea82547527bb997dc5c80db957f15e601c26d11d6bef1e",
+  "size_bytes": 2394284,
+  "width": 1672,
+  "height": 941,
+  "reference_role": "reference",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "prompt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/codex-image/D2-prompt.zh.txt",
+  "prompt_sha256": "4d57b6d6085df62972a5d1ed3c6ce3ff897dc961f41db2b2f29d99507e5778fb",
+  "semantic_review": "Static review by Parent: composition and key evidence readable; not video acceptance"
+}

@@ -1,0 +1,347 @@
+{
+  "shot": {
+    "shot_id": "MC00-CITY",
+    "scene_id": "city-eave-to-municipal",
+    "storyboard_beat_id": "one-city-one-continuous-move",
+    "intent": "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。\n城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。\n近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人只正常作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。\n末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 20
+    },
+    "character_ids": [
+      "municipal-worker"
+    ],
+    "continuity_constraints": [
+      "MC00独立内部一镜到底，MC01–06及B6不重编成一镜",
+      "屋檐横移真实揭示，同一主路与住宅站棚可追踪",
+      "不穿墙、不跨牵引线、不翻轴、不提前按停",
+      "方案A尾态只用已认可MC01精确第0帧，旧近似末态降为路线参考",
+      "原市政与B6不重生成、不重剪；接缝只处理MC00一侧",
+      "完整原速声画和接点另行验收"
+    ],
+    "visual_strategy": "generated_video",
+    "generated_video_rationale": "完整连续城市揭示与空间下降须由一次20秒源承载，不能为15秒阈值拆段掩切",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "first_frame",
+        "asset_ids": [
+          "MC00-first-eave"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      },
+      {
+        "role": "last_frame",
+        "asset_ids": [
+          "MC00-last-approved-MC01-frame0"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ]
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "approved_keyframe",
+        "asset_id": "MC00-first-eave"
+      },
+      {
+        "role": "last_frame",
+        "asset_id": "MC00-last-approved-MC01-frame0"
+      }
+    ],
+    "generation_intent": {
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "室外屋檐滴雨近景，建筑外转角部分遮挡城市，但始终可见城市一角",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "相机已完全停稳，正常市政作业的构图、透视、门位、工人姿态与灯态落到已认可MC01第0帧",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "municipal-worker"
+        ],
+        "preservation": "exact",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "city-eave-to-municipal",
+        "time_of_day": "同一雨夜",
+        "mood": "城市正常运转，异常尚未发生",
+        "state_constraints": [
+          "同一主路与沿途住宅、站棚及市政入口",
+          "工作灯亮，工人不提前按停",
+          "尾态以已认可MC01第0帧为唯一锚点"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "从建筑室外屋檐，经开放道路上方到市政牵引线街侧",
+        "screen_direction": "沿同一主路纵深前进下降，再逐渐收至市政观察侧",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不穿墙、不穿玻璃、不跨钢索、不翻轴"
+      },
+      "axis_continuity": {
+        "camera_axis": "道路纵深到市政牵引线街侧，与尾帧同侧",
+        "framing_continuity": "屋檐近景、城市展开、沿路下降及市政落点连成一条可追踪路径",
+        "crossing_policy": "全镜不中断，不用掠黑、满屏遮挡或叠化藏切点"
+      },
+      "subject_action": {
+        "start_state": "室外屋檐滴雨近景，建筑外转角部分遮挡城市，但始终可见城市一角",
+        "progression": "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。\n城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。\n近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人只正常作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "相机已完全停稳，正常市政作业的构图、透视、门位、工人姿态与灯态落到已认可MC01第0帧",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "沿檐口横移越过建筑外转角，城市从遮挡后显露",
+        "peak": "沿同一主路缓弧前进下降，住宅与站棚依次显露",
+        "settle": "钢索入前景，逐渐减速并完全停稳于市政尾态",
+        "direction": "室外侧移后沿道路纵深下降，收至街侧观察位",
+        "amplitude_class": "从屋檐近景到城市，再到正常市政场地，保持可信尺度"
+      },
+      "pacing": {
+        "cadence": "揭示后下降、近街面逐渐减速，留出认路和看清作业关系的时间",
+        "tempo_class": "正常原速，不为凑时长加速、冻结或删事件",
+        "shot_duration_seconds": 20.0
+      },
+      "camera_intent": {
+        "movement": "一条连续的屋檐横移揭示、沿路缓弧下降及街侧减速落点",
+        "stability": "平稳连续，末段完全停稳",
+        "framing_intent": "每次移动对应一次可见揭示，路网与地标可追踪",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "室外屋檐滴雨近景，建筑外转角部分遮挡城市，但始终可见城市一角",
+        "end_framing": "相机已完全停稳，正常市政作业的构图、透视、门位、工人姿态与灯态落到已认可MC01第0帧",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "市政作业仍正常，异常尚未发生",
+        "visible_response": "接近后才看清工人正常作业，不提前按停或惊恐",
+        "gaze_target": "工人关注原作业设备",
+        "body_behavior": "原位置正常作业，不闯入钢索路径",
+        "hand_behavior": "不演按停与收手，终态姿势以尾帧为准",
+        "terminal_performance_state": "尾帧正常作业、灯亮，尚未完成停止操作",
+        "character_directions": [
+          {
+            "character_id": "municipal-worker",
+            "screen_identity": "尾帧中黄色安全帽、深蓝工装的同一作业工人",
+            "role": "supporting",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "正常市政作业，接近后人物才可辨",
+                "emotion": "平常专注",
+                "intensity": "subtle",
+                "facial_expression": "自然专注，不提前惊恐",
+                "gaze_target": "作业设备",
+                "breathing": "自然平稳",
+                "body_behavior": "留在原作业位置，末态与尾帧一致，不重复按停或收手"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "雨夜真人电影摄影质感",
+        "palette": "深蓝灰夜色、冷白路灯与少量暖窗及作业灯",
+        "material_treatment": "真实湿金属檐口、旧住宅、棚柱、沥青及市政机械",
+        "prohibited_visual_drift": [
+          "建筑扭曲、鱼眼或突然变焦",
+          "分格、叠化、隐切、冻结或加速",
+          "新增对白、片名、字幕或音乐"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "城市路灯、窗户与市政工作灯",
+        "direction": "同一雨夜实用照明，尾态继承MC01第0帧",
+        "exposure_priority": "近处雨滴、路网地标和末段钢索设备人物关系可读",
+        "continuity_state": "工作灯始终亮，不提前断控"
+      },
+      "ambience_intent": {
+        "environment_bed": "近檐滴水退远、城市交通接管、现场马达逐渐清楚，结尾对齐MC01既有现场声",
+        "foley_cues": [
+          "檐口雨滴",
+          "轮胎压水",
+          "正常市政马达与机械声"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "crane_down",
+        "direction": "down",
+        "amplitude_class": "pronounced",
+        "speed_class": "moderate",
+        "start_motion_state": "in_motion",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "city-eave-to-municipal",
+        "relation_kind": "reveal",
+        "start_relation": "屋檐遮挡与城市一角同框",
+        "end_relation": "钢索、工人、控制盒和铁门关系清楚，构图为批准尾帧"
+      }
+    },
+    "conditioning_compatibility": {
+      "lane": "fl2va",
+      "first_anchor_id": "MC00-first-eave",
+      "last_anchor_id": "MC00-last-approved-MC01-frame0",
+      "same_subject_scale": false,
+      "composition_compatible": true,
+      "screen_order_compatible": true,
+      "axis_compatible": true,
+      "camera_path_reachable": true,
+      "character_prop_state_reachable": true,
+      "action_endpoint_reachable": true,
+      "available_duration_seconds": 20,
+      "scale_transition": {
+        "schema_version": "conditioning-scale-transition/1",
+        "first_anchor_id": "MC00-first-eave",
+        "first_anchor_sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68",
+        "last_anchor_id": "MC00-last-approved-MC01-frame0",
+        "last_anchor_sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+        "camera_intent_hash": "3b3ebb4f97c614192ffa7c684d6849e86cfdd8c661172fa8aef813070e7da61d",
+        "available_duration_seconds": 20.0,
+        "sources": [
+          {
+            "source_id": "anchor-review",
+            "kind": "anchor_geometry_review",
+            "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v2/pre-generation-feasibility.md",
+            "sha256": "b5b6ff01ce48e8f8f3deb122c96b0a720891f1caeba01f5f4cdac352a40e4395"
+          },
+          {
+            "source_id": "city-map",
+            "kind": "trajectory",
+            "evidence_ref": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/city-map.svg",
+            "sha256": "7ea340ed58ca0d548c216a79048eab5f93961b85c34b36021034c176139316a4"
+          },
+          {
+            "source_id": "first-anchor",
+            "kind": "anchor_geometry_review",
+            "evidence_ref": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/02-eave-start-v1.png",
+            "sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68"
+          },
+          {
+            "source_id": "last-anchor",
+            "kind": "anchor_geometry_review",
+            "evidence_ref": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+            "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+          },
+          {
+            "source_id": "route",
+            "kind": "trajectory",
+            "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v2/prospective-trajectory.json",
+            "sha256": "b780d32851738083576a0f9b954fe1a52bb6ed1f87685860d39ace1739442c7b"
+          }
+        ],
+        "findings": [
+          {
+            "finding_id": "anchor_correspondence",
+            "verdict": "PASS",
+            "rationale": "实际屋檐照片在外转角外、主路留在侧后景；实际市政照片为绞盘左、门右、索线南侧观察。新城市设计允许用同一主路和开放入口连接两个观察区；未声称照片测绘或实际运镜通过。",
+            "source_ids": [
+              "anchor-review",
+              "city-map",
+              "first-anchor",
+              "last-anchor"
+            ]
+          },
+          {
+            "finding_id": "continuous_camera_path",
+            "verdict": "PASS",
+            "rationale": "同一解析C1位置曲线和连续look方向连接起终点，设计体块内碰撞0、相机始终在牵引线南侧；从站棚北端开放处接近，不要求穿墙或跨索。实际雨线、门速、人体、遮挡和声画接点仍需新MP4验证。",
+            "source_ids": [
+              "anchor-review",
+              "city-map",
+              "route"
+            ]
+          },
+          {
+            "finding_id": "duration_reachable",
+            "verdict": "PASS",
+            "rationale": "20秒作者设计路径约69.31m，峰值5.30m/s、下降峰值1.63m/s，末半秒相机静止；运动容量支持先揭示后下降再减速的前期试验。该米制坐标为新创场景假设，不是源片实测。",
+            "source_ids": [
+              "anchor-review",
+              "route"
+            ]
+          },
+          {
+            "finding_id": "scale_fov_continuity",
+            "verdict": "PASS",
+            "rationale": "首尾尺度不同，明确same_subject_scale=False。约28mm等效正常广角为前期估计，靠脱离近檐、展开城市和缓弧下降改变主体尺度；解析look方向连续，未以变焦跳转、隐藏切镜或proxy替代。内参未标定，模型服从待实片。",
+            "source_ids": [
+              "anchor-review",
+              "first-anchor",
+              "last-anchor",
+              "route"
+            ]
+          }
+        ],
+        "content_hash": "22d3c97baaa12dc7c3f916a68d1c33b1c3ce7e7f3f1e2d2bec4a1df716f5a4fb"
+      }
+    },
+    "intent_evidence": {
+      "character_action_required": false,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 20,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

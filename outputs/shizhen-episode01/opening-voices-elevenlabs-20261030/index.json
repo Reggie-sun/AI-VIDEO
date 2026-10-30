@@ -1,0 +1,201 @@
+{
+  "model": "eleven_v4",
+  "source_plan_sha256": "665a5d7c4e595cf5138941715016203721119fb92e373f417618696d4264bcea",
+  "rows": [
+    {
+      "id": "L1",
+      "unit": "municipal",
+      "shot_s": 4.0,
+      "role": "relay",
+      "text": "检修口报，电闸断了，绞盘还在收",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "dry_file": "L1-dry.wav",
+      "radio_file": "L1-radio.wav",
+      "duration_s": 3.44,
+      "sha256": "3909ab4a294c7d7936a6e0ab383d615772b8642457990079932b0862414aff8c",
+      "source": "runs/shizhen-opening-voice-relay-20261030/assets/audio/3909ab4a294c7d7936a6e0ab383d615772b8642457990079932b0862414aff8c.wav",
+      "minimum_shot_with_1s_tail": 4.44,
+      "window_with_1s_tail_ok": false,
+      "human_quality": "NOT_EVALUATED",
+      "radio_sha256": "034975b890c1364834c1b3781e28a8a6745bc12886724d84bf8e54c4e4004af2"
+    },
+    {
+      "id": "L2",
+      "unit": "D2",
+      "shot_s": 5.0,
+      "role": "relay",
+      "text": "七号楼报，下了三层，还在原来那层",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "dry_file": "L2-dry.wav",
+      "radio_file": "L2-radio.wav",
+      "duration_s": 3.76,
+      "sha256": "d6036843fcdccda2491dfc71a1efcc1952d20d0057d1d27759eac89ea0883865",
+      "source": "runs/shizhen-opening-voice-relay-20261030/assets/audio/d6036843fcdccda2491dfc71a1efcc1952d20d0057d1d27759eac89ea0883865.wav",
+      "minimum_shot_with_1s_tail": 4.76,
+      "window_with_1s_tail_ok": true,
+      "human_quality": "NOT_EVALUATED",
+      "radio_sha256": "0379cbfea1241c8b2d19cbbef5d686cf650cb54468bed92e91847e3b9ae4a64b"
+    },
+    {
+      "id": "L3",
+      "unit": "D3",
+      "shot_s": 5.0,
+      "role": "relay",
+      "text": "急诊说，系统里她已经死了，人还躺着",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "dry_file": "L3-dry.wav",
+      "radio_file": "L3-radio.wav",
+      "duration_s": 4.24,
+      "sha256": "8b8252aaa4c1aabc63e21e6412db81762e0cb8402a18aea2ac35c0891e47b781",
+      "source": "runs/shizhen-opening-voice-relay-20261030/assets/audio/8b8252aaa4c1aabc63e21e6412db81762e0cb8402a18aea2ac35c0891e47b781.wav",
+      "minimum_shot_with_1s_tail": 5.24,
+      "window_with_1s_tail_ok": false,
+      "human_quality": "NOT_EVALUATED",
+      "radio_sha256": "81da1bd7f1b19419a504b95ffd5f4219a1a5ae68911d8b9b9addfc4768e44c76"
+    },
+    {
+      "id": "L4",
+      "unit": "D4",
+      "shot_s": 5.5,
+      "role": "relay",
+      "text": "人民路有人喊救命，在七楼，七楼早就封了",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "dry_file": "L4-dry.wav",
+      "radio_file": "L4-radio.wav",
+      "duration_s": 4.32,
+      "sha256": "6876cc4f56c27d0f17f972deb622e57d615a9a388b028bf307a45cf89b536a24",
+      "source": "runs/shizhen-opening-voice-relay-20261030/assets/audio/6876cc4f56c27d0f17f972deb622e57d615a9a388b028bf307a45cf89b536a24.wav",
+      "minimum_shot_with_1s_tail": 5.32,
+      "window_with_1s_tail_ok": true,
+      "human_quality": "NOT_EVALUATED",
+      "radio_sha256": "bd70c396c581ca4930ca76fdf1f75a097e6150cc2d0d6a3dbd03098821428dfd"
+    },
+    {
+      "id": "L5",
+      "unit": "D5",
+      "shot_s": 3.2,
+      "role": "dong",
+      "text": "记上，第十四起",
+      "voice": "Stella Gu",
+      "voice_id": "BqljjWyTnrioXPCNkCd4",
+      "dry_file": "L5-dry.wav",
+      "radio_file": null,
+      "duration_s": 2.08,
+      "sha256": "75b497d7898febddd1e1b6601918dc3d31a2344749473caf7f7a6933f3bd3548",
+      "source": "runs/shizhen-opening-voice-dong-20261030/assets/audio/75b497d7898febddd1e1b6601918dc3d31a2344749473caf7f7a6933f3bd3548.wav",
+      "minimum_shot_with_1s_tail": 3.08,
+      "window_with_1s_tail_ok": true,
+      "human_quality": "NOT_EVALUATED"
+    },
+    {
+      "id": "L6a",
+      "unit": "D6",
+      "shot_s": 3.5,
+      "role": "dong",
+      "text": "三号站台",
+      "voice": "Stella Gu",
+      "voice_id": "BqljjWyTnrioXPCNkCd4",
+      "dry_file": "L6a-dry.wav",
+      "radio_file": null,
+      "duration_s": 1.28,
+      "sha256": "0a5127ab7b693e25d79749b6793096523d72f5aa2e5a25c82630b914c5a7a690",
+      "source": "runs/shizhen-opening-voice-dong-20261030/assets/audio/0a5127ab7b693e25d79749b6793096523d72f5aa2e5a25c82630b914c5a7a690.wav",
+      "minimum_shot_with_1s_tail": 2.28,
+      "window_with_1s_tail_ok": true,
+      "human_quality": "NOT_EVALUATED"
+    },
+    {
+      "id": "L6b",
+      "unit": "D6",
+      "shot_s": 3.5,
+      "role": "relay",
+      "text": "暂无报告",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "dry_file": "L6b-dry.wav",
+      "radio_file": "L6b-radio.wav",
+      "duration_s": 1.04,
+      "sha256": "456e27d931a956c9c34cc1f08458ed6032ec35d6a9476497fc8495750eb9e7d6",
+      "source": "runs/shizhen-opening-voice-relay-20261030/assets/audio/456e27d931a956c9c34cc1f08458ed6032ec35d6a9476497fc8495750eb9e7d6.wav",
+      "minimum_shot_with_1s_tail": 2.04,
+      "window_with_1s_tail_ok": true,
+      "human_quality": "NOT_EVALUATED",
+      "radio_sha256": "2c43a43adc7192977b995885c72d4d52881f09226e6451db2b41dbf886c675b7"
+    }
+  ],
+  "actual_cost": "pending confirmation",
+  "unit_timing_advisory": {
+    "municipal": {
+      "speech_s": 3.44,
+      "window_s": 4.0,
+      "lines": [
+        "L1"
+      ],
+      "minimum_speech_plus_tail_s": 4.44,
+      "fits_without_dialogue_gaps": false
+    },
+    "D2": {
+      "speech_s": 3.76,
+      "window_s": 5.0,
+      "lines": [
+        "L2"
+      ],
+      "minimum_speech_plus_tail_s": 4.76,
+      "fits_without_dialogue_gaps": true
+    },
+    "D3": {
+      "speech_s": 4.24,
+      "window_s": 5.0,
+      "lines": [
+        "L3"
+      ],
+      "minimum_speech_plus_tail_s": 5.24,
+      "fits_without_dialogue_gaps": false
+    },
+    "D4": {
+      "speech_s": 4.32,
+      "window_s": 5.5,
+      "lines": [
+        "L4"
+      ],
+      "minimum_speech_plus_tail_s": 5.32,
+      "fits_without_dialogue_gaps": true
+    },
+    "D5": {
+      "speech_s": 2.08,
+      "window_s": 3.2,
+      "lines": [
+        "L5"
+      ],
+      "minimum_speech_plus_tail_s": 3.08,
+      "fits_without_dialogue_gaps": true
+    },
+    "D6": {
+      "speech_s": 2.32,
+      "window_s": 3.5,
+      "lines": [
+        "L6a",
+        "L6b"
+      ],
+      "minimum_speech_plus_tail_s": 3.32,
+      "fits_without_dialogue_gaps": true
+    }
+  },
+  "timing_note": "D6两句共享同一3.5秒窗口；最低时长未计对话间停顿，不是ResolvedTimeline或装配证明。L1可跨入D1接报反应，不要求修改已接受市政原片。",
+  "user_review": {
+    "status": "REJECTED_UNNATURAL",
+    "scope": [
+      "relay",
+      "dong"
+    ],
+    "feedback": [
+      "这不是还是ai声音吗",
+      "两种声音都不自然"
+    ],
+    "boundary": "advisory audition feedback, not canonical lifecycle mutation"
+  }
+}

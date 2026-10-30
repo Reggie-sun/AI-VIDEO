@@ -1,0 +1,31 @@
+{
+  "kind": "review_assembly/1",
+  "not_delivery": true,
+  "path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/assembly/失帧-独立开场-城市调度版-审看-1080p.mp4",
+  "sha256": "6c5c1167b6486dedac0695787260d8a897ae8a97831294bad69197d02d46c794",
+  "segments": [
+    {
+      "name": "municipal",
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+      "sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+      "frames": 164
+    },
+    {
+      "name": "CITY-RISE",
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/失帧-城市调度镜头-480p.mp4",
+      "sha256": "8a787dfcec864bc8d8b5f58755e18f1d77b99d051e661d5cd79abc2a9ac9215e",
+      "frames_used": "1..479",
+      "note": "frame0 dropped (municipal last frame duplicate), last frame dropped (B6 f0 duplicate)"
+    },
+    {
+      "name": "B6",
+      "path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a"
+    }
+  ],
+  "captions": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/assembly/dispatch-captions.ass",
+  "caption_offset_seconds": 6.749999999999999,
+  "radio_gain_db": -12.5,
+  "ambience_gain_db": -4.0,
+  "scope": "review only; CITY-RISE upscaled from 480p; captions burned via libass, not HyperFrames"
+}

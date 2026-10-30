@@ -1,0 +1,18 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+  "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+  "size_bytes": 4098545,
+  "width": 1920,
+  "height": 1080,
+  "reference_role": "last_frame",
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Static authoring source only; no generated video or junction acceptance",
+  "generator": "exact decoded video frame extraction; existing PNG reused",
+  "source_video_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+  "source_video_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "source_frame_index": 0,
+  "source_fps_numerator": 24,
+  "source_fps_denominator": 1,
+  "inherited_acceptance_scope": "Exact original municipal video only; not this future MC00 output"
+}

@@ -273,6 +273,8 @@ qualify assets or bypass readiness. Once the Shot and selected route are establi
   [seedance-authoring](../seedance-authoring/SKILL.md); selected Vidu models/services use
   [vidu-authoring](../vidu-authoring/SKILL.md), including dialogue versus automated TTS service matching.
   Other selected models use their matching owner.
+- Before paid generation of new creative work, show the user the reference package as a preview: the decisive keyframes (start, the change, the human reaction, end state), identities, evidence details and approved-footage style frames. Seal the user's exact approval as `preview_approval` ([reference package](../../../docs/shot-reference-planning.md#reference-package-before-preview-2026-10-30)). Paper coverage plus an LLM concept check is not that approval.
+- Do not remove drama to lower generation risk: an anomaly must happen on screen with someone seeing and reacting; narration or dialogue alone cannot carry it, and turning every performer away from camera is a risk choice, not a creative one.
 - Generation uses the selected adapter and existing authorization, budget, egress and permit gates.
   Rendering uses HyperFrames and timing uses the single `ResolvedTimeline`.
 - After each exact MP4, explicitly use project-local `video-analysis` MCP and the

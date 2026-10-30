@@ -1,0 +1,39 @@
+{
+  "kind": "authored-route-design/1",
+  "status": "AUTHORED_DESIGN_NOT_MEASURED",
+  "replaces": "v3 city-map route (camera west of road, ~69m with ~90deg turn into the site)",
+  "heading": "起幅朝向与尾帧相同；全程主路在画左、作业区在画右",
+  "duration_seconds": 16,
+  "beats": [
+    {
+      "phase": "reveal",
+      "relative_span": "前约四分之一",
+      "motion": "贴檐口向右平移约四至六米，绕过外墙转角",
+      "visible_change": "湿墙从左侧滑出，主路、车流与远处高楼群从墙后展开"
+    },
+    {
+      "phase": "descent",
+      "relative_span": "中段约一半",
+      "motion": "沿主路右侧上空向前，同时由约六层高度平缓下降",
+      "visible_change": "旧住宅（楼梯窗格）与透明玻璃站棚依次从右侧经过，行道树与路灯产生视差"
+    },
+    {
+      "phase": "approach",
+      "relative_span": "后约四分之一",
+      "motion": "降到人眼高度并减速，两根钢索从下缘入前景",
+      "visible_change": "绞盘、控制盒、黄帽深蓝工装工人、灰色铁门的关系与尾帧一致"
+    },
+    {
+      "phase": "settle",
+      "relative_span": "最后约一秒",
+      "motion": "轻轻停稳",
+      "visible_change": "画面收至MC01第0帧"
+    }
+  ],
+  "why_this_route": [
+    "首尾帧朝向一致，模型主要做右移+前进下降，不需凭空发明大转弯",
+    "首帧主路被墙遮住，揭示是真实发生的画面变化",
+    "16秒避免v3末段约6秒空停"
+  ],
+  "limits": "米制与位置为设计估计，非照片测绘；模型是否沿此路径运动只能由exact成片验证"
+}

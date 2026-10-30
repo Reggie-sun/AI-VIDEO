@@ -1,0 +1,10 @@
+{
+  "status": 200,
+  "body_sha256": "21d28abe7d9e7b0b714df34e7a13915962e93dd1e0ab8adbac033044c97bbea9",
+  "headers": {
+    "request-id": "wFkPrPwsG92cFfsrmGgx",
+    "character-cost": "34",
+    "content-type": "application/json"
+  },
+  "generation_call_index": 6
+}

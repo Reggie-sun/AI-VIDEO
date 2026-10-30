@@ -1,0 +1,33 @@
+{
+  "kind": "authored-route-design/1",
+  "status": "AUTHORED_DESIGN_NOT_MEASURED",
+  "duration_seconds": 20,
+  "beats": [
+    {
+      "phase": "rise",
+      "relative_span": "前约四分之一",
+      "motion": "从铁门钢索近景急速向后上方拉起至楼顶以上",
+      "visible_change": "作业现场缩成街角灯点"
+    },
+    {
+      "phase": "sweep",
+      "relative_span": "中段约四成",
+      "motion": "贴楼顶高度向前横掠",
+      "visible_change": "主路车流、旧住宅楼梯窗、红十字医院、九层旧楼与高楼群依次掠过"
+    },
+    {
+      "phase": "dive",
+      "relative_span": "后约三成",
+      "motion": "前倾俯冲并加速扎向站棚",
+      "visible_change": "玻璃站棚和棚下两人迅速放大"
+    },
+    {
+      "phase": "slam_stop",
+      "relative_span": "最后约半秒",
+      "motion": "猛然刹停后静止",
+      "visible_change": "收至B6第0帧"
+    }
+  ],
+  "audio_design": "调度对讲与字幕为后期层，台词见 dispatch-script.json；本请求原生声只要雨、风、车流",
+  "limits": "地理与高度为设计估计；模型路径服从待exact MP4验证"
+}

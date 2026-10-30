@@ -1,0 +1,30 @@
+{
+  "status": "MISSING_CURRENT_NATIVE_BINDING",
+  "selected_fixed_fields": {
+    "model_id": "seedance_2.5",
+    "input_mode": "first_last_frame",
+    "duration_seconds": 20,
+    "resolution": "480p",
+    "aspect_ratio": "16:9",
+    "native_audio": true
+  },
+  "required_current_fields": [
+    "account_sha256",
+    "project_id",
+    "node_id",
+    "benefit_amount",
+    "benefit_type",
+    "credit_upper_bound",
+    "native_mode3_current_config_identity",
+    "native_quote_and_budget_reservation"
+  ],
+  "new_attempt_id_to_allocate": "Parent must allocate one new exact MC00 attempt through current owner",
+  "suggested_new_root": "runs/shizhen-macro-opening-20261028/MC00-city-v2",
+  "operator_bound_source_only": "outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-v1/operator-bound.json",
+  "historical_operator_per_call_upper_bound_CRD": 1500,
+  "not_a_new_quote_or_authorization": true,
+  "planned_new_submit_count": 1,
+  "historical_known_macro_submits": 6,
+  "old_downstairs_door_unit_not_reallocated": true,
+  "do_not_copy_old_attempt_permit_or_profile": true
+}

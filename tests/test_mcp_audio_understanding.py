@@ -359,6 +359,19 @@ def test_invalid_or_empty_model_observations_are_evidence_gap(observations):
     assert error.value.outcome == "EVIDENCE_GAP"
 
 
+def test_estimated_end_rounding_past_duration_is_clamped_not_discarded():
+    # Models pin the last segment to the file end; a rounding overshoot must not discard the observation.
+    observations = {
+        "segments": [{"start_seconds": 0.05, "end_seconds": 0.6, "text": "Test words.", "speaker": "s"}],
+        "voice_description": "ok", "delivery_description": "ok",
+        "background_sounds": [], "uncertainties": [],
+    }
+    request = prepared()
+    analyzer = GeminiAudioAnalyzer(lambda: "test-key", FakeTransport(gemini_response(observations)))
+    result = analyzer.analyze(request, permit=OneShotPermit())
+    assert result["observations"]["segments"][0]["end_seconds"] == pytest.approx(request.duration_seconds)
+
+
 def test_invalid_response_shape_and_secret_reflection_are_safe():
     for response in (
         httpx.Response(200, json={"modelVersion": "", "candidates": []}),

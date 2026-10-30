@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67\",\n  \"source_size_bytes\": 38657680,\n  \"audio_sha256\": \"33cc8460c24b9ba301d6189e02257d1d9c3f2e4ea2848f1af88e084c8ef1a223\",\n  \"audio_size_bytes\": 1249404,\n  \"duration_seconds\": 7.082086167800454,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"a288a476c304840a91a4d3e86413bd27a3a32f83941dcead7c71a1ff1a89ffdf\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"5ce8b796061d09c23b03951b6ff94c7224e61e1d6e2a5416c6b284e5e87a7d3b\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"continuous static hiss\",\n      \"crackling and popping sounds\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-dispatch-20261030/D4r1/state/video-generation/fetch/files/f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

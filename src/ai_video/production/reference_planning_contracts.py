@@ -102,6 +102,12 @@ class DirectorCoverageBinding(StrictModel):
     unit_id: Identifier
 
 
+class PreviewApprovalBinding(StrictModel):
+    """Exact user approval of the visual preview; bytes live in authoring input."""
+
+    approval_hash: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+
+
 class ReferencePlanningIntent(StrictModel):
     contract_version: Literal["shot-reference-intent/1"] = "shot-reference-intent/1"
     facets: tuple[ShotFacet, ...] = ()
@@ -113,6 +119,7 @@ class ReferencePlanningIntent(StrictModel):
     natural_generation: tuple[Text, ...] = ()
     motion_reference_policy: Literal["auto", "required"] = "auto"
     director_coverage: DirectorCoverageBinding | None = None
+    preview_approval: PreviewApprovalBinding | None = None
 
     @model_serializer(mode="wrap")
     def _serialize(self, handler):
@@ -121,6 +128,8 @@ class ReferencePlanningIntent(StrictModel):
             payload.pop("motion_reference_policy", None)
         if self.director_coverage is None:
             payload.pop("director_coverage", None)
+        if self.preview_approval is None:
+            payload.pop("preview_approval", None)
         return payload
 
     @field_validator("facets")

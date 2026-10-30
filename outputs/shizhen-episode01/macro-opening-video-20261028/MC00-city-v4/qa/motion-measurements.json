@@ -1,0 +1,52 @@
+{
+  "source_sha256": "de0608983dd5b6722a6ef14b086c2a41494693fd97af7019de2e297553f990cf",
+  "method": "gray mean-abs frame difference at 214x120 (passthrough 385 frames) and phase correlation at 427x240",
+  "per_second_mean_diff": [
+    3.1,
+    5.69,
+    7.42,
+    6.61,
+    4.46,
+    4.04,
+    4.6,
+    5.65,
+    6.69,
+    7.94,
+    10.64,
+    14.45,
+    9.62,
+    7.44,
+    5.62,
+    4.44
+  ],
+  "speed_peak": "10-12s while passing under shelter canopy edge",
+  "tail_drift_px_per_6_frames_at_427w": {
+    "12.0s": [
+      -2,
+      -9
+    ],
+    "13.0s": [
+      -1,
+      -7
+    ],
+    "14.0s": [
+      -1,
+      -5
+    ],
+    "15.0s": [
+      0,
+      -3
+    ],
+    "15.75s": [
+      0,
+      -3
+    ]
+  },
+  "tail_settled": false,
+  "junction": {
+    "mc00_last_vs_mc01_f0_mean_abs_rgb_427": 4.83,
+    "seam_gray_diff": 7.3,
+    "mc00_tail_internal_gray_diff": "3.3-6.0",
+    "mc01_internal_gray_diff": "0.0-1.7"
+  }
+}

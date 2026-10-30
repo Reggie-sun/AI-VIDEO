@@ -1,0 +1,16 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/02-eave-start-v1.png",
+  "sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68",
+  "size_bytes": 2558971,
+  "width": 1672,
+  "height": 940,
+  "reference_role": "first_frame",
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Static authoring source only; no generated video or junction acceptance",
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "source_intent_path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/generation-intent.json",
+  "fictional_characters": true,
+  "source_intent_sha256": "0ca181af8b75df0afb290eee1be8c6cc99d1a66ca02b7db361e5979f1632ed36"
+}

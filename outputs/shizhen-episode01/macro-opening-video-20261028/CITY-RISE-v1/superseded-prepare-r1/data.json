@@ -1,0 +1,215 @@
+{
+  "objective": "市政异常之后急速拉开城市并俯冲落到站台，接入已认可B6第0帧；调度对讲与字幕后期叠加；不重做市政或B6",
+  "images": [
+    {
+      "asset_id": "CITY-RISE-first-municipal-last",
+      "node_id": "CITY-RISE-first-municipal-last-local-authoring-node",
+      "resource_id": "CITY-RISE-first-municipal-last-local-source",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/anchors/municipal-last-f163.png",
+      "usage_license": "Task-owned Shizhen approved-footage frame; local copy, not platform adoption",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/reference-first_frame-source.json",
+        "record_sha256": "6962037d565db2560b87fc4bd286d67ae2f69a8a9fd035e58450cb352187d1e7",
+        "tool": {
+          "name": "exact-video-frame-extraction",
+          "version": "ffmpeg-select-v1"
+        }
+      }
+    },
+    {
+      "asset_id": "CITY-RISE-last-B6-frame0",
+      "node_id": "CITY-RISE-last-B6-frame0-local-authoring-node",
+      "resource_id": "CITY-RISE-last-B6-frame0-local-source",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/anchors/b6-event-render-f0.png",
+      "usage_license": "Task-owned Shizhen approved-footage frame; local copy, not platform adoption",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/reference-last_frame-source.json",
+        "record_sha256": "f0f78ed391099d63f0e63e6c646ee14b0e26359cdd32f8716e13f32dcc607f34",
+        "tool": {
+          "name": "exact-video-frame-extraction",
+          "version": "ffmpeg-select-v1"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "gao-zheng",
+      "name": "高峥",
+      "identity": "已认可B6第0帧左侧戴眼镜的中年男人",
+      "appearance_bible": "眼镜、棕色夹克、斜挎包，按B6原造型；不从文字另造面孔",
+      "reference_asset_ids": [
+        "CITY-RISE-last-B6-frame0"
+      ]
+    },
+    {
+      "character_id": "luo-min",
+      "name": "罗敏",
+      "identity": "已认可B6第0帧右侧打电话的短发年轻女人",
+      "appearance_bible": "短发、墨绿色外套、手机，按B6原造型；不从文字另造面孔",
+      "reference_asset_ids": [
+        "CITY-RISE-last-B6-frame0"
+      ]
+    }
+  ],
+  "scene_images": [
+    "CITY-RISE-first-municipal-last",
+    "CITY-RISE-last-B6-frame0"
+  ],
+  "observations": {
+    "identity": "落地后高峥与罗敏的位置、造型与B6第0帧一致，无新增人物",
+    "action": "从市政铁门急速拉升，高空横掠城市，再俯冲扎向站棚",
+    "camera": "全镜连续无切点、叠化或冻结；运动紧凑有力，最后约半秒刹停并静止于批准尾帧",
+    "performance": "站台两人原地等车，男人低头、女人打电话，末态与B6第0帧一致",
+    "space": "建筑硬几何稳定，不穿墙、玻璃或棚顶；终点与B6第0帧同一观察侧",
+    "art": "同一写实雨夜，真实建筑与设备尺度，不新增片名字幕或奇观",
+    "sound": "原生雨、风、车流随运动变化，无对白旁白或音乐；调度对讲后期另验"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation",
+      "generation_intent.identity_continuity.character_ids.1"
+    ],
+    "action": [
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.open_state.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.subject_action.start_state"
+    ],
+    "camera": [
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.primary_camera_motion.end_motion_state",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response"
+    ],
+    "space": [
+      "generation_intent.space_continuity.crossing_policy",
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.close_state.state_text",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.subject_position"
+    ],
+    "art": [
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.visual_treatment.prohibited_visual_drift.2"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.music_intent.mode",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.2",
+      "generation_intent.dialogue_intent.lip_sync_required"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "随后镜头前倾俯冲，朝街边一座亮着暖灯的玻璃公交站棚直扎下去，越冲越快，站棚迅速放大。棚下站着两个人：左边戴眼镜、穿棕色夹克、斜挎包的中年男人低头站着，右边穿墨绿色外套的短发年轻女人在打电话。",
+      "最后半秒镜头猛然刹住，稳稳停在站棚正前方，画面与尾帧一致，此后不再移动。声音是雨声，拉升时风声变大，高处城市车流低鸣，俯冲时风声呼啸，刹停后只剩站台雨声。画面中没有人说话，没有音乐和字幕。"
+    ],
+    "action": [
+      "雨夜写实电影长镜头，一镜到底，节奏紧凑有力。开场是市政检修口灰色铁门和绷紧钢索的近景，绞盘仍在转。镜头随即急速向后上方拉起，越过铁门、路灯和行道树，冲进雨幕直升到楼顶以上，作业现场迅速缩成街角一点灯光。",
+      "升到高处镜头不停，贴着楼顶高度向前横掠，雨夜城市在下方铺开：主路车流、旧住宅的楼梯窗、楼顶亮着红十字灯的医院、一栋九层旧楼和远处高楼群依次从下方掠过，楼体竖直稳定，视差强烈。",
+      "随后镜头前倾俯冲，朝街边一座亮着暖灯的玻璃公交站棚直扎下去，越冲越快，站棚迅速放大。棚下站着两个人：左边戴眼镜、穿棕色夹克、斜挎包的中年男人低头站着，右边穿墨绿色外套的短发年轻女人在打电话。"
+    ],
+    "camera": [
+      "雨夜写实电影长镜头，一镜到底，节奏紧凑有力。开场是市政检修口灰色铁门和绷紧钢索的近景，绞盘仍在转。镜头随即急速向后上方拉起，越过铁门、路灯和行道树，冲进雨幕直升到楼顶以上，作业现场迅速缩成街角一点灯光。",
+      "升到高处镜头不停，贴着楼顶高度向前横掠，雨夜城市在下方铺开：主路车流、旧住宅的楼梯窗、楼顶亮着红十字灯的医院、一栋九层旧楼和远处高楼群依次从下方掠过，楼体竖直稳定，视差强烈。",
+      "最后半秒镜头猛然刹住，稳稳停在站棚正前方，画面与尾帧一致，此后不再移动。声音是雨声，拉升时风声变大，高处城市车流低鸣，俯冲时风声呼啸，刹停后只剩站台雨声。画面中没有人说话，没有音乐和字幕。"
+    ],
+    "performance": [
+      "随后镜头前倾俯冲，朝街边一座亮着暖灯的玻璃公交站棚直扎下去，越冲越快，站棚迅速放大。棚下站着两个人：左边戴眼镜、穿棕色夹克、斜挎包的中年男人低头站着，右边穿墨绿色外套的短发年轻女人在打电话。",
+      "最后半秒镜头猛然刹住，稳稳停在站棚正前方，画面与尾帧一致，此后不再移动。声音是雨声，拉升时风声变大，高处城市车流低鸣，俯冲时风声呼啸，刹停后只剩站台雨声。画面中没有人说话，没有音乐和字幕。"
+    ],
+    "space": [
+      "雨夜写实电影长镜头，一镜到底，节奏紧凑有力。开场是市政检修口灰色铁门和绷紧钢索的近景，绞盘仍在转。镜头随即急速向后上方拉起，越过铁门、路灯和行道树，冲进雨幕直升到楼顶以上，作业现场迅速缩成街角一点灯光。",
+      "升到高处镜头不停，贴着楼顶高度向前横掠，雨夜城市在下方铺开：主路车流、旧住宅的楼梯窗、楼顶亮着红十字灯的医院、一栋九层旧楼和远处高楼群依次从下方掠过，楼体竖直稳定，视差强烈。",
+      "随后镜头前倾俯冲，朝街边一座亮着暖灯的玻璃公交站棚直扎下去，越冲越快，站棚迅速放大。棚下站着两个人：左边戴眼镜、穿棕色夹克、斜挎包的中年男人低头站着，右边穿墨绿色外套的短发年轻女人在打电话。",
+      "最后半秒镜头猛然刹住，稳稳停在站棚正前方，画面与尾帧一致，此后不再移动。声音是雨声，拉升时风声变大，高处城市车流低鸣，俯冲时风声呼啸，刹停后只剩站台雨声。画面中没有人说话，没有音乐和字幕。"
+    ],
+    "art": [
+      "雨夜写实电影长镜头，一镜到底，节奏紧凑有力。开场是市政检修口灰色铁门和绷紧钢索的近景，绞盘仍在转。镜头随即急速向后上方拉起，越过铁门、路灯和行道树，冲进雨幕直升到楼顶以上，作业现场迅速缩成街角一点灯光。",
+      "升到高处镜头不停，贴着楼顶高度向前横掠，雨夜城市在下方铺开：主路车流、旧住宅的楼梯窗、楼顶亮着红十字灯的医院、一栋九层旧楼和远处高楼群依次从下方掠过，楼体竖直稳定，视差强烈。",
+      "随后镜头前倾俯冲，朝街边一座亮着暖灯的玻璃公交站棚直扎下去，越冲越快，站棚迅速放大。棚下站着两个人：左边戴眼镜、穿棕色夹克、斜挎包的中年男人低头站着，右边穿墨绿色外套的短发年轻女人在打电话。",
+      "最后半秒镜头猛然刹住，稳稳停在站棚正前方，画面与尾帧一致，此后不再移动。声音是雨声，拉升时风声变大，高处城市车流低鸣，俯冲时风声呼啸，刹停后只剩站台雨声。画面中没有人说话，没有音乐和字幕。"
+    ],
+    "sound": [
+      "最后半秒镜头猛然刹住，稳稳停在站棚正前方，画面与尾帧一致，此后不再移动。声音是雨声，拉升时风声变大，高处城市车流低鸣，俯冲时风声呼啸，刹停后只剩站台雨声。画面中没有人说话，没有音乐和字幕。"
+    ]
+  },
+  "intent_sha256": "bdfc21496be72b85df90ef7cc5ecdc3a87103e3e5a0f58a889cfa7c3ecc3f4a4",
+  "source_contract": {
+    "path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/README.md",
+    "section": "CITY-RISE dispatch redesign",
+    "user_quotes": [
+      "我覺得這個宏觀開始的內容是不是就要改",
+      "同時這個時候要有聲音和字幕同時介紹異常",
+      "做的我看下"
+    ]
+  },
+  "actual_model_inputs_planned": [
+    "CITY-RISE-first-municipal-last",
+    "CITY-RISE-last-B6-frame0"
+  ],
+  "review_only_inputs": [
+    "dispatch-script.json (post layer, not a model input)",
+    "route-design.json"
+  ],
+  "required_later_assembly_junction": "市政末帧→CITY-RISE首帧、CITY-RISE末帧→B6第0帧：原速检查运动、人物、声音；重复同构帧只留一帧",
+  "qualification_scope": "one unqualified 20s 480p preview, not Production acceptance"
+}

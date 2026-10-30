@@ -1,0 +1,22 @@
+{
+  "source_sha256": "af1507969bb88b6be6379bfd991c8ba26864fd11a334e66144a4de371b8df5b2",
+  "ended": true,
+  "currentTime": 20.063991,
+  "duration": 20.063991,
+  "playbackRate": 1,
+  "muted": false,
+  "volume": 1,
+  "width": 854,
+  "height": 480,
+  "quality": {},
+  "readyState": 4,
+  "error": null,
+  "seekable": [
+    [
+      0,
+      20.063991
+    ]
+  ],
+  "page_errors": [],
+  "scope": "Actual 1x player execution; no claim of human hearing or final media acceptance"
+}

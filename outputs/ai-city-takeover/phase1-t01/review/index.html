@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>T01《最后一位人类司机》審看</title>
+<style>
+  :root { --bg:#0b0e12; --fg:#dfe5ea; --dim:#8b97a3; --line:#222a33; --red:#e3342f; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.65 system-ui, "Noto Sans CJK TC", sans-serif; }
+  main { max-width: 1280px; margin: 28px auto 80px; padding: 0 24px; }
+  h1 { font-weight:600; font-size:22px; margin:0 0 4px; letter-spacing:.02em; }
+  .sub { color:var(--dim); margin:0 0 18px; }
+  .badge { display:inline-block; border:1px solid var(--red); color:var(--red); padding:1px 8px; border-radius:3px; font-size:12px; margin-left:8px; vertical-align:2px; }
+  video { width:100%; background:#000; display:block; border:1px solid var(--line); }
+  .bar { display:flex; gap:10px; align-items:center; margin:10px 0 22px; flex-wrap:wrap; }
+  button, select { background:#151b22; color:var(--fg); border:1px solid #2c3640; padding:7px 14px; border-radius:4px; cursor:pointer; font:inherit; }
+  button:hover { border-color:#4a5866; }
+  #tc { font-family: ui-monospace, "Noto Sans Mono CJK SC", monospace; color:var(--dim); margin-left:6px; }
+  h2 { font-size:16px; font-weight:600; margin:30px 0 10px; border-top:1px solid var(--line); padding-top:18px; }
+  ul { margin:6px 0; padding-left:20px; } li { margin:3px 0; }
+  .grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+  .grid img { width:100%; border:1px solid var(--line); display:block; }
+  .dim { color:var(--dim); }
+  code { background:#151b22; padding:1px 5px; border-radius:3px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>T01《最后一位人类司机》<span class="badge" id="ver">dev2 · 開發中，非交付版</span></h1>
+  <p class="sub">1920×1080 · 30fps · 10.0 s · HyperFrames + motion-kit（WebGL2 + Canvas2D，每幀為時間純函數）</p>
+
+  <video id="v" src="T01-dev2-review.mp4" controls playsinline preload="auto"></video>
+  <div class="bar">
+    <button id="play">播放 / 暫停（空白鍵）</button>
+    <button id="prev">◀ 上一幀（,）</button>
+    <button id="next">下一幀（.）▶</button>
+    <select id="rate"><option value="1">1×</option><option value="0.5">0.5×</option><option value="0.25">0.25×</option></select>
+    <button id="loop">循環：開</button>
+    <span id="tc">00.000 s · frame 0</span>
+  </div>
+
+  <h2>這一版的狀態</h2>
+  <ul>
+    <li><b>聲音是臨時導引節拍</b>（程式合成的 120 BPM kick/hat/riser/drop），只用來判斷畫面是否對拍，<b>不是正式配樂</b>。Suno 正式配樂需要你在官網生成（遇到人機驗證）。</li>
+    <li>節拍網格目前是暫定的 120 BPM；換上 Suno 音樂後，會依真實 beat map 重排每個小節。</li>
+    <li>結構（rev 2）：0–4 s S1 監控視角（片名 → 人口普查計數），4–6 s S2 車內（系統接管對話框），6 s drop S3 空拍（光脈衝先亂後齊，人类驾驶 0）。</li>
+  </ul>
+
+  <h2>我已發現、正在修的問題（dev3）</h2>
+  <ul id="issues">
+    <li>S1 尾燈太大太亮，車流連成一團紅色光暈，看不出單輛車；倒影太長。</li>
+    <li>S1 識別框太細，標籤字太小；片名的光暈略軟。</li>
+    <li>S3 光脈衝像一串圓點，要改成帶尾巴的流光；空拍識別框太小。</li>
+    <li>尚未做：完整聯繫圖 QA、節拍對位表、閃爍/離群幀掃描、歷史獨立檢查、獨立審片。</li>
+  </ul>
+
+  <h2>關鍵幀</h2>
+  <div class="grid" id="frames"></div>
+  <p class="dim">頁面檔案：<code>outputs/ai-city-takeover/phase1-t01/review/</code></p>
+</main>
+<script>
+  const v = document.getElementById('v'), tc = document.getElementById('tc');
+  const FPS = 30;
+  v.loop = true;
+  const upd = () => { tc.textContent = `${v.currentTime.toFixed(3).padStart(6,'0')} s · frame ${Math.round(v.currentTime*FPS)}`; requestAnimationFrame(upd); };
+  upd();
+  const step = d => { v.pause(); v.currentTime = Math.max(0, Math.min(v.duration - 1/FPS, (Math.round(v.currentTime*FPS) + d) / FPS)); };
+  document.getElementById('play').onclick = () => v.paused ? v.play() : v.pause();
+  document.getElementById('prev').onclick = () => step(-1);
+  document.getElementById('next').onclick = () => step(1);
+  document.getElementById('rate').onchange = e => v.playbackRate = +e.target.value;
+  document.getElementById('loop').onclick = e => { v.loop = !v.loop; e.target.textContent = '循環：' + (v.loop ? '開' : '關'); };
+  addEventListener('keydown', e => { if (e.key === ' ') { e.preventDefault(); v.paused ? v.play() : v.pause(); } if (e.key === ',') step(-1); if (e.key === '.') step(1); });
+  fetch('frames.json').then(r => r.json()).then(list => {
+    const g = document.getElementById('frames');
+    for (const f of list) { const a = document.createElement('a'); a.href = f.src; a.target = '_blank'; const i = document.createElement('img'); i.src = f.src; i.title = f.label; a.appendChild(i); g.appendChild(a); }
+  }).catch(() => {});
+</script>
+</body>
+</html>

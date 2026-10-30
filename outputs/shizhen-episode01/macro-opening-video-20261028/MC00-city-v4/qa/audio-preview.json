@@ -1,0 +1,33 @@
+{
+  "tool": "video-analysis audio_understand",
+  "mode": "offline preview",
+  "network_calls": 0,
+  "source_sha256": "de0608983dd5b6722a6ef14b086c2a41494693fd97af7019de2e297553f990cf",
+  "audio_sha256": "f3bc3975a259b3cc3f824bfb72b5e51797871e3d9a803d52e3161a17aeb4cc98",
+  "local_loudness_dbfs_per_second": [
+    -37.1,
+    -37.7,
+    -38.3,
+    -28.5,
+    -29.9,
+    -34.5,
+    -36.4,
+    -32.1,
+    -36.6,
+    -37.2,
+    -36.4,
+    -31.4,
+    -30.6,
+    -30.3,
+    -30.2,
+    -27.5
+  ],
+  "mc01_first_2s_dbfs_per_half_second": [
+    -29.3,
+    -28.0,
+    -29.2,
+    -32.0
+  ],
+  "semantic_audio": "NOT_EVALUATED",
+  "human_hearing": "NOT_EVALUATED"
+}

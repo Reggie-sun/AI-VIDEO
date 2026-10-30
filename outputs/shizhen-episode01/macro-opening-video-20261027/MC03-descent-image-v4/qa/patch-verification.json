@@ -1,0 +1,20 @@
+{
+  "video_sha256": "76d27a534fe5e97e2dc39f4833cc1c9e9a6f89639e3fc240e20581e073a7c9b8",
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "patch_sha256": "09590726eff3c4758ebe885cf253db020c82297af73cbb4438697c4455a46106",
+  "frame_count": 192,
+  "first_patch_frame": 144,
+  "alpha_zero_in_protected_foot_envelope": true,
+  "metrics": {
+    "source_opaque_region_mean_temporal_std_rgb": 1.2722206115722656,
+    "output_opaque_region_mean_temporal_std_rgb": 0.09330620616674423,
+    "scope": "Decoded 6..8s opaque patch pixels only; compression residual is possible; not a perceptual acceptance score"
+  },
+  "decoded_audio_sha256": "e1355ff057289357dd2ecb5b485c8c15612e91941ad07e26ece95d2e98170fac",
+  "audio_decoded_bytes": 1536000,
+  "audio_identical_to_previous_exact_mp4_sha256": "baecafca35d096811b8e544fda4944c5ce3e2f043afa0b185083ce31f27d9384",
+  "audio_evidence_reuse": "../MC03-descent-edit-v3/qa/native-audio-result.json; observation belongs to old MP4 and identical decoded audio, not new human listening",
+  "new_remote_audio_calls": 0,
+  "new_paid_generation_calls": 0,
+  "human_acceptance": "NOT_EVALUATED"
+}

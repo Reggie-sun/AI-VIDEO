@@ -130,6 +130,7 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
    首帧/首尾帧/全模态模式核验真正的素材列表与顺序，不以画布摆放或文字提及代替绑定。
    复核上述参考制作 specialist 返回的连续性与输入适用性检查；将已观察的空间/姿态冲突和
    审看标记污染返回对应 owner。本层不自行改剧情或自动重生成，不重复接管参考图审查。
+   “不为填满上限追加图片”不等于尽量少：先按[参考包](../../../docs/shot-reference-planning.md#reference-package-before-preview-2026-10-30)准备每个决定性时刻、可见表演者、证据细节与风格帧，再按模式能力选入；不得为了免做参考而改动 identity_continuity 或删掉人物与动作。
    消费现有 [Shot Reference Plan](../../../docs/shot-reference-planning.md) 的组合风险与 motion 等级，
    不因单个 contact/high-speed/camera 标签追加视频，也不为填满上限追加图片。
    对每份素材明确允许迁移与禁止迁移的属性；矛盾参考先解决用途，不默认叠加。

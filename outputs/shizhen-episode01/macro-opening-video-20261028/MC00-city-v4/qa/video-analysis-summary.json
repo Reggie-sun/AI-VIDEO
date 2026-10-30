@@ -1,0 +1,20 @@
+{
+  "tool": "project-local video-analysis MCP video_analyze (explicit call)",
+  "expected_sha256": "de0608983dd5b6722a6ef14b086c2a41494693fd97af7019de2e297553f990cf",
+  "probe": {
+    "duration_seconds": 16.065,
+    "resolution": [
+      854,
+      480
+    ],
+    "frame_count": 385,
+    "nominal_fps_header": "60/1 (not used)",
+    "audio": "aac 44100Hz stereo"
+  },
+  "scene_detect": {
+    "threshold": 0.3,
+    "total_scenes": 1
+  },
+  "transcription": "not requested",
+  "limits": "one detected scene does not prove absence of hidden cuts"
+}

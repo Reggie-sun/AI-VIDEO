@@ -1,0 +1,32 @@
+{
+  "scope": "Same-source full-wide fixed background image patch, preserve moving person and original A/V",
+  "user_request": "那個樓梯你就不能給一個image嗎",
+  "user_failure": "原像素回放仍然抖动",
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "patch_sha256": "09590726eff3c4758ebe885cf253db020c82297af73cbb4438697c4455a46106",
+  "overlay_window_source_frames": [
+    144,
+    192
+  ],
+  "preserved": [
+    "full original framing",
+    "all 192 consecutive source frames",
+    "native speed",
+    "native source sound",
+    "person motion and feet",
+    "closed door, hands free",
+    "original AI disclosure",
+    "B6, fonts and music"
+  ],
+  "paid_generation_calls": 0,
+  "local_renders_before": 2,
+  "new_local_render_ceiling": 1,
+  "new_audio_analysis_ceiling": 1,
+  "new_independent_media_review_ceiling": 1,
+  "reviews_before": 10,
+  "review_ceiling_after": 11,
+  "created_at": "2026-10-27T20:10:43.024727+00:00",
+  "stop_condition": "Any output failure or unknown stops; no next Shot until full Gate PASS",
+  "scope_boundary": "development_audio_preview only; no Production acceptance",
+  "change_from_previous": "Remove digital reframe and post text; apply source-derived fixed PNG over protected lower-right background only"
+}

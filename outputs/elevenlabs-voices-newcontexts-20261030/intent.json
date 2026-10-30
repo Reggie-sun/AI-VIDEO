@@ -1,0 +1,45 @@
+{
+  "model": "eleven_v4",
+  "voices": [
+    [
+      "coco",
+      "Coco Li",
+      "Ca5bKgudqKJzq8YRFoAz"
+    ],
+    [
+      "julia",
+      "Julia",
+      "tOuLUAIdXShmWH7PEUrU"
+    ],
+    [
+      "evan",
+      "Evan Zhao",
+      "MI36FIkp9wRP7cpWKPTl"
+    ],
+    [
+      "martin",
+      "Martin Li",
+      "WuLq5z7nEcrhppO0ZQJw"
+    ]
+  ],
+  "scenes": [
+    [
+      "惊喜报喜",
+      "中了！真的中了！你快看，是我们俩的名字！"
+    ],
+    [
+      "尴尬道歉",
+      "那个……杯子是我碰倒的。对不起，我赔你一个。"
+    ],
+    [
+      "紧张提醒",
+      "别回头……有人跟着我们。装作没发现，继续走。"
+    ]
+  ],
+  "max_submits": 12,
+  "no_retry": true,
+  "per_call_ceiling_microunits": 50000,
+  "per_voice_project_ceiling_microunits": 200000,
+  "estimated_total_upper_microunits": 128000,
+  "human_acceptance": "NOT_EVALUATED"
+}

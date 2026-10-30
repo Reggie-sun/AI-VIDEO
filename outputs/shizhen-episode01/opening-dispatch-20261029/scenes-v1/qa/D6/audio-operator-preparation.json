@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/qa/D6/audio-operator",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/qa/D6/audio-operator/intent.json",
+  "intent_sha256": "b4646b48dbded594e6d8a2e89460e63d69b217267d01a2da6e205723e747daa1",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/qa/D6/audio-operator/reservation.json",
+  "reservation_sha256": "40efc750b66a116e8221fdac6e6ee627985fd5fbae2ee3689b140e5357df67ae",
+  "source_sha256": "30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa",
+  "source_size_bytes": 6869595,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

@@ -1,0 +1,203 @@
+{
+  "objective": "MC00城市独立长镜头完整揭示城市空间，按方案A无可见跳动接入已认可MC01第0帧；不重做市政或B6",
+  "images": [
+    {
+      "asset_id": "MC00-first-eave",
+      "node_id": "MC00-first-eave-local-authoring-node",
+      "resource_id": "MC00-first-eave-local-source",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/first-frame-1920x1080.png",
+      "usage_license": "Task-owned Shizhen reference; director-declared local copy, not platform adoption",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/reference-first_frame-source.json",
+        "record_sha256": "a2424c84e600291319acdd7c24d9c07d206f1c925f8c90ef331446e97610ecf3",
+        "tool": {
+          "name": "ffmpeg-lanczos-input-normalization",
+          "version": "configured-ffmpeg"
+        }
+      }
+    },
+    {
+      "asset_id": "MC00-last-approved-MC01-frame0",
+      "node_id": "MC00-last-approved-MC01-frame0-local-authoring-node",
+      "resource_id": "MC00-last-approved-MC01-frame0-local-source",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+      "usage_license": "Task-owned Shizhen reference; director-declared local copy, not platform adoption",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/reference-last_frame-source.json",
+        "record_sha256": "65f54d931583c67c6fab6a3c835e830881830e93ab029162ca0462fae68df9cd",
+        "tool": {
+          "name": "exact-video-frame-extraction",
+          "version": "existing-frame-copy-v1"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "municipal-worker",
+      "name": "市政工人",
+      "identity": "已认可MC01第0帧中的同一个作业工人",
+      "appearance_bible": "黄色安全帽、深蓝工装及尾帧所见原造型；不从文字另造面孔",
+      "reference_asset_ids": [
+        "MC00-last-approved-MC01-frame0"
+      ]
+    }
+  ],
+  "scene_images": [
+    "MC00-first-eave",
+    "MC00-last-approved-MC01-frame0"
+  ],
+  "observations": {
+    "identity": "接近市政后同一黄帽深蓝工装工人，与尾帧位置及造型一致，无新增故事人物",
+    "action": "屋檐横移揭示城市，再沿同一主路缓弧下降，住宅和站棚依次真正显露，钢索入前景后交给作业",
+    "camera": "全镜连续无切点、叠化或冻结，下降自然，末段逐渐减速到完全停稳，构图与透视收至批准尾帧",
+    "performance": "工人可见后平常专注看向设备、自然呼吸并保持原位作业，不提前按停或收手；门正常缓慢右移，工作灯始终亮，尾态按源第0帧",
+    "space": "道路地标可追踪，建筑硬几何稳定，不穿墙或跨钢索翻轴，末态设备、门位、工人姿态和灯态对应MC01第0帧",
+    "art": "同一写实雨夜，真实建筑与设备尺度，不用模糊、雾或掠黑掩盖空间，不新增片名字幕或奇观",
+    "sound": "原生滴水随远离退去、城市交通接管、现场马达渐清，无对白旁白或音乐；与MC01既有声音的原速接点另验"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.open_state.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.subject_action.start_state"
+    ],
+    "camera": [
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.primary_camera_motion.end_motion_state",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response"
+    ],
+    "space": [
+      "generation_intent.space_continuity.crossing_policy",
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.close_state.state_text",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.subject_position"
+    ],
+    "art": [
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.visual_treatment.prohibited_visual_drift.2"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.music_intent.mode",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.2",
+      "generation_intent.dialogue_intent.lip_sync_required"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。黄帽深蓝工装工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+      "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+    ],
+    "action": [
+      "雨夜真人电影质感，深蓝灰夜色、冷白路灯与少量暖窗作业灯，湿金属、旧楼、沥青与机械材质真实，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+      "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+      "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。黄帽深蓝工装工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。"
+    ],
+    "camera": [
+      "雨夜真人电影质感，深蓝灰夜色、冷白路灯与少量暖窗作业灯，湿金属、旧楼、沥青与机械材质真实，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+      "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+      "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+    ],
+    "performance": [
+      "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。黄帽深蓝工装工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+      "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+    ],
+    "space": [
+      "雨夜真人电影质感，深蓝灰夜色、冷白路灯与少量暖窗作业灯，湿金属、旧楼、沥青与机械材质真实，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+      "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+      "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。黄帽深蓝工装工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+      "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+    ],
+    "art": [
+      "雨夜真人电影质感，深蓝灰夜色、冷白路灯与少量暖窗作业灯，湿金属、旧楼、沥青与机械材质真实，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+      "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+      "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。黄帽深蓝工装工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+      "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+    ],
+    "sound": [
+      "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+    ]
+  },
+  "intent_sha256": "25139b30cf228ed68cbe4dbf2b3453d3889c1e3b81a46a42cf862e33422a453e",
+  "source_contract": {
+    "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md",
+    "sha256": "fbd3383dcab6452107f79730b0bcd5ef342b6c4c623e76eb94676e75cad14b82",
+    "source_revision": "27b720d7f801d6807a8b1096452efbff0cf9262f",
+    "section": "MC00 — One City, One Continuous Move",
+    "landing_plan": "A"
+  },
+  "actual_model_inputs_planned": [
+    "MC00-first-eave",
+    "MC00-last-approved-MC01-frame0"
+  ],
+  "review_only_inputs": [
+    "MC00 city reveal and descent images",
+    "authored position map and prospective analytic trajectory; no rejected proxy input"
+  ],
+  "required_later_assembly_junction": "MC00→原MC01 exact0帧：原速检查位置、门速、车流雨线、姿态与声音；仅MC00侧处理接缝，重复同构帧只留一帧",
+  "qualification_scope": "one unqualified 480p preview, not Production acceptance or 1080p pixel match"
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "per-shot-post-media-gate/agent-verdict-1",
+  "shot_id": "D2",
+  "attempt_id": "shizhen-dispatch-D2-preview-001",
+  "media": {"path": "runs/shizhen-opening-dispatch-20261030/D2/state/video-generation/fetch/files/aa16a094e31597e2249f60040a7d957334587d62f173abd0140a07be742acc0b.mp4",
+            "sha256": "aa16a094e31597e2249f60040a7d957334587d62f173abd0140a07be742acc0b", "duration_seconds": 6.08, "resolution": "1920x1080"},
+  "evidence": ["contact.jpg (2fps, 0-5.5s)", "start-topright.jpg (6fps crop, 0-2s)", "video_analyze: 1 scene, no transcript",
+               "audio-understanding.json (gemini-3.8-flash via development operator unit audio-operator/)"],
+  "findings": {
+    "action": {"verdict": "FAIL", "reason": "开头住户已在上方那段楼梯向下走并从右侧出画，约3秒后从右侧走上平台：读作一次正常下楼到达，不是“从平台往下走出画、再从上方回到同一平台”。画面无法证实“下了三层，还在原来那层”。"},
+    "camera": {"verdict": "PASS", "reason": "固定机位，无推拉摇移、无切点（scene detect 1 段）。"},
+    "space": {"verdict": "PASS", "reason": "凹陷红色灭火器与平台、上下两段楼梯同框，终态住户停在灭火器前。"},
+    "performance": {"verdict": "PASS", "reason": "全程背影、不说话、不回头。"},
+    "sound": {"verdict": "PASS", "reason": "只有硬地脚步声；Whisper 无转写；audio_understand 无人声段。"},
+    "art": {"verdict": "PASS", "reason": "写实雨夜楼梯间，无新增人物、无字幕或文字（仅平台固有AI生成水印）。"}
+  },
+  "overall": "FAIL",
+  "next_shot_submit_allowed": false,
+  "repair_proposal": "单一变量：改用首帧条件（first_frame），首帧为同一楼梯间、住户背对镜头站在平台、正要走下右侧往下楼梯；锁住起态方向。其余提示词与参考不变。",
+  "human_acceptance": "NOT_EVALUATED"
+}

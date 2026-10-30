@@ -1,0 +1,281 @@
+{
+  "shot": {
+    "shot_id": "D3",
+    "scene_id": "er-bay",
+    "storyboard_beat_id": "D3-er-recorded-dead",
+    "intent": "参考素材1{{image:0}}负责护士、女病人、病床、扫码枪和急诊区的样貌与光线。\n夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。\n镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。\n声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 6
+    },
+    "character_ids": [
+      "er-nurse",
+      "er-patient"
+    ],
+    "continuity_constraints": [
+      "同一护士与病人",
+      "指示灯只亮红，不显示文字",
+      "不加字幕、屏幕文字或音乐",
+      "现场人物都不开口，对白来自记录台母带"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "调度蒙太奇 D3-er-recorded-dead：现场无对白画面，铺在对白母带的转报声下"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "scene_reference",
+        "asset_id": "D3-ref-er"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "slow_camera"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [
+          {
+            "event_id": "scanner-red",
+            "kind": "composition",
+            "visual_state": "扫码枪的红色指示灯",
+            "purpose": "让观众先看到系统判定失败",
+            "phase": "start",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "eyes-open",
+            "kind": "composition",
+            "visual_state": "病人的脸部近景，她睁着眼睛、正常呼吸",
+            "purpose": "让观众先看到系统判定失败，再看到她明明活着",
+            "phase": "end",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          }
+        ],
+        "anchors": [],
+        "selections": [],
+        "natural_generation": [],
+        "director_coverage": {
+          "coverage_hash": "d2a18ec6dcfaeb2afddc048b16b92f86e108d00c075cb135872bf5c115d49702",
+          "unit_id": "D3-er-recorded-dead"
+        }
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "护士站在病床旁，手持扫码枪对准女病人手腕上的白色腕带，病人平躺、睁着眼睛。",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "镜头停在女病人的脸部近景，她睁着眼睛、正常呼吸；扫码枪已两次亮红。",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [],
+        "preservation": "unspecified",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "er-bay",
+        "time_of_day": "雨夜",
+        "mood": "系统说她已经死了，人还活着",
+        "state_constraints": [
+          "同一护士与病人",
+          "指示灯只亮红，不显示文字",
+          "不加字幕、屏幕文字或音乐"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "护士在左，病人躺在右侧病床",
+        "screen_direction": "镜头从左侧扫码枪推向右侧病人的脸",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不越轴、不穿墙"
+      },
+      "axis_continuity": {
+        "camera_axis": "单一机位方向",
+        "framing_continuity": "先看清红色指示灯，再落到病人睁着的眼睛",
+        "crossing_policy": "不越轴"
+      },
+      "subject_action": {
+        "start_state": "护士站在病床旁，手持扫码枪对准女病人手腕上的白色腕带，病人平躺、睁着眼睛。",
+        "progression": "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "镜头停在女病人的脸部近景，她睁着眼睛、正常呼吸；扫码枪已两次亮红。",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "扫码枪第一次亮红",
+        "peak": "第二次亮红，护士抬眼",
+        "settle": "停在病人睁着眼的脸",
+        "direction": "从扫码枪推向病人",
+        "amplitude_class": "正常实时动作"
+      },
+      "pacing": {
+        "cadence": "两次扫码失败、护士抬眼、推到病人的脸",
+        "tempo_class": "自然原速",
+        "shot_duration_seconds": 6.0
+      },
+      "camera_intent": {
+        "movement": "从扫码枪红灯缓慢推向病人的脸",
+        "stability": "稳定",
+        "framing_intent": "先看清红色指示灯，再落到病人睁着的眼睛",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "扫码枪与腕带近景",
+        "end_framing": "病人的脸部近景",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "扫码两次失败",
+        "visible_response": "护士抬眼看病人，停住",
+        "gaze_target": "护士看病人的脸，病人看护士",
+        "body_behavior": "护士手里的扫码枪停在腕带上方",
+        "hand_behavior": "护士右手持扫码枪",
+        "terminal_performance_state": "病人平静地看着护士，正常呼吸",
+        "character_directions": [
+          {
+            "character_id": "er-nurse",
+            "screen_identity": "戴蓝色口罩的护士",
+            "role": "supporting",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "扫码枪两次亮红",
+                "emotion": "职业性的迟疑",
+                "intensity": "subtle",
+                "facial_expression": "口罩上方的眼睛微微一顿",
+                "gaze_target": "从扫码枪抬眼看病人",
+                "breathing": "自然平稳",
+                "body_behavior": "再扫一次后停手，不说话"
+              }
+            ]
+          },
+          {
+            "character_id": "er-patient",
+            "screen_identity": "睁着眼睛的六十多岁女病人",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "护士扫她的腕带",
+                "emotion": "平静",
+                "intensity": "subtle",
+                "facial_expression": "睁着眼睛，面容平静",
+                "gaze_target": "看着护士",
+                "breathing": "自然平稳",
+                "body_behavior": "平躺，胸口随正常呼吸起伏，不说话"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "正常速度的真人摄影质感",
+        "palette": "雨夜冷灰与实用灯",
+        "material_treatment": "潮湿墙面、金属、雨水与真实衣物",
+        "prohibited_visual_drift": [
+          "慢动作、闪屏、黑屏、鬼影",
+          "片名、字幕、说明文字或分格"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "急诊区冷白顶灯",
+        "direction": "顶光与侧前补光",
+        "exposure_priority": "红色指示灯和病人睁着的眼睛可读",
+        "continuity_state": "灯光不变"
+      },
+      "ambience_intent": {
+        "environment_bed": "监护仪平稳的嘀声、远处急诊区低低的嘈杂",
+        "foley_cues": [
+          "扫码失败提示音两声"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "dolly_in",
+        "direction": "forward",
+        "amplitude_class": "moderate",
+        "speed_class": "slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "er-patient",
+        "relation_kind": "reveal",
+        "start_relation": "扫码枪与腕带",
+        "end_relation": "病人睁着眼的脸"
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 6,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

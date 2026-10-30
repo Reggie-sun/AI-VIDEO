@@ -1,0 +1,1178 @@
+{
+  "decision": {
+    "snapshot_hash": "c2367bb4efed2d876a2324fdc72af49ff53d5ea177cd3b7a6956d56fab389c53",
+    "disposition": "GENERATE_ONCE",
+    "selected_candidate_id": "jimeng/jimeng-seedance-2.5-first-last-frame-v1",
+    "assessments": [
+      {
+        "candidate_id": "jimeng/jimeng-seedance-2.5-first-last-frame-v1",
+        "scope_hash": "13cefed13bdda13a71d365e8d9d3ab6fa7cade9a409b8e0c08a8241405edb0a6",
+        "fit": "unknown",
+        "compatible": true,
+        "executable": true,
+        "supported_dimensions": [],
+        "failed_dimensions": [],
+        "unknown_dimensions": [
+          "action",
+          "art",
+          "camera",
+          "identity",
+          "performance",
+          "sound",
+          "space"
+        ],
+        "evidence_hashes": [],
+        "ignored_evidence_hashes": [],
+        "sample_count": 0,
+        "pass_count": 0,
+        "fail_count": 0,
+        "not_evaluated_count": 0,
+        "runtime_failure_count": 0,
+        "unknown_outcome_count": 0,
+        "not_submitted_count": 0,
+        "reasons": [],
+        "empirical": {
+          "version": "generation-cohort/1",
+          "supported_artifacts": [],
+          "failed_artifacts": [],
+          "incomplete_artifacts": [],
+          "evidence_hashes": [],
+          "exclusions": [],
+          "failed_requirements": [],
+          "observed_success_fraction": null,
+          "interval_95": null,
+          "limitations": [
+            "observational cohort; selection and intervention confounding remain",
+            "unknown action complexity and hand/prop interaction are not matched",
+            "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+          ]
+        }
+      }
+    ],
+    "diagnosis": null,
+    "intervention": null,
+    "runtime_repair": null,
+    "routing": {
+      "decision": {
+        "target_shot_id": "MC00-CITY",
+        "target_shot_revision": 2,
+        "target_shot_content_hash": "be1d2fd136019bd6084ff55732669a6a979083d8c77c2f275dd9c3d173dceaf4",
+        "continuity_mode": "none",
+        "semantic_continuity_state": null,
+        "required_mode": "image_to_video",
+        "selected_mode": "image_to_video",
+        "required_binding_roles": [
+          "first_frame",
+          "last_frame"
+        ],
+        "input_assets": [
+          {
+            "role": "first_frame",
+            "asset_id": "MC00-first-eave",
+            "asset_sha256": "9c7c08897a2c8ff30ea21de3560112491518a0cb2cb240e480615cd13cabefee",
+            "source_registry_revision_id": "c6fe2ba609798fd344326aaa8c39c099ff06f23d15627f10e17d431b341253b8",
+            "canonical_owner_kind": null,
+            "canonical_owner_id": null,
+            "canonical_owner_content_hash": null,
+            "mime_type": "image/png",
+            "size_bytes": 4773499,
+            "width": 1920,
+            "height": 1080,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "last_frame",
+            "asset_id": "MC00-last-approved-MC01-frame0",
+            "asset_sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+            "source_registry_revision_id": "c6fe2ba609798fd344326aaa8c39c099ff06f23d15627f10e17d431b341253b8",
+            "canonical_owner_kind": null,
+            "canonical_owner_id": null,
+            "canonical_owner_content_hash": null,
+            "mime_type": "image/png",
+            "size_bytes": 4098545,
+            "width": 1920,
+            "height": 1080,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "provider_name": "jimeng",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.5-first-last-frame-v1",
+          "profile_path": "provider-profiles/9afd9e995b378f5abe683096cc6009bb92dd124d6e280a989615b3a0202095e4.json",
+          "profile_sha256": "9afd9e995b378f5abe683096cc6009bb92dd124d6e280a989615b3a0202095e4"
+        },
+        "provider_capabilities_fingerprint": "27bab7ec26a17e2952a314391f87b40113d1ba070e1aa669789d2ac6b0db0365",
+        "selected_capability_id": "jimeng-seedance-2.5-first-last-frame-v1",
+        "selected_capability_fingerprint": "3e678c5534f51c897cb624ab02374a527a619ee686b30862a5fbe445d8e5b82b",
+        "requirement_hash": "16b5039a56801e91f861c4806605520fbbe4866b59e48519023e742db6f51c99",
+        "continuity_transition_policy_hash": null,
+        "previous_provider_bound_request_hash": null,
+        "continuity_provider_route_binding_hash": null,
+        "execution_kind": "remote",
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 20,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "480p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "reason_codes": [
+          "CANONICAL_REFERENCES_ENABLE_R2V"
+        ],
+        "rationale": "Bind the verified neutral requirement to the exact capability.",
+        "policy": {
+          "policy_id": "shizhen-cold-open-qualification",
+          "policy_version": "1",
+          "policy_sha256": "980142d9a229b5b054bfa0f81dddce9cec6c1cdc82d69ccd47d74410b11f1c57"
+        },
+        "outcome": "selected",
+        "semantic_routing_hash": "d729f975ed1d7de80a942b3227064bcb7e5825a8bd8128010099d10b6c5cc528",
+        "audit_decision_hash": "fc408293a7d495e0671230054679c1a7b5301c61d0d305dc5682c20afb44e7f9"
+      },
+      "provider_bound_request": {
+        "plan_hash": "5b6b5927e79135f8ade8fa15ade9a517caeaa3fc51777e66ce62305128217dc6",
+        "requirement_hash": "16b5039a56801e91f861c4806605520fbbe4866b59e48519023e742db6f51c99",
+        "verified_projection_hash": "5ea46b46de9fe852131d6fea3a2ce4113e5335f2967d43b18f0c1b77fddf860d",
+        "target_shot_id": "MC00-CITY",
+        "target_shot_revision": 2,
+        "target_shot_content_hash": "be1d2fd136019bd6084ff55732669a6a979083d8c77c2f275dd9c3d173dceaf4",
+        "semantic_routing_hash": "d729f975ed1d7de80a942b3227064bcb7e5825a8bd8128010099d10b6c5cc528",
+        "audit_decision_hash": "fc408293a7d495e0671230054679c1a7b5301c61d0d305dc5682c20afb44e7f9",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.5",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.5-first-last-frame-v1",
+          "profile_path": "provider-profiles/9afd9e995b378f5abe683096cc6009bb92dd124d6e280a989615b3a0202095e4.json",
+          "profile_sha256": "9afd9e995b378f5abe683096cc6009bb92dd124d6e280a989615b3a0202095e4"
+        },
+        "capability_id": "jimeng-seedance-2.5-first-last-frame-v1",
+        "capability_fingerprint": "3e678c5534f51c897cb624ab02374a527a619ee686b30862a5fbe445d8e5b82b",
+        "execution_kind": "remote",
+        "billing_kind": "metered",
+        "mode": "image_to_video",
+        "binding_roles": [
+          "first_frame",
+          "last_frame"
+        ],
+        "input_assets": [
+          {
+            "role": "first_frame",
+            "asset_id": "MC00-first-eave",
+            "asset_sha256": "9c7c08897a2c8ff30ea21de3560112491518a0cb2cb240e480615cd13cabefee",
+            "source_registry_revision_id": "c6fe2ba609798fd344326aaa8c39c099ff06f23d15627f10e17d431b341253b8",
+            "canonical_owner_kind": null,
+            "canonical_owner_id": null,
+            "canonical_owner_content_hash": null,
+            "mime_type": "image/png",
+            "size_bytes": 4773499,
+            "width": 1920,
+            "height": 1080,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "last_frame",
+            "asset_id": "MC00-last-approved-MC01-frame0",
+            "asset_sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+            "source_registry_revision_id": "c6fe2ba609798fd344326aaa8c39c099ff06f23d15627f10e17d431b341253b8",
+            "canonical_owner_kind": null,
+            "canonical_owner_id": null,
+            "canonical_owner_content_hash": null,
+            "mime_type": "image/png",
+            "size_bytes": 4098545,
+            "width": 1920,
+            "height": 1080,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 20,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "480p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "lifecycle": {
+          "generation_id": "canvas-generation-cca37728bbae4507593887c6d83b45b6",
+          "target_asset_role": "primary_visual",
+          "base_project": {
+            "path": "state/projects/project.2.fda072f14d684f38d003336c18beb18114c1c432c0b0c095e2a14316f95d2f52.yaml",
+            "revision": 2,
+            "content_hash": "fda072f14d684f38d003336c18beb18114c1c432c0b0c095e2a14316f95d2f52",
+            "file_sha256": "f9446ca5da8d7c849d0c14c6d6bfbf784fe560a21ddea2710ae80e48a7ed20a7"
+          },
+          "base_registry": {
+            "path": "assets/registry.c6fe2ba609798fd344326aaa8c39c099ff06f23d15627f10e17d431b341253b8.json",
+            "revision_id": "c6fe2ba609798fd344326aaa8c39c099ff06f23d15627f10e17d431b341253b8",
+            "content_hash": "c6fe2ba609798fd344326aaa8c39c099ff06f23d15627f10e17d431b341253b8",
+            "file_sha256": "d0ca2415500232fd839a9020181b1a0cd3bb520d0e44fcf4b939bfd2b615757d"
+          },
+          "base_dependency_graph": {
+            "revision_id": "712c9c6e451e86006c9dfdc8d027e8e4c76de57c74abb7de87bff21338c68645",
+            "content_hash": "712c9c6e451e86006c9dfdc8d027e8e4c76de57c74abb7de87bff21338c68645",
+            "path": "state/dependency_graph.712c9c6e451e86006c9dfdc8d027e8e4c76de57c74abb7de87bff21338c68645.json",
+            "file_sha256": "e27d54c007340ac9c205fcbdb4a6bacbae6eef3a7642fef6cba3e9797660d6cc"
+          },
+          "input_artifact_ids": [
+            "shizhen-macro-MC00-CITY-shot",
+            "shizhen-macro-MC00-CITY-scene",
+            "shizhen-macro-MC00-CITY-character-municipal-worker",
+            "MC00-first-eave",
+            "MC00-last-approved-MC01-frame0"
+          ],
+          "output_asset_id": "canvas-video-cca37728bbae4507593887c6d83b45b6",
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false
+        },
+        "compiler_contract": {
+          "compiler_id": "jimeng-seedance-2.5-first-last-frame-video-compiler",
+          "compiler_version": "1",
+          "compiler_hash": "0dd622dc474bd2716f011fab1be5e369d56c27a75084581576692e48aa779b69"
+        },
+        "expression_strength": "semantic_prompt_allowed",
+        "generation_recipe": {
+          "contract_version": "generation-recipe/1",
+          "seed": {
+            "kind": "uncontrolled",
+            "value": null
+          },
+          "profile_sha256": "9afd9e995b378f5abe683096cc6009bb92dd124d6e280a989615b3a0202095e4",
+          "compiler_hash": "0dd622dc474bd2716f011fab1be5e369d56c27a75084581576692e48aa779b69",
+          "requirement_hash": "16b5039a56801e91f861c4806605520fbbe4866b59e48519023e742db6f51c99",
+          "rubric_hash": "6553b7eb9f5a0d327a8f65a07671ba13e0ff74bd3e0193b826858874bb7613ce",
+          "acceptance_policy": {
+            "domain_id": "original-drama",
+            "profile_id": "shizhen-macro-MC00-CITY-raw",
+            "profile_version": "2",
+            "profile_content_hash": "6553b7eb9f5a0d327a8f65a07671ba13e0ff74bd3e0193b826858874bb7613ce",
+            "profile_payload": {
+              "content_hash": "6553b7eb9f5a0d327a8f65a07671ba13e0ff74bd3e0193b826858874bb7613ce",
+              "domain_id": "original-drama",
+              "generation_requirements": [
+                {
+                  "dimension": "identity",
+                  "intent_paths": [
+                    "generation_intent.identity_continuity.character_ids.0",
+                    "generation_intent.identity_continuity.preservation"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact MP4 video-analysis and reliable audio observations",
+                  "native_text": [
+                    "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+                    "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.character_ids.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.preservation"
+                      }
+                    ],
+                    "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032"
+                  },
+                  "observable": "接近市政后同一黄帽深蓝工装工人，与尾帧位置及造型一致，无新增故事人物",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "identity",
+                  "stage": "raw_generation",
+                  "tolerance": "完整要求保持；前期检查不代视频通过"
+                },
+                {
+                  "dimension": "action",
+                  "intent_paths": [
+                    "generation_intent.subject_action.progression",
+                    "generation_intent.subject_action.endpoint.state_text"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact MP4 video-analysis and reliable audio observations",
+                  "native_text": [
+                    "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                    "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+                    "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.subject_action.progression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                      }
+                    ],
+                    "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032"
+                  },
+                  "observable": "屋檐横移揭示城市，再沿同一主路缓弧下降，住宅和站棚依次真正显露，钢索入前景后交给作业",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "action",
+                  "stage": "raw_generation",
+                  "tolerance": "完整要求保持；前期检查不代视频通过"
+                },
+                {
+                  "dimension": "camera",
+                  "intent_paths": [
+                    "generation_intent.camera_intent.movement",
+                    "generation_intent.camera_endpoint.end_framing",
+                    "generation_intent.primary_camera_motion.end_motion_state"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact MP4 video-analysis and reliable audio observations",
+                  "native_text": [
+                    "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                    "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+                    "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.camera_intent.movement"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.end_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                      }
+                    ],
+                    "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032"
+                  },
+                  "observable": "全镜连续无切点、叠化或冻结，下降自然，末段逐渐减速到完全停稳，构图与透视收至批准尾帧",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "camera",
+                  "stage": "raw_generation",
+                  "tolerance": "完整要求保持；前期检查不代视频通过"
+                },
+                {
+                  "dimension": "performance",
+                  "intent_paths": [
+                    "generation_intent.performance_intent.hand_behavior",
+                    "generation_intent.performance_intent.terminal_performance_state",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact MP4 video-analysis and reliable audio observations",
+                  "native_text": [
+                    "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+                    "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.hand_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                      }
+                    ],
+                    "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032"
+                  },
+                  "observable": "工人可见后平常专注看向设备、自然呼吸并保持原位作业，不提前按停或收手；门正常缓慢右移，工作灯始终亮，尾态按源第0帧",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "performance",
+                  "stage": "raw_generation",
+                  "tolerance": "完整要求保持；前期检查不代视频通过"
+                },
+                {
+                  "dimension": "space",
+                  "intent_paths": [
+                    "generation_intent.space_continuity.crossing_policy",
+                    "generation_intent.axis_continuity.camera_axis",
+                    "generation_intent.close_state.state_text"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact MP4 video-analysis and reliable audio observations",
+                  "native_text": [
+                    "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                    "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+                    "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+                    "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2,
+                          3
+                        ],
+                        "intent_path": "generation_intent.space_continuity.crossing_policy"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2,
+                          3
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.camera_axis"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1,
+                          2,
+                          3
+                        ],
+                        "intent_path": "generation_intent.close_state.state_text"
+                      }
+                    ],
+                    "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032"
+                  },
+                  "observable": "道路地标可追踪，建筑硬几何稳定，不穿墙或跨钢索翻轴，末态设备、门位、工人姿态和灯态对应MC01第0帧",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "space",
+                  "stage": "raw_generation",
+                  "tolerance": "完整要求保持；前期检查不代视频通过"
+                },
+                {
+                  "dimension": "art",
+                  "intent_paths": [
+                    "generation_intent.visual_treatment.medium_look",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact MP4 video-analysis and reliable audio observations",
+                  "native_text": [
+                    "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                    "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.medium_look"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                      }
+                    ],
+                    "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032"
+                  },
+                  "observable": "同一写实雨夜，真实建筑与设备尺度，不用模糊、雾或掠黑掩盖空间，不新增片名字幕或奇观",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "art",
+                  "stage": "raw_generation",
+                  "tolerance": "完整要求保持；前期检查不代视频通过"
+                },
+                {
+                  "dimension": "sound",
+                  "intent_paths": [
+                    "generation_intent.ambience_intent.environment_bed",
+                    "generation_intent.dialogue_intent.mode",
+                    "generation_intent.music_intent.mode"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact MP4 video-analysis and reliable audio observations",
+                  "native_text": [
+                    "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.environment_bed"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.mode"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.music_intent.mode"
+                      }
+                    ],
+                    "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032"
+                  },
+                  "observable": "原生滴水随远离退去、城市交通接管、现场马达渐清，无对白旁白或音乐；与MC01既有声音的原速接点另验",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "sound",
+                  "stage": "raw_generation",
+                  "tolerance": "完整要求保持；前期检查不代视频通过"
+                }
+              ],
+              "measurement_contract_version": "1",
+              "profile_id": "shizhen-macro-MC00-CITY-raw",
+              "profile_version": "2",
+              "required_requirement_ids": [
+                "identity",
+                "action",
+                "camera",
+                "performance",
+                "space",
+                "art",
+                "sound"
+              ]
+            },
+            "measurement_contract_version": "1",
+            "required_requirement_ids": [
+              "identity",
+              "action",
+              "camera",
+              "performance",
+              "space",
+              "art",
+              "sound"
+            ]
+          },
+          "expressions": [
+            {
+              "requirement_id": "action",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "action",
+              "observable": "屋檐横移揭示城市，再沿同一主路缓弧下降，住宅和站棚依次真正显露，钢索入前景后交给作业",
+              "tolerance": "完整要求保持；前期检查不代视频通过",
+              "measurement": "Exact MP4 video-analysis and reliable audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.subject_action.progression",
+                "generation_intent.subject_action.endpoint.state_text"
+              ],
+              "native_text": [
+                "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+                "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.subject_action.progression",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "art",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "art",
+              "observable": "同一写实雨夜，真实建筑与设备尺度，不用模糊、雾或掠黑掩盖空间，不新增片名字幕或奇观",
+              "tolerance": "完整要求保持；前期检查不代视频通过",
+              "measurement": "Exact MP4 video-analysis and reliable audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.visual_treatment.medium_look",
+                "generation_intent.visual_treatment.prohibited_visual_drift.0"
+              ],
+              "native_text": [
+                "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.visual_treatment.medium_look",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "camera",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "camera",
+              "observable": "全镜连续无切点、叠化或冻结，下降自然，末段逐渐减速到完全停稳，构图与透视收至批准尾帧",
+              "tolerance": "完整要求保持；前期检查不代视频通过",
+              "measurement": "Exact MP4 video-analysis and reliable audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.camera_intent.movement",
+                "generation_intent.camera_endpoint.end_framing",
+                "generation_intent.primary_camera_motion.end_motion_state"
+              ],
+              "native_text": [
+                "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+                "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.camera_intent.movement",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.end_framing",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "identity",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "identity",
+              "observable": "接近市政后同一黄帽深蓝工装工人，与尾帧位置及造型一致，无新增故事人物",
+              "tolerance": "完整要求保持；前期检查不代视频通过",
+              "measurement": "Exact MP4 video-analysis and reliable audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.identity_continuity.character_ids.0",
+                "generation_intent.identity_continuity.preservation"
+              ],
+              "native_text": [
+                "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+                "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.identity_continuity.character_ids.0",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.identity_continuity.preservation",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "performance",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "performance",
+              "observable": "工人可见后平常专注看向设备、自然呼吸并保持原位作业，不提前按停或收手；门正常缓慢右移，工作灯始终亮，尾态按源第0帧",
+              "tolerance": "完整要求保持；前期检查不代视频通过",
+              "measurement": "Exact MP4 video-analysis and reliable audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.performance_intent.hand_behavior",
+                "generation_intent.performance_intent.terminal_performance_state",
+                "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+              ],
+              "native_text": [
+                "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+                "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.performance_intent.hand_behavior",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "sound",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "sound",
+              "observable": "原生滴水随远离退去、城市交通接管、现场马达渐清，无对白旁白或音乐；与MC01既有声音的原速接点另验",
+              "tolerance": "完整要求保持；前期检查不代视频通过",
+              "measurement": "Exact MP4 video-analysis and reliable audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.ambience_intent.environment_bed",
+                "generation_intent.dialogue_intent.mode",
+                "generation_intent.music_intent.mode"
+              ],
+              "native_text": [
+                "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.ambience_intent.environment_bed",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.music_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "space",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "space",
+              "observable": "道路地标可追踪，建筑硬几何稳定，不穿墙或跨钢索翻轴，末态设备、门位、工人姿态和灯态对应MC01第0帧",
+              "tolerance": "完整要求保持；前期检查不代视频通过",
+              "measurement": "Exact MP4 video-analysis and reliable audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.space_continuity.crossing_policy",
+                "generation_intent.axis_continuity.camera_axis",
+                "generation_intent.close_state.state_text"
+              ],
+              "native_text": [
+                "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。",
+                "城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。",
+                "近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。",
+                "末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cc3e8ed162cfeb1ba050ffbf34b13d358338f7507b7556c9ac9daeea8d212032",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.space_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2,
+                      3
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.camera_axis",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2,
+                      3
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.state_text",
+                    "fragment_indices": [
+                      0,
+                      1,
+                      2,
+                      3
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "editorial_operations": [],
+          "comparison": null
+        },
+        "provider_bound_request_hash": "a46cd004968e677d76a151dacf491a6b512e1a2833608c0562fc06f7e411cbfe"
+      }
+    },
+    "rationale": [
+      "jimeng/jimeng-seedance-2.5-first-last-frame-v1: unknown; one bounded attempt, no quality guarantee",
+      "evidence and policy affect audit identity, not unrelated media semantics"
+    ],
+    "revalidate_requirements": [
+      "action",
+      "art",
+      "camera",
+      "identity",
+      "performance",
+      "sound",
+      "space"
+    ]
+  },
+  "compilation": {
+    "outcome": "unsupported",
+    "requirement_hash": "16b5039a56801e91f861c4806605520fbbe4866b59e48519023e742db6f51c99",
+    "provider_bound_request_hash": "a46cd004968e677d76a151dacf491a6b512e1a2833608c0562fc06f7e411cbfe",
+    "selected_capability_id": "jimeng-seedance-2.5-first-last-frame-v1",
+    "reason": "PROMPT_EXPRESSION_UNSUPPORTED",
+    "unsupported_field_paths": [
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.2",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.close_state.required_change",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.open_state.state_text",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.visual_treatment.prohibited_visual_drift.2"
+    ],
+    "retryable": false,
+    "prompt_text": null,
+    "payload": null,
+    "input_expression_report": {
+      "prompt_text": "雨夜真人电影质感，从首帧的室外屋檐滴雨近景开始，城市一角始终可见。摄影机沿檐口横移，越过建筑外转角才逐渐揭开城市，不穿墙、不以满屏墙面或掠黑藏切点。\n城市展开后沿同一条可追踪主路缓弧前进下降，旧住宅楼梯窗先显露，通透玻璃薄顶站棚随后显露，棚北端与市政区之间是同高的开放地面；路网、楼体、路灯和车流保持连续视差，建筑不扭曲。全镜连续、正常速度，不插切、叠化、变焦跳转、冻结或加速。\n近街面渐减速，钢索从前景边缘进入，把注意交给绞盘、工人和控制盒。保持街侧和同一受力线观察侧，不跨钢索或翻轴。工人可见后始终平常专注看着设备、呼吸平稳，留在原位自然作业，不提前按停、收手或惊恐；灯亮、门正常缓慢右移，异常留给下一镜。\n末段相机完全停稳，构图、透视、门位、工人姿态和灯态精确收至尾帧，不重演按停。声音由近檐滴水自然退远，城市交通接管，接近现场马达渐清；保留自然雨声、轮胎压水和机械声，结尾对齐既有现场声。无对白、旁白或音乐，不新增片名、字幕。",
+      "prompt_sha256": "b287310db8d485a0482a49a2d5ecbf76d243a6ffb6792106163bec4e62e56ffe",
+      "missing_requirement_paths": [
+        "generation_intent.ambience_intent.explicitly_silent",
+        "generation_intent.ambience_intent.foley_cues.0",
+        "generation_intent.ambience_intent.foley_cues.2",
+        "generation_intent.axis_continuity.crossing_policy",
+        "generation_intent.axis_continuity.framing_continuity",
+        "generation_intent.camera_endpoint.start_framing",
+        "generation_intent.camera_intent.framing_intent",
+        "generation_intent.camera_intent.stability",
+        "generation_intent.camera_subject_relation.end_relation",
+        "generation_intent.camera_subject_relation.relation_kind",
+        "generation_intent.camera_subject_relation.start_relation",
+        "generation_intent.close_state.required_change",
+        "generation_intent.dialogue_intent.lip_sync_required",
+        "generation_intent.lighting_intent.continuity_state",
+        "generation_intent.lighting_intent.direction",
+        "generation_intent.lighting_intent.exposure_priority",
+        "generation_intent.lighting_intent.motivated_source",
+        "generation_intent.motion_envelope.amplitude_class",
+        "generation_intent.motion_envelope.direction",
+        "generation_intent.motion_envelope.onset",
+        "generation_intent.motion_envelope.peak",
+        "generation_intent.motion_envelope.settle",
+        "generation_intent.open_state.state_text",
+        "generation_intent.pacing.cadence",
+        "generation_intent.pacing.tempo_class",
+        "generation_intent.performance_intent.body_behavior",
+        "generation_intent.performance_intent.character_directions.0.role",
+        "generation_intent.performance_intent.character_directions.0.screen_identity",
+        "generation_intent.performance_intent.character_directions.0.visibility",
+        "generation_intent.performance_intent.gaze_target",
+        "generation_intent.performance_intent.trigger",
+        "generation_intent.performance_intent.visible_response",
+        "generation_intent.primary_camera_motion.amplitude_class",
+        "generation_intent.primary_camera_motion.direction",
+        "generation_intent.primary_camera_motion.movement_kind",
+        "generation_intent.primary_camera_motion.speed_class",
+        "generation_intent.primary_camera_motion.start_motion_state",
+        "generation_intent.scene_continuity.mood",
+        "generation_intent.scene_continuity.state_constraints.0",
+        "generation_intent.scene_continuity.state_constraints.1",
+        "generation_intent.scene_continuity.state_constraints.2",
+        "generation_intent.scene_continuity.time_of_day",
+        "generation_intent.space_continuity.screen_direction",
+        "generation_intent.space_continuity.subject_position",
+        "generation_intent.subject_action.endpoint.required_change",
+        "generation_intent.subject_action.start_state",
+        "generation_intent.visual_treatment.material_treatment",
+        "generation_intent.visual_treatment.palette",
+        "generation_intent.visual_treatment.prohibited_visual_drift.1",
+        "generation_intent.visual_treatment.prohibited_visual_drift.2"
+      ],
+      "coverage_source": "selected_qa_final_text",
+      "rejected_coverage_source": "inherited_automatic_prose",
+      "actual_quality": "NOT_EVALUATED"
+    }
+  }
+}

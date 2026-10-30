@@ -1,0 +1,34 @@
+{
+  "kind": "exact_raw_preview_delivery/1",
+  "sha256": "af1507969bb88b6be6379bfd991c8ba26864fd11a334e66144a4de371b8df5b2",
+  "source": {
+    "artifact_path": "state/video-generation/fetch/files/af1507969bb88b6be6379bfd991c8ba26864fd11a334e66144a4de371b8df5b2.mp4",
+    "sha256": "af1507969bb88b6be6379bfd991c8ba26864fd11a334e66144a4de371b8df5b2",
+    "bytes": 30229169
+  },
+  "delivery_path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/失帧-MC00-城市试片-480p.mp4",
+  "source_bytes_identical": true,
+  "new_paid_video_submits": 1,
+  "macro_total_video_submits": 7,
+  "current_quote_CRD": 240,
+  "actual_settled_credits": "NOT_EXPOSED; quote is not settlement receipt",
+  "duration_seconds": 20.065,
+  "resolution": [
+    854,
+    480
+  ],
+  "native_audio": true,
+  "audio_codec": "AAC stereo44100Hz",
+  "presentation_frames": 481,
+  "first_last_pts_seconds": [
+    0,
+    20
+  ],
+  "measured_mean_presentation_fps": 24,
+  "nominal_header_r_frame_rate": "60/1; not used for retiming",
+  "post_media_verdict": "FAIL",
+  "human_acceptance": "NOT_EVALUATED",
+  "protected_municipal_and_B6_unchanged": true,
+  "no_retiming_reencode_or_patch": true,
+  "review_url": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/index.html"
+}

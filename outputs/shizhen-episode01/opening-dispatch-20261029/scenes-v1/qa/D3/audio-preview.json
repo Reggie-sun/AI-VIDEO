@@ -1,0 +1,21 @@
+{
+  "schema_version": "audio-understanding-preview/1",
+  "preview": {
+    "operation": "audio_understand",
+    "provider": "gemini",
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    "model_id": "gemini-3.8-flash",
+    "source_sha256": "b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f",
+    "source_size_bytes": 18136810,
+    "audio_sha256": "d13b5473f2a13d1ac46e23298633d8ce5896cf45588da08b9b9363311293602f",
+    "audio_size_bytes": 1073276,
+    "duration_seconds": 6.0836281179138325,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "3619089b91eff85870611b4bf3c9af19dd2d19403ad66691a811a075a10d0c40"
+  },
+  "network_calls": 0,
+  "production_acceptance": "NOT_EVALUATED",
+  "media_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-dispatch-20261030/D3/state/video-generation/fetch/files/b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f.mp4",
+  "analysis_audio_derivation": "full_source_track_pcm_derivative",
+  "human_acceptance": "NOT_EVALUATED"
+}

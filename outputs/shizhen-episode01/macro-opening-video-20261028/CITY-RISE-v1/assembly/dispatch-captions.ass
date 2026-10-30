@@ -1,0 +1,20 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 2
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: B6,Noto Sans CJK SC Medium,54,&H00FFFFFF,&H00FFFFFF,&H64000000,&H78000000,0,0,0,0,100,100,2,0,1,1.4,1.5,2,60,60,52,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:07.04,0:00:10.06,B6,,0,0,0,,检修口报告，电闸断了，绞盘还在收
+Dialogue: 0,0:00:10.08,0:00:13.29,B6,,0,0,0,,七号楼又报了，下了三层，还在原来那层
+Dialogue: 0,0:00:13.31,0:00:16.62,B6,,0,0,0,,急诊回话，查无此人，人就躺在床上
+Dialogue: 0,0:00:16.64,0:00:20.48,B6,,0,0,0,,人民路有人喊救命，在十二楼，那栋楼只有九层
+Dialogue: 0,0:00:20.50,0:00:22.52,B6,,0,0,0,,都记上，今晚第几起了
+Dialogue: 0,0:00:22.54,0:00:23.62,B6,,0,0,0,,第十四起
+Dialogue: 0,0:00:23.64,0:00:24.81,B6,,0,0,0,,站台那边呢
+Dialogue: 0,0:00:24.83,0:00:26.79,B6,,0,0,0,,站台那边，暂无报告

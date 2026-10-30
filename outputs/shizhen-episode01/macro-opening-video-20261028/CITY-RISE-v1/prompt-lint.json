@@ -1,0 +1,13 @@
+{
+  "two_exact_inputs": true,
+  "first_last_roles": true,
+  "no_multimodal_markers": true,
+  "pure_chinese_body": true,
+  "exact_authored_prompt": true,
+  "continuous_city_move": true,
+  "no_speech_in_video": true,
+  "settled_end": true,
+  "duration20": true,
+  "480p": true,
+  "native_audio": true
+}

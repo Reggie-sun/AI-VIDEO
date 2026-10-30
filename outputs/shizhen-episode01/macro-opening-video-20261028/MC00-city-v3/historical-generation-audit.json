@@ -1,0 +1,52 @@
+{
+  "scope": "Six macro submits only; old downstairs/door paired unit and unrelated UNKNOWN unchanged",
+  "unique_macro_attempts": 6,
+  "items": [
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC01-02",
+      "attempt_id": "shizhen-macro-MC01-02-qualification-001",
+      "known_fetched": true,
+      "artifact_sha256": "bae96d85f72179cae23aa3535180d851946f16b4676e138542b0147ec212a3d4",
+      "manifest_sha256": "02c00f53626c176ecd3335da0c962ce74250bc697e44ae74960d8b1156628f70"
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC01-02-720p-v2",
+      "attempt_id": "shizhen-macro-MC01-02-720p-preview-002",
+      "known_fetched": true,
+      "artifact_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+      "manifest_sha256": "9d4736ccb89c7dea694a4af440eaf4cfbadfeaf285dd7fd948b3ac77635f20fc"
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3",
+      "attempt_id": "shizhen-macro-MC01-02-1080p-approved-003",
+      "known_fetched": true,
+      "artifact_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+      "manifest_sha256": "0a219fa0a304a4396fb774c388d73d628a86b166c900238880fb455e4c396873"
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC03-05",
+      "attempt_id": "shizhen-macro-MC03-05-1080p-qualification-004",
+      "known_fetched": true,
+      "artifact_sha256": "43584ba80ad0fc3beaaadfd8cc55c2748f4f3169b667a61d0655787e2e2b5528",
+      "manifest_sha256": "d0b843e790e04da4f4c4a29a0c8e92521538db181e074fac14448a78f2df3744"
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC03-05-repair-v2",
+      "attempt_id": "shizhen-macro-MC03-05-firstlast-repair-005",
+      "known_fetched": true,
+      "artifact_sha256": "aecf88b4f06a005e5db32b11138dcc9b3db3700ab08c993187263e2ed21038c5",
+      "manifest_sha256": "036bd2144f5b7d90bcd6acc7822b6d5fbfad7db7be7b0a0616752fa95b93844c"
+    },
+    {
+      "root": "runs/shizhen-macro-opening-20261027/MC03-descent-v1",
+      "attempt_id": "shizhen-macro-MC03-descent-qualification-006",
+      "known_fetched": true,
+      "artifact_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+      "manifest_sha256": "904782edcd32f9cf6d637886808000f3e99de0ad1df80251e1904af9cde878a6"
+    }
+  ],
+  "unknown_other_history_preserved": [
+    "shizhen-S05-qualification-attempt-006"
+  ],
+  "new_macro_submissions": 0
+}

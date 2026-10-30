@@ -1,0 +1,30 @@
+{
+  "round": 11,
+  "previous_media_rounds": 10,
+  "scope": "static background image repair + targeted generic raster/captured audio implementation",
+  "agent": "/root/macro720_review",
+  "actual_profile": "reviewer_high",
+  "authority": "read_only_native_review_advisory",
+  "artifact_sha256": "76d27a534fe5e97e2dc39f4833cc1c9e9a6f89639e3fc240e20581e073a7c9b8",
+  "sampled_frames": 32,
+  "findings": [],
+  "parent_adjudication": "No concrete visual or code finding; independent samples and static review do not establish full-speed temporal stability or hearing",
+  "foot_envelope_xyxy": [
+    1290,
+    835,
+    1581,
+    899
+  ],
+  "protected_alpha_all_zero": true,
+  "full_speed_viewing": "NOT_EVALUATED",
+  "human_listening": "NOT_EVALUATED",
+  "snapshot_sha256": {
+    "src/ai_video/production/composition_contracts.py": "bcbbe22129ead353bd7d25e3f2f99ec3b363fca94c2f1e529da687f8004b59eb",
+    "src/ai_video/production/_composition_visual.py": "754e38cd737196eeab31208bac95c828404f1a6f2147a4f132adaa9073d62214",
+    "tests/test_production_composition.py": "58372032b0e450eacf49cda7935d7dc6eb8e3ab577de01f18065990107873e75",
+    "tests/test_caption_development_preview.py": "ac2e4d0726eb893f0cfe3228f145537e7345cf77edb2e29fe18ad3b592dbf5c9",
+    "docs/v0.2-runtime-baseline.md": "6500bc387e579f8a9479e8e42da9bf578398af762cfe5ddc87ef2188dd8227b4"
+  },
+  "new_review_ceiling": 11,
+  "new_automatic_review_remaining": 0
+}

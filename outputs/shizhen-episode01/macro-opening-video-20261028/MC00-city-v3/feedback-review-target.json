@@ -1,0 +1,13 @@
+{
+  "base_commit": "5ccfdf9",
+  "files": [
+    {
+      "path": "src/ai_video/production/generation_feedback.py",
+      "sha256": "1b42f3e58f89cbde962bca72ac769c98b5402b2c208041e7f6fa7964fbdb2418"
+    },
+    {
+      "path": "tests/test_generation_feedback.py",
+      "sha256": "97b99e1c5d91687ffdc9e00d8fd60465055bcfdf0c65b348ad28f54a75c4f296"
+    }
+  ]
+}

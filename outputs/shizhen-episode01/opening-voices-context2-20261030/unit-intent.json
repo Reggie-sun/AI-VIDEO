@@ -1,0 +1,24 @@
+{
+  "scope": [
+    "L1",
+    "L2",
+    "L4",
+    "L5",
+    "L6a",
+    "L6b"
+  ],
+  "excluded": {
+    "project": "runs/shizhen-acting-tag-relay-20261030/project.yaml",
+    "attempt_id": "shizhen-acting-tag-relay-20261030-1",
+    "request_fingerprint": "69dfa5ca8fcfa60c71337f17f00045a88eae937ebcd5721f4e26725d5da6f475",
+    "purpose": "additional authored restriction only; canonical Manifest owns actual lifecycle"
+  },
+  "old_manifest_sha256": "0c6b96ccf50c7218c7ca4e9377212bef721d8ae6a80a30fee1bc0bc225de01ba",
+  "source_package_sha256": "28fd2a3b3e96c5584e33ac2951b7a5b822ae8793471f59c77861e9046d7f0fff",
+  "max_new_submits": 6,
+  "no_retry": true,
+  "model": "eleven_v4",
+  "per_call_operator_ceiling_microunits": 50000,
+  "actual_cost": "pending confirmation",
+  "derived_packet_sha256": "3fbc654fd093753c7d99bae24153557f2930849d288316bb1049a3879e3070c4"
+}

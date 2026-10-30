@@ -1,0 +1,47 @@
+{
+  "voice": "Stella Gu",
+  "model": "eleven_v4",
+  "rows": [
+    {
+      "scene": "日常闲聊",
+      "text": "行，那就这么定了，明天见。",
+      "file": "01.wav",
+      "duration_s": 2.56,
+      "sha256": "831c759e4d5831b64c88820cccb06a43bbcf8df2da5168cc0a45d04d50091d12",
+      "source": "runs/elevenlabs-contexts-stella-20261030/assets/audio/831c759e4d5831b64c88820cccb06a43bbcf8df2da5168cc0a45d04d50091d12.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "scene": "安慰朋友",
+      "text": "没事，你慢慢说，我听着呢。",
+      "file": "02.wav",
+      "duration_s": 2.72,
+      "sha256": "d726a9f8861b9570e832cc6f05bb04878f814e10c3fec28c957f71cb6836f6ed",
+      "source": "runs/elevenlabs-contexts-stella-20261030/assets/audio/d726a9f8861b9570e832cc6f05bb04878f814e10c3fec28c957f71cb6836f6ed.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "scene": "紧急提醒",
+      "text": "小心！你脚下有东西，先退回来！",
+      "file": "03.wav",
+      "duration_s": 2.96,
+      "sha256": "a510d367d25c30181fa246855810bf726c958045959f8c2a2178b7e8982210d9",
+      "source": "runs/elevenlabs-contexts-stella-20261030/assets/audio/a510d367d25c30181fa246855810bf726c958045959f8c2a2178b7e8982210d9.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "scene": "失望质问",
+      "text": "你昨天不是答应过我吗？怎么又变了？",
+      "file": "04.wav",
+      "duration_s": 3.36,
+      "sha256": "9699ba21b0018c64609d8c3b18e3c986dba0edfe5a038f8fe63c254104c1a2e7",
+      "source": "runs/elevenlabs-contexts-stella-20261030/assets/audio/9699ba21b0018c64609d8c3b18e3c986dba0edfe5a038f8fe63c254104c1a2e7.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    }
+  ],
+  "actual_cost": "pending confirmation"
+}

@@ -1,0 +1,23 @@
+{
+  "authority": "current-task-parent-bounded-operator",
+  "authorization_quote": "先把画面做出来",
+  "scope": "One D6 dispatch scene 1080p Seedance 2.0 VIP preview; no activation",
+  "issued_at": "2026-10-30T18:45:33.094378+00:00",
+  "expires_at": "2026-10-30T21:45:33.094378+00:00",
+  "max_submit_count": 1,
+  "automatic_retries": 0,
+  "dispatch_unit_ceiling": {
+    "scenes": [
+      "D2",
+      "D3",
+      "D4",
+      "D6"
+    ],
+    "initial_submits_per_scene": 1,
+    "dialogue_master": 1,
+    "total_initial": 5
+  },
+  "per_call_credit_upper_bound": 1500,
+  "quote_credits": 165,
+  "quote_evidence": "native-readonly.json"
+}

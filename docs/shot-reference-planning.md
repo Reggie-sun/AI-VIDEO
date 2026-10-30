@@ -4,7 +4,7 @@
 
 Director 在既有 `generation.generation_intent.reference_planning` 中声明组合特征、视觉事件和参考职责。该字段随 `ProviderNeutralGenerationIntentProjection`、`VideoPlanningRequest`、neutral requirement 的既有 hashes 封存；不会新建 Production artifact 或 mutable lifecycle。历史数据重开、读取与 replay 不变，缺该字段时读取给出明确标注 `legacy_advisory` 的建议。
 
-**新生成的声明义务（`reference_authoring.py`）。** 在 `GenerationDecisionExecutionBinding.create`（fresh creation，排在既有表演／commercial／Seedance 表达检查之后，保留原错误优先级；`GenerationFeedbackOrchestrator.prepare` 经此创建）检查，不在历史读取运行：缺 `reference_planning` 阻断；机位非 `locked` 时至少一个 `composition` event，用 `visual_state/purpose` 说明移动让观众看见什么（编译器随后要求其进入实际 prompt）；导演证据按领域分开：剧情须有 `director_coverage={coverage_hash, unit_id}`，且当前 Project 已供给时，该 hash 必须是 Project／Shot provenance 中封存的 content-addressed authoring input，bytes 经 `director_coverage.py` 结构校验并含该 unit；电商（`commercial_execution_class` 或 commercial binding）的导演层是 AdCreativePlan，执行绑定创建时须有含 `ad_creative_plan_hash` 的 commercial binding（由既有 commercial owners 核对计划），不得挂剧情 coverage。共享的 `reference_planning` 与机位 composition 义务两个领域都适用。程序只核对声明存在与证据一致，不判断镜头类型、参考数量、白模取舍或移动是否有戏；这些仍归 Director Skill。Canvas 项目经 `direction.director_coverages` 封存；非 Canvas 项目用 `reference_authoring.director_coverage_authoring_input()` 取得 artifact，随生成 Shot 的修订一起经 `ProductionStateCommitter` 提交，并把该引用写入 Shot `source_provenance`。Runtime 只做结构校验，不核对 coverage 由哪个 Skill 产出（作者检查只在 open-video 入口脚本）；有结构化 `primary_camera_motion`（v4 必填）时以它判断是否运动；v1–v3 requirement 不能携带该字段，此时 `camera_intent.movement` 除精确的 `unspecified`／`locked`／`locked-off`（编译器已认可的静止 token）外一律视为可能运动，同样须声明 composition event。门禁只做精确 token 比较，不解析自由文本含义。M0／source qualification 等资格试验链经 `_QualificationExecutionBinding` 生成，验证的是连续性机制本身，不受本门禁约束；其产物不得作为作品镜头交付属 advisory 约束，目前没有 Harness 检查保证。
+**新生成的声明义务（`reference_authoring.py`）。** 在 `GenerationDecisionExecutionBinding.create`（fresh creation，排在既有表演／commercial／Seedance 表达检查之后，保留原错误优先级；`GenerationFeedbackOrchestrator.prepare` 经此创建）检查，不在历史读取运行：缺 `reference_planning` 阻断；机位非 `locked` 时至少一个 `composition` event，用 `visual_state/purpose` 说明移动让观众看见什么（编译器随后要求其进入实际 prompt）；导演证据按领域分开：剧情须有 `director_coverage={coverage_hash, unit_id}`，且当前 Project 已供给时，该 hash 必须是 Project／Shot provenance 中封存的 content-addressed authoring input，bytes 经 `director_coverage.py` 结构校验并含该 unit；电商（`commercial_execution_class` 或 commercial binding）的导演层是 AdCreativePlan，执行绑定创建时须有含 `ad_creative_plan_hash` 的 commercial binding（由既有 commercial owners 核对计划），不得挂剧情 coverage。共享的 `reference_planning` 与机位 composition 义务两个领域都适用。程序只核对声明存在与证据一致，不判断镜头类型、参考数量、白模取舍或移动是否有戏；这些仍归 Director Skill。剧情另须 `preview_approval={approval_hash}`：用户已看过的预览（`user-preview-approval/1`：`coverage_hash`、`unit_ids`、`preview_artifacts[{path, sha256, role}]`、`user_quote` 用户原话）同样以 content-addressed authoring input 封存在 Project／Shot provenance，并须绑定同一 coverage 与本 unit；程序只核对证据结构与封存，不能证明原话真实、也不评判预览，伪造或改写用户原话属违规。所有领域另有身份义务：`performance_intent.character_directions` 中 `visibility=visible` 的人物必须列入 `identity_continuity.character_ids`（Planner 随之要求身份参考），不得为免做参考图把可见表演者移出身份延续。Canvas 项目经 `direction.director_coverages` 与 `direction.preview_approvals` 封存；非 Canvas 项目用 `reference_authoring.director_coverage_authoring_input()` 取得 artifact，随生成 Shot 的修订一起经 `ProductionStateCommitter` 提交，并把该引用写入 Shot `source_provenance`。Runtime 只做结构校验，不核对 coverage 由哪个 Skill 产出（作者检查只在 open-video 入口脚本）；有结构化 `primary_camera_motion`（v4 必填）时以它判断是否运动；v1–v3 requirement 不能携带该字段，此时 `camera_intent.movement` 除精确的 `unspecified`／`locked`／`locked-off`（编译器已认可的静止 token）外一律视为可能运动，同样须声明 composition event。门禁只做精确 token 比较，不解析自由文本含义。M0／source qualification 等资格试验链经 `_QualificationExecutionBinding` 生成，验证的是连续性机制本身，不受本门禁约束；其产物不得作为作品镜头交付属 advisory 约束，目前没有 Harness 检查保证。
 
 ```mermaid
 flowchart LR
@@ -146,3 +146,15 @@ selected capability 直接投影现有 variant，不维护第二张能力表；s
 `tests/test_reference_planning.py` 覆盖组合语义、数量、时序、职责、选择、历史兼容和失败建议；`tests/test_reference_planning_integration.py` 经过真实 Canvas authoring、ProductionStateCommitter、loader、Planner、readiness、Router 和 compiler，使用 fake Provider，检查不发生 submit/fetch。
 
 工程测试只证明上述确定性行为。电影、电视剧、漫剧、广告、产品展示和片头共享规则维度，不以某个模型、作品、单镜或已有失败命名规则。没有真实生成实验，模型最终画面、物理因果和人工观看验收均为 `NOT_EVALUATED`。
+
+
+## Reference Package Before Preview（2026-10-30）
+
+“不为填满上限追加图片”不等于“越少越好”。每个新创作镜头在预览前先按实际事件准备参考包，再选进模型输入：
+
+- 每个可见表演者一份身份参考（多角度），由 `scenario-identity-library` 准备；只出现一次的人物同样需要，除非其不可辨认（背影、剪影）且 Director 在 `natural_generation` 写明理由。
+- 每个决定性时刻一张关键帧：起态、改变发生、人物反应、终态；由 `scenario-seedance-storyboard` 准备。异常或剧情转折必须在镜头内发生并有人看见、有反应，旁白不能代替画面证据。
+- 证据所依赖的道具细节、环境的关键角度，以及项目已有认可片段时的风格帧（色调、质感、人物比例）。
+- 选入模型的数量按所选模式与能力决定；未选入的图仍作为预览与审看依据。
+
+这套关键帧同时就是交给用户的预览；用户认可后封存 `preview_approval`，同一批图进入生成。程序门禁只检查声明与封存，不判断参考包是否充分或好看。

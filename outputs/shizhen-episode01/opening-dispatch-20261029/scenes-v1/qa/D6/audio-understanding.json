@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa\",\n  \"source_size_bytes\": 6869595,\n  \"audio_sha256\": \"194fe90088ae5a113421a7492954d62d3e76b5227704a27041819111e66c9e1b\",\n  \"audio_size_bytes\": 893052,\n  \"duration_seconds\": 5.061950113378685,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"a6204febb55b1eb73bd04191cd594c107d7634a46bf7c92f3219b38fd81a9a3f\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"7092adf8a18ba47bf3b4b96736be744823fbfad93e660649dadb8b28509a690c\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"sound of water rushing and splashing\",\n      \"flowing stream or ocean surf noise\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-dispatch-20261030/D6/state/video-generation/fetch/files/30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

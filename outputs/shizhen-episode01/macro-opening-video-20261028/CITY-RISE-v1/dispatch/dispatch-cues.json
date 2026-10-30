@@ -1,0 +1,81 @@
+{
+  "timeline": "CITY-RISE shot-local seconds",
+  "length": 20.0,
+  "audio": "dispatch-radio-20s-48k.wav",
+  "audio_sha256": "353fa6d239f53c5e948d1db9963fd73e1ed91dd7b792b0e3e625fdac7e0c6f67",
+  "radio_filter": "highpass=f=380,lowpass=f=3300,acompressor=threshold=-24dB:ratio=6:attack=3:release=60:makeup=6,asoftclip=type=tanh:threshold=0.6,equalizer=f=1800:t=q:w=1.2:g=4",
+  "cues": [
+    {
+      "id": "L1",
+      "text": "检修口报告，电闸断了，绞盘还在收",
+      "start": 0.25,
+      "end": 3.134,
+      "source": "L1-zm_010.wav",
+      "source_sha256": "82eb96cdde01d55449821a6f592b0ec70e9cef63c8f0bebab7509e9011e57b1f",
+      "caption_end": 3.264
+    },
+    {
+      "id": "L2",
+      "text": "七号楼又报了，下了三层，还在原来那层",
+      "start": 3.284,
+      "end": 6.372,
+      "source": "L2-zm_029.wav",
+      "source_sha256": "2426f89c663b122e5e10b5a19cd4787855b5ad57ee13ad4c22963f3f72acb035",
+      "caption_end": 6.502
+    },
+    {
+      "id": "L3",
+      "text": "急诊回话，查无此人，人就躺在床上",
+      "start": 6.522,
+      "end": 9.752,
+      "source": "L3-zf_003.wav",
+      "source_sha256": "91d223fd13c44b78c5d33312e6c902995b7b00365a4610dade672cb62f383806",
+      "caption_end": 9.832
+    },
+    {
+      "id": "L4",
+      "text": "人民路有人喊救命，在十二楼，那栋楼只有九层",
+      "start": 9.852,
+      "end": 13.509,
+      "source": "L4-zm_010.wav",
+      "source_sha256": "381d8eb0027ac2aa3168b80935b93c8ed882d9d61019a8c2c1a64322f98fc235",
+      "caption_end": 13.689
+    },
+    {
+      "id": "L5",
+      "text": "都记上，今晚第几起了",
+      "start": 13.709,
+      "end": 15.653,
+      "source": "L5-zf_003.wav",
+      "source_sha256": "b3f502e9a59a81b643bd395772221598715025ac06e14c27ba87a1764f15db35",
+      "caption_end": 15.733
+    },
+    {
+      "id": "L6",
+      "text": "第十四起",
+      "start": 15.753,
+      "end": 16.703,
+      "source": "L6-zm_029.wav",
+      "source_sha256": "250a08a9b34c58746b4b6902fc106305309b9a783a62e8ec252bb99013a0c0dd",
+      "caption_end": 16.833
+    },
+    {
+      "id": "L7",
+      "text": "站台那边呢",
+      "start": 16.853,
+      "end": 17.943,
+      "source": "L7-zf_003.wav",
+      "source_sha256": "faf6c3ff78eb234847ea39517d23a795876eb7b66c3557abdc271a040c2fdd01",
+      "caption_end": 18.023
+    },
+    {
+      "id": "L8",
+      "text": "站台那边，暂无报告",
+      "start": 18.043,
+      "end": 19.763,
+      "source": "L8-zm_029.wav",
+      "source_sha256": "a7c55ce12995df29eda31f075fd4655840e81b97d5bdd8dfb38ebd1fc1b995e3",
+      "caption_end": 20.0
+    }
+  ]
+}

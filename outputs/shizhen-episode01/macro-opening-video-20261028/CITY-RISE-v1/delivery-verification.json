@@ -1,0 +1,29 @@
+{
+  "kind": "exact_raw_preview_delivery/1",
+  "sha256": "8a787dfcec864bc8d8b5f58755e18f1d77b99d051e661d5cd79abc2a9ac9215e",
+  "source": {
+    "run_root": "runs/shizhen-macro-opening-20261028/CITY-RISE-v1-r2",
+    "artifact_path": "state/video-generation/fetch/files/8a787dfcec864bc8d8b5f58755e18f1d77b99d051e661d5cd79abc2a9ac9215e.mp4"
+  },
+  "delivery_path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/失帧-城市调度镜头-480p.mp4",
+  "source_bytes_identical": true,
+  "new_paid_video_submits": 1,
+  "macro_total_video_submits": 9,
+  "current_quote_CRD": 240,
+  "actual_settled_credits": "NOT_EXPOSED",
+  "duration_seconds": 20.065,
+  "resolution": [
+    854,
+    480
+  ],
+  "presentation_frames": 481,
+  "review_assembly": {
+    "path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/assembly/失帧-独立开场-城市调度版-审看-1080p.mp4",
+    "sha256": "6c5c1167b6486dedac0695787260d8a897ae8a97831294bad69197d02d46c794",
+    "frames": 1168,
+    "seconds": 48.695
+  },
+  "voice": "local Kokoro-82M-v1.1-zh, remote_calls 0",
+  "protected_municipal_unchanged": true,
+  "protected_B6_unchanged": true
+}

@@ -1,0 +1,310 @@
+{
+ "男声 · 转报员": [
+  {
+   "provider": "MiniMax",
+   "voice": "audiobook_male_1",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "MiniMax-audiobook_male_1-L3.wav",
+     "duration_s": 3.92
+    },
+    {
+     "line": "L4",
+     "file": "MiniMax-audiobook_male_1-L4.wav",
+     "duration_s": 5.4
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "male-qn-daxuesheng",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "MiniMax-male-qn-daxuesheng-L3.wav",
+     "duration_s": 4.77
+    },
+    {
+     "line": "L4",
+     "file": "MiniMax-male-qn-daxuesheng-L4.wav",
+     "duration_s": 5.07
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "male-qn-jingying",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "MiniMax-male-qn-jingying-L3.wav",
+     "duration_s": 3.24
+    },
+    {
+     "line": "L4",
+     "file": "MiniMax-male-qn-jingying-L4.wav",
+     "duration_s": 3.88
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "male-qn-qingse",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "MiniMax-male-qn-qingse-L3.wav",
+     "duration_s": 4.47
+    },
+    {
+     "line": "L4",
+     "file": "MiniMax-male-qn-qingse-L4.wav",
+     "duration_s": 5.2
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "presenter_male",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "MiniMax-presenter_male-L3.wav",
+     "duration_s": 4.09
+    },
+    {
+     "line": "L4",
+     "file": "MiniMax-presenter_male-L4.wav",
+     "duration_s": 4.31
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs v4 无tag",
+   "voice": "Anson",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "ElevenLabs_v4_无tag-Anson-L3.wav",
+     "duration_s": 4.4
+    },
+    {
+     "line": "L4",
+     "file": "ElevenLabs_v4_无tag-Anson-L4.wav",
+     "duration_s": 4.32
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs v4 无tag",
+   "voice": "Yun Calm Mature",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "ElevenLabs_v4_无tag-Yun_Calm_Mature-L3.wav",
+     "duration_s": 4.16
+    },
+    {
+     "line": "L4",
+     "file": "ElevenLabs_v4_无tag-Yun_Calm_Mature-L4.wav",
+     "duration_s": 4.32
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs 带tag疑似念出标签",
+   "voice": "Yun Calm Mature",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "ElevenLabs_带tag疑似念出标签-Yun_Calm_Mature-L3.wav",
+     "duration_s": 9.68
+    },
+    {
+     "line": "L4",
+     "file": "ElevenLabs_带tag疑似念出标签-Yun_Calm_Mature-L4.wav",
+     "duration_s": 4.0
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs 首版baseline",
+   "voice": "Evan Zhao",
+   "lines": [
+    {
+     "line": "L3",
+     "file": "ElevenLabs_首版baseline-Evan_Zhao-L3.wav",
+     "duration_s": 4.24
+    },
+    {
+     "line": "L4",
+     "file": "ElevenLabs_首版baseline-Evan_Zhao-L4.wav",
+     "duration_s": 4.32
+    }
+   ]
+  }
+ ],
+ "女声 · 董文慧": [
+  {
+   "provider": "MiniMax",
+   "voice": "audiobook_female_1",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "MiniMax-audiobook_female_1-L5.wav",
+     "duration_s": 2.22
+    },
+    {
+     "line": "L6a",
+     "file": "MiniMax-audiobook_female_1-L6a.wav",
+     "duration_s": 1.4
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "female-chengshu",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "MiniMax-female-chengshu-L5.wav",
+     "duration_s": 2.25
+    },
+    {
+     "line": "L6a",
+     "file": "MiniMax-female-chengshu-L6a.wav",
+     "duration_s": 1.28
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "female-tianmei",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "MiniMax-female-tianmei-L5.wav",
+     "duration_s": 1.96
+    },
+    {
+     "line": "L6a",
+     "file": "MiniMax-female-tianmei-L6a.wav",
+     "duration_s": 1.23
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "female-yujie",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "MiniMax-female-yujie-L5.wav",
+     "duration_s": 2.64
+    },
+    {
+     "line": "L6a",
+     "file": "MiniMax-female-yujie-L6a.wav",
+     "duration_s": 1.87
+    }
+   ]
+  },
+  {
+   "provider": "MiniMax",
+   "voice": "presenter_female",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "MiniMax-presenter_female-L5.wav",
+     "duration_s": 1.92
+    },
+    {
+     "line": "L6a",
+     "file": "MiniMax-presenter_female-L6a.wav",
+     "duration_s": 1.23
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs v4 无tag",
+   "voice": "Amy",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "ElevenLabs_v4_无tag-Amy-L5.wav",
+     "duration_s": 1.92
+    },
+    {
+     "line": "L6a",
+     "file": "ElevenLabs_v4_无tag-Amy-L6a.wav",
+     "duration_s": 1.2
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs v4 无tag",
+   "voice": "Serena",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "ElevenLabs_v4_无tag-Serena-L5.wav",
+     "duration_s": 2.16
+    },
+    {
+     "line": "L6a",
+     "file": "ElevenLabs_v4_无tag-Serena-L6a.wav",
+     "duration_s": 1.28
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs v4 无tag",
+   "voice": "Yun Anchor",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "ElevenLabs_v4_无tag-Yun_Anchor-L5.wav",
+     "duration_s": 2.08
+    },
+    {
+     "line": "L6a",
+     "file": "ElevenLabs_v4_无tag-Yun_Anchor-L6a.wav",
+     "duration_s": 1.28
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs 带tag疑似念出标签",
+   "voice": "Serena",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "ElevenLabs_带tag疑似念出标签-Serena-L5.wav",
+     "duration_s": 2.16
+    },
+    {
+     "line": "L6a",
+     "file": "ElevenLabs_带tag疑似念出标签-Serena-L6a.wav",
+     "duration_s": 6.56
+    }
+   ]
+  },
+  {
+   "provider": "ElevenLabs 首版baseline",
+   "voice": "Stella Gu",
+   "lines": [
+    {
+     "line": "L5",
+     "file": "ElevenLabs_首版baseline-Stella_Gu-L5.wav",
+     "duration_s": 2.08
+    },
+    {
+     "line": "L6a",
+     "file": "ElevenLabs_首版baseline-Stella_Gu-L6a.wav",
+     "duration_s": 1.28
+    }
+   ]
+  }
+ ]
+}

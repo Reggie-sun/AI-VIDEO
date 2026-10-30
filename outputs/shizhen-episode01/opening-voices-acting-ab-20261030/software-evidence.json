@@ -1,0 +1,22 @@
+{
+  "source_sha256": {
+    ".agent/harness/policy.yaml": "5c0ff0dc507ac45e3490a465818b58c7bf33fce52ebf2a83c15700ae45cbd297",
+    "docs/elevenlabs-speech.md": "472713eb28495c8b41dee3a28e19017252310a98a92815e72ee2fb7174452dfc",
+    "docs/agent-primary-contract-matrix.md": "1f3fdecf529526706e9ac7961fd0dc417ff5969fdc21a112023174873176e4d5",
+    "scripts/elevenlabs_speech_batch.py": "0464c2bc60c244d4f6a47b249eab50bb858807ac86658eec05ce62397edffd9f",
+    "src/ai_video/production/audio.py": "fa9c68463bcc02ac43bd73fa61d00cf7e4b5539fe20f964e35f01f1acca63a7a",
+    "src/ai_video/production/voice_parameters.py": "e0b3648fd75fa0abfed536643fecb6f400dd6267922f98749d041e5b5c267c6a",
+    "src/ai_video/production/elevenlabs_performance.py": "1dd75fc2e52d256f820eb2aa389ef34e0081b3c8063ab55342356b562282d14f",
+    "src/ai_video/production/elevenlabs.py": "2fc41bd49499807f8752a0846368ead7f5b2ce0a055cd71560b57dfb1d2bb8b8",
+    "src/ai_video/production/elevenlabs_batch.py": "43788c7b33f913f9867c20357c9965afe3e24d6997479510344c74d56e321a14",
+    "src/ai_video/production/_state_commit_voice_activation.py": "c8897ab29542ecf135008bf817e7a962bc5b8235bb559e9a2ee8c67c00e567c3",
+    "tests/test_production_elevenlabs.py": "1ee1fd6149617e321199bd8bcd070365cafde62b14adc49602b115731045fd84",
+    "tests/test_production_elevenlabs_batch.py": "049436d4c74898134289b5b2f74e00c2a8e116ce10d1aa609848ffe96b0658a0"
+  },
+  "targeted_tests": "177 passed in 39.28s",
+  "review": "APPROVE for bounded attempt, not media acceptance",
+  "architecture": "PASS against HEAD, no findings",
+  "policy_audit": "PASS after new modules staged",
+  "harness_receipt": "NOT_EVALUATED; no isolated exact-snapshot run for task yet",
+  "commit_status": "PENDING; awaiting media/recovery boundary"
+}

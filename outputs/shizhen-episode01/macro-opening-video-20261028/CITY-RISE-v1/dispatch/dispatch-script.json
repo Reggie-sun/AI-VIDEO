@@ -1,0 +1,68 @@
+{
+  "kind": "dispatch-radio-script/1",
+  "status": "AUTHORED_PREVIEW_NOT_ACCEPTED",
+  "speakers": {
+    "field_a": {
+      "role": "外勤甲（市政抢修）",
+      "voice": "zm_010"
+    },
+    "field_b": {
+      "role": "外勤乙",
+      "voice": "zm_029"
+    },
+    "dispatcher": {
+      "role": "调度员",
+      "voice": "zf_003"
+    }
+  },
+  "lines": [
+    {
+      "id": "L1",
+      "speaker": "field_a",
+      "text": "检修口报告，电闸断了，绞盘还在收",
+      "anomaly": "N08 没人下班"
+    },
+    {
+      "id": "L2",
+      "speaker": "field_b",
+      "text": "七号楼又报了，下了三层，还在原来那层",
+      "anomaly": "N04 楼下见"
+    },
+    {
+      "id": "L3",
+      "speaker": "dispatcher",
+      "text": "急诊回话，查无此人，人就躺在床上",
+      "anomaly": "N06 本人已故"
+    },
+    {
+      "id": "L4",
+      "speaker": "field_a",
+      "text": "人民路有人喊救命，在十二楼，那栋楼只有九层",
+      "anomaly": "N07 旧人声"
+    },
+    {
+      "id": "L5",
+      "speaker": "dispatcher",
+      "text": "都记上，今晚第几起了"
+    },
+    {
+      "id": "L6",
+      "speaker": "field_b",
+      "text": "第十四起"
+    },
+    {
+      "id": "L7",
+      "speaker": "dispatcher",
+      "text": "站台那边呢"
+    },
+    {
+      "id": "L8",
+      "speaker": "field_b",
+      "text": "站台那边，暂无报告",
+      "purpose": "B6 人物消失无人察觉的伏笔"
+    }
+  ],
+  "captions": "与语音同步，句尾不加标点；样式对齐 B6 既有字幕",
+  "canon_scope": "只报现象，不新增机制；对应 anomaly-bible N04/N06/N07/N08",
+  "revision_note": "v2: L2/L3 shortened to fit 20s; speed 1.25; v1 audio kept in raw-speed115"
+}

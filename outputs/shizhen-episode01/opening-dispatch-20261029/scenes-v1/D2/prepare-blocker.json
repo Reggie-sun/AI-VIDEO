@@ -1,0 +1,1783 @@
+{
+  "decision": {
+    "snapshot_hash": "484c604a0130e8f1366ad622d2a17e61275ea41b7614612cd353cb262116ec8d",
+    "disposition": "GENERATE_ONCE",
+    "selected_candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+    "assessments": [
+      {
+        "candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+        "scope_hash": "2516d0fcadfd04ae507a0549a67de939217b08470fa473fcf34415e5f63a0adb",
+        "fit": "unknown",
+        "compatible": true,
+        "executable": true,
+        "supported_dimensions": [],
+        "failed_dimensions": [],
+        "unknown_dimensions": [
+          "action",
+          "art",
+          "camera",
+          "identity",
+          "performance",
+          "sound",
+          "space"
+        ],
+        "evidence_hashes": [],
+        "ignored_evidence_hashes": [],
+        "sample_count": 0,
+        "pass_count": 0,
+        "fail_count": 0,
+        "not_evaluated_count": 0,
+        "runtime_failure_count": 0,
+        "unknown_outcome_count": 0,
+        "not_submitted_count": 0,
+        "reasons": [],
+        "empirical": {
+          "version": "generation-cohort/1",
+          "supported_artifacts": [],
+          "failed_artifacts": [],
+          "incomplete_artifacts": [],
+          "evidence_hashes": [],
+          "exclusions": [],
+          "failed_requirements": [],
+          "observed_success_fraction": null,
+          "interval_95": null,
+          "limitations": [
+            "observational cohort; selection and intervention confounding remain",
+            "unknown action complexity and hand/prop interaction are not matched",
+            "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+          ]
+        }
+      }
+    ],
+    "diagnosis": null,
+    "intervention": null,
+    "runtime_repair": null,
+    "routing": {
+      "decision": {
+        "target_shot_id": "D2",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "132026f2491328a0ade4fcd8288c8fb178e2d8b8f6a1bded6996d4cc8af51a45",
+        "continuity_mode": "none",
+        "semantic_continuity_state": null,
+        "required_mode": "reference_to_video",
+        "selected_mode": "reference_to_video",
+        "required_binding_roles": [
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "scene_reference",
+            "asset_id": "D2-ref-stair",
+            "asset_sha256": "b878175694b760b7f5ea82547527bb997dc5c80db957f15e601c26d11d6bef1e",
+            "source_registry_revision_id": "6b392faf62ce9de76545ff87f52c96c2e7bd725efc2481066119a8537800ba1f",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "stair-loop",
+            "canonical_owner_content_hash": "46bb2edc5b7b9f7d3e38bb96e34e4979e911f760ae23003d91608f03532444dc",
+            "mime_type": "image/png",
+            "size_bytes": 2394284,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "provider_name": "jimeng",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/e67781376827e8178fd5795be226d907c24d3f508ad66fc97297b36dc724002a.json",
+          "profile_sha256": "e67781376827e8178fd5795be226d907c24d3f508ad66fc97297b36dc724002a"
+        },
+        "provider_capabilities_fingerprint": "a4e4fa3add6a83b868e7246155d5a8dbfd3587a89f38e79d80087e71da4616d8",
+        "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "selected_capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "requirement_hash": "aeefa01e6f162e4d8a35247c3e472273cd62771896514f60bc77df8fce56d061",
+        "continuity_transition_policy_hash": null,
+        "previous_provider_bound_request_hash": null,
+        "continuity_provider_route_binding_hash": null,
+        "execution_kind": "remote",
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 6,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "reason_codes": [
+          "CANONICAL_REFERENCES_ENABLE_R2V"
+        ],
+        "rationale": "Bind the verified neutral requirement to the exact capability.",
+        "policy": {
+          "policy_id": "shizhen-cold-open-qualification",
+          "policy_version": "1",
+          "policy_sha256": "93a6f7bea07f9d4fcff1627203eb575bb8f633ce739cddaa5735a93c432c0bf5"
+        },
+        "outcome": "selected",
+        "semantic_routing_hash": "fc14711a5992fcb68225f4ca6f9229264f5616aa4830311310e52d54003e64f7",
+        "audit_decision_hash": "f6bb5e41a32fde28dd5b97e2b5304f1e239864f83a31300f0b117522b29917a0"
+      },
+      "provider_bound_request": {
+        "plan_hash": "6e159a6f6c438c37efbaa34bb32f240f23d6039074b8e4a51c1f6e140c666b98",
+        "requirement_hash": "aeefa01e6f162e4d8a35247c3e472273cd62771896514f60bc77df8fce56d061",
+        "verified_projection_hash": "4ee2f9dcec4ec96a3c3dc0d82f7b533d6bb1356f73e78716cfc8eea57a4467c9",
+        "target_shot_id": "D2",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "132026f2491328a0ade4fcd8288c8fb178e2d8b8f6a1bded6996d4cc8af51a45",
+        "semantic_routing_hash": "fc14711a5992fcb68225f4ca6f9229264f5616aa4830311310e52d54003e64f7",
+        "audit_decision_hash": "f6bb5e41a32fde28dd5b97e2b5304f1e239864f83a31300f0b117522b29917a0",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.0_vip",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/e67781376827e8178fd5795be226d907c24d3f508ad66fc97297b36dc724002a.json",
+          "profile_sha256": "e67781376827e8178fd5795be226d907c24d3f508ad66fc97297b36dc724002a"
+        },
+        "capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "execution_kind": "remote",
+        "billing_kind": "metered",
+        "mode": "reference_to_video",
+        "binding_roles": [
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "scene_reference",
+            "asset_id": "D2-ref-stair",
+            "asset_sha256": "b878175694b760b7f5ea82547527bb997dc5c80db957f15e601c26d11d6bef1e",
+            "source_registry_revision_id": "6b392faf62ce9de76545ff87f52c96c2e7bd725efc2481066119a8537800ba1f",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "stair-loop",
+            "canonical_owner_content_hash": "46bb2edc5b7b9f7d3e38bb96e34e4979e911f760ae23003d91608f03532444dc",
+            "mime_type": "image/png",
+            "size_bytes": 2394284,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 6,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "lifecycle": {
+          "generation_id": "canvas-generation-e6ad6b3f560883ccb802f91fa781f065",
+          "target_asset_role": "primary_visual",
+          "base_project": {
+            "path": "state/projects/project.1.61548c9027740f212519652dc1dd427f2b5585ef14a3455a37625d4e724bc86f.yaml",
+            "revision": 1,
+            "content_hash": "61548c9027740f212519652dc1dd427f2b5585ef14a3455a37625d4e724bc86f",
+            "file_sha256": "ae16182aeecbf1811e8cd3cfc6b043904349a0bc85158af37f196f6149dfa08e"
+          },
+          "base_registry": {
+            "path": "assets/registry.6b392faf62ce9de76545ff87f52c96c2e7bd725efc2481066119a8537800ba1f.json",
+            "revision_id": "6b392faf62ce9de76545ff87f52c96c2e7bd725efc2481066119a8537800ba1f",
+            "content_hash": "6b392faf62ce9de76545ff87f52c96c2e7bd725efc2481066119a8537800ba1f",
+            "file_sha256": "6383903383d2e53f316e906926d78ea9293d422e11d5216ac6855a3585eac38e"
+          },
+          "base_dependency_graph": {
+            "revision_id": "d5c4e16db3794a6c41115c46396d812026b148c0c9303a510f6969c30ba45644",
+            "content_hash": "d5c4e16db3794a6c41115c46396d812026b148c0c9303a510f6969c30ba45644",
+            "path": "state/dependency_graph.d5c4e16db3794a6c41115c46396d812026b148c0c9303a510f6969c30ba45644.json",
+            "file_sha256": "4a7b23213b10f27d48aff1494bd7ad4094a8f04fe2b39c08ce4d84c8ea2c09cb"
+          },
+          "input_artifact_ids": [
+            "shizhen-dispatch-D2-shot",
+            "shizhen-dispatch-D2-scene",
+            "shizhen-dispatch-D2-character-stair-resident",
+            "D2-ref-stair"
+          ],
+          "output_asset_id": "canvas-video-e6ad6b3f560883ccb802f91fa781f065",
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false
+        },
+        "compiler_contract": {
+          "compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+          "compiler_version": "1",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49"
+        },
+        "expression_strength": "semantic_prompt_allowed",
+        "generation_recipe": {
+          "contract_version": "generation-recipe/1",
+          "seed": {
+            "kind": "uncontrolled",
+            "value": null
+          },
+          "profile_sha256": "e67781376827e8178fd5795be226d907c24d3f508ad66fc97297b36dc724002a",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+          "requirement_hash": "aeefa01e6f162e4d8a35247c3e472273cd62771896514f60bc77df8fce56d061",
+          "rubric_hash": "0e6b07bc25fffa2c3a8c0b6dec20818e1eb5e74d8580c66566579a70fc9eb72c",
+          "acceptance_policy": {
+            "domain_id": "original-drama",
+            "profile_id": "shizhen-dispatch-D2-raw",
+            "profile_version": "1",
+            "profile_content_hash": "0e6b07bc25fffa2c3a8c0b6dec20818e1eb5e74d8580c66566579a70fc9eb72c",
+            "profile_payload": {
+              "content_hash": "0e6b07bc25fffa2c3a8c0b6dec20818e1eb5e74d8580c66566579a70fc9eb72c",
+              "domain_id": "original-drama",
+              "generation_requirements": [
+                {
+                  "dimension": "identity",
+                  "intent_paths": [
+                    "generation_intent.identity_continuity.preservation"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "参考素材1{{image:0}}只负责楼梯间的空间布局、那只侧面凹陷的红色灭火器、墙面和灯光；人物不从参考图来。",
+                    "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.preservation"
+                      }
+                    ],
+                    "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea"
+                  },
+                  "observable": "人物与参考或首帧一致，没有新增人物或换脸",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "identity",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "action",
+                  "intent_paths": [
+                    "generation_intent.open_state.kind",
+                    "generation_intent.open_state.state_text",
+                    "generation_intent.open_state.required_change",
+                    "generation_intent.close_state.kind",
+                    "generation_intent.close_state.state_text",
+                    "generation_intent.close_state.required_change",
+                    "generation_intent.scene_continuity.scene_id",
+                    "generation_intent.scene_continuity.time_of_day",
+                    "generation_intent.scene_continuity.mood",
+                    "generation_intent.scene_continuity.state_constraints.0",
+                    "generation_intent.scene_continuity.state_constraints.1",
+                    "generation_intent.scene_continuity.state_constraints.2",
+                    "generation_intent.subject_action.start_state",
+                    "generation_intent.subject_action.progression",
+                    "generation_intent.subject_action.endpoint.state_text",
+                    "generation_intent.subject_action.endpoint.required_change",
+                    "generation_intent.motion_envelope.onset",
+                    "generation_intent.motion_envelope.peak",
+                    "generation_intent.motion_envelope.settle",
+                    "generation_intent.motion_envelope.direction",
+                    "generation_intent.motion_envelope.amplitude_class",
+                    "generation_intent.pacing.cadence",
+                    "generation_intent.pacing.tempo_class",
+                    "generation_intent.pacing.shot_duration_seconds"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.scene_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.time_of_day"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.mood"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.2"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.start_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.progression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.onset"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.peak"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.settle"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.cadence"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.tempo_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.shot_duration_seconds"
+                      }
+                    ],
+                    "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea"
+                  },
+                  "observable": "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "action",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "camera",
+                  "intent_paths": [
+                    "generation_intent.axis_continuity.camera_axis",
+                    "generation_intent.axis_continuity.framing_continuity",
+                    "generation_intent.axis_continuity.crossing_policy",
+                    "generation_intent.camera_endpoint.start_framing",
+                    "generation_intent.camera_endpoint.end_framing",
+                    "generation_intent.camera_endpoint.position_lock",
+                    "generation_intent.camera_endpoint.orientation_lock",
+                    "generation_intent.camera_intent.movement",
+                    "generation_intent.camera_intent.stability",
+                    "generation_intent.camera_intent.framing_intent",
+                    "generation_intent.camera_intent.expression_strength",
+                    "generation_intent.camera_subject_relation.subject_id",
+                    "generation_intent.camera_subject_relation.relation_kind",
+                    "generation_intent.camera_subject_relation.start_relation",
+                    "generation_intent.camera_subject_relation.end_relation",
+                    "generation_intent.primary_camera_motion.movement_kind",
+                    "generation_intent.primary_camera_motion.direction",
+                    "generation_intent.primary_camera_motion.amplitude_class",
+                    "generation_intent.primary_camera_motion.speed_class",
+                    "generation_intent.primary_camera_motion.start_motion_state",
+                    "generation_intent.primary_camera_motion.end_motion_state"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "机位全程固定不动，不推拉、不摇移、不切镜，让离开和回到原处在同一个画面里完成。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.camera_axis"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.framing_continuity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.crossing_policy"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.start_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.end_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.position_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.orientation_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.movement"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.stability"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.framing_intent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.expression_strength"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.subject_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.relation_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.start_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.end_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.movement_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.speed_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.start_motion_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                      }
+                    ],
+                    "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea"
+                  },
+                  "observable": "机位全程固定不动，不推拉、不摇移、不切镜，让离开和回到原处在同一个画面里完成。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "camera",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "performance",
+                  "intent_paths": [
+                    "generation_intent.performance_intent.trigger",
+                    "generation_intent.performance_intent.visible_response",
+                    "generation_intent.performance_intent.gaze_target",
+                    "generation_intent.performance_intent.body_behavior",
+                    "generation_intent.performance_intent.hand_behavior",
+                    "generation_intent.performance_intent.terminal_performance_state",
+                    "generation_intent.performance_intent.character_directions.0.character_id",
+                    "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "generation_intent.performance_intent.character_directions.0.role",
+                    "generation_intent.performance_intent.character_directions.0.visibility",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.visible_response"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.body_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.hand_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.character_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.visibility"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                      }
+                    ],
+                    "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea"
+                  },
+                  "observable": "人物都不开口，反应克制自然",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "performance",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "space",
+                  "intent_paths": [
+                    "generation_intent.space_continuity.subject_position",
+                    "generation_intent.space_continuity.screen_direction",
+                    "generation_intent.space_continuity.crossing_policy"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.subject_position"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.screen_direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.crossing_policy"
+                      }
+                    ],
+                    "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea"
+                  },
+                  "observable": "住户从平台走下右侧楼梯出画，再从右上方楼梯回到平台",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "space",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "sound",
+                  "intent_paths": [
+                    "generation_intent.ambience_intent.environment_bed",
+                    "generation_intent.ambience_intent.foley_cues.0",
+                    "generation_intent.ambience_intent.explicitly_silent",
+                    "generation_intent.dialogue_intent.mode",
+                    "generation_intent.dialogue_intent.lip_sync_required",
+                    "generation_intent.music_intent.mode"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.environment_bed"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.foley_cues.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.explicitly_silent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.mode"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.lip_sync_required"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.music_intent.mode"
+                      }
+                    ],
+                    "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea"
+                  },
+                  "observable": "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "sound",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "art",
+                  "intent_paths": [
+                    "generation_intent.lighting_intent.motivated_source",
+                    "generation_intent.lighting_intent.direction",
+                    "generation_intent.lighting_intent.exposure_priority",
+                    "generation_intent.lighting_intent.continuity_state",
+                    "generation_intent.visual_treatment.medium_look",
+                    "generation_intent.visual_treatment.palette",
+                    "generation_intent.visual_treatment.material_treatment",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。",
+                    "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.motivated_source"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.exposure_priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.continuity_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.medium_look"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.palette"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.material_treatment"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                      }
+                    ],
+                    "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea"
+                  },
+                  "observable": "真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "art",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                }
+              ],
+              "measurement_contract_version": "1",
+              "profile_id": "shizhen-dispatch-D2-raw",
+              "profile_version": "1",
+              "required_requirement_ids": [
+                "identity",
+                "action",
+                "camera",
+                "performance",
+                "space",
+                "sound",
+                "art"
+              ]
+            },
+            "measurement_contract_version": "1",
+            "required_requirement_ids": [
+              "identity",
+              "action",
+              "camera",
+              "performance",
+              "space",
+              "sound",
+              "art"
+            ]
+          },
+          "expressions": [
+            {
+              "requirement_id": "action",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "action",
+              "observable": "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.open_state.kind",
+                "generation_intent.open_state.state_text",
+                "generation_intent.open_state.required_change",
+                "generation_intent.close_state.kind",
+                "generation_intent.close_state.state_text",
+                "generation_intent.close_state.required_change",
+                "generation_intent.scene_continuity.scene_id",
+                "generation_intent.scene_continuity.time_of_day",
+                "generation_intent.scene_continuity.mood",
+                "generation_intent.scene_continuity.state_constraints.0",
+                "generation_intent.scene_continuity.state_constraints.1",
+                "generation_intent.scene_continuity.state_constraints.2",
+                "generation_intent.subject_action.start_state",
+                "generation_intent.subject_action.progression",
+                "generation_intent.subject_action.endpoint.state_text",
+                "generation_intent.subject_action.endpoint.required_change",
+                "generation_intent.motion_envelope.onset",
+                "generation_intent.motion_envelope.peak",
+                "generation_intent.motion_envelope.settle",
+                "generation_intent.motion_envelope.direction",
+                "generation_intent.motion_envelope.amplitude_class",
+                "generation_intent.pacing.cadence",
+                "generation_intent.pacing.tempo_class",
+                "generation_intent.pacing.shot_duration_seconds"
+              ],
+              "native_text": [
+                "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.open_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.scene_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.time_of_day",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.mood",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.2",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.start_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.progression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.onset",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.peak",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.settle",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.cadence",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.tempo_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.shot_duration_seconds",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "art",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "art",
+              "observable": "真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.lighting_intent.motivated_source",
+                "generation_intent.lighting_intent.direction",
+                "generation_intent.lighting_intent.exposure_priority",
+                "generation_intent.lighting_intent.continuity_state",
+                "generation_intent.visual_treatment.medium_look",
+                "generation_intent.visual_treatment.palette",
+                "generation_intent.visual_treatment.material_treatment",
+                "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                "generation_intent.visual_treatment.prohibited_visual_drift.1"
+              ],
+              "native_text": [
+                "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。",
+                "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.lighting_intent.motivated_source",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.direction",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.exposure_priority",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.continuity_state",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.medium_look",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.palette",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.material_treatment",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "camera",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "camera",
+              "observable": "机位全程固定不动，不推拉、不摇移、不切镜，让离开和回到原处在同一个画面里完成。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.axis_continuity.camera_axis",
+                "generation_intent.axis_continuity.framing_continuity",
+                "generation_intent.axis_continuity.crossing_policy",
+                "generation_intent.camera_endpoint.start_framing",
+                "generation_intent.camera_endpoint.end_framing",
+                "generation_intent.camera_endpoint.position_lock",
+                "generation_intent.camera_endpoint.orientation_lock",
+                "generation_intent.camera_intent.movement",
+                "generation_intent.camera_intent.stability",
+                "generation_intent.camera_intent.framing_intent",
+                "generation_intent.camera_intent.expression_strength",
+                "generation_intent.camera_subject_relation.subject_id",
+                "generation_intent.camera_subject_relation.relation_kind",
+                "generation_intent.camera_subject_relation.start_relation",
+                "generation_intent.camera_subject_relation.end_relation",
+                "generation_intent.primary_camera_motion.movement_kind",
+                "generation_intent.primary_camera_motion.direction",
+                "generation_intent.primary_camera_motion.amplitude_class",
+                "generation_intent.primary_camera_motion.speed_class",
+                "generation_intent.primary_camera_motion.start_motion_state",
+                "generation_intent.primary_camera_motion.end_motion_state"
+              ],
+              "native_text": [
+                "机位全程固定不动，不推拉、不摇移、不切镜，让离开和回到原处在同一个画面里完成。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.axis_continuity.camera_axis",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.framing_continuity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.start_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.end_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.position_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.orientation_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.movement",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.stability",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.framing_intent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.expression_strength",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.subject_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.relation_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.start_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.end_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.movement_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.speed_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.start_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "identity",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "identity",
+              "observable": "人物与参考或首帧一致，没有新增人物或换脸",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.identity_continuity.preservation"
+              ],
+              "native_text": [
+                "参考素材1{{image:0}}只负责楼梯间的空间布局、那只侧面凹陷的红色灭火器、墙面和灯光；人物不从参考图来。",
+                "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.identity_continuity.preservation",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "performance",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "performance",
+              "observable": "人物都不开口，反应克制自然",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.performance_intent.trigger",
+                "generation_intent.performance_intent.visible_response",
+                "generation_intent.performance_intent.gaze_target",
+                "generation_intent.performance_intent.body_behavior",
+                "generation_intent.performance_intent.hand_behavior",
+                "generation_intent.performance_intent.terminal_performance_state",
+                "generation_intent.performance_intent.character_directions.0.character_id",
+                "generation_intent.performance_intent.character_directions.0.screen_identity",
+                "generation_intent.performance_intent.character_directions.0.role",
+                "generation_intent.performance_intent.character_directions.0.visibility",
+                "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+              ],
+              "native_text": [
+                "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.performance_intent.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.visible_response",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.hand_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.character_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.visibility",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "sound",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "sound",
+              "observable": "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.ambience_intent.environment_bed",
+                "generation_intent.ambience_intent.foley_cues.0",
+                "generation_intent.ambience_intent.explicitly_silent",
+                "generation_intent.dialogue_intent.mode",
+                "generation_intent.dialogue_intent.lip_sync_required",
+                "generation_intent.music_intent.mode"
+              ],
+              "native_text": [
+                "声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.ambience_intent.environment_bed",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.foley_cues.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.explicitly_silent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.lip_sync_required",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.music_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "space",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "space",
+              "observable": "住户从平台走下右侧楼梯出画，再从右上方楼梯回到平台",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.space_continuity.subject_position",
+                "generation_intent.space_continuity.screen_direction",
+                "generation_intent.space_continuity.crossing_policy"
+              ],
+              "native_text": [
+                "雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "fe9661552bfaf89af534b4ab0f559571f35be2f0e881f52c416c26bcc44669ea",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.space_continuity.subject_position",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.screen_direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "editorial_operations": [],
+          "comparison": null
+        },
+        "provider_bound_request_hash": "bf47ba67e4b3ee0e41221512fdee4b59a43059adcd9b46fb4e2cd90b44b09323"
+      }
+    },
+    "rationale": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1: unknown; one bounded attempt, no quality guarantee",
+      "evidence and policy affect audit identity, not unrelated media semantics"
+    ],
+    "revalidate_requirements": [
+      "action",
+      "art",
+      "camera",
+      "identity",
+      "performance",
+      "sound",
+      "space"
+    ]
+  },
+  "compilation": {
+    "outcome": "unsupported",
+    "requirement_hash": "aeefa01e6f162e4d8a35247c3e472273cd62771896514f60bc77df8fce56d061",
+    "provider_bound_request_hash": "bf47ba67e4b3ee0e41221512fdee4b59a43059adcd9b46fb4e2cd90b44b09323",
+    "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+    "reason": "PROMPT_EXPRESSION_UNSUPPORTED",
+    "unsupported_field_paths": [
+      "identity"
+    ],
+    "retryable": false,
+    "prompt_text": null,
+    "payload": null,
+    "input_expression_report": {
+      "prompt_text": "参考素材1{{image:0}}只负责楼梯间的空间布局、那只侧面凹陷的红色灭火器、墙面和灯光；人物不从参考图来。\n雨夜老旧住宅楼梯间，真人实拍质感，构图同参考素材1。一名穿深色外套、背着黄色帆布包的住户背对镜头，从平台走下右侧往下的楼梯，拐弯出画。片刻后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。\n机位全程固定不动，不推拉、不摇移、不切镜，让离开和回到原处在同一个画面里完成。\n声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。",
+      "prompt_sha256": "36fa849d41aa84a5834367041edc709e704e247593f0e079d33f7d245b2db349",
+      "missing_requirement_paths": [
+        "identity"
+      ],
+      "coverage_source": "selected_qa_final_text",
+      "rejected_coverage_source": "inherited_automatic_prose",
+      "actual_quality": "NOT_EVALUATED"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<title>失帧 · 调度蒙太奇 现场画面审看</title>
+<style>
+body{font-family:"Noto Sans CJK TC","PingFang TC",sans-serif;background:#0f1115;color:#e6e6e6;margin:0;padding:28px 36px;max-width:1280px}
+h1{font-size:21px;margin:0 0 4px}.sub{color:#8a8f98;font-size:13px;margin-bottom:24px;line-height:1.6}
+.shot{background:#181b22;border:1px solid #262a33;border-radius:10px;padding:16px 18px;margin-bottom:18px;display:grid;grid-template-columns:640px 1fr;gap:18px}
+video{width:640px;border-radius:6px;background:#000}
+h2{font-size:16px;margin:0 0 6px}.line{color:#c9a227;font-size:14px;margin:6px 0 10px}
+.note{font-size:13px;color:#a0a6b0;line-height:1.7}.ok{color:#7ed29a}.warn{color:#f0a35e}
+details{margin-top:8px;font-size:13px;color:#a0a6b0}summary{cursor:pointer}
+details video{width:480px;margin-top:6px}
+</style>
+<h1>《失帧》冷开场 · 调度蒙太奇 现场画面（先出画面版）</h1>
+<div class="sub">Seedance 2.0 VIP · 1080p · 原声为现场环境声（对白之后由记录台母带提供，铺在这些画面下）。<br>
+状态：逐镜 Gate 已过（Agent 判定），你的观看验收未做。字幕与对讲声尚未加入。每格下方黄色是这一镜将要铺上的对讲台词。</div>
+
+<div class="shot"><video src="D2.mp4" controls preload="metadata"></video><div>
+<h2>D2 楼梯 · 回到原层（6s）</h2>
+<div class="line">对讲：七号楼报，下了三层，还在原来那层</div>
+<div class="note"><span class="ok">住户沿楼梯往下走出画面，平台空了片刻，同一个背黄色帆布包的人回到同一个平台，停在凹陷的灭火器旁。</span><br>
+<span class="warn">回来时从右侧近前景入画，不如“从上面那段楼梯下来”明确。</span></div>
+<details><summary>第一版（未通过）</summary><video src="D2-v1-fail.mp4" controls preload="metadata"></video>
+<div class="note">人从上面那段楼梯一路走下来到平台，读成正常下楼，证实不了“还在原来那层”。</div></details>
+</div></div>
+
+<div class="shot"><video src="D3.mp4" controls preload="metadata"></video><div>
+<h2>D3 急诊 · 系统登记已死（6s）</h2>
+<div class="line">对讲：急诊说，系统里她已经死了，人还躺着</div>
+<div class="note"><span class="ok">扫码枪红灯反复亮起，镜头推到病人睁着的眼睛，她在正常呼吸。</span><br>
+<span class="warn">护士一直低头扫腕带，没有明确“抬眼看她”那一下；开头模型自己加了约 1 秒红灯特写后切到中景。</span></div>
+</div></div>
+
+<div class="shot"><video src="D4.mp4" controls preload="metadata"></video><div>
+<h2>D4 封死的七楼（7s）</h2>
+<div class="line">对讲：人民路有人喊救命，在七楼，七楼早就封了</div>
+<div class="note"><span class="ok">镜头跟手电光斑从低层一路往上摇，经过亮灯的窗户进入上面黑暗、被木板封死的楼层，停在被照亮的封窗上。</span><br>
+<span class="warn">精确数到“第七层”不保证；原设计木板后极轻的一声“救命”两次都没生成，转为成片组装时的声音待办。</span></div>
+<details><summary>第一版（未通过）</summary><video src="D4-v1-fail.mp4" controls preload="metadata"></video>
+<div class="note">一开场就是整栋楼、光斑已在顶部封窗，然后推近，不是逐层上摇。</div></details>
+</div></div>
+
+<div class="shot"><video src="D6.mp4" controls preload="metadata"></video><div>
+<h2>D6 站台 · 暂无报告（5s）</h2>
+<div class="line">记录台：三号站台？／扬声器：暂无报告（L-cut 铺在这镜下）→ 接 B6</div>
+<div class="note"><span class="ok">以 B6 第 0 帧为首尾帧，两人原地等车，只有雨声。</span><br>
+<span class="warn">时钟停在 03:16:53（后期补成逐秒走字）；结尾与 B6 第 0 帧构图接近但色调略冷，接点要在组装后实看。</span></div>
+</div></div>
+</html>

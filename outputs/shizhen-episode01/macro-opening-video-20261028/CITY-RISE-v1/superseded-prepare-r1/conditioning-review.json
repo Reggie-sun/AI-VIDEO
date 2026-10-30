@@ -1,0 +1,94 @@
+{
+  "scope": "PRE_GENERATION_AUTHORED_FEASIBILITY_ONLY",
+  "evidence": {
+    "lane": "fl2va",
+    "first_anchor_id": "CITY-RISE-first-municipal-last",
+    "last_anchor_id": "CITY-RISE-last-B6-frame0",
+    "same_subject_scale": false,
+    "composition_compatible": true,
+    "screen_order_compatible": true,
+    "axis_compatible": true,
+    "camera_path_reachable": true,
+    "character_prop_state_reachable": true,
+    "action_endpoint_reachable": true,
+    "available_duration_seconds": 20,
+    "scale_transition": {
+      "schema_version": "conditioning-scale-transition/1",
+      "first_anchor_id": "CITY-RISE-first-municipal-last",
+      "first_anchor_sha256": "3d461331069e5505af70b6e18e36b0ec05098890f181146e775d8df90dae55fb",
+      "last_anchor_id": "CITY-RISE-last-B6-frame0",
+      "last_anchor_sha256": "6ab19dffab771f23fa82545c28eef2ccaa37d7c215b5c3475a9d30dab977e83c",
+      "camera_intent_hash": "141ec50a67cd16c0a5fca1395e17c246f4eb57f4d663b38038e35a2fed293f7f",
+      "available_duration_seconds": 20.0,
+      "sources": [
+        {
+          "source_id": "anchor-review",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/pre-generation-feasibility.md",
+          "sha256": "5f35dce2db072dd0cac94cf5cde0f1f1a5fff936cc03566a0e4cdedc3297bca8"
+        },
+        {
+          "source_id": "first-anchor",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/anchors/municipal-last-f163.png",
+          "sha256": "3d461331069e5505af70b6e18e36b0ec05098890f181146e775d8df90dae55fb"
+        },
+        {
+          "source_id": "last-anchor",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/anchors/b6-event-render-f0.png",
+          "sha256": "6ab19dffab771f23fa82545c28eef2ccaa37d7c215b5c3475a9d30dab977e83c"
+        },
+        {
+          "source_id": "route",
+          "kind": "trajectory",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/route-design.json",
+          "sha256": "fdb6a58c395043dc029079cd7a2ca633d604dd038c986cb0ea79c4a08aa86892"
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "anchor_correspondence",
+          "verdict": "PASS",
+          "rationale": "首尾均为已认可成片原样解码帧，两端固定机位；中段为新设计城市，用拉升与俯冲连接两个地点，未声称测绘对应。",
+          "source_ids": [
+            "anchor-review",
+            "first-anchor",
+            "last-anchor"
+          ]
+        },
+        {
+          "finding_id": "continuous_camera_path",
+          "verdict": "PASS",
+          "rationale": "作者路线为后拉上升、楼顶高度横掠、俯冲刹停，不要求穿墙或穿棚；实际服从待exact MP4验证。",
+          "source_ids": [
+            "anchor-review",
+            "route"
+          ]
+        },
+        {
+          "finding_id": "duration_reachable",
+          "verdict": "PASS",
+          "rationale": "20秒按约四分之一拉升、四成横掠、三成俯冲与最后约半秒刹停分配；设计估计，非实测。",
+          "source_ids": [
+            "route"
+          ]
+        },
+        {
+          "finding_id": "scale_fov_continuity",
+          "verdict": "PASS",
+          "rationale": "首尾景别和地点均不同，same_subject_scale=False；景别变化由真实位移产生，不以变焦跳转或隐切替代。",
+          "source_ids": [
+            "anchor-review",
+            "first-anchor",
+            "last-anchor",
+            "route"
+          ]
+        }
+      ],
+      "content_hash": "bb693509153b2778b326c1760822e589d2da1021974e320e54d0296838be882e"
+    }
+  },
+  "actual_motion_and_sound": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

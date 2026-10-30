@@ -1,0 +1,112 @@
+{
+  "schema_version": "assembly-review/2",
+  "authority": "development_only",
+  "video_sha256": "76d27a534fe5e97e2dc39f4833cc1c9e9a6f89639e3fc240e20581e073a7c9b8",
+  "timeline_sha256": "9051acb96d0df05a77884e3e57bd7ac6684f44f7fe7731dde087f43a16aa06df",
+  "render_report_sha256": "ab74a274880f266aff17cb707f580da5a50b664402db8548fc1085661e9e3461",
+  "inventory_sha256": "2903c11f25c88fabad667f68fb11c0d50ef657b85775f78afb033581802a45bb",
+  "evaluator_name": "Codex sampled-frame evaluator; static-image repair, human full A/V review pending",
+  "strength": "explicit_evaluator",
+  "junction_findings": [
+    {
+      "junction_id": "e6cce4f1965de06f6b6f967932da92885ed478a89168fa6e25e8c8ca69d67f79",
+      "inventory_sha256": "2903c11f25c88fabad667f68fb11c0d50ef657b85775f78afb033581802a45bb",
+      "edit_decision": "retain_with_reason",
+      "edit_reason": "同一原片零至六秒后接六至八秒，原构图不变；六秒只启用同源台阶静态补片，没有新增摄影切镜",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "明确MCP及本地0.25秒取帧显示同侧全景下楼到关闭门前；补片alpha避开脚部，时间性接缝观感待原速人审",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "新片48k双声道完整解码PCM与修订03逐字节相同；未重用旧MP4的human验收，当前接点听验待审",
+      "audio_basis": "not_listened",
+      "audio_reason": "完整保留同源样本0至384000，无增益、fade或重定时，无新声音",
+      "viewing_mode": "sampled_frames",
+      "viewing_speed_milli": null,
+      "action_review": {
+        "repetition": {
+          "verdict": "not_evaluated",
+          "observation": "源窗0..144及144..192连续，无重放；完整动作流畅度仍待人审"
+        },
+        "state_continuity": {
+          "verdict": "not_evaluated",
+          "observation": "所看图中双脚和手空保留，继续下楼到同一关闭灰门，无开门"
+        },
+        "pacing": {
+          "verdict": "not_evaluated",
+          "observation": "完整8秒原速，无切近或冻结人物；实际步态停顿仍待人审"
+        }
+      },
+      "editing_intent": {
+        "narrative_type": "opening",
+        "technique": "hard_cut",
+        "reason": "在同一固定全景内仅锁定末两秒台阶背景，不改变摄影机或行动",
+        "expected_effect": "台阶稳定，人物继续正常下楼到达",
+        "outgoing_phase": "下行完成后走向同一低平台关闭灰门",
+        "incoming_phase": "同一源的下一帧继续在平台迈步，双手空着",
+        "axis_eyeline_space": "同一原机位与完整全景不变；门窗、电箱与栏杆对应，末两秒仅启用台阶背景补片",
+        "scale_reaction": "原始全景和AI标识保留，不作数字切近",
+        "rhythm_reveal": "第六秒仅启用背景图片，原行动时序不变",
+        "continuity_risks": [
+          "补片边缘可能形成时间性接缝",
+          "完整声画观感尚未获当前用户接受"
+        ],
+        "audio_treatment": "sync",
+        "audio_reason": "相邻同源样本窗连续，0dB无fade或新声音",
+        "audio_track_ids": [
+          "native-DESCENT-PRE",
+          "native-DESCENT-TAIL"
+        ],
+        "pickup_requirement": null
+      },
+      "source_selection": {
+        "outgoing": {
+          "layer_id": "retained-DESCENT-PRE",
+          "shot_id": "DESCENT-PRE",
+          "asset_id": "descent-pre-capture",
+          "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+          "start_frame": 0,
+          "duration_frames": 144,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 144,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "incoming": {
+          "layer_id": "retained-DESCENT-TAIL",
+          "shot_id": "DESCENT-TAIL",
+          "asset_id": "descent-tail-capture",
+          "asset_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+          "start_frame": 144,
+          "duration_frames": 48,
+          "trim_start_frame": 144,
+          "trim_duration_frames": 48,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        "source_out_frame_exclusive": 144,
+        "source_in_frame": 144
+      },
+      "editing_review": {
+        "action_match": {
+          "verdict": "not_evaluated",
+          "observation": "静帧/精确源时序与原声PCM检查已完成；完整原速声画审看尚待，不能据此签接点PASS"
+        },
+        "axis_eyeline_space": {
+          "verdict": "not_evaluated",
+          "observation": "静帧/精确源时序与原声PCM检查已完成；完整原速声画审看尚待，不能据此签接点PASS"
+        },
+        "scale_reaction": {
+          "verdict": "not_evaluated",
+          "observation": "静帧/精确源时序与原声PCM检查已完成；完整原速声画审看尚待，不能据此签接点PASS"
+        },
+        "rhythm_reveal": {
+          "verdict": "not_evaluated",
+          "observation": "静帧/精确源时序与原声PCM检查已完成；完整原速声画审看尚待，不能据此签接点PASS"
+        },
+        "sound_bridge": {
+          "verdict": "not_evaluated",
+          "observation": "静帧/精确源时序与原声PCM检查已完成；完整原速声画审看尚待，不能据此签接点PASS"
+        }
+      }
+    }
+  ]
+}

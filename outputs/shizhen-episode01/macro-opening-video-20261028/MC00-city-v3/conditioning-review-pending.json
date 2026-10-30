@@ -1,0 +1,24 @@
+{
+  "status": "REPLACED_BY_EXACT_TYPED_PROSPECTIVE_REVIEW",
+  "evidence": {
+    "lane": "fl2va",
+    "first_anchor_id": "MC00-first-eave",
+    "last_anchor_id": "MC00-last-approved-MC01-frame0",
+    "same_subject_scale": null,
+    "composition_compatible": null,
+    "screen_order_compatible": null,
+    "axis_compatible": null,
+    "camera_path_reachable": null,
+    "character_prop_state_reachable": null,
+    "action_endpoint_reachable": null,
+    "available_duration_seconds": 20
+  },
+  "reason": "首帧为屋檐近景、尾帧为市政中远景，不能以模板自行断言same_subject_scale及可达性全True；须现有conditioning owner作真实审查或返回契约缺口",
+  "must_not_do": [
+    "伪填全True",
+    "移除rich camera intent以旁路conditioning",
+    "以两张静态端点代替连续路径证明"
+  ],
+  "previous_status": "NOT_EVALUATED_BLOCKS_EXECUTION",
+  "current_review": "conditioning-review.json"
+}

@@ -1,0 +1,339 @@
+{
+  "shot": {
+    "shot_id": "CITY-RISE",
+    "scene_id": "municipal-to-station-city",
+    "storyboard_beat_id": "city-rise-dispatch",
+    "intent": "雨夜写实电影长镜头，一镜到底，节奏紧凑有力。开场是市政检修口灰色铁门和绷紧钢索的近景，绞盘仍在转。镜头随即急速向后上方拉起，越过铁门、路灯和行道树，冲进雨幕直升到楼顶以上，作业现场迅速缩成街角一点灯光。\n升到高处镜头不停，贴着楼顶高度向前横掠，雨夜城市在下方铺开：主路车流、旧住宅的楼梯窗、楼顶亮着红十字灯的医院、一栋九层旧楼和远处高楼群依次从下方掠过，楼体竖直稳定，视差强烈。\n随后镜头前倾俯冲，朝街边一座亮着暖灯的玻璃公交站棚直扎下去，越冲越快，站棚迅速放大。棚下站着两个人：左边戴眼镜、穿棕色夹克、斜挎包的中年男人低头站着，右边穿墨绿色外套的短发年轻女人在打电话。\n最后半秒镜头猛然刹住，稳稳停在站棚正前方，画面与尾帧一致，此后不再移动。声音是雨声，拉升时风声变大，高处城市车流低鸣，俯冲时风声呼啸，刹停后只剩站台雨声。画面中没有人说话，没有音乐和字幕。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 20
+    },
+    "character_ids": [
+      "gao-zheng",
+      "luo-min"
+    ],
+    "continuity_constraints": [
+      "承接已认可市政原片末帧，不重生成或重剪市政",
+      "一镜到底：拉升、横掠、俯冲、刹停",
+      "终点为已认可B6第0帧，B6原片不改",
+      "调度对讲与字幕为后期层，不进入视频请求",
+      "完整原速声画和两个接点另行验收"
+    ],
+    "visual_strategy": "generated_video",
+    "generated_video_rationale": "异常之后拉开城市并落到站台，由一次20秒源承载，不拆段掩切",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "first_frame",
+        "asset_ids": [
+          "CITY-RISE-first-municipal-last"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      },
+      {
+        "role": "last_frame",
+        "asset_ids": [
+          "CITY-RISE-last-B6-frame0"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ]
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "approved_keyframe",
+        "asset_id": "CITY-RISE-first-municipal-last"
+      },
+      {
+        "role": "last_frame",
+        "asset_id": "CITY-RISE-last-B6-frame0"
+      }
+    ],
+    "generation_intent": {
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "已认可市政片末帧：灰色铁门、牵引耳与绷紧钢索近景，工人在左后方，固定机位",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "相机刹停后静止于已认可B6第0帧：玻璃站棚正前方，左侧中年男人低头，右侧短发女人打电话",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "gao-zheng",
+          "luo-min"
+        ],
+        "preservation": "exact",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "municipal-to-station-city",
+        "time_of_day": "同一雨夜",
+        "mood": "城市照常运转，异常被当作日常报告",
+        "state_constraints": [
+          "起点为市政原片末态，不重演按停或断电",
+          "中段为同一雨夜城市",
+          "终点以B6第0帧为唯一锚点"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "从市政铁门前，升到楼顶以上，横掠城市后俯冲到站棚正前方",
+        "screen_direction": "后拉上升，再向前横掠，最后前倾俯冲正对站棚",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不穿墙、不穿玻璃、不穿棚顶"
+      },
+      "axis_continuity": {
+        "camera_axis": "终点正对站棚，与B6第0帧同一观察侧",
+        "framing_continuity": "铁门近景、城市高空、站棚正面连成一条可追踪路径",
+        "crossing_policy": "全镜不中断，不用掠黑、满屏遮挡或叠化藏切点"
+      },
+      "subject_action": {
+        "start_state": "已认可市政片末帧：灰色铁门、牵引耳与绷紧钢索近景，工人在左后方，固定机位",
+        "progression": "雨夜写实电影长镜头，一镜到底，节奏紧凑有力。开场是市政检修口灰色铁门和绷紧钢索的近景，绞盘仍在转。镜头随即急速向后上方拉起，越过铁门、路灯和行道树，冲进雨幕直升到楼顶以上，作业现场迅速缩成街角一点灯光。\n升到高处镜头不停，贴着楼顶高度向前横掠，雨夜城市在下方铺开：主路车流、旧住宅的楼梯窗、楼顶亮着红十字灯的医院、一栋九层旧楼和远处高楼群依次从下方掠过，楼体竖直稳定，视差强烈。\n随后镜头前倾俯冲，朝街边一座亮着暖灯的玻璃公交站棚直扎下去，越冲越快，站棚迅速放大。棚下站着两个人：左边戴眼镜、穿棕色夹克、斜挎包的中年男人低头站着，右边穿墨绿色外套的短发年轻女人在打电话。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "相机刹停后静止于已认可B6第0帧：玻璃站棚正前方，左侧中年男人低头，右侧短发女人打电话",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "从铁门钢索近景急速向后上方拉起",
+        "peak": "贴楼顶高度横掠城市，随后前倾俯冲加速",
+        "settle": "最后约半秒猛然刹停并静止于尾帧",
+        "direction": "后拉上升、向前横掠、俯冲下降",
+        "amplitude_class": "从地面近景到楼顶高空再回到地面中景，保持可信尺度"
+      },
+      "pacing": {
+        "cadence": "拉升约四分之一、横掠约四成、俯冲约三成、最后约半秒刹停",
+        "tempo_class": "紧凑有力，原速，不冻结或插切",
+        "shot_duration_seconds": 20.0
+      },
+      "camera_intent": {
+        "movement": "一条连续的急速拉升、高空横掠、俯冲刹停",
+        "stability": "运动有力但不抖，刹停后完全静止",
+        "framing_intent": "每段运动对应一次城市层级变化，终点构图为批准尾帧",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "已认可市政片末帧：灰色铁门、牵引耳与绷紧钢索近景，工人在左后方，固定机位",
+        "end_framing": "相机刹停后静止于已认可B6第0帧：玻璃站棚正前方，左侧中年男人低头，右侧短发女人打电话",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "站台两人只是在等车，异常尚未发生",
+        "visible_response": "俯冲接近后才看清两人，男人低头、女人打电话",
+        "gaze_target": "男人看地面，女人看前方",
+        "body_behavior": "两人原地站立，不走动",
+        "hand_behavior": "女人右手持手机贴耳，男人手插口袋",
+        "terminal_performance_state": "尾帧两人姿态与B6第0帧一致",
+        "character_directions": [
+          {
+            "character_id": "luo-min",
+            "screen_identity": "B6第0帧右侧穿墨绿色外套打电话的短发年轻女人",
+            "role": "supporting",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "站台等车，接近后才可辨",
+                "emotion": "平常",
+                "intensity": "subtle",
+                "facial_expression": "自然",
+                "gaze_target": "前方",
+                "breathing": "自然平稳",
+                "body_behavior": "原地打电话，末态与尾帧一致"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "雨夜真人电影摄影质感",
+        "palette": "深蓝灰夜色、冷白路灯与少量暖窗及作业灯",
+        "material_treatment": "真实湿金属铁门与钢索、旧楼、楼顶、沥青路面与玻璃站棚",
+        "prohibited_visual_drift": [
+          "建筑扭曲、鱼眼或突然变焦",
+          "分格、叠化、隐切、冻结",
+          "新增对白、片名、字幕或音乐"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "路灯、窗户、医院红十字灯与站棚暖灯",
+        "direction": "同一雨夜实用照明，尾态继承B6第0帧",
+        "exposure_priority": "城市层次与站棚两人可读",
+        "continuity_state": "站棚灯始终亮"
+      },
+      "ambience_intent": {
+        "environment_bed": "雨声，拉升风声增大，高处车流低鸣，俯冲风声呼啸，刹停后只剩站台雨声",
+        "foley_cues": [
+          "雨声",
+          "风声",
+          "城市车流"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "crane_up",
+        "direction": "up",
+        "amplitude_class": "pronounced",
+        "speed_class": "fast",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "municipal-to-station-city",
+        "relation_kind": "reveal",
+        "start_relation": "铁门钢索占满近景",
+        "end_relation": "站棚与两人正面中景，构图为批准尾帧"
+      }
+    },
+    "conditioning_compatibility": {
+      "lane": "fl2va",
+      "first_anchor_id": "CITY-RISE-first-municipal-last",
+      "last_anchor_id": "CITY-RISE-last-B6-frame0",
+      "same_subject_scale": false,
+      "composition_compatible": true,
+      "screen_order_compatible": true,
+      "axis_compatible": true,
+      "camera_path_reachable": true,
+      "character_prop_state_reachable": true,
+      "action_endpoint_reachable": true,
+      "available_duration_seconds": 20,
+      "scale_transition": {
+        "schema_version": "conditioning-scale-transition/1",
+        "first_anchor_id": "CITY-RISE-first-municipal-last",
+        "first_anchor_sha256": "3d461331069e5505af70b6e18e36b0ec05098890f181146e775d8df90dae55fb",
+        "last_anchor_id": "CITY-RISE-last-B6-frame0",
+        "last_anchor_sha256": "6ab19dffab771f23fa82545c28eef2ccaa37d7c215b5c3475a9d30dab977e83c",
+        "camera_intent_hash": "141ec50a67cd16c0a5fca1395e17c246f4eb57f4d663b38038e35a2fed293f7f",
+        "available_duration_seconds": 20.0,
+        "sources": [
+          {
+            "source_id": "anchor-review",
+            "kind": "anchor_geometry_review",
+            "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/pre-generation-feasibility.md",
+            "sha256": "5f35dce2db072dd0cac94cf5cde0f1f1a5fff936cc03566a0e4cdedc3297bca8"
+          },
+          {
+            "source_id": "first-anchor",
+            "kind": "anchor_geometry_review",
+            "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/anchors/municipal-last-f163.png",
+            "sha256": "3d461331069e5505af70b6e18e36b0ec05098890f181146e775d8df90dae55fb"
+          },
+          {
+            "source_id": "last-anchor",
+            "kind": "anchor_geometry_review",
+            "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/anchors/b6-event-render-f0.png",
+            "sha256": "6ab19dffab771f23fa82545c28eef2ccaa37d7c215b5c3475a9d30dab977e83c"
+          },
+          {
+            "source_id": "route",
+            "kind": "trajectory",
+            "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/route-design.json",
+            "sha256": "fdb6a58c395043dc029079cd7a2ca633d604dd038c986cb0ea79c4a08aa86892"
+          }
+        ],
+        "findings": [
+          {
+            "finding_id": "anchor_correspondence",
+            "verdict": "PASS",
+            "rationale": "首尾均为已认可成片原样解码帧，两端固定机位；中段为新设计城市，用拉升与俯冲连接两个地点，未声称测绘对应。",
+            "source_ids": [
+              "anchor-review",
+              "first-anchor",
+              "last-anchor"
+            ]
+          },
+          {
+            "finding_id": "continuous_camera_path",
+            "verdict": "PASS",
+            "rationale": "作者路线为后拉上升、楼顶高度横掠、俯冲刹停，不要求穿墙或穿棚；实际服从待exact MP4验证。",
+            "source_ids": [
+              "anchor-review",
+              "route"
+            ]
+          },
+          {
+            "finding_id": "duration_reachable",
+            "verdict": "PASS",
+            "rationale": "20秒按约四分之一拉升、四成横掠、三成俯冲与最后约半秒刹停分配；设计估计，非实测。",
+            "source_ids": [
+              "route"
+            ]
+          },
+          {
+            "finding_id": "scale_fov_continuity",
+            "verdict": "PASS",
+            "rationale": "首尾景别和地点均不同，same_subject_scale=False；景别变化由真实位移产生，不以变焦跳转或隐切替代。",
+            "source_ids": [
+              "anchor-review",
+              "first-anchor",
+              "last-anchor",
+              "route"
+            ]
+          }
+        ],
+        "content_hash": "bb693509153b2778b326c1760822e589d2da1021974e320e54d0296838be882e"
+      }
+    },
+    "intent_evidence": {
+      "character_action_required": false,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 20,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

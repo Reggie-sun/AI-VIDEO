@@ -1,0 +1,10 @@
+{
+  "status": "KNOWN_LOCAL_PREPARE_FAILURE_NO_EXTERNAL_EFFECT",
+  "diagnostic": "asset_evidence.anchor_geometry",
+  "reason": "raw first1672x940 versus last1920x1080",
+  "video_attempts_started": 0,
+  "paid_submits": 0,
+  "next_root": "runs/shizhen-macro-opening-20261028/MC00-city-v3",
+  "normalization_record": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/input-raster-normalization.json",
+  "original_run_retained": true
+}

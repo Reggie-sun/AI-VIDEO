@@ -1,0 +1,150 @@
+{
+  "model": "eleven_v4",
+  "rows": [
+    {
+      "voice": "Coco Li",
+      "voice_id": "Ca5bKgudqKJzq8YRFoAz",
+      "scene": "惊喜报喜",
+      "text": "中了！真的中了！你快看，是我们俩的名字！",
+      "file": "coco-01.wav",
+      "duration_s": 3.84,
+      "sha256": "89a947fa2bae6d166891e4819485d97bc8412a7a0d2608c5cab2d1846ad99605",
+      "source": "runs/elevenlabs-newctx-coco-20261030/assets/audio/89a947fa2bae6d166891e4819485d97bc8412a7a0d2608c5cab2d1846ad99605.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Coco Li",
+      "voice_id": "Ca5bKgudqKJzq8YRFoAz",
+      "scene": "尴尬道歉",
+      "text": "那个……杯子是我碰倒的。对不起，我赔你一个。",
+      "file": "coco-02.wav",
+      "duration_s": 4.8,
+      "sha256": "edd08c22a685aecfacc9be531dc48d5630cd73bad841dc5238aee8940a9a621c",
+      "source": "runs/elevenlabs-newctx-coco-20261030/assets/audio/edd08c22a685aecfacc9be531dc48d5630cd73bad841dc5238aee8940a9a621c.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Coco Li",
+      "voice_id": "Ca5bKgudqKJzq8YRFoAz",
+      "scene": "紧张提醒",
+      "text": "别回头……有人跟着我们。装作没发现，继续走。",
+      "file": "coco-03.wav",
+      "duration_s": 4.56,
+      "sha256": "3f93a529b0740b04b3df66467109800b8b8a747809a961b4f7b4b3cba64727ec",
+      "source": "runs/elevenlabs-newctx-coco-20261030/assets/audio/3f93a529b0740b04b3df66467109800b8b8a747809a961b4f7b4b3cba64727ec.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Julia",
+      "voice_id": "tOuLUAIdXShmWH7PEUrU",
+      "scene": "惊喜报喜",
+      "text": "中了！真的中了！你快看，是我们俩的名字！",
+      "file": "julia-01.wav",
+      "duration_s": 3.92,
+      "sha256": "62efe348f483aa2eeb6eaca9ea625165b183b905011758c5881a1bc8eddcdf6a",
+      "source": "runs/elevenlabs-newctx-julia-20261030/assets/audio/62efe348f483aa2eeb6eaca9ea625165b183b905011758c5881a1bc8eddcdf6a.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Julia",
+      "voice_id": "tOuLUAIdXShmWH7PEUrU",
+      "scene": "尴尬道歉",
+      "text": "那个……杯子是我碰倒的。对不起，我赔你一个。",
+      "file": "julia-02.wav",
+      "duration_s": 4.56,
+      "sha256": "f7f7758b033667d43628deff40a079f7af17d5820ae9db072d7ec6fc4af79acf",
+      "source": "runs/elevenlabs-newctx-julia-20261030/assets/audio/f7f7758b033667d43628deff40a079f7af17d5820ae9db072d7ec6fc4af79acf.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Julia",
+      "voice_id": "tOuLUAIdXShmWH7PEUrU",
+      "scene": "紧张提醒",
+      "text": "别回头……有人跟着我们。装作没发现，继续走。",
+      "file": "julia-03.wav",
+      "duration_s": 4.64,
+      "sha256": "5aaa343f8e44abbff1ab8a8f3c8668af2f263310fdaf3049ce4fffbf9232cf43",
+      "source": "runs/elevenlabs-newctx-julia-20261030/assets/audio/5aaa343f8e44abbff1ab8a8f3c8668af2f263310fdaf3049ce4fffbf9232cf43.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "scene": "惊喜报喜",
+      "text": "中了！真的中了！你快看，是我们俩的名字！",
+      "file": "evan-01.wav",
+      "duration_s": 3.68,
+      "sha256": "825aefcc5f3e5d79ece9c93b2dc08ff01ce32cda11c1c9eaaf7804e1f5671f05",
+      "source": "runs/elevenlabs-newctx-evan-20261030/assets/audio/825aefcc5f3e5d79ece9c93b2dc08ff01ce32cda11c1c9eaaf7804e1f5671f05.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "scene": "尴尬道歉",
+      "text": "那个……杯子是我碰倒的。对不起，我赔你一个。",
+      "file": "evan-02.wav",
+      "duration_s": 4.56,
+      "sha256": "7fbe2074f296fb64194fb0c97f6d84c9f498d32a5e417d1fbc579e87e09f542e",
+      "source": "runs/elevenlabs-newctx-evan-20261030/assets/audio/7fbe2074f296fb64194fb0c97f6d84c9f498d32a5e417d1fbc579e87e09f542e.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "scene": "紧张提醒",
+      "text": "别回头……有人跟着我们。装作没发现，继续走。",
+      "file": "evan-03.wav",
+      "duration_s": 4.48,
+      "sha256": "c1c0ed8e0b0f7de2fa4e1d71e9cdafb18f175c0ef31ca9dda9e07fefcfce261a",
+      "source": "runs/elevenlabs-newctx-evan-20261030/assets/audio/c1c0ed8e0b0f7de2fa4e1d71e9cdafb18f175c0ef31ca9dda9e07fefcfce261a.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Martin Li",
+      "voice_id": "WuLq5z7nEcrhppO0ZQJw",
+      "scene": "惊喜报喜",
+      "text": "中了！真的中了！你快看，是我们俩的名字！",
+      "file": "martin-01.wav",
+      "duration_s": 3.76,
+      "sha256": "3843134314fbcadfe4b82286beca2cac34cd15ccc77e6f56500acc882898cf2d",
+      "source": "runs/elevenlabs-newctx-martin-20261030/assets/audio/3843134314fbcadfe4b82286beca2cac34cd15ccc77e6f56500acc882898cf2d.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Martin Li",
+      "voice_id": "WuLq5z7nEcrhppO0ZQJw",
+      "scene": "尴尬道歉",
+      "text": "那个……杯子是我碰倒的。对不起，我赔你一个。",
+      "file": "martin-02.wav",
+      "duration_s": 4.88,
+      "sha256": "cb9aa9e328aae430bae0512a1ec827652c36000782ce5500858bb84751fa010d",
+      "source": "runs/elevenlabs-newctx-martin-20261030/assets/audio/cb9aa9e328aae430bae0512a1ec827652c36000782ce5500858bb84751fa010d.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "voice": "Martin Li",
+      "voice_id": "WuLq5z7nEcrhppO0ZQJw",
+      "scene": "紧张提醒",
+      "text": "别回头……有人跟着我们。装作没发现，继续走。",
+      "file": "martin-03.wav",
+      "duration_s": 4.56,
+      "sha256": "97a85d08df24c90a4bfbace798b16114110b080a661a0338de8afa36fb53aed1",
+      "source": "runs/elevenlabs-newctx-martin-20261030/assets/audio/97a85d08df24c90a4bfbace798b16114110b080a661a0338de8afa36fb53aed1.wav",
+      "technical_decode": "PASS",
+      "human_acceptance": "NOT_EVALUATED"
+    }
+  ],
+  "actual_cost": "pending confirmation"
+}

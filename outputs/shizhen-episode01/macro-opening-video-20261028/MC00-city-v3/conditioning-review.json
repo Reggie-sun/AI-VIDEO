@@ -1,0 +1,110 @@
+{
+  "scope": "PRE_GENERATION_AUTHORED_FEASIBILITY_ONLY",
+  "evidence": {
+    "lane": "fl2va",
+    "first_anchor_id": "MC00-first-eave",
+    "last_anchor_id": "MC00-last-approved-MC01-frame0",
+    "same_subject_scale": false,
+    "composition_compatible": true,
+    "screen_order_compatible": true,
+    "axis_compatible": true,
+    "camera_path_reachable": true,
+    "character_prop_state_reachable": true,
+    "action_endpoint_reachable": true,
+    "available_duration_seconds": 20,
+    "scale_transition": {
+      "schema_version": "conditioning-scale-transition/1",
+      "first_anchor_id": "MC00-first-eave",
+      "first_anchor_sha256": "9c7c08897a2c8ff30ea21de3560112491518a0cb2cb240e480615cd13cabefee",
+      "last_anchor_id": "MC00-last-approved-MC01-frame0",
+      "last_anchor_sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "camera_intent_hash": "3b3ebb4f97c614192ffa7c684d6849e86cfdd8c661172fa8aef813070e7da61d",
+      "available_duration_seconds": 20.0,
+      "sources": [
+        {
+          "source_id": "anchor-review",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/pre-generation-feasibility.md",
+          "sha256": "22939354777f01a72294338ef4259f5f7e8c559ef56118f7aa66bf51a9af9545"
+        },
+        {
+          "source_id": "city-map",
+          "kind": "trajectory",
+          "evidence_ref": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/city-map.svg",
+          "sha256": "7ea340ed58ca0d548c216a79048eab5f93961b85c34b36021034c176139316a4"
+        },
+        {
+          "source_id": "first-anchor",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/first-frame-1920x1080.png",
+          "sha256": "9c7c08897a2c8ff30ea21de3560112491518a0cb2cb240e480615cd13cabefee"
+        },
+        {
+          "source_id": "last-anchor",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+          "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+        },
+        {
+          "source_id": "raster-normalization",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/input-raster-normalization.json",
+          "sha256": "19a89c00396e4aaf42d0e612bad06da9225e83900ff331327063b4aba2e6afd3"
+        },
+        {
+          "source_id": "route",
+          "kind": "trajectory",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/prospective-trajectory.json",
+          "sha256": "b780d32851738083576a0f9b954fe1a52bb6ed1f87685860d39ace1739442c7b"
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "anchor_correspondence",
+          "verdict": "PASS",
+          "rationale": "实际屋檐照片在外转角外、主路留在侧后景；实际市政照片为绞盘左、门右、索线南侧观察。新城市设计允许用同一主路和开放入口连接两个观察区；未声称照片测绘或实际运镜通过。 实际首帧为原屋檐图的纯尺寸适配副本，无重画、裁切或内容添加；源与derivative身份分别保留。",
+          "source_ids": [
+            "anchor-review",
+            "city-map",
+            "first-anchor",
+            "last-anchor",
+            "raster-normalization"
+          ]
+        },
+        {
+          "finding_id": "continuous_camera_path",
+          "verdict": "PASS",
+          "rationale": "同一解析C1位置曲线和连续look方向连接起终点，设计体块内碰撞0、相机始终在牵引线南侧；从站棚北端开放处接近，不要求穿墙或跨索。实际雨线、门速、人体、遮挡和声画接点仍需新MP4验证。",
+          "source_ids": [
+            "anchor-review",
+            "city-map",
+            "route"
+          ]
+        },
+        {
+          "finding_id": "duration_reachable",
+          "verdict": "PASS",
+          "rationale": "20秒作者设计路径约69.31m，峰值5.30m/s、下降峰值1.63m/s，末半秒相机静止；运动容量支持先揭示后下降再减速的前期试验。该米制坐标为新创场景假设，不是源片实测。",
+          "source_ids": [
+            "anchor-review",
+            "route"
+          ]
+        },
+        {
+          "finding_id": "scale_fov_continuity",
+          "verdict": "PASS",
+          "rationale": "首尾尺度不同，明确same_subject_scale=False。约28mm等效正常广角为前期估计，靠脱离近檐、展开城市和缓弧下降改变主体尺度；解析look方向连续，未以变焦跳转、隐藏切镜或proxy替代。内参未标定，模型服从待实片。",
+          "source_ids": [
+            "anchor-review",
+            "first-anchor",
+            "last-anchor",
+            "route"
+          ]
+        }
+      ],
+      "content_hash": "d40f7d52783e2efe6a481b7ca444d21eee583d6b9da9cd42054c49981dfb8188"
+    }
+  },
+  "actual_motion_and_sound": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

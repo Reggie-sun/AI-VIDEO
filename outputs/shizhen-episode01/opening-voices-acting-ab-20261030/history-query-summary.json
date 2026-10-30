@@ -1,0 +1,10 @@
+{
+  "operation": "read-only history recovery",
+  "window": [
+    1793333400,
+    1793333440
+  ],
+  "history_items_in_exact_scope": 1,
+  "exact_text_matches": 0,
+  "canonical_state": "UNKNOWN_UNCHANGED"
+}

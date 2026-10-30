@@ -84,6 +84,11 @@ def load_performance_context(path: Path, line_id: str) -> dict:
         source_sha = hashlib.sha256(source_bytes).hexdigest()
         if source_sha != package['source_plan_sha256']:
             raise _invalid()
+        excluded = package.get('excluded_line_ids', [])
+        if (not isinstance(excluded, list)
+                or any(not isinstance(value, str) or not value for value in excluded)
+                or len(excluded) != len(set(excluded)) or line_id in excluded):
+            raise _invalid()
         rows = _line_map(package['rows'])
         sources = _line_map(source['lines'])
         line = rows[line_id]

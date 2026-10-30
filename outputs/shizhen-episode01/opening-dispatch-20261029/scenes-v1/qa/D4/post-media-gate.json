@@ -1,0 +1,18 @@
+{
+  "schema": "per-shot-post-media-gate/agent-verdict-1",
+  "shot_id": "D4", "attempt_id": "shizhen-dispatch-D4-preview-001",
+  "media": {"path": "runs/shizhen-opening-dispatch-20261030/D4/state/video-generation/fetch/files/3a27d47e2d8a1a05d92486f9004d2ace502d9528c38e39aa7a8cb668c26a3d46.mp4",
+            "sha256": "3a27d47e2d8a1a05d92486f9004d2ace502d9528c38e39aa7a8cb668c26a3d46"},
+  "evidence": ["contact.jpg (2fps)", "audio-understanding.json: rain + static hiss, no voice"],
+  "findings": {
+    "camera": {"verdict": "FAIL", "reason": "开场即整栋楼全景、光斑已停在近顶部封窗，随后推近到封窗；不是从一楼跟光斑逐层上摇，观众无法数出第七层（楼约十层，封死的是倒数第二层）。"},
+    "action": {"verdict": "FAIL", "reason": "光斑未从一楼开始逐层上移。"},
+    "sound": {"verdict": "FAIL", "reason": "无木板后极轻的“救命”；只有雨声与底噪。"},
+    "space": {"verdict": "PASS", "reason": "保安在楼下前景、楼体在后，封死楼层醒目。"},
+    "performance": {"verdict": "PASS", "reason": "保安背影、不说话。"},
+    "art": {"verdict": "PASS", "reason": "写实雨夜外立面，无字幕或招牌文字。"}
+  },
+  "overall": "FAIL", "next_shot_submit_allowed": false,
+  "repair_proposal": "单一变量：改用首帧条件，首帧只拍到同一栋楼的一到三楼、保安背影在前景、光斑照在一楼窗户，楼体向上出画；提示词不变（仅首帧职责行）。",
+  "human_acceptance": "NOT_EVALUATED"
+}

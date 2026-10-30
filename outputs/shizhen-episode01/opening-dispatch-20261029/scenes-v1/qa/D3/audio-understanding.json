@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f\",\n  \"source_size_bytes\": 18136810,\n  \"audio_sha256\": \"d13b5473f2a13d1ac46e23298633d8ce5896cf45588da08b9b9363311293602f\",\n  \"audio_size_bytes\": 1073276,\n  \"duration_seconds\": 6.0836281179138325,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"3619089b91eff85870611b4bf3c9af19dd2d19403ad66691a811a075a10d0c40\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"08945419eec806ea033b83ddd016c2bf076181274f8b07abaaee606ab40ccd38\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"repetitive rhythmic mechanical clicking sound\",\n      \"faint ambient room reverberation\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-dispatch-20261030/D3/state/video-generation/fetch/files/b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

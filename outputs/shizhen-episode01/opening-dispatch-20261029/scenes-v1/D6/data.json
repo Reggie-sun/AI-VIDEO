@@ -1,0 +1,206 @@
+{
+  "objective": "失帧冷开场调度蒙太奇 D6-station-no-report：站台照常，暂无报告；无对白现场画面",
+  "images": [
+    {
+      "asset_id": "D6-b6-f0",
+      "node_id": "D6-b6-f0-node",
+      "resource_id": "D6-b6-f0-local",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D6/anchors/b6-source-f0.png",
+      "usage_license": "Task-owned approved Shizhen footage frame",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D6/reference-b6-f0-source.json",
+        "record_sha256": "e5d2ee7b2cc545c4a00cfd866a92501b87d60e0d6103fdae70f8be63e9cd8c27",
+        "tool": {
+          "name": "exact-video-frame-extraction",
+          "version": "ffmpeg-select-v1"
+        }
+      }
+    },
+    {
+      "asset_id": "D6-b6-f0-last",
+      "node_id": "D6-b6-f0-last-node",
+      "resource_id": "D6-b6-f0-last-local",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D6/anchors/b6-source-f0-last.png",
+      "usage_license": "Task-owned approved Shizhen footage frame",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D6/reference-b6-f0-last-source.json",
+        "record_sha256": "874ab6db20720d0ceb728cf7eac363fdc219e51a9f1e7c61695316ad6b93e7c0",
+        "tool": {
+          "name": "ffmpeg-lossless-png-reencode",
+          "version": "compression-level-9"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "gao-zheng",
+      "name": "高峥",
+      "identity": "B6第0帧左侧戴眼镜的中年男人",
+      "appearance_bible": "眼镜、棕色夹克、斜挎包，按B6原造型",
+      "reference_asset_ids": [
+        "D6-b6-f0"
+      ]
+    },
+    {
+      "character_id": "luo-min",
+      "name": "罗敏",
+      "identity": "B6第0帧右侧打电话的短发年轻女人",
+      "appearance_bible": "短发、墨绿色外套、手机，按B6原造型",
+      "reference_asset_ids": [
+        "D6-b6-f0"
+      ]
+    }
+  ],
+  "scene_images": [
+    "D6-b6-f0"
+  ],
+  "observations": {
+    "action": "雨夜玻璃站棚，真人实拍质感。左侧戴眼镜、穿棕色夹克的中年男人低头站着，右侧穿墨绿色外套的短发年轻女人把手机贴在耳边等电话，两人原地等车，只有极小的自然动作：呼吸、雨水顺着站棚流下、远处车灯移动。结尾两人的姿态与首帧相同。",
+    "camera": "机位完全固定，不推拉摇移，不切镜。",
+    "performance": "人物都不开口，反应克制自然",
+    "space": "左高峥右罗敏，原位",
+    "sound": "声音只有站棚上的雨声和远处车流，两人都不说话；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现新的字幕或文字。",
+    "art": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字"
+  },
+  "paths": {
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+      "generation_intent.performance_intent.character_directions.1.character_id",
+      "generation_intent.performance_intent.character_directions.1.screen_identity",
+      "generation_intent.performance_intent.character_directions.1.role",
+      "generation_intent.performance_intent.character_directions.1.visibility",
+      "generation_intent.performance_intent.character_directions.1.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.1.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.1.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.1.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.1.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.1.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.1.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.1.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1"
+    ]
+  },
+  "fragments": {
+    "action": [
+      "雨夜玻璃站棚，真人实拍质感。左侧戴眼镜、穿棕色夹克的中年男人低头站着，右侧穿墨绿色外套的短发年轻女人把手机贴在耳边等电话，两人原地等车，只有极小的自然动作：呼吸、雨水顺着站棚流下、远处车灯移动。结尾两人的姿态与首帧相同。"
+    ],
+    "camera": [
+      "机位完全固定，不推拉摇移，不切镜。"
+    ],
+    "performance": [
+      "雨夜玻璃站棚，真人实拍质感。左侧戴眼镜、穿棕色夹克的中年男人低头站着，右侧穿墨绿色外套的短发年轻女人把手机贴在耳边等电话，两人原地等车，只有极小的自然动作：呼吸、雨水顺着站棚流下、远处车灯移动。结尾两人的姿态与首帧相同。"
+    ],
+    "space": [
+      "雨夜玻璃站棚，真人实拍质感。左侧戴眼镜、穿棕色夹克的中年男人低头站着，右侧穿墨绿色外套的短发年轻女人把手机贴在耳边等电话，两人原地等车，只有极小的自然动作：呼吸、雨水顺着站棚流下、远处车灯移动。结尾两人的姿态与首帧相同。"
+    ],
+    "sound": [
+      "声音只有站棚上的雨声和远处车流，两人都不说话；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现新的字幕或文字。"
+    ],
+    "art": [
+      "雨夜玻璃站棚，真人实拍质感。左侧戴眼镜、穿棕色夹克的中年男人低头站着，右侧穿墨绿色外套的短发年轻女人把手机贴在耳边等电话，两人原地等车，只有极小的自然动作：呼吸、雨水顺着站棚流下、远处车灯移动。结尾两人的姿态与首帧相同。",
+      "声音只有站棚上的雨声和远处车流，两人都不说话；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现新的字幕或文字。"
+    ]
+  },
+  "intent_sha256": "397fe8663cd8c6765caec5ff2239db0122d22c8c70ae5c7957910a95af7a21e6",
+  "coverage": {
+    "path": "outputs/shizhen-episode01/opening-dispatch-20261029/director-coverage.v5.json",
+    "sha256": "4b8e8fb0b34f6cb588b67140e66c6ee364e242c9efdff5d125ada14ef389c657",
+    "coverage_hash": "d2a18ec6dcfaeb2afddc048b16b92f86e108d00c075cb135872bf5c115d49702",
+    "unit_id": "D6-station-no-report"
+  },
+  "scene": {
+    "scene_id": "rain-stop",
+    "location": "雨夜玻璃公交站棚",
+    "mood": "站台照常，暂无报告"
+  }
+}

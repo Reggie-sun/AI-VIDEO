@@ -1,0 +1,16 @@
+{
+  "schema": "per-shot-post-media-gate/agent-verdict-1",
+  "shot_id": "D2", "attempt_id": "shizhen-dispatch-D2r1-preview-001", "repair_of": "qa/D2/post-media-gate.json (FAIL)",
+  "media": {"path": "runs/shizhen-opening-dispatch-20261030/D2r1/state/video-generation/fetch/files/5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a.mp4",
+            "sha256": "5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a", "duration_seconds": 6.08, "resolution": "1920x1080"},
+  "evidence": ["contact.jpg (2fps)", "video_analyze: 1 scene; Whisper 'and' over footsteps (hallucination)", "audio-understanding.json: no voice segments"],
+  "findings": {
+    "action": {"verdict": "PASS", "reason": "0–0.7s住户沿扶手旁楼梯往下走出画面；1–2.5s平台空；约3s同一背黄色帆布包住户从右侧回到平台，背对镜头停在凹陷灭火器旁。"},
+    "camera": {"verdict": "PASS", "reason": "固定机位，单一场景段，无切点。"},
+    "space": {"verdict": "PASS", "reason": "凹陷灭火器与平台全程同框；回来从右侧极近前景入画，较“从上方楼梯下来”略不明确，剪辑可选入点（advisory）。"},
+    "performance": {"verdict": "PASS", "reason": "全程背影，不说话、不回头。"},
+    "sound": {"verdict": "PASS", "reason": "audio_understand 无人声段，只有脚步与室内混响。"},
+    "art": {"verdict": "PASS", "reason": "写实雨夜楼梯间，无新增人物、字幕或文字（平台固有AI生成水印除外）。"}
+  },
+  "overall": "PASS", "next_shot_submit_allowed": true, "human_acceptance": "NOT_EVALUATED"
+}

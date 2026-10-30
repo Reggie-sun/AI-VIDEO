@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-preview/1\",\n  \"preview\": {\n    \"operation\": \"audio_understand\",\n    \"provider\": \"gemini\",\n    \"endpoint\": \"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent\",\n    \"model_id\": \"gemini-3.8-flash\",\n    \"source_sha256\": \"af1507969bb88b6be6379bfd991c8ba26864fd11a334e66144a4de371b8df5b2\",\n    \"source_size_bytes\": 30229169,\n    \"audio_sha256\": \"034ff2460c76e952635bcad362baed2ae6dc2a3ebe27793d3a051025365d54f7\",\n    \"audio_size_bytes\": 3543164,\n    \"duration_seconds\": 20.085260770975058,\n    \"audio_start_seconds\": 0.0,\n    \"request_fingerprint\": \"b1b26ffcf7c17a8d8f8fb830f316b479593a2cead9ef94f0ab253418c6cd58c8\"\n  },\n  \"network_calls\": 0,\n  \"production_acceptance\": \"NOT_EVALUATED\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/失帧-MC00-城市试片-480p.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}"
+    }
+  ],
+  "isError": false
+}

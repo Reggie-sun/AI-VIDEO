@@ -1,0 +1,22 @@
+{
+  "status": "HISTORY_CANDIDATE_UNPROVEN_ATTRIBUTION",
+  "canonical_attempt": "UNKNOWN_UNCHANGED",
+  "female": "NOT_SUBMITTED",
+  "history_item_id": "9uTrg6UueIp1o06TDxNL",
+  "provider_request_id": "rKrhXl9bzorxFKt6Jum7",
+  "history_voice_id": null,
+  "history_text": null,
+  "alignment_exact_synthesis_match": true,
+  "raw_pcm_sha256": "2333cd8741f423c887ce399027d9a5dff9360faf8c463b9bae35f493d7f7b3cc",
+  "wav_sha256": "2708e044a952c854c78ef997a000f5aa8568629890225a05dfb6a975f3ff7d4c",
+  "raw_bytes": 376320,
+  "wav_derivation": {
+    "source": "history-candidate.pcm",
+    "sample_rate": 48000,
+    "channels": 1,
+    "sample_width": 2,
+    "retime": false
+  },
+  "duration_s": 3.92,
+  "human_acceptance": "NOT_EVALUATED"
+}

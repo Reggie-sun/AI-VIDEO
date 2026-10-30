@@ -321,10 +321,15 @@ def _author_voice_routing(runtime, voice: VoiceRoutingRequirement | None):
     shots = []
     refs = []
     artifacts: list[PreparedArtifact] = []
-    from tests.reference_authoring_fixture import fixture_director_coverage_artifact
+    from tests.reference_authoring_fixture import (
+        fixture_director_coverage_artifact, fixture_preview_approval_artifact,
+    )
     coverage = fixture_director_coverage_artifact()
     coverage_reference = SourceReference(kind="user_input", reference=coverage.relative_path.as_posix(),
                                          content_hash=coverage.relative_path.stem)
+    approval = fixture_preview_approval_artifact()
+    approval_reference = SourceReference(kind="user_input", reference=approval.relative_path.as_posix(),
+                                         content_hash=approval.relative_path.stem)
     for shot, reference in zip(loaded.shots, loaded.project.artifacts.shots, strict=True):
         generated = voice is not None and shot.shot_id == "shot-1"
         updated = seal_artifact(shot.model_copy(update={
@@ -332,7 +337,8 @@ def _author_voice_routing(runtime, voice: VoiceRoutingRequirement | None):
             "content_hash": "0" * 64,
             "dialogue": _SCRIPT,
             # The generated Shot seals the Director coverage its fresh request binds.
-            **({"source_provenance": tuple(dict.fromkeys((*shot.source_provenance, coverage_reference)))}
+            **({"source_provenance": tuple(dict.fromkeys((*shot.source_provenance, coverage_reference,
+                                                          approval_reference)))}
                if generated else {}),
             "voice_routing": voice if shot.shot_id == "shot-1" else None,
             **(
@@ -360,7 +366,7 @@ def _author_voice_routing(runtime, voice: VoiceRoutingRequirement | None):
         payload = _canonical_yaml_bytes(updated)
         artifacts.append(PreparedArtifact(path, payload, hashlib.sha256(payload).hexdigest()))
         if generated:
-            artifacts.append(coverage)
+            artifacts.extend((coverage, approval))
         shots.append(updated)
     project = seal_artifact(loaded.project.model_copy(update={
         "revision": loaded.project.revision + 1,

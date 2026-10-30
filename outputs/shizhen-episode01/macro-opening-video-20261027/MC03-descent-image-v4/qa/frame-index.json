@@ -1,0 +1,133 @@
+{
+  "source_sha256": "76d27a534fe5e97e2dc39f4833cc1c9e9a6f89639e3fc240e20581e073a7c9b8",
+  "frames": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-01.png",
+      "source_pts_seconds": 0.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-02.png",
+      "source_pts_seconds": 0.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-03.png",
+      "source_pts_seconds": 0.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-04.png",
+      "source_pts_seconds": 0.75
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-05.png",
+      "source_pts_seconds": 1.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-06.png",
+      "source_pts_seconds": 1.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-07.png",
+      "source_pts_seconds": 1.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-08.png",
+      "source_pts_seconds": 1.75
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-09.png",
+      "source_pts_seconds": 2.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-10.png",
+      "source_pts_seconds": 2.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-11.png",
+      "source_pts_seconds": 2.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-12.png",
+      "source_pts_seconds": 2.75
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-13.png",
+      "source_pts_seconds": 3.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-14.png",
+      "source_pts_seconds": 3.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-15.png",
+      "source_pts_seconds": 3.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-16.png",
+      "source_pts_seconds": 3.75
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-17.png",
+      "source_pts_seconds": 4.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-18.png",
+      "source_pts_seconds": 4.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-19.png",
+      "source_pts_seconds": 4.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-20.png",
+      "source_pts_seconds": 4.75
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-21.png",
+      "source_pts_seconds": 5.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-22.png",
+      "source_pts_seconds": 5.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-23.png",
+      "source_pts_seconds": 5.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-24.png",
+      "source_pts_seconds": 5.75
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-25.png",
+      "source_pts_seconds": 6.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-26.png",
+      "source_pts_seconds": 6.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-27.png",
+      "source_pts_seconds": 6.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-28.png",
+      "source_pts_seconds": 6.75
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-29.png",
+      "source_pts_seconds": 7.0
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-30.png",
+      "source_pts_seconds": 7.25
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-31.png",
+      "source_pts_seconds": 7.5
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/MC03-descent-image-v4/qa/frames/frame-32.png",
+      "source_pts_seconds": 7.75
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D6/anchors/b6-source-f0-last.png",
+  "sha256": "7ee3725fea5df3efa580c97f283c344fad4ec528e12e4e937778815b753f6c90",
+  "size_bytes": 3814185,
+  "width": 1920,
+  "height": 1080,
+  "reference_role": "last_frame",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "exact decoded video frame extraction (ffmpeg -vsync 0 select)",
+  "source_video_path": "runs/shizhen-fusion-B-motion-20261027/render-ASSEMBLY-B6/source/assets/587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc.mp4",
+  "source_video_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+  "source_frame_index": 0,
+  "semantic_review": "Pixel-identical lossless PNG re-encode of B6 frame 0; distinct bytes only because lifecycle input identities must be unique",
+  "lossless_reencode_of": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D6/anchors/b6-source-f0.png"
+}

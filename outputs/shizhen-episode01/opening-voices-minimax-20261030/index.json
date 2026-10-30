@@ -1,0 +1,68 @@
+{
+ "provider": "minimax-speech cn speech-2.8-hd",
+ "lines": [
+  {
+   "id": "L1",
+   "text": "检修口报，电闸断了，绞盘还在收",
+   "voice": "male-qn-jingying",
+   "duration_s": 3.54,
+   "sha256": "3e1b0e0f6af1676599cfab42eec2be8cfa991985a2b048d34fc78272300f8388",
+   "source": "runs/shizhen-opening-minimax-cn-relay-20261030-d/assets/audio/3e1b0e0f6af1676599cfab42eec2be8cfa991985a2b048d34fc78272300f8388.wav",
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L2",
+   "text": "七号楼报，下了三层，还在原来那层",
+   "voice": "male-qn-jingying",
+   "duration_s": 3.15,
+   "sha256": "b9e7aac104abac852ced63b5d72090b29c5c1de2c88940d7c045ad40c0f2c456",
+   "source": "runs/shizhen-opening-minimax-cn-relay-20261030-d/assets/audio/b9e7aac104abac852ced63b5d72090b29c5c1de2c88940d7c045ad40c0f2c456.wav",
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L3",
+   "text": "急诊说，系统里她已经死了，人还躺着",
+   "voice": "male-qn-jingying",
+   "duration_s": 3.24,
+   "sha256": "508984510f38926bfc13a28f3a0ad60e5cde5bbbfcc49ad290d6e2694777fd5f",
+   "source": "runs/shizhen-opening-minimax-cn-relay-20261030-d/assets/audio/508984510f38926bfc13a28f3a0ad60e5cde5bbbfcc49ad290d6e2694777fd5f.wav",
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L4",
+   "text": "人民路有人喊救命，在七楼，七楼早就封了",
+   "voice": "male-qn-jingying",
+   "duration_s": 3.88,
+   "sha256": "a6eec44467ba1790733404b6b84e9f6ea67db37d17e5b878d70294062294268f",
+   "source": "runs/shizhen-opening-minimax-cn-relay-20261030-d/assets/audio/a6eec44467ba1790733404b6b84e9f6ea67db37d17e5b878d70294062294268f.wav",
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L5",
+   "text": "记上，第十四起",
+   "voice": "female-chengshu",
+   "duration_s": 2.25,
+   "sha256": "6a7f1058803220898e142869173fc838bf5b716e9f5e11cb6b476724775bfeac",
+   "source": "runs/shizhen-opening-minimax-cn-dong-20261030-d/assets/audio/6a7f1058803220898e142869173fc838bf5b716e9f5e11cb6b476724775bfeac.wav",
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L6a",
+   "text": "三号站台",
+   "voice": "female-chengshu",
+   "duration_s": 1.28,
+   "sha256": "185df9cbdef9d36130b9e18d852a771c48febd37efd79b501688798cb41dbda7",
+   "source": "runs/shizhen-opening-minimax-cn-dong-20261030-d/assets/audio/185df9cbdef9d36130b9e18d852a771c48febd37efd79b501688798cb41dbda7.wav",
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L6b",
+   "text": "暂无报告",
+   "voice": "male-qn-jingying",
+   "duration_s": 0.89,
+   "sha256": "a3c1588b2b9b55ee1c799965f4fc2ad21a21d6a11ee1330342b869a89a5aac38",
+   "source": "runs/shizhen-opening-minimax-cn-relay-20261030-d/assets/audio/a3c1588b2b9b55ee1c799965f4fc2ad21a21d6a11ee1330342b869a89a5aac38.wav",
+   "human_quality": "NOT_EVALUATED"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"3a27d47e2d8a1a05d92486f9004d2ace502d9528c38e39aa7a8cb668c26a3d46\",\n  \"source_size_bytes\": 31934282,\n  \"audio_sha256\": \"a2639ec11cb3d1a4e2a4f56442d8a851dda3f378e9866f59077e8318d1ecdba2\",\n  \"audio_size_bytes\": 1249404,\n  \"duration_seconds\": 7.082086167800454,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"858af1def016f23777f22b88ec59efbecbbfe647cc28886ee94321e045613fbe\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"bd8d4520d922fbee15d64e0875ff991f952a0320510070f6c8c3aa72db0719dd\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"continuous rushing water or heavy rain sound\",\n      \"steady static hiss\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-dispatch-20261030/D4/state/video-generation/fetch/files/3a27d47e2d8a1a05d92486f9004d2ace502d9528c38e39aa7a8cb668c26a3d46.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

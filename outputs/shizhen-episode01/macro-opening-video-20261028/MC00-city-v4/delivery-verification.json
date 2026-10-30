@@ -1,0 +1,31 @@
+{
+  "kind": "exact_raw_preview_delivery/1",
+  "sha256": "de0608983dd5b6722a6ef14b086c2a41494693fd97af7019de2e297553f990cf",
+  "source": {
+    "artifact_path": "state/video-generation/fetch/files/de0608983dd5b6722a6ef14b086c2a41494693fd97af7019de2e297553f990cf.mp4",
+    "run_root": "runs/shizhen-macro-opening-20261028/MC00-city-v4"
+  },
+  "delivery_path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/失帧-MC00-城市重做-480p.mp4",
+  "source_bytes_identical": true,
+  "new_paid_video_submits": 1,
+  "macro_total_video_submits": 8,
+  "current_quote_CRD": 192,
+  "actual_settled_credits": "NOT_EXPOSED; quote is not settlement receipt",
+  "duration_seconds": 16.065,
+  "resolution": [
+    854,
+    480
+  ],
+  "presentation_frames": 385,
+  "review_assembly": {
+    "path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/assembly-MC00-MC01/失帧-MC00接市政-审看-480p.mp4",
+    "sha256": "41663091555a1977c7365b51603f807491e22bf3878e77c668beb28497443a2f",
+    "frames": 548,
+    "composition": "MC00 frames 0-383 (last frame dropped as duplicate of MC01 f0) + MC01-02-edit-v4 all 164 frames, 24fps, review-only re-encode",
+    "not_delivery": true
+  },
+  "post_media_verdict": "FAIL",
+  "human_acceptance": "NOT_EVALUATED",
+  "protected_municipal_unchanged": true,
+  "review_url": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/index.html"
+}

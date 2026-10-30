@@ -76,9 +76,12 @@ reservation 保留。正式声音接回视频须经选中 route、P4 composition
 字幕、Registry 台词和对齐仍使用原台词，不把提示混入朗读文字或另建时间线。
 
 [官方 v4 指导](https://elevenlabs.io/docs/overview/capabilities/text-to-speech/best-practices#prompting-eleven-v4)
-支持内嵌表演标签，但不保证每个提示有效或听感自然。本地不猜测 tags 的时间戳表达：
-仅接受 Provider 原 alignment 或 normalized alignment 中至少一组逐字等于原台词；
-两组都带标签或文字不符时仍 UNKNOWN，停止、不剥字、不自动重试。
+支持内嵌表演标签，但不保证每个提示有效或听感自然。本地先严格校验 Provider 两组原始时间数组；若其字符逐字等于已封存的 synthesis_text，
+仅允许在字符条目边界投影本次编译的 exact tags 前缀，保留全部原始绝对时间。
+映射后的原 alignment 或 normalized alignment 至少一组仍须逐字等于原台词。
+receipt 的 synthesis_alignment 保留两组原始数组、exact prefix、输入 SHA 和原响应 body SHA；
+无标签 receipt 字节保持兼容。非精确前缀、漏字/多字、跨条目边界或错误时间仍 UNKNOWN 停止，
+不使用 History duration 数组补造时间，不泛化剥离括号、不自动重试。
 对齐成功不证明标签没被读出，模型表演与逐字发音仍须原速试听。
 
 ## Shared Performance Context Entry
@@ -105,3 +108,11 @@ role/unit/时长逐项核对，拒绝重复 key/ID、symlink、路径逃逸和�
 取凭据和发请求前拒绝。READY_FOR_CANONICAL_PREFLIGHT 只表示输入没有该项额外限制，
 不授予执行权限；原 permit、预算、egress、UNKNOWN/recovery 与验收仍由既有 owner 管理。
 任何 unresolved 指针仍阻断，无 force 参数，不用改包字段冒充 canonical recovery。
+
+## Nonoverlapping Audition Units
+
+上下文包可声明 `excluded_line_ids`；入口在选行前拒绝被排除 ID，即使它仍出现在 rows 中。
+前序 UNKNOWN 的原包、attempt、reservation 保留，不把它改为 READY。用户明确要求新的
+试听时，只能为确实未提交的、不同的选中行封存不重叠的有限单元；记录 predecessor、
+排除原因、新旧次数及预算。新包字段不代替授权或 canonical state，不允许借新文件/新root
+重发被排除的未知请求。任何新 UNKNOWN 立即停止本单元。

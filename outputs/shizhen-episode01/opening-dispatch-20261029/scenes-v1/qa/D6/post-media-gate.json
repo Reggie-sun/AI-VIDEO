@@ -1,0 +1,16 @@
+{
+  "schema": "per-shot-post-media-gate/agent-verdict-1",
+  "shot_id": "D6", "attempt_id": "shizhen-dispatch-D6-preview-001",
+  "media": {"path": "runs/shizhen-opening-dispatch-20261030/D6/state/video-generation/fetch/files/30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa.mp4", "sha256": "30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa"},
+  "evidence": ["contact.jpg (2fps)", "junction.jpg (D6 last frame vs B6 frame 0; mean abs diff 23.5/255)", "audio-understanding.json: rain/water, no voice"],
+  "findings": {
+    "camera": {"verdict": "PASS", "reason": "固定机位，无切点。"},
+    "action": {"verdict": "PASS", "reason": "两人原地等车；男人中段抬头环顾后回到低头，女人一直打电话。"},
+    "space": {"verdict": "PASS", "reason": "站位与B6第0帧一致。"},
+    "performance": {"verdict": "PASS", "reason": "两人不说话。"},
+    "sound": {"verdict": "PASS", "reason": "只有雨声，无人声。"},
+    "art": {"verdict": "PASS", "reason": "与B6同一写实雨夜；时钟停在03:16:53（后期补走字，已知）。"},
+    "junction_to_B6": {"verdict": "NOT_EVALUATED", "reason": "末帧与B6第0帧构图接近但色调略冷、雨反光不同；须在组装后以 verify-assembly 与正常速度声画核验。"}
+  },
+  "overall": "PASS", "next_shot_submit_allowed": true, "human_acceptance": "NOT_EVALUATED"
+}

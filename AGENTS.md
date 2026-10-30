@@ -39,6 +39,8 @@
 
 验收看正常速度、带声音的成片；任何改动（含修复）都不能破坏已满足的效果。先交片，用户认可后再跑完整验证，通过才 commit/push，避免工程验证拖慢交片。字幕时机与格式、逐镜累积审看和输出规格（含商品广告固定720p）见[成片优先](docs/canvas-continuous-production.md#formal-narrative-output-defaults)；单段认可不代替拼接审查，接点与复用素材核验归 `open-video`。
 
+新创作的付费视频生成前，先把该镜头将使用的参考包（决定性时刻的关键帧、人物、细节、环境、已认可片段的风格帧）作为预览交给用户，取得明确认可并封存为 `preview_approval` 才能提交；“好不好看、怪不怪”只由用户判，Agent 的检查表 PASS 不代替。2026-10-30 用户要求修订，原因：多次纸上定稿后直接付费生成、成片被否定（细则见[参考规划](docs/shot-reference-planning.md)）。
+
 ### Empirical Validation Priority
 
 遇到模型质量问题、工作流能力不足或反复失败时，先取证再扩建工程：
@@ -54,7 +56,7 @@
 
 每 Shot exact MP4 落盘后、下一 Shot submit 前，必须显式调用 project-local `video-analysis` MCP，对照封存意图、必查项和前序已接受状态逐项裁决；仅全 `PASS` 推进，问题不带进后续镜头。
 
-- 禁止整批生成后补查，禁止用 hook 或评分代替；证据缺失、过期、identity 不符或 MCP 不可用都算 `NOT_EVALUATED`。
+- 禁止整批生成后补查，禁止用 hook 或评分代替；证据缺失、过期、identity 不符或 MCP 不可用都算 `NOT_EVALUATED`。封存要求未达即 `FAIL`，不写“PASS 但有偏差”；改判次要、移出或延后须用户当次决定；观感不由 Agent 判。
 - `FAIL` / `NOT_EVALUATED` 停止 attempt。本地豁免且结果已知（local exemption + known outcome）时执行有界的 `LOCAL_BOUNDED_REPAIR_LOOP`；证据本身有问题先走 `EVIDENCE_REPAIR_FIRST`；结果未知则 unknown 停止。
 
 执行前必须读取 [Per-Shot Gate](.agent/context/control-plane-playbook.md#per-shot-post-media-gate)；Harness 不代为执行，也不代签验收。

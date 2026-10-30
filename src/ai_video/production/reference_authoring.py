@@ -9,6 +9,11 @@ Structured reference planning is shared by every genre. Director evidence stays
 per domain: drama binds exact Director coverage sealed in the Project, while
 ecommerce binds its own AdCreativePlan through the commercial request binding,
 which the commercial owners verify. Neither domain borrows the other's layer.
+
+Two obligations close shortcuts observed in practice (2026-10-30): drama must
+bind the user's approval of a cheap visual preview before paid generation, and a
+visibly performing character cannot be left out of identity continuity, because
+that silently removes the identity reference the planner would otherwise require.
 """
 from ai_video.errors import AiVideoError, ErrorCode
 
@@ -39,11 +44,25 @@ def is_ecommerce_requirement(requirement, commercial_binding=None) -> bool:
         getattr(requirement, "commercial_execution_class", None) is not None)
 
 
+def _visible_performers(intent) -> tuple[str, ...]:
+    performance = intent.performance_intent
+    if performance is None:
+        return ()
+    return tuple(direction.character_id for direction in performance.character_directions
+                 if direction.visibility == "visible")
+
+
 def reference_authoring_issues(intent, *, ecommerce: bool = False) -> tuple[str, ...]:
     authored = intent.reference_planning
     if authored is None:
         return (_ROOT,)
     issues = []
+    identities = set(intent.identity_continuity.character_ids)
+    for character_id in _visible_performers(intent):
+        if character_id not in identities:
+            # Dropping a performer from identity continuity is how a Shot dodges the
+            # identity reference; the Director must prepare that reference instead.
+            issues.append(f"generation_intent.identity_continuity.character_ids[{character_id}]")
     if _camera_moves(intent) and not any(event.kind == "composition" for event in authored.events):
         # A moving camera must name the visible relation it changes; the existing
         # compiler then requires that visual_state/purpose in the native text.
@@ -51,8 +70,11 @@ def reference_authoring_issues(intent, *, ecommerce: bool = False) -> tuple[str,
     if ecommerce:
         if authored.director_coverage is not None:
             issues.append(f"{_ROOT}.director_coverage[ecommerce_uses_ad_creative_plan]")
-    elif authored.director_coverage is None:
-        issues.append(f"{_ROOT}.director_coverage")
+    else:
+        if authored.director_coverage is None:
+            issues.append(f"{_ROOT}.director_coverage")
+        if authored.preview_approval is None:
+            issues.append(f"{_ROOT}.preview_approval")
     return tuple(issues)
 
 
@@ -76,6 +98,29 @@ def director_coverage_evidence_issues(binding, project) -> tuple[str, ...]:
         return (f"{path}.coverage_hash",)
     if binding.unit_id not in {unit.get("unit_id") for unit in coverage["coverage_units"]}:
         return (f"{path}.unit_id",)
+    return ()
+
+
+def preview_approval_evidence_issues(binding, coverage, project) -> tuple[str, ...]:
+    """Reopen the sealed user preview approval and bind it to this exact coverage unit."""
+    from ai_video.production.authoring_input import PREFIX, reopen_authoring_input
+    from ai_video.production.models import SourceReference
+    from ai_video.production.preview_approval import PreviewApprovalError, validate_preview_approval
+
+    path = f"{_ROOT}.preview_approval.approval_hash"
+    reference = SourceReference(kind="user_input", reference=f"{PREFIX}{binding.approval_hash}.json",
+                                content_hash=binding.approval_hash)
+    sealed = {*project.project.source_provenance,
+              *(item for shot in project.shots for item in shot.source_provenance)}
+    if reference not in sealed:
+        return (path,)
+    try:
+        approval = reopen_authoring_input(project.root, reference)
+        validate_preview_approval(approval)
+    except (PreviewApprovalError, ValueError, OSError):
+        return (path,)
+    if approval["coverage_hash"] != coverage.coverage_hash or coverage.unit_id not in approval["unit_ids"]:
+        return (f"{_ROOT}.preview_approval[coverage_unit]",)
     return ()
 
 
@@ -113,11 +158,15 @@ def require_reference_authoring(requirement, *, project=None, commercial_binding
         if commercial_binding is None:
             issues.append("commercial_binding.ad_creative_plan_hash")
     elif not issues and project is not None:
-        issues.extend(director_coverage_evidence_issues(intent.reference_planning.director_coverage, project))
+        planning = intent.reference_planning
+        issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+        if not issues:
+            issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                           planning.director_coverage, project))
     if issues:
         raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
             user_message="Author Director reference planning before new generation: " + ", ".join(issues))
 
 
 __all__ = ["director_coverage_authoring_input", "director_coverage_evidence_issues", "is_ecommerce_requirement",
-           "reference_authoring_issues", "require_reference_authoring"]
+           "preview_approval_evidence_issues", "reference_authoring_issues", "require_reference_authoring"]

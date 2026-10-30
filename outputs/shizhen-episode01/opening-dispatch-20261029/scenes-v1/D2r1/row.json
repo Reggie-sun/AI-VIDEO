@@ -1,0 +1,256 @@
+{
+  "shot": {
+    "shot_id": "D2r1",
+    "scene_id": "stair-loop",
+    "storyboard_beat_id": "D2-stair-return",
+    "intent": "首帧是同一个楼梯间：那名背黄色帆布包的住户背对镜头，右手扶着扶手，正踏下往下那段楼梯的第一级。\n雨夜老旧住宅楼梯间，真人实拍质感，构图同首帧。住户沿着扶手旁往下的那段楼梯一级一级走下去，身体逐渐降低，直到完全走出画面。平台空了片刻。随后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只侧面凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。\n机位全程固定不动，不推拉、不摇移、不切镜，让往下离开和从上方回到原处在同一个画面里完成。\n声音只有楼梯间里脚步的回声、远处雨声和吸顶灯轻微的电流声；无对白、旁白、配乐。正常原速，不慢动作、不闪屏、不叠化，不出现字幕、文字或楼层号。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 6
+    },
+    "character_ids": [
+      "stair-resident"
+    ],
+    "continuity_constraints": [
+      "同一只凹陷的灭火器始终在前景",
+      "同一名住户，只露背影",
+      "不加字幕、楼层号或音乐",
+      "现场人物都不开口，对白来自记录台母带"
+    ],
+    "visual_strategy": "generated_video",
+    "generated_video_rationale": "调度蒙太奇 D2-stair-return：现场无对白画面，铺在对白母带的转报声下",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "first_frame",
+        "asset_ids": [
+          "D2r1-first-frame"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ]
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "approved_keyframe",
+        "asset_id": "D2r1-first-frame"
+      }
+    ],
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "stable"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [],
+        "anchors": [],
+        "selections": [],
+        "natural_generation": [],
+        "director_coverage": {
+          "coverage_hash": "d2a18ec6dcfaeb2afddc048b16b92f86e108d00c075cb135872bf5c115d49702",
+          "unit_id": "D2-stair-return"
+        }
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "住户背对镜头，右手扶着扶手，正踏下往下那段楼梯的第一级；前景墙角是侧面凹陷的红色灭火器。",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "同一名背黄色帆布包的住户从上方那段楼梯回到同一个平台，背对镜头停在同一只凹陷的灭火器前。",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [],
+        "preservation": "unspecified",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "stair-loop",
+        "time_of_day": "雨夜",
+        "mood": "楼梯照常，却回到了原来那层",
+        "state_constraints": [
+          "同一只凹陷的灭火器始终在前景",
+          "同一名住户，只露背影",
+          "不加字幕、楼层号或音乐"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "住户先沿扶手旁往下的楼梯走出画面，再从右上方楼梯回到平台",
+        "screen_direction": "往下离开走出画面，回来从右上入画",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不越轴、不穿墙"
+      },
+      "axis_continuity": {
+        "camera_axis": "单一机位方向",
+        "framing_continuity": "平台、凹陷的灭火器和上下两段楼梯同框",
+        "crossing_policy": "不越轴"
+      },
+      "subject_action": {
+        "start_state": "住户背对镜头，右手扶着扶手，正踏下往下那段楼梯的第一级；前景墙角是侧面凹陷的红色灭火器。",
+        "progression": "雨夜老旧住宅楼梯间，真人实拍质感，构图同首帧。住户沿着扶手旁往下的那段楼梯一级一级走下去，身体逐渐降低，直到完全走出画面。平台空了片刻。随后，同一名背黄色帆布包的住户从画面右上方那段楼梯走下来，回到同一个平台，停在那只侧面凹陷的红色灭火器前，背对镜头站住，没有回头。住户始终只露背影，不说话。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "同一名背黄色帆布包的住户从上方那段楼梯回到同一个平台，背对镜头停在同一只凹陷的灭火器前。",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "住户走下楼梯拐弯出画",
+        "peak": "同一住户从上方楼梯走下来",
+        "settle": "停在凹陷的灭火器前",
+        "direction": "下楼出画再从上方回到原处",
+        "amplitude_class": "正常实时动作"
+      },
+      "pacing": {
+        "cadence": "离开、短暂空画、从上方回来、停住",
+        "tempo_class": "自然原速",
+        "shot_duration_seconds": 6.0
+      },
+      "camera_intent": {
+        "movement": "固定",
+        "stability": "稳定",
+        "framing_intent": "平台、凹陷的灭火器和上下两段楼梯同框",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "平台全景，凹陷的灭火器在前景",
+        "end_framing": "同一全景，住户停在灭火器前",
+        "position_lock": true,
+        "orientation_lock": true
+      },
+      "performance_intent": {
+        "trigger": "下楼离开",
+        "visible_response": "从上方回到原处，停在灭火器前",
+        "gaze_target": "前方楼梯",
+        "body_behavior": "正常下楼，回来后停住，不回头",
+        "hand_behavior": "自然下垂",
+        "terminal_performance_state": "背对镜头停在灭火器前",
+        "character_directions": [
+          {
+            "character_id": "stair-resident",
+            "screen_identity": "背黄色帆布包、穿深色外套的住户背影",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "正常下楼",
+                "emotion": "平常，没有察觉异常",
+                "intensity": "subtle",
+                "facial_expression": "不可见",
+                "gaze_target": "前方楼梯",
+                "breathing": "自然平稳",
+                "body_behavior": "正常下楼出画，再从上方楼梯走回平台停住，不回头"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "正常速度的真人摄影质感",
+        "palette": "雨夜冷灰与实用灯",
+        "material_treatment": "潮湿墙面、金属、雨水与真实衣物",
+        "prohibited_visual_drift": [
+          "慢动作、闪屏、黑屏、鬼影",
+          "片名、字幕、说明文字或分格"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "吸顶灯与窗外雨夜",
+        "direction": "偏冷顶光",
+        "exposure_priority": "凹陷的灭火器和住户背影可读",
+        "continuity_state": "同一盏灯常亮"
+      },
+      "ambience_intent": {
+        "environment_bed": "楼梯间脚步回声、远处雨声、吸顶灯轻微电流声",
+        "foley_cues": [
+          "脚步回声"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "stair-resident",
+        "relation_kind": "fixed_frame",
+        "start_relation": "平台与灭火器同框",
+        "end_relation": "住户回到平台"
+      }
+    },
+    "conditioning_compatibility": {
+      "lane": "i2va",
+      "first_anchor_id": "D2r1-first-frame",
+      "available_duration_seconds": 6,
+      "composition_compatible": true,
+      "screen_order_compatible": true,
+      "axis_compatible": true,
+      "camera_path_reachable": true,
+      "character_prop_state_reachable": true,
+      "action_endpoint_reachable": true
+    },
+    "intent_evidence": {
+      "character_action_required": false,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 6,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

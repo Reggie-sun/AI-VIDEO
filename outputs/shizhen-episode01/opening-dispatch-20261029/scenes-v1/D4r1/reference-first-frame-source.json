@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/codex-image/raw/D4-first-frame-v1.png",
+  "sha256": "19d56756f148111cb66b9fbba61c34aa88a5aab32a0327b067d67000c7111d7d",
+  "size_bytes": 2708995,
+  "width": 1672,
+  "height": 941,
+  "reference_role": "first_frame",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "prompt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/codex-image/D4-first-frame-prompt.zh.txt",
+  "prompt_sha256": "459ed92fd2ff84496c241e101336d00da91627a1da7a329de91cbcfceca82c23",
+  "semantic_review": "Static review by Parent before use; not video acceptance"
+}

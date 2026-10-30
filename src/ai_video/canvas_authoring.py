@@ -84,7 +84,7 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     packet, direction = deepcopy(packet), deepcopy(direction)
     allowed = {"project_id", "title", "language", "brief", "story", "characters", "scenes",
                "storyboard", "shots", "delivery_profile", "composition_order", "cut_requirements",
-               "director_coverages"}
+               "director_coverages", "preview_approvals"}
     if set(direction) - allowed:
         raise ValueError("unknown director input fields")
     if packet.get("authority") != "development_preparation_only_not_production_state":
@@ -111,8 +111,11 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     # Drama Director coverage is sealed as its own content-addressed input so a
     # Shot's reference_planning.director_coverage can bind its exact bytes.
     from ai_video.production.reference_authoring import director_coverage_authoring_input
-    coverage_artifacts = tuple({a.relative_path: a for a in (director_coverage_authoring_input(coverage)[1]
-                               for coverage in direction.get("director_coverages", ()))}.values())
+    from ai_video.production.preview_approval import preview_approval_authoring_input
+    # The user's preview approval is sealed the same way so reference_planning.preview_approval binds it.
+    coverage_artifacts = tuple({a.relative_path: a for a in (
+        *(director_coverage_authoring_input(coverage)[1] for coverage in direction.get("director_coverages", ())),
+        *(preview_approval_authoring_input(approval)[1] for approval in direction.get("preview_approvals", ())))}.values())
     asset_artifacts = (*asset_artifacts, *(a for a in coverage_artifacts if a.relative_path not in
                                              {item.relative_path for item in asset_artifacts}))
     for reference in prepared_authoring_input_references(asset_artifacts):

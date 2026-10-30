@@ -1,0 +1,191 @@
+{
+  "objective": "失帧冷开场调度蒙太奇 D3-er-recorded-dead：系统说她已经死了，人还活着；无对白现场画面",
+  "images": [
+    {
+      "asset_id": "D3-ref-er",
+      "node_id": "D3-ref-er-node",
+      "resource_id": "D3-ref-er-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/codex-image/raw/D3-v1.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D3/reference-source.json",
+        "record_sha256": "86626456ce0fbe0f1e763a33ac2708626bcb710ebf5cbc056ed40e0f2348adb8",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "er-nurse",
+      "name": "急诊护士",
+      "identity": "戴蓝色口罩的护士",
+      "appearance_bible": "浅蓝护士服、蓝色口罩、盘发",
+      "reference_asset_ids": [
+        "D3-ref-er"
+      ]
+    },
+    {
+      "character_id": "er-patient",
+      "name": "女病人",
+      "identity": "六十多岁的女病人",
+      "appearance_bible": "灰白短发、病号服、白色腕带",
+      "reference_asset_ids": [
+        "D3-ref-er"
+      ]
+    }
+  ],
+  "scene_images": [
+    "D3-ref-er"
+  ],
+  "observations": {
+    "action": "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。",
+    "camera": "镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。",
+    "performance": "人物都不开口，反应克制自然",
+    "space": "护士在左，病人躺在右侧病床",
+    "sound": "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。",
+    "art": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字"
+  },
+  "paths": {
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+      "generation_intent.performance_intent.character_directions.1.character_id",
+      "generation_intent.performance_intent.character_directions.1.screen_identity",
+      "generation_intent.performance_intent.character_directions.1.role",
+      "generation_intent.performance_intent.character_directions.1.visibility",
+      "generation_intent.performance_intent.character_directions.1.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.1.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.1.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.1.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.1.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.1.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.1.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.1.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1"
+    ]
+  },
+  "fragments": {
+    "action": [
+      "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+    ],
+    "camera": [
+      "镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。"
+    ],
+    "performance": [
+      "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+    ],
+    "space": [
+      "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+    ],
+    "sound": [
+      "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。"
+    ],
+    "art": [
+      "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。",
+      "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。"
+    ]
+  },
+  "intent_sha256": "324e72ae38091856c7b7cbd662a8904e31a3c4ab760bcb71284752ae8f855a43",
+  "coverage": {
+    "path": "outputs/shizhen-episode01/opening-dispatch-20261029/director-coverage.v5.json",
+    "sha256": "4b8e8fb0b34f6cb588b67140e66c6ee364e242c9efdff5d125ada14ef389c657",
+    "coverage_hash": "d2a18ec6dcfaeb2afddc048b16b92f86e108d00c075cb135872bf5c115d49702",
+    "unit_id": "D3-er-recorded-dead"
+  },
+  "scene": {
+    "scene_id": "er-bay",
+    "location": "夜间医院急诊区",
+    "mood": "系统说她已经死了，人还活着"
+  }
+}

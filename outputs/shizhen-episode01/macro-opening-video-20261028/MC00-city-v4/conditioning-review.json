@@ -1,0 +1,101 @@
+{
+  "scope": "PRE_GENERATION_AUTHORED_FEASIBILITY_ONLY",
+  "evidence": {
+    "lane": "fl2va",
+    "first_anchor_id": "MC00-first-eave",
+    "last_anchor_id": "MC00-last-approved-MC01-frame0",
+    "same_subject_scale": false,
+    "composition_compatible": true,
+    "screen_order_compatible": true,
+    "axis_compatible": true,
+    "camera_path_reachable": true,
+    "character_prop_state_reachable": true,
+    "action_endpoint_reachable": true,
+    "available_duration_seconds": 16,
+    "scale_transition": {
+      "schema_version": "conditioning-scale-transition/1",
+      "first_anchor_id": "MC00-first-eave",
+      "first_anchor_sha256": "349b3581b2681ae1724d496a05d30b7cf0650ab678ce03e214f3116ab10b5260",
+      "last_anchor_id": "MC00-last-approved-MC01-frame0",
+      "last_anchor_sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "camera_intent_hash": "7a160467cfc297f2358a287f7e40aba37ecfabdae96aded2f267607b28df0be2",
+      "available_duration_seconds": 16.0,
+      "sources": [
+        {
+          "source_id": "anchor-review",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/pre-generation-feasibility.md",
+          "sha256": "b5c1df2d2fe52218a920fa2259dc9db0579ec97da7db77bf3f4777d8bafdb3c3"
+        },
+        {
+          "source_id": "first-anchor",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/first-frame-1920x1080.png",
+          "sha256": "349b3581b2681ae1724d496a05d30b7cf0650ab678ce03e214f3116ab10b5260"
+        },
+        {
+          "source_id": "last-anchor",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+          "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+        },
+        {
+          "source_id": "raster-normalization",
+          "kind": "anchor_geometry_review",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/input-raster-normalization.json",
+          "sha256": "4fc0381a6e1eaaf79fbde0ce3bd53b147248b228df55e36e7f0629d0fb16e162"
+        },
+        {
+          "source_id": "route",
+          "kind": "trajectory",
+          "evidence_ref": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/route-design.json",
+          "sha256": "bdb110e3d61f9eef411aa8b1c0983b40f14f943eea582c7e1fc57fb5343e5821"
+        }
+      ],
+      "findings": [
+        {
+          "finding_id": "anchor_correspondence",
+          "verdict": "PASS",
+          "rationale": "首尾帧朝向一致：首帧主路与作业区藏在左侧湿墙后，尾帧主路在左、作业区在右；揭示后布局可自然对应。首帧仅尺寸适配，无重画或裁切。未声称照片测绘或运镜已成立。",
+          "source_ids": [
+            "anchor-review",
+            "first-anchor",
+            "last-anchor",
+            "raster-normalization"
+          ]
+        },
+        {
+          "finding_id": "continuous_camera_path",
+          "verdict": "PASS",
+          "rationale": "作者路线为右移绕墙角后沿尾帧朝向前进下降，不需穿墙、跨索或大角度转向；实际路径服从待exact MP4验证。",
+          "source_ids": [
+            "anchor-review",
+            "route"
+          ]
+        },
+        {
+          "finding_id": "duration_reachable",
+          "verdict": "PASS",
+          "rationale": "16秒按约四分之一揭示、一半下降、四分之一减速并最后约一秒停稳分配，无长段静止尾帧；为设计估计，非实测。",
+          "source_ids": [
+            "route"
+          ]
+        },
+        {
+          "finding_id": "scale_fov_continuity",
+          "verdict": "PASS",
+          "rationale": "首尾景别不同，same_subject_scale=False；景别变化由离开檐口、前进与下降产生，不以变焦跳转或隐藏切镜替代。内参未标定，模型服从待实片。",
+          "source_ids": [
+            "anchor-review",
+            "first-anchor",
+            "last-anchor",
+            "route"
+          ]
+        }
+      ],
+      "content_hash": "80e9930d07197b5a4e18402fc2a7403039b347ca35396108cf8be7572d60b7f0"
+    }
+  },
+  "actual_motion_and_sound": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

@@ -1,0 +1,60 @@
+{
+  "purpose": "MC00 v4 first frame whose occlusion actually allows an eave reveal",
+  "user_instruction": "直接重做,生圖調用codex",
+  "provider": "codex exec (codex-cli 0.165.0) built-in image_gen",
+  "max_calls": 3,
+  "calls_used": 2,
+  "actual_model_id": "NOT_EXPOSED",
+  "actual_billing": "NOT_EXPOSED",
+  "unknown_outcome_rule": "STOP; no retry or fallback",
+  "calls": [
+    {
+      "id": "01-first-frame",
+      "status": "KNOWN_OUTPUT",
+      "prompt": "codex-image/01-first-frame-prompt.zh.txt",
+      "prompt_sha256": "bc2b1f8acd6b5fc2428d2af824feef4c9fa65c38593c2c5e8a61c0238da58a91",
+      "task_wrapper": "codex-image/codex-task-1.md",
+      "inputs": [
+        {
+          "role": "参考一 尾帧",
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+          "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+        },
+        {
+          "role": "参考二 湿墙檐口质感",
+          "path": "referces/shizhen/macro-opening-20261027/MC00-reference-revision-20261028/02-eave-start-v1.png",
+          "sha256": "03e1386dad73448fea3fada774c810b3d8cb0d593f97f3f637e34e3bd5ee2e68"
+        }
+      ],
+      "output": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/codex-image/raw/first-frame-v1.png",
+      "sha256": "d7cb20a6bb0cad075c9c0b1056e8525725c86fd70b6a54d60dd9172a46aa93e3",
+      "width": 1672,
+      "height": 941,
+      "verdict": "FAIL: 主路、车流和天际线已在右半画面露出，揭示余地不足；主路在右与尾帧主路在左不一致"
+    },
+    {
+      "id": "02-first-frame-repair",
+      "status": "KNOWN_OUTPUT",
+      "prompt": "codex-image/02-first-frame-repair-prompt.zh.txt",
+      "prompt_sha256": "15207027d8328b5fc2aca07be3a6595ccfbcfb570e689ddd166bc39e07f796f9",
+      "task_wrapper": "codex-image/codex-task-2.md",
+      "inputs": [
+        {
+          "role": "参考一 尾帧",
+          "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+          "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+        },
+        {
+          "role": "参考二 上一版起幅（只取质感）",
+          "path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/codex-image/raw/first-frame-v1.png",
+          "sha256": "d7cb20a6bb0cad075c9c0b1056e8525725c86fd70b6a54d60dd9172a46aa93e3"
+        }
+      ],
+      "output": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/codex-image/raw/first-frame-v2.png",
+      "sha256": "a425fb681a075a09b4c5279437278c9a0a6dc54340433d54f93cf82fe6713268",
+      "width": 1672,
+      "height": 941,
+      "verdict": "SELECTED_STATIC_CANDIDATE: 湿墙约占左侧55%，主路和作业区被墙挡住，右侧只露旧住宅屋顶与远处高楼；静态审看，不代表视频通过"
+    }
+  ]
+}

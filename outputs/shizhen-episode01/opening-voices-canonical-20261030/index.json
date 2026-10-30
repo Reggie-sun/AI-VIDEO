@@ -1,0 +1,84 @@
+{
+ "context": "performance-context.v2.json",
+ "model": "eleven_v4",
+ "canonical": true,
+ "lines": [
+  {
+   "id": "L1",
+   "role": "relay",
+   "text": "检修口报，电闸断了，绞盘还在收",
+   "voice": "Yun Calm Mature",
+   "duration_s": 8.48,
+   "sha256": "f82d62eb282bf550e339bc8086057997bb721ffccd6deb34bf9a6dfac30825fe",
+   "source": "runs/shizhen-opening-canon-20261030-L1/assets/audio/f82d62eb282bf550e339bc8086057997bb721ffccd6deb34bf9a6dfac30825fe.wav",
+   "shot_s": 4.0,
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L2",
+   "role": "relay",
+   "text": "七号楼报，下了三层，还在原来那层",
+   "voice": "Yun Calm Mature",
+   "duration_s": 9.36,
+   "sha256": "39dda00906359c61dd3ed69f38d8d504dad4d75fb65cb20d6a7633621fcf0f71",
+   "source": "runs/shizhen-opening-canon-20261030-L2/assets/audio/39dda00906359c61dd3ed69f38d8d504dad4d75fb65cb20d6a7633621fcf0f71.wav",
+   "shot_s": 5.0,
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L3",
+   "role": "relay",
+   "text": "急诊说，系统里她已经死了，人还躺着",
+   "voice": "Yun Calm Mature",
+   "duration_s": 9.68,
+   "sha256": "3caacdf23cb86e7f628a0d667a7c1dae8848a9b55635db172f094b2907dba188",
+   "source": "runs/shizhen-opening-canon-20261030-L3/assets/audio/3caacdf23cb86e7f628a0d667a7c1dae8848a9b55635db172f094b2907dba188.wav",
+   "shot_s": 5.0,
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L4",
+   "role": "relay",
+   "text": "人民路有人喊救命，在七楼，七楼早就封了",
+   "voice": "Yun Calm Mature",
+   "duration_s": 4.0,
+   "sha256": "3e102d91b8053c8a3694a4ec0229e759cc9ad027465631ec9474327d6be610da",
+   "source": "runs/shizhen-opening-canon-20261030-L4/assets/audio/3e102d91b8053c8a3694a4ec0229e759cc9ad027465631ec9474327d6be610da.wav",
+   "shot_s": 5.5,
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L5",
+   "role": "dong",
+   "text": "记上，第十四起",
+   "voice": "Serena Calm Soothing",
+   "duration_s": 2.16,
+   "sha256": "165d86696c347fc4a907248933827620d27e39df9d23f7628f32635f78e254b5",
+   "source": "runs/shizhen-opening-canon-20261030-L5/assets/audio/165d86696c347fc4a907248933827620d27e39df9d23f7628f32635f78e254b5.wav",
+   "shot_s": 3.2,
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L6a",
+   "role": "dong",
+   "text": "三号站台",
+   "voice": "Serena Calm Soothing",
+   "duration_s": 6.56,
+   "sha256": "519a6be16bfcd4d9c01f8368f9c0f29a8c32dc29c455ceb81e1ad47b3a03391f",
+   "source": "runs/shizhen-opening-canon-20261030-L6a/assets/audio/519a6be16bfcd4d9c01f8368f9c0f29a8c32dc29c455ceb81e1ad47b3a03391f.wav",
+   "shot_s": 3.5,
+   "human_quality": "NOT_EVALUATED"
+  },
+  {
+   "id": "L6b",
+   "role": "relay",
+   "text": "暂无报告",
+   "voice": "Yun Calm Mature",
+   "duration_s": 3.36,
+   "sha256": "3ea7c6b40d51538f0c80736fcf1de7e03b4ecbdaf22456b7f5f9d7c4621ce1b4",
+   "source": "runs/shizhen-opening-canon-20261030-L6b/assets/audio/3ea7c6b40d51538f0c80736fcf1de7e03b4ecbdaf22456b7f5f9d7c4621ce1b4.wav",
+   "shot_s": 3.5,
+   "human_quality": "NOT_EVALUATED"
+  }
+ ]
+}

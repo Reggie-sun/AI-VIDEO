@@ -1,0 +1,1887 @@
+{
+  "decision": {
+    "snapshot_hash": "ba9e9ce3140c6714e2c5c091a84ccdc77eca9602e46d60f212f079d3b359c4ea",
+    "disposition": "GENERATE_ONCE",
+    "selected_candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+    "assessments": [
+      {
+        "candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+        "scope_hash": "511b4aa4e8007d02b805e7095fa86eeb8b8ba16e28a2a7118d2f5d08009339ec",
+        "fit": "unknown",
+        "compatible": true,
+        "executable": true,
+        "supported_dimensions": [],
+        "failed_dimensions": [],
+        "unknown_dimensions": [
+          "action",
+          "art",
+          "camera",
+          "performance",
+          "sound",
+          "space"
+        ],
+        "evidence_hashes": [],
+        "ignored_evidence_hashes": [],
+        "sample_count": 0,
+        "pass_count": 0,
+        "fail_count": 0,
+        "not_evaluated_count": 0,
+        "runtime_failure_count": 0,
+        "unknown_outcome_count": 0,
+        "not_submitted_count": 0,
+        "reasons": [],
+        "empirical": {
+          "version": "generation-cohort/1",
+          "supported_artifacts": [],
+          "failed_artifacts": [],
+          "incomplete_artifacts": [],
+          "evidence_hashes": [],
+          "exclusions": [],
+          "failed_requirements": [],
+          "observed_success_fraction": null,
+          "interval_95": null,
+          "limitations": [
+            "observational cohort; selection and intervention confounding remain",
+            "unknown action complexity and hand/prop interaction are not matched",
+            "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+          ]
+        }
+      }
+    ],
+    "diagnosis": null,
+    "intervention": null,
+    "runtime_repair": null,
+    "routing": {
+      "decision": {
+        "target_shot_id": "D3",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "28030641d6ce60860704a7cf0f0003f7494ce1e2d7395c074ecd2b6c26600281",
+        "continuity_mode": "none",
+        "semantic_continuity_state": null,
+        "required_mode": "reference_to_video",
+        "selected_mode": "reference_to_video",
+        "required_binding_roles": [
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "scene_reference",
+            "asset_id": "D3-ref-er",
+            "asset_sha256": "f00740b3c0bc38d748528e64d438b0a2834fa7bfc18e5d370c11406c8683b2c9",
+            "source_registry_revision_id": "a6049d680addd36103568c3d25af946fd6142ad3cf12b1f9b4b9a829ee9dd4d3",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "er-bay",
+            "canonical_owner_content_hash": "4137a838568f470502db53814c0e1f5ca1da0ac5dcc5b383850f7e7d2c45bd88",
+            "mime_type": "image/png",
+            "size_bytes": 1985194,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "provider_name": "jimeng",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/5011bf6ab9649b5bf432b4c0b008c7fc91a30fa1df5695cc25ba3260a3a47de8.json",
+          "profile_sha256": "5011bf6ab9649b5bf432b4c0b008c7fc91a30fa1df5695cc25ba3260a3a47de8"
+        },
+        "provider_capabilities_fingerprint": "a4e4fa3add6a83b868e7246155d5a8dbfd3587a89f38e79d80087e71da4616d8",
+        "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "selected_capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "requirement_hash": "692463233081324cd3a2ba6c7652a5c2320cb9e884e6a513cd8c0deeadea4030",
+        "continuity_transition_policy_hash": null,
+        "previous_provider_bound_request_hash": null,
+        "continuity_provider_route_binding_hash": null,
+        "execution_kind": "remote",
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 6,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "reason_codes": [
+          "CANONICAL_REFERENCES_ENABLE_R2V"
+        ],
+        "rationale": "Bind the verified neutral requirement to the exact capability.",
+        "policy": {
+          "policy_id": "shizhen-cold-open-qualification",
+          "policy_version": "1",
+          "policy_sha256": "04464d18be7984d5635e169fe90e8bd6826cfa8edaea2349d917548c0827cbbd"
+        },
+        "outcome": "selected",
+        "semantic_routing_hash": "4ed1f1d1804c7aabf972774e7cd544862524504c75cbf67f9bcc9c694413ea8f",
+        "audit_decision_hash": "9cd8392a8020b222f8423cc67e060f48f98e49c4798c4a24a00998efeee4dcb1"
+      },
+      "provider_bound_request": {
+        "plan_hash": "fd626bfccf1092e8a2b61e64a0ca465597b1089479ae9c34cbd26908ccf3007f",
+        "requirement_hash": "692463233081324cd3a2ba6c7652a5c2320cb9e884e6a513cd8c0deeadea4030",
+        "verified_projection_hash": "a386bb8d9159f65f6fa2925a21ae2df70567739b82dc55cc0ee6c77e34319d6a",
+        "target_shot_id": "D3",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "28030641d6ce60860704a7cf0f0003f7494ce1e2d7395c074ecd2b6c26600281",
+        "semantic_routing_hash": "4ed1f1d1804c7aabf972774e7cd544862524504c75cbf67f9bcc9c694413ea8f",
+        "audit_decision_hash": "9cd8392a8020b222f8423cc67e060f48f98e49c4798c4a24a00998efeee4dcb1",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.0_vip",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/5011bf6ab9649b5bf432b4c0b008c7fc91a30fa1df5695cc25ba3260a3a47de8.json",
+          "profile_sha256": "5011bf6ab9649b5bf432b4c0b008c7fc91a30fa1df5695cc25ba3260a3a47de8"
+        },
+        "capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "execution_kind": "remote",
+        "billing_kind": "metered",
+        "mode": "reference_to_video",
+        "binding_roles": [
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "scene_reference",
+            "asset_id": "D3-ref-er",
+            "asset_sha256": "f00740b3c0bc38d748528e64d438b0a2834fa7bfc18e5d370c11406c8683b2c9",
+            "source_registry_revision_id": "a6049d680addd36103568c3d25af946fd6142ad3cf12b1f9b4b9a829ee9dd4d3",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "er-bay",
+            "canonical_owner_content_hash": "4137a838568f470502db53814c0e1f5ca1da0ac5dcc5b383850f7e7d2c45bd88",
+            "mime_type": "image/png",
+            "size_bytes": 1985194,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 6,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "lifecycle": {
+          "generation_id": "canvas-generation-5353bbf45002841c86a76add6a8409ad",
+          "target_asset_role": "primary_visual",
+          "base_project": {
+            "path": "state/projects/project.1.2a51e3d36f3909bc82438596cc8c1bc935e11c44673aa7e07e09407ae5690912.yaml",
+            "revision": 1,
+            "content_hash": "2a51e3d36f3909bc82438596cc8c1bc935e11c44673aa7e07e09407ae5690912",
+            "file_sha256": "a52fa2b65f7fa291327c3dd61f287d00a51eb9029e6372ed45a4736baa405ba9"
+          },
+          "base_registry": {
+            "path": "assets/registry.a6049d680addd36103568c3d25af946fd6142ad3cf12b1f9b4b9a829ee9dd4d3.json",
+            "revision_id": "a6049d680addd36103568c3d25af946fd6142ad3cf12b1f9b4b9a829ee9dd4d3",
+            "content_hash": "a6049d680addd36103568c3d25af946fd6142ad3cf12b1f9b4b9a829ee9dd4d3",
+            "file_sha256": "91b84197668b0749774c3830216f79f613ee8426b8d2d4118d87249e03e168fd"
+          },
+          "base_dependency_graph": {
+            "revision_id": "daa36965873989bdd086729c70f83ba9850806af730975141830614060bb6953",
+            "content_hash": "daa36965873989bdd086729c70f83ba9850806af730975141830614060bb6953",
+            "path": "state/dependency_graph.daa36965873989bdd086729c70f83ba9850806af730975141830614060bb6953.json",
+            "file_sha256": "a4720c3abd6c2323d1b31de4e33e4a7353d89643c6e7336cbdec4c510bee5f1b"
+          },
+          "input_artifact_ids": [
+            "shizhen-dispatch-D3-shot",
+            "shizhen-dispatch-D3-scene",
+            "shizhen-dispatch-D3-character-er-nurse",
+            "shizhen-dispatch-D3-character-er-patient",
+            "D3-ref-er"
+          ],
+          "output_asset_id": "canvas-video-5353bbf45002841c86a76add6a8409ad",
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false
+        },
+        "compiler_contract": {
+          "compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+          "compiler_version": "1",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49"
+        },
+        "expression_strength": "semantic_prompt_allowed",
+        "generation_recipe": {
+          "contract_version": "generation-recipe/1",
+          "seed": {
+            "kind": "uncontrolled",
+            "value": null
+          },
+          "profile_sha256": "5011bf6ab9649b5bf432b4c0b008c7fc91a30fa1df5695cc25ba3260a3a47de8",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+          "requirement_hash": "692463233081324cd3a2ba6c7652a5c2320cb9e884e6a513cd8c0deeadea4030",
+          "rubric_hash": "6e335f42ba58e27074355441c3e1dcb2117921ae35b69f3089278c2048613faa",
+          "acceptance_policy": {
+            "domain_id": "original-drama",
+            "profile_id": "shizhen-dispatch-D3-raw",
+            "profile_version": "1",
+            "profile_content_hash": "6e335f42ba58e27074355441c3e1dcb2117921ae35b69f3089278c2048613faa",
+            "profile_payload": {
+              "content_hash": "6e335f42ba58e27074355441c3e1dcb2117921ae35b69f3089278c2048613faa",
+              "domain_id": "original-drama",
+              "generation_requirements": [
+                {
+                  "dimension": "action",
+                  "intent_paths": [
+                    "generation_intent.open_state.kind",
+                    "generation_intent.open_state.state_text",
+                    "generation_intent.open_state.required_change",
+                    "generation_intent.close_state.kind",
+                    "generation_intent.close_state.state_text",
+                    "generation_intent.close_state.required_change",
+                    "generation_intent.scene_continuity.scene_id",
+                    "generation_intent.scene_continuity.time_of_day",
+                    "generation_intent.scene_continuity.mood",
+                    "generation_intent.scene_continuity.state_constraints.0",
+                    "generation_intent.scene_continuity.state_constraints.1",
+                    "generation_intent.scene_continuity.state_constraints.2",
+                    "generation_intent.subject_action.start_state",
+                    "generation_intent.subject_action.progression",
+                    "generation_intent.subject_action.endpoint.state_text",
+                    "generation_intent.subject_action.endpoint.required_change",
+                    "generation_intent.motion_envelope.onset",
+                    "generation_intent.motion_envelope.peak",
+                    "generation_intent.motion_envelope.settle",
+                    "generation_intent.motion_envelope.direction",
+                    "generation_intent.motion_envelope.amplitude_class",
+                    "generation_intent.pacing.cadence",
+                    "generation_intent.pacing.tempo_class",
+                    "generation_intent.pacing.shot_duration_seconds"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.scene_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.time_of_day"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.mood"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.2"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.start_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.progression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.onset"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.peak"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.settle"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.cadence"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.tempo_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.shot_duration_seconds"
+                      }
+                    ],
+                    "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89"
+                  },
+                  "observable": "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "action",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "camera",
+                  "intent_paths": [
+                    "generation_intent.axis_continuity.camera_axis",
+                    "generation_intent.axis_continuity.framing_continuity",
+                    "generation_intent.axis_continuity.crossing_policy",
+                    "generation_intent.camera_endpoint.start_framing",
+                    "generation_intent.camera_endpoint.end_framing",
+                    "generation_intent.camera_endpoint.position_lock",
+                    "generation_intent.camera_endpoint.orientation_lock",
+                    "generation_intent.camera_intent.movement",
+                    "generation_intent.camera_intent.stability",
+                    "generation_intent.camera_intent.framing_intent",
+                    "generation_intent.camera_intent.expression_strength",
+                    "generation_intent.camera_subject_relation.subject_id",
+                    "generation_intent.camera_subject_relation.relation_kind",
+                    "generation_intent.camera_subject_relation.start_relation",
+                    "generation_intent.camera_subject_relation.end_relation",
+                    "generation_intent.primary_camera_motion.movement_kind",
+                    "generation_intent.primary_camera_motion.direction",
+                    "generation_intent.primary_camera_motion.amplitude_class",
+                    "generation_intent.primary_camera_motion.speed_class",
+                    "generation_intent.primary_camera_motion.start_motion_state",
+                    "generation_intent.primary_camera_motion.end_motion_state"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.camera_axis"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.framing_continuity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.crossing_policy"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.start_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.end_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.position_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.orientation_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.movement"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.stability"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.framing_intent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.expression_strength"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.subject_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.relation_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.start_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.end_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.movement_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.speed_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.start_motion_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                      }
+                    ],
+                    "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89"
+                  },
+                  "observable": "镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "camera",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "performance",
+                  "intent_paths": [
+                    "generation_intent.performance_intent.trigger",
+                    "generation_intent.performance_intent.visible_response",
+                    "generation_intent.performance_intent.gaze_target",
+                    "generation_intent.performance_intent.body_behavior",
+                    "generation_intent.performance_intent.hand_behavior",
+                    "generation_intent.performance_intent.terminal_performance_state",
+                    "generation_intent.performance_intent.character_directions.0.character_id",
+                    "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "generation_intent.performance_intent.character_directions.0.role",
+                    "generation_intent.performance_intent.character_directions.0.visibility",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "generation_intent.performance_intent.character_directions.1.character_id",
+                    "generation_intent.performance_intent.character_directions.1.screen_identity",
+                    "generation_intent.performance_intent.character_directions.1.role",
+                    "generation_intent.performance_intent.character_directions.1.visibility",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.phase",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.trigger",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.emotion",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.intensity",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.facial_expression",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.gaze_target",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.breathing",
+                    "generation_intent.performance_intent.character_directions.1.beats.0.body_behavior"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.visible_response"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.body_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.hand_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.character_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.visibility"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.character_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.screen_identity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.visibility"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.emotion"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.intensity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.facial_expression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.breathing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.body_behavior"
+                      }
+                    ],
+                    "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89"
+                  },
+                  "observable": "人物都不开口，反应克制自然",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "performance",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "space",
+                  "intent_paths": [
+                    "generation_intent.space_continuity.subject_position",
+                    "generation_intent.space_continuity.screen_direction",
+                    "generation_intent.space_continuity.crossing_policy"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.subject_position"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.screen_direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.crossing_policy"
+                      }
+                    ],
+                    "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89"
+                  },
+                  "observable": "护士在左，病人躺在右侧病床",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "space",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "sound",
+                  "intent_paths": [
+                    "generation_intent.ambience_intent.environment_bed",
+                    "generation_intent.ambience_intent.foley_cues.0",
+                    "generation_intent.ambience_intent.explicitly_silent",
+                    "generation_intent.dialogue_intent.mode",
+                    "generation_intent.dialogue_intent.lip_sync_required",
+                    "generation_intent.music_intent.mode"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.environment_bed"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.foley_cues.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.explicitly_silent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.mode"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.lip_sync_required"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.music_intent.mode"
+                      }
+                    ],
+                    "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89"
+                  },
+                  "observable": "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "sound",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                },
+                {
+                  "dimension": "art",
+                  "intent_paths": [
+                    "generation_intent.lighting_intent.motivated_source",
+                    "generation_intent.lighting_intent.direction",
+                    "generation_intent.lighting_intent.exposure_priority",
+                    "generation_intent.lighting_intent.continuity_state",
+                    "generation_intent.visual_treatment.medium_look",
+                    "generation_intent.visual_treatment.palette",
+                    "generation_intent.visual_treatment.material_treatment",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+                  "native_text": [
+                    "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。",
+                    "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.motivated_source"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.exposure_priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.continuity_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.medium_look"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.palette"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.material_treatment"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0,
+                          1
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                      }
+                    ],
+                    "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89"
+                  },
+                  "observable": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "art",
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过"
+                }
+              ],
+              "measurement_contract_version": "1",
+              "profile_id": "shizhen-dispatch-D3-raw",
+              "profile_version": "1",
+              "required_requirement_ids": [
+                "action",
+                "camera",
+                "performance",
+                "space",
+                "sound",
+                "art"
+              ]
+            },
+            "measurement_contract_version": "1",
+            "required_requirement_ids": [
+              "action",
+              "camera",
+              "performance",
+              "space",
+              "sound",
+              "art"
+            ]
+          },
+          "expressions": [
+            {
+              "requirement_id": "action",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "action",
+              "observable": "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.open_state.kind",
+                "generation_intent.open_state.state_text",
+                "generation_intent.open_state.required_change",
+                "generation_intent.close_state.kind",
+                "generation_intent.close_state.state_text",
+                "generation_intent.close_state.required_change",
+                "generation_intent.scene_continuity.scene_id",
+                "generation_intent.scene_continuity.time_of_day",
+                "generation_intent.scene_continuity.mood",
+                "generation_intent.scene_continuity.state_constraints.0",
+                "generation_intent.scene_continuity.state_constraints.1",
+                "generation_intent.scene_continuity.state_constraints.2",
+                "generation_intent.subject_action.start_state",
+                "generation_intent.subject_action.progression",
+                "generation_intent.subject_action.endpoint.state_text",
+                "generation_intent.subject_action.endpoint.required_change",
+                "generation_intent.motion_envelope.onset",
+                "generation_intent.motion_envelope.peak",
+                "generation_intent.motion_envelope.settle",
+                "generation_intent.motion_envelope.direction",
+                "generation_intent.motion_envelope.amplitude_class",
+                "generation_intent.pacing.cadence",
+                "generation_intent.pacing.tempo_class",
+                "generation_intent.pacing.shot_duration_seconds"
+              ],
+              "native_text": [
+                "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.open_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.scene_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.time_of_day",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.mood",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.2",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.start_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.progression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.onset",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.peak",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.settle",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.cadence",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.tempo_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.shot_duration_seconds",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "art",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "art",
+              "observable": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.lighting_intent.motivated_source",
+                "generation_intent.lighting_intent.direction",
+                "generation_intent.lighting_intent.exposure_priority",
+                "generation_intent.lighting_intent.continuity_state",
+                "generation_intent.visual_treatment.medium_look",
+                "generation_intent.visual_treatment.palette",
+                "generation_intent.visual_treatment.material_treatment",
+                "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                "generation_intent.visual_treatment.prohibited_visual_drift.1"
+              ],
+              "native_text": [
+                "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。",
+                "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.lighting_intent.motivated_source",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.direction",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.exposure_priority",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.continuity_state",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.medium_look",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.palette",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.material_treatment",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                    "fragment_indices": [
+                      0,
+                      1
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "camera",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "camera",
+              "observable": "镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.axis_continuity.camera_axis",
+                "generation_intent.axis_continuity.framing_continuity",
+                "generation_intent.axis_continuity.crossing_policy",
+                "generation_intent.camera_endpoint.start_framing",
+                "generation_intent.camera_endpoint.end_framing",
+                "generation_intent.camera_endpoint.position_lock",
+                "generation_intent.camera_endpoint.orientation_lock",
+                "generation_intent.camera_intent.movement",
+                "generation_intent.camera_intent.stability",
+                "generation_intent.camera_intent.framing_intent",
+                "generation_intent.camera_intent.expression_strength",
+                "generation_intent.camera_subject_relation.subject_id",
+                "generation_intent.camera_subject_relation.relation_kind",
+                "generation_intent.camera_subject_relation.start_relation",
+                "generation_intent.camera_subject_relation.end_relation",
+                "generation_intent.primary_camera_motion.movement_kind",
+                "generation_intent.primary_camera_motion.direction",
+                "generation_intent.primary_camera_motion.amplitude_class",
+                "generation_intent.primary_camera_motion.speed_class",
+                "generation_intent.primary_camera_motion.start_motion_state",
+                "generation_intent.primary_camera_motion.end_motion_state"
+              ],
+              "native_text": [
+                "镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.axis_continuity.camera_axis",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.framing_continuity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.start_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.end_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.position_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.orientation_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.movement",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.stability",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.framing_intent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.expression_strength",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.subject_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.relation_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.start_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.end_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.movement_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.speed_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.start_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "performance",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "performance",
+              "observable": "人物都不开口，反应克制自然",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.performance_intent.trigger",
+                "generation_intent.performance_intent.visible_response",
+                "generation_intent.performance_intent.gaze_target",
+                "generation_intent.performance_intent.body_behavior",
+                "generation_intent.performance_intent.hand_behavior",
+                "generation_intent.performance_intent.terminal_performance_state",
+                "generation_intent.performance_intent.character_directions.0.character_id",
+                "generation_intent.performance_intent.character_directions.0.screen_identity",
+                "generation_intent.performance_intent.character_directions.0.role",
+                "generation_intent.performance_intent.character_directions.0.visibility",
+                "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                "generation_intent.performance_intent.character_directions.1.character_id",
+                "generation_intent.performance_intent.character_directions.1.screen_identity",
+                "generation_intent.performance_intent.character_directions.1.role",
+                "generation_intent.performance_intent.character_directions.1.visibility",
+                "generation_intent.performance_intent.character_directions.1.beats.0.phase",
+                "generation_intent.performance_intent.character_directions.1.beats.0.trigger",
+                "generation_intent.performance_intent.character_directions.1.beats.0.emotion",
+                "generation_intent.performance_intent.character_directions.1.beats.0.intensity",
+                "generation_intent.performance_intent.character_directions.1.beats.0.facial_expression",
+                "generation_intent.performance_intent.character_directions.1.beats.0.gaze_target",
+                "generation_intent.performance_intent.character_directions.1.beats.0.breathing",
+                "generation_intent.performance_intent.character_directions.1.beats.0.body_behavior"
+              ],
+              "native_text": [
+                "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.performance_intent.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.visible_response",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.hand_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.character_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.visibility",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.character_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.screen_identity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.visibility",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.phase",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.emotion",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.intensity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.facial_expression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.breathing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.1.beats.0.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "sound",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "sound",
+              "observable": "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.ambience_intent.environment_bed",
+                "generation_intent.ambience_intent.foley_cues.0",
+                "generation_intent.ambience_intent.explicitly_silent",
+                "generation_intent.dialogue_intent.mode",
+                "generation_intent.dialogue_intent.lip_sync_required",
+                "generation_intent.music_intent.mode"
+              ],
+              "native_text": [
+                "声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.ambience_intent.environment_bed",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.foley_cues.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.explicitly_silent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.lip_sync_required",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.music_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "space",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "space",
+              "observable": "护士在左，病人躺在右侧病床",
+              "tolerance": "逐项满足分镜与完整动作；不凭静态图片或工具成功推断视频通过",
+              "measurement": "Exact project-local video-analysis plus frame sequences and qualified audio observations",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.space_continuity.subject_position",
+                "generation_intent.space_continuity.screen_direction",
+                "generation_intent.space_continuity.crossing_policy"
+              ],
+              "native_text": [
+                "夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。"
+              ],
+              "production_owner": "shot_authoring",
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "cf8193edd418d05315ab208f0599a8fd6d4456030f5d84befe57ca1a95a50a89",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.space_continuity.subject_position",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.screen_direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "editorial_operations": [],
+          "comparison": null
+        },
+        "provider_bound_request_hash": "1c534ff8e79d05391e7bd3616e59b93cdf2f65653213b4882e52c1e3d46922f6"
+      }
+    },
+    "rationale": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1: unknown; one bounded attempt, no quality guarantee",
+      "evidence and policy affect audit identity, not unrelated media semantics"
+    ],
+    "revalidate_requirements": [
+      "action",
+      "art",
+      "camera",
+      "performance",
+      "sound",
+      "space"
+    ]
+  },
+  "compilation": {
+    "outcome": "unsupported",
+    "requirement_hash": "692463233081324cd3a2ba6c7652a5c2320cb9e884e6a513cd8c0deeadea4030",
+    "provider_bound_request_hash": "1c534ff8e79d05391e7bd3616e59b93cdf2f65653213b4882e52c1e3d46922f6",
+    "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+    "reason": "PROMPT_EXPRESSION_UNSUPPORTED",
+    "unsupported_field_paths": [
+      "generation_intent.reference_planning.events.0"
+    ],
+    "retryable": false,
+    "prompt_text": null,
+    "payload": null,
+    "input_expression_report": {
+      "prompt_text": "参考素材1{{image:0}}负责护士、女病人、病床、扫码枪和急诊区的样貌与光线。\n夜间医院急诊区，真人实拍质感。戴蓝色口罩的护士用手持扫码枪对准女病人手腕上的白色腕带，扫码枪顶部的指示灯亮红；她再扫一次，指示灯又一次亮红。护士从扫码枪上抬起眼睛，看向病人的脸，停住。女病人平躺着，睁着眼睛，胸口随正常呼吸起伏，平静地看着护士。两人都不说话。\n镜头从扫码枪的红色指示灯开始，缓慢平稳地推向病人，最后停在病人的脸部近景，她睁着眼睛、正常呼吸，让观众先看到系统判定失败，再看到她明明活着。\n声音是扫码枪两声短促的失败提示音、监护仪平稳的嘀声和远处急诊区低低的嘈杂；无对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现屏幕文字、字幕或可读字符。",
+      "prompt_sha256": "f2db6c6c81ff6642b30ad2625b7bc971a18aecd5183e7cdc65fa32fcd6151b37",
+      "missing_requirement_paths": [
+        "generation_intent.reference_planning.events.0"
+      ],
+      "coverage_source": "selected_qa_final_text",
+      "rejected_coverage_source": "inherited_automatic_prose",
+      "actual_quality": "NOT_EVALUATED"
+    }
+  }
+}

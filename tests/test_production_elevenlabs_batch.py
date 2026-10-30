@@ -263,7 +263,7 @@ def test_directed_batch_seals_wire_egress_and_replays_without_post(tmp_path):
     assert len(transport.calls) == 1
 
 
-@pytest.mark.parametrize("returned", ["[quiet] 你好", "你", "你好呀"])
+@pytest.mark.parametrize("returned", ["[other] 你好", "你", "你好呀"])
 def test_directed_alignment_gap_stops_without_retry_or_second_line(tmp_path, returned):
     transport = DirectedTransport(alignment_text=returned, normalized_text=returned)
     exact = directed_batch(scripts=("你好", "再见"))
@@ -541,3 +541,108 @@ def test_secret_supplier_preserves_exact_reference_and_user_bus(monkeypatch, exi
         existing_bus or f"unix:path=/run/user/{os.getuid()}/bus")
     assert os.environ.get("DBUS_SESSION_BUS_ADDRESS") == existing_bus
     assert len(calls) == 1
+
+
+class RetainedPrefixTransport:
+    def __init__(self, mutation=None):
+        self.calls = []
+        self.mutation = mutation
+
+    def request(self, request):
+        self.calls.append(request)
+        text = json.loads(request.body)["text"]
+        chars = list(text)
+        if self.mutation == "nonexact_prefix":
+            chars = list(text.replace("[quiet] ", "[other] "))
+        elif self.mutation == "missing_prefix_space":
+            chars = list(text.replace("[quiet] ", "[quiet]"))
+        elif self.mutation == "extra_prefix":
+            chars = list("[extra] " + text)
+        elif self.mutation == "missing_word":
+            chars = list(text[:-1])
+        elif self.mutation == "boundary_token":
+            chars = ["[quiet] 你", "好"]
+        timing = dict(characters=chars,
+            character_start_times_seconds=[i * .02 for i in range(len(chars))],
+            character_end_times_seconds=[(i + 1) * .02 for i in range(len(chars))])
+        normalized = json.loads(json.dumps(timing))
+        if self.mutation == "negative_prefix_time":
+            timing["character_start_times_seconds"][0] = -.01
+        elif self.mutation == "nan_prefix_time":
+            timing["character_start_times_seconds"][0] = float("nan")
+        elif self.mutation == "reordered_prefix_time":
+            timing["character_start_times_seconds"][2] = .001
+        elif self.mutation == "duration_style_end":
+            timing["character_end_times_seconds"][-1] = .01
+        elif self.mutation == "malformed_normalized":
+            normalized["character_end_times_seconds"] = []
+        payload = dict(audio_base64=base64.b64encode(b"\0\0" * 48000).decode(),
+                       alignment=timing, normalized_alignment=normalized)
+        self.response_body = json.dumps(payload).encode()
+        return ElevenLabsTransportResponse(200,
+            {"character-cost": str(len(text)), "request-id": "prefix-test"}, self.response_body)
+
+
+def test_retained_exact_prefix_maps_spoken_times_and_preserves_raw_evidence(tmp_path):
+    from decimal import Decimal
+    import hashlib
+    transport = RetainedPrefixTransport()
+    exact = directed_batch()
+    paths = run(tmp_path, exact, transport)
+    assert len(paths) == 1
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.manifest.attempts[-1].status.value == "succeeded"
+    attempt = tmp_path / "state/voice/attempts/eleven-test-1"
+    receipt_bytes = (attempt / "alignment.json").read_bytes()
+    receipt = json.loads(receipt_bytes)
+    assert "".join(receipt["alignment"]["characters"]) == "你好"
+    assert Decimal(receipt["alignment"]["character_start_times_seconds"][0]) == Decimal("0.16")
+    assert Decimal(receipt["alignment"]["character_end_times_seconds"][-1]) == Decimal("0.20")
+    evidence = receipt["synthesis_alignment"]
+    assert "".join(evidence["raw_alignment"]["characters"]) == "[quiet] 你好"
+    assert "".join(evidence["raw_normalized_alignment"]["characters"]) == "[quiet] 你好"
+    assert evidence["prefix"] == "[quiet] "
+    assert evidence["synthesis_text_sha256"] == hashlib.sha256("[quiet] 你好".encode()).hexdigest()
+    assert evidence["mapping_kind"] == "sealed-prefix-projection/1"
+    assert evidence["provider_response_sha256"] == hashlib.sha256(transport.response_body).hexdigest()
+    assert run(tmp_path, exact, transport) == paths
+    assert (attempt / "alignment.json").read_bytes() == receipt_bytes
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize("mutation", [
+    "nonexact_prefix", "missing_prefix_space", "extra_prefix", "missing_word", "boundary_token",
+    "negative_prefix_time", "nan_prefix_time", "reordered_prefix_time", "duration_style_end", "malformed_normalized",
+])
+def test_prefix_projection_rejects_nonexact_text_or_invalid_raw_timing_without_retry(tmp_path, mutation):
+    transport = RetainedPrefixTransport(mutation)
+    exact = directed_batch(scripts=("你好", "再见"))
+    with pytest.raises(Exception):
+        run(tmp_path, exact, transport)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    attempts = [a for a in loaded.manifest.attempts if a.operation == "voice_generation"]
+    assert len(attempts) == 1 and attempts[0].status.value == "outcome_unknown"
+    with pytest.raises(Exception, match="explicit recovery"):
+        run(tmp_path, exact, transport)
+    assert len(transport.calls) == 1
+
+
+def test_exact_prefix_projection_preserves_literal_spoken_brackets(tmp_path):
+    transport = RetainedPrefixTransport()
+    run(tmp_path, directed_batch(scripts=("[A]你好",)), transport)
+    receipt = json.loads((tmp_path / "state/voice/attempts/eleven-test-1/alignment.json").read_text())
+    assert "".join(receipt["alignment"]["characters"]) == "[A]你好"
+    assert receipt["synthesis_alignment"]["prefix"] == "[quiet] "
+    assert "".join(receipt["synthesis_alignment"]["raw_alignment"]["characters"]) == "[quiet] [A]你好"
+
+
+@pytest.mark.parametrize("excluded", [["L1"], "L1", [None], [""]])
+def test_context_cannot_select_excluded_or_malformed_line_list(performance_context_package, excluded):
+    from ai_video.errors import AiVideoError
+    from scripts.elevenlabs_performance_context import load_performance_context
+    path, data, _ = performance_context_package
+    data["submit_status"] = "READY_FOR_CANONICAL_PREFLIGHT"
+    data["excluded_line_ids"] = excluded
+    path.write_text(json.dumps(data))
+    with pytest.raises(AiVideoError):
+        load_performance_context(path, "L1")

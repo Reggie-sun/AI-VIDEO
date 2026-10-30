@@ -21,7 +21,7 @@ from test_production_generated_video_e2e import _runtime
 from production_generation_execution_factory import fixture_generation_expression
 from test_production_generation_decision import acceptance_policy
 from test_production_video import _paid_preview, _paid_authorization
-from tests.reference_authoring_fixture import fixture_director_coverage, fixture_reference_planning
+from tests.reference_authoring_fixture import fixture_director_coverage, fixture_preview_approval, fixture_reference_planning
 
 
 def runtime(tmp_path, *, status_events=(VideoTaskState.SUCCEEDED,), native_media=None):
@@ -48,6 +48,7 @@ def runtime(tmp_path, *, status_events=(VideoTaskState.SUCCEEDED,), native_media
     data["delivery_profile"] = {"width": 64, "height": 64, "fps": 24}
     # Drama Director coverage is sealed with the Project so each fresh generation binds it.
     data["director_coverages"] = [fixture_director_coverage()]
+    data["preview_approvals"] = [fixture_preview_approval()]
     source = inputs.project.registry.assets[0]
     source = source.model_copy(update={"input_artifact_ids": ()})
     registry = AssetRegistrySnapshot(revision_id="0" * 64, content_hash="0" * 64, assets=(source,))

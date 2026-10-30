@@ -1,0 +1,56 @@
+{
+  "authority": "supplemental_development_checks_not_Harness_PASS",
+  "checks": [
+    {
+      "check": "docs_contract",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "scripts.docs_contract_gate",
+        "check"
+      ],
+      "exit_code": 0,
+      "stdout": "Documentation contract gate passed.\n",
+      "stderr": ""
+    },
+    {
+      "check": "policy_audit",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "scripts.agent_harness",
+        "policy-audit"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"candidate_count\": 1210,\n  \"docs_contract_diagnostics\": [],\n  \"missing_check_test_paths\": [],\n  \"unmapped_paths\": [\n    \"src/ai_video/production/_qualification_quality_repair.py\",\n    \"src/ai_video/production/qualification_preview_input.py\",\n    \"src/ai_video/production/watermark_preset.py\",\n    \"tests/test_captionless_native_join_preview.py\",\n    \"tests/test_mixed_stock_dialogue_preview.py\",\n    \"tests/test_preview_source_clock.py\",\n    \"tests/test_qualification_preview_input.py\",\n    \"tests/test_qualification_quality_repair.py\",\n    \"tests/test_watermark_preset.py\"\n  ],\n  \"unreferenced_test_paths\": [\n    \"tests/test_captionless_native_join_preview.py\",\n    \"tests/test_mixed_stock_dialogue_preview.py\",\n    \"tests/test_preview_source_clock.py\",\n    \"tests/test_qualification_preview_input.py\",\n    \"tests/test_watermark_preset.py\"\n  ],\n  \"unverified_paths\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "check": "architecture",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "scripts.architecture_gate",
+        "check",
+        "--base-ref",
+        "HEAD",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"findings\": [],\n  \"status\": \"PASS\"\n}\n",
+      "stderr": ""
+    }
+  ],
+  "focused_receipt": ".agent/harness/runs/shizhen-raster-overlay-focused-20261027/receipt.json",
+  "focused_status": "FAILED: libass/freetype native linkage and index snapshot drift; initial source scope excluded later captured-audio change",
+  "related_receipt": ".agent/harness/runs/shizhen-raster-overlay-related-20261027/receipt.json",
+  "related_status": "FAILED: unchanged AGENTS.md budget",
+  "targeted_actual_current_code": "159 passed; generic raster, captured-audio guards, repair admission, source audio",
+  "independent_review": "qa/independent-media-review.json; empty findings, no media acceptance",
+  "additional_regression": {
+    "passed": 73,
+    "skipped": 17,
+    "environment": "process-scoped LD_PRELOAD=/lib/x86_64-linux-gnu/libfreetype.so.6; no system mutation"
+  }
+}

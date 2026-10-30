@@ -1,0 +1,17 @@
+{
+  "schema": "per-shot-post-media-gate/agent-verdict-1",
+  "shot_id": "D3", "attempt_id": "shizhen-dispatch-D3-preview-001",
+  "media": {"path": "runs/shizhen-opening-dispatch-20261030/D3/state/video-generation/fetch/files/b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f.mp4",
+            "sha256": "b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f"},
+  "evidence": ["contact.jpg (2fps)", "mid.jpg (3fps, 2-6s)", "audio-understanding.json: no voice segments"],
+  "findings": {
+    "action": {"verdict": "PASS", "reason": "扫码枪红灯反复亮起、扫码失败可读；病人睁眼、正常呼吸。偏差：护士持续低头扫腕带，未明确“抬眼看病人”这一拍（次要节拍，记录在案）。"},
+    "camera": {"verdict": "PASS", "reason": "0–1s红灯插入特写后切到中景，再缓推到病人脸部近景；与“一路推近”不同，但先见失败再见她活着的目的成立，插入特写可作剪辑素材。"},
+    "space": {"verdict": "PASS", "reason": "护士在左、病床在右，全程一致。"},
+    "performance": {"verdict": "PASS", "reason": "两人都不开口；护士戴口罩，病人平静。"},
+    "sound": {"verdict": "PASS", "reason": "只有规律的机械提示声与室内混响，无人声。"},
+    "art": {"verdict": "PASS", "reason": "写实急诊区，无字幕、无屏幕文字。"}
+  },
+  "overall": "PASS", "deviations_disclosed_to_user": ["护士未明确抬眼", "开头插入特写加切点"],
+  "next_shot_submit_allowed": true, "human_acceptance": "NOT_EVALUATED"
+}

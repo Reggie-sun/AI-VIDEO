@@ -1,0 +1,19 @@
+{
+  "schema": "per-shot-post-media-gate/agent-verdict-1",
+  "shot_id": "D4", "attempt_id": "shizhen-dispatch-D4r1-preview-001", "repair_of": "qa/D4/post-media-gate.json (FAIL)",
+  "media": {"path": "runs/shizhen-opening-dispatch-20261030/D4r1/state/video-generation/fetch/files/f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67.mp4", "sha256": "f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67"},
+  "evidence": ["contact.jpg (2fps)", "audio-understanding.json: hiss + crackling (rain), no voice"],
+  "findings": {
+    "camera": {"verdict": "PASS", "reason": "跟着手电光斑向上摇，逐层经过亮灯窗户进入上方黑暗、木板封死的楼层，停在被照亮的封窗上。精确数到第七层不可保证（advisory）。"},
+    "action": {"verdict": "PASS", "reason": "光斑由低层逐层上移，停在封窗。"},
+    "space": {"verdict": "PASS", "reason": "保安在楼下前景、楼体在后；封死楼层醒目。"},
+    "performance": {"verdict": "PASS", "reason": "保安背影、不说话。"},
+    "art": {"verdict": "PASS", "reason": "写实雨夜外立面，无字幕或招牌文字。"},
+    "sound_ambience": {"verdict": "PASS", "reason": "雨声持续，无人声。"},
+    "sound_faint_cry": {"verdict": "NOT_ACHIEVED", "reason": "木板后极轻的“救命”在 D4 与 D4r1 两次生成中都没有出现。按实证规则不再以同一方式重试；这是 v3 的 director_choice 而非用户要求，移出本镜 raw 要求，转为成片组装的声音待办（未解决，不计为通过）。"}
+  },
+  "overall": "PASS_PICTURE_WITH_OPEN_AUDIO_ITEM",
+  "next_shot_submit_allowed": true,
+  "rationale_for_advance": "剩余缺口只在本镜声音层，且场景原声在成片中只作环境底，问题不进入后续镜头；Director 修复取舍已记录。",
+  "human_acceptance": "NOT_EVALUATED"
+}

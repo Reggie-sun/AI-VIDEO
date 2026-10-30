@@ -1,0 +1,62 @@
+{
+  "decision": {
+    "snapshot_hash": "9ee30a7df342c15517f992d748cd4610ab550d092cf7f88b9f3c463f91b8078d",
+    "disposition": "CHANGE_REFERENCE_STRATEGY",
+    "selected_candidate_id": null,
+    "assessments": [
+      {
+        "candidate_id": "jimeng/jimeng-seedance-2.5-first-last-frame-v1",
+        "scope_hash": "d55add9b2379fdb2b1ecde6678c615e1de02ce6417d3d3dc287eddf4b561d594",
+        "fit": "unknown",
+        "compatible": true,
+        "executable": true,
+        "supported_dimensions": [],
+        "failed_dimensions": [],
+        "unknown_dimensions": [
+          "action",
+          "art",
+          "camera",
+          "identity",
+          "performance",
+          "sound",
+          "space"
+        ],
+        "evidence_hashes": [],
+        "ignored_evidence_hashes": [],
+        "sample_count": 0,
+        "pass_count": 0,
+        "fail_count": 0,
+        "not_evaluated_count": 0,
+        "runtime_failure_count": 0,
+        "unknown_outcome_count": 0,
+        "not_submitted_count": 0,
+        "reasons": [],
+        "empirical": {
+          "version": "generation-cohort/1",
+          "supported_artifacts": [],
+          "failed_artifacts": [],
+          "incomplete_artifacts": [],
+          "evidence_hashes": [],
+          "exclusions": [],
+          "failed_requirements": [],
+          "observed_success_fraction": null,
+          "interval_95": null,
+          "limitations": [
+            "observational cohort; selection and intervention confounding remain",
+            "unknown action complexity and hand/prop interaction are not matched",
+            "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+          ]
+        }
+      }
+    ],
+    "diagnosis": null,
+    "intervention": null,
+    "runtime_repair": null,
+    "routing": null,
+    "rationale": [
+      "conditioning compatibility failed: same_subject_scale; owner=shot_authoring"
+    ],
+    "revalidate_requirements": []
+  },
+  "compilation": null
+}

@@ -1,0 +1,3 @@
+# Series Runs
+
+- `{"run_id": "CN-20261030-160454-99a193", "plate": "CN", "started": "2026-10-30T16:04:54", "finished": "2026-10-30T16:05:46", "exit": 0, "prompt_sha256": "236361a2030a2a6b4ef7473d004979520c5f44063af121465768cd2bae98775d", "scratch": "/tmp/ev-codex/CN-20261030-160454-99a193", "argv": ["codex", "exec", "--skip-git-repo-check", "-C", "/tmp/ev-codex/CN-20261030-160454-99a193", "-c", "approval_policy=\"never\"", "-o", "/tmp/ev-codex/CN-20261030-160454-99a193/last-message.txt", "--json", "-"], "sha256": "e122c5a91ac3d07ee9e9e50e872149fa1f5a5047835cb87ae5e1dfb8061d2838", "bytes": 2167329, "size": [1672, 941], "dest": "outputs/ai-city-takeover/series/casting/raw/CN-a.png", "status": "delivered"}`

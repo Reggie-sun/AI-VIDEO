@@ -1,0 +1,85 @@
+{
+  "scope": "OPERATOR_PER_SHOT_POST_MEDIA_GATE; not P6 or human acceptance",
+  "shot_id": "MC00-CITY",
+  "attempt_id": "shizhen-macro-MC00-city-qualification-007",
+  "artifact_path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v3/失帧-MC00-城市试片-480p.mp4",
+  "artifact_sha256": "af1507969bb88b6be6379bfd991c8ba26864fd11a334e66144a4de371b8df5b2",
+  "artifact_size_bytes": 30229169,
+  "sealed_intent_path": "row.json",
+  "sealed_intent_sha256": "03b5cbd126a2458f6622421024966f762b060a279ed8a590b5c10058ce4a0194",
+  "explicit_project_video_analysis": "qa/video-analysis.json",
+  "explicit_project_video_analysis_sha256": "5c435da2f86fc3b31b8f6dec414f978e96a72edcdb09ee2541a956a7935d1042",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/frames/frame-11.png",
+        "qa/frames/frame-15.png"
+      ],
+      "reason": "末段单个黄帽深蓝工服工人可辨；静态采样不足以签全程身份与姿态一致"
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "FAIL",
+      "evidence": [
+        "qa/contact-sheet.jpg",
+        "qa/frames/frame-06.png",
+        "qa/frames/frame-08.png"
+      ],
+      "reason": "没有形成要求的独立、充分的城市大全景展开；6至10秒主要转向近墙和屋顶，沿主路逐个显露地标的叙事不足"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "FAIL",
+      "evidence": [
+        "qa/contact-sheet.jpg",
+        "qa/frame-index.json"
+      ],
+      "reason": "中段近处楼体占据大片视野，削弱真正揭示城市和道路追踪；一段scene检测不能证明无隐切或自然运动，原速观感另待人工"
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/frames/frame-11.png",
+        "qa/frames/frame-15.png"
+      ],
+      "reason": "采样没有证明工人全程不重复按停／收手；不能凭几张姿态签完整行动通过"
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "FAIL",
+      "evidence": [
+        "qa/frames/frame-07.png",
+        "qa/frames/frame-08.png",
+        "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/B6-entry.png"
+      ],
+      "reason": "中段棚体更接近大面积平顶围合设施，未保持B6透明玻璃、细框、薄顶站棚形制；城市位置与精确接点不能由端点近似继承通过"
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/contact-sheet.jpg"
+      ],
+      "reason": "样本可见写实雨夜材质，但未完成全程建筑稳定、变形及隐蔽遮挡审查"
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/video-analysis.json",
+        "qa/audio-preview.json"
+      ],
+      "reason": "exact源有AAC立体声且完整解码；audio_understand仅offline preview，network_calls=0，没有声音语义观察或human完整听音"
+    }
+  ],
+  "verdict": "FAIL",
+  "human_acceptance": "NOT_EVALUATED",
+  "next_shot_submit_allowed": false,
+  "automatic_retry_allowed": false,
+  "production_activation": false,
+  "normal_speed_audiovisual_acceptance": "NOT_EVALUATED",
+  "created_at": "2026-10-28T20:13:49.731394+00:00"
+}

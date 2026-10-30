@@ -1,0 +1,18 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/macro-opening-video-20261028/CITY-RISE-v1/anchors/municipal-last-f163.png",
+  "sha256": "3d461331069e5505af70b6e18e36b0ec05098890f181146e775d8df90dae55fb",
+  "size_bytes": 4718329,
+  "width": 1920,
+  "height": 1080,
+  "reference_role": "first_frame",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "exact decoded video frame extraction (ffmpeg -vsync 0 select)",
+  "source_video_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+  "source_video_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+  "source_frame_index": 163,
+  "source_fps_numerator": 24,
+  "source_fps_denominator": 1,
+  "inherited_acceptance_scope": "Exact approved municipal video only",
+  "semantic_review": "Exact approved-footage frame; no repaint, crop or scale"
+}

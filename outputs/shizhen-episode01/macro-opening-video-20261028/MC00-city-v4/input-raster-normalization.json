@@ -1,0 +1,20 @@
+{
+  "kind": "technical-input-raster-normalization/1",
+  "source_path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/codex-image/raw/first-frame-v2.png",
+  "source_sha256": "a425fb681a075a09b4c5279437278c9a0a6dc54340433d54f93cf82fe6713268",
+  "source_dimensions": [
+    1672,
+    941
+  ],
+  "output_path": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/first-frame-1920x1080.png",
+  "sha256": "349b3581b2681ae1724d496a05d30b7cf0650ab678ce03e214f3116ab10b5260",
+  "size_bytes": 4554077,
+  "width": 1920,
+  "height": 1080,
+  "operation": "FFmpeg Lanczos scale only; no crop/repaint/content insertion",
+  "generator": "FFmpeg input preprocessing; not a new model image",
+  "ffmpeg_executable": "/home/reggie/miniconda3/bin/ffmpeg",
+  "original_generation_record": "outputs/shizhen-episode01/macro-opening-video-20261028/MC00-city-v4/codex-image/generation-record.json",
+  "original_preserved": true,
+  "output_video_resolution_remains": "480p"
+}

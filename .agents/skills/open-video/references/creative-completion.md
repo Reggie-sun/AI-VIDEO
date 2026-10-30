@@ -77,6 +77,12 @@ Director和制作层共同判断怎样保住创作目标并完成它；可执行
 
 遇到关键隐喻、空间因果或反应时机，先让独立者复述人物在做什么、为何改变、哪里困惑，再给作者的设计解释。若对照多案，提供共同brief与可比信息，不预先标注新旧优劣。指出具体观察和替代解读，避免把作者解释后的认同当作首次可读性；文本复核仍不证明实际画面或观众接受。
 
+### What A Concept Check Cannot Approve
+
+An independent concept check reads text; it never sees the film. Its READY verdict cannot authorize paid generation of new
+creative work—only the user's approval of the visual preview can. Ask before generating: with the sound removed, does each
+shot still show something happening? If the anomaly lives only in narration, redesign the shot before preparing references.
+
 ### Advertising
 
 先说明这支片子是产品演示、品牌氛围还是转化广告，再确定它需要的表达。检查商品身份、包装文字与结构、事实/功效来源、画面和文案是否互相支持、品牌记忆与收尾是否成立。转化目标需要可信的行动动机；品牌氛围片不被强制套卖点、购买理由或 CTA。无法核实的产品事实不能编造，生成错字不能冒充真实包装。

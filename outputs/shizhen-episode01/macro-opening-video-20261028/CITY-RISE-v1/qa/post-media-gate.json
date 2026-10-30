@@ -1,0 +1,74 @@
+{
+  "scope": "OPERATOR_PER_SHOT_POST_MEDIA_GATE; not P6 or human acceptance",
+  "shot_id": "CITY-RISE",
+  "attempt_id": "shizhen-macro-CITY-RISE-preview-009",
+  "artifact_sha256": "8a787dfcec864bc8d8b5f58755e18f1d77b99d051e661d5cd79abc2a9ac9215e",
+  "sealed_intent_sha256": "08d99c7516022e84684e112c30ac5595dde97d7448f1517846db614fb7534f7c",
+  "explicit_project_video_analysis": "project-local video-analysis video_analyze, 1 scene @0.3",
+  "required_findings": [
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "evidence": [
+        "qa/contact-sheet.jpg",
+        "qa/motion-measurements.json",
+        "qa/jump-288-299.jpg"
+      ],
+      "reason": "单一连续镜头；拉升、横掠、俯冲、刹停四段齐全，末段静止；中段横掠节奏偏匀，需原速主观确认"
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "PASS",
+      "evidence": [
+        "qa/contact-sheet.jpg"
+      ],
+      "reason": "从铁门拉起、越过楼顶、掠过城市与红十字医院、俯冲落到站棚，按采样成立"
+    },
+    {
+      "requirement_id": "identity",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/assembly-check.jpg"
+      ],
+      "reason": "末帧与B6第0帧几乎一致；俯冲中两人远景未逐帧核对"
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/contact-sheet.jpg"
+      ],
+      "reason": "两人原地站立、女人打电话，采样未见异常动作"
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/contact-sheet.jpg"
+      ],
+      "reason": "未穿墙或穿棚；“九层旧楼、旧住宅楼梯窗”不可辨认，建筑全程稳定性需原速审看"
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "qa/contact-sheet.jpg"
+      ],
+      "reason": "写实雨夜一致；中段高空较暗偏灰"
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "evidence": [
+        "dispatch/dispatch-cues.json"
+      ],
+      "reason": "原生雨风声存在；对讲为本地Kokoro合成后期层，未经人工听音"
+    }
+  ],
+  "verdict": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED",
+  "next_shot_submit_allowed": false,
+  "automatic_retry_allowed": false,
+  "production_activation": false,
+  "created_at": "2026-10-28T23:09:27.627237+00:00"
+}

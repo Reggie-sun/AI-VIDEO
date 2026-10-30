@@ -1,0 +1,212 @@
+{
+ "kind": "director-authored performance context; advisory input package, not Production state",
+ "source_plan": "outputs/shizhen-episode01/opening-dispatch-20261029/plan-v3.json",
+ "source_plan_sha256": "665a5d7c4e595cf5138941715016203721119fb92e373f417618696d4264bcea",
+ "source_shotboard_sha256": "9e89d0eae83ebf90b3119dea05991b62db974d7cead10f1effd2d619e839b8dd",
+ "shared_scene": "夜间应急记录台。值班转报员把各处来电交给董文慧记录；转报员不在异常现场。董文慧用桌面扬声器接报，边记录边确认数量与地点。异常事实造成不安，角色仍在完成眼前的值班工作。",
+ "source_facts": [
+  "转报员转述来电，不是到场外勤",
+  "董文慧是记录员，使用桌面扬声器，不戴耳机",
+  "调度语气平淡，声音交代信息，画面证实",
+  "董文慧的记数是画内自语，使用室内干声",
+  "三号站台与暂无报告构成例行问答"
+ ],
+ "director_additions": "逐句潜台词、说话动作和轻重落点为本次导演补充，不新增剧情事实，也不是已确认的心理设定。",
+ "not_transmitted_as_spoken_text": [
+  "场景说明",
+  "角色动机与知识边界",
+  "表演评审说明"
+ ],
+ "model_binding": "完整中文上下文供创作与审听；每句英文 audio_tags 是当前 v4 入口可表达的压缩候选，已离线验证并编译，但未向 Provider 发送。上下文未通过 previous_text/next_text 或 Text to Dialogue 传输，不能声称模型已收到整场。",
+ "voice_assignment_status": "暂定（未听审）：relay=Yun Calm Mature t0rw9qQF814RSPRK0vm2；dong=Serena Calm Soothing QAe8SYEl8U8qnxlfuLRz；由 CLI --voice-id 传入，不在包内绑定",
+ "submit_status": "READY_FOR_CANONICAL_PREFLIGHT",
+ "rows": [
+  {
+   "id": "L1",
+   "unit": "municipal",
+   "shot_s": 4.0,
+   "role": "relay",
+   "text": "检修口报，电闸断了，绞盘还在收",
+   "speaker": "值班转报员",
+   "performance_context": {
+    "trigger": "转报员刚接到检修口的来电：来电称“电闸断了”，绞盘仍在收卷。",
+    "listener": "夜间记录台的董文慧。",
+    "objective": "把报告来源和矛盾现象交代清楚，让她能立即记下并继续处理。",
+    "subtext": "先把这件解释不通的事实记准，别把来源和现象混在一起。",
+    "delivery": "先自然带出“检修口报”，把“电闸断了”作为已收到的条件，再接“绞盘还在收”。后半句让矛盾落地，不把每个短语读成一条播报。",
+    "after": "信息交给记录员，等她处理；不自加解释或补一句感叹。",
+    "knowledge": "只知道来电内容，没有亲眼看见绞盘。不得演成在现场喊话的工人。"
+   },
+   "audio_tags": [
+    "night dispatcher relaying a caller's report, speaking plainly to a record keeper"
+   ],
+   "candidate_synthesis_text": "[night dispatcher relaying a caller's report, speaking plainly to a record keeper] 检修口报，电闸断了，绞盘还在收",
+   "candidate_synthesis_sha256": "d857d633b37323c1584812c964708a551fd5f8244c36c8311b16bce49046788f",
+   "compiled_characters": 98,
+   "operator_upper_microunits": 49000,
+   "model_candidate": "eleven_v4",
+   "submitted": false
+  },
+  {
+   "id": "L2",
+   "unit": "D2",
+   "shot_s": 5.0,
+   "role": "relay",
+   "text": "七号楼报，下了三层，还在原来那层",
+   "speaker": "值班转报员",
+   "performance_context": {
+    "trigger": "上一条报告交出后，转报员接到七号楼的新信息：住户说下了三层，却仍在原来的楼层。",
+    "listener": "仍在接报记录的董文慧。",
+    "objective": "让听者听懂住户描述的空间矛盾，保留“下了三层”和“原来那层”的区别。",
+    "subtext": "这话听着不对，但这是来电者说的，我得把意思说清楚。",
+    "delivery": "“七号楼报”是工作中的来源说明；“下了三层”正常说完，“还在原来那层”略作重新确认式的落点。允许思考感，整体仍是对同事说话。",
+    "after": "报告交出，继续等待下一条信息，不故意拖长句尾制造悬念。",
+    "knowledge": "没有自己走过楼梯，不把住户经历演成转报员的第一人称惊恐。"
+   },
+   "audio_tags": [
+    "night dispatcher explaining a caller's confusing account to a record keeper"
+   ],
+   "candidate_synthesis_text": "[night dispatcher explaining a caller's confusing account to a record keeper] 七号楼报，下了三层，还在原来那层",
+   "candidate_synthesis_sha256": "1436a9d7c298c49407f474194c72d077d8855b4b6e69eed41c172f46f6372102",
+   "compiled_characters": 94,
+   "operator_upper_microunits": 47000,
+   "model_candidate": "eleven_v4",
+   "submitted": false
+  },
+  {
+   "id": "L3",
+   "unit": "D3",
+   "shot_s": 5.0,
+   "role": "relay",
+   "text": "急诊说，系统里她已经死了，人还躺着",
+   "speaker": "值班转报员",
+   "performance_context": {
+    "trigger": "刚收到急诊一侧的报告：系统把她登记为死亡，人仍躺在病床上。",
+    "listener": "负责把信息记下来的董文慧。",
+    "objective": "把“系统记录”和“人在病床上”这两个信息都转述到位，不替急诊下医疗结论。",
+    "subtext": "我也不能替他们解释，先让你把这个矛盾听明白。",
+    "delivery": "“急诊说”像刚听完来电后的转述，不用播音开场。“系统里她已经死了”交代记录，“人还躺着”接出矛盾；句末说给对方听，避免恐怖旁白式压低和夸张重音。",
+    "after": "话留给记录员接收，不补充“人还活着”等原台词没有的结论。",
+    "knowledge": "转报员不在病房，也不知道异常机制；护士和病人的可见动作不自动成为转报员目击事实。"
+   },
+   "audio_tags": [
+    "night dispatcher relaying an ER call, quietly emphasizing the contradiction"
+   ],
+   "candidate_synthesis_text": "[night dispatcher relaying an ER call, quietly emphasizing the contradiction] 急诊说，系统里她已经死了，人还躺着",
+   "candidate_synthesis_sha256": "7edfb23511694b128478a6ea2f5f38571889eae10cf6c55877d7ec9ac4715e75",
+   "compiled_characters": 95,
+   "operator_upper_microunits": 47500,
+   "model_candidate": "eleven_v4",
+   "submitted": false
+  },
+  {
+   "id": "L4",
+   "unit": "D4",
+   "shot_s": 5.5,
+   "role": "relay",
+   "text": "人民路有人喊救命，在七楼，七楼早就封了",
+   "speaker": "值班转报员",
+   "performance_context": {
+    "trigger": "接到人民路的求救信息，报告地点在早已封闭的七楼。",
+    "listener": "董文慧。",
+    "objective": "先让她定位求救地点，再补充楼层早已封闭的限制。",
+    "subtext": "先抓住人在哪里；封楼这件事也必须跟着记上。",
+    "delivery": "“人民路有人喊救命”带着处理来电的目的，“在七楼”收窄位置，“七楼早就封了”是紧跟着补上的关键信息。焦点明确，工作语气里有注意力，不尖叫、不拖成悬疑预告。",
+    "after": "报告说完即交接；木板后的“救命”属于现场声，不能由这个转报员再补念。",
+    "knowledge": "只转述来电，不假装自己正在楼下拿手电照窗。"
+   },
+   "audio_tags": [
+    "night dispatcher relaying a call about a sealed floor, focused and restrained"
+   ],
+   "candidate_synthesis_text": "[night dispatcher relaying a call about a sealed floor, focused and restrained] 人民路有人喊救命，在七楼，七楼早就封了",
+   "candidate_synthesis_sha256": "ae56888b9028927f8da89889b0e76a5757facd40fcbd78f8595957841742f652",
+   "compiled_characters": 99,
+   "operator_upper_microunits": 49500,
+   "model_candidate": "eleven_v4",
+   "submitted": false
+  },
+  {
+   "id": "L5",
+   "unit": "D5",
+   "shot_s": 3.2,
+   "role": "dong",
+   "text": "记上，第十四起",
+   "speaker": "董文慧",
+   "performance_context": {
+    "trigger": "董文慧听完这一组转报，在纸本记录上新增一行，确认累计数量。",
+    "listener": "主要是她自己；桌面记录动作与这句话在同一处境里。",
+    "objective": "把数量落实到记录上，然后继续值班。",
+    "subtext": "又一条。先把它记清楚。",
+    "delivery": "声音向内收，但保持完整发声。“记上”像做事时给自己的短提醒，“第十四起”是核对数量后落下的一笔。语气来自记录动作，不把数字当作片名或悬念台词。",
+    "after": "确认落在纸上，收住声音，转入下一次例行询问。",
+    "knowledge": "她知道自己记了多少起；不让她提前知道站台将发生什么。疲惫只能作为导演可选细节，原稿并未规定她已疲惫。"
+   },
+   "audio_tags": [
+    "record keeper making a quiet note to herself while writing the case count"
+   ],
+   "candidate_synthesis_text": "[record keeper making a quiet note to herself while writing the case count] 记上，第十四起",
+   "candidate_synthesis_sha256": "727a91e3d119425b602a17b63d9a5c952a9a7df0de795281af5cc7d6dbb625c3",
+   "compiled_characters": 83,
+   "operator_upper_microunits": 41500,
+   "model_candidate": "eleven_v4",
+   "submitted": false
+  },
+  {
+   "id": "L6a",
+   "unit": "D6",
+   "shot_s": 3.5,
+   "role": "dong",
+   "text": "三号站台",
+   "speaker": "董文慧",
+   "performance_context": {
+    "trigger": "记完数量，董文慧例行询问三号站台的情况。",
+    "listener": "值班转报员。",
+    "objective": "得到这个地点的当前报告状态。",
+    "subtext": "那三号站台呢？",
+    "delivery": "短句要有明确询问对象。“三号”负责定位，“站台”轻微保留问意，给对方应答空间。保持原文“三号站台”，不新增“呢”或额外说明，不因观众将看到站台就预演担忧。",
+    "after": "停下来听答复；问答间隔交给后续实测与唯一时间线安排。",
+    "knowledge": "她不知道站台接下来发生的异常，这只是例行点名。"
+   },
+   "audio_tags": [
+    "record keeper asking dispatch for the status of platform three, routine enquiry"
+   ],
+   "candidate_synthesis_text": "[record keeper asking dispatch for the status of platform three, routine enquiry] 三号站台",
+   "candidate_synthesis_sha256": "70abfc67911bf9b3ad315a718107ce33b6209f23c0383c33a477c90e130c474a",
+   "compiled_characters": 86,
+   "operator_upper_microunits": 43000,
+   "model_candidate": "eleven_v4",
+   "submitted": false
+  },
+  {
+   "id": "L6b",
+   "unit": "D6",
+   "shot_s": 3.5,
+   "role": "relay",
+   "text": "暂无报告",
+   "speaker": "值班转报员",
+   "performance_context": {
+    "trigger": "转报员听见董文慧问“三号站台”。",
+    "listener": "董文慧。",
+    "objective": "用最简短的工作答复交代当前没有报告。",
+    "subtext": "目前没有这一处的报告。",
+    "delivery": "承接对方问句，直接答复，不重新起一个播报段落。正常、利落地落下“暂无报告”；没有故意放空的停顿，也不在“暂无”上做讽刺或阴森暗示。",
+    "after": "答复结束，把声音让给站台雨声与后续原片，不加解释。",
+    "knowledge": "不知道站台即将发生什么；不能把观众的预期演进声音里。"
+   },
+   "audio_tags": [
+    "dispatcher answering the record keeper's location enquiry, routine and direct"
+   ],
+   "candidate_synthesis_text": "[dispatcher answering the record keeper's location enquiry, routine and direct] 暂无报告",
+   "candidate_synthesis_sha256": "bac6cee62005f69514c1fd0bfd5cc32ccb189c23c33bb257ca6b36fac171c181",
+   "compiled_characters": 84,
+   "operator_upper_microunits": 42000,
+   "model_candidate": "eleven_v4",
+   "submitted": false
+  }
+ ],
+ "blocked_by_attempt": null,
+ "supersedes": {
+  "package": "performance-context.v1.json",
+  "reason": "用户 2026-10-30 明确要求走规范入口生成开局配音，并改用新音色；v1 所列 attempt shizhen-acting-tag-relay-20261030-1 针对 Evan Zhao/L3 旧请求，保持 outcome_unknown，不 retry、不 remint、不复用其 root；本包只解除对新音色新 root 的创作阻断，不授予权限、预算或 permit。"
+ }
+}

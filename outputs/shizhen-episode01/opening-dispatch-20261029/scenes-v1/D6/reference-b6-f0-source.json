@@ -1,0 +1,15 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D6/anchors/b6-source-f0.png",
+  "sha256": "6ab19dffab771f23fa82545c28eef2ccaa37d7c215b5c3475a9d30dab977e83c",
+  "size_bytes": 3814682,
+  "width": 1920,
+  "height": 1080,
+  "reference_role": "first_frame/last_frame",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "exact decoded video frame extraction (ffmpeg -vsync 0 select)",
+  "source_video_path": "runs/shizhen-fusion-B-motion-20261027/render-ASSEMBLY-B6/source/assets/587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc.mp4",
+  "source_video_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+  "source_frame_index": 0,
+  "semantic_review": "Exact approved B6 source frame; carries the source clock and provider watermark"
+}

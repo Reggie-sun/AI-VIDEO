@@ -1,0 +1,29 @@
+{
+  "source_sha256": "326e4fcb83b4bfcd232a3efefab44bd52f0caef6c7be2b3242a0042cca41e43e",
+  "extracted_frame_index": 144,
+  "actual_pts_seconds": 6.0,
+  "frame_sha256": "019d2a89114271d91d70827269ba7b4ae97bf1250c618c59b6cafb6f6c1e556c",
+  "patch_sha256": "09590726eff3c4758ebe885cf253db020c82297af73cbb4438697c4455a46106",
+  "size": [
+    1920,
+    1080
+  ],
+  "alpha_outer_bounds": [
+    1000,
+    835,
+    1760,
+    1080
+  ],
+  "protected_foot_envelope_xywh": [
+    1290,
+    835,
+    291,
+    64
+  ],
+  "feather_px": 8,
+  "all_RGB_matches_exact_source_frame": true,
+  "protected_envelope_alpha_zero": true,
+  "opaque_pixel_count": 157784,
+  "method": "Same-source exact RGB with separately prepared deterministic alpha; no generated imagery",
+  "historical_rectangle_patch": "../MC03-descent-edit-v2/stair-lock-rgba.png; not used because dense sampling warrants larger foot clearance"
+}

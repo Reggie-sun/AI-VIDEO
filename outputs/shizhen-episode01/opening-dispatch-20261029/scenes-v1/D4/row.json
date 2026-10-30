@@ -1,0 +1,261 @@
+{
+  "shot": {
+    "shot_id": "D4",
+    "scene_id": "sealed-building",
+    "storyboard_beat_id": "D4-sealed-seventh",
+    "intent": "参考素材1{{image:0}}只负责这栋老旧住宅楼的外立面、被木板钉死的楼层、保安背影和雨夜光色，它是镜头最后停住的画面。\n雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。\n镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。\n声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 7
+    },
+    "character_ids": [
+      "night-guard"
+    ],
+    "continuity_constraints": [
+      "第七层所有窗户被木板封死",
+      "保安只露背影、不说话",
+      "不加字幕、招牌或音乐",
+      "现场人物都不开口，对白来自记录台母带"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "调度蒙太奇 D4-sealed-seventh：现场无对白画面，铺在对白母带的转报声下"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "scene_reference",
+        "asset_id": "D4-ref-facade"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "slow_camera"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [
+          {
+            "event_id": "guard-ground",
+            "kind": "composition",
+            "visual_state": "楼下保安肩后的低位",
+            "purpose": "跟着手电光斑平稳地向上摇，逐层经过窗户",
+            "phase": "start",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "sealed-seventh",
+            "kind": "composition",
+            "visual_state": "第七层那扇被木板封死的窗",
+            "purpose": "让观众数着楼层看见七楼早已封死",
+            "phase": "end",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          }
+        ],
+        "anchors": [],
+        "selections": [],
+        "natural_generation": [],
+        "director_coverage": {
+          "coverage_hash": "d2a18ec6dcfaeb2afddc048b16b92f86e108d00c075cb135872bf5c115d49702",
+          "unit_id": "D4-sealed-seventh"
+        }
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "保安背对镜头站在楼下，手电光斑照在一楼的窗户上。",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "镜头停在第七层一扇被木板钉死的窗上，手电光斑停在那里。",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [],
+        "preservation": "unspecified",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "sealed-building",
+        "time_of_day": "雨夜",
+        "mood": "有人在早已封死的七楼呼救",
+        "state_constraints": [
+          "第七层所有窗户被木板封死",
+          "保安只露背影、不说话",
+          "不加字幕、招牌或音乐"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "保安在楼下前景，楼体在后",
+        "screen_direction": "镜头与光斑一起向上",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不越轴、不穿墙"
+      },
+      "axis_continuity": {
+        "camera_axis": "单一机位方向",
+        "framing_continuity": "逐层经过窗户，停在七楼封死的窗",
+        "crossing_policy": "不越轴"
+      },
+      "subject_action": {
+        "start_state": "保安背对镜头站在楼下，手电光斑照在一楼的窗户上。",
+        "progression": "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "镜头停在第七层一扇被木板钉死的窗上，手电光斑停在那里。",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "手电照亮一楼窗户",
+        "peak": "光斑逐层上移",
+        "settle": "停在七楼封死的窗上",
+        "direction": "由下往上",
+        "amplitude_class": "正常实时动作"
+      },
+      "pacing": {
+        "cadence": "逐层上移，停住，雨声里一声极轻的呼救",
+        "tempo_class": "自然原速",
+        "shot_duration_seconds": 7.0
+      },
+      "camera_intent": {
+        "movement": "跟着手电光斑由下往上摇",
+        "stability": "稳定",
+        "framing_intent": "逐层经过窗户，停在七楼封死的窗",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "保安肩后低位，一楼窗户",
+        "end_framing": "七楼被木板封死的窗",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "接到人民路的呼救报告",
+        "visible_response": "举手电逐层往上照",
+        "gaze_target": "手电光斑",
+        "body_behavior": "站在楼下不动",
+        "hand_behavior": "右手举手电往上照",
+        "terminal_performance_state": "手电停在七楼封死的窗上",
+        "character_directions": [
+          {
+            "character_id": "night-guard",
+            "screen_identity": "穿透明雨衣的保安背影",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "楼上有人呼救",
+                "emotion": "警觉",
+                "intensity": "subtle",
+                "facial_expression": "不可见",
+                "gaze_target": "手电光斑",
+                "breathing": "自然平稳",
+                "body_behavior": "右手举手电由下往上照，不说话"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "正常速度的真人摄影质感",
+        "palette": "雨夜冷灰与实用灯",
+        "material_treatment": "潮湿墙面、金属、雨水与真实衣物",
+        "prohibited_visual_drift": [
+          "慢动作、闪屏、黑屏、鬼影",
+          "片名、字幕、说明文字或分格"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "手电光与楼内窗光",
+        "direction": "手电由下往上",
+        "exposure_priority": "光斑与七楼木板可读",
+        "continuity_state": "雨夜不变"
+      },
+      "ambience_intent": {
+        "environment_bed": "密集雨声、雨点打在雨衣上、远处车流",
+        "foley_cues": [
+          "光斑停住后木板后极轻的一声呼救"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "tilt_up",
+        "direction": "up",
+        "amplitude_class": "pronounced",
+        "speed_class": "slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "night-guard",
+        "relation_kind": "follow",
+        "start_relation": "保安肩后与一楼",
+        "end_relation": "七楼封死的窗"
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 7,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

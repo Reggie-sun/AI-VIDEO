@@ -1,0 +1,376 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "我覺得這個宏觀開始的內容是不是就要改\n同時這個時候要有聲音和字幕同時介紹異常\n運鏡太平緩了,然後我是在想不出這個鏡頭怎麼吸引人\n不是這太無厘頭了,這個韻鏡你是怎麼設計的.還有這個語音你是怎麼生成的\n制作我确认了你说的,开始把",
+    "creative_constraints": [
+      {
+        "constraint_id": "C-voice",
+        "source_text": "同時這個時候要有聲音和字幕同時介紹異常",
+        "scope": "beat_specific"
+      },
+      {
+        "constraint_id": "C-camera",
+        "source_text": "運鏡太平緩了",
+        "scope": "beat_specific"
+      }
+    ],
+    "target_duration_seconds": 53.208,
+    "coverage_strategy": "multi_shot",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "异常发生在城市不同地点，对讲把它们串起来；每报一起需要切到能证实它的现场，单一机位无法承载跨地点的证据，所以用多镜蒙太奇，由对讲节奏决定切点。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "municipal",
+      "duration_seconds": 6.833,
+      "beat_function": "establish",
+      "objective": "保留已认可市政异常：断电后绞盘仍在收",
+      "open_state": "市政正常作业",
+      "close_state": "铁门撞到限位、钢索仍受力",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "沿用原片机位",
+      "visible_change": "控制已断而工作未停",
+      "transition_out": "motivated_cut",
+      "constraint_ids": []
+    },
+    {
+      "unit_id": "D1-dispatch-call",
+      "duration_seconds": 3.5,
+      "beat_function": "transition",
+      "objective": "把市政异常交到全城调度台，建立对讲来源",
+      "open_state": "调度台安静，来电灯未亮",
+      "close_state": "调度员按下通话键开始记录",
+      "shot_scale": "medium",
+      "camera_treatment": "push_in",
+      "camera_intent": "轻推向调度员，把注意力从现场收到汇报中枢",
+      "visible_change": "红色来电灯亮起，她开始记录",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "C-voice",
+        "C-camera"
+      ]
+    },
+    {
+      "unit_id": "D2-stair-return",
+      "duration_seconds": 5,
+      "beat_function": "reveal",
+      "objective": "证实七号楼下了三层仍在原层",
+      "open_state": "董文慧从上层走下楼梯",
+      "close_state": "她在同样凹痕的灭火器前停住",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "楼梯井俯视固定，让行进和回到原处同框可见",
+      "visible_change": "同一个带凹痕的灭火器再次出现",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "C-voice",
+        "C-camera"
+      ]
+    },
+    {
+      "unit_id": "D3-er-no-record",
+      "duration_seconds": 4.5,
+      "beat_function": "detail",
+      "objective": "证实急诊查无此人而人躺在床上",
+      "open_state": "护士举起扫码器对准手环",
+      "close_state": "病人仍躺着看着护士",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "中近景固定，扫码灯与病人同框",
+      "visible_change": "扫码指示灯两次变红",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "C-voice",
+        "C-camera"
+      ]
+    },
+    {
+      "unit_id": "D4-ninth-floor-cry",
+      "duration_seconds": 5,
+      "beat_function": "escalate",
+      "objective": "证实呼救来自不存在的十二楼",
+      "open_state": "保安在九层旧楼下举手电",
+      "close_state": "镜头停在楼顶之上的黑色雨夜",
+      "shot_scale": "wide",
+      "camera_treatment": "tilt",
+      "camera_intent": "沿外墙逐层上抬到楼顶，让楼层可被数出",
+      "visible_change": "楼顶之上空无一物而呼救仍在",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "C-voice",
+        "C-camera"
+      ]
+    },
+    {
+      "unit_id": "D5-dispatch-tally",
+      "duration_seconds": 3.5,
+      "beat_function": "decision",
+      "objective": "让异常数量累积成不安",
+      "open_state": "调度员握笔",
+      "close_state": "记录本上又多一道",
+      "shot_scale": "close_up",
+      "camera_treatment": "static",
+      "camera_intent": "近景固定在记录本与手",
+      "visible_change": "新划下一道计数",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "C-voice",
+        "C-camera"
+      ]
+    },
+    {
+      "unit_id": "D6-station-no-report",
+      "duration_seconds": 3,
+      "beat_function": "reversal",
+      "objective": "暂无报告落在站台两人身上",
+      "open_state": "镜头接近站棚",
+      "close_state": "停稳在站棚正面两人",
+      "shot_scale": "wide",
+      "camera_treatment": "push_in",
+      "camera_intent": "减速停在站台两人身上，与B6第0帧同构",
+      "visible_change": "运动停稳到两人",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "C-voice",
+        "C-camera"
+      ]
+    },
+    {
+      "unit_id": "B6",
+      "duration_seconds": 21.875,
+      "beat_function": "payoff",
+      "objective": "保留已认可《两位》原片",
+      "open_state": "站台两人等车",
+      "close_state": "片名",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "沿用原片",
+      "visible_change": "人物消失无人察觉",
+      "transition_out": "end",
+      "constraint_ids": []
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "restructure",
+      "statement": "宏观开场内容改为对讲报异常的段落，不再是城市风景长镜头",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b404fbbd1469628b8cbb2a9a399f8cbeace727661b9ab3b01e356f2f627da27f",
+          "locator": "user-messages-2026-10-28/29",
+          "intent_item_id": "restructure",
+          "quote": "我覺得這個宏觀開始的內容是不是就要改",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "voice-and-subtitle",
+      "statement": "每起异常由对讲声音与同步字幕同时介绍",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b404fbbd1469628b8cbb2a9a399f8cbeace727661b9ab3b01e356f2f627da27f",
+          "locator": "user-messages-2026-10-28/29",
+          "intent_item_id": "voice-and-subtitle",
+          "quote": "同時這個時候要有聲音和字幕同時介紹異常",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-flat-camera",
+      "statement": "运镜不能平缓到无事可看",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b404fbbd1469628b8cbb2a9a399f8cbeace727661b9ab3b01e356f2f627da27f",
+          "locator": "user-messages-2026-10-28/29",
+          "intent_item_id": "no-flat-camera",
+          "quote": "運鏡太平緩了",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-nonsense",
+      "statement": "声音与画面不能各说各的、无动机",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b404fbbd1469628b8cbb2a9a399f8cbeace727661b9ab3b01e356f2f627da27f",
+          "locator": "user-messages-2026-10-28/29",
+          "intent_item_id": "no-nonsense",
+          "quote": "這太無厘頭了",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "scene-proves-report",
+      "statement": "每报一起异常，画面落到那起的现场并给出可核实的视觉证据",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "59c235aa9bc9f6c2af6b5d974968f65b660175c290e97d67cae7ccc3eade9f32",
+          "locator": "outputs/shizhen-episode01/opening-dispatch-20261029/DISPATCH-SHOTBOARD.md",
+          "intent_item_id": "scene-proves-report",
+          "quote": "每报一起，画面就落到那起的现场，让观众亲眼核实",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "voice-and-subtitle"
+      ]
+    },
+    {
+      "intent_item_id": "station-no-report",
+      "statement": "最后一句暂无报告落在站台两人身上，接入B6",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "59c235aa9bc9f6c2af6b5d974968f65b660175c290e97d67cae7ccc3eade9f32",
+          "locator": "outputs/shizhen-episode01/opening-dispatch-20261029/DISPATCH-SHOTBOARD.md",
+          "intent_item_id": "station-no-report",
+          "quote": "最后一句“暂无报告”落在站台的两个人身上",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "keep-approved",
+      "statement": "已认可市政片与B6原片不重生成不重剪",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "59c235aa9bc9f6c2af6b5d974968f65b660175c290e97d67cae7ccc3eade9f32",
+          "locator": "outputs/shizhen-episode01/opening-dispatch-20261029/DISPATCH-SHOTBOARD.md",
+          "intent_item_id": "keep-approved",
+          "quote": "已认可的市政片与 B6 原片不重生成、不重剪",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "flat-dispatcher",
+      "statement": "调度员语气平淡",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "59c235aa9bc9f6c2af6b5d974968f65b660175c290e97d67cae7ccc3eade9f32",
+          "locator": "outputs/shizhen-episode01/opening-dispatch-20261029/DISPATCH-SHOTBOARD.md",
+          "intent_item_id": "flat-dispatcher",
+          "quote": "调度员语气平淡，越平淡越不安",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "floor-count-tilt",
+      "statement": "九层楼镜头从楼底逐层上抬到楼顶，让楼层可被数出",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "59c235aa9bc9f6c2af6b5d974968f65b660175c290e97d67cae7ccc3eade9f32",
+          "locator": "outputs/shizhen-episode01/opening-dispatch-20261029/DISPATCH-SHOTBOARD.md",
+          "intent_item_id": "floor-count-tilt",
+          "quote": "九层楼一镜从楼底向上逐层抬到楼顶",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "scene-proves-report"
+      ]
+    },
+    {
+      "intent_item_id": "montage-length",
+      "statement": "新增蒙太奇约24.5秒",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "59c235aa9bc9f6c2af6b5d974968f65b660175c290e97d67cae7ccc3eade9f32",
+          "locator": "outputs/shizhen-episode01/opening-dispatch-20261029/DISPATCH-SHOTBOARD.md",
+          "intent_item_id": "montage-length",
+          "quote": "站台·暂无报告",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "framing-variation",
+      "statement": "各现场景别与机位可调整，只要现场证据仍能证实对讲内容",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "59c235aa9bc9f6c2af6b5d974968f65b660175c290e97d67cae7ccc3eade9f32",
+          "locator": "outputs/shizhen-episode01/opening-dispatch-20261029/DISPATCH-SHOTBOARD.md",
+          "intent_item_id": "framing-variation",
+          "quote": "每个现场只拍能证实那句报告的一个视觉证据",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "scene-proves-report"
+      ]
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "restructure"
+      },
+      {
+        "intent_item_id": "voice-and-subtitle"
+      },
+      {
+        "intent_item_id": "scene-proves-report"
+      },
+      {
+        "intent_item_id": "station-no-report"
+      }
+    ],
+    "must_not_happen": [
+      {
+        "intent_item_id": "no-flat-camera"
+      },
+      {
+        "intent_item_id": "no-nonsense"
+      },
+      {
+        "intent_item_id": "keep-approved"
+      }
+    ],
+    "preferred_performance": [
+      {
+        "intent_item_id": "flat-dispatcher"
+      },
+      {
+        "intent_item_id": "floor-count-tilt"
+      }
+    ],
+    "timing_targets": [
+      {
+        "intent_item_id": "montage-length",
+        "target_kind": "delivery_constraint"
+      }
+    ],
+    "acceptable_variation": [
+      {
+        "intent_item_id": "framing-variation"
+      }
+    ]
+  }
+}

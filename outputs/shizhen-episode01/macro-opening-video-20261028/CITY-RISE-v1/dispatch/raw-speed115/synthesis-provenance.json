@@ -1,0 +1,92 @@
+{
+  "tool": "kokoro-onnx",
+  "model": "Kokoro-82M-v1.1-zh",
+  "model_sha256": "859f9ded9f53be16c24857cdab3254a45da53c3afd5ba6ef134c7de3f822e326",
+  "voices_sha256": "14cb6186c99e4f6016871405f62046c5df863ae27465cbdc4ee08be7dd703acd",
+  "license": "Apache-2.0",
+  "speed": 1.15,
+  "remote_calls": 0,
+  "hearing": "USER_REVIEW_PENDING",
+  "lines": [
+    {
+      "id": "L1",
+      "voice": "zm_010",
+      "text": "检修口报告，电闸断了，绞盘还在收",
+      "path": "L1-zm_010.wav",
+      "sha256": "4f3a46f1c388df2907107733e14aa16f6024425a5bb1b3e84d6840de3675fdb9",
+      "sample_rate": 24000,
+      "duration_seconds": 3.324,
+      "generation_seconds": 2.03
+    },
+    {
+      "id": "L2",
+      "voice": "zm_029",
+      "text": "七号楼又报了，住户下了三层，还在原来那层",
+      "path": "L2-zm_029.wav",
+      "sha256": "255f87539ec1fb23494d9bbdb2afc6494a0c9bd51e524b342749671a8e5b9946",
+      "sample_rate": 24000,
+      "duration_seconds": 4.011,
+      "generation_seconds": 2.37
+    },
+    {
+      "id": "L3",
+      "voice": "zf_003",
+      "text": "急诊回话，系统里查无此人，人就躺在床上",
+      "path": "L3-zf_003.wav",
+      "sha256": "af00c8ce64afc2267f08f5b37bc0e82218929dbe7022fc01b74e3f1239997f77",
+      "sample_rate": 24000,
+      "duration_seconds": 4.32,
+      "generation_seconds": 2.5
+    },
+    {
+      "id": "L4",
+      "voice": "zm_010",
+      "text": "人民路有人喊救命，在十二楼，那栋楼只有九层",
+      "path": "L4-zm_010.wav",
+      "sha256": "d94d2a61a4bd6b8db0fcc6316d0b858a28bf501408cd1ac147f128f7efcd4a57",
+      "sample_rate": 24000,
+      "duration_seconds": 3.877,
+      "generation_seconds": 2.23
+    },
+    {
+      "id": "L5",
+      "voice": "zf_003",
+      "text": "都记上，今晚第几起了",
+      "path": "L5-zf_003.wav",
+      "sha256": "8dd643683c7a72fe0c8222cd5d2ee9ed8fcbda728320b77e7afc903e89d56f68",
+      "sample_rate": 24000,
+      "duration_seconds": 2.287,
+      "generation_seconds": 1.36
+    },
+    {
+      "id": "L6",
+      "voice": "zm_029",
+      "text": "第十四起",
+      "path": "L6-zm_029.wav",
+      "sha256": "973485a27899583460a36e0ffdf2be58bc9c5ab467b736e77df4e60daa910d04",
+      "sample_rate": 24000,
+      "duration_seconds": 1.472,
+      "generation_seconds": 0.96
+    },
+    {
+      "id": "L7",
+      "voice": "zf_003",
+      "text": "站台那边呢",
+      "path": "L7-zf_003.wav",
+      "sha256": "af049b3956d629f0b7b0a32cea6d265baeae8c37696369124be45d739a03fe5d",
+      "sample_rate": 24000,
+      "duration_seconds": 1.685,
+      "generation_seconds": 1.72
+    },
+    {
+      "id": "L8",
+      "voice": "zm_029",
+      "text": "站台那边，暂无报告",
+      "path": "L8-zm_029.wav",
+      "sha256": "43d39fb063771d753cdd64598aa606d3d2ebd088da74f3ab2b2e3c33c072a90a",
+      "sample_rate": 24000,
+      "duration_seconds": 2.133,
+      "generation_seconds": 1.41
+    }
+  ]
+}

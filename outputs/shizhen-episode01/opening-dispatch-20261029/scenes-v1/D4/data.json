@@ -1,0 +1,170 @@
+{
+  "objective": "失帧冷开场调度蒙太奇 D4-sealed-seventh：有人在早已封死的七楼呼救；无对白现场画面",
+  "images": [
+    {
+      "asset_id": "D4-ref-facade",
+      "node_id": "D4-ref-facade-node",
+      "resource_id": "D4-ref-facade-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/codex-image/raw/D4-v1.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/scenes-v1/D4/reference-source.json",
+        "record_sha256": "0b89351ce3d6da96851b3ae32c73ef82ab446b3ae110faf986aefea06c908493",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "night-guard",
+      "name": "保安",
+      "identity": "只露背影的夜班保安",
+      "appearance_bible": "深色制服、透明雨衣、手电",
+      "reference_asset_ids": [
+        "D4-ref-facade"
+      ]
+    }
+  ],
+  "scene_images": [
+    "D4-ref-facade"
+  ],
+  "observations": {
+    "action": "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。",
+    "camera": "镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。",
+    "performance": "人物都不开口，反应克制自然",
+    "space": "保安在楼下前景，楼体在后",
+    "sound": "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。",
+    "art": "没有新增人物或换脸；真人摄影质感、雨夜光线连续，无慢动作、闪屏、字幕、屏幕文字"
+  },
+  "paths": {
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1"
+    ]
+  },
+  "fragments": {
+    "action": [
+      "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+    ],
+    "camera": [
+      "镜头从楼下保安肩后的低位开始，跟着手电光斑平稳地向上摇，逐层经过窗户，停在第七层那扇被木板封死的窗上，让观众数着楼层看见七楼早已封死。"
+    ],
+    "performance": [
+      "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+    ],
+    "space": [
+      "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。"
+    ],
+    "sound": [
+      "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。"
+    ],
+    "art": [
+      "雨夜，一名穿深色制服和透明雨衣的保安背对镜头站在楼下，举起手电往楼上照。手电光斑从一楼的窗户开始，沿外墙一层一层往上移，经过二楼、三楼、四楼、五楼、六楼，最后停在第七层一扇被木板钉死的窗上。第七层所有窗户都被潮湿发黑的木板封死，其余楼层亮着暖光或暗着。保安不说话。",
+      "声音是密集的雨声、雨点打在雨衣上的声音和远处车流；光斑停住后，木板后面传来极轻、模糊的一声“救命”，几乎被雨声盖住，不是保安说的。无其他对白、旁白、配乐。正常原速，不慢动作、不闪屏，不出现字幕、文字、招牌或门牌。"
+    ]
+  },
+  "intent_sha256": "9d7c22ecf3736152ba241efb0921924f81d8b56cdb173380b5af7839b05058c9",
+  "coverage": {
+    "path": "outputs/shizhen-episode01/opening-dispatch-20261029/director-coverage.v5.json",
+    "sha256": "4b8e8fb0b34f6cb588b67140e66c6ee364e242c9efdff5d125ada14ef389c657",
+    "coverage_hash": "d2a18ec6dcfaeb2afddc048b16b92f86e108d00c075cb135872bf5c115d49702",
+    "unit_id": "D4-sealed-seventh"
+  },
+  "scene": {
+    "scene_id": "sealed-building",
+    "location": "雨夜老旧住宅楼外",
+    "mood": "有人在早已封死的七楼呼救"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "source_plan": "outputs/shizhen-episode01/opening-dispatch-20261029/plan-v3.json",
+  "source_plan_sha256": "665a5d7c4e595cf5138941715016203721119fb92e373f417618696d4264bcea",
+  "lines": [
+    {
+      "id": "L1",
+      "unit": "municipal",
+      "shot_s": 4.0,
+      "role": "relay",
+      "text": "检修口报，电闸断了，绞盘还在收"
+    },
+    {
+      "id": "L2",
+      "unit": "D2",
+      "shot_s": 5.0,
+      "role": "relay",
+      "text": "七号楼报，下了三层，还在原来那层"
+    },
+    {
+      "id": "L3",
+      "unit": "D3",
+      "shot_s": 5.0,
+      "role": "relay",
+      "text": "急诊说，系统里她已经死了，人还躺着"
+    },
+    {
+      "id": "L4",
+      "unit": "D4",
+      "shot_s": 5.5,
+      "role": "relay",
+      "text": "人民路有人喊救命，在七楼，七楼早就封了"
+    },
+    {
+      "id": "L5",
+      "unit": "D5",
+      "shot_s": 3.2,
+      "role": "dong",
+      "text": "记上，第十四起"
+    },
+    {
+      "id": "L6a",
+      "unit": "D6",
+      "shot_s": 3.5,
+      "role": "dong",
+      "text": "三号站台"
+    },
+    {
+      "id": "L6b",
+      "unit": "D6",
+      "shot_s": 3.5,
+      "role": "relay",
+      "text": "暂无报告"
+    }
+  ],
+  "voices": {
+    "relay": [
+      "Evan Zhao",
+      "MI36FIkp9wRP7cpWKPTl"
+    ],
+    "dong": [
+      "Stella Gu",
+      "BqljjWyTnrioXPCNkCd4"
+    ]
+  },
+  "model": "eleven_v4",
+  "max_submits": 7,
+  "no_retry": true,
+  "estimated_cost_upper_microunits": 41000,
+  "per_call_ceiling_microunits": 50000,
+  "per_role_project_ceiling_microunits": 200000,
+  "purpose": "standalone audition; no source track activation"
+}

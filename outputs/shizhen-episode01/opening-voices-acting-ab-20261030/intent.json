@@ -1,0 +1,53 @@
+{
+  "purpose": "single-variable acting tags comparison; not accepted production audio",
+  "max_submits": 2,
+  "no_retry": true,
+  "estimated_upper_microunits": 55000,
+  "per_call_ceiling_microunits": 50000,
+  "per_role_project_ceiling_microunits": 50000,
+  "samples": [
+    {
+      "id": "L3",
+      "unit": "D3",
+      "shot_s": 5.0,
+      "role": "relay",
+      "text": "急诊说，系统里她已经死了，人还躺着",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "dry_file": "L3-dry.wav",
+      "radio_file": "L3-radio.wav",
+      "duration_s": 4.24,
+      "sha256": "8b8252aaa4c1aabc63e21e6412db81762e0cb8402a18aea2ac35c0891e47b781",
+      "source": "runs/shizhen-opening-voice-relay-20261030/assets/audio/8b8252aaa4c1aabc63e21e6412db81762e0cb8402a18aea2ac35c0891e47b781.wav",
+      "minimum_shot_with_1s_tail": 5.24,
+      "window_with_1s_tail_ok": false,
+      "human_quality": "NOT_EVALUATED",
+      "radio_sha256": "81da1bd7f1b19419a504b95ffd5f4219a1a5ae68911d8b9b9addfc4768e44c76",
+      "audio_tags": [
+        "matter-of-fact, speaking quietly to a colleague"
+      ],
+      "synthesis_text": "[matter-of-fact, speaking quietly to a colleague] 急诊说，系统里她已经死了，人还躺着"
+    },
+    {
+      "id": "L5",
+      "unit": "D5",
+      "shot_s": 3.2,
+      "role": "dong",
+      "text": "记上，第十四起",
+      "voice": "Stella Gu",
+      "voice_id": "BqljjWyTnrioXPCNkCd4",
+      "dry_file": "L5-dry.wav",
+      "radio_file": null,
+      "duration_s": 2.08,
+      "sha256": "75b497d7898febddd1e1b6601918dc3d31a2344749473caf7f7a6933f3bd3548",
+      "source": "runs/shizhen-opening-voice-dong-20261030/assets/audio/75b497d7898febddd1e1b6601918dc3d31a2344749473caf7f7a6933f3bd3548.wav",
+      "minimum_shot_with_1s_tail": 3.08,
+      "window_with_1s_tail_ok": true,
+      "human_quality": "NOT_EVALUATED",
+      "audio_tags": [
+        "quiet, tired, speaking to herself"
+      ],
+      "synthesis_text": "[quiet, tired, speaking to herself] 记上，第十四起"
+    }
+  ]
+}

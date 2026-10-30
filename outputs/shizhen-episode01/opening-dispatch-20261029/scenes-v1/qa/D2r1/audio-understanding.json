@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a\",\n  \"source_size_bytes\": 11122879,\n  \"audio_sha256\": \"f6a13dbbd2866bd129b7107ff3f127e6c2535cbd47277ea29447d24f0e4f4fe4\",\n  \"audio_size_bytes\": 1073276,\n  \"duration_seconds\": 6.0836281179138325,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"03fb0c5f6f4fa210d875a84c2a7f4930ea74b8c0e7eff6231df366646c0aa5a2\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"c397c09a1befa3efb943a3f80c4db8dd102b73eb2509bc76b22a4a6a7c9d5662\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"rhythmic footsteps on a hard floor\",\n      \"room reverberation\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-dispatch-20261030/D2r1/state/video-generation/fetch/files/5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

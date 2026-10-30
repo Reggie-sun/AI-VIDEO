@@ -1,0 +1,15 @@
+{
+ "note": "T01 rev 2 board events in window bars [bar, beat, sub]; single source for main.js and QA. roi = [x,y,w,h] output px where the event changes the picture.",
+ "events": {
+  "s1_title":      {"at": [0, 1], "key": "B", "shot": "S1", "roi": [100, 330, 760, 300], "what": "片名 slam"},
+  "s1_ptz1":       {"at": [0, 2], "key": "B", "shot": "S1", "roi": [960, 0, 960, 1080], "what": "PTZ 變焦第一級"},
+  "s1_ptz2":       {"at": [0, 2, 0.5], "key": "B", "shot": "S1", "roi": [960, 0, 960, 1080], "what": "PTZ 變焦第二級"},
+  "s1_census":     {"at": [1, 0], "key": "B", "shot": "S1", "roi": [100, 690, 700, 140], "what": "片名退場 + 計數卡第一行"},
+  "s1_census2":    {"at": [1, 0, 0.25], "key": "B", "shot": "S1", "roi": [100, 840, 700, 80], "what": "計數卡第二行（人类驾驶 1）"},
+  "cut_s2":        {"at": [2, 0], "key": "B", "shot": "S2", "roi": null, "what": "切 S2 車內"},
+  "s2_disable":    {"at": [2, 3], "key": "B", "shot": "S2", "roi": [1300, 700, 560, 220], "what": "保持手动 變灰"},
+  "cut_s3_drop":   {"at": [3, 0], "key": "H", "shot": "S3", "roi": null, "what": "DROP：切 S3 + 人类驾驶 0"},
+  "s3_box":        {"at": [3, 1], "key": "B", "shot": "S3", "roi": null, "what": "最後入相光軌被框"},
+  "s3_time":       {"at": [4, 0], "key": "B", "shot": "S3", "roi": [100, 600, 400, 80], "what": "03:48 小字"}
+ }
+}

@@ -1,0 +1,126 @@
+{
+  "status": "SIX_NEW_LINES_L3_EXCLUDED",
+  "rows": [
+    {
+      "id": "L1",
+      "role": "relay",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "text": "检修口报，电闸断了，绞盘还在收",
+      "file": "L1-context.wav",
+      "duration_s": 8.56,
+      "sha256": "ebdc6228061537c0790eabad2d3c47eb4734a2edfe2a8ee00532ac4b9f11d478",
+      "source": "runs/shizhen-context2-L1-20261030/assets/audio/ebdc6228061537c0790eabad2d3c47eb4734a2edfe2a8ee00532ac4b9f11d478.wav",
+      "audio_tags": [
+        "night dispatcher relaying a caller's report, speaking plainly to a record keeper"
+      ],
+      "raw_response_sha256": "f280f17c25c8f72e5f0421ce987698ed5f8796a58ee64dc0dada1dcb765e0a63",
+      "canonical_status": "succeeded",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "L2",
+      "role": "relay",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "text": "七号楼报，下了三层，还在原来那层",
+      "file": "L2-context.wav",
+      "duration_s": 9.76,
+      "sha256": "d2cd0768fede9ca882492ee4a2300c0908ca21057b81af0d8718552f94f1a344",
+      "source": "runs/shizhen-context2-L2-20261030/assets/audio/d2cd0768fede9ca882492ee4a2300c0908ca21057b81af0d8718552f94f1a344.wav",
+      "audio_tags": [
+        "night dispatcher explaining a caller's confusing account to a record keeper"
+      ],
+      "raw_response_sha256": "9b20b97ccff514f79113efd8475977d4bb1678a14d18d377623185ad1dcf9f2d",
+      "canonical_status": "succeeded",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "L4",
+      "role": "relay",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "text": "人民路有人喊救命，在七楼，七楼早就封了",
+      "file": "L4-context.wav",
+      "duration_s": 4.08,
+      "sha256": "2dc6b8fb673eb31a31e503910e0790d6ffca5bf06f30ef0ee700f3f10297329d",
+      "source": "runs/shizhen-context2-L4-20261030/assets/audio/2dc6b8fb673eb31a31e503910e0790d6ffca5bf06f30ef0ee700f3f10297329d.wav",
+      "audio_tags": [
+        "night dispatcher relaying a call about a sealed floor, focused and restrained"
+      ],
+      "raw_response_sha256": "3c290db19722a2a18c4aeff7792871cd861f92d04d8fe71f8ccf2c1d1b477cc3",
+      "canonical_status": "succeeded",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "L5",
+      "role": "dong",
+      "voice": "Stella Gu",
+      "voice_id": "BqljjWyTnrioXPCNkCd4",
+      "text": "记上，第十四起",
+      "file": "L5-context.wav",
+      "duration_s": 2.08,
+      "sha256": "2e8a9ed2aec1f9da9c422ae12f64a2b1dd1e591c967d2cfb288002a4f4662520",
+      "source": "runs/shizhen-context2-L5-20261030/assets/audio/2e8a9ed2aec1f9da9c422ae12f64a2b1dd1e591c967d2cfb288002a4f4662520.wav",
+      "audio_tags": [
+        "record keeper making a quiet note to herself while writing the case count"
+      ],
+      "raw_response_sha256": "109c3c10a14f7bd10f8a0efffd60095a60f9f80d59857bc66c36bc0c34abe84c",
+      "canonical_status": "succeeded",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "L6a",
+      "role": "dong",
+      "voice": "Stella Gu",
+      "voice_id": "BqljjWyTnrioXPCNkCd4",
+      "text": "三号站台",
+      "file": "L6a-context.wav",
+      "duration_s": 3.84,
+      "sha256": "d9b85bbb24e8a918a394681e17d7646f88178fc51fce5fff6bd8469bcb713edc",
+      "source": "runs/shizhen-context2-L6a-20261030/assets/audio/d9b85bbb24e8a918a394681e17d7646f88178fc51fce5fff6bd8469bcb713edc.wav",
+      "audio_tags": [
+        "record keeper asking dispatch for the status of platform three, routine enquiry"
+      ],
+      "raw_response_sha256": "4210083d6744892164cd24f0629585ce75d492244726fcfbfed9a798a4958954",
+      "canonical_status": "succeeded",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "id": "L6b",
+      "role": "relay",
+      "voice": "Evan Zhao",
+      "voice_id": "MI36FIkp9wRP7cpWKPTl",
+      "text": "暂无报告",
+      "file": "L6b-context.wav",
+      "duration_s": 2.4,
+      "sha256": "fe2832e994da623541f22194baa9158df940b4888c86be1216aeec4219d0b2e2",
+      "source": "runs/shizhen-context2-L6b-20261030/assets/audio/fe2832e994da623541f22194baa9158df940b4888c86be1216aeec4219d0b2e2.wav",
+      "audio_tags": [
+        "dispatcher answering the record keeper's location enquiry, routine and direct"
+      ],
+      "raw_response_sha256": "21d28abe7d9e7b0b714df34e7a13915962e93dd1e0ab8adbac033044c97bbea9",
+      "canonical_status": "succeeded",
+      "human_acceptance": "NOT_EVALUATED"
+    }
+  ],
+  "excluded_line": "L3 remains UNKNOWN, not regenerated",
+  "actual_cost": "pending confirmation",
+  "new_generation_calls": 6,
+  "old_manifest_sha256_unchanged": "0c6b96ccf50c7218c7ca4e9377212bef721d8ae6a80a30fee1bc0bc225de01ba",
+  "timing_advisory": {
+    "L1": {
+      "duration_s": 8.56,
+      "prior_window_s": 4.0
+    },
+    "L2": {
+      "duration_s": 9.76,
+      "prior_window_s": 5.0
+    },
+    "D6": {
+      "L6a_plus_L6b_s": 6.24,
+      "prior_shared_window_s": 3.5
+    },
+    "acceptance": "NOT_EVALUATED; no retime or video replacement"
+  }
+}
