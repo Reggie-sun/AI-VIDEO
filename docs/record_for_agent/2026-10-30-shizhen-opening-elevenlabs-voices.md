@@ -62,3 +62,26 @@ L1 可在后续 D1 接报反应保留余量，不以此要求修改已接受的�
 媒体和试听页本地保留，仅本记录提交；其他窗口 dirty/staged 工作不变。
 `record-ai-video-session`：recorded；`distill-ai-video-learning`：no_candidate。
 这是已知成功生成与技术播放证据，没有本版人工听感结论。
+
+## User Rejection And Repair Boundary
+
+交付后用户反馈“这不是还是ai声音吗”，随后明确“两种声音都不自然”。
+本版两种声音均未通过用户听感；前述生成/播放/解码成功仍是技术事实，不是质量通过。
+本地试听页与 JSON 新增 rejected 提示和 exact 用户反馈，原音频保持不变；未改 canonical
+Manifest/Registry/QA lifecycle。此前“待试听”的当前状态由本节更新为本版用户否定。
+
+重新核对 exact request：逐句独立生成，默认 stability=0.5、similarity=0.75、speed=1；
+没有独立场景/表演提示或跨句上下文。它是当前请求事实，尚不能单独证明全部音质问题根因。
+本会话未取得主模型原生听音证据，不假称已听出具体音色缺陷。
+一次 audio_understand 离线 preview 因选错 hash 返回 invalid_source_identity；
+修正到 L1 exact SHA 后 preview 成功，network_calls=0，没有执行外部识音模型。
+
+当前官方文档支持 v4 inline audio tags；“没有独立 emotion 参数”不等于模型不能表演。
+但官方 timestamps 定义没有保证 tags 在字符对齐中的保留/剥离方式；本地现有
+script_text 同时作为 wire text 与 strict 字面对齐原文，尚无朗读文本/表演提示的分离契约。
+因此不把标签直接塞入台词作付费试错，不放宽 alignment 校验，不把未知结果自动重试。
+
+涉及 `src/ai_video/production/elevenlabs.py`、`elevenlabs_batch.py` 等适配文件时，
+当前有其他窗口 staged 修改；本窗口保持只读。后续要接通表演控制需先协调同文件 owner，
+然后仅做男/女各一句有界对照，不能自动整批重生成或宣称质量已改善。
+`distill-ai-video-learning`：no_candidate，缺受控听感归因，用户反馈只裁决本版。
