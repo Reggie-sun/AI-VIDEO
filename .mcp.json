@@ -78,6 +78,12 @@
       "command": "/home/reggie/.local/share/elevenlabs-direct/launch.sh",
       "args": [],
       "env": {}
+    },
+    "minimax-direct": {
+      "type": "stdio",
+      "command": "/home/reggie/.local/share/minimax-direct/launch.sh",
+      "args": [],
+      "env": {}
     }
   }
 }

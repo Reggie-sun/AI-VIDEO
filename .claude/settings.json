@@ -19,7 +19,12 @@
       "mcp__blender__record_trajectory_feedback",
       "mcp__blender__search_polyhaven_assets",
       "mcp__blender__search_sketchfab_models",
-      "mcp__blender__set_texture"
+      "mcp__blender__set_texture",
+      "mcp__minimax-direct__generate_video",
+      "mcp__minimax-direct__query_video_generation",
+      "mcp__minimax-direct__text_to_image",
+      "mcp__minimax-direct__voice_clone",
+      "mcp__minimax-direct__voice_design"
     ]
   },
   "hooks": {

@@ -292,9 +292,10 @@ class VoiceGenerationPreview(_VoiceStrictModel):
     def _validate_sealed_preview(self) -> "VoiceGenerationPreview":
         if self.payload_categories != _VOICE_PAYLOAD_CATEGORIES:
             raise ValueError("voice preview payload categories must be exact and ordered")
-        if self.billable_units_upper_bound != max(
-            self.script_characters, self.minimum_billable_units
-        ):
+        allowed_bounds = {max(self.script_characters, self.minimum_billable_units)}
+        if self.destination in {"https://api.minimax.io", "https://api.minimaxi.com"}:
+            allowed_bounds.add(max(2 * self.script_characters, self.minimum_billable_units))
+        if self.billable_units_upper_bound not in allowed_bounds:
             raise ValueError("voice preview billable units are not conservative")
         if self.estimated_cost_upper_bound_microunits != (
             None if self.unit_price_microunits is None
@@ -628,7 +629,9 @@ def build_voice_generation_preview(
         raise _voice_error(ErrorCode.VOICE_BUDGET_REJECTED,
                            "Unknown voice pricing is limited to MiniMax Speech batches.")
     script_characters = len(request.synthesis_text)
-    billable_units = max(script_characters, pricing.minimum_billable_units)
+    # MiniMax bills each Chinese character as 2 units (live 2026-10-30: 4 characters -> 8).
+    unit_factor = 2 if request.provider_kind == "minimax-speech" and request.language == "Chinese" else 1
+    billable_units = max(script_characters * unit_factor, pricing.minimum_billable_units)
     data: dict[str, object] = {
         "request_fingerprint": request.voice_request_fingerprint,
         "pricing_snapshot_id": pricing.snapshot_id,

@@ -456,6 +456,8 @@ def test_script_character_limit_fails_before_transport(tmp_path):
             invisible_character_ratio="0"
         ),
         lambda payload: payload["data"].update(audio="not-hex"),
+        lambda payload: payload["data"].update(ced="unexpected"),
+        lambda payload: payload["data"].update(other=""),
     ],
 )
 def test_tampered_or_contradictory_response_is_outcome_unknown(tmp_path, mutate):
@@ -472,6 +474,53 @@ def test_tampered_or_contradictory_response_is_outcome_unknown(tmp_path, mutate)
     assert transport.invocations == 1
     assert caught.value.__cause__ is None
     assert caught.value.__context__ is None
+
+
+def test_chinese_usage_is_double_counted_in_the_preview_bound_and_accepted(tmp_path):
+    request = _request(script_text="暂无报告", language="Chinese", voice_id="male-qn-jingying")
+    transport = _FakeTransport(_response(
+        mutate=lambda payload: payload["extra_info"].update(usage_characters=8)))
+    provider = _provider(transport)
+    assert provider.preview(request).billable_units_upper_bound == 8
+    authorization = _authorization(provider, request)
+    permit = _issue_real_permit(tmp_path, provider, request, authorization)
+
+    provider.generate(request, authorization, permit)
+
+    assert transport.invocations == 1
+
+
+def test_non_chinese_request_with_cjk_text_is_rejected_before_transport():
+    transport = _FakeTransport(_response())
+    provider = _provider(transport)
+    request = _request(script_text="Meet 李明 tonight")
+
+    assert provider.preview(request).output_supported is False
+    assert transport.invocations == 0
+
+
+def test_preview_rejects_unconservative_or_foreign_unit_factors():
+    preview = _provider(_FakeTransport(_response())).preview(_request()).model_dump(mode="json")
+    for bound in (62, 3 * 63):
+        with pytest.raises(ValueError):
+            type(_provider(_FakeTransport(_response())).preview(_request())).model_validate(
+                {**preview, "billable_units_upper_bound": bound})
+
+
+def test_english_preview_bound_stays_one_unit_per_character():
+    assert _provider(_FakeTransport(_response())).preview(_request()).billable_units_upper_bound == 63
+
+
+def test_live_response_with_empty_ced_is_accepted(tmp_path):
+    transport = _FakeTransport(_response(mutate=lambda payload: payload["data"].update(ced="")))
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+    permit = _issue_real_permit(tmp_path, provider, request, authorization)
+
+    provider.generate(request, authorization, permit)
+
+    assert transport.invocations == 1
 
 
 def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit(tmp_path):

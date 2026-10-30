@@ -6,6 +6,7 @@ import binascii
 import io
 import json
 import re
+import unicodedata
 import wave
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -207,6 +208,9 @@ def _request_is_supported(request: VoiceGenerationRequest) -> bool:
         and request.output_channels in {1, 2}
         and request.language in {"English", "Chinese"}
         and len(request.script_text) < 10_000
+        # Chinese characters bill at 2 units; a non-Chinese request must not hide them.
+        and (request.language == "Chinese"
+             or not any(unicodedata.east_asian_width(c) in {"W", "F"} for c in request.script_text))
         and parameters.stability_milli is None
         and parameters.similarity_boost_milli is None
         and parameters.style_milli is None
@@ -412,7 +416,8 @@ def _parse_result(
     trace_id = payload["trace_id"]
     if (
         not isinstance(data, dict)
-        or set(data) != {"audio", "status"}
+        or set(data) not in ({"audio", "status"}, {"audio", "status", "ced"})
+        or data.get("ced", "") != ""  # live CN responses (2026-10-30) carry an empty ced
         or type(data.get("status")) is not int
         or data["status"] != 2
         or not isinstance(extra, dict)

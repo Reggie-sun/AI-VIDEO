@@ -45,3 +45,11 @@ python -m scripts.minimax_speech_batch \
 `python -m pytest -p no:cacheprovider tests/test_production_minimax_speech.py -q`
 
 测试覆盖中文 UTF-8 原文、language/voice/provenance binding、真实 committer permit、旧英文路径和未配置语言拒绝。Fake transport 验证不等于真实声音已生成。
+
+## Direct MCP (Listening Only)
+
+项目 `.mcp.json` 注册了 `minimax-direct`（官方 `minimax-mcp==0.0.19`，固定 venv 与依赖清单，国内站 `https://api.minimaxi.com`，key 同 supplier 顺序：仓库根 `.env` 的 `MINIMAX_API_KEY`，其次 exact Secret Service CN 引用）。只用于试听与查音色：`text_to_audio`、`list_voices`、`play_audio`；`generate_video`、`query_video_generation`、`text_to_image`、`voice_clone`、`voice_design` 在 `.claude/settings.json` 中 deny。直连输出不经 permit/预算/receipt，不进 Production、不代替上文 batch 入口；可用不等于授权。
+
+真实国内响应与适配器的两处差异（2026-10-30）：`data` 多一个空字符串 `ced`（只接受空串）；汉字按 2 单位计费，中文 MiniMax 预览上限为 `2 × 字符数`（英文仍 1:1）。
+
+直连 `text_to_audio` 只可使用默认输出目录（`~/.local/share/minimax-direct/output`），不得把 `output_directory` 指向 `runs/`、`outputs/` 或 Production 目录；`play_audio` 不用于抓取外部 URL。旧的未决 MiniMax 中文 attempt（如 `runs/shizhen-opening-minimax-*-20261030`、`minimax-speech-zh-test-20260911-01`）绑定旧的 1 倍上限公式，保持停止，不重送。
