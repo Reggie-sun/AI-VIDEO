@@ -10,6 +10,13 @@ from ai_video.models import WorkflowBinding
 from ai_video.workflow_loader import load_workflow_template
 
 
+@pytest.fixture(autouse=True)
+def _isolate_repository_dotenv(tmp_path: Path, monkeypatch) -> None:
+    # Credential suppliers must never read the real repo-root .env under test.
+    from ai_video.production import dotenv_source
+    monkeypatch.setattr(dotenv_source, "REPOSITORY_DOTENV", tmp_path / ".isolated-repository" / ".env")
+
+
 @pytest.fixture
 def example_project_files(tmp_path: Path) -> tuple[Path, Path]:
     refs = tmp_path / "refs"

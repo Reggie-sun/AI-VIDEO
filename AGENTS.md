@@ -114,7 +114,7 @@
 
 **任何情况都不做**：
 
-- 削弱 Product Invariants、凭据、预算、egress、permit 或真实验收。
+- 削弱 Product Invariants、凭据、预算、egress、permit 或真实验收（2026-10-30 用户授权的 `.env` 凭据来源修订见下文，不视为削弱）。
 - 预算耗尽后绕过 guard、重置消费、改历史或无限执行；应先停 attempt、核对真实计数和结果，再有据封存下一有限单元并保留前序与新旧上限。
 - unknown 时 retry 或 remint；应先取证或走显式 recovery。
 
@@ -122,7 +122,7 @@
 
 ## Provider Credential and Paid Execution Rules
 
-- **凭据**：只经注入 supplier 的 exact private reference 获取，不进 repo、`.env`、prompt、argv、日志、错误或 receipt；查找失败即 fail closed，不找其他 secret 来源。
+- **凭据**：只经注入 supplier 获取，来源依次为仓库根 `.env` 的 exact 变量、再 exact Secret Service reference（映射见 [Provider Details](.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)）；值不进 Git、prompt、argv、日志、错误或 receipt，Agent 不读取或回显 `.env`；两处都无值或 `.env` 无效即 fail closed，不找其他 secret 来源（不读进程环境、cwd 或其他文件）。2026-10-30 用户授权修订，旧规则为"只经 exact private reference，不进 repo/`.env`"；收益：配音/音频生成不再因缺 Secret Service 条目而阻断交片。
 - **付费授权**：执行请求即默认授权任务内必要的付费/远程调用，自控有限次数与预算，不另要付费授权；完成时如实报告金额或积分，未结算标"待确认"。用户明确禁令与硬上限优先；文档或凭据本身不授权执行，不为授权查价或估账。
 - **每次 submit 前**核对剩余次数、exact preview、Budget Guard/预留、egress、持久化 intent 和一次性 permit；金额字段只用预配置并封存的 operator 上限（不代表市场价），续期见[续期细则](.agent/context/control-plane-playbook.md#operator-ceiling-renewal)。
 

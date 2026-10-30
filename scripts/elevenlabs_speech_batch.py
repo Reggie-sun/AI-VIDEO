@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.dotenv_source import DotenvSourceError, read_dotenv_value
 from ai_video.production.elevenlabs import ElevenLabsTransportResponse
 from ai_video.production.elevenlabs_batch import ElevenLabsSpeechTestBatch, run_elevenlabs_speech_batch
 from ai_video.production.project import load_production_project
@@ -21,6 +22,12 @@ from scripts.elevenlabs_performance_context import load_performance_context
 
 class _SecretServiceCredential:
     def api_key(self):
+        try:
+            dotenv_value = read_dotenv_value("ELEVENLABS_API_KEY")
+        except DotenvSourceError:
+            raise RuntimeError("ElevenLabs .env credential source is invalid") from None
+        if dotenv_value is not None:
+            return dotenv_value
         supplier_env = dict(os.environ)
         supplier_env.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{os.getuid()}/bus")
         result = subprocess.run(
@@ -113,6 +120,7 @@ def main():
             "parameters": {**batch.parameters.model_dump(mode="json"),
                            "audio_tags": args.audio_tag},
         })
+    read_dotenv_value("ELEVENLABS_API_KEY")  # fail on an invalid .env before any permit is consumed
     paths = run_elevenlabs_speech_batch(args.root, batch, transport=_HttpTransport(),
         credential=_SecretServiceCredential(), toolchain=_toolchain())
     print(json.dumps({"batch_id": batch.batch_id, "wav_files": [str(p) for p in paths],

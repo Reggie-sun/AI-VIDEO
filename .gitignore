@@ -20,3 +20,4 @@ node_modules/
 # Agent workflow state (OMX for Codex, OMC for Claude Code); never Product state.
 .omx/
 .omc/
+.env

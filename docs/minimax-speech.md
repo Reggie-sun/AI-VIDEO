@@ -12,7 +12,7 @@
 
 当前用户选择 MiniMax Speech 为已保留的 S03 画面补对白。准备参数为 `speech-2.8-hd`、`Chinese`、系统音色 `male-qn-jingying`、`speaker_id=P2`、对白“什么？没报站啊。”、`speed_milli=1000`、mono 44,100 Hz PCM s16le WAV。音色是首个候选，不声称已试听或已成为跨镜头验收声线。0.50–2.60s 是最终对白覆盖目标，不得通过截断语音或伪造 alignment 宣称满足。
 
-Secret Service lookup 的唯一操作引用见 [control-plane playbook](../.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)。配置只保存引用，不能复制密钥到 JSON、环境文件、命令参数或日志。
+凭据来源的唯一操作引用见 [control-plane playbook](../.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)：国内 `MINIMAX_SPEECH_CN_API_KEY` 先读仓库根 `.env` 的 exact `MINIMAX_API_KEY`，无值再查同名 Secret Service；国际 `MINIMAX_SPEECH_API_KEY` 只查 Secret Service，不读 `.env`；均无即 fail closed（2026-10-30 用户授权修订，旧规则为只经 Secret Service）。配置只保存引用，不能复制密钥到 JSON、其他环境文件、命令参数或日志。
 
 ## Execution Boundary
 

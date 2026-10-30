@@ -13,6 +13,7 @@ import subprocess
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 
+from ai_video.production.dotenv_source import read_dotenv_value
 from ai_video.production.paths import _read_regular_file_nofollow
 from ai_video_mcp.audio_understanding import (
     AudioUnderstandingError, GeminiAudioAnalyzer, PreparedAudioRequest, _verify_prepared_request,
@@ -494,6 +495,9 @@ def _secret_service_credential() -> str:
     uid = os.getuid()
     bus = Path(f"/run/user/{uid}/bus")
     try:
+        dotenv_value = read_dotenv_value("GOOGLE_API_KEY")
+        if dotenv_value is not None:
+            return dotenv_value
         info = os.lstat(bus)
         if not stat.S_ISSOCK(info.st_mode) or info.st_uid != uid:
             raise ValueError
@@ -514,7 +518,7 @@ def _secret_service_credential() -> str:
 
 
 def build_runtime() -> AudioUnderstandingRuntime:
-    """Read only the explicit unit bindings; never inspect dotenv or ambient credentials."""
+    """Read only the explicit unit bindings; credentials come from repo-root .env or exact Secret Service only."""
     try:
         unit = Path(os.environ["VIDEO_MCP_AUDIO_OPERATOR_UNIT"])
         intent_hash = os.environ["VIDEO_MCP_AUDIO_OPERATOR_INTENT_SHA256"]

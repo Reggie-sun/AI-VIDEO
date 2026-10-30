@@ -11,10 +11,14 @@ from urllib.error import HTTPError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from ai_video.production.audio import AudioProbeToolchain
+from ai_video.production.dotenv_source import DotenvSourceError, read_dotenv_value
 from ai_video.production.minimax_speech import MiniMaxSpeechTransportResponse
 from ai_video.production.minimax_speech_batch import MiniMaxSpeechTestBatch, run_minimax_speech_batch
 from ai_video.production.models import ToolIdentity
 from ai_video.production.project import load_production_project
+
+# Only the domestic reference has a repo-root .env key; international stays Secret Service only.
+_DOTENV_NAMES = {"MINIMAX_SPEECH_CN_API_KEY": "MINIMAX_API_KEY"}
 
 
 class _SecretServiceCredential:
@@ -22,6 +26,14 @@ class _SecretServiceCredential:
         self._reference_id = reference_id
 
     def bearer_header(self):
+        dotenv_name = _DOTENV_NAMES.get(self._reference_id)
+        if dotenv_name is not None:
+            try:
+                dotenv_value = read_dotenv_value(dotenv_name)
+            except DotenvSourceError:
+                raise RuntimeError("MiniMax Speech .env credential source is invalid") from None
+            if dotenv_value is not None:
+                return "Bearer " + dotenv_value
         result = subprocess.run(
             ["secret-tool", "lookup", "application", "ai-video", "provider", "minimax-speech",
              "credential", self._reference_id], capture_output=True, timeout=15, check=False)
@@ -71,7 +83,7 @@ def main():
                         help="Repeat for a finite ordered batch; stops on first error.")
     parser.add_argument("--voice-id", default="male-qn-jingying")
     parser.add_argument("--region", choices=("cn", "international"), default="cn",
-                        help="cn uses the domestic API and a separate Secret Service credential.")
+                        help="cn uses the domestic API and a separate credential (.env MINIMAX_API_KEY, then Secret Service).")
     args = parser.parse_args()
     source = load_production_project(args.source_project)
     source_sha = hashlib.sha256((source.root / "state/manifest.json").read_bytes()).hexdigest()

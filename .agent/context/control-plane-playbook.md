@@ -72,18 +72,18 @@ Capability/model/profile/settings claims 重新核对 selected adapter、sealed 
 
 ## 3. Provider Credential And Paid Execution Details
 
-只经 injected supplier 的 exact Secret Service lookup；key 不回显、不持久化。失败/locked/rotated 停止，
-不搜 repo/history 或替代 source。以下是 reference metadata，不能证明 access、余额或 authorization：
+只经 injected supplier：先读仓库根 `.env` 的 exact 变量，无值再 exact Secret Service lookup。`.env` 无效或均无值即停止，不搜其他 source（2026-10-30 用户授权修订）。
+以下 reference metadata 不证明 access、余额或 authorization：
 
-| Provider | Reference | Exact attributes（另含 `application ai-video`） |
-| --- | --- | --- |
-| Seedance | `ARK_API_KEY` | `provider seedance`、`credential ARK_API_KEY` |
-| Vidu | `VIDU_API_KEY` | `provider vidu`、`credential VIDU_API_KEY` |
-| MiniMax Speech | `MINIMAX_SPEECH_API_KEY` | `provider minimax-speech`、同名 credential |
-| MiniMax Speech CN | `MINIMAX_SPEECH_CN_API_KEY` | `provider minimax-speech`、同名 credential；仅 `https://api.minimaxi.com` |
-| ElevenLabs | `ELEVENLABS_API_KEY` | `provider elevenlabs`、同名 credential；仅 `https://api.elevenlabs.io` |
+| Provider | Reference | Exact attributes（另含 `application ai-video`） | `.env` |
+| --- | --- | --- | --- |
+| Seedance | `ARK_API_KEY` | `provider seedance`、`credential ARK_API_KEY` | — |
+| Vidu | `VIDU_API_KEY` | `provider vidu`、`credential VIDU_API_KEY` | — |
+| MiniMax Speech | `MINIMAX_SPEECH_API_KEY` | `provider minimax-speech`、同名 credential | — |
+| MiniMax Speech CN | `MINIMAX_SPEECH_CN_API_KEY` | `provider minimax-speech`、同名 credential；仅 `api.minimaxi.com` | `MINIMAX_API_KEY` |
+| ElevenLabs | `ELEVENLABS_API_KEY` | `provider elevenlabs`、同名 credential；仅 `api.elevenlabs.io` | `ELEVENLABS_API_KEY` |
 
-不使用 `SEEDANCE_API_KEY` 或跨 Provider fallback；CN 不复制旧引用。细节见
+`—`＝仅 Secret Service。不使用 `SEEDANCE_API_KEY` 或跨 Provider fallback；CN 不复制旧引用。细节见
 [Vidu](../../docs/vidu-provider.md)、[Speech](../../docs/minimax-speech.md)。
 Paid scope/count 与 local exemption 只由 `AGENTS.md` 决定；每 submit 保留 remaining count、exact preview、
 reservation、egress、durable intent、one-use permit。Local video 仍经 `VideoGenerationService`，禁止裸 transport/submit。
