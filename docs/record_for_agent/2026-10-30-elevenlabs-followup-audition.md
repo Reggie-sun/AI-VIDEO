@@ -29,3 +29,33 @@ FFprobe：2.000 秒、48 kHz、mono、PCM s16le；FFmpeg 全量解码 exit 0。
 
 `record-ai-video-session`：recorded；`distill-ai-video-learning`：no_candidate。
 本次单例生成无受控听感对照，不形成通用音质结论。
+
+## Context Auditions
+
+用户随后要求“多生成几个”“不同语境环境下的”，并要求在前端打开。
+本次新增独立 batch `runs/elevenlabs-contexts-stella-20261030/`，固定同一
+Stella Gu/eleven_v4，以四段不同台词比较语境，场景标签不进入朗读文本：
+
+| Context | Text | Duration |
+| --- | --- | --- |
+| 日常闲聊 | 行，那就这么定了，明天见。 | 2.56 s |
+| 安慰朋友 | 没事，你慢慢说，我听着呢。 | 2.72 s |
+| 紧急提醒 | 小心！你脚下有东西，先退回来！ | 2.96 s |
+| 失望质问 | 你昨天不是答应过我吗？怎么又变了？ | 3.36 s |
+
+独立只读概念检查修正“别动/退回来”的指令矛盾，仅证明文本合理，非音频验收。
+四次 submit 均 succeeded，无重试；预留估计总上限 USD 0.029，单次硬上限
+50,000 microunits、batch 硬上限 200,000 microunits；实际费用待确认。
+所有输出经 SHA-256 对照 exact outcome、FFprobe 与 FFmpeg 完整解码。
+听感未人工验收，不宣称轻声/紧迫/克制表演已经实现，没有添加环境声。
+
+本地交付目录 `outputs/elevenlabs-contexts-stella-20261030/`：
+`01.wav` 至 `04.wav` 为原 WAV 的字节一致副本，`index.json` 保留原路径和 SHA，
+`index.html` 提供四个独立播放器；媒体与本机预览页本地保存，不随本记录推送。
+仅监听 loopback 的预览服务为 `http://127.0.0.1:18767/index.html`。
+已在桌面 Chrome 新窗口打开，窗口标题“不同语境试听 - Google Chrome”，
+页面和四个 WAV 均有 HTTP 200 请求读回。共享 DevTools profile 被占用，
+采用现有桌面 Chrome profile 新窗口；没有停止或重启共享浏览器/daemon。
+
+本次 `record-ai-video-session`：recorded；`distill-ai-video-learning`：no_candidate。
+没有受控听感结论或用户反馈，不从四段内容不同的单批次推广模型表现规则。
