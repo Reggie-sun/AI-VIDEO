@@ -6,6 +6,8 @@ learning_eligibility: ineligible
 
 # Shared ElevenLabs Context Entry And Claude Registration
 
+> 当前状态更新：用户指定项目根 `.mcp.json` 后已迁移为 project-scope，先前新增的 user-scope 项已移除。见下文 Project Scope Correction；旧 user 配置部分保留为操作历史。
+
 ## Scope And Result
 
 用户明确要求把上下文接入共享入口，并注册到 Claude。本次接入工程与只读 MCP 验证，
@@ -65,3 +67,16 @@ authoring_blocked=true、authorization_granted=false。真实包仅做离线读�
 voice-routing、audio-understanding 和 lockfile 的其他窗口 dirty/staged 工作不归本次提交。
 `record-ai-video-session`：recorded；`distill-ai-video-learning`：no_candidate。
 本次是输入接线与连接证据，没有新的模型表演实验或质量结论。
+
+## Project Scope Correction
+
+用户明确指定 `/home/reggie/vscode_folder/AI-VIDEO/.mcp.json`，注册已改为该项目文件。
+写前备份 `/home/reggie/.local/share/elevenlabs-direct/backups/AI-VIDEO-mcp-before-20261030T061412Z.json`
+mode600；只新增 elevenlabs-direct，原有7个服务器内容和格式保留。
+移除本次 user-scope 同名项，避免两个配置 owner。仅对这个 server 做项目定向 approval，
+没有 reset 其他 MCP 决策或重启 daemon。
+`claude mcp get elevenlabs-direct` 已连续两次读回 Project config (shared via .mcp.json)、Connected。
+实际 user 配置虽不再注册 server，仍承载该 Claude 客户端的 project trust；不把它当项目 MCP owner。
+本机当前证据 `claude-project-health.txt` 与 `claude-project-registration-verification.json`
+位于 `/home/reggie/.local/share/elevenlabs-direct/`。原 user-scope 证据只作为历史保留。
+后续移除项目项使用 `claude mcp remove elevenlabs-direct -s project`。

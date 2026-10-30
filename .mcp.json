@@ -72,6 +72,12 @@
         "XAUTHORITY": "/run/user/1000/gdm/Xauthority",
         "XDG_RUNTIME_DIR": "/run/user/1000"
       }
+    },
+    "elevenlabs-direct": {
+      "type": "stdio",
+      "command": "/home/reggie/.local/share/elevenlabs-direct/launch.sh",
+      "args": [],
+      "env": {}
     }
   }
 }
