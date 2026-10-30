@@ -67,3 +67,10 @@ L1/L2 明显长于旧4/5秒窗口，D6两句6.24秒长于旧3.5秒窗口；已�
 仅本记录独立归档，不夹带其他窗口的 voice-routing/audio-understanding/lockfile 工作。
 `record-ai-video-session`：recorded；`distill-ai-video-learning`：no_candidate。
 没有本轮用户听感结论，不把对齐/生成成功转成自然度规则。
+
+## Optional Content Check Gap
+
+为排查 L1 时长偏长是否来自额外英文提示，尝试 project-local video_transcribe，
+使用已缓存 base 模型、auto-language、原 WAV；工具在执行转写前返回 no_video_stream，
+没有得到 ASR 文字。未下载模型、未用新媒体包装补证、未追加生成或改称已听审。
+对白额外内容与自然度仍需用户试听；本版不是完整/已验收开局。
