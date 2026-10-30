@@ -1123,3 +1123,47 @@ def test_non_adapter_parse_failure_keeps_technical_detail_empty(monkeypatch):
     assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
     assert caught.value.technical_detail is None
     assert "TOP-SECRET-DUMMY" not in repr(caught.value)
+
+
+def test_audio_tags_empty_preserve_historical_request_identity():
+    request = _request()
+    assert "audio_tags" not in request.provider_parameters.model_dump(mode="json")
+    assert request.provider_parameters_hash == "23cd636ac8802769a6660a35ad571ce79f2567cb30ba9744680eeb84e0c8cc51"
+    assert request.voice_request_fingerprint == "65bcb646b64458817e8301b38357ed2c0aedeeb9948b89078615b88e080da6a2"
+    assert request.synthesis_text == request.script_text
+
+
+@pytest.mark.parametrize("tags", [
+    ("",), (" padded",), ("padded ",), ("[quiet]",), ("bad\nline",),
+    ("a" * 121,), ("a", "b", "c", "d"), ("Cafe\u0301",),
+])
+def test_audio_tags_reject_unsealed_or_ambiguous_controls(tags):
+    with pytest.raises(ValueError):
+        VoiceProviderParameters(audio_tags=tags)
+
+
+def test_audio_tags_bind_direction_but_preserve_literal_spoken_brackets():
+    original = _request(model_id="eleven_v4", script_text="[A]你好", language="zh",
+                        provider_parameters=VoiceProviderParameters(stability_milli=500))
+    directed = _request(model_id="eleven_v4", script_text=original.script_text, language="zh",
+                        provider_parameters=VoiceProviderParameters(stability_milli=500, audio_tags=("quiet",)))
+    assert directed.script_text == original.script_text
+    assert directed.script_hash == original.script_hash
+    assert directed.provider_parameters_hash != original.provider_parameters_hash
+    assert directed.voice_request_fingerprint != original.voice_request_fingerprint
+    assert directed.synthesis_text == "[quiet] [A]你好"
+    provider = _provider(_FakeTransport(_response()))
+    preview = provider.preview(directed)
+    assert preview.script_characters == len(directed.synthesis_text)
+    assert preview.script_utf8_bytes == len(directed.synthesis_text.encode("utf-8"))
+    assert preview.billable_units_upper_bound == len(directed.synthesis_text)
+
+
+@pytest.mark.parametrize("provider_kind,model_id", [
+    ("elevenlabs", "eleven_multilingual_v2"),
+    ("minimax-speech", "speech-2.8-hd"),
+])
+def test_audio_tags_reject_unsupported_provider_model(provider_kind, model_id):
+    with pytest.raises(ValueError):
+        _request(provider_kind=provider_kind, model_id=model_id,
+                 provider_parameters=VoiceProviderParameters(audio_tags=("quiet",)))

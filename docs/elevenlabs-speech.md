@@ -11,6 +11,10 @@
 （2026-10-29 核对），POST 路径为 `/v1/text-to-speech/{voice_id}/with-timestamps`，
 `output_format=pcm_48000` 在 query，认证为 `xi-api-key`。multilingual v2 不支持
 `language_code`，语言保存在 sealed request/provenance，不发送该 wire 参数。
+`eleven_v4`（2026-10-30 `/v1/models` 核对：支持 zh，`can_use_style`／`can_use_speaker_boost` 为 false）
+可用 `--model-id eleven_v4` 显式选择：发送 `language_code`，默认 voice settings 只含
+stability／similarity_boost／speed；带 style 或 speaker boost 的 v4 请求在消费 permit 前以
+`VOICE_REQUEST_INVALID` 拒绝。v2 默认值与既有 batch 哈希不变。
 其他既有 adapter model 调用保持显式 language 参数行为；不宣称任意新模型兼容。
 
 真实 2026-10-29 zh 响应（multilingual v2）与官方文档有两处差异，adapter 按证据处理：
@@ -57,3 +61,47 @@ Python 入口为 `run_elevenlabs_speech_batch(root, batch, transport=..., creden
 reservation 保留。正式声音接回视频须经选中 route、P4 composition 与完整声画验收。
 
 验证结果见[接入记录](record_for_agent/2026-10-29-elevenlabs-speech-integration.md)。
+
+## Performance Controls
+
+`VoiceProviderParameters.audio_tags` 是可选的封存表演提示，当前只允许显式
+`elevenlabs/eleven_v4`；CLI 使用可重复的 `--audio-tag`。每次最多三个标签，
+每个最多 120 字符，必须是无方括号和控制字符的 NFC 文本。
+空标签不进入序列化，既有参数、batch/request hash 与默认 wire text 保持兼容。
+
+`script_text`/`script_hash` 始终是原台词；`VoiceGenerationRequest.synthesis_text`
+经 `elevenlabs_performance` 唯一编译器派生模型输入。参数定义归 `voice_parameters.py`，
+原有 `audio.VoiceProviderParameters` 导入兼容。提示进入参数/request 指纹，预算 preview
+按完整合成文本保守计字符/字节；paid egress 与 committer 校验绑定完整输入 SHA/bytes。
+字幕、Registry 台词和对齐仍使用原台词，不把提示混入朗读文字或另建时间线。
+
+[官方 v4 指导](https://elevenlabs.io/docs/overview/capabilities/text-to-speech/best-practices#prompting-eleven-v4)
+支持内嵌表演标签，但不保证每个提示有效或听感自然。本地不猜测 tags 的时间戳表达：
+仅接受 Provider 原 alignment 或 normalized alignment 中至少一组逐字等于原台词；
+两组都带标签或文字不符时仍 UNKNOWN，停止、不剥字、不自动重试。
+对齐成功不证明标签没被读出，模型表演与逐字发音仍须原速试听。
+
+## Shared Performance Context Entry
+
+Codex 与 Claude 在同一 working tree 使用同一个显式 CLI，不需要复制台词或标签：
+
+```bash
+.venv/bin/python -m scripts.elevenlabs_speech_batch \
+  --performance-context outputs/shizhen-episode01/opening-dispatch-20261029/performance-context.v1.json \
+  --line-id L3 --preview-context
+```
+
+该模式只读、无网络、不读取凭据、不建 Production project；输出完整导演上下文、
+选中原台词、经过校验并重新编译的模型输入、包 SHA 与 source plan SHA。
+这是 authoring preview，不是 canonical paid preview 或执行授权。完整导演说明供 Agent
+创作/审听，实际模型输入仍是选中行的 audio_tags + 原台词；没有暗中接入 Text to Dialogue。
+
+执行时去掉 `--preview-context` 并提供原有 root、source-project、明确 voice-id、预算参数；
+context 与 `--text`/`--audio-tag` 互斥，不能覆盖来源台词或模型。来源 plan SHA、ID、
+role/unit/时长逐项核对，拒绝重复 key/ID、symlink、路径逃逸和超限 JSON。
+包 SHA 与 line ID 封存进既有 batch source_reference，重开时沿 exact batch 校验。
+
+当前开局包仍 BLOCKED，且保留 blocked_by_attempt 指针；实际执行在加载 Production、
+取凭据和发请求前拒绝。READY_FOR_CANONICAL_PREFLIGHT 只表示输入没有该项额外限制，
+不授予执行权限；原 permit、预算、egress、UNKNOWN/recovery 与验收仍由既有 owner 管理。
+任何 unresolved 指针仍阻断，无 force 参数，不用改包字段冒充 canonical recovery。

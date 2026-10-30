@@ -655,6 +655,15 @@ class ElevenLabsVoiceProvider:
                 ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,
                 "ElevenLabs machine policy authorization is incomplete.",
             )
+        # Live /v1/models (2026-10-30): eleven_v4 cannot use style or speaker boost.
+        if request.model_id == "eleven_v4" and (
+            request.provider_parameters.style_milli is not None
+            or request.provider_parameters.use_speaker_boost is not None
+        ):
+            raise _error(
+                ErrorCode.VOICE_REQUEST_INVALID,
+                "ElevenLabs eleven_v4 does not support style or speaker boost.",
+            )
         binding = _permit_binding(request, authorization, preview, self._policy)
         if not _permit_is_valid(permit, binding):
             raise _error(
@@ -662,7 +671,7 @@ class ElevenLabsVoiceProvider:
                 "A current one-use durable voice submit permit is required.",
             )
         payload = {
-            "text": request.script_text,
+            "text": request.synthesis_text,
             "model_id": request.model_id,
             "voice_settings": _voice_settings(request),
         }

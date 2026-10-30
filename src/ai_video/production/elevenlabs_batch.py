@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import hashlib
 from pathlib import Path
 import unicodedata
 from typing import Callable, Literal
 
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.audio import (
@@ -36,7 +37,7 @@ class ElevenLabsSpeechTestBatch(StrictModel):
     scripts: tuple[str, ...] = Field(min_length=1, max_length=1000)
     source_reference: str = Field(min_length=1)
     voice_id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,128}$")
-    model_id: Literal["eleven_multilingual_v2"] = "eleven_multilingual_v2"
+    model_id: Literal["eleven_multilingual_v2", "eleven_v4"] = "eleven_multilingual_v2"
     language: Literal["zh", "en"] = "zh"
     speaker_id: str = "narrator"
     unit_price_microunits: int = Field(strict=True, gt=0)
@@ -45,6 +46,21 @@ class ElevenLabsSpeechTestBatch(StrictModel):
     parameters: VoiceProviderParameters = Field(default_factory=lambda: VoiceProviderParameters(
         stability_milli=500, similarity_boost_milli=750, style_milli=0,
         speed_milli=1000, use_speaker_boost=True))
+
+    @model_validator(mode="before")
+    @classmethod
+    def _v4_default_parameters(cls, data):
+        # v4 rejects style/speaker boost; v2 keeps its sealed defaults unchanged.
+        if isinstance(data, dict) and data.get("model_id") == "eleven_v4" and "parameters" not in data:
+            data = {**data, "parameters": VoiceProviderParameters(
+                stability_milli=500, similarity_boost_milli=750, speed_milli=1000)}
+        return data
+
+    @model_validator(mode="after")
+    def _validate_performance_model(self):
+        if self.parameters.audio_tags and self.model_id != "eleven_v4":
+            raise ValueError("Audio tags require eleven_v4")
+        return self
 
     @field_validator("scripts")
     @classmethod
@@ -120,8 +136,9 @@ def run_elevenlabs_speech_batch(
             model_id=request.model_id, request_fingerprint=request.voice_request_fingerprint,
             billing_mode="remote_metered", currency=preview.currency,
             estimated_cost_upper_bound_microunits=preview.estimated_cost_upper_bound_microunits, destination=preview.destination, method="POST",
-            egress_items=(PaidProviderEgressItem(item_id="script", sha256=request.script_hash,
-                size_bytes=len(text.encode("utf-8")), mime_type="text/plain", purpose="script"),),
+            egress_items=(PaidProviderEgressItem(item_id="script",
+                sha256=hashlib.sha256(request.synthesis_text.encode("utf-8")).hexdigest(),
+                size_bytes=len(request.synthesis_text.encode("utf-8")), mime_type="text/plain", purpose="script"),),
             retention_mode="provider_standard", provider_policy_snapshot_id=batch.policy_id,
             secret_reference=SecretReference(kind="secret_store", reference_id=policy.credential_reference_id))
 

@@ -93,3 +93,10 @@ USD 0.05 单次预算上限内；本次没有消费预算或 permit，submit 状
 本节只证明上下文已写入资料包，不证明模型已按上下文演绎或声音变自然。
 本文作为记录单独提交；前述控制代码保持已暂存未提交，媒体/预览资料本地保留。
 `distill-ai-video-learning`：no_candidate；这是新创作补充，无新增听感实验或规则采纳。
+
+## Shared Entry Followup
+
+用户随后明确要求接入共享上下文入口并注册到 Claude，接入范围、验证与配置位置见
+[Shared Entry And Claude](2026-10-30-elevenlabs-shared-context-claude.md)。
+该后续工程任务会将必要的控制代码一起提交，更新前述“代码未提交”的历史检查点；
+媒体 UNKNOWN、历史候选归属缺口和女声未提交仍保持，不代表声音已通过。

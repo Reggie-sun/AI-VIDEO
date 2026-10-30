@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
@@ -368,8 +370,8 @@ class _StateCommitVoiceActivationMixin:
             != (
                 PaidProviderEgressItem(
                     item_id="script",
-                    sha256=request.script_hash,
-                    size_bytes=len(request.script_text.encode("utf-8")),
+                    sha256=hashlib.sha256(request.synthesis_text.encode("utf-8")).hexdigest(),
+                    size_bytes=len(request.synthesis_text.encode("utf-8")),
                     mime_type="text/plain",
                     purpose="script",
                 ),

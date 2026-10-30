@@ -21,6 +21,7 @@ from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.voice_parameters import VoiceProviderParameters
 from ai_video.production.models import (
     AUDIO_KIND_TO_ASSET_TYPE,
     AssetRecord,
@@ -131,16 +132,6 @@ class _VoiceStrictModel(StrictModel):
     )
 
 
-class VoiceProviderParameters(_VoiceStrictModel):
-    stability_milli: int | None = Field(default=None, strict=True, ge=0, le=1000)
-    similarity_boost_milli: int | None = Field(
-        default=None, strict=True, ge=0, le=1000
-    )
-    style_milli: int | None = Field(default=None, strict=True, ge=0, le=1000)
-    use_speaker_boost: bool | None = Field(default=None, strict=True)
-    speed_milli: int | None = Field(default=None, strict=True, ge=700, le=1200)
-
-
 class VoiceGenerationRequest(_VoiceStrictModel):
     request_id: str = Field(min_length=1)
     attempt_id: str = Field(min_length=1)
@@ -166,6 +157,12 @@ class VoiceGenerationRequest(_VoiceStrictModel):
     budget_reservation_receipt_id: str = Field(min_length=1)
     egress_authorization_receipt_id: str = Field(min_length=1)
     voice_request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @property
+    def synthesis_text(self) -> str:
+        """Exact wire text; script_text remains the spoken transcript contract."""
+        from ai_video.production.elevenlabs_performance import compile_synthesis_text
+        return compile_synthesis_text(self.script_text, self.provider_parameters.audio_tags)
 
     @staticmethod
     def _fingerprint_payload(data: dict[str, object]) -> dict[str, object]:
@@ -196,6 +193,7 @@ class VoiceGenerationRequest(_VoiceStrictModel):
 
     @model_validator(mode="after")
     def _validate_sealed_request(self) -> "VoiceGenerationRequest":
+        self.provider_parameters.validate_route(self.provider_kind, self.model_id)
         if self.audio_kind not in {AudioKind.DIALOGUE, AudioKind.NARRATION}:
             raise ValueError("voice request audio_kind must be dialogue or narration")
         if unicodedata.normalize("NFC", self.script_text) != self.script_text:
@@ -629,7 +627,7 @@ def build_voice_generation_preview(
     ):
         raise _voice_error(ErrorCode.VOICE_BUDGET_REJECTED,
                            "Unknown voice pricing is limited to MiniMax Speech batches.")
-    script_characters = len(request.script_text)
+    script_characters = len(request.synthesis_text)
     billable_units = max(script_characters, pricing.minimum_billable_units)
     data: dict[str, object] = {
         "request_fingerprint": request.voice_request_fingerprint,
@@ -647,7 +645,7 @@ def build_voice_generation_preview(
         "destination": destination,
         "method": "POST",
         "payload_categories": _VOICE_PAYLOAD_CATEGORIES,
-        "script_utf8_bytes": len(request.script_text.encode("utf-8")),
+        "script_utf8_bytes": len(request.synthesis_text.encode("utf-8")),
         "script_characters": script_characters,
         "credential_reference_kind": credential_reference_kind,
         "paid_call_required": True,
