@@ -6,6 +6,7 @@ import io
 import json
 import math
 import re
+import unicodedata
 import wave
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -153,11 +154,11 @@ def _error(
     )
 
 
-def _post_submit_outcome_unknown() -> AiVideoError:
+def _post_submit_outcome_unknown(stage: str | None = None) -> AiVideoError:
     return AiVideoError(
         code=ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN,
         user_message="ElevenLabs submit outcome is unknown.",
-        technical_detail=None,
+        technical_detail=stage,
         retryable=False,
     )
 
@@ -389,24 +390,37 @@ def _parse_timing_response(body: bytes, script_text: str) -> tuple[bytes, bytes]
             "ElevenLabs response exceeds the response limit.",
         )
     payload = _parse_json_object(body, surface="response")
-    if not isinstance(payload, dict) or set(payload) != {
-        "audio_base64",
-        "alignment",
-        "normalized_alignment",
-    }:
+    required = {"audio_base64", "alignment", "normalized_alignment"}
+    # Live responses (2026-10-29) add an undocumented ``quality_check``; it is
+    # tolerated when null and never persisted. Any other unknown key still fails closed.
+    if not isinstance(payload, dict) or not (
+        required <= set(payload) <= required | {"quality_check"}
+    ):
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
             "ElevenLabs response is incomplete.",
+        )
+    # Only the observed null is understood; any other quality verdict is unknown.
+    if payload.get("quality_check") is not None:
+        raise _error(
+            ErrorCode.VOICE_PROVIDER_FAILED,
+            "ElevenLabs response quality check is not recognized.",
         )
     audio = _decode_audio(payload["audio_base64"])
     alignment = _parse_character_alignment(payload["alignment"], name="alignment")
     normalized = _parse_character_alignment(
         payload["normalized_alignment"], name="normalized alignment"
     )
-    if "".join(normalized["characters"]) != script_text:
+    # Normalized text may be a transliteration (zh returns spaced pinyin, live
+    # 2026-10-29), so either the original or the normalized alignment must
+    # spell the exact script.
+    if script_text not in {
+        unicodedata.normalize("NFC", "".join(alignment["characters"])),
+        "".join(normalized["characters"]),
+    }:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
-            "ElevenLabs normalized alignment does not match the script.",
+            "ElevenLabs alignment does not match the script.",
         )
     receipt = json.dumps(
         {"alignment": alignment, "normalized_alignment": normalized},
@@ -711,6 +725,7 @@ class ElevenLabsVoiceProvider:
                 f"ElevenLabs request failed with HTTP {response.status_code}.",
             )
         response_parse_failed = False
+        parse_stage: str | None = None
         try:
             raw_audio, alignment_receipt = _parse_timing_response(
                 response.body, request.script_text
@@ -779,8 +794,15 @@ class ElevenLabsVoiceProvider:
                 provenance_receipt=provenance_receipt,
                 terminal_status="succeeded",
             )
-        except Exception:
+        except Exception as error:
             response_parse_failed = True
+            # Adapter-authored messages are fixed text; never echo provider bytes.
+            parse_stage = (
+                error.user_message
+                if isinstance(error, AiVideoError)
+                and error.code is ErrorCode.VOICE_PROVIDER_FAILED
+                else None
+            )
         if response_parse_failed:
-            raise _post_submit_outcome_unknown()
+            raise _post_submit_outcome_unknown(parse_stage)
         return result

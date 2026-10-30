@@ -1028,3 +1028,98 @@ def test_forced_alignment_fixture_is_strict_and_preserves_loss_without_confidenc
     assert parsed["loss"] == "0.125"
     assert parsed["words"][0]["loss"] == "0.125"
     assert "confidence" not in parsed
+
+
+
+def _live_zh_payload(**extra) -> dict:
+    """Shape of the live zh multilingual v2 response observed on 2026-10-29."""
+    starts = [0.0, 0.221, 0.464, 0.488, 0.639, 0.801, 0.975]
+    ends = starts[1:] + [1.533]
+    pinyin = list(" Ji Shang ,Di Shi Si Qi ")
+    step = [round(index * 0.06, 3) for index in range(len(pinyin) + 1)]
+    return {
+        "audio_base64": "AAAAAA==",
+        "alignment": {
+            "characters": list("记上，第十四起"),
+            "character_start_times_seconds": starts,
+            "character_end_times_seconds": ends,
+        },
+        "normalized_alignment": {
+            "characters": pinyin,
+            "character_start_times_seconds": step[:-1],
+            "character_end_times_seconds": step[1:],
+        },
+        "quality_check": None,
+        **extra,
+    }
+
+
+def test_live_zh_response_matches_script_through_original_alignment():
+    transport = _FakeTransport(_response(payload=_live_zh_payload()))
+    provider = _provider(transport)
+    request = _request(script_text="记上，第十四起", language="zh")
+    result = _generate(provider, request, _authorization(provider, request))
+    receipt = json.loads(result.alignment_receipt_bytes)
+    assert "".join(receipt["alignment"]["characters"]) == "记上，第十四起"
+    assert "quality_check" not in receipt
+
+
+_WRONG_ZH_TEXT = {
+    "characters": list("记上，第十五起"),
+    "character_start_times_seconds": [0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 0.9],
+    "character_end_times_seconds": [0.2, 0.4, 0.5, 0.6, 0.8, 0.9, 1.5],
+}
+
+
+@pytest.mark.parametrize(
+    ("payload", "detail"),
+    [
+        (_live_zh_payload(unexpected=True), "ElevenLabs response is incomplete."),
+        (
+            _live_zh_payload(quality_check={"passed": False}),
+            "ElevenLabs response quality check is not recognized.",
+        ),
+        (
+            {**_live_zh_payload(), "alignment": _WRONG_ZH_TEXT},
+            "ElevenLabs alignment does not match the script.",
+        ),
+    ],
+)
+def test_live_zh_response_still_fails_closed(payload, detail):
+    transport = _FakeTransport(_response(payload=payload))
+    provider = _provider(transport)
+    request = _request(script_text="记上，第十四起", language="zh")
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, _authorization(provider, request))
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
+    assert caught.value.retryable is False
+    assert caught.value.technical_detail == detail
+
+
+def test_normalized_alignment_alone_may_spell_the_script():
+    payload = json.loads(
+        (FIXTURE_ROOT / "elevenlabs-with-timestamps.json").read_text(encoding="utf-8")
+    )
+    payload["alignment"]["characters"][0] = "K"
+    transport = _FakeTransport(_response(payload=payload))
+    provider = _provider(transport)
+    request = _request()
+    result = _generate(provider, request, _authorization(provider, request))
+    assert result.terminal_status == "succeeded"
+
+
+def test_non_adapter_parse_failure_keeps_technical_detail_empty(monkeypatch):
+    from ai_video.production import elevenlabs as module
+
+    def leak(*args, **kwargs):
+        raise ValueError("TOP-SECRET-DUMMY provider value")
+
+    monkeypatch.setattr(module.VoiceProviderResult, "create", leak)
+    transport = _FakeTransport(_response())
+    provider = _provider(transport)
+    request = _request()
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, _authorization(provider, request))
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
+    assert caught.value.technical_detail is None
+    assert "TOP-SECRET-DUMMY" not in repr(caught.value)

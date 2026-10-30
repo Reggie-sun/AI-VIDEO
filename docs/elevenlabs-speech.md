@@ -13,6 +13,13 @@
 `language_code`，语言保存在 sealed request/provenance，不发送该 wire 参数。
 其他既有 adapter model 调用保持显式 language 参数行为；不宣称任意新模型兼容。
 
+真实 2026-10-29 zh 响应（multilingual v2）与官方文档有两处差异，adapter 按证据处理：
+顶层多一个未写入文档的 `quality_check`，只接受 `null`、不落盘，其他值或其他未知字段仍 fail closed；
+`normalized_alignment` 为带空格拼音（如 ` Ji Shang ,Di Shi Si Qi `），所以原文 `alignment`（NFC）
+或 `normalized_alignment` 任一与台词逐字一致即可。字符对齐只证明 Provider 回报的文本，
+不证明音频读对；读音仍须试听与逐镜 Gate。History API 返回的 `character_end_times_seconds`
+是逐字时长而非结束时间，不能当作 with-timestamps 响应的证据。
+
 ## Entry
 
 ```bash
