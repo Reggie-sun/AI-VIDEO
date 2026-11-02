@@ -102,6 +102,23 @@ def _planning(loaded, shot, changes, *, roles=(SemanticReferenceRole.FIRST_FRAME
     from tests.reference_authoring_fixture import with_fixture_reference_planning
 
     intent = with_fixture_reference_planning(intent)
+    from ai_video.production.authoring_input import PREFIX, reopen_authoring_input
+    from tests.reference_authoring_fixture import fixture_preview_approval_binding
+    selected_hashes = {a.asset_sha256 for a in selected}
+    waiver_ids = {w.character_id for w in intent.reference_planning.identity_waivers}
+    for reference in (*loaded.project.source_provenance, *shot.source_provenance):
+        if reference.kind != "user_input" or not reference.reference.startswith(PREFIX):
+            continue
+        approval = reopen_authoring_input(loaded.root, reference)
+        if (approval.get("kind") == "user-preview-approval/1"
+                and selected_hashes <= {a["sha256"] for a in approval["preview_artifacts"]}
+                and waiver_ids <= set(approval.get("identity_waivers", ()))):
+            planning = intent.reference_planning.model_dump(mode="python")
+            planning["preview_approval"] = fixture_preview_approval_binding(approval)
+            intent = GenerationIntent.model_validate({**intent.model_dump(mode="python"),
+                "reference_planning": planning})
+            break
+
     return VideoPlanningRequest.create(request_id=f"sequence-input-{shot.shot_id}",
         target_shot=shot, character_context=tuple(c for c in loaded.characters if c.character_id in shot.character_ids),
         scene_context=next(s for s in loaded.scenes if s.scene_id == shot.scene_id),
@@ -231,6 +248,17 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
     state = next(a.video_generation_state for a in loaded.manifest.attempts if a.attempt_id == ATTEMPT_ID)
     terminal = (load_terminal_frame_evidence(tmp_path, state.terminal_frame_evidence)
                 if state.terminal_frame_evidence is not None else None)
+    from tests.production_generation_execution_factory import approve_fixture_preview
+    from test_production_generated_video_e2e import _p7_png
+    # Review the registered source/terminal assets and the fake provider's exact
+    # predetermined future keyframe before creating any destination image lineage.
+    preview_hashes = sorted({a.sha256 for a in loaded.registry.assets} |
+                            {hashlib.sha256(_p7_png()).hexdigest()})
+    inputs = approve_fixture_preview(inputs=replace(inputs, project=loaded),
+        identity_waivers=tuple({c for shot in loaded.shots for c in shot.character_ids}),
+        preview_artifacts=[{"path": f"fixture/preview/{sha}.png", "sha256": sha,
+                            "role": "sequence reference"} for sha in preview_hashes])
+    loaded = inputs.project
     return dict(root=tmp_path, loaded=loaded, inputs=inputs, provider=provider,
                 source_request=authored, binding=prepared.binding, stack=stack, route=source_route,
                 terminal=terminal)
@@ -739,7 +767,8 @@ def test_legacy_pointer_omission_cannot_authorize_new_production(tmp_path, monke
     pure = resolve_generation_decision(VideoGenerationResolver(), **current, inputs=captured["inputs"])
     compiled = compile_fixture(pure.routing.provider_bound_request, current["projection"].requirement)
     legacy_binding = GenerationDecisionExecutionBinding.create(**current, inputs=captured["inputs"],
-        decision=pure, compiled_request=source["provider"].resolve(compiled.request))
+        decision=pure, compiled_request=source["provider"].resolve(compiled.request),
+            source_project=load_production_project(tmp_path / "project.yaml"))
     with pytest.raises(ValueError, match="activation pointer"):
         legacy_binding.validate_current_project(loaded)
 
@@ -964,7 +993,8 @@ def test_cross_stack_other_seed_selection_cannot_bypass_production_reopen(activa
         compiled = activated_source["provider"].compile_request(
             decision.routing.provider_bound_request, binding.projection.requirement)
         resealed = GenerationDecisionExecutionBinding.create(**arguments, decision=decision,
-            compiled_request=activated_source["provider"].resolve(compiled.request))
+            compiled_request=activated_source["provider"].resolve(compiled.request),
+            source_project=load_production_project(activated_source["root"] / "project.yaml"))
         with pytest.raises(ValueError, match="seed|authoring evidence|planning request"):
             resealed.validate_current_project(loaded)
 
@@ -984,7 +1014,8 @@ def test_final_router_rejects_candidate_destination_route_mismatch(activated_sou
         update={"allowed_remote_candidates": (other.candidate_id,)})})
     decision = VideoGenerationResolver().resolve_requirement(projection=binding.projection,
         context=binding.context, policy=binding.policy, lifecycle=binding.lifecycle, inputs=inputs,
-        continuity_routing=routing, source_project=load_production_project(activated_source["root"] / "project.yaml"))
+        continuity_routing=routing,
+            source_project=load_production_project(activated_source["root"] / "project.yaml"))
     assert decision.selected_candidate_id is None
     assert "CONTINUITY_DESTINATION_ROUTE_MISMATCH" in decision.assessments[0].reasons
 
@@ -1006,7 +1037,8 @@ def test_route_candidate_is_not_selection_and_forced_decision_cannot_be_resealed
     with pytest.raises(ValueError, match="stale or altered"):
         GenerationDecisionExecutionBinding.create(projection=proof.projection, context=proof.context,
             policy=proof.policy, lifecycle=proof.lifecycle, inputs=ambiguous.inputs,
-            decision=proof.decision, compiled_request=proof.compiled_request)
+            decision=proof.decision, compiled_request=proof.compiled_request,
+            source_project=load_production_project(activated_source["root"] / "project.yaml"))
 
 
 def test_cross_stack_cannot_reuse_sequence_decision_as_its_own_initial_selection(activated_source):
@@ -1060,7 +1092,8 @@ def test_resealed_non_planner_prior_projection_cannot_authorize_sequence(activat
     assert prior_decision.disposition == "GENERATE_ONCE"
     compiled = source["provider"].compile_request(prior_decision.routing.provider_bound_request, forged_requirement)
     forged = GenerationDecisionExecutionBinding.create(**prior_arguments, decision=prior_decision,
-        compiled_request=source["provider"].resolve(compiled.request))
+        compiled_request=source["provider"].resolve(compiled.request),
+            source_project=load_production_project(activated_source["root"] / "project.yaml"))
     assert forged.projection.requirement.source_request_content_hash == requirement.source_request_content_hash
     assert forged.selected_provider_route == initial.selected_provider_route
     forged.validate_current_project(load_production_project(source["root"] / "project.yaml"))
@@ -1084,6 +1117,7 @@ def test_resealed_non_planner_prior_projection_cannot_authorize_sequence(activat
         assert decision.disposition == "GENERATE_ONCE"
         compiled = source["provider"].compile_request(decision.routing.provider_bound_request, final.projection.requirement)
         resealed = GenerationDecisionExecutionBinding.create(**arguments, decision=decision,
-            compiled_request=source["provider"].resolve(compiled.request))
+            compiled_request=source["provider"].resolve(compiled.request),
+            source_project=load_production_project(activated_source["root"] / "project.yaml"))
         with pytest.raises(ValueError, match="Planner-derived seed projection"):
             resealed.validate_current_project(loaded)

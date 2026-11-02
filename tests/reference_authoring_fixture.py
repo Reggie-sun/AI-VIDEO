@@ -50,7 +50,7 @@ def fixture_director_coverage_artifact(coverage: dict | None = None):
     return director_coverage_authoring_input(coverage or fixture_director_coverage())[1]
 
 
-def fixture_preview_approval(coverage: dict | None = None, *, identity_waivers=()) -> dict:
+def fixture_preview_approval(coverage: dict | None = None, *, identity_waivers=(), preview_artifacts=None) -> dict:
     """Synthetic user approval of the fixture's visual preview, bound to its coverage unit."""
 
     coverage = coverage or fixture_director_coverage()
@@ -61,6 +61,8 @@ def fixture_preview_approval(coverage: dict | None = None, *, identity_waivers=(
             "user_quote": "fixture user approves this preview",
             # Fixture performers carry no identity sheets; the synthetic user approved generating them without.
             "identity_waivers": list(FIXTURE_WAIVED_PERFORMERS)}
+    if preview_artifacts is not None:
+        approval["preview_artifacts"] = list(preview_artifacts)
     waiver_ids = sorted(identity_waivers)
     if waiver_ids:
         approval["identity_waivers"] = waiver_ids
@@ -163,4 +165,33 @@ __all__ = [
     "fixture_preview_approval_binding",
     "fixture_reference_planning",
     "with_fixture_reference_planning",
+    "fixture_wiring_preview_project",
 ]
+
+
+def fixture_wiring_preview_project(intent, requirement, context):
+    """Seal compiler-only synthetic approvals through the real project owner."""
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from production_project_factory import make_p8_video_generation_base
+    from production_generation_execution_factory import activate_generated_video_shot
+    from production_remote_generation_factory import _register_remote_inputs
+
+    temporary = TemporaryDirectory(prefix="reference-wiring-")
+    root = Path(temporary.name)
+    inputs = activate_generated_video_shot(root=root, inputs=make_p8_video_generation_base(root, schema_version="2.7"))
+    assets = list(requirement.asset_evidence)
+    for name in ("shot_keyframe", "last_frame", "canonical_scene_reference", "canonical_character_reference"):
+        asset = getattr(context, name, None)
+        if asset is not None:
+            assets.append(asset)
+    hashes = sorted({a.asset_sha256 for a in assets})
+    approval = fixture_preview_approval(identity_waivers=[w.character_id for w in intent.reference_planning.identity_waivers],
+        preview_artifacts=[{"path": f"fixture/preview/{h}.png", "sha256": h, "role": "model input"}
+                           for h in hashes] or None)
+    project = _register_remote_inputs(root=root, inputs=inputs, project=inputs.project,
+        bindings=(), input_bytes={}, approval=approval)
+    intent = intent.model_copy(update={"reference_planning": intent.reference_planning.model_copy(update={
+        "preview_approval": type(intent.reference_planning.preview_approval).model_validate(
+            fixture_preview_approval_binding(approval))})})
+    return temporary, project, intent

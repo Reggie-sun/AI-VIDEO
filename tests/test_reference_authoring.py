@@ -279,3 +279,96 @@ def test_legacy_v1_route_keeps_locked_camera_and_gates_prose_movement():
     moving = locked.model_copy(update={"camera_intent": locked.camera_intent.model_copy(
         update={"movement": "slow push toward the doorway"})})
     assert reference_authoring_issues(moving) == ("generation_intent.reference_planning.events[composition]",)
+
+
+@pytest.mark.parametrize("ecommerce", [False, True])
+@pytest.mark.parametrize("covered", [False, True])
+def test_shot_cast_requires_identity_even_without_performance(ecommerce, covered):
+    intent = _intent(binding=None if ecommerce else _binding())
+    if covered:
+        intent = intent.model_copy(update={"identity_continuity": intent.identity_continuity.model_copy(
+            update={"character_ids": ("resident",)})})
+    requirement = SimpleNamespace(generation_intent=intent,
+        target_shot=SimpleNamespace(character_ids=("resident",)),
+        commercial_execution_class="product_interaction" if ecommerce else None)
+    if covered:
+        require_reference_authoring(requirement)
+    else:
+        with pytest.raises(AiVideoError, match=r"character_ids\[resident\]"):
+            require_reference_authoring(requirement)
+
+
+def test_execution_drama_requires_project_but_structural_inspection_does_not():
+    requirement = SimpleNamespace(generation_intent=_intent(binding=_binding()))
+    require_reference_authoring(requirement)
+    with pytest.raises(AiVideoError, match="source_project"):
+        require_reference_authoring(requirement, commercial_binding=None)
+
+
+@pytest.mark.parametrize("kind", ["image_bindings", "media_bindings"])
+@pytest.mark.parametrize("approved", [False, True])
+def test_final_model_inputs_must_be_in_sealed_preview(tmp_path, kind, approved):
+    request = SimpleNamespace(image_bindings=(), media_bindings=())
+    setattr(request, kind, (SimpleNamespace(asset_id="selected", asset_sha256=("a" if approved else "b") * 64),))
+    requirement = SimpleNamespace(generation_intent=_intent(binding=_binding()))
+    project = _project(tmp_path, _payload())
+    if approved:
+        require_reference_authoring(requirement, project=project, commercial_binding=None, resolved_request=request)
+    else:
+        with pytest.raises(AiVideoError, match="input_asset:selected"):
+            require_reference_authoring(requirement, project=project, commercial_binding=None, resolved_request=request)
+
+
+@pytest.mark.parametrize("reason", [None, "", "画外声"])
+def test_shot_cast_offscreen_exception_requires_explicit_reason(reason):
+    intent = _intent(binding=_binding())
+    direction = SimpleNamespace(character_id="resident", visibility="offscreen", offscreen_reason=reason)
+    intent = intent.model_copy(update={"performance_intent": SimpleNamespace(character_directions=(direction,))})
+    requirement = SimpleNamespace(generation_intent=intent, target_shot=SimpleNamespace(character_ids=("resident",)))
+    if reason:
+        require_reference_authoring(requirement)
+    else:
+        with pytest.raises(AiVideoError, match=r"character_ids\[resident\]"):
+            require_reference_authoring(requirement)
+
+
+@pytest.mark.parametrize("ecommerce", [False, True])
+@pytest.mark.parametrize("approved", [False, True])
+def test_shot_cast_waiver_requires_sealed_user_approval(tmp_path, ecommerce, approved):
+    approval = _approval()
+    if approved:
+        approval["identity_waivers"] = ["resident"]
+    planning = ReferencePlanningIntent(
+        director_coverage=None if ecommerce else _binding(), preview_approval=_approval_binding(approval),
+        identity_waivers=({"character_id": "resident", "reason": "不可辨认的剪影"},))
+    intent = _intent().model_copy(update={"reference_planning": planning})
+    requirement = SimpleNamespace(generation_intent=intent, target_shot=SimpleNamespace(character_ids=("resident",)),
+        commercial_execution_class="product_interaction" if ecommerce else None)
+    project = _project(tmp_path, _payload(), approval=approval)
+    if approved:
+        require_reference_authoring(requirement, project=project)
+    else:
+        with pytest.raises(AiVideoError, match="not_in_preview_approval"):
+            require_reference_authoring(requirement, project=project)
+    if ecommerce:
+        with pytest.raises(AiVideoError, match="sealed_preview_required"):
+            require_reference_authoring(requirement)
+
+
+def test_shot_cast_without_direction_accepts_required_anchor():
+    intent = _intent(binding=_binding())
+    intent = intent.model_copy(update={"reference_planning": intent.reference_planning.model_copy(update={
+        "anchors": ReferencePlanningIntent(anchors=({"anchor_id": "resident", "role": "identity",
+            "owner_id": "resident", "priority": "required", "purpose": "Keep identity"},)).anchors})})
+    require_reference_authoring(SimpleNamespace(generation_intent=intent,
+        target_shot=SimpleNamespace(character_ids=("resident",))))
+
+
+@pytest.mark.parametrize("role", ["first_frame", "last_frame"])
+def test_mixed_approved_and_unapproved_endpoint_inputs_fail(tmp_path, role):
+    request = SimpleNamespace(media_bindings=(), image_bindings=(
+        SimpleNamespace(asset_id="approved", role="reference", asset_sha256="a" * 64),
+        SimpleNamespace(asset_id="endpoint", role=role, asset_sha256="b" * 64)))
+    with pytest.raises(AiVideoError, match="input_asset:endpoint"):
+        require_reference_authoring(SimpleNamespace(generation_intent=_intent(binding=_binding())),
+            project=_project(tmp_path, _payload()), commercial_binding=None, resolved_request=request)

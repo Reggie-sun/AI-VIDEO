@@ -704,10 +704,20 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
     )
     initial = inputs.project
     initial_shot = initial.shots[0]
+    from tests.reference_authoring_fixture import (
+        fixture_director_coverage_artifact, fixture_preview_approval, fixture_preview_approval_artifact,
+    )
+    preview = fixture_preview_approval(identity_waivers=initial_shot.character_ids,
+        preview_artifacts=[{"path": "fixture/preview/first-frame.png",
+            "sha256": initial.registry.assets[0].sha256, "role": "first_frame"}])
+    approval_artifacts = (fixture_director_coverage_artifact(), fixture_preview_approval_artifact(preview))
+    approval_references = tuple(SourceReference(kind="user_input",
+        reference=a.relative_path.as_posix(), content_hash=a.relative_path.stem) for a in approval_artifacts)
     generated_shot = seal_artifact(
         initial_shot.model_copy(
             update={
                 "revision": initial_shot.revision + 1,
+                "source_provenance": (*initial_shot.source_provenance, *approval_references),
                 "content_hash": "0" * 64,
                 "visual_strategy": VisualStrategy.GENERATED_VIDEO,
                 "required_asset_roles": (
@@ -788,6 +798,7 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
             sorted(
                 (
                     *base_commit.artifacts,
+                    *approval_artifacts,
                     PreparedArtifact(
                         transition.candidate_dependency_graph.path,
                         graph_bytes,
@@ -1045,6 +1056,13 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
     terminal = load_terminal_frame_evidence(
         tmp_path, source_state.terminal_frame_evidence
     )
+    from tests.production_generation_execution_factory import approve_fixture_preview
+    # The fake image provider below returns these exact predetermined preview bytes.
+    inputs = approve_fixture_preview(inputs=replace(inputs, project=selected),
+        identity_waivers=selected.shots[1].character_ids,
+        preview_artifacts=[{"path": "fixture/preview/first-frame.png",
+            "sha256": hashlib.sha256(_p7_png()).hexdigest(), "role": "first_frame"}])
+    selected = inputs.project
     target = selected.shots[1]
     character = selected.characters[0]
     scene = selected.scenes[0]

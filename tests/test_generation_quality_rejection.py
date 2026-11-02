@@ -162,14 +162,17 @@ def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path)
     )
     # Freshly authored fixture: fingerprints bind its declared reference_planning
     # and sealed Director coverage/approved identity waiver, like its acting input.
+    # 2026-11-02: old-fixture reproduction matched the prior five goldens exactly;
+    # recursive payload diff contains only added preview provenance, approval hash,
+    # and their derived identities. The selected first-frame bytes are now approved.
     # Historical /1 payload hashes remain frozen in test_generation_evaluation.py.
     assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
-        "9678c49676be7e77c71c16bf533cf9d480fa8908d83abc14c9f500d717ee6d65",
-        "43c1d3c1fe358e8bc7a9ff8703a5103bda8cf33da1e118c0bd985837318125d5",
-        "cfa0e08359665b1ae691e932f35345f2a77aaca951142d4a6096529c1f27de19",
+        "ee80fa453467d88efece57dc77df55a020d0c129a3a09eed42566b7d4e8c5050",
+        "a09a45fba370783fe8420dc57565d2d6bed0fa5242c2651148daea96c3768015",
+        "4188780ad28c94af508aac5ea14bf6a56afab0b804b8d7683b7a0f9ead61ad1e",
     )
-    assert experience.evidence[0].evidence_hash == "20b69015ea8484c9da7b706772ea0ac4e402f80a745c5f7937a574c16cb71c9a"
-    assert canonical_sha256(experience.model_dump(mode="json")) == "a3dde622a57f10b41d87f2732c6b2f73d1a6c69f8a7931ad7964e890ea20b7fb"
+    assert experience.evidence[0].evidence_hash == "103f7437f4b568212edee2e5bad5356d9dfa78bca0cec5f61ec73773e9550260"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "9e956caa44226803c878b83feebedfec339b8697489342a549d918c5ca21d76c"
     assert diagnose_exact_result(
         experience.evidence[0], experience.evidence, experience.candidate.recipe
     ).failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")

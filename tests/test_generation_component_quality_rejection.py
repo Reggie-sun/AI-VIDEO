@@ -391,7 +391,17 @@ def _persist_video_component_authoring(tmp_path, *, legacy_shared_rubric=False):
         content_hash=parent.content_hash,
         path=Path(f"creative/shots/{parent.content_hash}.yaml"),
     )
+    from tests.reference_authoring_fixture import (
+        fixture_director_coverage_artifact, fixture_preview_approval, fixture_preview_approval_artifact,
+    )
+    source = next(asset for asset in loaded.registry.assets if asset.asset_id == "image-shot-1")
+    preview_artifacts = (fixture_director_coverage_artifact(), fixture_preview_approval_artifact(
+        fixture_preview_approval(identity_waivers=parent.character_ids, preview_artifacts=[{
+            "path": "fixture/preview/first-frame.png", "sha256": source.sha256, "role": "first_frame"}])))
+    preview_references = tuple(SourceReference(kind="user_input", reference=a.relative_path.as_posix(),
+        content_hash=a.relative_path.stem) for a in preview_artifacts)
     project = seal_artifact(loaded.project.model_copy(update={
+        "source_provenance": (*loaded.project.source_provenance, *preview_references),
         "revision": loaded.project.revision + 1,
         "content_hash": "0" * 64,
         "artifacts": loaded.project.artifacts.model_copy(update={
@@ -428,7 +438,7 @@ def _persist_video_component_authoring(tmp_path, *, legacy_shared_rubric=False):
         base,
         dependency_graph_transition=transition,
         artifacts=tuple(sorted(
-            (*base.artifacts,
+            (*base.artifacts, *preview_artifacts,
              PreparedArtifact(
                  transition.candidate_dependency_graph.path,
                  graph_payload,

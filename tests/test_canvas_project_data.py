@@ -820,7 +820,9 @@ def test_nominal_15_second_example_uses_real_seedance_compiler_without_effects(t
     # bind it per Shot, so the fresh-generation gate is exercised rather than relaxed.
     from tests.reference_authoring_fixture import fixture_preview_approval, fixture_preview_approval_binding
     coverage = data["director_coverages"][0]
-    approval = {**fixture_preview_approval(coverage),
+    approval = {**fixture_preview_approval(coverage, preview_artifacts=[
+                    {"path": f"fixture/preview/{asset.asset_id}.png", "sha256": asset.sha256,
+                     "role": "selected model reference"} for asset in registry.assets]),
                 "unit_ids": [u["unit_id"] for u in coverage["coverage_units"]]}
     data["preview_approvals"] = [approval]
     for row in data["shots"]:

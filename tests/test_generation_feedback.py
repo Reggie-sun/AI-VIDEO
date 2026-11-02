@@ -33,15 +33,21 @@ class NativeFixtureProvider(ScriptedFakeVideoProvider):
 
 def feedback_setup():
     setup = setup_decision()
+    from tests.reference_authoring_fixture import fixture_wiring_preview_project
+    from test_production_provider_neutral_adapters import _replace_requirement
+    temporary, project, intent = fixture_wiring_preview_project(
+        setup["projection"].requirement.generation_intent, setup["projection"].requirement, setup["context"])
+    setup["projection"] = _replace_requirement(setup["projection"], generation_intent=intent)
     candidate = setup["inputs"].candidates[0]
     provider = NativeFixtureProvider(capabilities=candidate.capabilities, artifact_bytes=b"unused-offline")
     current = {key: value for key, value in setup.items() if key != "inputs"}
+    current["source_project"] = project
     current["acceptance"] = candidate.recipe.acceptance_policy
     history = [GenerationHistory()]
     orchestrator = GenerationFeedbackOrchestrator(
         targets=(RegisteredGenerationTarget(provider, candidate.provider_profile,
                   candidate.compiler_contract, candidate.output_requirement),),
-        context_loader=lambda: current, history_loader=lambda: history[0],
+        context_loader=lambda _keepalive=temporary: current, history_loader=lambda: history[0],
         policy=DecisionPolicy(allow_bounded_exploration=True))
     return setup, provider, current, history, orchestrator
 
@@ -292,6 +298,12 @@ def test_cohort_survives_profile_renewal_without_exact_hash_pass():
 @pytest.mark.parametrize("window_minutes", [40, 180, 360])
 def test_pure_vidu_profile_reaffirmation_compiles_bounded_seed_resample(window_minutes):
     setup = setup_decision(remote=True)
+    from tests.reference_authoring_fixture import fixture_wiring_preview_project
+    from test_production_provider_neutral_adapters import _replace_requirement
+    temporary, project, intent = fixture_wiring_preview_project(
+        setup["projection"].requirement.generation_intent, setup["projection"].requirement, setup["context"])
+    setup["projection"] = _replace_requirement(setup["projection"], generation_intent=intent)
+    setup["source_project"] = project
     original = setup["inputs"].candidates[0]
     variant = original.capabilities.variants[0].model_copy(update={
         "provider_kind": "vidu", "profile_version": VIDU_PROFILE_VERSION,

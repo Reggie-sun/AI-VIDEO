@@ -591,6 +591,7 @@ def test_execution_binding_cannot_mint_from_tampered_final_seedance_text():
             inputs=binding.inputs,
             decision=binding.decision,
             compiled_request=tampered_request,
+            source_project=orchestrator.context_loader()["source_project"],
             continuity_routing=binding.continuity_routing,
             unsubmitted_predecessor_evidence_hash=binding.unsubmitted_predecessor_evidence_hash,
         )
@@ -707,7 +708,15 @@ def _feedback_orchestrator_fixture(*, omit_paths=(), performance_intent_override
         performance_intent_override=performance_intent_override,
         qa_performance_override=qa_performance_override,
     )
+    from tests.reference_authoring_fixture import fixture_wiring_preview_project
+    from test_production_provider_neutral_adapters import _replace_requirement
+
+    temporary, project, intent = fixture_wiring_preview_project(
+        requirement.generation_intent, requirement, context)
+    projection = _replace_requirement(projection, generation_intent=intent)
+    requirement = projection.requirement
     current = {
+        "source_project": project,
         "projection": projection,
         "context": context,
         "policy": _policy(remote_authorized=True, budget_authorized=True),
@@ -751,7 +760,7 @@ def _feedback_orchestrator_fixture(*, omit_paths=(), performance_intent_override
     def orchestrator(adapter):
         return GenerationFeedbackOrchestrator(
             targets=(RegisteredGenerationTarget(adapter, _profile_pointer(profile), compiler, output),),
-            context_loader=lambda: current,
+            context_loader=lambda _keepalive=temporary: current,
             history_loader=GenerationHistory,
             policy=DecisionPolicy(allow_bounded_exploration=True),
         )

@@ -237,7 +237,7 @@ def test_subject_compiler_and_capability_must_be_selected_together(version, capa
     _named_route(compiler_version=version, capability_id=capability, expect_blocked=True)
 
 
-def test_complete_intent_reopens_execution_binding_and_rejects_resealed_subject_swap():
+def test_complete_intent_reopens_execution_binding_and_rejects_resealed_subject_swap(request):
     from ai_video.planning.video_planner import VideoPlanner
     from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
     from ai_video.production.generation_decision import DecisionInputs, GenerationCandidate
@@ -245,6 +245,12 @@ def test_complete_intent_reopens_execution_binding_and_rejects_resealed_subject_
     from production_generation_execution_factory import fixture_generation_expression
     from test_production_generation_decision import acceptance_policy, setup_decision
     provider, projection, context, lifecycle = _named_route(complete=True, setup=True)
+    from tests.reference_authoring_fixture import fixture_wiring_preview_project
+    temporary, source_project, intent = fixture_wiring_preview_project(
+        projection.requirement.generation_intent, projection.requirement, context)
+    projection = _replace_requirement(projection, generation_intent=intent)
+    # Keep the real temporary Project alive through both binding checks.
+    request.addfinalizer(temporary.cleanup)
     compiler = AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="4")
     output = _request().output_requirement
     expression = fixture_generation_expression(output)
@@ -280,7 +286,7 @@ def test_complete_intent_reopens_execution_binding_and_rejects_resealed_subject_
     compiled = provider.compile_request(decision.routing.provider_bound_request, projection.requirement)
     assert isinstance(compiled, CompiledProviderVideoRequest), compiled
     resolved = provider.resolve(compiled.request)
-    binding = GenerationDecisionExecutionBinding.create(**values, decision=decision, compiled_request=resolved)
+    binding = GenerationDecisionExecutionBinding.create(**values, decision=decision, compiled_request=resolved, source_project=source_project)
     assert GenerationDecisionExecutionBinding.model_validate_json(binding.model_dump_json()) == binding
     changed = compiled.request.model_dump(mode="python", exclude={"request_input_hash"})
     subjects = list(compiled.request.subject_bindings)
@@ -291,7 +297,7 @@ def test_complete_intent_reopens_execution_binding_and_rejects_resealed_subject_
     swapped = provider.resolve(VideoGenerationRequest.create(**changed))
     assert swapped.resolved_generation_hash != resolved.resolved_generation_hash
     with pytest.raises(ValidationError, match="canonical inputs"):
-        GenerationDecisionExecutionBinding.create(**values, decision=decision, compiled_request=swapped)
+        GenerationDecisionExecutionBinding.create(**values, decision=decision, compiled_request=swapped, source_project=source_project)
 
 
 def test_subject_prompt_assigns_one_dialogue_speaker_without_repeating_script():

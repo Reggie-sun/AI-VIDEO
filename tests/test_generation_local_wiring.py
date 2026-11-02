@@ -120,7 +120,9 @@ def _prepare(*, provider, profile, compiler, output, setup, projection):
                 "schema": "provider-neutral-generation-intent/2",
                 "generation_intent": intent.model_dump(mode="json"),
             }))
+    from tests.reference_authoring_fixture import fixture_wiring_preview_project
     declared = with_fixture_reference_planning(projection.requirement.generation_intent)
+    temporary, project, declared = fixture_wiring_preview_project(declared, projection.requirement, setup["context"])
     projection = _replace_requirement(
         projection, generation_intent=declared, generation_intent_hash=canonical_sha256({
             "schema": "provider-neutral-generation-intent/2",
@@ -133,7 +135,7 @@ def _prepare(*, provider, profile, compiler, output, setup, projection):
             *dict.fromkeys((*lifecycle.input_artifact_ids,
                             setup["context"].target_shot_id, first.asset_id)),)})
     current = {**{key: value for key, value in setup.items() if key != "inputs"},
-               "projection": projection, "lifecycle": lifecycle,
+               "projection": projection, "lifecycle": lifecycle, "source_project": project,
                "acceptance": acceptance_with_fixture_performance(_acceptance())
                    if projection.requirement.characters else _acceptance()}
     limits = setup["inputs"].limits.model_copy(update={
@@ -144,7 +146,8 @@ def _prepare(*, provider, profile, compiler, output, setup, projection):
         context_loader=lambda: current, history_loader=GenerationHistory,
         policy=DecisionPolicy(allow_bounded_exploration=True),
     )
-    return orchestrator.prepare(limits=limits)
+    with temporary:
+        return orchestrator.prepare(limits=limits)
 
 
 def _pointer(profile, *, version):

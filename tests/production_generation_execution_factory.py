@@ -93,6 +93,7 @@ from tests.reference_authoring_fixture import (
     fixture_director_coverage_artifact,
     fixture_preview_approval,
     fixture_preview_approval_artifact,
+    fixture_preview_approval_binding,
     with_fixture_reference_planning,
 )
 
@@ -333,10 +334,21 @@ def activate_generated_video_shot(
         content_hash=coverage_artifact.relative_path.stem)
     # Some tests preserve cast identity; lifecycle fixtures without identity sheets
     # explicitly approve their visible cast's waivers in a distinct sealed payload.
-    approval_artifacts = (fixture_preview_approval_artifact(),)
+    preview_artifacts = ([{"path": "fixture/preview/first-frame.png",
+        "sha256": first_frame_asset.sha256, "role": "first_frame"}]
+        if first_frame_asset is not None else None)
+    approval_artifacts = (fixture_preview_approval_artifact(
+        fixture_preview_approval(preview_artifacts=preview_artifacts)),)
     if authored_shot.character_ids:
         approval_artifacts += (fixture_preview_approval_artifact(fixture_preview_approval(
-            identity_waivers=authored_shot.character_ids)),)
+            identity_waivers=authored_shot.character_ids, preview_artifacts=preview_artifacts)),)
+    # T2V callers still use the generic synthetic preview; retain that explicit
+    # approval alongside the selected first-frame preview, without changing its hash.
+    if preview_artifacts is not None:
+        approval_artifacts += (fixture_preview_approval_artifact(),)
+        if authored_shot.character_ids:
+            approval_artifacts += (fixture_preview_approval_artifact(fixture_preview_approval(
+                identity_waivers=authored_shot.character_ids)),)
     approval_references = tuple(SourceReference(kind="user_input",
         reference=artifact.relative_path.as_posix(), content_hash=artifact.relative_path.stem)
         for artifact in approval_artifacts)
@@ -456,6 +468,36 @@ def activate_generated_video_shot(
     return replace(inputs, project=load_production_project(root / "project.yaml"))
 
 
+def approve_fixture_preview(*, inputs, preview_artifacts, identity_waivers=()):
+    """Explicitly seal a synthetic approval before a fixture plans changed media."""
+    initial = inputs.project
+    artifact = fixture_preview_approval_artifact(fixture_preview_approval(
+        identity_waivers=identity_waivers, preview_artifacts=preview_artifacts))
+    reference = SourceReference(kind="user_input", reference=artifact.relative_path.as_posix(),
+                                content_hash=artifact.relative_path.stem)
+    project = seal_artifact(initial.project.model_copy(update={
+        "revision": initial.project.revision + 1, "content_hash": "0" * 64,
+        "source_provenance": (*initial.project.source_provenance, reference),
+    }))
+    commit = prepare_project_registry_commit(manifest=initial.manifest,
+        project=project, registry=initial.registry, attempt_id="fixture-preview-" + reference.content_hash[:16])
+    candidate = initial.model_copy(update={"project": project,
+        "manifest": initial.manifest.model_copy(update={"active_project": commit.next_project})})
+    graph = build_production_dependency_graph(replace(inputs, project=candidate))
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=initial.manifest.manifest_revision,
+        base_dependency_graph=initial.manifest.active_dependency_graph, candidate_graph=graph,
+        candidate_dependency_states=resolve_dependency_state(graph, initial.manifest.dependency_states).states,
+        expected_desired_fingerprints=desired_fingerprints(graph))
+    payload = _canonical_json_bytes(graph)
+    ProductionStateCommitter(initial.root).commit(replace(commit,
+        dependency_graph_transition=transition, artifacts=tuple(sorted((
+            *commit.artifacts, artifact,
+            PreparedArtifact(transition.candidate_dependency_graph.path, payload,
+                             hashlib.sha256(payload).hexdigest())), key=lambda a: a.relative_path.as_posix()))))
+    return replace(inputs, project=load_production_project(initial.root / "project.yaml"))
+
+
 def prepare_generation_execution(
     *,
     project,
@@ -557,7 +599,12 @@ def prepare_generation_execution(
                 breathing="quiet, even breathing",
                 body_behavior="stands at ease and settles weight subtly",
             ) if shot.character_ids else None,
-        ), ecommerce=request.commercial_binding is not None),
+        ), ecommerce=request.commercial_binding is not None,
+            preview_approval=fixture_preview_approval_binding(fixture_preview_approval(
+                identity_waivers=shot.character_ids,
+                preview_artifacts=([{ "path": "fixture/preview/first-frame.png",
+                    "sha256": source.asset_sha256, "role": "first_frame"}]
+                    if source is not None else None)))),
         # Ecommerce binds its AdCreativePlan via commercial_binding, not drama coverage.
         semantic_reference_roles=(
             (SemanticReferenceRole.FIRST_FRAME,) if source is not None else ()
@@ -719,6 +766,7 @@ def prepare_generation_execution(
         inputs=inputs,
         decision=decision,
         compiled_request=resolved,
+        source_project=project,
     )
     return PreparedGenerationExecution(binding=binding, resolved=resolved)
 

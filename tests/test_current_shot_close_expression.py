@@ -93,7 +93,20 @@ def fresh_fixture(tmp_path, monkeypatch):
             endpoint=ActionEndpoint(state_text="actor holds the raised book still"))})
     # The authored action changed, so re-declare planning from this intent
     # (its composition event must state what the new action shows).
-    intent = with_fixture_reference_planning(intent.model_copy(update={"reference_planning": None}))
+    # Explicit synthetic approval of this fixture's selected model media.
+    from dataclasses import replace
+    from tests.production_generation_execution_factory import approve_fixture_preview
+    from tests.reference_authoring_fixture import fixture_preview_approval, fixture_preview_approval_binding
+    loaded = load_production_project(tmp_path / "project.yaml")
+    preview_artifacts = [{"path": f"fixture/preview/{asset.asset_sha256}.png",
+                          "sha256": asset.asset_sha256, "role": "current close reference"}
+                         for asset in bound.input_assets]
+    waiver_ids = tuple(w.character_id for w in intent.reference_planning.identity_waivers)
+    approve_fixture_preview(inputs=replace(fixture["source"]["inputs"], project=loaded),
+        preview_artifacts=preview_artifacts, identity_waivers=waiver_ids)
+    approval = fixture_preview_approval(preview_artifacts=preview_artifacts, identity_waivers=waiver_ids)
+    intent = with_fixture_reference_planning(intent.model_copy(update={"reference_planning": None}),
+        preview_approval=fixture_preview_approval_binding(approval))
     author = ProviderNeutralGenerationIntentProjection.create(**{
         **{name: getattr(author, name) for name in type(author).model_fields if name != "projection_hash"},
         "generation_intent": intent})

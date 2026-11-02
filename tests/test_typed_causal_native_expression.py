@@ -61,6 +61,8 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
     elif arbitrary_close:
         intent = intent.model_copy(update={"close_state": TypedStateReference(kind="typed_hash", state_hash="f" * 64)})
     intent = with_fixture_reference_planning(intent)
+    intent = intent.model_copy(update={"reference_planning": intent.reference_planning.model_copy(update={
+        "preview_approval": seed.generation_intent.generation_intent.reference_planning.preview_approval})})
     first = next(a for a in seed.available_assets if a.role.value == (
         "previous_shot_terminal" if exact_terminal else "approved_keyframe"))
     authored = ProviderNeutralGenerationIntentProjection.create(**{
@@ -457,6 +459,16 @@ def metaso_canonical_fixture(tmp_path, monkeypatch, *, target_acceptance=False):
                 expected_manifest_revision=loaded.manifest.manifest_revision,
                 attempt_id="fixture-performance-qa",
             )
+    # Approve the scripted 512x288 keyframe bytes before its image lineage starts.
+    from tests.production_generation_execution_factory import approve_fixture_preview
+    loaded = load_production_project(tmp_path / "project.yaml")
+    hashes = sorted({asset.sha256 for asset in loaded.registry.assets} |
+                    {hashlib.sha256(e._p7_png(512, 288)).hexdigest()})
+    updated_inputs = approve_fixture_preview(inputs=replace(source["inputs"], project=loaded),
+        identity_waivers=tuple({c for shot in loaded.shots for c in shot.character_ids}),
+        preview_artifacts=[{"path": f"fixture/preview/{sha}.png", "sha256": sha,
+                            "role": "sequence reference"} for sha in hashes])
+    source = {**source, "inputs": updated_inputs, "loaded": updated_inputs.project}
     return provider, canonical_expression_fixture(tmp_path, source=source, duration=6)
 
 

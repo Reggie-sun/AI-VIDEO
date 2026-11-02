@@ -2241,6 +2241,14 @@ def _real_input(
         caption_style_fingerprints=caption_style_fingerprints,
     )
     shot = next(item for item in loaded.shots if item.shot_id == shot_id)
+    from production_generation_execution_factory import approve_fixture_preview
+    from tests.reference_authoring_fixture import fixture_preview_approval, fixture_preview_approval_binding
+    approval_hash = fixture_preview_approval_binding(fixture_preview_approval(
+        identity_waivers=shot.character_ids))["approval_hash"]
+    if not any(ref.content_hash == approval_hash for ref in loaded.project.source_provenance):
+        inputs = approve_fixture_preview(inputs=inputs, preview_artifacts=None,
+            identity_waivers=shot.character_ids)
+    loaded = inputs.project
     projection = next(
         item
         for item in execution.handoff.commercial_execution_projections

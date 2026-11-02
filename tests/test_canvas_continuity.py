@@ -537,6 +537,19 @@ def test_successor_requires_its_own_exact_state_findings_before_adoption(tmp_pat
     accept_current(service, provider, limits, auth)
     service.handoff_reference(source_shot_id="one", target_occurrence_id="b", frame_index=7,
         replace_asset_id=aid, usage_license="fixture-only", **reference_gate(service))
+    # The successor has a newly extracted model input: explicitly approve its exact bytes.
+    from tests.reference_authoring_fixture import fixture_preview_approval, fixture_preview_approval_binding
+    row = service.direction["shots"][1]
+    loaded = service._load()
+    references = row["generation"]["references"]
+    selected = {item["asset_id"] for item in references}
+    approval = fixture_preview_approval(preview_artifacts=[
+        {"path": str(asset.artifact_path), "sha256": asset.sha256, "role": "successor reference"}
+        for asset in loaded.registry.assets if asset.asset_id in selected])
+    service.direction["preview_approvals"].append(approval)
+    row["generation"]["generation_intent"]["reference_planning"]["preview_approval"] = (
+        fixture_preview_approval_binding(approval))
+    service.revise_authoring(attempt_id="approve-successor-preview")
     original = provider.capabilities().variants[0]
     successor = original.model_copy(update={"capability_id": "fixture-state-r2v",
         "mode": VideoGenerationMode.REFERENCE_TO_VIDEO, "required_first_frame": False,

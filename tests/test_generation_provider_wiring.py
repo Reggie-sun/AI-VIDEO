@@ -32,6 +32,8 @@ def prepare(provider, profile, output, compiler_id, compiler_version="2", author
             update={"progression": action_progression}),
             "reference_planning": None})
     intent = with_fixture_reference_planning(intent)
+    from tests.reference_authoring_fixture import fixture_wiring_preview_project
+    temporary, project, intent = fixture_wiring_preview_project(intent, setup["projection"].requirement, setup["context"])
     conditioning = setup["projection"].requirement.conditioning_compatibility
     if conditioning is not None:
         conditioning = conditioning.model_copy(update={"available_duration_seconds": output.duration_seconds})
@@ -49,15 +51,16 @@ def prepare(provider, profile, output, compiler_id, compiler_version="2", author
         observable="hand secures product", tolerance="exact", measurement="viewing", proof="human",
         intent_paths=("generation_intent.performance_intent.hand_behavior",), production_owner="shot_authoring"),))
     current = {**{k: v for k, v in setup.items() if k != "inputs"}, "projection": projection,
-               "acceptance": acceptance}
+               "acceptance": acceptance, "source_project": project}
     target = RegisteredGenerationTarget(provider, profile, AdapterCompilerContract.create(
         compiler_id=compiler_id, compiler_version=compiler_version), output)
     capabilities = provider.capabilities()
     limits = setup["inputs"].limits.model_copy(update={"allowed_remote_candidates": tuple(
         f"{capabilities.provider_name}/{v.capability_id}" for v in capabilities.variants
         if authorized_model is None or v.model_id == authorized_model)})
-    return GenerationFeedbackOrchestrator(targets=(target,), context_loader=lambda: current,
-        history_loader=GenerationHistory, policy=DecisionPolicy(allow_bounded_exploration=True)).prepare(limits=limits)
+    with temporary:
+        return GenerationFeedbackOrchestrator(targets=(target,), context_loader=lambda: current,
+            history_loader=GenerationHistory, policy=DecisionPolicy(allow_bounded_exploration=True)).prepare(limits=limits)
 
 
 @pytest.mark.parametrize("model", [

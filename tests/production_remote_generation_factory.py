@@ -8,7 +8,7 @@ from ai_video.production.generation_decision import DecisionPolicy
 from ai_video.production.generation_feedback import (
     GenerationFeedbackOrchestrator, GenerationHistory, RegisteredGenerationTarget,
 )
-from ai_video.production.hashing import canonical_sha256
+from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.shot_router import AdapterCompilerContract
 from ai_video.production.video_requirement import (
     AmbienceIntent, AssetEvidence, AudioNeed, CapabilityNeed, GenerationMode,
@@ -16,7 +16,7 @@ from ai_video.production.video_requirement import (
     VerifiedGenerationRequirementProjection,
 )
 from ai_video.production.models import (
-    AssetRecord, AssetSourceKind, AssetType, ToolIdentity,
+    AssetRecord, AssetSourceKind, AssetType, ToolIdentity, SourceReference,
 )
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import (
@@ -38,12 +38,11 @@ from production_generation_execution_factory import (
 from test_production_generation_decision import setup_decision
 from tests.test_production_video_intent_validation import _complete_intent
 from tests.performance_fixture import fixture_performance_intent
-from tests.reference_authoring_fixture import with_fixture_reference_planning
+from tests.reference_authoring_fixture import (with_fixture_reference_planning, fixture_preview_approval,
+    fixture_preview_approval_artifact, fixture_preview_approval_binding)
 
 
-def _register_remote_inputs(*, root, inputs, project, bindings, input_bytes):
-    if not bindings:
-        return project
+def _register_remote_inputs(*, root, inputs, project, bindings, input_bytes, approval):
     records = []
     artifacts = []
     for binding in bindings:
@@ -85,13 +84,20 @@ def _register_remote_inputs(*, root, inputs, project, bindings, input_bytes):
     })
     registry_hash = registry_semantic_sha256(registry)
     registry = registry.model_copy(update={"revision_id": registry_hash, "content_hash": registry_hash})
+    approval_artifact = fixture_preview_approval_artifact(approval)
+    artifacts.append(approval_artifact)
+    reference = SourceReference(kind="user_input", reference=approval_artifact.relative_path.as_posix(),
+        content_hash=approval_artifact.relative_path.stem)
+    authored_project = seal_artifact(project.project.model_copy(update={
+        "revision": project.project.revision + 1, "content_hash": "0" * 64,
+        "source_provenance": tuple(dict.fromkeys((*project.project.source_provenance, reference)))}))
     request = prepare_project_registry_commit(
-        manifest=project.manifest, project=project.project, registry=registry,
+        manifest=project.manifest, project=authored_project, registry=registry,
         attempt_id="fixture-remote-generation-inputs",
     )
     candidate = project.model_copy(update={
-        "registry": registry,
-        "manifest": project.manifest.model_copy(update={"active_registry": request.next_registry}),
+        "project": authored_project, "registry": registry,
+        "manifest": project.manifest.model_copy(update={"active_registry": request.next_registry, "active_project": request.next_project}),
     })
     graph = build_production_dependency_graph(replace(inputs, project=candidate))
     states = resolve_dependency_state(graph, project.manifest.dependency_states).states
@@ -120,13 +126,16 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
         root=root, inputs=make_p8_video_generation_base(root, schema_version="2.7"))
     project = inputs.project
     supplied = (*request.image_bindings, *request.media_bindings)
+    approval = fixture_preview_approval(identity_waivers=project.shots[0].character_ids,
+        preview_artifacts=[{"path": f"fixture/preview/{b.asset_id}", "sha256": b.asset_sha256,
+                            "role": b.role} for b in supplied] or None)
     if supplied:
         if input_bytes is None or set(input_bytes) != {item.asset_id for item in supplied}:
             raise ValueError("fixture remote inputs require exact bytes for every binding")
-        project = _register_remote_inputs(
-            root=root, inputs=inputs, project=project,
-            bindings=supplied, input_bytes=input_bytes,
-        )
+    project = _register_remote_inputs(
+        root=root, inputs=inputs, project=project,
+        bindings=supplied, input_bytes=input_bytes or {}, approval=approval,
+    )
     inputs = activate_fixture_generation_qa_policy(
         root=root,
         inputs=replace(inputs, project=project),
@@ -161,6 +170,9 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
            if not output.native_audio else {}),
     })
     intent = with_fixture_reference_planning(intent)
+    intent = intent.model_copy(update={"reference_planning": intent.reference_planning.model_copy(update={
+        "preview_approval": type(intent.reference_planning.preview_approval).model_validate(
+            fixture_preview_approval_binding(approval))})})
     if request.mode is VideoGenerationMode.REFERENCE_TO_VIDEO:
         role = SemanticReferenceRole.SCENE
         image = request.image_bindings[0]
@@ -241,7 +253,7 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
     acceptance = project.qa_policy.domain_acceptance
     assert acceptance is not None
     current = dict(projection=projection, context=context, policy=setup["policy"],
-                   lifecycle=lifecycle, acceptance=acceptance)
+                   lifecycle=lifecycle, acceptance=acceptance, source_project=project)
     capabilities = provider.capabilities()
     limits = setup["inputs"].limits.model_copy(update={"allowed_remote_candidates": tuple(
         f"{capabilities.provider_name}/{v.capability_id}" for v in capabilities.variants

@@ -128,7 +128,8 @@ def preview_approval_evidence_issues(binding, coverage, project) -> tuple[str, .
         validate_preview_approval(approval)
     except (PreviewApprovalError, ValueError, OSError):
         return (path,)
-    if approval["coverage_hash"] != coverage.coverage_hash or coverage.unit_id not in approval["unit_ids"]:
+    if coverage is not None and (approval["coverage_hash"] != coverage.coverage_hash
+                                 or coverage.unit_id not in approval["unit_ids"]):
         return (f"{_ROOT}.preview_approval[coverage_unit]",)
     return ()
 
@@ -169,7 +170,8 @@ def director_coverage_authoring_input(coverage):
                                                     hashlib.sha256(payload).hexdigest())
 
 
-def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -> None:
+def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED,
+                                resolved_request=None) -> None:
     """Structural obligations always; exact evidence whenever its owner input is supplied.
 
     Before compilation the commercial binding is unknown; at execution-binding
@@ -178,6 +180,23 @@ def require_reference_authoring(requirement, *, project=None, commercial_binding
     ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
     intent = requirement.generation_intent
     issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+    planning = intent.reference_planning
+    target = getattr(requirement, "target_shot", None)
+    if planning is not None and target is not None:
+        covered = set(intent.identity_continuity.character_ids) | {w.character_id for w in planning.identity_waivers} | {
+            a.owner_id for a in planning.anchors if a.role.value == "identity" and a.priority == "required"}
+        directions = intent.performance_intent.character_directions if intent.performance_intent else ()
+        offscreen = {d.character_id for d in directions
+                     if d.visibility == "offscreen" and d.offscreen_reason and d.offscreen_reason.strip()}
+        # A contradictory visible direction cannot be waived by an offscreen declaration.
+        offscreen -= set(_visible_performers(intent))
+        for character_id in target.character_ids:
+            if character_id not in covered | offscreen:
+                issue = f"generation_intent.identity_continuity.character_ids[{character_id}]"
+                if issue not in issues:
+                    issues.append(issue)
+    if not ecommerce and project is None and (commercial_binding is not _UNCOMPILED or resolved_request is not None):
+        issues.append(f"{_ROOT}.source_project")
     if ecommerce:
         if commercial_binding is None:
             issues.append("commercial_binding.ad_creative_plan_hash")
@@ -189,6 +208,25 @@ def require_reference_authoring(requirement, *, project=None, commercial_binding
                                                            planning.director_coverage, project))
         if not issues:
             issues.extend(identity_waiver_approval_issues(planning, project))
+    if not issues and planning is not None and ecommerce and planning.identity_waivers:
+        if project is None or planning.preview_approval is None:
+            issues.append(f"{_ROOT}.identity_waivers[sealed_preview_required]")
+        else:
+            issues.extend(preview_approval_evidence_issues(planning.preview_approval, None, project))
+            if not issues:
+                issues.extend(identity_waiver_approval_issues(planning, project))
+    if not issues and not ecommerce and resolved_request is not None:
+        from ai_video.production.authoring_input import PREFIX, reopen_authoring_input
+        from ai_video.production.models import SourceReference
+
+        binding = planning.preview_approval
+        reference = SourceReference(kind="user_input", reference=f"{PREFIX}{binding.approval_hash}.json",
+                                    content_hash=binding.approval_hash)
+        approval = reopen_authoring_input(project.root, reference)
+        approved = {artifact["sha256"] for artifact in approval["preview_artifacts"]}
+        for asset in (*resolved_request.image_bindings, *resolved_request.media_bindings):
+            if asset.asset_sha256 not in approved:
+                issues.append(f"{_ROOT}.preview_approval[input_asset:{asset.asset_id}]")
     if issues:
         raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
             user_message="Author Director reference planning before new generation: " + ", ".join(issues),

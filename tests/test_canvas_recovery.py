@@ -109,6 +109,7 @@ def test_unsubmitted_intermediate_preserves_submitted_baseline_and_direct_lineag
         projection=binding.projection, context=binding.context, policy=binding.policy,
         lifecycle=binding.lifecycle, inputs=binding.inputs, decision=binding.decision,
         compiled_request=binding.compiled_request, continuity_routing=binding.continuity_routing,
+        source_project=service._load(),
     )
     for invalid_parent in (
         submitted.evidence[-1].evidence_hash,
@@ -699,7 +700,7 @@ def test_accepted_failed_t2v_retarget_consumes_exact_grant_on_i2v_submit(tmp_pat
         projection=successor_binding.projection, context=successor_binding.context,
         policy=successor_binding.policy, lifecycle=successor_binding.lifecycle,
         inputs=successor_binding.inputs, decision=successor_binding.decision,
-        compiled_request=successor_binding.compiled_request,
+        compiled_request=successor_binding.compiled_request, source_project=service._load(),
         continuity_routing=successor_binding.continuity_routing,
         unsubmitted_predecessor_evidence_hash=None,
     ))

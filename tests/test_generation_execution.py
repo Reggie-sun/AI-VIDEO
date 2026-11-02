@@ -211,3 +211,14 @@ def test_decision_binding_rejects_stale_current_shot_before_request_write(
         for attempt in committer._read_manifest().attempts
     )
     assert provider.submit_calls == provider.status_calls == provider.fetch_calls == 0
+
+
+def test_fresh_execution_binding_rejects_missing_source_project(tmp_path):
+    from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+
+    _, _, _, binding, _ = _runtime(tmp_path)
+    with pytest.raises(AiVideoError, match="source_project"):
+        GenerationDecisionExecutionBinding.create(
+            projection=binding.projection, context=binding.context, policy=binding.policy,
+            lifecycle=binding.lifecycle, inputs=binding.inputs, decision=binding.decision,
+            compiled_request=binding.compiled_request)

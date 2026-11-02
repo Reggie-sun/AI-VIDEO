@@ -130,9 +130,12 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
         parts.append({"type": "text", "text": " " + authored_deadline_text})
     data = direction()
     data["delivery_profile"] = {"width": 1280, "height": 720, "fps": 24}
-    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_preview_approval, fixture_reference_planning
+    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_preview_approval, fixture_preview_approval_binding, fixture_reference_planning
     data["director_coverages"] = [fixture_director_coverage()]
-    data["preview_approvals"] = [fixture_preview_approval()]
+    approval = fixture_preview_approval(preview_artifacts=[
+        {"path": str(asset.artifact_path), "sha256": asset.sha256, "role": "subject fixture reference"}
+        for asset in registry.assets])
+    data["preview_approvals"] = [approval]
     if scenario:
         data["scenes"][0]["location"] = space
     data["characters"] = [{"character_id": "robot", "name": character, "identity": character,
@@ -167,6 +170,7 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
         # Two identity candidates share one owner, so the Director names each duty;
         # each purpose is text the authored prompt already carries.
         row["generation"]["generation_intent"]["reference_planning"] = fixture_reference_planning(
+            preview_approval=fixture_preview_approval_binding(approval),
             anchors=({"anchor_id": "main-id", "role": "identity", "purpose": "图片2", "owner_id": "robot"},
                      {"anchor_id": "aux-id", "role": "identity", "purpose": "图片1", "owner_id": "robot"}),
             selections=({"need_id": "main-id", "asset_id": "robot-main"},

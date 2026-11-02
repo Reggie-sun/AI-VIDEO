@@ -227,6 +227,13 @@ def _approved_commercial_project(
         source_plan_shot_id=source_plan_shot_id,
         target_shot_id=loaded.shots[0].shot_id,
     )
+    if post_media:
+        from production_generation_execution_factory import approve_fixture_preview
+        keyframe = next(a for a in loaded.registry.assets if a.asset_id == import_receipt.output_asset_id)
+        inputs = approve_fixture_preview(inputs=replace(inputs, project=loaded), preview_artifacts=[{
+            "path": "fixture/preview/first-frame.png", "sha256": keyframe.sha256, "role": "first_frame"}],
+            identity_waivers=loaded.shots[0].character_ids)
+        loaded = inputs.project
     request = _state_request(root, reference_set, projection=projection)
     committer.begin_commercial_source_preparation(request)
     loaded = load_production_project(root / "project.yaml")

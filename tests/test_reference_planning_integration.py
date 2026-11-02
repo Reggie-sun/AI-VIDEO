@@ -60,6 +60,7 @@ def test_director_reference_events_survive_loader_planner_router_and_real_compil
     loaded, row, bundle = load_canvas(tmp_path, planning)
     setup = setup_decision()
     current = canvas_feedback_context(loaded=loaded, row=row, policy=setup["policy"])
+    current["source_project"] = loaded
     candidate = setup["inputs"].candidates[0]
     current["acceptance"] = candidate.recipe.acceptance_policy
     provider = NativeFixtureProvider(capabilities=candidate.capabilities, artifact_bytes=b"never-submitted")
@@ -153,6 +154,14 @@ def motion_preparer(*, supports_video=True, cardinality_conflict=False):
         available_assets=(asset,), generation_intent=projection, planning_contract_version="video-planner/3")
     plan = VideoPlanner().plan(request)
     verified = require_current_video_plan(current_request=request, plan=plan)
+    from tests.reference_authoring_fixture import fixture_wiring_preview_project
+    temporary, loaded, authored = fixture_wiring_preview_project(authored, verified.requirement, context)
+    projection = ProviderNeutralGenerationIntentProjection.create(generation_intent=authored,
+        output_need=original.output_need, audio_need=original.audio_need, quality_need=original.quality_need)
+    request = VideoPlanningRequest.create(**request.model_dump(mode="python",
+        exclude={"request_content_hash", "generation_intent"}), generation_intent=projection)
+    plan = VideoPlanner().plan(request)
+    verified = require_current_video_plan(current_request=request, plan=plan)
     context = type(context).model_validate({**context.model_dump(mode="python"),
         "motion_requirement": plan.motion_requirement.value,
         "continuity_mode": plan.continuity_mode.value, "scene_content_hash": scene.content_hash})
@@ -169,9 +178,9 @@ def motion_preparer(*, supports_video=True, cardinality_conflict=False):
             VideoBindingCardinalityConstraint(roles=("reference_video",), min_count=0, max_count=0),)})
     provider = NativeFixtureProvider(capabilities=_capabilities(variant), artifact_bytes=b"never-used")
     current = dict(projection=verified, context=context, policy=setup["policy"], lifecycle=lifecycle,
-        acceptance=base.recipe.acceptance_policy)
+        acceptance=base.recipe.acceptance_policy, source_project=loaded)
     orchestrator = GenerationFeedbackOrchestrator(targets=(RegisteredGenerationTarget(provider,
-        base.provider_profile, base.compiler_contract, _output()),), context_loader=lambda: current,
+        base.provider_profile, base.compiler_contract, _output()),), context_loader=lambda _keepalive=temporary: current,
         history_loader=GenerationHistory, policy=DecisionPolicy(allow_bounded_exploration=True))
     return orchestrator, setup["inputs"].limits, provider, current
 
@@ -254,9 +263,9 @@ def _drama_prepare(tmp_path, planning, **load):
     loaded, row, _ = load_canvas(tmp_path, planning, **load)
     setup = setup_decision()
     current = canvas_feedback_context(loaded=loaded, row=row, policy=setup["policy"])
+    current["source_project"] = loaded
     candidate = setup["inputs"].candidates[0]
     current["acceptance"] = candidate.recipe.acceptance_policy
-    current["source_project"] = loaded  # the canonical for_project loader supplies the current Project
     provider = NativeFixtureProvider(capabilities=candidate.capabilities, artifact_bytes=b"never-submitted")
     provider.prompt_text = "Generate 4 seconds."
     orchestrator = GenerationFeedbackOrchestrator(

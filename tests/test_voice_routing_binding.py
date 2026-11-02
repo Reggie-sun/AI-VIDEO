@@ -532,6 +532,7 @@ def test_voice_submit_count_uses_durable_current_task_provenance(tmp_path: Path)
         decision=forged_decision,
         compiled_request=allowed.execution_binding.compiled_request,
         continuity_routing=allowed.execution_binding.continuity_routing,
+        source_project=source,
     )
 
     with pytest.raises(ValueError, match="submit usage"):

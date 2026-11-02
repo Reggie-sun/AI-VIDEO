@@ -223,6 +223,7 @@ def _qualification_binding(
         inputs=decision_inputs,
         decision=decision,
         compiled_request=request,
+        source_project=inputs.project,
         continuity_routing=base.continuity_routing,
     )
     return inputs, provider, decision, binding, request

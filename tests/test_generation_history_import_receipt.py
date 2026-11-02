@@ -149,10 +149,13 @@ def test_prepares_and_reopens_a_strict_legacy_remote_snapshot(tmp_path):
     # This fixture is freshly authored, then projected into legacy receipt
     # shape; its fingerprints include the new explicit acting input/rubric and the
     # declared planning with sealed coverage and the approved identity waiver.
+    # 2026-11-02: isolated old-fixture reproduction matched all three prior goldens;
+    # recursive payload diff contains only added preview provenance/approval and
+    # derived identities. The selected first-frame bytes are now explicitly approved.
     # Historical /1 payload hashes remain frozen in test_generation_evaluation.py.
-    assert source.source_sha256 == "8c957f570a0b80fe8d3f9fde3df7ef19ebd21914e29016cd83e35a9b7e3e0717"
-    assert experience.evidence[0].evidence_hash == "cbe829779d5d1e15155baae9b0d21d5da5d6d14fca4a660645762c07fef05dcf"
-    assert canonical_sha256(experience.model_dump(mode="json")) == "08f32670ac3de8421bf0ad85bdbe759336054f40e84487ab37ea57094c19c0fe"
+    assert source.source_sha256 == "85752818bc2cb466ff18d09bdd5d2d9cd4dc24c2e703bec785152c10abc82e3c"
+    assert experience.evidence[0].evidence_hash == "0870b3712278af8c953624c630d38d01f77c97d81c1bfe3b3ee10c4c91171756"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "b416746cbf3df41656d89c17215069257edf1bdeca4a5448bde23b007dba511b"
     assert "analysis_evidence" not in source_payload
     assert GenerationEvaluationSource.model_validate(source_payload).model_dump(mode="json") == source_payload
     expected = hashlib.sha256((tmp_path / "state/manifest.json").read_bytes()).hexdigest()

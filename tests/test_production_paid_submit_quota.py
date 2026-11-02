@@ -186,6 +186,7 @@ def _new_goal_pending(
         inputs=prior_inputs,
         decision=prior_decision,
         compiled_request=prior_request,
+        source_project=load_production_project(tmp_path / "project.yaml"),
     )
     prior_preview = e2e._paid_preview(
         prior_request,
@@ -412,6 +413,7 @@ def _new_goal_pending(
         inputs=inputs,
         decision=decision,
         compiled_request=target_request,
+        source_project=load_production_project(tmp_path / "project.yaml"),
     )
     target_preview = e2e._paid_preview(
         target_request,
@@ -468,7 +470,8 @@ def _pending(tmp_path, *, used=1, local_batch_limit=1):
     compiled = provider.compile_request(decision.routing.provider_bound_request, old.projection.requirement)
     request = provider.resolve(compiled.request)
     binding = GenerationDecisionExecutionBinding.create(projection=old.projection, context=old.context,
-        policy=old.policy, lifecycle=old.lifecycle, inputs=inputs, decision=decision, compiled_request=request)
+        policy=old.policy, lifecycle=old.lifecycle, inputs=inputs, decision=decision, compiled_request=request,
+        source_project=load_production_project(tmp_path / "project.yaml"))
     preview = e2e._paid_preview(request, attempt_id=NEXT, video_preview=provider.preview(request))
     authorization = e2e._paid_authorization(preview)
     from ai_video.production.paid_provider import PaidProviderAuthorizationDecision
@@ -647,6 +650,7 @@ def test_paid_submit_reuses_locked_snapshot_for_reconciled_failed_history(tmp_pa
         inputs=inputs,
         decision=decision,
         compiled_request=request,
+        source_project=load_production_project(tmp_path / "project.yaml"),
     )
     preview = e2e._paid_preview(
         request, attempt_id=NEXT, video_preview=provider.preview(request)

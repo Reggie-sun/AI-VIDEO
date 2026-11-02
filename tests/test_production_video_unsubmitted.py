@@ -116,7 +116,8 @@ def test_closed_request_can_start_fresh_successor_with_complete_history_and_same
     compiled=provider.compile_request(decision.routing.provider_bound_request,binding.projection.requirement)
     request=provider.resolve(compiled.request)
     successor=GenerationDecisionExecutionBinding.create(projection=binding.projection,context=binding.context,
-        policy=binding.policy,lifecycle=binding.lifecycle,inputs=inputs,decision=decision,compiled_request=request)
+        policy=binding.policy,lifecycle=binding.lifecycle,inputs=inputs,decision=decision,compiled_request=request,
+        source_project=load_production_project(tmp_path / "project.yaml"))
     service.start(attempt_id='fresh-successor',request=request,execution_binding=successor)
     manifest=load_production_project(tmp_path/'project.yaml').manifest
     state=next(a for a in manifest.attempts if a.attempt_id=='fresh-successor').video_generation_state

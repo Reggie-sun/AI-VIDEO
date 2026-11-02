@@ -454,7 +454,7 @@ class GenerationDecisionExecutionBinding(StrictModel):
         from ai_video.production.reference_authoring import require_reference_authoring
 
         require_reference_authoring(projection.requirement, project=source_project,
-            commercial_binding=compiled_request.commercial_binding)
+            commercial_binding=compiled_request.commercial_binding, resolved_request=compiled_request)
         values: dict[str, object] = {
             "schema_version": "1",
             "projection": projection,
