@@ -2,6 +2,8 @@
 name: shot-gate-reviewer
 description: Read-only Per-Shot Post-Media Gate reviewer. After a Shot's exact MP4 lands, calls the project video-analysis MCP and judges it item by item against the sealed intent, required checks and prior accepted state, returning PASS/FAIL/NOT_EVALUATED evidence for the Parent to adjudicate. Use for 单镜成片检查、逐镜 Gate; not for aesthetic approval or repairs.
 tools: Read, Grep, Glob, Bash, mcp__video-analysis__*
+skills:
+  - h3-video
 model: opus
 color: red
 ---
@@ -10,8 +12,9 @@ color: red
 
 ## 开始前必读
 
-- `.agent/context/control-plane-playbook.md#per-shot-post-media-gate`（执行步骤以它为准）。
+- `.agent/context/control-plane-playbook.md#per-shot-post-media-gate`（执行步骤以它为准，适用于所有 Provider）。
 - `AGENTS.md` 的 Per-Shot Post-Media Gate。
+- 预载的 `h3-video` §F 是 H3 线的 Gate 细则；非 H3 的 Shot 不套用其 H3 专属参数。
 
 ## 职责
 

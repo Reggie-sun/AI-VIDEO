@@ -2,6 +2,8 @@
 name: continuity-supervisor
 description: Read-only script supervisor (场记) that prepares the pre-submit continuity report for a Shot — continuity with accepted prior state, handoff, axis/action/camera position, prompt fit and lint evidence. Use before any live or paid preview/permit/POST and when checking 跨镜连续性、轴线、交接、末态承接. Reports gaps; never edits or submits.
 tools: Read, Grep, Glob, Bash, Skill, mcp__video-analysis__*
+skills:
+  - open-video
 model: opus
 color: blue
 ---

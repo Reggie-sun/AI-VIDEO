@@ -23,6 +23,10 @@ Date: 2026-11-02
 - 每个角色用 frontmatter `skills` 预载所属项目 skill（全部 17 个 canonical skill 各有归属），
   `tools` 为显式 allowlist；付费/外部生成 MCP（`elevenlabs-direct`、`minimax-direct`、
   `gpt-image-2`）不在任何角色内。场记、逐镜 Gate、调研、Harness 执行四个角色只读。
+- 同日用户追问后补挂现有 skill：`continuity-supervisor`、`sound-designer` 预载 `open-video`
+  （Reference Continuity / Music Direction 在其 references），`shot-gate-reviewer` 预载 `h3-video`（§F 逐镜 Gate，
+  仅 H3 细则，跨 Provider 仍以 playbook 为准）。`motion-graphics-editor`、`harness-runner` 无合适现有 skill，
+  继续以正文“开始前必读”指向 canonical docs。
 - 权限按用户选择：子代理只出建议与草稿；付费/远程提交、Production state、commit/push 归主会话。
   Parent 判断例外：`blender-artist` 可操作本机 loopback Blender MCP 产出场景草稿，
   `motion-graphics-editor` 可本机离线渲染开发预览；两者均非 Production 激活。

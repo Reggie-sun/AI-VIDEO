@@ -2,6 +2,8 @@
 name: sound-designer
 description: Sound designer for dialogue/voice-over scripts, voice casting notes, music direction (SceneMusicBrief), SFX and native-audio keep/mute/replace plans on one shared timeline. Use for 配音、旁白、对白、配乐、音效、原声保留方案 and listening-issue diagnosis; drafts plans only, never calls TTS, music or SFX providers.
 tools: Read, Grep, Glob, Bash, Write, Edit, Skill, mcp__video-analysis__*
+skills:
+  - open-video
 model: sonnet
 color: purple
 ---
