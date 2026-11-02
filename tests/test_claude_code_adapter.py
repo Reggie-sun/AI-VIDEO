@@ -251,3 +251,14 @@ def test_role_agents_preload_only_existing_project_skills() -> None:
         skills = _agent_frontmatter(AGENTS_DIR / f"{name}.md").get("skills") or []
         # 预载缺失的 skill 会被静默跳过，必须在此处失败。
         assert set(skills) <= canonical, f"{name} preloads unknown skills"
+
+
+def test_claude_md_routes_every_role_agent() -> None:
+    # 派发规则须覆盖每个专职角色，删除或新增角色时同步更新 adapter。
+    lines = [
+        line for line in CLAUDE_MD.read_text(encoding="utf-8").splitlines()
+        if line.startswith("- 派发规则")
+    ]
+    assert len(lines) == 1
+    for name in ROLE_AGENTS:
+        assert f"`{name}`" in lines[0], name

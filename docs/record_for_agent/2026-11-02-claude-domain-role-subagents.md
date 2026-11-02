@@ -36,6 +36,9 @@ Date: 2026-11-02
   `motion-graphics-editor`，保留 6 个：`continuity-supervisor`、`shot-gate-reviewer`（独立检查）、
   `model-researcher`、`memory-keeper`（重检索）、`harness-runner`（机械验证）、`blender-artist`（重工具）。
   “每个项目 skill 须有角色预载”测试改为“预载 skill 必须存在”。上文 13 角色描述为历史。
+- 同日补派发规则（用户选择）：分工靠“主会话不亲自执行”落实，而非对主会话隐藏 skill——主会话需读规则以编写派发指令和裁决；
+  预载要求 skill 可发现，`disable-model-invocation: true` 的 skill 不能预载，拆 symlink 会破坏 Codex 对齐。
+  `CLAUDE.md` 写明 6 类工作的派发对象及失败时记 `NOT_EVALUATED` 不代做；测试校验每个角色均在派发规则中。
 - 与 2026-10-27 [OMX 迁移](2026-10-27-omx-global-harness-migration.md) 的关系：退役的是旧
   SUBAGENTS profile/Risk Gate review 路由；本次角色是 OMC workflow 内可派发的领域 worker，
   代码实现、规划、代码 review/verify 仍走 `oh-my-claudecode:*`。分工写在 `CLAUDE.md`

@@ -13,7 +13,8 @@
 - Project MCP 在 `.mcp.json`，与 `.codex/config.toml` 的 `mcp_servers` 同名对齐；首次加载需用户在 Claude Code 中批准。Codex `enabled_tools` 白名单在 `.claude/settings.json` 以 `permissions.deny` 表达；Codex 的 per-server timeout 无对应字段，由 Claude 全局 MCP timeout 承担。可用不等于授权，外部效果仍按 `AGENTS.md` 判定。
 - 保持 cwd 在仓库根：OMC 按 cwd 写 `.omc/` 状态，`cd` 进子目录会生成游离 `.omc/`。
 - `.claude/agents/harness-reviewer.md` 仅为用户显式要求时的只读 reviewer 定义，不主动派发。
-- `.claude/agents/` 其余项目子代理只承担适合冷启动隔离的工作：独立检查（`continuity-supervisor`、`shot-gate-reviewer`）、重检索（`model-researcher`、`memory-keeper`）、机械验证（`harness-runner`）与重工具操作（`blender-artist`），按需以 frontmatter `skills` 预载项目 skill。创作主线（导演、剧作、广告、参考、Provider 提示、声音、动效）留在主会话直接调用对应 skill。子代理只产出建议与草稿：付费/远程提交、Production state 写入与 commit/push 归主会话。OMC 仍是编排层：代码实现、规划与代码 review/verify 继续走 `oh-my-claudecode:*`；项目角色名无 `oh-my-claudecode:` 前缀，不与 OMC 冲突。
+- `.claude/agents/` 其余项目子代理只承担适合冷启动隔离的工作：独立检查（`continuity-supervisor`、`shot-gate-reviewer`）、重检索（`model-researcher`、`memory-keeper`）、机械验证（`harness-runner`）与重工具操作（`blender-artist`），按需以 frontmatter `skills` 预载项目 skill。创作主线（导演、剧作、广告、参考、Provider 提示、声音、动效）留在主会话直接调用对应 skill。
+- 派发规则（用户 2026-11-02 长期授权，无需逐次点名）：逐镜 Gate → `shot-gate-reviewer`；Live/付费提交前的连续性报告 → `continuity-supervisor`；Blender 操作 → `blender-artist`；外部调研 → `model-researcher`；记忆检索与 session record/learning 评估 → `memory-keeper`；Harness 验证 → `harness-runner`。主会话不亲自执行这些工作，只用对应 skill 编写派发指令（exact 输入、identity、验收项）并裁决回报；子代理不可用或失败时按原 Gate 记为 `NOT_EVALUATED` 并报告，不由主会话代做。子代理只产出建议与草稿：付费/远程提交、Production state 写入与 commit/push 归主会话。OMC 仍是编排层：代码实现、规划与代码 review/verify 继续走 `oh-my-claudecode:*`；项目角色名无 `oh-my-claudecode:` 前缀，不与 OMC 冲突。
 - Specs / plans 约定：`docs/superpowers/specs|plans/YYYY-MM-DD-<slug>.md`。
 
 ## Runtime Term Mapping
