@@ -13,6 +13,7 @@
 - Project MCP 在 `.mcp.json`，与 `.codex/config.toml` 的 `mcp_servers` 同名对齐；首次加载需用户在 Claude Code 中批准。Codex `enabled_tools` 白名单在 `.claude/settings.json` 以 `permissions.deny` 表达；Codex 的 per-server timeout 无对应字段，由 Claude 全局 MCP timeout 承担。可用不等于授权，外部效果仍按 `AGENTS.md` 判定。
 - 保持 cwd 在仓库根：OMC 按 cwd 写 `.omc/` 状态，`cd` 进子目录会生成游离 `.omc/`。
 - `.claude/agents/harness-reviewer.md` 仅为用户显式要求时的只读 reviewer 定义，不主动派发。
+- `.claude/agents/` 其余项目子代理是制作领域专职角色（导演、剧作、广告、参考、Blender、Provider 提示、场记、逐镜 Gate、声音、动效、记忆、调研、Harness 执行），各自以 frontmatter `skills` 预载所属项目 skill，每个项目 skill 至少归属一个角色。它们只产出建议与草稿：付费/远程提交、Production state 写入与 commit/push 归主会话。OMC 仍是编排层：代码实现、规划与代码 review/verify 继续走 `oh-my-claudecode:*`，领域角色不替代也不另建 workflow；名称无 `oh-my-claudecode:` 前缀，不与 OMC 冲突。
 - Specs / plans 约定：`docs/superpowers/specs|plans/YYYY-MM-DD-<slug>.md`。
 
 ## Runtime Term Mapping

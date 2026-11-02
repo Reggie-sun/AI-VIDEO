@@ -194,3 +194,64 @@ def test_claude_md_maps_codex_workflow_terms_to_claude_runtime() -> None:
     # 已退役路由不得在 adapter 中复活。
     for retired in ("Kimi", "SUBAGENTS.md", "superpowers:writing-plans"):
         assert retired not in text
+
+
+AGENTS_DIR = ROOT / ".claude" / "agents"
+# 领域专职角色：只产出建议与草稿；付费提交、Production state 与 commit/push 归主会话。
+ROLE_AGENTS = {
+    "video-director", "drama-writer", "ad-strategist", "reference-artist",
+    "blender-artist", "provider-prompt-author", "continuity-supervisor",
+    "shot-gate-reviewer", "sound-designer", "motion-graphics-editor",
+    "memory-keeper", "model-researcher", "harness-runner",
+}
+READ_ONLY_ROLE_AGENTS = {
+    "continuity-supervisor", "shot-gate-reviewer", "model-researcher", "harness-runner",
+}
+# 子代理不得持有付费/外部生成通道（这些调用只由主会话执行）。
+PAID_GENERATION_TOOL_PREFIXES = (
+    "mcp__elevenlabs-direct", "mcp__minimax-direct", "mcp__gpt-image-2",
+)
+
+
+def _agent_frontmatter(path: Path) -> dict:
+    import yaml
+
+    text = path.read_text(encoding="utf-8")
+    assert text.startswith("---\n"), path.name
+    return yaml.safe_load(text.split("---", 2)[1])
+
+
+def _agent_tools(meta: dict) -> list[str]:
+    tools = meta.get("tools")
+    assert tools, f"{meta['name']} must declare an explicit tools allowlist"
+    return [tool.strip() for tool in tools.split(",")] if isinstance(tools, str) else list(tools)
+
+
+def test_role_agents_have_identity_description_and_explicit_tools() -> None:
+    defined = {path.stem for path in AGENTS_DIR.glob("*.md")}
+    assert ROLE_AGENTS <= defined
+    for name in sorted(ROLE_AGENTS):
+        meta = _agent_frontmatter(AGENTS_DIR / f"{name}.md")
+        assert meta["name"] == name
+        assert ":" not in name  # 冒号保留给插件作用域（如 oh-my-claudecode:*）
+        assert isinstance(meta.get("description"), str) and len(meta["description"]) > 40
+        tools = _agent_tools(meta)
+        for tool in tools:
+            assert not tool.startswith(PAID_GENERATION_TOOL_PREFIXES), f"{name}: {tool}"
+        if name in READ_ONLY_ROLE_AGENTS:
+            assert not set(tools) & WRITE_TOOL_NAMES, name
+
+
+def test_every_project_skill_is_preloaded_by_a_role_agent() -> None:
+    canonical = {
+        entry.name
+        for entry in CANONICAL_SKILLS_DIR.iterdir()
+        if (entry / "SKILL.md").is_file()
+    }
+    owned: set[str] = set()
+    for name in sorted(ROLE_AGENTS):
+        skills = _agent_frontmatter(AGENTS_DIR / f"{name}.md").get("skills") or []
+        assert set(skills) <= canonical, f"{name} preloads unknown skills"
+        owned |= set(skills)
+    # 新增项目 skill 时须指派给某个专职角色，避免无人承接。
+    assert owned == canonical
