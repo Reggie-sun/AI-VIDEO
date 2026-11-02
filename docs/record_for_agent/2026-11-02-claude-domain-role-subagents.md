@@ -30,6 +30,12 @@ Date: 2026-11-02
 - 权限按用户选择：子代理只出建议与草稿；付费/远程提交、Production state、commit/push 归主会话。
   Parent 判断例外：`blender-artist` 可操作本机 loopback Blender MCP 产出场景草稿，
   `motion-graphics-editor` 可本机离线渲染开发预览；两者均非 Production 激活。
+- 同日精简（用户采纳 Parent 建议）：子代理冷启动、不继承对话，创作主线串行且每步需用户认可，
+  拆出只增加交接与二次审阅成本，主会话本可直接调用对应 skill。故删除 `video-director`、
+  `drama-writer`、`ad-strategist`、`reference-artist`、`provider-prompt-author`、`sound-designer`、
+  `motion-graphics-editor`，保留 6 个：`continuity-supervisor`、`shot-gate-reviewer`（独立检查）、
+  `model-researcher`、`memory-keeper`（重检索）、`harness-runner`（机械验证）、`blender-artist`（重工具）。
+  “每个项目 skill 须有角色预载”测试改为“预载 skill 必须存在”。上文 13 角色描述为历史。
 - 与 2026-10-27 [OMX 迁移](2026-10-27-omx-global-harness-migration.md) 的关系：退役的是旧
   SUBAGENTS profile/Risk Gate review 路由；本次角色是 OMC workflow 内可派发的领域 worker，
   代码实现、规划、代码 review/verify 仍走 `oh-my-claudecode:*`。分工写在 `CLAUDE.md`

@@ -197,12 +197,11 @@ def test_claude_md_maps_codex_workflow_terms_to_claude_runtime() -> None:
 
 
 AGENTS_DIR = ROOT / ".claude" / "agents"
-# 领域专职角色：只产出建议与草稿；付费提交、Production state 与 commit/push 归主会话。
+# 领域专职角色：只承担适合冷启动隔离的独立检查与重工具/重检索工作；创作主线留在主会话。
+# 只产出建议与草稿；付费提交、Production state 与 commit/push 归主会话。
 ROLE_AGENTS = {
-    "video-director", "drama-writer", "ad-strategist", "reference-artist",
-    "blender-artist", "provider-prompt-author", "continuity-supervisor",
-    "shot-gate-reviewer", "sound-designer", "motion-graphics-editor",
-    "memory-keeper", "model-researcher", "harness-runner",
+    "continuity-supervisor", "shot-gate-reviewer", "model-researcher",
+    "memory-keeper", "harness-runner", "blender-artist",
 }
 READ_ONLY_ROLE_AGENTS = {
     "continuity-supervisor", "shot-gate-reviewer", "model-researcher", "harness-runner",
@@ -242,16 +241,13 @@ def test_role_agents_have_identity_description_and_explicit_tools() -> None:
             assert not set(tools) & WRITE_TOOL_NAMES, name
 
 
-def test_every_project_skill_is_preloaded_by_a_role_agent() -> None:
+def test_role_agents_preload_only_existing_project_skills() -> None:
     canonical = {
         entry.name
         for entry in CANONICAL_SKILLS_DIR.iterdir()
         if (entry / "SKILL.md").is_file()
     }
-    owned: set[str] = set()
     for name in sorted(ROLE_AGENTS):
         skills = _agent_frontmatter(AGENTS_DIR / f"{name}.md").get("skills") or []
+        # 预载缺失的 skill 会被静默跳过，必须在此处失败。
         assert set(skills) <= canonical, f"{name} preloads unknown skills"
-        owned |= set(skills)
-    # 新增项目 skill 时须指派给某个专职角色，避免无人承接。
-    assert owned == canonical
