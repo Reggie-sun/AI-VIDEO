@@ -39,7 +39,7 @@
 
 验收看正常速度、带声音的成片；任何改动（含修复）都不能破坏已满足的效果。先交片，用户认可后再跑完整验证，通过才 commit/push，避免工程验证拖慢交片。字幕时机与格式、逐镜累积审看和输出规格（含商品广告固定720p）见[成片优先](docs/canvas-continuous-production.md#formal-narrative-output-defaults)；单段认可不代替拼接审查，接点与复用素材核验归 `open-video`。
 
-新创作的付费视频生成前，先把该镜头将使用的参考包（决定性时刻的关键帧、人物、细节、环境、已认可片段的风格帧）作为预览交给用户，取得明确认可并封存为 `preview_approval` 才能提交；“好不好看、怪不怪”只由用户判，Agent 的检查表 PASS 不代替。2026-10-30 用户要求修订，原因：多次纸上定稿后直接付费生成、成片被否定（细则见[参考规划](docs/shot-reference-planning.md)）。
+剧情类新创作的付费视频生成前（电商以 AdCreativePlan 为准），先把该镜头将使用的参考包（决定性时刻的关键帧、人物、细节、环境、已认可片段的风格帧）作为预览交给用户，取得明确认可并封存为 `preview_approval` 才能提交；“好不好看、怪不怪”只由用户判，Agent 的检查表 PASS 不代替。2026-10-30 用户要求修订，原因：多次纸上定稿后直接付费生成、成片被否定（细则见[参考规划](docs/shot-reference-planning.md)）。
 
 ### Empirical Validation Priority
 

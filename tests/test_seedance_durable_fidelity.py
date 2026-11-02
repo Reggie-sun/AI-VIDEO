@@ -21,6 +21,7 @@ from ai_video.production.video_compiler import CompiledProviderVideoRequest
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_requirement import AudioNeed, OutputNeed, Pacing
 from production_project_factory import make_p8_video_generation_base
+from reference_authoring_fixture import with_fixture_reference_planning
 from production_generation_execution_factory import (
     activate_generated_video_shot, activate_fixture_generation_qa_policy, fixture_performance_intent,
 )
@@ -52,8 +53,8 @@ def _project_execution(root, *, ordinary_compiler_version="2"):
         emotion="focused curiosity", facial_expression="brows lift slightly",
         gaze_target="the room ahead", breathing="quiet even breathing",
         body_behavior="stands balanced and attentive")
-    intent = _complete_intent().model_copy(update={"performance_intent": performance,
-        "pacing": Pacing(shot_duration_seconds=output.duration_seconds)})
+    intent = with_fixture_reference_planning(_complete_intent().model_copy(update={
+        "performance_intent": performance, "pacing": Pacing(shot_duration_seconds=output.duration_seconds)}))
     projection = _replace_requirement(_verified_requirement(context),
         contract_version="provider-neutral-video-requirement/4", target_shot=shot,
         scene=scene, characters=characters, generation_intent=intent,

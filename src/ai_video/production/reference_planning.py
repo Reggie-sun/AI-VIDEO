@@ -71,8 +71,11 @@ def plan_shot_references(intent) -> ShotReferencePlan:
             purpose=purpose, mechanism=mechanism, priority=priority, **kw))
 
     for anchor in authored.anchors:
+        # An optional anchor cannot downgrade the independently declared identity duty.
+        priority = ("required" if anchor.role is Role.IDENTITY
+                    and anchor.owner_id in intent.identity_continuity.character_ids else anchor.priority)
         add(anchor.anchor_id, anchor.role, "persistent", anchor.purpose,
-            priority=anchor.priority, owner_id=anchor.owner_id)
+            priority=priority, owner_id=anchor.owner_id)
     anchored = {(n.role, n.owner_id) for n in needs}
     for character_id in intent.identity_continuity.character_ids:
         if (Role.IDENTITY, character_id) not in anchored:

@@ -93,11 +93,12 @@ def _named_route(*, compiler_version="4", capability_id="viduq3-r2v-subjects-v1"
                 ),
             ),
         )
-        intent = _complete_intent().model_copy(update={
+        from tests.reference_authoring_fixture import with_fixture_reference_planning
+        intent = with_fixture_reference_planning(_complete_intent().model_copy(update={
             "pacing": Pacing(shot_duration_seconds=5),
             "performance_intent": performance,
             "camera_subject_relation": _complete_intent().camera_subject_relation.model_copy(update={"subject_id": "COCO"}),
-        })
+        }))
     projection = _replace_requirement(_verified_requirement(context), scene=scene, characters=characters,
         contract_version="provider-neutral-video-requirement/4" if complete else "provider-neutral-video-requirement/1",
         generation_mode=GenerationMode.REFERENCE_TO_VIDEO,

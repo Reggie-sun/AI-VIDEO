@@ -12,8 +12,9 @@ which the commercial owners verify. Neither domain borrows the other's layer.
 
 Two obligations close shortcuts observed in practice (2026-10-30): drama must
 bind the user's approval of a cheap visual preview before paid generation, and a
-visibly performing character cannot be left out of identity continuity, because
-that silently removes the identity reference the planner would otherwise require.
+visibly performing character cannot silently leave identity continuity (which drops
+the identity reference the planner would require) unless the Director states an
+explicit ``identity_waivers`` entry with its reason.
 """
 from ai_video.errors import AiVideoError, ErrorCode
 
@@ -58,10 +59,18 @@ def reference_authoring_issues(intent, *, ecommerce: bool = False) -> tuple[str,
         return (_ROOT,)
     issues = []
     identities = set(intent.identity_continuity.character_ids)
+    waivers = [waiver.character_id for waiver in authored.identity_waivers]
+    if len(set(waivers)) != len(waivers) or set(waivers) & identities:
+        issues.append(f"{_ROOT}.identity_waivers")
+    # Only a required identity anchor creates a reference duty the planner enforces;
+    # a preferred one would let the identity sheet silently drop out again.
+    covered = identities | set(waivers) | {
+        anchor.owner_id for anchor in authored.anchors
+        if anchor.role.value == "identity" and anchor.priority == "required" and anchor.owner_id is not None}
     for character_id in _visible_performers(intent):
-        if character_id not in identities:
-            # Dropping a performer from identity continuity is how a Shot dodges the
-            # identity reference; the Director must prepare that reference instead.
+        if character_id not in covered:
+            # Silently dropping a performer from identity continuity is how a Shot dodged
+            # the identity reference; prepare it (identity/required anchor) or waive it explicitly.
             issues.append(f"generation_intent.identity_continuity.character_ids[{character_id}]")
     if _camera_moves(intent) and not any(event.kind == "composition" for event in authored.events):
         # A moving camera must name the visible relation it changes; the existing
@@ -124,6 +133,21 @@ def preview_approval_evidence_issues(binding, coverage, project) -> tuple[str, .
     return ()
 
 
+def identity_waiver_approval_issues(planning, project) -> tuple[str, ...]:
+    """Each identity waiver must be one the user saw and approved in the sealed preview."""
+    from ai_video.production.authoring_input import PREFIX, reopen_authoring_input
+    from ai_video.production.models import SourceReference
+
+    if not planning.identity_waivers:
+        return ()
+    binding = planning.preview_approval
+    reference = SourceReference(kind="user_input", reference=f"{PREFIX}{binding.approval_hash}.json",
+                                content_hash=binding.approval_hash)
+    approved = set(reopen_authoring_input(project.root, reference).get("identity_waivers", ()))
+    missing = [w.character_id for w in planning.identity_waivers if w.character_id not in approved]
+    return tuple(f"{_ROOT}.identity_waivers[{character_id}][not_in_preview_approval]" for character_id in missing)
+
+
 def director_coverage_authoring_input(coverage):
     """Validate drama Director coverage and return its sealable authoring input.
 
@@ -163,10 +187,15 @@ def require_reference_authoring(requirement, *, project=None, commercial_binding
         if not issues:
             issues.extend(preview_approval_evidence_issues(planning.preview_approval,
                                                            planning.director_coverage, project))
+        if not issues:
+            issues.extend(identity_waiver_approval_issues(planning, project))
     if issues:
         raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
-            user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+            user_message="Author Director reference planning before new generation: " + ", ".join(issues),
+            technical_detail=("A visible performer needs identity_continuity, a required identity anchor, "
+                              "or a user-approved identity_waivers entry; drama needs a sealed preview_approval."))
 
 
 __all__ = ["director_coverage_authoring_input", "director_coverage_evidence_issues", "is_ecommerce_requirement",
-           "preview_approval_evidence_issues", "reference_authoring_issues", "require_reference_authoring"]
+           "identity_waiver_approval_issues", "preview_approval_evidence_issues", "reference_authoring_issues",
+           "require_reference_authoring"]

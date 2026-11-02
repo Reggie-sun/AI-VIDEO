@@ -91,8 +91,9 @@ from tests.performance_fixture import (
 )
 from tests.reference_authoring_fixture import (
     fixture_director_coverage_artifact,
+    fixture_preview_approval,
     fixture_preview_approval_artifact,
-    fixture_reference_planning,
+    with_fixture_reference_planning,
 )
 
 
@@ -330,17 +331,22 @@ def activate_generated_video_shot(
     coverage_reference = SourceReference(kind="user_input",
         reference=coverage_artifact.relative_path.as_posix(),
         content_hash=coverage_artifact.relative_path.stem)
-    approval_artifact = fixture_preview_approval_artifact()
-    approval_reference = SourceReference(kind="user_input",
-        reference=approval_artifact.relative_path.as_posix(),
-        content_hash=approval_artifact.relative_path.stem)
+    # Some tests preserve cast identity; lifecycle fixtures without identity sheets
+    # explicitly approve their visible cast's waivers in a distinct sealed payload.
+    approval_artifacts = (fixture_preview_approval_artifact(),)
+    if authored_shot.character_ids:
+        approval_artifacts += (fixture_preview_approval_artifact(fixture_preview_approval(
+            identity_waivers=authored_shot.character_ids)),)
+    approval_references = tuple(SourceReference(kind="user_input",
+        reference=artifact.relative_path.as_posix(), content_hash=artifact.relative_path.stem)
+        for artifact in approval_artifacts)
     generated_shot = seal_artifact(
         authored_shot.model_copy(
             update={
                 "revision": authored_shot.revision + 1,
                 "content_hash": "0" * 64,
                 "source_provenance": tuple(dict.fromkeys(
-                    (*authored_shot.source_provenance, coverage_reference, approval_reference))),
+                    (*authored_shot.source_provenance, coverage_reference, *approval_references))),
                 "visual_strategy": VisualStrategy.GENERATED_VIDEO,
                 "generated_video_rationale": "fixture lifecycle generation",
                 "required_asset_roles": (
@@ -440,7 +446,7 @@ def activate_generated_video_shot(
                         hashlib.sha256(shot_bytes).hexdigest(),
                     ),
                     coverage_artifact,
-                    approval_artifact,
+                    *approval_artifacts,
                 ),
                 key=lambda item: item.relative_path.as_posix(),
             )
@@ -541,7 +547,7 @@ def prepare_generation_execution(
         ),
         continuity_mode="none",
         motion_requirement=MotionRequirement.FREE_COMPLEX,
-        generation_intent=GenerationIntent(
+        generation_intent=with_fixture_reference_planning(GenerationIntent(
             performance_intent=fixture_performance_intent(
                 tuple(item for item in project.characters if item.character_id in shot.character_ids),
                 trigger="The shot opens on the hero in the room",
@@ -551,9 +557,8 @@ def prepare_generation_execution(
                 breathing="quiet, even breathing",
                 body_behavior="stands at ease and settles weight subtly",
             ) if shot.character_ids else None,
-            # Ecommerce binds its AdCreativePlan via commercial_binding, not drama coverage.
-            reference_planning=fixture_reference_planning(ecommerce=request.commercial_binding is not None),
-        ),
+        ), ecommerce=request.commercial_binding is not None),
+        # Ecommerce binds its AdCreativePlan via commercial_binding, not drama coverage.
         semantic_reference_roles=(
             (SemanticReferenceRole.FIRST_FRAME,) if source is not None else ()
         ),

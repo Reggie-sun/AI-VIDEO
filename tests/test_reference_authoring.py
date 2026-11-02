@@ -159,6 +159,20 @@ def test_visible_performer_cannot_be_dropped_from_identity_continuity():
     covered = dodged.model_copy(update={"identity_continuity": dodged.identity_continuity.model_copy(
         update={"character_ids": ("resident",), "preservation": "exact"})})
     assert reference_authoring_issues(covered) == ()
+    waived = dodged.model_copy(update={"reference_planning": ReferencePlanningIntent.model_validate({
+        **planning, "identity_waivers": [{"character_id": "resident", "reason": "只露背影的路人，不可辨认"}]})})
+    assert reference_authoring_issues(waived) == ()
+    anchored = dodged.model_copy(update={"reference_planning": ReferencePlanningIntent.model_validate({
+        **planning, "anchors": [{"anchor_id": "resident-id", "role": "identity", "purpose": "住户脸", "owner_id": "resident"}]})})
+    assert reference_authoring_issues(anchored) == ()
+    preferred = anchored.model_copy(update={"reference_planning": ReferencePlanningIntent.model_validate({
+        **planning, "anchors": [{"anchor_id": "resident-id", "role": "identity", "purpose": "住户脸",
+                                "owner_id": "resident", "priority": "preferred"}]})})
+    assert reference_authoring_issues(preferred) == (
+        "generation_intent.identity_continuity.character_ids[resident]",)
+    with pytest.raises(ValueError):
+        ReferencePlanningIntent.model_validate({"identity_waivers": [{"character_id": "resident", "reason": " "}]})
+    assert "identity_waivers" not in ReferencePlanningIntent().model_dump(mode="json")
     offscreen = GenerationIntent.model_validate({"reference_planning": planning, "performance_intent": {**_PERFORMANCE,
         "character_directions": [{**direction, "visibility": "offscreen", "offscreen_reason": "画外声", "beats": []}]}})
     assert reference_authoring_issues(offscreen) == ()
@@ -185,6 +199,44 @@ def test_shared_reference_planning_still_applies_to_ecommerce():
     missing = SimpleNamespace(generation_intent=_intent(planning=False), commercial_execution_class="product_interaction")
     with pytest.raises(AiVideoError, match="generation_intent.reference_planning"):
         require_reference_authoring(missing)
+
+
+@pytest.mark.parametrize("field", ["unit_ids", "identity_waivers"])
+@pytest.mark.parametrize("invalid", [[{}], [[]], [1], ["resident", "resident"], [" "]])
+def test_preview_approval_rejects_invalid_identifier_lists_as_typed_errors(field, invalid):
+    from ai_video.production.preview_approval import PreviewApprovalError, validate_preview_approval
+
+    with pytest.raises(PreviewApprovalError):
+        validate_preview_approval({**_approval(), field: invalid})
+
+
+@pytest.mark.parametrize("approved", [False, True])
+def test_identity_waiver_must_be_present_in_exact_sealed_preview(tmp_path, approved):
+    approval = _approval()
+    if approved:
+        approval["identity_waivers"] = ["resident"]
+    intent = _intent(binding=_binding()).model_copy(update={"reference_planning": ReferencePlanningIntent(
+        director_coverage=_binding(), preview_approval=_approval_binding(approval),
+        identity_waivers=({"character_id": "resident", "reason": "不可辨认的剪影"},))})
+    requirement = SimpleNamespace(generation_intent=intent)
+    project = _project(tmp_path, _payload(), approval=approval)
+    if approved:
+        require_reference_authoring(requirement, project=project)
+    else:
+        with pytest.raises(AiVideoError, match=r"identity_waivers\[resident\]\[not_in_preview_approval\]"):
+            require_reference_authoring(requirement, project=project)
+
+
+@pytest.mark.parametrize("conflict", ["duplicate", "identity"])
+def test_identity_waivers_cannot_duplicate_or_contradict_identity_obligations(conflict):
+    waiver = {"character_id": "resident", "reason": "不可辨认的剪影"}
+    intent = _intent(binding=_binding()).model_copy(update={"reference_planning": ReferencePlanningIntent(
+        director_coverage=_binding(), preview_approval=_approval_binding(),
+        identity_waivers=(waiver, waiver) if conflict == "duplicate" else (waiver,))})
+    if conflict == "identity":
+        intent = intent.model_copy(update={"identity_continuity": intent.identity_continuity.model_copy(
+            update={"character_ids": ("resident",)})})
+    assert reference_authoring_issues(intent) == ("generation_intent.reference_planning.identity_waivers",)
 
 
 @pytest.mark.parametrize("movement", ["unspecified", "locked", "locked-off"])

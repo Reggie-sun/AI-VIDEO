@@ -19,10 +19,13 @@ from tests.test_generation_feedback import NativeFixtureProvider
 from tests.test_production_generation_decision import setup_decision
 
 
-def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True):
-    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_preview_approval, fixture_director_coverage_binding
+def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True, seal_approval=True):
+    from tests.reference_authoring_fixture import (
+        fixture_director_coverage, fixture_director_coverage_binding, fixture_preview_approval,
+        fixture_preview_approval_binding)
     if isinstance(planning, dict) and bind_coverage:
-        planning = {"director_coverage": fixture_director_coverage_binding(), **planning}
+        planning = {"director_coverage": fixture_director_coverage_binding(),
+                    "preview_approval": fixture_preview_approval_binding(), **planning}
     raw = document()
     raw["edges"] = []
     for node in raw["nodes"]:
@@ -35,7 +38,8 @@ def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True):
     data["delivery_profile"] = {"width": 1024, "height": 576, "fps": 24}
     if seal_coverage:
         data["director_coverages"] = [fixture_director_coverage()]
-    data["preview_approvals"] = [fixture_preview_approval()]
+    if seal_approval:
+        data["preview_approvals"] = [fixture_preview_approval()]
     row = data["shots"][0]
     row["shot"]["duration_policy"]["seconds"] = 4
     row["generation"] = {"generation_intent": {
@@ -135,9 +139,10 @@ def motion_preparer(*, supports_video=True, cardinality_conflict=False):
         source_registry_revision_id="f" * 64, mime_type=asset.mime_type, size_bytes=asset.size_bytes,
         width=asset.width, height=asset.height, duration_millis=asset.duration_millis, fps=asset.fps)
     context = _context(important=False, reference_videos=(routed_asset,))
-    from tests.reference_authoring_fixture import fixture_director_coverage_binding
+    from tests.reference_authoring_fixture import fixture_director_coverage_binding, fixture_preview_approval_binding
     authored = intent(facets=("contact_timing",), selections=({"need_id": "auto:motion", "asset_id": "motion"},),
-                      director_coverage=fixture_director_coverage_binding())
+                      director_coverage=fixture_director_coverage_binding(),
+                      preview_approval=fixture_preview_approval_binding())
     authored = authored.model_copy(update={"subject_action": authored.subject_action.model_copy(
         update={"progression": "Generate 4 seconds."})})
     original = setup["projection"].requirement
@@ -272,6 +277,7 @@ def test_drama_director_coverage_sealed_through_canvas_authoring_reaches_executi
 @pytest.mark.parametrize("load,message", [
     ({"seal_coverage": False}, "director_coverage.coverage_hash"),
     ({"bind_coverage": False}, "director_coverage"),
+    ({"seal_approval": False}, "preview_approval"),
 ])
 def test_unsealed_or_unbound_drama_coverage_blocks_before_any_effect(tmp_path, load, message):
     from ai_video.errors import AiVideoError

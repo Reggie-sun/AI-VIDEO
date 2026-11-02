@@ -345,7 +345,9 @@ def _voice_projection(setup, output):
         breathing="quiet, steady breathing",
         body_behavior="relaxed shoulders with small natural weight shifts",
     )
-    intent = _complete_intent().model_copy(update={
+    from reference_authoring_fixture import with_fixture_reference_planning
+
+    intent = with_fixture_reference_planning(_complete_intent().model_copy(update={
         "pacing": Pacing(shot_duration_seconds=output.duration_seconds or 4),
         "performance_intent": performance,
         "ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True),
@@ -359,7 +361,7 @@ def _voice_projection(setup, output):
             on_screen=False,
             response_obligation="The hero opens the gate.",
         ),
-    })
+    }))
     from ai_video.production.video_requirement import (
         GenerationOperation,
         ProviderNeutralGenerationIntentProjection,

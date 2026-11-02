@@ -815,6 +815,17 @@ def test_nominal_15_second_example_uses_real_seedance_compiler_without_effects(t
     baseline = {row["shot"]["shot_id"]: unit for unit, row in
         zip(service.packet["units"], service.direction["shots"], strict=True)}
     baseline_rows = {row["shot"]["shot_id"]: row for row in service.direction["shots"]}
+    # The checked-in example carries Director coverage but no user preview approval
+    # (none was ever given for it): seal a synthetic one over the exact coverage and
+    # bind it per Shot, so the fresh-generation gate is exercised rather than relaxed.
+    from tests.reference_authoring_fixture import fixture_preview_approval, fixture_preview_approval_binding
+    coverage = data["director_coverages"][0]
+    approval = {**fixture_preview_approval(coverage),
+                "unit_ids": [u["unit_id"] for u in coverage["coverage_units"]]}
+    data["preview_approvals"] = [approval]
+    for row in data["shots"]:
+        row["generation"]["generation_intent"]["reference_planning"]["preview_approval"] = (
+            fixture_preview_approval_binding(approval))
     for unit, row in zip(packet["units"], data["shots"], strict=True):
         old_parts = baseline[row["shot"]["shot_id"]]["prompt_source"]["parts"]
         current_parts = unit["prompt_source"]["parts"]

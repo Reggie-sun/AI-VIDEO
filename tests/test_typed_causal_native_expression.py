@@ -26,6 +26,7 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
     from ai_video.production.project import load_production_project
     from ai_video.production.video_requirement import ConditioningLane
     from performance_fixture import fixture_performance_intent
+    from reference_authoring_fixture import with_fixture_reference_planning
 
     source = source or s._activated_source(tmp_path)
     inputs = s._edge_inputs(source, **({"boundary": s.BoundaryKind.WITHIN_CONTINUOUS_TAKE}
@@ -59,6 +60,7 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
         intent = intent.model_copy(update={"close_state": intent.open_state})
     elif arbitrary_close:
         intent = intent.model_copy(update={"close_state": TypedStateReference(kind="typed_hash", state_hash="f" * 64)})
+    intent = with_fixture_reference_planning(intent)
     first = next(a for a in seed.available_assets if a.role.value == (
         "previous_shot_terminal" if exact_terminal else "approved_keyframe"))
     authored = ProviderNeutralGenerationIntentProjection.create(**{

@@ -115,6 +115,21 @@ def test_persistent_roles_are_separate_from_temporal_frames_and_missing_product_
     assert "MISSING_REFERENCE:auto:product" in result.reference_plan["execution_gaps"]
 
 
+@pytest.mark.parametrize("priority", ["preferred", "required"])
+def test_identity_continuity_cannot_be_downgraded_by_an_anchor(priority):
+    directed = intent(anchors=({"anchor_id": "hero-id", "role": "identity", "owner_id": "hero",
+                               "purpose": "保持人物身份", "priority": priority},)).model_copy(
+        update={"identity_continuity": IdentityContinuity(character_ids=("hero",))})
+    plan = plan_shot_references(directed)
+    identity = [need for need in plan.needs if need.role is ReferenceRole.IDENTITY]
+    assert len(identity) == 1
+    assert identity[0].priority == "required"
+    result = VideoPlanner().plan(request_for(directed, shot=make_shot(
+        visual_strategy=VisualStrategy.GENERATED_VIDEO, character_ids=("hero",))))
+    assert result.outcome is PlanOutcome.BLOCKED
+    assert "MISSING_REFERENCE:hero-id" in result.reference_plan["execution_gaps"]
+
+
 @pytest.mark.parametrize("payload", [
     dict(events=(event("cut", "cut"),)),
     dict(structure="multi_shot"),

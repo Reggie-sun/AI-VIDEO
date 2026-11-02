@@ -322,12 +322,13 @@ def _author_voice_routing(runtime, voice: VoiceRoutingRequirement | None):
     refs = []
     artifacts: list[PreparedArtifact] = []
     from tests.reference_authoring_fixture import (
-        fixture_director_coverage_artifact, fixture_preview_approval_artifact,
+        fixture_director_coverage_artifact, fixture_preview_approval, fixture_preview_approval_artifact,
     )
     coverage = fixture_director_coverage_artifact()
     coverage_reference = SourceReference(kind="user_input", reference=coverage.relative_path.as_posix(),
                                          content_hash=coverage.relative_path.stem)
-    approval = fixture_preview_approval_artifact()
+    approval = fixture_preview_approval_artifact(fixture_preview_approval(
+        identity_waivers=next(shot.character_ids for shot in loaded.shots if shot.shot_id == "shot-1")))
     approval_reference = SourceReference(kind="user_input", reference=approval.relative_path.as_posix(),
                                          content_hash=approval.relative_path.stem)
     for shot, reference in zip(loaded.shots, loaded.project.artifacts.shots, strict=True):

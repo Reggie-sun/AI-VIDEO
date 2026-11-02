@@ -264,9 +264,9 @@ checks:
     cwd: .
     description: Verify MiniMax speech batch orchestration and voice candidate lifecycle.
   elevenlabs_speech_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_elevenlabs.py, tests/test_production_elevenlabs_batch.py, tests/test_voice_routing_elevenlabs.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_elevenlabs.py, tests/test_production_elevenlabs_batch.py, tests/test_voice_routing_elevenlabs.py, tests/test_production_dotenv_source.py, -q]
     cwd: .
-    description: Verify ElevenLabs transport, bounded speech execution, and selected voice routing.
+    description: Verify ElevenLabs transport, bounded speech execution, selected voice routing and shared fail-closed credential-source suppliers.
   architecture_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_architecture_gate.py, tests/test_architecture_gate_cli.py, -q]
     cwd: .
@@ -530,6 +530,7 @@ categories:
       - src/ai_video/production/reference_planning_contracts.py
       - src/ai_video/production/reference_strategy.py
       - src/ai_video/production/reference_authoring.py
+      - src/ai_video/production/preview_approval.py
       - src/ai_video/production/director_coverage.py
       - src/ai_video/planning/_reference_planning.py
       - tests/test_reference_planning.py
@@ -751,6 +752,7 @@ categories:
       - src/ai_video/production/performance_direction.py
       - src/ai_video/production/performance_authoring.py
       - src/ai_video/production/reference_authoring.py
+      - src/ai_video/production/preview_approval.py
       - tests/test_performance_direction.py
       - tests/test_performance_authoring.py
       - tests/test_reference_authoring.py
@@ -1788,6 +1790,16 @@ categories:
     focused_check_ids: [experience_learning_skill_tests]
     check_ids:
       - experience_learning_skill_tests
+      - task_architecture_gate
+  provider_credential_source:
+    patterns:
+      - src/ai_video/production/dotenv_source.py
+      - tests/test_production_dotenv_source.py
+    focused_check_ids: [elevenlabs_speech_tests]
+    check_ids:
+      - elevenlabs_speech_tests
+      - minimax_speech_batch_tests
+      - mcp_tests
       - task_architecture_gate
   minimax_speech_batch:
     patterns:

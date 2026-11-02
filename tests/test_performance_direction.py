@@ -170,12 +170,14 @@ def test_empty_directions_keep_the_legacy_six_field_hash() -> None:
         "b33f58485e4c0f9a2fef257335cac9cc1bc5e39dff589b989ef35aea49310206"
     )
     # The pre-planning golden is unchanged once the newly declared fixture
-    # reference_planning is the only difference.
+    # reference_planning is the only difference.  The full fixture intent hash
+    # moved only because fresh fixture planning now also binds preview_approval;
+    # without that single field it equals the previous golden (3580...3bab).
     assert canonical_sha256(
         _complete_intent().model_copy(update={"reference_planning": None}).model_dump(mode="json")
     ) == "6c61c0afdc861ff99c956003e4e9d84adb53467560bc25ec5eb578d2d4fc9ed0"
     assert canonical_sha256(_complete_intent().model_dump(mode="json")) == (
-        "35802402540570e79a1349c0f21eee8e1594b64ee242170bbf43aed3c62b3bab"
+        "b493e6f5fa4e5a2fa1f4c327e12f2a01635bf9b4da8f70e449d62b49fb188db2"
     )
 
 

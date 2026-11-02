@@ -161,14 +161,15 @@ def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path)
         "generation-evaluation/1", "generation-evaluation/1", "generation-evaluation/1",
     )
     # Freshly authored fixture: fingerprints bind its declared reference_planning
-    # and sealed Director coverage input, like its explicit acting input.
+    # and sealed Director coverage/approved identity waiver, like its acting input.
+    # Historical /1 payload hashes remain frozen in test_generation_evaluation.py.
     assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
-        "e95ebdf7eada31349c79d87a16a904948efa23d3df47ab9bd5ef27ab3976ce17",
-        "17b3229ff6ebcc773b509d41f3d93e0a947060abcb28c02fd5c9ac1ece81c4bf",
-        "010273e2b71a8610d7fa7571e93886b90a0a4f770407f1d8cc8afb2b1841dd8a",
+        "9678c49676be7e77c71c16bf533cf9d480fa8908d83abc14c9f500d717ee6d65",
+        "43c1d3c1fe358e8bc7a9ff8703a5103bda8cf33da1e118c0bd985837318125d5",
+        "cfa0e08359665b1ae691e932f35345f2a77aaca951142d4a6096529c1f27de19",
     )
-    assert experience.evidence[0].evidence_hash == "b82648ecefb9bf04b5cf252cdc08b2aecbae9c51f72eca7057909565404f7669"
-    assert canonical_sha256(experience.model_dump(mode="json")) == "92251603ca9dd55e6defa94096cf46c338798398c1c190b131eb85373c27d784"
+    assert experience.evidence[0].evidence_hash == "20b69015ea8484c9da7b706772ea0ac4e402f80a745c5f7937a574c16cb71c9a"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "a3dde622a57f10b41d87f2732c6b2f73d1a6c69f8a7931ad7964e890ea20b7fb"
     assert diagnose_exact_result(
         experience.evidence[0], experience.evidence, experience.candidate.recipe
     ).failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
