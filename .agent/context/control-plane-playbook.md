@@ -13,9 +13,8 @@ Advisory reference，无 Product state/Provider/验收 authority。
 
 ### Creative Completion
 
-新创作、实质重剪及字幕/图形/配乐设计，执行前与交付前使用 `open-video` 的
-[Creative Completion Practice](../../.agents/skills/open-video/references/creative-completion.md)。
-保持完整目标、exact 成片独立观看与有界修复；忠实复刻不等于创作性重剪，纯复制已验收 bytes 沿原交付路径核验。
+新创作默认读取 `open-video` 内固定 awesome-seedance 流程及本地契约映射；旧方法仅按需诊断，不二次创作。
+保持完整目标、exact 成片独立观看、逐镜 Gate 与有界修复；忠实复刻不等于创作性重剪，已验收 bytes 复制沿原交付路径。
 
 ### Final-output-first Repair Preflight
 
@@ -53,11 +52,11 @@ Provider capability 归 current profile；结构 PASS 不证明语义/质量。�
 
 - `ecommerce-ad-workflow`：广告事实与package；`ad-creative`按需补角度/Hook/文案，剧情广告仍归广告。
 - `drama-authoring`：剧情/剧本与制作设定，遵 accepted Drama contract；镜头交 Director。
-- `open-video`：concept/script/coverage；调度/表演按需读其 `references/professional-specialists.md`。
+- `open-video`：concept/script/coverage 唯一入口，默认 awesome-seedance；旧资料只按需诊断。
 - `hell-grind-aigc-skill`：semantic state/continuity/diagnosis，不建第二 ledger。
 - `h3-video`：approved Shot + selected MiniMax H3 的表达指导。
 - `seedance-authoring` MUST use：approved Shot + requirement + selected Seedance，先 shared knowledge 再一个 exact
-  version overlay；unknown/mixed selection 停止。semantic intent -> seedance-authoring: prompt/reference expression。
+  version overlay；unknown/mixed selection 停止。semantic intent -> seedance-authoring: 仅语法、参考与能力适配，不二次创作。
 - 已选 Vidu model/service 的表达先读 `vidu-authoring`，核对角色对白/无口播段与服务 TTS 控制是否匹配；其他 Non-Seedance guidance 用 `higgsfield`；deterministic motion/graphics/pacing 用 `video-shotcraft`。
 - `higgsfield-seedance`、`higgsfield-seedance-2-5`、`higgsfield-seedance-vfx` 与 `higgsfield-troubleshoot` 的
   Seedance branch 已 retired，MUST NOT direct-dispatch；仅 selected seedance-authoring 后可读取 advisory excerpt。

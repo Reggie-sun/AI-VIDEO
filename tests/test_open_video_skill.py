@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import importlib.util
+import json
 from pathlib import Path
 import re
 
@@ -874,3 +875,45 @@ def test_schema_v2_prompt_presence_routing_contract_is_retired() -> None:
 
     with pytest.raises(validator.CoverageValidationError, match="schema_version"):
         validator.validate_director_coverage(payload)
+
+
+def test_default_creative_workflow_is_pinned_awesome_seedance() -> None:
+    skill = SKILL_PATH.read_text(encoding="utf-8")
+    assert "## Default Creative Workflow" in skill
+    assert "MUST read `references/awesome-seedance/UPSTREAM.md`" in skill
+    assert "唯一默认创作流程" in skill
+    assert "director_skill=open-video" in skill
+    assert "不执行上游 `scripts/validate_plan.py`" in skill
+    assert "不创建第二份 `run-manifest.json`" in skill
+    assert "旧创作方法仅供显式历史查询或已定位缺口的诊断" in skill
+    assert "read [Creative Completion Practice]" not in skill
+    assert "read [Event-Led Timing]" not in skill
+
+
+def test_vendored_awesome_workflow_is_complete_and_content_pinned() -> None:
+    vendor = SKILL_PATH.parent / "references" / "awesome-seedance"
+    source = json.loads((vendor / "SOURCE.json").read_text(encoding="utf-8"))
+    assert source["repository"] == "https://github.com/LearnPrompt/awesome-seedance"
+    assert source["commit"] == "67df3707a4f25f860088790fb0a74d8f99a50cbb"
+    expected = {"UPSTREAM.md", "LICENSE", "references/editable-template.md",
+                "references/deliverables.md", "references/provider-capabilities.md",
+                "references/qa-rubric.md"}
+    assert {entry["local_path"] for entry in source["files"]} == expected
+    assert {p.relative_to(vendor).as_posix() for p in vendor.rglob("*") if p.is_file()} == expected | {"SOURCE.json"}
+    for entry in source["files"]:
+        assert hashlib.sha256((vendor / entry["local_path"]).read_bytes()).hexdigest() == entry["sha256"]
+        assert f"/{source['commit']}/" in entry["url"]
+    assert "Copyright (c) 2026 LearnPrompt" in (vendor / "LICENSE").read_text()
+    assert "MIT License" in (vendor / "LICENSE").read_text()
+    assert "planned" in (vendor / "UPSTREAM.md").read_text()
+    assert not list(vendor.rglob("*.py"))
+
+
+def test_vendored_workflow_cannot_be_discovered_as_an_independent_skill() -> None:
+    vendor = SKILL_PATH.parent / "references" / "awesome-seedance"
+    assert not list(vendor.rglob("SKILL.md"))
+    assert set(SKILL_PATH.parent.rglob("SKILL.md")) == {SKILL_PATH}
+    source = json.loads((vendor / "SOURCE.json").read_text(encoding="utf-8"))
+    upstream = next(entry for entry in source["files"] if entry["local_path"] == "UPSTREAM.md")
+    assert upstream["upstream_path"] == "agents/skills/seedance-production-workflow/SKILL.md"
+    assert upstream["sha256"] == "b40482f047a3463cd9a4c7cb4fcbf65997b6ae12d35b67d6187334c458ff0ef4"

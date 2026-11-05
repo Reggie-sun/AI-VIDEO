@@ -8,6 +8,15 @@ description: Use when an approved AI-VIDEO Shot needs authorized Seedance 2.0/2.
 将已经批准的 AI-VIDEO Shot 转换为面向 Seedance 的创作指导。该 Skill 是 Agent-side
 prompt/reference 专家，不是 Seedance workflow、router、Provider adapter 或 validator。
 
+## Technical Adaptation Only
+
+默认创作已由 `open-video` 中固定的 awesome-seedance `seedance-production-workflow` 完成。
+本 Skill 只将该稿适配到当前 exact model/profile 的语法、reference tokens/roles、素材约束与
+实际 native preview；不得自动二次创作，不按本地旧模板重排动作、镜头、表演、节奏或语气。
+保存上游创作原文、实际 native prompt 与必要技术差异；没有技术差异就保留原文。
+可执行性缺口返回原创作 owner，不以“优化”名义删内容。修复方案由 `open-video` 的默认 awesome-seedance 流程提出，
+本层只检查其表达能否被当前模式合法消费，不自动应用旧 Repair Bias。
+
 ## Trigger Boundary
 
 具体 prompt/reference authoring 仅在以下输入全部存在时进行；尚未确定版本时，只提供下节的选择建议，
@@ -87,7 +96,7 @@ mixed, or stale 时必须 fail closed，并报告缺失的 deterministic selecti
 
 ## Progressive Loading
 
-1. Load `references/authoring-common.md`，获取共享 prompt 与 reference-role knowledge。
+1. Load `references/authoring-common.md`，仅作技术一致性与 reference-role 核对，不再次起草创作稿。
 2. 只加载 exactly one version overlay：
    - 已选择 Seedance 2.0 family（包括 exact Mini/variant profile）->
      `references/seedance-2.0.md`;
@@ -137,19 +146,18 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
    准备输入见 `planned_model_inputs`，实际提交依据 exact preview 的 `actual_model_inputs` 与 native list；
    审看宫格、未完成的候选图和已选输入不能混同。2.0/2.5 的官方最大容量不证明当前渠道可用，
    R2V 中间图不等于定时关键帧；必需控制与 selected mode 冲突时交回现有 selection/Director，不能静默丢图或换模式。
-3. 来源保留任务输出封存原 prompt，按 `references/authoring-common.md` 的 Generation Input Boundary
-   核对实际输入与差异；结构化 Shot 不自动授权扩写。仅已授权创作/优化才从 approved Shot 起草
-   subject、visible action、scene、spatial relation、camera、lighting、audio intent、chronology 与
-   negative constraints；repair 限于已声明失败项。不得新增 story 或 continuity facts，也不得机械
-   拼入内部 enums、`unspecified`、验证结果或完整 contract 序列化。
-4. 只应用 selected version overlay。将 authoring advice、current runtime facts 与
-   empirical/community observations 分开。
+3. 保存 `open-video` 交来的创作 prompt 或用户要求保留的 exact source。只转换当前渠道要求的
+   reference token、role 或语法，并逐项记录 original → native 的技术差异。场景、动作、表演、
+   镜头、台词、节奏与声音保持原意；不机械拼入内部 enums、`unspecified`、验证结果或完整 contract。
+   不能合法表达时回到 Director，不在本层补一套新的创作方案。
+4. 只核对 selected version overlay 的能力与语法边界。历史表达 advice 不自动执行；将
+   current runtime facts 与 empirical/community observations 分开。
 5. 检查 prompt/reference consistency：每个被提及的 reference 都存在；每个 asset 只有一个清晰
    job；edit/extend 使用 direct operation wording；event density 适配 selected duration；任何
    transfer rule 都不与 Shot 冲突。
 6. 将 advisory result 返回现有 AI-VIDEO workflow，绝不直接执行。
 
-人物表演或画风 repair 还须按 `references/authoring-common.md` 的 Performance And Whole-Shot Review，核对约束来源、逐人物/beat 的最终文字职责、exact 参考的全场局部证据及正常速度声画审查。静止或细微表演不按关键词判错；完整参数、片段存在、人数及参考 SHA 均不能冒充真实自然度或全场风格通过。
+表演、画风修复方案由 Director 返回后，本层仅按 `references/authoring-common.md` 核对约束、字段与 native 正文一致；参数和片段存在不证明真实自然度或全场风格通过。
 
 ## Output
 
@@ -157,18 +165,18 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
 
 ```text
 selected_profile: <从输入回显的 exact model/profile identity + version family + mode + runtime surface>
-prompt_draft: <面向 Seedance 的 authoring draft>
+prompt_draft: <保持创作原意的 native technical adaptation>
 reference_transfers:
   - <reference_planning 中的 asset/need identity>: <transfers; must_not_transfer>
 authoring_warnings: <ambiguity、unsupported expression 或 evidence limits>
-repair_note: <诊断失败结果时仅隔离一个 authoring change>
+repair_note: <回传 Director 的具体表达或能力缺口，不自动改写>
 runtime_handoff: <现有 capability/provider path 必须验证的 facts>
 ```
 
 ## Troubleshooting Dispatch
 
-该 Skill 可以诊断 prompt ambiguity、互相冲突的 reference jobs、过高的 event density，或无法表达
-approved Shot 的 wording。每次只修复一个 authoring variable，并与 accepted observed result 比较。
+该 Skill 可以报告 prompt ambiguity、互相冲突的 reference jobs，或无法合法表达 approved Shot 的
+具体位置。创作诊断和定点修复返回默认 Director 流程；本层不能据诊断自行重写或再次生成。
 
 Runtime/API/ComfyUI/node/credential/budget/egress/task/container errors 属于 selected AI-VIDEO
 Provider adapter 与 typed failure path。Cross-Shot identity/state/axis 问题属于 continuity engine

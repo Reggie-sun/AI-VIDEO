@@ -93,7 +93,7 @@
 | 媒体实验、Pilot、成片交付 | [Verification/Pilot](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details) |
 | credential、付费、额度续期 | [Provider Details](.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)，授权边界见下文 |
 
-镜头覆盖、生成分组定长与修复取舍归 `open-video`。Live 或付费的 preview/permit/POST 前，必须报告连续性、交接、轴线/动作/机位、prompt 适配和 lint 证据，缺一项即停止；schema 与操作归各 Skill 和 validator。
+视频创作默认由 `open-video` 内置的 awesome-seedance 负责。Live 或付费的 preview/permit/POST 前，必须报告连续性、交接、轴线/动作/机位、prompt 适配和 lint 证据，缺一项即停止；schema 与操作归各 Skill 和 validator。
 
 ## Agent Workflow Routing
 

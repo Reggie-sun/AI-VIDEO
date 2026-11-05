@@ -3,14 +3,19 @@
 这是 authoring-only overlay。current AI-VIDEO capability/profile 与 selected adapter 仍是 exact
 support、limits、modes 与 surface behavior 的 authority。
 
+## Technical Scope
+
+不得据本 overlay 自动改写已批准的 awesome-seedance 创作稿。仅核对当前版本语法与能力，
+表达偏好只可作为向 Director 报告的风险，不产生另一轮创作或默认修复。
+
 ## Use This Dialect
 
 - 单次生成时长上限为**15秒**，不能继承2.5的30秒容量。先按完整行动与回应组织生成分组；
   超过15秒且用户允许版本择优时，交现有selection owner评估2.5，不截断对白或把连续戏机械切短。
   当前渠道的exact variant、mode、分辨率和参考限制仍须执行前核实。
-- 优先使用清晰的 visual sequence，不要使用密集 timestamp choreography。Official 2.0 guidance
+- 核对时间控制能力。Official 2.0 guidance
   提醒 precise timing 可能无法被可靠遵循；除非 exact selected surface 有更强控制的 current evidence，
-  否则使用 relative beats。
+  否则报告未支持精确控制，是否改成 relative beats 由 Director 决定。
 - 将每个输入的 image/video/audio reference 绑定到一个 semantic job，并说明必须保持不变的内容。
   不得假设 reference ordering 本身就能表达该 job。
 - 对 first/last-frame authoring，描述 start state、permitted transition 与 endpoint state。不得在两个
@@ -20,11 +25,10 @@ support、limits、modes 与 surface behavior 的 authority。
 - 将 native audio、reference ceilings、duration、resolution、file format 与 surface syntax 视为
   current runtime facts；不得从 `2.0` label 推断。
 
-## Repair Bias
+## Repair Handoff
 
-结果偏离 intent 时，优先减少 competing actions、澄清 reference job，或将脆弱的 clock-time wording
-替换为有序 relative beats。每个 retry proposal 只改变一个 authoring variable，并与 exact
-accepted/failed output evidence 比较。
+遇到参考冲突、动作遗漏或时间漂移，回报 exact 结果、原文和技术适配差异；修复选择归
+`open-video` 的默认 awesome-seedance 流程。本 overlay 不自动减少事件、追加时间码或重写 prompt。
 
 ## Source Boundary
 

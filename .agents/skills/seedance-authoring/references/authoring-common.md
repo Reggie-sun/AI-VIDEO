@@ -1,7 +1,8 @@
 # Shared Seedance Authoring Knowledge
 
-本文件保存可跨 version 使用的 authoring guidance，不定义 runtime capability、provider parameters、
-asset identity、production validation 或 lifecycle state。
+本文件是技术核对清单，不是默认改写模板。它消费 `open-video` 已完成的 awesome-seedance 创作稿，
+不定义 runtime capability、provider parameters、asset identity、production validation 或 lifecycle state，
+也不自动应用旧创作或修复偏好。
 
 ## Evidence Order
 
@@ -29,7 +30,8 @@ prompt 更长、lint PASS 或 source quote 仍存在来证明语义保真或模�
 
 ## Performance And Whole-Shot Review
 
-表演修订先辨明用户明确约束、已批准叙事事实、导演选择和旧 repair margin；保留构图/坐姿不能自行扩张为头身全锁。让可读的动机连接脸部、目光、呼吸、平衡与主动作，按景别说明可见范围；不强制每镜增加动作，不用全员同步眨眼或摆动代替背景生活状态。有来源的静止、`subtle`、`none`、`throughout` 均可保留，遮挡及微表演不可辨认时明确缺证。
+核对原创作稿的表演约束是否在技术转换时丢失或反转；发现缺口返回 Director，
+不自行增补呼吸、眨眼、手势或头身限制，也不将事实/语义检查升级为观感判定。
 
 author/revise 后逐项核对 canonical directions → selected QA 的人物/beat 表达职责 → exact 最终 native 正文。普通精简 binding 的片段可共同表达多个明确列出的字段；在现有 QA 表达里绑定具体路径及片段，不继承被替换长文的覆盖声明，不凭父路径或泛泛的“自然一些”豁免全员。当前新普通 Seedance binding 使用已封存 compiler/4；preserved-source 原有逐字契约独立，不把整个渲染表演模板强塞进普通正文。程序核验片段、路径和绑定；作者另审片段是否确实表达意图、有无反向语句矛盾，不将字面检查当作 NLP 等义证明。
 
@@ -37,30 +39,11 @@ author/revise 后逐项核对 canonical directions → selected QA 的人物/bea
 
 实际结果另沿现有 Per-Shot Gate 以 project-local `video-analysis` 观察 exact MP4；表演须正常速度观看，声音语义和反应时机须可靠的同 bytes 声画证据。分别保留基础连续性、表演/观感、完整剧情/声音结论；FAIL/NOT_EVALUATED 停止，缺证先同 bytes 补证。工程接通、参考覆盖或静态表达通过均不能签发自然度、activation 或最终验收。
 
-## Prompt Grammar
+## Prompt Compatibility
 
-以下起草 guidance 适用于已授权创作/优化或对应 repair；来源保留沿 Generation Input Boundary，
-发现 event density 或 grammar 不适配时报告缺口，不静默缩减原动作或重写原文。起草使用可观察的表达，
-并保持 chronology 清晰：
-
-```text
-subject 与 stable identity
--> visible action 与 state change
--> scene 与 spatial relations
--> 一个 primary camera treatment
--> lighting 与 visual treatment
--> 必要时加入 audible action / dialogue / ambience
--> constraints 与 protected properties
-```
-
-- 描述可见或可听的内容，不要用 mood label 取代 action。
-- 每个摄影镜头保留清楚的 primary camera intent；一段戏的镜头数与切点先由 Director 按关注点和反应决定，再组织有序 coverage 与生成片段。本条不把一段戏或一次生成限制为单镜，完整表演也不等于不切镜；明确包含 cut 的 approved coverage 保留其切镜意图。
-- 按 start state -> action -> resulting state 排列事件。Selected duration 无法清晰表达所有 beat
-  时，降低 event density。
-- 保留 approved names、appearance、wardrobe、objects、screen axis、direction 与 causal anchors，
-  不得虚构缺失的 story facts。
-- Audio 仅作为 authoring intent。Exact native-audio support 与 final mix ownership 仍属于 current
-  AI-VIDEO runtime facts。
+保持原创作稿的语言、叙事顺序、动作与声音。技术适配只处理当前 selected surface 要求的
+reference tokens、roles、native grammar 和明确硬限制，并保存差异。不要把旧 subject → action
+模板套到已有原文，不为让字段“看起来齐全”重复拼入完整 contract。需要实质改写时回到 Director。
 
 ### Prompt Length Guidance
 
@@ -68,9 +51,8 @@ Seedance 2.0、2.0 Fast 和 2.5 的[官方 API 文档](https://docs.volcengine.c
 建议中文提示词不超过 500 字、英文提示词不超过 1000 词；文字过长可能使信息分散，模型遗漏细节、仅关注重点，
 导致视频缺少部分元素。这是创作建议，不是已核实的 API 硬上限，也不意味着长 Prompt 必然失败。
 
-优先精简重复场景描述、泛化形容词和互相竞争的指令，保留决定含义的动机、动作因果、人物反应、表情变化、
-关键声音及参考职责。不能为凑字数自动截断或删除批准内容；来源保留任务仍按 Generation Input Boundary
-保留原文，创作性改写需有当前任务授权。实际本地编译边界见[运行说明](../../../../docs/seedance-prompt-length.md)，
+长度建议只触发可读性提示，不触发自动精简。不能为凑字数截断或删除批准内容；仍按 Generation Input Boundary
+保留原文，创作性改写交回默认 Director，需有当前任务授权。实际本地编译边界见[运行说明](../../../../docs/seedance-prompt-length.md)，
 不得将中文“字”、英文“词”、字符、UTF-8 字节和 token 当作同一单位。
 
 ## Reference Role Map
@@ -88,7 +70,7 @@ Seedance 2.0、2.0 Fast 和 2.5 的[官方 API 文档](https://docs.volcengine.c
 
 每个 asset 的 dominant job（只能有一个）是 Director 判断，只写入
 `generation_intent.reference_planning` 的 `anchors`／`events`／`selections`，由程序校验数量、
-角色、模式与实际绑定；本 Skill 不另维护第二份职责表。本 Skill 只为 prompt 表达补充：
+角色、模式与实际绑定；本 Skill 不另维护第二份职责表。本 Skill 只核对已有表达是否包含：
 
 - `transfers`：允许 prompt 继承的 properties；
 - `must_not_transfer`：必须排除的 properties；
@@ -117,11 +99,8 @@ handoff 前确认：
 - first/last/reference roles 未被混淆；
 - 每条 transfer 与 `must_not_transfer` rule 都可追溯到 approved intent；
 - prompt chronology 不存在 impossible overlap 或 contradictory state；
-- 涉及持物、放置、交接、失去支撑或碰撞时，按 Director 的
-  [Physical Action Continuity](../../open-video/references/event-led-timing.md#physical-action-continuity)
-  核对实际参考、前态、支撑转移、释放与退手、运动路径、落点及邻近物体后果；必要关系须保留在
-  actual native preview 的动作描述中，不能只留在 Shot/检查记录或用“物理正确、保持不动”概括。
-  顺序前提不得改成同时发生；输入互相矛盾时先回到原 authoring owner 修订，不靠追加负面词掩盖；
+- 动作前提、接触、释放、落点等在创作稿中已确定的关系不能在技术转换时丢失或反转；
+  有疑义交回默认 Director，不自动载入旧动作方法或追加负面词；
 - edit/extend 直接说明 operation；
 - 未猜测 runtime limits、file formats、reference counts、mode tokens 或 node/API fields；
 - 所有来自 community 的 heuristic 都标注为 advisory。

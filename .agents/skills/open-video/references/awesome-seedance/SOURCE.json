@@ -1,0 +1,46 @@
+{
+  "repository": "https://github.com/LearnPrompt/awesome-seedance",
+  "commit": "67df3707a4f25f860088790fb0a74d8f99a50cbb",
+  "skill": "seedance-production-workflow",
+  "license": "MIT",
+  "scope": "Original workflow documentation only; no case prompts, media, generated cases or third-party scripts vendored.",
+  "update_policy": "manual reviewed pin only; no automatic update or install",
+  "files": [
+    {
+      "local_path": "UPSTREAM.md",
+      "upstream_path": "agents/skills/seedance-production-workflow/SKILL.md",
+      "url": "https://raw.githubusercontent.com/LearnPrompt/awesome-seedance/67df3707a4f25f860088790fb0a74d8f99a50cbb/agents/skills/seedance-production-workflow/SKILL.md",
+      "sha256": "b40482f047a3463cd9a4c7cb4fcbf65997b6ae12d35b67d6187334c458ff0ef4"
+    },
+    {
+      "local_path": "LICENSE",
+      "upstream_path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/LearnPrompt/awesome-seedance/67df3707a4f25f860088790fb0a74d8f99a50cbb/LICENSE",
+      "sha256": "1eef1394cbdc77865323cb153d3ffc241af74184246ee253ce5bcfd65b61cc0b"
+    },
+    {
+      "local_path": "references/editable-template.md",
+      "upstream_path": "agents/skills/seedance-production-workflow/references/editable-template.md",
+      "url": "https://raw.githubusercontent.com/LearnPrompt/awesome-seedance/67df3707a4f25f860088790fb0a74d8f99a50cbb/agents/skills/seedance-production-workflow/references/editable-template.md",
+      "sha256": "1bb9a2d37e573db5acc6714c150780036abd177a96b4823d44d2859f3fca123b"
+    },
+    {
+      "local_path": "references/deliverables.md",
+      "upstream_path": "agents/skills/seedance-production-workflow/references/deliverables.md",
+      "url": "https://raw.githubusercontent.com/LearnPrompt/awesome-seedance/67df3707a4f25f860088790fb0a74d8f99a50cbb/agents/skills/seedance-production-workflow/references/deliverables.md",
+      "sha256": "fcf28eeec7e8ee4498557e21b965b85986242a39873713e9ee0f3644ee2550a6"
+    },
+    {
+      "local_path": "references/provider-capabilities.md",
+      "upstream_path": "agents/skills/seedance-production-workflow/references/provider-capabilities.md",
+      "url": "https://raw.githubusercontent.com/LearnPrompt/awesome-seedance/67df3707a4f25f860088790fb0a74d8f99a50cbb/agents/skills/seedance-production-workflow/references/provider-capabilities.md",
+      "sha256": "e6df2f0e5f42084d7f026fb42f65fe9003e362f73496d236065076cc720c4f62"
+    },
+    {
+      "local_path": "references/qa-rubric.md",
+      "upstream_path": "agents/skills/seedance-production-workflow/references/qa-rubric.md",
+      "url": "https://raw.githubusercontent.com/LearnPrompt/awesome-seedance/67df3707a4f25f860088790fb0a74d8f99a50cbb/agents/skills/seedance-production-workflow/references/qa-rubric.md",
+      "sha256": "1e85bff0411091782e47364280b6980744a865ea00b01c6b941d1f818b2a79a8"
+    }
+  ]
+}

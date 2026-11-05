@@ -3,6 +3,11 @@
 这是 authoring-only overlay。current AI-VIDEO capability/profile 与 selected adapter 仍是 exact
 support、limits、modes 与 surface behavior 的 authority。
 
+## Technical Scope
+
+不得据本 overlay 自动改写已批准的 awesome-seedance 创作稿。仅核对当前版本语法与能力，
+表达偏好只可作为向 Director 报告的风险，不产生另一轮创作或默认修复。
+
 ## Use This Dialect
 
 - 单次生成时长上限为**30秒**，不能沿用2.0的15秒上限或默认8–10秒分段；按完整戏剧过程和
@@ -18,9 +23,9 @@ support、limits、modes 与 surface behavior 的 authority。
 - 将 audio behavior、reference ceilings、duration、resolution、file format 与 surface syntax 视为
   current runtime facts；不得从 `2.5` label 推断。
 
-## Specialized Direction
+## Optional Historical Direction
 
-仅在本 overlay 已由 exact selected `2.5` profile 选中时，使用下列 Liyue 方法；不向 2.0
+下列 Liyue 方法不再默认执行；仅用户显式要求或定位具体缺口后按需参考，且必须已选 exact `2.5` profile。不向 2.0
 路由注入 2.5 语法、时长或模式，也不因外部方案建议而改选模型。
 
 为每个实际素材注明身份/场景/动作/声音/待编辑来源等职责、有效区间、必须保留和不得继承的内容。
@@ -39,11 +44,10 @@ selected surface/profile 实际支持且任务已选择时使用；上游列表�
 [Liyue SKILL](https://github.com/liyue-aigc/seedance-2-5-video-director/blob/ad0e68ba6ce24fb9ae9c67c9276061cef37663f1/SKILL.md)，
 [MIT notice](../../open-video/licenses/seedance-2.5-director-MIT.txt)。
 
-## Repair Bias
+## Repair Handoff
 
-结果混合多个 references 时，将每个 asset 收窄为一个 job，并加强 `must_not_transfer`。Timing drift
-时先简化 competing beats，再增加 timestamps。每个 retry proposal 只改变一个 authoring variable，
-并将 diagnosis 绑定 exact observed output。
+遇到参考冲突、动作遗漏或时间漂移，回报 exact 结果、原文和技术适配差异；修复选择归
+`open-video` 的默认 awesome-seedance 流程。本 overlay 不自动减少事件、追加时间码或重写 prompt。
 
 ## Source Boundary
 

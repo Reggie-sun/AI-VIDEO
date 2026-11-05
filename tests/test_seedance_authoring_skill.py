@@ -29,7 +29,11 @@ def test_seedance_authoring_is_a_minimal_progressively_loaded_skill() -> None:
 
     assert SKILL_ROOT.is_dir()
     assert {path for path in expected_files if not path.is_file()} == set()
-    assert {path for path in SKILL_ROOT.rglob("*") if path.is_file()} == expected_files
+    # OMC hook metadata is runtime state, not part of the shipped Skill package.
+    assert {
+        path for path in SKILL_ROOT.rglob("*")
+        if path.is_file() and ".omc" not in path.relative_to(SKILL_ROOT).parts
+    } == expected_files
 
     text = _read(SKILL_PATH)
     match = re.match(r"\A---\n(.*?)\n---\n", text, flags=re.DOTALL)
@@ -171,3 +175,16 @@ def test_design_branch_routes_raw_creative_input_to_director_before_seedance() -
     assert "prompt presence" in playbook
     assert "VIDEO_EXTEND" in playbook
     assert "时长阈值" in playbook
+
+
+def test_seedance_is_technical_adaptation_not_a_second_creative_pass() -> None:
+    skill = _read(SKILL_PATH)
+    assert "## Technical Adaptation Only" in skill
+    assert "不得自动二次创作" in skill
+    assert "保存上游创作原文、实际 native prompt 与必要技术差异" in skill
+    assert "修复方案由 `open-video` 的默认 awesome-seedance 流程提出" in skill
+    common = _read(SKILL_ROOT / "references" / "authoring-common.md")
+    assert "技术核对清单，不是默认改写模板" in common
+    for version in ("2.0", "2.5"):
+        overlay = _read(SKILL_ROOT / "references" / f"seedance-{version}.md")
+        assert "不得据本 overlay 自动改写" in overlay
