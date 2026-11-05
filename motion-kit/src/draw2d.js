@@ -108,7 +108,7 @@ export function osd(ctx, x, y, lines, { size = 22, color = 'rgba(236,241,244,0.8
 
 // Corner-bracket detection box with a label tag; `box` = [x, y, w, h] output px.
 // Snaps in from s0 over ~2 frames; corners carry 1 px deterministic jitter per frame.
-export function detector(ctx, box, { t, t0, frame, label, sub = null, subColor = '#E3342F', color = 'rgba(240,244,246,0.92)', s0 = 1.6, lw = 2 }) {
+export function detector(ctx, box, { t, t0, frame, label, sub = null, subColor = '#E3342F', color = 'rgba(240,244,246,0.92)', s0 = 1.6, lw = 2, alpha = 1, size = 24 }) {
   if (t < t0) return;
   const k = clamp((t - t0) / 0.066);
   const e = easeOutCubic(k);
@@ -120,7 +120,7 @@ export function detector(ctx, box, { t, t0, frame, label, sub = null, subColor =
   x += j(1); y += j(2); w += j(3); h += j(4);
   const L = Math.max(8, Math.min(w, h) * 0.24);
   ctx.save();
-  ctx.globalAlpha = Math.min(1, 0.3 + e);
+  ctx.globalAlpha = alpha * Math.min(1, 0.3 + e);
   ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'square';
   ctx.beginPath();
   for (const [px, py, dx, dy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
@@ -128,24 +128,25 @@ export function detector(ctx, box, { t, t0, frame, label, sub = null, subColor =
   }
   ctx.stroke();
   // label tag above-left, like a real detector overlay
-  font(ctx, F.mono, 24, 0.5);
-  const tw = ctx.measureText(label).width + 14;
-  ctx.fillStyle = color; ctx.fillRect(Math.round(x), Math.round(y - 36), Math.round(tw), 32);
-  ctx.fillStyle = 'rgba(8,10,12,0.95)'; ctx.fillText(label, Math.round(x + 7), Math.round(y - 12));
+  const th = Math.round(size * 1.33), pad = Math.round(size * 0.3);
+  font(ctx, F.mono, size, 0.5);
+  const tw = ctx.measureText(label).width + 2 * pad;
+  ctx.fillStyle = color; ctx.fillRect(Math.round(x), Math.round(y - th - 4), Math.round(tw), th);
+  ctx.fillStyle = 'rgba(8,10,12,0.95)'; ctx.fillText(label, Math.round(x + pad), Math.round(y - 4 - th * 0.27));
   if (sub) {
-    font(ctx, F.monoB, 24, 1);
-    const sw = ctx.measureText(sub).width + 14;
-    ctx.fillStyle = subColor; ctx.fillRect(Math.round(x + tw + 4), Math.round(y - 36), Math.round(sw), 32);
+    font(ctx, F.monoB, size, 1);
+    const sw = ctx.measureText(sub).width + 2 * pad;
+    ctx.fillStyle = subColor; ctx.fillRect(Math.round(x + tw + 4), Math.round(y - th - 4), Math.round(sw), th);
     ctx.fillStyle = subColor.startsWith('#') ? 'rgba(250,250,250,0.98)' : 'rgba(8,10,12,0.95)';
-    ctx.fillText(sub, Math.round(x + tw + 11), Math.round(y - 12));
+    ctx.fillText(sub, Math.round(x + tw + 4 + pad), Math.round(y - 4 - th * 0.27));
   }
   ctx.restore();
 }
 
 // Fine registration frame: hairline inset, corner marks; aligned to the pixel grid.
-export function chrome(ctx, w, h, { inset = 36, alpha = 0.5, mark = 26 } = {}) {
+export function chrome(ctx, w, h, { inset = 36, alpha = 0.5, mark = 26, lw = 1 } = {}) {
   ctx.save();
-  ctx.strokeStyle = `rgba(236,241,244,${alpha})`; ctx.lineWidth = 1;
+  ctx.strokeStyle = `rgba(236,241,244,${alpha})`; ctx.lineWidth = lw;
   const a = inset + 0.5, b = w - inset - 0.5, c = inset + 0.5, d = h - inset - 0.5;
   ctx.beginPath();
   for (const [x, y, dx, dy] of [[a, c, 1, 1], [b, c, -1, 1], [a, d, 1, -1], [b, d, -1, -1]]) {
@@ -168,7 +169,7 @@ export function carDialog(ctx, W, H, { t, on, title, button, disabledAt, progres
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, '#0a0f14'); g.addColorStop(1, '#05080b');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  const k = clamp((t - on) / 0.18);
+  const k = clamp((t - on) / 0.06);
   if (k <= 0) { ctx.restore(); return; }
   ctx.globalAlpha = easeOutCubic(k);
   // header strip
@@ -185,8 +186,9 @@ export function carDialog(ctx, W, H, { t, on, title, button, disabledAt, progres
   ctx.fillStyle = 'rgba(242,245,247,0.16)'; ctx.fillRect(72, 252, W - 144, 4);
   ctx.fillStyle = 'rgba(242,245,247,0.95)'; ctx.fillRect(72, 252, (W - 144) * clamp(progress), 4);
   // the human option: alive, then greyed out and unavailable
-  const dis = clamp((t - disabledAt) / 0.08);
-  const bw = 330, bh = 92, bx = W - 72 - bw, by = H - 40 - bh;
+  const dis = clamp((t - disabledAt) / 0.05);
+  if (dis > 0) { ctx.fillStyle = `rgba(227,52,47,${0.95 * dis})`; ctx.fillRect(72, 252, W - 144, 4); }   // the line turns red: no way back
+  const bw = 330, bh = 92, bx = W - 200 - bw, by = H - 40 - bh;
   ctx.lineWidth = 2;
   ctx.strokeStyle = `rgba(242,245,247,${lerp(0.9, 0.22, dis)})`;
   roundRect(ctx, bx, by, bw, bh, 14); ctx.stroke();
@@ -195,9 +197,9 @@ export function carDialog(ctx, W, H, { t, on, title, button, disabledAt, progres
   const tw = ctx.measureText(button).width;
   ctx.fillText(button, bx + (bw - tw) / 2, by + 62);
   if (dis > 0) {
-    font(ctx, F.sansR, 30, 2);
+    font(ctx, F.sans, 44, 3);
     ctx.fillStyle = `rgba(227,52,47,${0.95 * dis})`;
-    ctx.fillText('不可用', bx - 128, by + 58);
+    ctx.fillText('不可用', bx - 190, by + 62);
   }
   ctx.restore();
 }

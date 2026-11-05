@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+<link rel="icon" href="data:,">
 <meta charset="utf-8">
 <title>T01《最后一位人类司机》審看</title>
 <style>
@@ -26,10 +27,10 @@
 </head>
 <body>
 <main>
-  <h1>T01《最后一位人类司机》<span class="badge" id="ver">dev2 · 開發中，非交付版</span></h1>
+  <h1>T01《最后一位人类司机》<span class="badge" id="ver">dev7 · 引擎驗收候選（音樂為臨時導引）</span></h1>
   <p class="sub">1920×1080 · 30fps · 10.0 s · HyperFrames + motion-kit（WebGL2 + Canvas2D，每幀為時間純函數）</p>
 
-  <video id="v" src="T01-dev2-review.mp4" controls playsinline preload="auto"></video>
+  <video id="v" src="T01-dev7-review.mp4" controls playsinline preload="auto"></video>
   <div class="bar">
     <button id="play">播放 / 暫停（空白鍵）</button>
     <button id="prev">◀ 上一幀（,）</button>
@@ -46,14 +47,27 @@
     <li>結構（rev 2）：0–4 s S1 監控視角（片名 → 人口普查計數），4–6 s S2 車內（系統接管對話框），6 s drop S3 空拍（光脈衝先亂後齊，人类驾驶 0）。</li>
   </ul>
 
-  <h2>我已發現、正在修的問題（dev3）</h2>
+  <h2>dev7：依 dev6b 獨立復核補強可讀停留</h2>
+  <ul>
+    <li>[blocking] S2 窗外不再凍結：路面以地平面 2.5D 前推，前方有等距的 AI 車隊尾燈；速度調為平穩巡航，不做曲速拉絲。</li>
+    <li>掃光峰值對準拍點（f150 = 5.0 s）；S3 移除每拍一次的鏡頭 bump，最後一拍鏡頭靜止。</li>
+    <li>色差改以像素計算（角落 ≤0.9 px）；「0」不再用 RGB 分離，只在剪點幀做一次曝光閃。</li>
+    <li>drop 後保持紅「1」與 HUMAN 約半秒（實查 f181–194，14 幀），6.5 s（f195）同一拍翻成白「0」與 AI，最後一條光軌同時完成入相。</li>
+    <li>「保持手动」收進安全區；停用時進度線轉紅，「不可用」放大。「0 · 03:48」排在同一列。</li>
+  </ul>
+  <h2>dev7 QA（腳本可驗）</h2>
+  <ul>
+    <li>規格 1920×1080 / 30fps / 300 幀；節拍對位 11/11（±1 幀）；閃爍 0；突跳、strobe、離群幀皆為 0。</li>
+    <li>聯繫圖：<a href="../qa/dev7/sheet-eighths.jpg" target="_blank">8 分音全片</a> · <a href="../qa/dev7/sheet-shots.jpg" target="_blank">每鏡首中尾</a> · <a href="../qa/dev7/sheet-legibility-390.jpg" target="_blank">390px 可讀性</a> · <a href="../qa/dev7/sheet-safe-area.jpg" target="_blank">安全區</a> · <a href="../qa/dev7/sheet-crops-100.jpg" target="_blank">文字裁切</a> · <a href="../qa/dev7/report.md" target="_blank">報告</a> · <a href="../qa/dev5/independent-review.md" target="_blank">dev5 審片與裁決</a></li>
+  </ul>
+  <h2>尚未驗證</h2>
   <ul id="issues">
-    <li>S1 尾燈太大太亮，車流連成一團紅色光暈，看不出單輛車；倒影太長。</li>
-    <li>S1 識別框太細，標籤字太小；片名的光暈略軟。</li>
-    <li>S3 光脈衝像一串圓點，要改成帶尾巴的流光；空拍識別框太小。</li>
-    <li>尚未做：完整聯繫圖 QA、節拍對位表、閃爍/離群幀掃描、歷史獨立檢查、獨立審片。</li>
+    <li>聲音是臨時導引節拍，正式配樂待 Suno。</li>
+    <li>4 Mbps 模擬轉碼後，暗部霧區有壓縮色塊（兩版都有）；真實抖音轉碼需實際上傳才驗得到，<b>未驗證</b>。</li>
+    <li>觀感與聽感由你判斷；技術逐幀核對不代替正常速度觀看及實際聆聽。</li>
   </ul>
 
+  <p class="dim">dev6b 的 1 與 HUMAN 原先只停留 1／2 幀。<a href="../qa/dev7/repair-plan.md">dev7 修復範圍</a> · <a href="../qa/dev7/codex-independent-review.md">dev7 獨立復核</a> · <a href="../../series/identity-cf/">IRIS 身份參考</a> · <a href="../../ep01/lyrics-v1.md">已認可歌詞</a> · <a href="../../ep01/fact-check.md">新聞一手來源</a> · <a href="../../ep01/storyboard-draft.md">EP01 分鏡草案</a></p>
   <h2>關鍵幀</h2>
   <div class="grid" id="frames"></div>
   <p class="dim">頁面檔案：<code>outputs/ai-city-takeover/phase1-t01/review/</code></p>

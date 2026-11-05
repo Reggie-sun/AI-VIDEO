@@ -1,0 +1,1055 @@
+{
+  "shot_id": "S0147",
+  "start_frame": 6710,
+  "end_frame": 6750,
+  "start_time": 279.5833,
+  "end_time": 281.2917,
+  "duration_frames": 41,
+  "duration_s": 1.7083,
+  "start_tc": "00:04:39:14",
+  "end_tc": "00:04:41:06",
+  "boundary_in_id": "B4-017",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 6710,
+      "path": "keyframes/S0147_f06710.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6720,
+      "path": "keyframes/S0147_f06720.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6730,
+      "path": "keyframes/S0147_f06730.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6740,
+      "path": "keyframes/S0147_f06740.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6750,
+      "path": "keyframes/S0147_f06750.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6730,
+      "path": "work/full_batch/06730.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 reference"
+    }
+  ],
+  "scene_type": "detail_insert",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Long black hanging barcode label diagonal over white textile",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Long black hanging barcode label diagonal over white textile. RGB fringes6719,6729,6740; annulus expands then settles. 独立图层、时序与屏幕坐标已根据实际参考帧复核；隐藏原参数保留unknown。",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Long black hanging barcode label diagonal over white textile",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Long black hanging barcode label diagonal over white textile",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "RGB fringes6719,6729,6740; annulus expands then settles",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0147.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0033,
+      "pan_y_frac_per_s": -0.0,
+      "zoom_per_s": -0.0,
+      "median_flow_frac_per_s": 0.0047,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#ECEBE9",
+        "fraction": 0.404,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#1D1D1E",
+        "fraction": 0.309,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#D9D7D5",
+        "fraction": 0.14,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#4E4748",
+        "fraction": 0.053,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#76747B",
+        "fraction": 0.051,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#BA9C95",
+        "fraction": 0.043,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[131.6, 164.2, 163.7]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "Small upper-left chrome present in filmstrip; exact look digits require full-resolution review"
+    },
+    "G-TITLE-TAG": {
+      "state": "Upper-right small collection chrome visible except final black"
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Zero-month / final no-underclass state after countdown; exact per-frame widget content unresolved"
+    },
+    "G-TICKER": {
+      "state": "Bottom ticker visible; microtext not transcribed from thumbnail"
+    },
+    "G-TIMECODE": {
+      "state": "Bottom-right timecode; exact per-frame expected time from supplied timeline"
+    },
+    "G-HALFTONE": {
+      "state": "Colored print dots visible; finale coarse-dot modulation especially S0151-S0152"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0147-E01",
+      "shot_id": "S0147",
+      "type": "background_media",
+      "description": "Long black hanging barcode label diagonal over white textile. RGB fringes6719,6729,6740; annulus expands then settles.",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Long black hanging barcode label diagonal over white textile. RGB fringes6719,6729,6740; annulus expands then settles."
+      },
+      "motion": {
+        "path": "Long black hanging barcode label diagonal over white textile. RGB fringes6719,6729,6740; annulus expands then settles.",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6710; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6710,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6710,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0147-E02",
+      "shot_id": "S0147",
+      "type": "prop",
+      "description": "Long black hanging label angled down-left against white cloth; bottom white barcode remains physical texture",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.3255208333333333,
+        "y": 0.0,
+        "w": 0.40625,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Long black hanging label angled down-left against white cloth; bottom white barcode remains physical texture"
+      },
+      "motion": {
+        "path": "Long black hanging label angled down-left against white cloth; bottom white barcode remains physical texture",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6710; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6710,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6710,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0147-E03",
+      "shot_id": "S0147",
+      "type": "text_title",
+      "description": "Orange100% and small lining warning printed on black label",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.4322916666666667,
+        "y": 0.06481481481481481,
+        "w": 0.20833333333333334,
+        "h": 0.26851851851851855,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Orange100% and small lining warning printed on black label"
+      },
+      "motion": {
+        "path": "Orange100% and small lining warning printed on black label",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6710; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6710,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6710,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "LINING · INSIDE / 100% / DO NOT SHOW OUTSIDE / WEAR SHELL SIDE OUT",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 122,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0147-E04",
+      "shot_id": "S0147",
+      "type": "tag_card",
+      "description": "Black lower-left fibre card inverts former cream card; same barcode and identifier",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.6037037037037037,
+        "w": 0.2916666666666667,
+        "h": 0.2962962962962963,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Black lower-left fibre card inverts former cream card; same barcode and identifier"
+      },
+      "motion": {
+        "path": "Black lower-left fibre card inverts former cream card; same barcode and identifier",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6710; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6710,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6710,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "CARE LABEL 01 · FIBRE CONTENT / SHELL: optimism. / LINING: doom. / EV-27-0000 · WOVEN · MADE TO ORDER",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0147-E05",
+      "shot_id": "S0147",
+      "type": "text_lyric",
+      "description": "LINING doom types with orange first word then settles white on black card",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.04791666666666667,
+        "y": 0.7685185185185185,
+        "w": 0.25,
+        "h": 0.06759259259259259,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 32,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "LINING doom types with orange first word then settles white on black card"
+      },
+      "motion": {
+        "path": "LINING doom types with orange first word then settles white on black card",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6710; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6710,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6710,
+          "text": "LINING: do"
+        },
+        {
+          "frame": 6714,
+          "text": "LINING: doom."
+        },
+        {
+          "frame": 6720,
+          "state": "white doom"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6710,
+        6714,
+        6720,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "LINING: doom.",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 66,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0147-E06",
+      "shot_id": "S0147",
+      "type": "hud_panel",
+      "description": "Right cream SECTION A-A sleeve cross-section paper",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.6822916666666666,
+        "y": 0.18518518518518517,
+        "w": 0.2604166666666667,
+        "h": 0.5185185185185185,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Right cream SECTION A-A sleeve cross-section paper"
+      },
+      "motion": {
+        "path": "Right cream SECTION A-A sleeve cross-section paper",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6710; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6710,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6710,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "SECTION A-A · SLEEVE / FIG. 12",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0147-E07",
+      "shot_id": "S0147",
+      "type": "hud_gauge",
+      "description": "Concentric section: orange outer shell complete, inner grey ring progressively fills black clockwise, centre MODEL01 WEARER",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.7317708333333334,
+        "y": 0.25555555555555554,
+        "w": 0.16145833333333334,
+        "h": 0.28703703703703703,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 31,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Concentric section: orange outer shell complete, inner grey ring progressively fills black clockwise, centre MODEL01 WEARER"
+      },
+      "motion": {
+        "path": "Concentric section: orange outer shell complete, inner grey ring progressively fills black clockwise, centre MODEL01 WEARER",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6710; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6710,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6712,
+          "state": "grey inner ring"
+        },
+        {
+          "frame": 6720,
+          "state": "black arc aboutquarter"
+        },
+        {
+          "frame": 6732,
+          "state": "black arc aboutthreequarters"
+        },
+        {
+          "frame": 6746,
+          "state": "inner black ring complete"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6710,
+        6712,
+        6720,
+        6732,
+        6746,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "MODEL 01 / (WEARER)",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 14,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0147-E08",
+      "shot_id": "S0147",
+      "type": "text_label",
+      "description": "Two legend lines type independently under ring",
+      "start_frame": 6712,
+      "end_frame": 6750,
+      "bounding_box": {
+        "x": 0.696875,
+        "y": 0.5583333333333333,
+        "w": 0.20833333333333334,
+        "h": 0.06481481481481481,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 32,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Two legend lines type independently under ring"
+      },
+      "motion": {
+        "path": "Two legend lines type independently under ring",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6712; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6750"
+      },
+      "keyframes": [
+        {
+          "frame": 6712,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6712,
+          "text": "SH / LI"
+        },
+        {
+          "frame": 6732,
+          "text": "100%"
+        },
+        {
+          "frame": 6738,
+          "state": "full words"
+        },
+        {
+          "frame": 6750,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6712,
+        6732,
+        6738,
+        6750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "SHELL · OUTSIDE · 100% OPTIMISM / LINING · INSIDE · 100% DOOM",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 14,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0147-E09",
+      "shot_id": "S0147",
+      "type": "glitch",
+      "description": "Brief magenta/cyan edge fringe/RGB separation on tag border",
+      "start_frame": 6719,
+      "end_frame": 6720,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Brief magenta/cyan edge fringe/RGB separation on tag border"
+      },
+      "motion": {
+        "path": "Brief magenta/cyan edge fringe/RGB separation on tag border",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6719; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6720"
+      },
+      "keyframes": [
+        {
+          "frame": 6719,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6720,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6719,
+        6720
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0147-E10",
+      "shot_id": "S0147",
+      "type": "glitch",
+      "description": "Brief magenta/cyan edge fringe/RGB separation on tag border",
+      "start_frame": 6729,
+      "end_frame": 6730,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Brief magenta/cyan edge fringe/RGB separation on tag border"
+      },
+      "motion": {
+        "path": "Brief magenta/cyan edge fringe/RGB separation on tag border",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6729; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6730"
+      },
+      "keyframes": [
+        {
+          "frame": 6729,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6730,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6729,
+        6730
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0147-E11",
+      "shot_id": "S0147",
+      "type": "glitch",
+      "description": "Brief magenta/cyan edge fringe/RGB separation on tag border",
+      "start_frame": 6740,
+      "end_frame": 6741,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Brief magenta/cyan edge fringe/RGB separation on tag border"
+      },
+      "motion": {
+        "path": "Brief magenta/cyan edge fringe/RGB separation on tag border",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6740; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6741"
+      },
+      "keyframes": [
+        {
+          "frame": 6740,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6741,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6740,
+        6741
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0147-A05",
+      "target_element_ids": [
+        "S0147-E05"
+      ],
+      "description": "LINING doom types with orange first word then settles white on black card",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0147-A07",
+      "target_element_ids": [
+        "S0147-E07"
+      ],
+      "description": "Concentric section: orange outer shell complete, inner grey ring progressively fills black clockwise, centre MODEL01 WEARER",
+      "start_frame": 6710,
+      "end_frame": 6750,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0147-A08",
+      "target_element_ids": [
+        "S0147-E08"
+      ],
+      "description": "Two legend lines type independently under ring",
+      "start_frame": 6712,
+      "end_frame": 6750,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [],
+      "frame_range": [
+        6719,
+        6720
+      ],
+      "type": "glitch",
+      "description": "Single-frame RGB-split/edge fringe on the black tag shot (also 6729 and 6740 repeat the same effect at ~10-frame period).",
+      "confidence": 0.8,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    },
+    {
+      "dist_ids": [],
+      "frame_range": [
+        6729,
+        6730
+      ],
+      "type": "glitch",
+      "description": "Repeat RGB-split single frame on black tag shot.",
+      "confidence": 0.8,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    },
+    {
+      "dist_ids": [],
+      "frame_range": [
+        6740,
+        6741
+      ],
+      "type": "glitch",
+      "description": "Repeat RGB-split single frame on black tag shot.",
+      "confidence": 0.8,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "other",
+      "boundary_id": "B4-017",
+      "span": [
+        6704,
+        6711
+      ],
+      "description": "RGB fringes6719,6729,6740; annulus expands then settles",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B4-018",
+      "span": [
+        6750,
+        6750
+      ],
+      "description": "RGB fringes6719,6729,6740; annulus expands then settles",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0435",
+      "relation": "vocal_word_candidate (unknown) at frame 6708–6738; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6710
+    },
+    {
+      "audio_event_id": "AB0621",
+      "relation": "beat_candidate (unknown) at frame 6719; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6719
+    },
+    {
+      "audio_event_id": "AB0622",
+      "relation": "beat_candidate (unknown) at frame 6730; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6730
+    },
+    {
+      "audio_event_id": "AB0623",
+      "relation": "beat_candidate (unknown) at frame 6741; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6741
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0147.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Unknown font files, physical plate/overlay decomposition, original curve, alpha and random flip seed",
+    "Measured visual boxes +/-0.02 normalized; event start bounds +/-3f; precise audio alignment still requires listening",
+    "Author eight-point star statement does not override observed nine-point ending; uncounted clips remain unknown"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0147.jpg",
+      "keyframes/S0147_f06710.jpg",
+      "keyframes/S0147_f06720.jpg",
+      "keyframes/S0147_f06730.jpg",
+      "keyframes/S0147_f06740.jpg",
+      "keyframes/S0147_f06750.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "reviewer": "root",
+    "method": "whole filmstrip, native1920 midpoint and independent1–4f regional/whole-shot second pass",
+    "timing_precision_frames": 3,
+    "reference_sheet": "work/root_review/tail_micro_S0147.jpg",
+    "pending": []
+  },
+  "observed_text_inventory": [
+    "LINING · INSIDE / 100% / DO NOT SHOW OUTSIDE / WEAR SHELL SIDE OUT",
+    "CARE LABEL 01 · FIBRE CONTENT / SHELL: optimism. / LINING: doom. / EV-27-0000 · WOVEN · MADE TO ORDER",
+    "LINING: doom.",
+    "SECTION A-A · SLEEVE / FIG. 12",
+    "MODEL 01 / (WEARER)",
+    "SHELL · OUTSIDE · 100% OPTIMISM / LINING · INSIDE · 100% DOOM"
+  ]
+}

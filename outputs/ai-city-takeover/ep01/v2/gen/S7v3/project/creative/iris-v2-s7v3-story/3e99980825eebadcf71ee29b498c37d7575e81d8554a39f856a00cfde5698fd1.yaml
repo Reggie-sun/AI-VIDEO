@@ -1,0 +1,49 @@
+artifact_id: iris-v2-s7v3-story
+beats:
+- beat_id: offline
+  summary: 分镜 v2.1 S7v3
+content_hash: 3e99980825eebadcf71ee29b498c37d7575e81d8554a39f856a00cfde5698fd1
+creation_receipt_id: iris-v2-s7v3-authoring
+language: zh
+logline: IRIS EP01 v2 S7v3
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 27c0b1f4226944ad5354d84e54230a68380eff54c9de7d3484c1d0083007799d
+  kind: user_input
+  reference: evidence/authoring-input/27c0b1f4226944ad5354d84e54230a68380eff54c9de7d3484c1d0083007799d.json
+- content_hash: 1fa0609beeb57e71206d697b6bdbf0d989d4e19fbd4f5df39d842ddb3b7d4fb0
+  kind: user_input
+  reference: evidence/authoring-input/1fa0609beeb57e71206d697b6bdbf0d989d4e19fbd4f5df39d842ddb3b7d4fb0.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 46b256fea8124675d213d0e8f4cee416fb039a52375943cf0864ce4e4f62f625
+  kind: user_input
+  reference: evidence/authoring-input/46b256fea8124675d213d0e8f4cee416fb039a52375943cf0864ce4e4f62f625.json
+- content_hash: 36e1c14db247b203f5f7349fc3cf8f8084a0006b484f60a87e24ec862e6e5445
+  kind: user_input
+  reference: evidence/authoring-input/36e1c14db247b203f5f7349fc3cf8f8084a0006b484f60a87e24ec862e6e5445.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+source_references: []
+synopsis: 真人电影摄影，横幅十六比九，连续六秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性站在几乎全黑的房间里，几块半透明的发光薄片悬浮在她身前和身侧；第二张图只示范她在这一镜要达到的神情与投入程度，不是起始画面，也不改变构图；第三张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第三张图的背景。

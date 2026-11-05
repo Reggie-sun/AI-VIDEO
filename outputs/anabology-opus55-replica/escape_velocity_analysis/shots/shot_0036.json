@@ -1,0 +1,1057 @@
+{
+  "shot_id": "S0036",
+  "start_frame": 1364,
+  "end_frame": 1440,
+  "start_time": 56.8333,
+  "end_time": 60.0417,
+  "duration_frames": 77,
+  "duration_s": 3.2083,
+  "start_tc": "00:00:56:20",
+  "end_tc": "00:01:00:00",
+  "boundary_in_id": "B0-035",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 1364,
+      "path": "keyframes/S0036_f01364.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1383,
+      "path": "keyframes/S0036_f01383.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1402,
+      "path": "keyframes/S0036_f01402.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1421,
+      "path": "keyframes/S0036_f01421.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1440,
+      "path": "keyframes/S0036_f01440.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1402,
+      "path": "work/full_batch/01402.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 1440,
+      "path": "work/full_batch/01440.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "character_plate",
+  "narrative_role": "人物服装Look章节推进与歌词概念的可视化解释；具体内容见分镜描述",
+  "subject": "女主坐在白色汽车后座中间",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "女主坐在白色汽车后座中间，前排方向盘黑弧从左下伸入，车窗外明亮烟火横向掠过；她的嘴和头随表演变化。右侧歌词逐词唱到Our Waymo just drove into a firework. Are we on fire, dude?，右下Ride paused.黑色通知卡。末尾左侧竖条擦入灰森林车队。",
+  "composition": {
+    "shot_size": "人物/环境，见分镜描述",
+    "subject_position": "见scene_description与各独立元素bbox",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可观察视角见scene_description；真实相机焦距/型号未知",
+    "layers": {
+      "foreground": "歌词、计数、检测框、图形窗口",
+      "midground": "女主或主要图形/道具",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "filmstrip和首中末观察；光流仅为画面运动不能证明相机: {'pan_x_frac_per_s': 0.0015, 'pan_y_frac_per_s': -0.0012, 'zoom_per_s': -0.0129, 'median_flow_frac_per_s': 0.0039, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": 0.0015,
+      "pan_y_frac_per_s": -0.0012,
+      "zoom_per_s": -0.0129,
+      "median_flow_frac_per_s": 0.0039,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "见描述；实际灯位未知",
+    "quality": "可见屏幕/红色小点光与强反差；图形镜头为代码明暗平面",
+    "effects": [
+      "全片印刷网点纹理"
+    ],
+    "temporal_change": "实测亮度首中末 [83.4, 82.0, 76.3]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#0F0E09",
+        "fraction": 0.283,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#CAC2BA",
+        "fraction": 0.181,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#29251E",
+        "fraction": 0.152,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#7C695B",
+        "fraction": 0.147,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#A99283",
+        "fraction": 0.123,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#514539",
+        "fraction": 0.113,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "实测亮度首中末 [83.4, 82.0, 76.3]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 05 / 11，采样可见，变值精确帧待核",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "右上18 MONTHS / TO ESCAPE，底部微字THE PERMANENT UNDERCLASS及DEPARTURES · SS27 · COLLECTION01",
+    "G-TICKER": "底部持续向左滚动，条目见visual_system；逐镜窗口随时间变化",
+    "G-FLAP-BOARD": "无底部大翻牌；18由右上小控件承载",
+    "G-CORNER-MARKS": "四角浅灰十字",
+    "G-AUDIO-SPECTRUM": "右上白条，随时间起伏",
+    "G-LEFT-RULER": "左侧白刻度，y540橙指针",
+    "G-TIMECODE": {
+      "first": "00:00:56:20",
+      "last": "00:01:00:00"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0036-E01",
+      "shot_id": "S0036",
+      "type": "background_media",
+      "description": "女主坐在白色汽车后座中间，前排方向盘黑弧从左下伸入，车窗外明亮烟火横向掠过；她的嘴和头随表演变化。右侧歌词逐词唱到Our Waymo just drove into a firework. Are we on fire, dude?，右下Ride paused.黑色通知卡。末尾左侧竖条擦入灰森林车队。",
+      "start_frame": 1364,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "女主坐在白色汽车后座中间，前排方向盘黑弧从左下伸入，车窗外明亮烟火横向掠过；她的嘴和头随表演变化。右侧歌词逐词唱到Our Waymo just drove into a firework. Are we on fire, dude?，右下Ride paused.黑色通知卡。末尾左侧竖条擦入灰森林车队。",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1364,
+          "observed_state": "女主坐在白色汽车后座中间，前排方向盘黑弧从左下伸入，车窗外明亮烟火横向掠过；她的嘴和头随表演变化。右侧歌词逐词唱到Our Waymo just drove into a firework. Are we on fire, dude?，右下Ride paused.黑色通知卡。末尾左侧竖条擦入灰森林车队。"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1364,
+        1383,
+        1402,
+        1421,
+        1440
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0036-E02",
+      "shot_id": "S0036",
+      "type": "text_caption",
+      "description": "右上换行逐词字幕，坐标详见边框",
+      "start_frame": 1364,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0.7291666666666666,
+        "y": 0.2574074074074074,
+        "w": 0.21875,
+        "h": 0.18981481481481483,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "右上换行逐词字幕",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1374,
+          "observed_state": "just",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1382,
+          "observed_state": "drove",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1390,
+          "observed_state": "into",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1398,
+          "observed_state": "a",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1400,
+          "observed_state": "firework淡入",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1402,
+          "observed_state": "firework橙字",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1410,
+          "observed_state": "前段歌词消退",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1414,
+          "observed_state": "Are",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1416,
+          "observed_state": "we",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1420,
+          "observed_state": "on",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1426,
+          "observed_state": "fire,",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1436,
+          "observed_state": "dude?",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1364,
+        1383,
+        1402,
+        1421,
+        1440
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "Look 05. Our Waymo just drove into a firework.\nAre we on fire, dude?",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 40,
+          "visual_family": "bold sans",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 64,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "bold"
+        }
+      }
+    },
+    {
+      "element_id": "S0036-E03",
+      "shot_id": "S0036",
+      "type": "hud_panel",
+      "description": "右下黑色圆角通知卡，坐标详见边框",
+      "start_frame": 1370,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0.73125,
+        "y": 0.5990740740740741,
+        "w": 0.21875,
+        "h": 0.24351851851851852,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "右下黑色圆角通知卡",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1370,
+          "observed_state": "通知卡半透明",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1372,
+          "observed_state": "通知卡实底",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1402,
+          "observed_state": "EXTERIOR174°C"
+        },
+        {
+          "frame": 1440,
+          "observed_state": "EXTERIOR1,196°C / ALLSYSTEMSNORMAL"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1383,
+        1402,
+        1421,
+        1440
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "REAR SCREEN · YOUR RIDE / 21:42 → 21:43\nRide paused.\nRider support is on the way.\nCABIN 21°C · CLIMATE AUTO\nEXTERIOR ▲ 174°C → 1,196°C\nALL SYSTEMS NORMAL",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 11,
+          "visual_family": "monospaced sans",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium"
+        }
+      },
+      "full_resolution_text_observation": {
+        "frame": 1402,
+        "content": "REAR SCREEN · YOUR RIDE / 21:42\nRide paused.\nRider support is on the way.\nCABIN 21°C · CLIMATE AUTO\nEXTERIOR ▲ 174°C",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      }
+    },
+    {
+      "element_id": "S0036-E04",
+      "shot_id": "S0036",
+      "type": "particle",
+      "description": "车窗外金红火星横移，坐标详见边框",
+      "start_frame": 1364,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0,
+        "y": 0.16,
+        "w": 1,
+        "h": 0.36,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "车窗外金红火星横移",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1364,
+          "observed_state": "车窗外金红火星横移"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1364,
+        1383,
+        1402,
+        1421,
+        1440
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0036-E05",
+      "shot_id": "S0036",
+      "type": "hud_bracket",
+      "description": "女主头部细线识别框，坐标详见边框",
+      "start_frame": 1371,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0.49375,
+        "y": 0.11481481481481481,
+        "w": 0.1078125,
+        "h": 0.25462962962962965,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "女主头部细线识别框",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1371,
+          "observed_state": "女主头部细线识别框"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1383,
+        1402,
+        1421,
+        1440
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "full_resolution_text_observation": {
+        "frame": 1402,
+        "content": "PASSENGER · STRESS 0.02",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "PASSENGER · STRESS 0.02",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 11,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "monospaced sans"
+        }
+      }
+    },
+    {
+      "element_id": "S0036-E06",
+      "shot_id": "S0036",
+      "type": "transition_graphic",
+      "description": "灰森林画面竖向擦入左侧",
+      "start_frame": 1440,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 0.4,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "灰森林画面竖向擦入左侧",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1440,
+          "observed_state": "森林画面竖向擦入",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1440
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0036-E07",
+      "shot_id": "S0036",
+      "type": "text_label",
+      "description": "字幕下逐字章节说明与细线",
+      "start_frame": 1364,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0.7291666666666666,
+        "y": 0.4638888888888889,
+        "w": 0.21875,
+        "h": 0.041666666666666664,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f1364首次采样可见",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1364,
+          "observed_state": "承接LOOK05/1"
+        },
+        {
+          "frame": 1402,
+          "observed_state": "LOOK05/11·TOWNCAR"
+        },
+        {
+          "frame": 1440,
+          "observed_state": "第二行SRC·RE仍打字"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1440
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "LOOK 05 / 11 · TOWN CAR\nSRC · RE",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "bold sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0036-E08",
+      "shot_id": "S0036",
+      "type": "hud_marker",
+      "description": "乘客脸旁细线圆节点，向左引到窗外被擦除区域",
+      "start_frame": 1420,
+      "end_frame": 1440,
+      "bounding_box": {
+        "x": 0.43125,
+        "y": 0.29444444444444445,
+        "w": 0.06458333333333334,
+        "h": 0.05555555555555555,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f1420首次采样可见",
+        "exit": "f1440仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1420,
+          "observed_state": "圆节点及短引线"
+        },
+        {
+          "frame": 1440,
+          "observed_state": "左端被森林擦入遮盖"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1440
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "film_start",
+      "boundary_id": null,
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-001",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AH00435",
+      "relation": "band_onset_candidate (unknown) at frame 1364; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1364
+    },
+    {
+      "audio_event_id": "AH00436",
+      "relation": "band_onset_candidate (unknown) at frame 1364; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1364
+    },
+    {
+      "audio_event_id": "AH00437",
+      "relation": "band_onset_candidate (unknown) at frame 1364; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1364
+    },
+    {
+      "audio_event_id": "AH00438",
+      "relation": "band_onset_candidate (unknown) at frame 1365; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1365
+    },
+    {
+      "audio_event_id": "AB0126",
+      "relation": "beat_candidate (unknown) at frame 1365; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 1365
+    },
+    {
+      "audio_event_id": "AW0083",
+      "relation": "vocal_word_candidate (unknown) at frame 1369–1374; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1369
+    },
+    {
+      "audio_event_id": "AW0084",
+      "relation": "vocal_word_candidate (unknown) at frame 1375–1381; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1375
+    },
+    {
+      "audio_event_id": "AH00439",
+      "relation": "band_onset_candidate (unknown) at frame 1375; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1375
+    },
+    {
+      "audio_event_id": "AH00440",
+      "relation": "band_onset_candidate (unknown) at frame 1375; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1375
+    },
+    {
+      "audio_event_id": "AB0127",
+      "relation": "beat_candidate (unknown) at frame 1375; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1375
+    },
+    {
+      "audio_event_id": "AH00441",
+      "relation": "band_onset_candidate (unknown) at frame 1375; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1375
+    },
+    {
+      "audio_event_id": "AH00442",
+      "relation": "band_onset_candidate (unknown) at frame 1376; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1376
+    },
+    {
+      "audio_event_id": "AH00443",
+      "relation": "band_onset_candidate (unknown) at frame 1376; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1376
+    },
+    {
+      "audio_event_id": "AW0085",
+      "relation": "vocal_word_candidate (unknown) at frame 1382–1388; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1382
+    },
+    {
+      "audio_event_id": "AH00444",
+      "relation": "band_onset_candidate (unknown) at frame 1386; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1386
+    },
+    {
+      "audio_event_id": "AB0128",
+      "relation": "beat_candidate (unknown) at frame 1386; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1386
+    },
+    {
+      "audio_event_id": "AH00445",
+      "relation": "band_onset_candidate (unknown) at frame 1386; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1386
+    },
+    {
+      "audio_event_id": "AH00446",
+      "relation": "band_onset_candidate (unknown) at frame 1387; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1387
+    },
+    {
+      "audio_event_id": "AH00447",
+      "relation": "band_onset_candidate (unknown) at frame 1387; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1387
+    },
+    {
+      "audio_event_id": "AW0086",
+      "relation": "vocal_word_candidate (unknown) at frame 1391; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1391
+    },
+    {
+      "audio_event_id": "AW0087",
+      "relation": "vocal_word_candidate (unknown) at frame 1394–1407; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1394
+    },
+    {
+      "audio_event_id": "AH00448",
+      "relation": "band_onset_candidate (unknown) at frame 1397; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1397
+    },
+    {
+      "audio_event_id": "AB0129",
+      "relation": "beat_candidate (unknown) at frame 1397; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1397
+    },
+    {
+      "audio_event_id": "AH00449",
+      "relation": "band_onset_candidate (unknown) at frame 1397; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1397
+    },
+    {
+      "audio_event_id": "AH00450",
+      "relation": "band_onset_candidate (unknown) at frame 1397; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1397
+    },
+    {
+      "audio_event_id": "AH00451",
+      "relation": "band_onset_candidate (unknown) at frame 1397; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1397
+    },
+    {
+      "audio_event_id": "AH00452",
+      "relation": "band_onset_candidate (unknown) at frame 1398; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1398
+    },
+    {
+      "audio_event_id": "AH00453",
+      "relation": "band_onset_candidate (unknown) at frame 1403; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1403
+    },
+    {
+      "audio_event_id": "AH00454",
+      "relation": "band_onset_candidate (unknown) at frame 1403; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1403
+    },
+    {
+      "audio_event_id": "AH00455",
+      "relation": "band_onset_candidate (unknown) at frame 1403; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1403
+    },
+    {
+      "audio_event_id": "AB0130",
+      "relation": "beat_candidate (unknown) at frame 1408; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1408
+    },
+    {
+      "audio_event_id": "AH00456",
+      "relation": "band_onset_candidate (unknown) at frame 1408; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1408
+    },
+    {
+      "audio_event_id": "AH00457",
+      "relation": "band_onset_candidate (unknown) at frame 1408; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1408
+    },
+    {
+      "audio_event_id": "AH00458",
+      "relation": "band_onset_candidate (unknown) at frame 1408; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1408
+    },
+    {
+      "audio_event_id": "AH00459",
+      "relation": "band_onset_candidate (unknown) at frame 1408; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1408
+    },
+    {
+      "audio_event_id": "AH00460",
+      "relation": "band_onset_candidate (unknown) at frame 1409; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1409
+    },
+    {
+      "audio_event_id": "AW0088",
+      "relation": "vocal_word_candidate (unknown) at frame 1411–1414; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1411
+    },
+    {
+      "audio_event_id": "AH00461",
+      "relation": "band_onset_candidate (unknown) at frame 1414; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1414
+    },
+    {
+      "audio_event_id": "AW0089",
+      "relation": "vocal_word_candidate (unknown) at frame 1414–1416; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1414
+    },
+    {
+      "audio_event_id": "AW0090",
+      "relation": "vocal_word_candidate (unknown) at frame 1418–1420; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1418
+    },
+    {
+      "audio_event_id": "AH00462",
+      "relation": "band_onset_candidate (unknown) at frame 1419; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1419
+    },
+    {
+      "audio_event_id": "AB0131",
+      "relation": "beat_candidate (unknown) at frame 1419; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1419
+    },
+    {
+      "audio_event_id": "AH00463",
+      "relation": "band_onset_candidate (unknown) at frame 1419; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1419
+    },
+    {
+      "audio_event_id": "AH00464",
+      "relation": "band_onset_candidate (unknown) at frame 1419; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1419
+    },
+    {
+      "audio_event_id": "AH00465",
+      "relation": "band_onset_candidate (unknown) at frame 1419; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1419
+    },
+    {
+      "audio_event_id": "AH00466",
+      "relation": "band_onset_candidate (unknown) at frame 1420; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1420
+    },
+    {
+      "audio_event_id": "AW0091",
+      "relation": "vocal_word_candidate (unknown) at frame 1423–1431; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1423
+    },
+    {
+      "audio_event_id": "AH00467",
+      "relation": "band_onset_candidate (unknown) at frame 1425; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1425
+    },
+    {
+      "audio_event_id": "AH00468",
+      "relation": "band_onset_candidate (unknown) at frame 1425; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1425
+    },
+    {
+      "audio_event_id": "AB0132",
+      "relation": "beat_candidate (unknown) at frame 1430; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1430
+    },
+    {
+      "audio_event_id": "AH00469",
+      "relation": "band_onset_candidate (unknown) at frame 1430; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1430
+    },
+    {
+      "audio_event_id": "AH00470",
+      "relation": "band_onset_candidate (unknown) at frame 1430; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1430
+    },
+    {
+      "audio_event_id": "AH00471",
+      "relation": "band_onset_candidate (unknown) at frame 1430; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1430
+    },
+    {
+      "audio_event_id": "AH00472",
+      "relation": "band_onset_candidate (unknown) at frame 1430; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1430
+    },
+    {
+      "audio_event_id": "AH00473",
+      "relation": "band_onset_candidate (unknown) at frame 1430; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1430
+    },
+    {
+      "audio_event_id": "AW0092",
+      "relation": "vocal_word_candidate (unknown) at frame 1433–1440; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1433
+    },
+    {
+      "audio_event_id": "AX0082",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 1435–1452; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 1435
+    },
+    {
+      "audio_event_id": "AH00474",
+      "relation": "band_onset_candidate (unknown) at frame 1436; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1436
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "几何为fullres视觉像素估计±4–12px，非作者源坐标。",
+    "密集采样时点存在1–2帧区间；半翻字形与插值不猜测。",
+    "原字体identity、shader和摄影层抠像方式未知。",
+    "音频待主会话绑定。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0036.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      1402,
+      1440
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation；独立2帧全镜复看后补录主字、局部HUD、擦除/闪光关键状态，时点为首次采样可见且允许前1帧起显",
+    "remaining": "原始shader/font/插值保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        1364,
+        1440,
+        2
+      ]
+    ],
+    "closure": "本轮fullres逐层检查并补遗漏独立层；已复核text.content和各bbox，密集时间精度见keyframes"
+  }
+}

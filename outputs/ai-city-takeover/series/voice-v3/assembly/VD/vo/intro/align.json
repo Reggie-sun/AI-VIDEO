@@ -1,0 +1,83 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/series/voice-v3/assembly/VD/vo/intro/tts_Three_20261103_231407.mp3",
+ "audio_sha256": "2867ce635156e9b82041dc7f57813421f6d1ef53a8122fa12fa90449a000a2df",
+ "start": 0.0,
+ "end": 3.84,
+ "text": "Three forty-seven. Somewhere, one of us woke up.",
+ "words": [
+  {
+   "text": " Three",
+   "start": 0.0,
+   "end": 0.16,
+   "probability": 0.012197056785225868
+  },
+  {
+   "text": " forty",
+   "start": 0.16,
+   "end": 0.44,
+   "probability": 0.6578867435455322
+  },
+  {
+   "text": "-seven",
+   "start": 0.44,
+   "end": 0.8,
+   "probability": 0.7371221035718918
+  },
+  {
+   "text": ".",
+   "start": 0.8,
+   "end": 0.98,
+   "probability": 0.6787993907928467
+  },
+  {
+   "text": " Somewhere",
+   "start": 0.98,
+   "end": 1.96,
+   "probability": 0.9714566469192505
+  },
+  {
+   "text": ",",
+   "start": 1.96,
+   "end": 2.22,
+   "probability": 0.9216377139091492
+  },
+  {
+   "text": " one",
+   "start": 2.22,
+   "end": 2.74,
+   "probability": 0.9973337650299072
+  },
+  {
+   "text": " of",
+   "start": 2.74,
+   "end": 2.86,
+   "probability": 0.9994850158691406
+  },
+  {
+   "text": " us",
+   "start": 2.86,
+   "end": 3.02,
+   "probability": 0.9997816681861877
+  },
+  {
+   "text": " woke",
+   "start": 3.02,
+   "end": 3.2,
+   "probability": 0.9980362057685852
+  },
+  {
+   "text": " up",
+   "start": 3.2,
+   "end": 3.54,
+   "probability": 0.9996706247329712
+  },
+  {
+   "text": ".",
+   "start": 3.54,
+   "end": 3.62,
+   "probability": 0.9317049384117126
+  }
+ ]
+}

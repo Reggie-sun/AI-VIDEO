@@ -1,0 +1,74 @@
+artifact_id: iris-a01-first-frame-repair-project
+artifacts:
+  brief:
+    artifact_id: iris-a01-first-frame-repair-brief
+    content_hash: d082d3767ad6907015d5ce17f4978b45c8e6bd487605476e2675ab2852419bcf
+    path: creative/iris-a01-first-frame-repair-brief/d082d3767ad6907015d5ce17f4978b45c8e6bd487605476e2675ab2852419bcf.yaml
+    revision: 2
+  characters:
+  - artifact_id: iris-a01-first-frame-repair-character
+    content_hash: 1182dadd969b118c2f68d478938e5157a858e89abf726c590493c28d7a0b3706
+    path: creative/iris-a01-first-frame-repair-character/1182dadd969b118c2f68d478938e5157a858e89abf726c590493c28d7a0b3706.yaml
+    revision: 2
+  scenes:
+  - artifact_id: iris-a01-first-frame-repair-scene
+    content_hash: f090acf7beac005b484a3a19608509b522dde3ee303caaa257d1c692d260faea
+    path: creative/iris-a01-first-frame-repair-scene/f090acf7beac005b484a3a19608509b522dde3ee303caaa257d1c692d260faea.yaml
+    revision: 2
+  shots:
+  - artifact_id: iris-a01-first-frame-repair-shot
+    content_hash: b9d5bf148bac915024d4a3698f0be30e93039a597f54b24d0664863eacffeccc
+    path: creative/iris-a01-first-frame-repair-shot/b9d5bf148bac915024d4a3698f0be30e93039a597f54b24d0664863eacffeccc.yaml
+    revision: 2
+  story:
+    artifact_id: iris-a01-first-frame-repair-story
+    content_hash: ecfa1b8526856e8cca99fc99dd5e2fa2b46bcd925f14d96bd4f096ab576d68e4
+    path: creative/iris-a01-first-frame-repair-story/ecfa1b8526856e8cca99fc99dd5e2fa2b46bcd925f14d96bd4f096ab576d68e4.yaml
+    revision: 2
+  storyboard:
+    artifact_id: iris-a01-first-frame-repair-storyboard
+    content_hash: 8db9e6d9e4d73a25309fc1deaf2a56e1112ca917ec985b8ebe6c71f298b35cc2
+    path: creative/iris-a01-first-frame-repair-storyboard/8db9e6d9e4d73a25309fc1deaf2a56e1112ca917ec985b8ebe6c71f298b35cc2.yaml
+    revision: 2
+asset_root: assets/files
+content_hash: 56c3fc1af8a49b71676df224702a8c8d1dabac7d03da2eb381f340238ca717a5
+creation_receipt_id: iris-a01-first-frame-repair-bootstrap
+default_language: zh
+delivery_profile:
+  codec_profile: h264
+  fps: 30
+  height: 1080
+  width: 1920
+project_id: iris-ep01-a01-first-frame-repair-002
+renderer_policy:
+  allowed:
+  - hyperframes
+  default_preference: hyperframes
+revision: 2
+schema_version: '2.0'
+source_provenance:
+- content_hash: 08aeb291feeacb19d87647af419c0725565c4561b9582f097735ea281ac53c0c
+  kind: user_input
+  reference: evidence/authoring-input/08aeb291feeacb19d87647af419c0725565c4561b9582f097735ea281ac53c0c.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: 635f087286f651075d22ca00c9c71e12969622a7f5481b92e030cad6b0bdb89f
+  kind: user_input
+  reference: evidence/authoring-input/635f087286f651075d22ca00c9c71e12969622a7f5481b92e030cad6b0bdb89f.json
+- content_hash: 9bf6ca4d17685f27fd8d748c3cabb832216109755efac15c38a149ed456405dc
+  kind: user_input
+  reference: evidence/authoring-input/9bf6ca4d17685f27fd8d748c3cabb832216109755efac15c38a149ed456405dc.json
+- content_hash: 9c67d74e5f7ad8458adca64578b33eca7d85869d7c75938ab83d1b5f639d7ae4
+  kind: user_input
+  reference: evidence/authoring-input/9c67d74e5f7ad8458adca64578b33eca7d85869d7c75938ab83d1b5f639d7ae4.json
+- content_hash: 2fd3fb75ff8fbe34aa0648529f2748632c260bf8ba4c4c396b14484d38512640
+  kind: user_input
+  reference: evidence/authoring-input/2fd3fb75ff8fbe34aa0648529f2748632c260bf8ba4c4c396b14484d38512640.json
+title: IRIS EP01 A01 multimodal two-reference repair

@@ -1,0 +1,22 @@
+{
+  "schema": "upstream-song-source-audition/1",
+  "created_at_utc": "2026-10-31T08:55:42.528632+00:00",
+  "purpose": "Restore missing music in30s spoken-word song source audition; not final-film composition",
+  "vocal_source": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/G-guided-retention/1358c281-0a0d-26b1-548a-82c5b306d7d7.wav",
+    "sha256": "b469c215138b3b517dad78c84de0614fdf97821d853059f7c7106f8e99f4df13",
+    "bytes": 5760044
+  },
+  "instrumental_source": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/H-instrumental/9a6a6771-859c-e9c3-8cdf-b5b37c00278c.wav",
+    "sha256": "dda4ce0ed63b1c5dd4736c835d22967cd1e0b82095b822c00b869d77f81e0304",
+    "bytes": 5760044
+  },
+  "operation": "Full equal-length source sum, same source sample0; no source cropping, shifting or speedup",
+  "vocal_gain_db": -1.0,
+  "instrumental_gain_db": -4.0,
+  "peak_ceiling": 0.94,
+  "canonical_film_timing": "Untouched; later integration only through ResolvedTimeline/P4",
+  "human_music_quality": "NOT_EVALUATED",
+  "sung_hook_status": "Still being separately repaired, this restore preview retains G spoken hook"
+}

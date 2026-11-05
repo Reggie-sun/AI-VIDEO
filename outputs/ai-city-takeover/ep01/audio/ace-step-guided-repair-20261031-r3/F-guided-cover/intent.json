@@ -1,0 +1,69 @@
+{
+  "schema": "local-song-guided-cover-unit/1",
+  "series_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/series-intent.json",
+  "series_intent_sha256": "f14a4b9feef75f46fb0626ab3355685311dcddb170731008baf4a3eb4ce0af73",
+  "label": "F",
+  "cumulative_attempt_ordinal": 6,
+  "runtime_root": "/home/reggie/.local/share/ai-video/ace-step/runtime-ca1e85fe",
+  "code_sha": "ca1e85fe9430179831e6bc6be790c332190a3866",
+  "weights_revision": "19671f406d603126926c1b7e2adc169acbcade22",
+  "weights_manifest_path": "/home/reggie/.local/share/ai-video/ace-step/weights-manifest.json",
+  "inputs_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/F-guided-cover/inputs.json",
+  "inputs_sha256": "af913436c0bb91ccb685c9e5f41f1ed810ff86f588fc9576835c5955089332c9",
+  "predecessor_results": [
+    {
+      "result_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/E-sft-cfg/result.json",
+      "result_sha256": "c1516fb6cdfc80e01def5129f2388eeb97052f3b327c67d7d67e026d86f16151",
+      "success": true,
+      "artifact_sha256": "6946a264be015525a680708b8e5becb8b49d083502d55c7645606cffda6b8ca9"
+    }
+  ],
+  "selected_dit": "acestep-v15-sft",
+  "use_lm": false,
+  "source_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "source_intent_sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+  "original_lyrics_sha256": "179b2bc93c75f4767837f0e09df6eb47ebaadc94a7f2134706fd835b7dbb57fe",
+  "lyrics_adaptation": "Only standard section labels and short phrase line breaks; all spoken words, punctuation and order exactly match original",
+  "planned_param_diff_from_B": {
+    "thinking": {
+      "before": true,
+      "after": false
+    },
+    "lyric_section_labels_and_wrapping": "normalized; performance directions moved to caption without deleting meaning"
+  },
+  "automatic_retries": 0,
+  "output_count": 1,
+  "production_state_writes": 0,
+  "created_at_utc": "2026-10-31T05:17:27.721706+00:00",
+  "runner_sha256": "ebfacc2a3a6c778805628e7ccb69408bb2fa695cd8c59c820d7840dd2ef1c0a1",
+  "planned_param_diff_from_C": {
+    "lyrics": "standard labels and short phrase wrapping",
+    "caption": "append original section performance directions removed from labels"
+  },
+  "extra_weights_manifest_path": "/home/reggie/.local/share/ai-video/ace-step/weights-sft-manifest.json",
+  "extra_weights_manifest_sha256": "09fec3e95fbeed0862d1e468863e11be2e50336bfe9f9259d29ec54b8a324ee2",
+  "extra_weights_revision": "c410d249e71ea9385a7b586865e65b1473e1098d",
+  "extra_model_repo": "ACE-Step/acestep-v15-sft",
+  "planned_param_diff_from_D": {
+    "selected_dit": {
+      "before": "acestep-v15-turbo",
+      "after": "acestep-v15-sft"
+    },
+    "inference_steps": {
+      "before": 8,
+      "after": 50
+    },
+    "guidance_scale": 7.0
+  },
+  "guide": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/guide-01/reference-30s.wav",
+    "sha256": "e89ff4fb11b06423e6b40a714a2106d827b0236a77283a7c1bd493ffcdc80c18",
+    "validation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/guide-01/reference-validation.json",
+    "validation_sha256": "0769928216d65983be52bb5a4bb0e6a874ee91f4df6465f8a615bee1a91b7f4d",
+    "asr_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/guide-01/asr.json",
+    "asr_sha256": "4cf6512ba16ea4aa8670082d4657361b9c90d516ac5d633501da58ae0592b5d4"
+  },
+  "planned_change": "Use a byte-bound complete30s spoken rhythm guide in the official cover pathway; preserve song caption and all words",
+  "cover_strength_semantics": "all denoising steps use source semantic context; not a literal vocal-preservation guarantee",
+  "checkpoint_code_authority": "Official sync from pinned package source; downloaded weight/code origins remain separately recorded"
+}

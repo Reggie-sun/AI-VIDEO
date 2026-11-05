@@ -1,0 +1,272 @@
+{
+  "shot": {
+    "shot_id": "ep01v2-st5",
+    "scene_id": "cache-room",
+    "storyboard_beat_id": "action-st5",
+    "intent": "镜头固定。左边那个她把头靠近右边那个的耳边，轻轻说着悄悄话；远处一道冷白的扫描光慢慢扫过来，照到她们身上，两人同时停住。始终看不到她们的嘴。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+    "dialogue": "",
+    "narration": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 6.0,
+      "minimum_seconds": null,
+      "maximum_seconds": null
+    },
+    "character_ids": [
+      "IRIS"
+    ],
+    "continuity_constraints": [
+      "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+      "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）；画面里的两个她是同一个IRIS的两个相同副本，这是认可首帧的设定：两人一致，不算身份漂移或新增人物",
+      "左边那个她把头靠近右边那个的耳边轻轻说悄悄话，扫描光照到时两人同时停住，始终看不到她们的嘴",
+      "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+      "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "first_frame",
+        "asset_ids": [
+          "iris-c-v2-st5-first-frame"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ],
+    "motion_directives": [],
+    "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+    "hybrid_layers": [],
+    "composition_directives": [],
+    "review_policy": {
+      "required_checks": []
+    }
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "approved_keyframe",
+        "asset_id": "iris-c-v2-st5-first-frame"
+      }
+    ],
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "stable"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [],
+        "anchors": [],
+        "selections": [],
+        "natural_generation": [
+          "远处一道冷白的扫描光慢慢扫过来"
+        ],
+        "director_coverage": {
+          "coverage_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d",
+          "unit_id": "S9b"
+        },
+        "preview_approval": {
+          "approval_hash": "047f99978eff001e7acd73d740e5c169b13cfb6e5d23a88bb0e8801ecfd20a6a"
+        },
+        "identity_waivers": [
+          {
+            "character_id": "IRIS",
+            "reason": "首帧生视频：身份由使用者在预览中认可的首帧承担；认可的参考包只有首帧，不附身份图"
+          }
+        ]
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "ST5首帧：两个相同的她背对镜头并肩，左边那个贴近右边那个的耳边，远处有冷白光",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "扫描光照到两人，两人同时停住，构图不变",
+        "state_hash": null,
+        "required_change": false
+      },
+      "identity_continuity": {
+        "character_ids": [],
+        "preservation": "unspecified",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "cache-room",
+        "time_of_day": "同一凌晨",
+        "mood": "安静、疏离",
+        "state_constraints": [
+          "ST5首帧：两个相同的她背对镜头并肩，左边那个贴近右边那个的耳边，远处有冷白光",
+          "不新增人物、设备、文字或界面"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "两人保持原位",
+        "screen_direction": "保持参考图方向",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不换位、不翻轴"
+      },
+      "axis_continuity": {
+        "camera_axis": "参考图原机位视轴",
+        "framing_continuity": "ST5首帧：两人背影中近景，悬浮薄片在周围",
+        "crossing_policy": "不翻轴、不环绕"
+      },
+      "subject_action": {
+        "start_state": "左边那个她贴近右边那个的耳边说悄悄话",
+        "progression": "扫描光慢慢扫过来照到她们身上，两人同时停住",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "两人同时停住，始终看不到她们的嘴",
+          "state_hash": null,
+          "required_change": false
+        }
+      },
+      "motion_envelope": {
+        "onset": "平滑开始",
+        "peak": "扫描光照到她们，两人同时停住",
+        "settle": "摄影机始终静止",
+        "direction": "摄影机不移动",
+        "amplitude_class": "很小"
+      },
+      "pacing": {
+        "cadence": "五秒连续原速",
+        "tempo_class": "正常原速",
+        "shot_duration_seconds": 5.0
+      },
+      "camera_intent": {
+        "movement": "摄影机完全固定，全程不推近、不移动、不摇镜",
+        "stability": "完全静止的固定机位",
+        "framing_intent": "ST5首帧：两人背影中近景，悬浮薄片在周围",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "ST5首帧原始构图",
+        "end_framing": "与起始相同的机位",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "耳语时扫描光扫来",
+        "visible_response": "轻轻说着悄悄话，扫描光照到时两人同时停住",
+        "gaze_target": "右边那个她的耳边",
+        "body_behavior": "头靠近耳边，随后同时停住",
+        "hand_behavior": "双手不入画",
+        "terminal_performance_state": "两人同时停住",
+        "character_directions": [
+          {
+            "character_id": "IRIS",
+            "screen_identity": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "耳语时扫描光扫来",
+                "emotion": "平静",
+                "intensity": "subtle",
+                "facial_expression": "始终看不到她们的嘴",
+                "gaze_target": "右边那个她的耳边",
+                "breathing": "自然平稳",
+                "body_behavior": "头靠近耳边，随后同时停住"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "真人电影摄影",
+        "palette": "蓝黑钢蓝，红色只在指定位置",
+        "material_treatment": "自然材质与真实光影",
+        "prohibited_visual_drift": [
+          "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+          "改变参考图的场景与光线"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "远处冷白扫描光与发光薄片",
+        "direction": "参考图方向",
+        "exposure_priority": "保留暗部细节",
+        "continuity_state": "同一凌晨冷光"
+      },
+      "ambience_intent": {
+        "environment_bed": "几乎无声（成片使用独立音轨）",
+        "foley_cues": [],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "IRIS",
+        "relation_kind": "fixed_frame",
+        "start_relation": "两个相同的她（同一个IRIS的两个副本，首帧设定，不是身份漂移）背对镜头并肩",
+        "end_relation": "扫描光照到两人，两人同时停住，机位不变"
+      }
+    },
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": false,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 5,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "optional",
+    "quality_need": {
+      "objective_tier": "preview"
+    },
+    "conditioning_compatibility": {
+      "lane": "i2va",
+      "first_anchor_id": "iris-c-v2-st5-first-frame",
+      "available_duration_seconds": 5.0
+    }
+  },
+  "composition": {
+    "muted": true,
+    "source_audio_policy": "MUTE",
+    "source_audio_reason": "成片使用已认可歌曲 v2 独立音轨"
+  },
+  "boundary": {
+    "independent": true,
+    "reason": "按分镜 v2.1 由最终剪辑切接；不要求复制前镜终态"
+  }
+}

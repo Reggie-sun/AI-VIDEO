@@ -1,0 +1,134 @@
+{
+  "record_kind": "read_only_recovery_observation",
+  "created_at_utc": "2026-10-31T02:16:04.461690+00:00",
+  "prior_intent_path": "outputs/ai-city-takeover/ep01/audio/suno-xdotool-restart-20261030/intent.json",
+  "prior_intent_sha256": "b4f4e5b151ba6d04fa2a133f91862fa2292b976d200e51aa7b6b581b6a747f65",
+  "account_visible_on_original_window": "sunruijie42",
+  "profile": "cp-e7be810d639e",
+  "observations": {
+    "list": {
+      "argv": [
+        "suno",
+        "--json",
+        "--no-browser",
+        "list"
+      ],
+      "exit_code": 0,
+      "status": "success",
+      "observed_at_utc": "2026-10-31T02:16:03.715713+00:00",
+      "clip_count": 6,
+      "has_more": false,
+      "clips": [
+        {
+          "id": "fc0af846-fba9-49ae-bd0c-d6c9e43e7740",
+          "title": "cold-open-title suspense_atmosphere",
+          "status": "complete",
+          "created_at": "2026-10-25T22:03:15.080Z",
+          "model_name": "chirp-hawk"
+        },
+        {
+          "id": "31d31b57-b210-4f14-b1dc-6199f99f6573",
+          "title": "cold-open-title suspense_atmosphere",
+          "status": "complete",
+          "created_at": "2026-10-25T22:03:15.080Z",
+          "model_name": "chirp-hawk"
+        },
+        {
+          "id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+          "title": "Scene04 修复台：两个源文件的缺口 instrumental_bed",
+          "status": "complete",
+          "created_at": "2026-10-25T21:33:01.184Z",
+          "model_name": "chirp-hawk"
+        },
+        {
+          "id": "e3599d34-c24a-4750-ad48-69825671da9b",
+          "title": "Scene04 修复台：两个源文件的缺口 instrumental_bed",
+          "status": "complete",
+          "created_at": "2026-10-25T21:33:01.184Z",
+          "model_name": "chirp-hawk"
+        },
+        {
+          "id": "e61e327c-4e53-4e68-9e52-118e3ac0cb64",
+          "title": "失帧｜空位动机",
+          "status": "complete",
+          "created_at": "2026-10-25T21:13:39.996Z",
+          "model_name": "chirp-hawk"
+        },
+        {
+          "id": "6de433ab-dab5-4ca4-a0f5-7665a0d48c01",
+          "title": "失帧｜空位动机",
+          "status": "complete",
+          "created_at": "2026-10-25T21:13:39.996Z",
+          "model_name": "chirp-hawk"
+        }
+      ]
+    },
+    "credits": {
+      "argv": [
+        "suno",
+        "--json",
+        "--no-browser",
+        "credits"
+      ],
+      "exit_code": 0,
+      "status": "success",
+      "observed_at_utc": "2026-10-31T02:16:04.460895+00:00",
+      "total_credits_left": 2470,
+      "monthly_usage": 30,
+      "monthly_limit": 2500
+    }
+  },
+  "doctor_observation": {
+    "observed_at_utc": "2026-10-31T02:14Z",
+    "status": "success",
+    "captcha_preflight": "required: true",
+    "detail": "generation uses the captcha provider selected by Suno"
+  },
+  "screenshots": [
+    {
+      "file": "original-window.png",
+      "window_id": 205520910,
+      "sha256": "e2104bce152f8d12da61e8e9a599379c847bbe237fb26d38c300c9e68b9556dc",
+      "visual_observation": "Normal Suno create form; no visible challenge or submission-result notification in captured viewport",
+      "challenge_solving": false
+    },
+    {
+      "file": "second-window.png",
+      "window_id": 205520999,
+      "sha256": "9dde4175f4c3df7adab15aaf9ad1cfe8c9bdae6a6a7d16677688d570b7a045f9",
+      "visual_observation": "Normal Suno create form; no visible challenge or submission-result notification in captured viewport",
+      "challenge_solving": false
+    }
+  ],
+  "current_create_clicks": 0,
+  "current_generation_submissions": 0,
+  "prior_unknown_outcomes": "PRESERVED",
+  "song_generation": "NOT_CONFIRMED",
+  "settled_current_generation_charge": "NOT_APPLICABLE_NO_GENERATION_SUBMITTED_THIS_CONTINUATION",
+  "historical_settlement": "NOT_CONFIRMED",
+  "assembly_validation": {
+    "argv": [
+      "python",
+      "outputs/ai-city-takeover/ep01/assembly-preparation/prepare.py",
+      "validate",
+      "--require-preview-ready"
+    ],
+    "exit_code": 2,
+    "source_bytes_and_receipts": "PASS",
+    "typed_asset_candidates": 6,
+    "typed_shot_candidates": 8,
+    "preview_ready": false,
+    "final_compose_ready": false,
+    "state_writes": 0,
+    "provider_calls": 0
+  },
+  "blocking_prerequisite": "Human confirmation of previous challenge result or exact platform outcome identity; no new Create while prior result is unknown",
+  "record_assessment": {
+    "outcome": "no_record",
+    "reason": "Read-only follow-up to the existing Suno recovery record; no material implementation, new media result or newly resolved prior request"
+  },
+  "learning_assessment": "no_candidate",
+  "source_edits": 0,
+  "index_mutations": 0,
+  "commit_push": "NOT_PERFORMED_FINAL_OUTPUT_NOT_ACCEPTED"
+}

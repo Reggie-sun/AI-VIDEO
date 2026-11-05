@@ -1,0 +1,1193 @@
+{
+  "shot_id": "S0082",
+  "start_frame": 3724,
+  "end_frame": 3777,
+  "duration_frames": 54,
+  "start_time": 155.1667,
+  "end_time": 157.4167,
+  "duration_s": 2.25,
+  "start_tc": "00:02:35:04",
+  "end_tc": "00:02:37:09",
+  "boundary_in_id": "B2-013",
+  "boundary_in_type": "zoom_punch_cut",
+  "boundary_in_span": [
+    3722,
+    3724
+  ],
+  "boundary_out_id": "B2-014",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 3724,
+      "end_frame": 3726,
+      "event": "瞳孔06极近景",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3724,
+        3726
+      ],
+      "description": "瞳孔06极近景",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3727,
+      "end_frame": 3729,
+      "event": "双眼全景与逃生图出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3727,
+        3729
+      ],
+      "description": "双眼全景与逃生图出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3733,
+      "end_frame": 3735,
+      "event": "IRIS卡框出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3733,
+        3735
+      ],
+      "description": "IRIS卡框出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3736,
+      "end_frame": 3738,
+      "event": "卡内06落定",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3736,
+        3738
+      ],
+      "description": "卡内06落定",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3742,
+      "end_frame": 3744,
+      "event": "等高线入画",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3742,
+        3744
+      ],
+      "description": "等高线入画",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3745,
+      "end_frame": 3747,
+      "event": "底部歌词至the",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3745,
+        3747
+      ],
+      "description": "底部歌词至the",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3748,
+      "end_frame": 3750,
+      "event": "permanent；逃生图锁图标出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3748,
+        3750
+      ],
+      "description": "permanent；逃生图锁图标出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3757,
+      "end_frame": 3759,
+      "event": "UNDERCLASS橙底",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3757,
+        3759
+      ],
+      "description": "UNDERCLASS橙底",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3760,
+      "end_frame": 3762,
+      "event": "UNDERCLASS黑白字；底部underclass",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3760,
+        3762
+      ],
+      "description": "UNDERCLASS黑白字；底部underclass",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3777,
+      "end_frame": 3777,
+      "event": "IRIS卡打到GAZE光标",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3777,
+        3777
+      ],
+      "description": "IRIS卡打到GAZE光标",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描。左下白色逃生门剖面图更新位置，尾段UNDERCLASS横跨眼睛。",
+  "reference_frames": [
+    {
+      "frame": 3724,
+      "path": "keyframes/S0082_f03724.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3737,
+      "path": "keyframes/S0082_f03737.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3751,
+      "path": "keyframes/S0082_f03751.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3764,
+      "path": "keyframes/S0082_f03764.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3777,
+      "path": "keyframes/S0082_f03777.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3750,
+      "path": "work/full_batch/03750.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    }
+  ],
+  "composition": {
+    "shot_size": "extreme close-up",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.08,
+      "y": 0,
+      "w": 0.9,
+      "h": 0.93,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描。左下白色逃生门剖面图更新位置，尾段UNDERCLASS横跨眼睛。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0006, \"pan_y_frac_per_s\": 0.0009, \"zoom_per_s\": 0.0046, \"median_flow_frac_per_s\": 0.003, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[90.5, 98.4, 104.2]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#928895",
+        "fraction": 0.184,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#564540",
+        "fraction": 0.181,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#80767F",
+        "fraction": 0.179,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#685D63",
+        "fraction": 0.179,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#2C2923",
+        "fraction": 0.163,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#D7D5D0",
+        "fraction": 0.113,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[90.5, 98.4, 104.2]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0082-E01",
+      "shot_id": "S0082",
+      "type": "background_media",
+      "description": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描。左下白色逃生门剖面图更新位置，尾段UNDERCLASS横跨眼睛。",
+      "start_frame": 3724,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描。左下白色逃生门剖面图更新位置，尾段UNDERCLASS横跨眼睛。"
+      },
+      "motion": {
+        "path": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描。左下白色逃生门剖面图更新位置，尾段UNDERCLASS横跨眼睛。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3724–3777；入口按密采事件区间±2帧。",
+        "exit": "3777为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3724,
+          "state": "瞳孔06极近景"
+        },
+        {
+          "frame": 3727,
+          "state": "双眼全景与逃生图出现"
+        },
+        {
+          "frame": 3733,
+          "state": "IRIS卡框出现"
+        },
+        {
+          "frame": 3736,
+          "state": "卡内06落定"
+        },
+        {
+          "frame": 3742,
+          "state": "等高线入画"
+        },
+        {
+          "frame": 3745,
+          "state": "底部歌词至the"
+        },
+        {
+          "frame": 3748,
+          "state": "permanent；逃生图锁图标出现"
+        },
+        {
+          "frame": 3757,
+          "state": "UNDERCLASS橙底"
+        },
+        {
+          "frame": 3760,
+          "state": "UNDERCLASS黑白字；底部underclass"
+        },
+        {
+          "frame": 3777,
+          "state": "IRIS卡打到GAZE光标"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3724,
+        3737,
+        3751,
+        3764,
+        3777
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0082-E02",
+      "shot_id": "S0082",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 3724,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0.08,
+        "y": 0,
+        "w": 0.9,
+        "h": 0.93,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描。左下白色逃生门剖面图更新位置，尾段UNDERCLASS横跨眼睛。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3724–3777；入口按密采事件区间±2帧。",
+        "exit": "3777为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3724,
+          "state": "瞳孔06极近景"
+        },
+        {
+          "frame": 3727,
+          "state": "双眼全景与逃生图出现"
+        },
+        {
+          "frame": 3733,
+          "state": "IRIS卡框出现"
+        },
+        {
+          "frame": 3736,
+          "state": "卡内06落定"
+        },
+        {
+          "frame": 3742,
+          "state": "等高线入画"
+        },
+        {
+          "frame": 3745,
+          "state": "底部歌词至the"
+        },
+        {
+          "frame": 3748,
+          "state": "permanent；逃生图锁图标出现"
+        },
+        {
+          "frame": 3757,
+          "state": "UNDERCLASS橙底"
+        },
+        {
+          "frame": 3760,
+          "state": "UNDERCLASS黑白字；底部underclass"
+        },
+        {
+          "frame": 3777,
+          "state": "IRIS卡打到GAZE光标"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3724,
+        3737,
+        3751,
+        3764,
+        3777
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0082-E03",
+      "shot_id": "S0082",
+      "type": "hud_panel",
+      "description": "右上IRIS白面板x0.73 y0.23 w0.21 h0.23，两黑格橙数字06及右侧分析文本。",
+      "start_frame": 3733,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0.74,
+        "y": 0.24,
+        "w": 0.2,
+        "h": 0.22,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右上IRIS白面板x0.73 y0.23 w0.21 h0.23，两黑格橙数字06及右侧分析文本。"
+      },
+      "motion": {
+        "path": "右上IRIS白面板x0.73 y0.23 w0.21 h0.23，两黑格橙数字06及右侧分析文本。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3733–3777；入口按密采事件区间±2帧。",
+        "exit": "3777为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3733,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.74,
+            "y": 0.24,
+            "w": 0.2,
+            "h": 0.22,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3777,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3737,
+        3751,
+        3764,
+        3777
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "IRIS L · REFLECTION | MIRROR ⇄ | 06 | BOARD READS 06 | UNIT · MONTHS | PUPIL 4.1 MM | GAZE",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0082-E04",
+      "shot_id": "S0082",
+      "type": "deco_graphic",
+      "description": "白色细等高线条沿皮肤轮廓扫描，3738起显著。",
+      "start_frame": 3742,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "白色细等高线条沿皮肤轮廓扫描，3738起显著。"
+      },
+      "motion": {
+        "path": "白色细等高线条沿皮肤轮廓扫描，3738起显著。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3742–3777；入口按密采事件区间±2帧。",
+        "exit": "3777为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3742,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3777,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3751,
+        3764,
+        3777
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0082-E05",
+      "shot_id": "S0082",
+      "type": "hud_chart",
+      "description": "左下双层逃生口PLAN/ELEVATION白卡，红线与YOU点向下移动，永久底层区变橙。",
+      "start_frame": 3727,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.5,
+        "w": 0.16,
+        "h": 0.4,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左下双层逃生口PLAN/ELEVATION白卡，红线与YOU点向下移动，永久底层区变橙。"
+      },
+      "motion": {
+        "path": "左下双层逃生口PLAN/ELEVATION白卡，红线与YOU点向下移动，永久底层区变橙。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3727–3777；入口按密采事件区间±2帧。",
+        "exit": "3777为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3727,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.5,
+            "w": 0.16,
+            "h": 0.4,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3777,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3737,
+        3751,
+        3764,
+        3777
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "FIG. 1 · ESCAPE HATCH PLAN / ELEV. | PLAN · OPENING ∝ MONTHS LEFT | CH.1 · 18 MO | 6 MO | ELEVATION | PERMANENT | YOU",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0082-E06",
+      "shot_id": "S0082",
+      "type": "text_title",
+      "description": "3759附近UNDERCLASS.顶左白黑混色大字。",
+      "start_frame": 3757,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.12,
+        "w": 0.55,
+        "h": 0.14,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "3759附近UNDERCLASS.顶左白黑混色大字。"
+      },
+      "motion": {
+        "path": "3759附近UNDERCLASS.顶左白黑混色大字。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3757–3777；入口按密采事件区间±2帧。",
+        "exit": "3777为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3757,
+          "text": "UNDERCLASS.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3764,
+        3777
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "UNDERCLASS.",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 180 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0082-E07",
+      "shot_id": "S0082",
+      "type": "text_lyric",
+      "description": "底部白歌词，永久底层词转橙，逐词出现。",
+      "start_frame": 3727,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0.22,
+        "y": 0.89,
+        "w": 0.6,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "底部白歌词，永久底层词转橙，逐词出现。"
+      },
+      "motion": {
+        "path": "底部白歌词，永久底层词转橙，逐词出现。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3727–3777；入口按密采事件区间±2帧。",
+        "exit": "3777为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3727,
+          "text": "You have 6 months to",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3736,
+          "text": "You have 6 months to escape",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3745,
+          "text": "You have 6 months to escape the",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3748,
+          "text": "You have 6 months to escape the permanent",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3760,
+          "text": "You have 6 months to escape the permanent underclass",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3737,
+        3751,
+        3764,
+        3777
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "You have 6 months to escape the permanent underclass",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0082-E08",
+      "shot_id": "S0082",
+      "type": "counter",
+      "description": "蓝色瞳孔内部白色06反射，位于左眼虹膜；初帧为全幅极近景，3727后缩入眼中，与右IRIS卡独立。",
+      "start_frame": 3724,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0.39,
+        "y": 0.33,
+        "w": 0.1,
+        "h": 0.09,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "蓝色瞳孔内部白色06反射，位于左眼虹膜；初帧为全幅极近景，3727后缩入眼中，与右IRIS卡独立。"
+      },
+      "motion": {
+        "path": "蓝色瞳孔内部白色06反射，位于左眼虹膜；初帧为全幅极近景，3727后缩入眼中，与右IRIS卡独立。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3724起±2帧，参见逐3帧密采",
+        "exit": "3777末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3724,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.39,
+            "y": 0.33,
+            "w": 0.1,
+            "h": 0.09,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3777,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3724,
+        3737,
+        3751,
+        3764,
+        3777,
+        3750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "06",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "cap height approx 180 px at 1920x1080; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    },
+    {
+      "element_id": "S0082-E09",
+      "shot_id": "S0082",
+      "type": "text_label",
+      "description": "左上白条DEPTH SCAN状态随等高线推进，ISO编号变化。",
+      "start_frame": 3727,
+      "end_frame": 3777,
+      "bounding_box": {
+        "x": 0.033,
+        "y": 0.159,
+        "w": 0.14,
+        "h": 0.025,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "左上白条DEPTH SCAN状态随等高线推进，ISO编号变化。"
+      },
+      "motion": {
+        "path": "左上白条DEPTH SCAN状态随等高线推进，ISO编号变化。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3727起±2帧，参见逐3帧密采",
+        "exit": "3777末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3727,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.033,
+            "y": 0.159,
+            "w": 0.14,
+            "h": 0.025,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3777,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3737,
+        3751,
+        3764,
+        3777,
+        3750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "DEPTH SCAN · ISO 10/14 · Δ 0.05",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0082-A03",
+      "target_element_ids": [
+        "S0082-E03"
+      ],
+      "description": "右上IRIS白面板x0.73 y0.23 w0.21 h0.23，两黑格橙数字06及右侧分析文本。",
+      "start_frame": 3733,
+      "end_frame": 3777,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0082-A04",
+      "target_element_ids": [
+        "S0082-E04"
+      ],
+      "description": "白色细等高线条沿皮肤轮廓扫描，3738起显著。",
+      "start_frame": 3742,
+      "end_frame": 3777,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0082-A05",
+      "target_element_ids": [
+        "S0082-E05"
+      ],
+      "description": "左下双层逃生口PLAN/ELEVATION白卡，红线与YOU点向下移动，永久底层区变橙。",
+      "start_frame": 3727,
+      "end_frame": 3777,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0082-A06",
+      "target_element_ids": [
+        "S0082-E06"
+      ],
+      "description": "3759附近UNDERCLASS.顶左白黑混色大字。",
+      "start_frame": 3757,
+      "end_frame": 3777,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0082-A07",
+      "target_element_ids": [
+        "S0082-E07"
+      ],
+      "description": "底部白歌词，永久底层词转橙，逐词出现。",
+      "start_frame": 3727,
+      "end_frame": 3777,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AB0343",
+      "relation": "beat_candidate (unknown) at frame 3724; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3724
+    },
+    {
+      "audio_event_id": "AW0258",
+      "relation": "vocal_word_candidate (unknown) at frame 3724–3727; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3724
+    },
+    {
+      "audio_event_id": "AW0259",
+      "relation": "vocal_word_candidate (unknown) at frame 3729–3740; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3729
+    },
+    {
+      "audio_event_id": "AB0344",
+      "relation": "beat_candidate (unknown) at frame 3735; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3735
+    },
+    {
+      "audio_event_id": "AW0260",
+      "relation": "vocal_word_candidate (unknown) at frame 3741–3743; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3741
+    },
+    {
+      "audio_event_id": "AW0261",
+      "relation": "vocal_word_candidate (unknown) at frame 3745–3755; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3745
+    },
+    {
+      "audio_event_id": "AB0345",
+      "relation": "beat_candidate (unknown) at frame 3746; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3746
+    },
+    {
+      "audio_event_id": "AB0346",
+      "relation": "beat_candidate (unknown) at frame 3757; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3757
+    },
+    {
+      "audio_event_id": "AW0262",
+      "relation": "vocal_word_candidate (unknown) at frame 3758–3788; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3758
+    },
+    {
+      "audio_event_id": "AB0347",
+      "relation": "beat_candidate (unknown) at frame 3768; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3768
+    },
+    {
+      "audio_event_id": "AH01520",
+      "relation": "band_onset_candidate (unknown) at frame 3768; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3768
+    },
+    {
+      "audio_event_id": "AH01521",
+      "relation": "band_onset_candidate (unknown) at frame 3768; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3768
+    },
+    {
+      "audio_event_id": "AH01522",
+      "relation": "band_onset_candidate (unknown) at frame 3768; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3768
+    },
+    {
+      "audio_event_id": "AH01523",
+      "relation": "band_onset_candidate (unknown) at frame 3768; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3768
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0082.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "zoom_punch_cut",
+      "boundary_id": "B2-013",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        3722,
+        3724
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B2-014",
+      "description": "少女蓝眼极近景由瞳孔中的06开始拉开至倾斜双眼面部，右上白色IRIS卡复述06，面部等高线自上左向右下扫描。左下白色逃生门剖面图更新位置，尾段UNDERCLASS横跨眼睛。",
+      "span": [
+        3777,
+        3777
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "You have 6 months to escape the permanent underclass.",
+    "UNDERCLASS.",
+    "IRIS L · REFLECTION",
+    "BOARD READS 06",
+    "UNIT · MONTHS",
+    "PUPIL 4.1 MM"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      3750,
+      3777
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

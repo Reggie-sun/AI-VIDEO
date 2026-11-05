@@ -1,0 +1,51 @@
+artifact_id: iris-v2-n4-shot
+character_ids:
+- IRIS
+composition_directives: []
+content_hash: 356c4faf6e5cbbdb6b8d97e6e23f826e6a4e3fa0521e2e1b61a695843a1202eb
+continuity_constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）
+- 她在薄片之间慢慢走，抬手用指尖碰到一块薄片，薄片泛起柔光后漂开，她收回手继续走，神情平静，嘴唇自然闭合
+- 镜头缓慢横移跟随她
+- 画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡
+creation_receipt_id: iris-v2-N4-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: 镜头缓慢横移跟随。她在悬浮的发光薄片之间慢慢走，抬手用指尖碰到一块薄片，薄片泛起一圈柔光后微微漂开，她收回手继续向前走，神情平静，嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-c-v2-n4-first-frame
+  role: first_frame
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: cache-room
+schema_version: '2.0'
+shot_id: ep01v2-n4
+source_provenance:
+- content_hash: 77cf5d64807373ac092b262e4a9f1bf7e36d9822a45948285b1940acb7c8373f
+  kind: user_input
+  reference: evidence/authoring-input/77cf5d64807373ac092b262e4a9f1bf7e36d9822a45948285b1940acb7c8373f.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 36efa492b9dd938f024eb176e5d47b92c24bc930f66a909f7a9e8b7180018034
+  kind: user_input
+  reference: evidence/authoring-input/36efa492b9dd938f024eb176e5d47b92c24bc930f66a909f7a9e8b7180018034.json
+storyboard_beat_id: action-n4
+visual_strategy: generated_video

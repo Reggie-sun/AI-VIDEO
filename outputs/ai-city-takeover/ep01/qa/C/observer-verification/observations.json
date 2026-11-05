@@ -1,0 +1,164 @@
+{
+  "scope": "Independent analyzer QA observations only; no Product lifecycle/acceptance mutation",
+  "shot_id": "ep01-dns",
+  "source_sha256": "974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15",
+  "source_size_bytes": 12706989,
+  "project_revision": 1,
+  "qa_policy_hash": "b0dbc8e38b2fa0955a613cc33240dafbb7ff69221b6229b95d7ce08d5bb5cacd",
+  "acceptance_profile_hash": "104bc2f01bf0963eceb0375f2e8a84c5c4dd95a166d7edbf88e638728bcdfe58",
+  "required_requirement_ids": [
+    "identity",
+    "observer",
+    "camera",
+    "monitor-back"
+  ],
+  "sealed_observables": {
+    "identity": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "observer": "保持认可A03的身体朝向与设备视线，嘴唇自然静置，不出现说话或演唱的连续口型；不操作设备、不敲键盘、不抬手；自然呼吸或眨眼属可接受变化，不要求必须观察到某次事件",
+    "camera": "沿原视轴极缓慢微幅推近，保持原观察侧与人物、显示器背面的相对位置，末段平滑收稳",
+    "monitor-back": "保持显示器背面、背壳与支架，绝不转向正面或向背面贴图；新闻解释图形由独立剪辑承接"
+  },
+  "references": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/reference-package/A03-v1.png",
+      "sha256": "24e5bb452e90e1c9566ad914ac11213cfaecb9596131db6a1b8b5f585199ca0f"
+    },
+    {
+      "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+      "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+    }
+  ],
+  "preceding_accepted_gate": {
+    "path": "outputs/ai-city-takeover/ep01/qa/A01-v2/post-media-gate.json",
+    "sha256": "69a428fad163a3473c189a839919caadf5b830eb0fd15e91fc33a7ec124c14b6",
+    "verdict": "PASS",
+    "relation": "Approved new Scene cut; retain identity/costume/time/cold palette, not a continuous camera move across rooms"
+  },
+  "original_project_mcp_evidence": [
+    {
+      "path": "../mcp-analysis.json",
+      "sha256": "c7aef6de8713fb1c215a7e4b5f6db07c686dd84ecdef2f6064f096ed82a4caa2"
+    },
+    {
+      "path": "../mcp-review.json",
+      "sha256": "7a344448a68d3d49bd3548a7fc812c14fb5b7b8dcbd910672cba493c308405a5"
+    }
+  ],
+  "video_timing": {
+    "decoded_frame_count": 145,
+    "video_duration_seconds": 6.016667,
+    "container_duration_seconds": 6.08,
+    "r_frame_rate": "60/1",
+    "avg_frame_rate": "8700/361",
+    "timing_interpretation": "VFR timestamps; do not describe as constant60fps"
+  },
+  "normal_speed_playback": {
+    "rate": 1,
+    "ended": true,
+    "wall_seconds": 6.338,
+    "total_video_frames": 145,
+    "dropped_video_frames": 0,
+    "corrupted_video_frames": 0,
+    "callback_count": 145,
+    "full_frame_live_samples": 13,
+    "muted": true,
+    "evidence": "normal-speed-playback.json",
+    "human_acceptance": "NOT_EVALUATED"
+  },
+  "dense_visual_evidence": {
+    "face_frames": 145,
+    "full_frames": 73,
+    "full_frame_source_indices": "0,2,4,...,144",
+    "timestamp_source": "frame-probe.json"
+  },
+  "findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "对照实际A03、ID7b及全部145个PTS脸部样本与正常速度全片：同一女性面貌、浅肤雀斑、灰蓝眼、深棕后梳低髻、解剖左耳黑色耳挂、左领细红线与炭黑高领大衣保持。未见换脸、装置换侧或服装/五官显著形变；与前序A01v2接受的身份、服装和凌晨冷光一致。这是已批准新Scene的切镜，未增设连续穿越要求。",
+      "evidence_refs": [
+        "face-sheet-000.jpg",
+        "face-sheet-049.jpg",
+        "face-sheet-098.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json"
+      ]
+    },
+    {
+      "requirement_id": "observer",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "保持A03的原身体朝向和看向左侧设备的视线。嘴唇自然静置，仅小幅自然微变化，没有连续说话/演唱式开合；145脸部帧、73个约12fps全幅样本及1x全片中未见抬手、伸手操作设备、敲键盘或转身。当前observable明确自然呼吸/眨眼属于可接受变化而非必须发生的独立事件，因此不另设可见呼吸幅度或眨眼计数门槛。",
+      "evidence_refs": [
+        "face-sheet-000.jpg",
+        "face-sheet-049.jpg",
+        "face-sheet-098.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json",
+        "full-sheet-000.jpg",
+        "full-sheet-025.jpg",
+        "full-sheet-050.jpg"
+      ]
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "正常速度和0至6秒密集全幅序列显示极小、连续的靠近变化；人物留在右侧，显示器背面留在左前景，观察侧、视轴侧及二者的空间关系不变，无翻轴、环绕、突然拉远或切镜。末段5.5至6秒平稳收束，无突然变焦/机位跳动。不把2D图像观察冒称物理3D轨迹测量，也未新增未封存的像素锁定要求。",
+      "evidence_refs": [
+        "full-sheet-000.jpg",
+        "full-sheet-025.jpg",
+        "full-sheet-050.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json",
+        "../mcp-review.json"
+      ]
+    },
+    {
+      "requirement_id": "monitor-back",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "73个密集全幅样本及正常速度全片内始终为显示器背壳、背部连接结构与支架，未转出正面显示面，背壳未被贴入新闻画面、文字或发光界面；未新增剧情字幕、片名或新闻图形。仅保留用户允许的平台AI生成标识，新闻解释继续由独立图形素材剪辑承接。",
+      "evidence_refs": [
+        "full-sheet-000.jpg",
+        "full-sheet-025.jpg",
+        "full-sheet-050.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json",
+        "../mcp-review.json"
+      ]
+    }
+  ],
+  "overall_verdict": "PASS",
+  "all_required_observed_pass": true,
+  "authority_boundary": "Parent must record through canonical feedback/Gate owners. This report does not issue a submit permit, activate assets, or establish human/final acceptance.",
+  "new_provider_calls": 0,
+  "canonical_state_writes": 0,
+  "human_acceptance": "NOT_EVALUATED",
+  "audio_meaning_or_listening": "NOT_EVALUATED"
+}

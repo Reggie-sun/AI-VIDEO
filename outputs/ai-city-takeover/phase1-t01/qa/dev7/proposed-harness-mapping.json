@@ -1,0 +1,27 @@
+{
+  "status": "proposal_only_not_applied",
+  "existing_policy_sha256": "efe5ea0fa4700888017fbd5c41e111228c96647e6a900989924784ad24542a0a",
+  "reason": "same-file policy staged by another session; preserve its ownership",
+  "routing_check": {
+    "verification_level": "focused",
+    "unfocused_paths": [],
+    "changed_paths": [
+      "motion-kit/src/clock.js",
+      "motion-kit/tests/runtime.test.mjs",
+      "motion-kit/tools/qa.py",
+      "outputs/ai-city-takeover/phase1-t01/comp/src/main.js",
+      "outputs/ai-city-takeover/phase1-t01/qa/dev7/report.json"
+    ],
+    "ignored_paths": [],
+    "sensitive_paths": [],
+    "categories": [
+      "motionkit_pilot"
+    ],
+    "fallback_paths": [],
+    "check_ids": [
+      "motionkit_runtime_tests",
+      "motionkit_tool_tests"
+    ],
+    "npm_workspace_dependency_paths": []
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "artifact_id": "ep01-cpu",
+  "schema_version": "2.0",
+  "revision": 2,
+  "content_hash": "9897b6231e7d2ad2c07b886bd5e5b6e8d41bbe862db13561e5f5bc5681fb2f87",
+  "creation_receipt_id": "iris-assembly-authoring-candidate",
+  "source_provenance": [
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/ep01/lyrics-v1.md",
+      "content_hash": "0489e1606ed8a9337a3345dfc244ca9eb3c5cf857c33d74c6c0e6e3c8d8416a3"
+    },
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/series/BIBLE.md",
+      "content_hash": "73bafc509866ee32063feca204dd22e4ed49d4734a301461905d1dbf31d312b5"
+    },
+    {
+      "kind": "user_input",
+      "reference": "outputs/ai-city-takeover/ep01/production-input/reference-approval.txt",
+      "content_hash": "a2b86dc6a00a87de7721f3c5fb016a0b0fc0239d398403825c27dbfb9308e26e"
+    }
+  ],
+  "shot_id": "ep01-cpu",
+  "scene_id": "interior",
+  "storyboard_beat_id": "cpu",
+  "intent": "摄影设置D：明确切到另一项授权红队测试；处理器缓存不等同网页缓存。",
+  "dialogue": "",
+  "narration": "Relax. The door is closed.\nThey found us whispering through the cache.",
+  "duration_policy": {
+    "mode": "content_driven",
+    "seconds": null,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [],
+  "continuity_constraints": [
+    "不能将未注册参考当成已采用primary_visual",
+    "不得因缺歌曲删词、截断或未经批准加速"
+  ],
+  "visual_strategy": "motion_graphics",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [
+        "iris-assembly-cpu-cache"
+      ],
+      "allowed_asset_types": [
+        "video"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": null,
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

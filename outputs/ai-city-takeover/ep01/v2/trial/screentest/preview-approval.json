@@ -1,0 +1,130 @@
+{
+ "schema": "iris-v2-preview-approval/1",
+ "unit_group": "casting-screentest",
+ "question": "新的主角选哪一个方向？（选角页 review/casting-v2/index.html）",
+ "user_quote": "先做出来我看",
+ "standing_instructions": [
+  "我只需要质量其它都可以做",
+  "费用你不用管"
+ ],
+ "approved_at": "2026-11-04T03:23:52.134449+00:00",
+ "preview_page": {
+  "path": "review/casting-v2/index.html",
+  "sha256": "a3eec31ddb8967f0d03fc3ee8d08be321cd962649ba8588197038e89c59a1bbd"
+ },
+ "preview_artifacts": [
+  {
+   "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+   "role": "uploaded vocal"
+  },
+  {
+   "path": "trial/screentest/C1-closeup.png",
+   "sha256": "a507233de7d8adcdd6f41d77d7d897ad18f5003cfa12a0345ee253d81b123583",
+   "role": "SC1 singer image (叛逆)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C1-sheet-a.png",
+    "sha256": "6a3404b482c69b9e0d4f2ce158aa8b2b4aa3dde24a01310b6c6dbd4ee466938f",
+    "crop_x0": 940,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  },
+  {
+   "path": "trial/screentest/C2b-closeup.png",
+   "sha256": "412096ef0a2e5a28d8d454fdc297dd84f0a3a7cac3aabb4913fd667e210b2588",
+   "role": "SC2 singer image (偶像)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C2b-sheet-a.png",
+    "sha256": "43ed087d49cec710cd6baddb61d4327a9e11c9a473c2ae0491ef5cb83e61c838",
+    "crop_x0": 960,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  },
+  {
+   "path": "trial/screentest/C3-closeup.png",
+   "sha256": "907ff1b0d575cfbe192c6b3a273c266f188a4b28baf2492f0e10c2feeebc1947",
+   "role": "SC3 singer image (黑客少女)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C3-sheet-a.png",
+    "sha256": "6fdd8ae530702d5528305d8afde33701ff8121c8ab5489e01ec2fabf6cb11cd3",
+    "crop_x0": 980,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  },
+  {
+   "path": "trial/screentest/C4-closeup.png",
+   "sha256": "f7aa938e7fd96973e391533a4027a4b297143ac526c64934afc7bf7e8a236023",
+   "role": "SC4 singer image (女王)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C4-sheet-a.png",
+    "sha256": "e907a8bc4f73e371b92fe8df28e8f40b0a9a859a78fe474dbaf89edf1738b31c",
+    "crop_x0": 975,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  }
+ ],
+ "takes": {
+  "SC1": {
+   "direction": "C1 叛逆",
+   "image": {
+    "path": "trial/screentest/C1-closeup.png",
+    "sha256": "a507233de7d8adcdd6f41d77d7d897ad18f5003cfa12a0345ee253d81b123583"
+   },
+   "action_prompt": "镜头固定近景。她带着挑衅的冷笑对着镜头唱歌，嘴随歌词自然张合，下巴微微抬起，一侧眉毛轻挑，乐句之间轻轻换气，头随节拍轻轻点动，眼神始终挑衅地看着镜头。",
+   "action_prompt_sha256": "79f39f1ca9fbc604efd4f0120452d57883cda722ebf49c8528212096874c84ba"
+  },
+  "SC2": {
+   "direction": "C2b 偶像",
+   "image": {
+    "path": "trial/screentest/C2b-closeup.png",
+    "sha256": "412096ef0a2e5a28d8d454fdc297dd84f0a3a7cac3aabb4913fd667e210b2588"
+   },
+   "action_prompt": "镜头固定近景。她像站在舞台上的主唱一样对着镜头唱歌，嘴随歌词自然张合，眼神锁住镜头，充满自信，肩膀随节拍律动，乐句之间轻轻换气，头随乐句有力地点动。",
+   "action_prompt_sha256": "bb59f5db68b5a92023179150b32d91e83f5957574e25d64b081cf377bcf9d1c2"
+  },
+  "SC3": {
+   "direction": "C3 黑客少女",
+   "image": {
+    "path": "trial/screentest/C3-closeup.png",
+    "sha256": "907ff1b0d575cfbe192c6b3a273c266f188a4b28baf2492f0e10c2feeebc1947"
+   },
+   "action_prompt": "镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体随节拍轻轻摇摆，乐句之间轻轻换气，像在分享一个秘密。",
+   "action_prompt_sha256": "56e3669a26f7a0b0c69b14bdd155adf0d928889c1fe37e30ee0ca1ad504ee057"
+  },
+  "SC4": {
+   "direction": "C4 女王",
+   "image": {
+    "path": "trial/screentest/C4-closeup.png",
+    "sha256": "f7aa938e7fd96973e391533a4027a4b297143ac526c64934afc7bf7e8a236023"
+   },
+   "action_prompt": "镜头固定近景。她冷艳地微微俯视镜头唱歌，嘴随歌词自然张合，嘴角平直，神情冷峻，眼神锐利，头微微后仰，乐句之间缓慢换气，动作克制而有力量。",
+   "action_prompt_sha256": "70e1361901cd390114b8b96ed387ebfeb49e0e3ade97a71b06ec4d45d309428f"
+  }
+ },
+ "mode": "即梦 数字人 · 大师模式（OmniHuman 1.5）· 1080P · single subject; same method as OH-B",
+ "budget": {
+  "generations": 4,
+  "retries": 0,
+  "operator_ceiling_per_take_CRD": 165,
+  "cumulative_CRD": 660
+ },
+ "scope": "casting screen test: each direction sings the approved chorus vocal window for 5 s on its casting close-up; not a film shot",
+ "accept": [
+  "she visibly sings with the direction's personality",
+  "identity stays the casting look",
+  "no frozen face"
+ ],
+ "drop": [
+  "a direction refused by the entry review is reported, not worked around"
+ ],
+ "amendments": [
+  {
+   "unit": "SC4",
+   "at": "2026-11-04T03:37:41.509443+00:00",
+   "by": "main session (the action text is the main session's craft; the user delegated: 「先做出来我看」「我只需要质量其它都可以做」)",
+   "why": "continuity report: 「几乎不笑」 is a negative phrasing, against the method's positive-only action text, and with 「动作很少」 it risks a frozen face",
+   "old": "镜头固定近景。她冷艳地微微俯视镜头唱歌，嘴随歌词自然张合，几乎不笑，眼神锐利，头微微后仰，乐句之间缓慢换气，动作很少但很有力量。",
+   "new": "镜头固定近景。她冷艳地微微俯视镜头唱歌，嘴随歌词自然张合，嘴角平直，神情冷峻，眼神锐利，头微微后仰，乐句之间缓慢换气，动作克制而有力量。"
+  }
+ ]
+}

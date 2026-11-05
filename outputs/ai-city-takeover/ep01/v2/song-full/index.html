@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 完整版歌 v3（結構與時間參考）</title>
+<style>
+ :root { --bg:#0a0c11; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; }
+ body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK TC","Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+ h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:17px; font-weight:600; margin:26px 0 8px; }
+ .dim { color:var(--dim); font-size:13px; } code { font-size:12px; word-break:break-all; }
+ .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 16px; max-width:1500px; }
+ .warn { border-color:#7a3b17; background:#1d130c; }
+ audio { width:min(1500px,96vw); margin:10px 0 4px; }
+ .lane { position:relative; height:30px; max-width:1500px; background:#0d1016; border:1px solid var(--line); margin:4px 0; cursor:pointer; }
+ .lane .seg { position:absolute; top:0; bottom:0; border-right:1px solid #0a0c11; overflow:hidden; white-space:nowrap; font-size:11px; padding:6px 4px 0; box-sizing:border-box; }
+ .lane-label { font-size:12px; color:var(--dim); margin-top:8px; }
+ .ph { position:absolute; top:-3px; bottom:-3px; width:2px; background:#fff; pointer-events:none; }
+ table { border-collapse:collapse; width:100%; max-width:1500px; } td, th { border-bottom:1px solid var(--line); padding:4px 8px; text-align:left; vertical-align:top; }
+ th { color:var(--dim); font-weight:500; } tr.line { cursor:pointer; } tr.line:hover { background:#141924; } tr.now { background:#1d2433; }
+ .m-spoken { color:#9ec1ff; } .m-whisper { color:#c9a7ff; } .m-sung { color:#ffb35c; } .ph-tag { color:#ff8a65; font-size:12px; }
+ .sec-head td { color:var(--dim); font-size:12px; padding-top:12px; border-bottom:none; }
+</style>
+<h1>IRIS 01 · Looked Outside — 完整版歌 v3（2:40）</h1>
+<div class="dim">126 BPM · 4/4 · 84 小節 · 160.000 s · 48 kHz 立體聲 · −14.0 LUFS（ebur128 integrated）／true peak −1.2 dBTP · 歌詞與小節表 <code>ep01/lyrics-v2.1-full.md</code></div>
+<div class="box warn" style="margin-top:12px"><b>人聲＝原聲音。</b>使用者 2026-11-04 試聽四個新音色後：「这几个声音不都行,还没有原声音好」→ 保留原聲音：三段副歌是 v2 已認可的演唱、念白是 Stella。這一版就是完整版歌的試聽版（結構、小節拍點、各句位置與逐詞時間也以它為準）。</div>
+<audio id="a" controls preload="auto" src="mix/IRIS-01-full-v3.mp3"></audio>
+<div class="dim">也有 WAV：<code>song-full/mix/IRIS-01-full-v3.wav</code>（24-bit）。點下方任一條或任一句可跳到該處。</div>
+
+<div class="lane-label">段落（小節）</div><div class="lane" id="lane-sec"></div>
+<div class="lane-label">人聲（藍＝念白、紫＝耳語、橘＝演唱）</div><div class="lane" id="lane-vox"></div>
+<div class="lane-label">伴奏來源（B＝bed-01、C＝v2 已認可伴奏的副歌段、P1＝patch-01、P2＝patch-02）</div><div class="lane" id="lane-src"></div>
+
+<h2>逐句時間（timing/words.json）</h2>
+<table id="tbl"><tr><th>開始</th><th>結束</th><th>小節</th><th>方式</th><th>英文</th><th>聲音來源</th></tr></table>
+
+<h2>這版用了什麼</h2>
+<div class="box"><ul>
+ <li><b>沿用（未重做）</b>：三段副歌＝v2 已認可伴奏 <code>song/bed-01</code> 18.333–26.667 s 原樣逐樣本貼回；前奏念白＝v2 已認可的 <code>song/vo/intro</code>；主歌一、前導、主歌二、橋段前兩句、尾奏念白＝前一個工作者已生成的 Stella TTS；橋段後兩句與「And outside looked back」＝bed-01 裡 ElevenLabs Music 唱的版本。</li>
+ <li><b>這次新做（不花錢）</b>：把 bed-01、patch-01（第 28–31 小節，去掉多唱的一句副歌）、patch-02（第 81–84 小節尾奏）與三段副歌接成一條，每段對齊 126 BPM 網格；按小節表放所有念白；混音與母帶；逐詞時間；本頁。</li>
+ <li><b>接點</b>：11 個接點都在拍前的安靜處做 13–30 ms 交叉淡化（第 81 小節兩邊是同一個長音墊，用一拍）；bed-01 本身在第 41 小節前少了約 37 ms、在橋段第 67 小節第 2 拍前少了約 42 ms，已各補回一小段使網格連續（第二處在唱的「I」長音裡）。</li>
+</ul></div>
+<h2>已知限制</h2>
+<div class="box"><ul>
+ <li>Agent 不能用耳朵判斷好不好聽；以下只是量測。</li>
+ <li>橋段第 4 句「I mouth the word against the glass」Whisper 聽成 “I'm out the wood / I'm not the word”，強制對齊 “the” 機率低（0.3），可能唱成 “a word”。</li>
+ <li>尾奏（patch-02）只有安靜的長音墊（約 −34 dBFS），沒有計畫中的低音脈衝與琶音；最後一小節淡出。</li>
+ <li>三段副歌第一句的 “I” 是弱起，比副歌第一個強拍早約 0.15 s（屬已認可的演唱）。</li>
+</ul></div>
+<script>
+const T = 240 / 126, DUR = 160;
+const SECS = [["Intro",1,4],["Verse 1",5,16],["Pre",17,20],["Chorus 1",21,28],["Verse 2",29,44],["Chorus 2",45,52],
+  ["Instrumental",53,60],["Bridge",61,68],["Final Chorus",69,76],["Coda",77,80],["Outro",81,84]];
+const COL = {spoken:"#2b4f86", whisper:"#56398a", sung:"#8a5a1c"}, SRC = {B:"#2a3242", C:"#7a4a14", P1:"#24563f", P2:"#1f4f5a"};
+const a = document.getElementById("a"), pct = t => (100 * t / DUR) + "%";
+function seg(lane, t0, t1, txt, color, title) {
+  const d = document.createElement("div"); d.className = "seg"; d.style.left = pct(t0); d.style.width = pct(t1 - t0);
+  d.style.background = color; d.textContent = txt; d.title = title || txt; lane.appendChild(d);
+}
+function lane(id) { const l = document.getElementById(id); const p = document.createElement("div"); p.className = "ph"; l.appendChild(p);
+  l.addEventListener("click", e => { const r = l.getBoundingClientRect(); a.currentTime = DUR * (e.clientX - r.left) / r.width; a.play(); }); return l; }
+const ls = lane("lane-sec"), lv = lane("lane-vox"), lsrc = lane("lane-src");
+SECS.forEach(([n, b0, b1], i) => seg(ls, (b0 - 1) * T, b1 * T, `${n} ${b0}–${b1}`, i % 2 ? "#1a2130" : "#232c3e"));
+const sourceOf = l => l.mode === "sung" ? (/didn't run|just looked/.test(l.en) ? "v2 已認可副歌（將換聲）" : "bed-01 演唱（將換聲）")
+  : (l.end < 7.6 ? "v2 song/vo/intro（Stella，將換聲）" : "song-full/vo TTS（Stella，將換聲）");
+Promise.all([fetch("timing/words.json").then(r => r.json()), fetch("mix/placement-result.json").then(r => r.json())]).then(([w, p]) => {
+  const tbl = document.getElementById("tbl"); const rows = [];
+  let sec = -1;
+  w.lines.forEach(l => {
+    seg(lv, l.start, l.end, "", COL[l.mode], `${l.start.toFixed(2)}–${l.end.toFixed(2)} ${l.en}`);
+    const s = SECS.findIndex(([, b0, b1]) => l.start + 0.3 < b1 * T);
+    if (s !== sec) { sec = s; const h = tbl.insertRow(); h.className = "sec-head"; h.innerHTML = `<td colspan=6>${SECS[s][0]}（第 ${SECS[s][1]}–${SECS[s][2]} 小節，${((SECS[s][1]-1)*T).toFixed(2)}–${(SECS[s][2]*T).toFixed(2)} s）</td>`; }
+    const r = tbl.insertRow(); r.className = "line";
+    r.innerHTML = `<td>${l.start.toFixed(2)}</td><td>${l.end.toFixed(2)}</td><td>${(1 + l.start / T).toFixed(2)}</td><td class="m-${l.mode}">${l.mode}</td><td>${l.en}</td><td class="ph-tag">${sourceOf(l)}</td>`;
+    r.onclick = () => { a.currentTime = Math.max(0, l.start - 0.3); a.play(); }; rows.push([l, r]);
+  });
+  p.segments.forEach(s => seg(lsrc, s.master_s[0], s.master_s[1], s.src, SRC[s.src],
+    `${s.src} ${s.file}\nmaster ${s.master_s[0].toFixed(3)}–${s.master_s[1].toFixed(3)} s ＝ 來源 ${s.source_s[0].toFixed(3)}–${s.source_s[1].toFixed(3)} s\n${s.covers}`));
+  const tick = () => { const t = a.currentTime; document.querySelectorAll(".ph").forEach(p => p.style.left = pct(t));
+    rows.forEach(([l, r]) => r.classList.toggle("now", t >= l.start && t < l.end)); requestAnimationFrame(tick); };
+  tick();
+}).catch(e => document.body.insertAdjacentHTML("beforeend", `<p class="dim">讀不到 timing/words.json 或 placement-result.json（請用 http://127.0.0.1:8767/song-full/index.html 開）：${e}</p>`));
+</script>
+</html>

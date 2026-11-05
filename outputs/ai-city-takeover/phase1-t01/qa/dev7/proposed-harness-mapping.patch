@@ -1,0 +1,30 @@
+--- a/.agent/harness/policy.yaml
++++ b/.agent/harness/policy.yaml
+@@ -96,0 +97,12 @@
++  motionkit_runtime_tests:
++    argv: [node, --test, motion-kit/tests/runtime.test.mjs]
++    cwd: .
++    execution_priority: 20
++    timeout_seconds: 120
++    description: Verify variable-tempo clocks, frame boundaries, deterministic noise and perspective mapping without rendering or Provider effects.
++  motionkit_tool_tests:
++    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_motionkit_tools.py, -q]
++    cwd: .
++    execution_priority: 20
++    timeout_seconds: 120
++    description: Verify bounded audio windows, fail-closed QA exits and immutable image-reference input identity with fake effects only.
+@@ -447,0 +460 @@
++      - motionkit_tool_tests
+@@ -526,0 +540,12 @@
++  motionkit_pilot:
++    patterns:
++      - tests/test_motionkit_tools.py
++      - motion-kit/**
++      - outputs/ai-city-takeover/**
++      - docs/superpowers/specs/2026-10-30-ev-motion-douyin-pipeline.md
++      - docs/record_for_agent/2026-10-30-iris-t01-readable-takeover.md
++    focused_check_ids: [motionkit_runtime_tests, motionkit_tool_tests]
++    check_ids:
++      - motionkit_runtime_tests
++      - motionkit_tool_tests
++      - task_architecture_gate

@@ -1,1 +1,42 @@
-[{"src": "frame-0.60.jpg", "label": "t=0.60 s"}, {"src": "frame-1.40.jpg", "label": "t=1.40 s"}, {"src": "frame-3.80.jpg", "label": "t=3.80 s"}, {"src": "frame-4.70.jpg", "label": "t=4.70 s"}, {"src": "frame-5.70.jpg", "label": "t=5.70 s"}, {"src": "frame-6.10.jpg", "label": "t=6.10 s"}, {"src": "frame-7.00.jpg", "label": "t=7.00 s"}, {"src": "frame-9.50.jpg", "label": "t=9.50 s"}]
+[
+ {
+  "src": "dev7-f024.jpg",
+  "label": "t=0.800s · frame 24"
+ },
+ {
+  "src": "dev7-f072.jpg",
+  "label": "t=2.400s · frame 72"
+ },
+ {
+  "src": "dev7-f141.jpg",
+  "label": "t=4.700s · frame 141"
+ },
+ {
+  "src": "dev7-f174.jpg",
+  "label": "t=5.800s · frame 174"
+ },
+ {
+  "src": "dev7-f184.jpg",
+  "label": "t=6.133s · frame 184"
+ },
+ {
+  "src": "dev7-f194.jpg",
+  "label": "t=6.467s · frame 194"
+ },
+ {
+  "src": "dev7-f195.jpg",
+  "label": "t=6.500s · frame 195"
+ },
+ {
+  "src": "dev7-f201.jpg",
+  "label": "t=6.700s · frame 201"
+ },
+ {
+  "src": "dev7-f249.jpg",
+  "label": "t=8.300s · frame 249"
+ },
+ {
+  "src": "dev7-f294.jpg",
+  "label": "t=9.800s · frame 294"
+ }
+]

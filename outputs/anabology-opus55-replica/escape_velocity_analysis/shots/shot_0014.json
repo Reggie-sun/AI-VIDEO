@@ -1,0 +1,713 @@
+{
+  "shot_id": "S0014",
+  "start_frame": 358,
+  "end_frame": 399,
+  "start_time": 14.9167,
+  "end_time": 16.6667,
+  "duration_frames": 42,
+  "duration_s": 1.75,
+  "start_tc": "00:00:14:22",
+  "end_tc": "00:00:16:15",
+  "boundary_in_id": "B0-013",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 358,
+      "path": "keyframes/S0014_f00358.jpg",
+      "role": "first",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 368,
+      "path": "keyframes/S0014_f00368.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 379,
+      "path": "keyframes/S0014_f00379.jpg",
+      "role": "middle",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 389,
+      "path": "keyframes/S0014_f00389.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 399,
+      "path": "keyframes/S0014_f00399.jpg",
+      "role": "last",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 378,
+      "path": "work/full_batch/00378.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 399,
+      "path": "work/full_batch/00399.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "character_plate",
+  "narrative_role": "以摄影层与独立信息层推进序章、服装展示和机器观众主题",
+  "subject": "女主半身歪头看向镜头",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "女主半身歪头看向镜头，白色蓬袖和黑色胸前束带占中下，蓝红离焦灯在后方。脸上有白色检测十字与细括号，左下黑色网格面板逐字补全威胁句。末尾大号花形白色遮罩展开并露出下一镜背影。",
+  "composition": {
+    "shot_size": "近景",
+    "subject_position": "见subject_bbox；视觉估计",
+    "subject_bbox": {
+      "x": 0.26,
+      "y": 0.02,
+      "w": 0.64,
+      "h": 0.96,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "腰部插镜近水平；汽车大远景略俯；其他平视，实际焦距未知",
+    "layers": {
+      "foreground": "独立文字/检测框，及近处主体",
+      "midground": "人物、汽车或无摄影层的统计图",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "首/中/末与filmstrip已检查；光流观测 {'pan_x_frac_per_s': 0.0072, 'pan_y_frac_per_s': 0.0072, 'zoom_per_s': 0.0105, 'median_flow_frac_per_s': 0.0104, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": 0.0072,
+      "pan_y_frac_per_s": 0.0072,
+      "zoom_per_s": 0.0105,
+      "median_flow_frac_per_s": 0.0104,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "视觉估计：冷蓝环境照明；红色点光或侧光见描述",
+    "quality": "低照度深阴影、反光表面与高亮屏幕；图形层自发光",
+    "effects": [
+      "可见彩色网点/细颗粒"
+    ],
+    "temporal_change": "见逐镜描述，精确亮度变化使用shot_stats luma"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#161D18",
+        "fraction": 0.409,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#393E40",
+        "fraction": 0.21,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#798CB3",
+        "fraction": 0.165,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#596475",
+        "fraction": 0.148,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#A7C3E4",
+        "fraction": 0.058,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#BE4349",
+        "fraction": 0.01,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "亮度首中末 [64.6, 65.6, 86.6]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 00 / 11",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "右上18 MONTHS / TO ESCAPE，底部微字THE PERMANENT UNDERCLASS及DEPARTURES · SS27 · COLLECTION01",
+    "G-FLAP-BOARD": "无底部大翻牌；18由右上小控件承载",
+    "G-TICKER": "底部持续向左滚动，条目见visual_system；逐镜窗口随时间变化",
+    "G-CORNER-MARKS": "四角浅灰十字",
+    "G-AUDIO-SPECTRUM": "右上白条，随时间起伏",
+    "G-LEFT-RULER": "左侧白刻度，y540橙指针",
+    "G-TIMECODE": {
+      "first": "00:00:14:22",
+      "last": "00:00:16:15"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0014-E01",
+      "shot_id": "S0014",
+      "type": "background_media",
+      "description": "女主半身歪头看向镜头，白色蓬袖和黑色胸前束带占中下，蓝红离焦灯在后方。脸上有白色检测十字与细括号，左下黑色网格面板逐字补全威胁句。末尾大号花形白色遮罩展开并露出下一镜背影。",
+      "start_frame": 358,
+      "end_frame": 399,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "摄影层人物/机位运动见首中末参考帧",
+        "easing": "unknown",
+        "entrance": "f358首个可见状态；变化见dense采样keyframes",
+        "exit": "f399仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 358,
+          "observed_state": "女主半身歪头看向镜头，白色蓬袖和黑色胸前束带占中下，蓝红离焦灯在后方。脸上有白色检测十字与细括号，左下黑色网格面板逐字补全威胁句。末尾大号花形白色遮罩展开并露出下一镜背影。"
+        },
+        {
+          "frame": 399,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        358,
+        368,
+        379,
+        389,
+        399
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0014-E02",
+      "shot_id": "S0014",
+      "type": "hud_bracket",
+      "description": "随倾斜头部贴合的白色细线检测框",
+      "start_frame": 358,
+      "end_frame": 399,
+      "bounding_box": {
+        "x": 0.328125,
+        "y": 0.17407407407407408,
+        "w": 0.246875,
+        "h": 0.3851851851851852,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定图形定位见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f358首个可见状态；变化见dense采样keyframes",
+        "exit": "f399仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 358,
+          "observed_state": "随倾斜头部贴合的白色细线检测框"
+        },
+        {
+          "frame": 399,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        358,
+        368,
+        379,
+        389,
+        399
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "full_resolution_text_observation": {
+        "frame": 378,
+        "content": "FACE · MODEL 01 / 0.98",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "FACE · MODEL 01 / 0.98",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 11,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "monospaced sans"
+        }
+      }
+    },
+    {
+      "element_id": "S0014-E03",
+      "shot_id": "S0014",
+      "type": "hud_panel",
+      "description": "左下黑面板，网格与白色多行句子",
+      "start_frame": 358,
+      "end_frame": 399,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.6388888888888888,
+        "w": 0.2604166666666667,
+        "h": 0.2324074074074074,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定图形定位见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f358首个可见状态；变化见dense采样keyframes",
+        "exit": "f399仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 358,
+          "text_visible": "THIS IS NOT AN"
+        },
+        {
+          "frame": 367,
+          "text_visible": "AN AI BILLBOARD."
+        },
+        {
+          "frame": 374,
+          "text_visible": "PREPARE TO DIE."
+        },
+        {
+          "frame": 390,
+          "text_visible": "all source-caption lines complete"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        358,
+        368,
+        379,
+        389,
+        399
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "REF 01 · THE ORIGINAL / SF · 2026\n“THIS IS NOT AN AI BILLBOARD. PREPARE TO DIE.”\nMASONIC AVE · LAUREL HEIGHTS\nUP SEP 1 · REPORTED SEP 9\nREHUNG HERE AS THE BACKDROP →\nPRESIDIO ↑ / MASONIC / EUCLID / GEARY / SCHEMATIC · NOT TO SCALE",
+        "transcription_status": "可读主字；小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "visual_family": "monospaced sans",
+          "font_candidates": [],
+          "cap_height_px": 11,
+          "tracking": "normal",
+          "alignment": "left",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 24,
+          "weight": "medium"
+        }
+      },
+      "full_resolution_text_observation": {
+        "frame": 378,
+        "content": "REF 01 · THE ORIGINAL / SF · 2026\nTHIS IS NOT AN AI BILLBOARD. PREPARE TO DIE.\nMASONIC AVE · LAUREL HEIGHTS / UP SEP 1 · REPORTED SEP 9\nPRESIDIO / MASONIC / EUCLID / GEARY / SCHEMATIC · NOT TO SCALE",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      }
+    },
+    {
+      "element_id": "S0014-E04",
+      "shot_id": "S0014",
+      "type": "transition_graphic",
+      "description": "八瓣白色花形遮罩展开，内部显示下镜头",
+      "start_frame": 397,
+      "end_frame": 399,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 60,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定图形定位见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f397首个可见状态；变化见dense采样keyframes",
+        "exit": "f399仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 397,
+          "observed_state": "头上白色星芒起显"
+        },
+        {
+          "frame": 399,
+          "observed_state": "星芒急放大成全屏放射状窗口，窗口内露出下镜背身女主"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        399
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0014-E05",
+      "shot_id": "S0014",
+      "type": "hud_marker",
+      "description": "橙色发缕圆节点与左侧肘形引线",
+      "start_frame": 358,
+      "end_frame": 399,
+      "bounding_box": {
+        "x": 0.15520833333333334,
+        "y": 0.14814814814814814,
+        "w": 0.22395833333333334,
+        "h": 0.16666666666666666,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f358首次采样可见",
+        "exit": "f399仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 358,
+          "observed_state": "引线随头部追踪"
+        },
+        {
+          "frame": 378,
+          "observed_state": "STREAK·CLAY#D9仍打字"
+        },
+        {
+          "frame": 399,
+          "observed_state": "两行完整"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        399
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "STREAK · CLAY #D97757\nCLIP · SPARK ✱ 8 PT",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 14,
+          "line_height_px": 22.400000000000002,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0014-E06",
+      "shot_id": "S0014",
+      "type": "hud_gauge",
+      "description": "头顶圆形口径标尺，位置及范围见归一化边框",
+      "start_frame": 378,
+      "end_frame": 399,
+      "bounding_box": {
+        "x": 0.4296875,
+        "y": 0.07777777777777778,
+        "w": 0.03229166666666667,
+        "h": 0.08888888888888889,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f378首次采样可见",
+        "exit": "f399仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 378,
+          "observed_state": "圆形细线与直径标尺"
+        },
+        {
+          "frame": 390,
+          "observed_state": "保持"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        390
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "Ø 38 MM",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0014-E07",
+      "shot_id": "S0014",
+      "type": "hud_bracket",
+      "description": "小型对焦四角框沿脸下方移动",
+      "start_frame": 358,
+      "end_frame": 399,
+      "bounding_box": {
+        "x": 0.44375,
+        "y": 0.27870370370370373,
+        "w": 0.2015625,
+        "h": 0.21944444444444444,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f358首次采样可见",
+        "exit": "f399仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 358,
+          "observed_state": "小框沿脸部"
+        },
+        {
+          "frame": 378,
+          "observed_state": "框在嘴附近，SEARCHING"
+        },
+        {
+          "frame": 399,
+          "observed_state": "小框移到肩部"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        399
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "AF-C · SEARCHING · 4.1 M",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B0-013",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "shape_wipe",
+      "boundary_id": "B0-014",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0034",
+      "relation": "beat_candidate (unknown) at frame 358; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 358
+    },
+    {
+      "audio_event_id": "AB0035",
+      "relation": "beat_candidate (unknown) at frame 369; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 369
+    },
+    {
+      "audio_event_id": "AB0036",
+      "relation": "beat_candidate (unknown) at frame 379; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 379
+    },
+    {
+      "audio_event_id": "AB0037",
+      "relation": "beat_candidate (unknown) at frame 390; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 390
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "几何为fullres视觉像素估计±4–12px，非作者源坐标。",
+    "密集采样时点存在1–2帧区间；半翻字形与插值不猜测。",
+    "原字体identity、shader和摄影层抠像方式未知。",
+    "音频待主会话绑定。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0014.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      378,
+      399
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation",
+    "remaining": "原始shader/font/插值保持unknown；音频由主会话整合。",
+    "closure": "本轮fullres逐层检查并补遗漏独立层；已复核text.content和各bbox，密集时间精度见keyframes"
+  }
+}

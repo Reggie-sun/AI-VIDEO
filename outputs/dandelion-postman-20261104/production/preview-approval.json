@@ -1,0 +1,15 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "a9bd4189f449d32dacac411063f9390e456969963a209ef274e7100336d18f9d",
+  "unit_ids": [
+    "postman"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/dandelion-postman-20261104/reference-v1.png",
+      "sha256": "8125187d8eba4f1b9d13262ade2301c81391ccb756c32237b9b1ffebca68cd48",
+      "role": "reference_image"
+    }
+  ],
+  "user_quote": "可以"
+}

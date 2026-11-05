@@ -1,0 +1,53 @@
+{
+ "about": "Preview for the minimal OmniHuman trial (Jimeng 数字人 大师模式): research-2026-11-02.md. User direction: 「不行,太low了.我看了下这个对嘴,要不不用对的狠准,我们只需要让人物真的表现在唱歌就好」. Nothing is submitted before the user approves this preview.",
+ "image": {
+  "path": "keyframes/raw/K7-a.png",
+  "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+  "size": [
+   1672,
+   941
+  ],
+  "role": "the singer; unmodified"
+ },
+ "audio": {
+  "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+  "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+  "seconds": 5.0,
+  "song_window": [
+   17.97,
+   22.97
+  ],
+  "role": "uploaded vocal (isolated), not TTS or a cloned voice; chorus pass 1 'I didn't run / I just looked outside'"
+ },
+ "mode": "即梦 数字人 · 大师模式 · 1080P · single subject (not 生动模式, which crops to 1:1)",
+ "takes": {
+  "OH-A": {
+   "action_prompt": null,
+   "why": "control: no action description"
+  },
+  "OH-B": {
+   "action_prompt": "镜头固定特写。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，乐句之间轻轻换气，肩膀随呼吸微微起伏，头随乐句轻轻点动，眉头舒展，眼神始终看着镜头。",
+   "action_prompt_sha256": "c2ab14038f4d267c32e25cba8cb5071ab459abbf5abf4bffed1aed6e027eac99",
+   "why": "pure Chinese, positive, actions only (official template: camera + mood + speaking state + actions); 冷静但活着 as the user chose for v3"
+  }
+ },
+ "budget": {
+  "generations": 2,
+  "retries": 0,
+  "estimate_credits_upper": 330,
+  "estimate_basis": "no official per-second price for 数字人; upper bound at the Seedance 2.0 VIP 1080p rate (~33 credits/s) x 5 s x 2",
+  "rule": "read the UI price and the balance before and after each submit; stop on any unknown outcome"
+ },
+ "placement": "lag 0 at song 17.97 s (the audio starts at clip 0); S8a uses clip 0.897-4.597 s (film 18.867-22.567 s)",
+ "accept": [
+  "both phrases visibly open and close",
+  "a breath is visible before 'I just'",
+  "no frown, no frozen face, no over-acting",
+  "identity matches K7, pane background stable",
+  "per-shot gate first, then the user watches it with the song"
+ ],
+ "drop": [
+  "K7 refused by the entry review: stop, no preprocessing to get past it",
+  "both takes repeat the frown / weak expression / frozen face, or show exaggerated mouth, broken teeth or identity drift: drop the route, no third take"
+ ]
+}

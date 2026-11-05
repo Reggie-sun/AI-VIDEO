@@ -9,9 +9,13 @@ import hashlib
 from pathlib import Path
 from typing import Literal
 
+from pydantic import Field, model_validator
+
+from ai_video.production.artifact_contracts import StrictModel
+from ai_video.production.composition_contracts import AudioTrackSpec
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
-    AssetRecord, AssetRegistrySnapshot, AssetSourceKind, AssetType, ProductionManifest,
+    AssetRecord, AssetRegistrySnapshot, AssetSourceKind, AssetType, AudioKind, ProductionManifest,
 )
 from ai_video.production.paths import _read_regular_file_nofollow, canonical_video_asset_path
 from ai_video.production.repair_input_admission import (
@@ -23,6 +27,100 @@ from ai_video.production.repair_input_admission import (
 
 class QualificationPreviewInputReceipt(RepairPreviewInputAdmissionReceipt):
     contract_version: Literal["development-qualification-preview/1"] = "development-qualification-preview/1"
+
+
+class CaptionedMusicCaption(StrictModel):
+    caption_asset_id: str = Field(min_length=1)
+    caption_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    script_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    transcript_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class CaptionedMusicPreview(StrictModel):
+    """One exact song and sample window, never captured dialogue."""
+
+    track: AudioTrackSpec
+    audio_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    captions: tuple[CaptionedMusicCaption, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _normal_speed_global_song(self):
+        track = self.track
+        if (track.audio_kind is not AudioKind.BGM or track.shot_id is not None
+                or track.start_sample != 0 or track.trim_duration_samples is None
+                or track.gain_millidb != 0 or track.fade_in_samples != 0
+                or track.fade_out_samples != 0 or track.ducking is not None):
+            raise ValueError("Captioned music preview requires one explicit unmodified global BGM window")
+        if len({caption.caption_asset_id for caption in self.captions}) != len(self.captions):
+            raise ValueError("Captioned music preview caption IDs must be unique")
+        return self
+
+    def validate_asset(self, asset):
+        metadata = asset.audio_metadata if asset is not None else None
+        if (asset is None or asset.asset_id != self.track.asset_id
+                or asset.asset_type is not AssetType.MUSIC
+                or asset.source_kind not in {AssetSourceKind.IMPORTED, AssetSourceKind.GENERATED}
+                or asset.sha256 != self.audio_asset_sha256 or metadata is None
+                or metadata.audio_kind is not AudioKind.BGM
+                or metadata.source.kind is not asset.source_kind
+                or metadata.source.provider_or_tool != asset.tool
+                or metadata.source.input_fingerprint != asset.input_fingerprint
+                or self.track.trim_start_sample + self.track.trim_duration_samples
+                > metadata.duration_samples):
+            raise ValueError("Captioned music preview differs from its exact song provenance and samples")
+
+    def validate_caption(self, asset):
+        expected = next((c for c in self.captions if c.caption_asset_id == asset.asset_id), None)
+        metadata = asset.caption_metadata
+        if (expected is None or asset.asset_type is not AssetType.CAPTION or metadata is None
+                or asset.sha256 != expected.caption_asset_sha256
+                or metadata.source_audio_asset_id != self.track.asset_id
+                or metadata.source_audio_sha256 != self.audio_asset_sha256
+                or metadata.script_hash != expected.script_hash
+                or metadata.transcript_hash != expected.transcript_hash):
+            raise ValueError("Captioned music preview differs from its exact sealed caption identity")
+
+    def validate_captions(self, assets):
+        by_id = {asset.asset_id: asset for asset in assets}
+        for caption in self.captions:
+            asset = by_id.get(caption.caption_asset_id)
+            if asset is None:
+                raise ValueError("Captioned music preview is missing its sealed caption asset")
+            self.validate_caption(asset)
+
+
+class CaptionedMusicQualificationPreviewInputReceipt(QualificationPreviewInputReceipt):
+    contract_version: Literal["development-qualification-preview/2"] = "development-qualification-preview/2"
+    captioned_music: CaptionedMusicPreview
+
+
+def allows_captioned_music_caption(project, caption, source):
+    """A narrowly sealed development source exception, never general music captions."""
+    from ai_video.production.repair_input_admission import is_repair_input_record, verify_repair_input
+
+    if source.asset_type is not AssetType.MUSIC or source.audio_metadata is None:
+        return False
+    receipts = []
+    for asset in project.registry.assets:
+        if not is_repair_input_record(asset, project.root):
+            continue
+        receipt = verify_repair_input(asset, project.root)
+        if (receipt.contract_version != "development-qualification-preview/2"
+                or receipt.target_project_id != project.project.project_id
+                or receipt.target_project_hash != project.project.content_hash):
+            continue
+        receipts.append(receipt)
+    if not receipts:
+        return False
+    music = receipts[0].captioned_music
+    if any(receipt.captioned_music != music for receipt in receipts):
+        return False
+    try:
+        music.validate_asset(source)
+        music.validate_caption(caption)
+    except ValueError:
+        return False
+    return True
 
 
 def _source_state(manifest, attempt_id):
@@ -109,7 +207,8 @@ def validate_qualification_capture(receipt):
 
 
 def _prepare_qualification_preview_input(*, target_root, project, registry, source_root,
-        source_attempt_id, source_sha256, asset_id, usage_license, preview_use, preview_probe):
+        source_attempt_id, source_sha256, asset_id, usage_license, preview_use, preview_probe,
+        captioned_music=None):
     """Read-only preparation for canonical bootstrap_initial_state; no side effects."""
     from ai_video.production.project import load_production_project
     from ai_video.production.registry import registry_semantic_sha256
@@ -142,8 +241,17 @@ def _prepare_qualification_preview_input(*, target_root, project, registry, sour
         source_attempt_id=source_attempt_id, source_manifest_json=raw.decode(),
         source_manifest_sha256=hashlib.sha256(raw).hexdigest(), documents=docs,
         preview_use=RepairPreviewUse.model_validate(preview_use), preview_probe=preview_probe)
-    provisional = QualificationPreviewInputReceipt.model_construct(**values, content_hash="0" * 64)
-    receipt = QualificationPreviewInputReceipt.model_validate({**provisional.model_dump(mode="python"),
+    receipt_type = QualificationPreviewInputReceipt
+    if captioned_music is not None:
+        if isinstance(captioned_music, CaptionedMusicPreview):
+            captioned_music = captioned_music.model_dump(mode="python")
+        music = CaptionedMusicPreview.model_validate(captioned_music)
+        music.validate_asset(next((a for a in registry.assets if a.asset_id == music.track.asset_id), None))
+        music.validate_captions(registry.assets)
+        values['captioned_music'] = music
+        receipt_type = CaptionedMusicQualificationPreviewInputReceipt
+    provisional = receipt_type.model_construct(**values, content_hash="0" * 64)
+    receipt = receipt_type.model_validate({**provisional.model_dump(mode="python"),
         "content_hash": canonical_sha256(provisional.model_dump(mode="json"))})
     measured = receipt.preview_probe.measured
     asset = AssetRecord(asset_id=asset_id, asset_type=AssetType.VIDEO,

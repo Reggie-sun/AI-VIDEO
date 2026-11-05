@@ -1,0 +1,40 @@
+artifact_id: iris-a01-first-frame-repair-brief
+audience: 中文短视频观众
+constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 保持认可阳台图的正面闭口姿态，仅自然呼吸和轻微自然眨眼；不说话、不唱歌、不做口型、不转身、不抬手
+- 以认可阳台构图的正面平视头胸中近景、人物大小与身体姿态开始，只做极小原轴微推进，不拉远、不侧身、不露背，末段收稳
+- 真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线；保留平台正常人工智能生成标识，只禁止新增剧情字幕、片名和新闻图形
+content_hash: d082d3767ad6907015d5ce17f4978b45c8e6bd487605476e2675ab2852419bcf
+creation_receipt_id: iris-a01-first-frame-repair-authoring:brief
+format: 1920×1080 30fps horizontal source
+language: zh
+objective: 已认可阳台参考的六秒轻微自然运动源片；未完成歌曲、对嘴或整集
+revision: 2
+schema_version: '2.0'
+source_provenance:
+- content_hash: 08aeb291feeacb19d87647af419c0725565c4561b9582f097735ea281ac53c0c
+  kind: user_input
+  reference: evidence/authoring-input/08aeb291feeacb19d87647af419c0725565c4561b9582f097735ea281ac53c0c.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: 635f087286f651075d22ca00c9c71e12969622a7f5481b92e030cad6b0bdb89f
+  kind: user_input
+  reference: evidence/authoring-input/635f087286f651075d22ca00c9c71e12969622a7f5481b92e030cad6b0bdb89f.json
+- content_hash: 9bf6ca4d17685f27fd8d748c3cabb832216109755efac15c38a149ed456405dc
+  kind: user_input
+  reference: evidence/authoring-input/9bf6ca4d17685f27fd8d748c3cabb832216109755efac15c38a149ed456405dc.json
+- content_hash: 9c67d74e5f7ad8458adca64578b33eca7d85869d7c75938ab83d1b5f639d7ae4
+  kind: user_input
+  reference: evidence/authoring-input/9c67d74e5f7ad8458adca64578b33eca7d85869d7c75938ab83d1b5f639d7ae4.json
+- content_hash: 2fd3fb75ff8fbe34aa0648529f2748632c260bf8ba4c4c396b14484d38512640
+  kind: user_input
+  reference: evidence/authoring-input/2fd3fb75ff8fbe34aa0648529f2748632c260bf8ba4c4c396b14484d38512640.json
+title: IRIS EP01 A01 multimodal two-reference repair

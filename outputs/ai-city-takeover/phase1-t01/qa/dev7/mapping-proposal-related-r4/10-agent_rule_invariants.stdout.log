@@ -1,0 +1,55 @@
+...........................................F                             [100%]
+=================================== FAILURES ===================================
+__ test_close_retains_exact_request_history_budget_and_replays_without_writes __
+
+tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2057/test_close_retains_exact_reque0')
+
+    def test_close_retains_exact_request_history_budget_and_replays_without_writes(tmp_path):
+>       writer, _, _, prior = _pending(tmp_path)
+                              ^^^^^^^^^^^^^^^^^^
+
+tests/test_production_video_unsubmitted.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_production_paid_submit_quota.py:441: in _pending
+    _, provider, resolved, committer = e2e._reach_fetch(tmp_path, activate_second_shot=True)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_production_generated_video_e2e.py:955: in _reach_fetch
+    inputs, provider, resolved, execution_binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+project = None, commercial_binding = None
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -> None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+>           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError
+=========================== short test summary info ============================
+FAILED tests/test_production_video_unsubmitted.py::test_close_retains_exact_request_history_budget_and_replays_without_writes
+1 failed, 43 passed in 3.37s

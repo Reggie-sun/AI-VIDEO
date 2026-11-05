@@ -1,0 +1,26 @@
+[
+  {
+    "asset_id": "iris-c-v2-s5-window",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5b-a.png",
+    "sha256": "5c92c9d658681077e9d00232aeaddd9be1fb1d4033bbe9212710d26486ba3c62",
+    "size_bytes": 1808854,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K5b: start frame, window composition and light",
+    "need_id": "window",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-cf-details",
+    "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+    "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+    "size_bytes": 1843560,
+    "width": 1672,
+    "height": 941,
+    "role": "approved front IRIS identity: face, left-ear device and fine red left-collar line",
+    "need_id": "identity",
+    "anchor_role": "identity",
+    "selected_for_provider": true
+  }
+]

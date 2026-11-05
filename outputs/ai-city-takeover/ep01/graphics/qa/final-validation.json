@@ -1,0 +1,38 @@
+{
+  "scope": "development_source_asset",
+  "checks": [
+    {
+      "kind": "dns",
+      "full_decode_exit": 0,
+      "decode_errors": "",
+      "http": 200,
+      "sha_matches": true
+    },
+    {
+      "kind": "pause",
+      "full_decode_exit": 0,
+      "decode_errors": "",
+      "http": 200,
+      "sha_matches": true
+    },
+    {
+      "kind": "web-cache",
+      "full_decode_exit": 0,
+      "decode_errors": "",
+      "http": 200,
+      "sha_matches": true
+    },
+    {
+      "kind": "cpu-cache",
+      "full_decode_exit": 0,
+      "decode_errors": "",
+      "http": 200,
+      "sha_matches": true
+    }
+  ],
+  "node_tests": {
+    "passed": 5,
+    "failed": 0
+  },
+  "human_acceptance": "NOT_EVALUATED"
+}

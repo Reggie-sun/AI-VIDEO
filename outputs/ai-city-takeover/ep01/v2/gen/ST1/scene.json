@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v2-st1-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "c47d4e2767a14974bb6e0b32d99404a0b4f0bf4b3c8c3566a9c8240403d79bfe",
+  "creation_receipt_id": "iris-v2-ST1-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/1c48c1345853232cbb382e4a53b703cb4b3b442ded70c43d017a6110d81a7b2d.json",
+      "content_hash": "1c48c1345853232cbb382e4a53b703cb4b3b442ded70c43d017a6110d81a7b2d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7d82b775e4a84bd5155a014ac28902cda5b39097500c746db9e7e192c65db130.json",
+      "content_hash": "7d82b775e4a84bd5155a014ac28902cda5b39097500c746db9e7e192c65db130"
+    }
+  ],
+  "scene_id": "aisle",
+  "location": "凌晨数据中心机房走道",
+  "time": "凌晨",
+  "mood": "冷静、精密、略有压迫感",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左领红光位置一致",
+    "蓝黑/钢蓝，红为唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v2-st1-first-frame"
+  ]
+}

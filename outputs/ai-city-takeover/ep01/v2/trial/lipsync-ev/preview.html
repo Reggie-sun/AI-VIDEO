@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><title>IRIS 01 · 對嘴方法試驗 · 參考包預覽</title>
+<style>
+ body { background:#0a0c10; color:#dfe3ea; font:15px/1.65 system-ui,"Noto Sans CJK TC",sans-serif; margin:0; padding:28px 40px 60px; max-width:1500px; }
+ h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:18px; margin:28px 0 8px; } .dim { color:#8b93a3; font-size:13px; }
+ .box { background:#11141b; border:1px solid #1f2430; border-radius:6px; padding:10px 16px; } img { max-width:900px; width:100%; border:1px solid #1f2430; }
+ pre { white-space:pre-wrap; background:#11141b; border:1px solid #1f2430; border-radius:6px; padding:12px 16px; font:14px/1.6 ui-monospace,monospace; }
+ table { border-collapse:collapse; } td, th { border-bottom:1px solid #1f2430; padding:5px 10px; text-align:left; } code { color:#9fb7ff; }
+</style>
+<h1>IRIS 01 · 對嘴方法試驗：參考包預覽（付費前請確認）</h1>
+<div class="dim">照 ESCAPE VELOCITY 的做法。完整計畫：<code>docs/superpowers/plans/2026-11-02-iris-ep01-lipsync-trial.md</code></div>
+<h2>1. 底片（參考素材1，<code>{{image:0}}</code>）</h2>
+<img src="A02-v1.png" alt="A02"><div class="dim">A02（第一遍副歌已認可的底片）· SHA f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039</div>
+<h2>2. 人聲窗口（參考素材2，<code>{{audio:1}}</code>）</h2>
+<div class="box">歌曲 17.97–22.97 s（5 秒）：「I didn't run — I just looked outside. I」<br>
+送出的人聲窗口：<audio controls src="window-17.97-22.97.wav"></audio><br>
+同一段母帶（對照，不送出）：<audio controls src="master-17.97-22.97.wav"></audio><br>
+<span class="dim">開頭 0.63 s 空隙（作者：從第一個字前約 0.3–0.7 s 開始）；結尾在 22.97 s 的停頓，不在字中間。SHA 851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7</span></div>
+<h2>3. 4 支試驗片（各 5 秒、1080p、即夢 Seedance 2.0 VIP 全能參考）</h2>
+<table><tr><th>單元</th><th>prompt</th><th>預計</th></tr>
+<tr><td>EV-en-1、EV-en-2</td><td>作者的英文原句</td><td>2 × 165 積分</td></tr>
+<tr><td>EV-zh-1、EV-zh-2</td><td>中文直譯＋引號內英文歌詞</td><td>2 × 165 積分</td></tr></table>
+<div class="dim">合計預計 660 積分，累計上限 800；每支 operator 上限 250、一次性 permit。</div>
+<h3>EV-en（作者原句）</h3><pre>{{image:0}} sings {{audio:1}}. She lip-syncs to {{audio:1}} exactly, every word in time: &quot;I didn&#x27;t run — I just looked outside. I&quot;. Medium close-up of the woman from {{image:0}}, her dark hair slicked back into a low bun, a black ear hook on her left ear and a thin red light line on her left collar, standing on the rainy glass balcony at night and facing the camera, singing calmly with her eyes on the lens, her head tilting slightly on the long notes. Cold blue city light behind her. Locked camera, no cuts, no head turns. No on-screen text.</pre>
+<h3>EV-zh（中文直譯）</h3><pre>{{image:0}}中的她演唱{{audio:1}}。她的口型严格对准{{audio:1}}，每个字都准时：&quot;I didn&#x27;t run — I just looked outside. I&quot;。中近景：{{image:0}}中的女人，深色头发向后梳成低发髻，左耳戴黑色耳挂，左领口一条细细的红色灯线，站在夜雨中的玻璃阳台上，面向镜头，冷静地唱，眼睛看着镜头，长音时头微微倾斜。背后是冷蓝色的城市灯光。镜头固定，不切镜，不转头。画面中没有任何文字。</pre>
+<h2>4. 出片後怎麼判</h2>
+<div class="box"><ul>
+<li>逐鏡檢查（shot-gate-reviewer）：身份、無變形、無文字、AI 標識、鏡頭固定、唱時嘴動、無聲時閉嘴。</li>
+<li>量測：片段音軌對人聲窗口（sync_check.py）＋逐幀嘴型對實測字起點。</li>
+<li>4 支都完成後，給你看正常速度的疊歌片並排比較，由你挑方法；Agent 不判對嘴觀感。</li>
+<li>停止條件：共用輸入造成的客觀 FAIL 就停；結果不明就停；對嘴準不準是要量的，不是停止條件。</li>
+</ul></div>
+</html>

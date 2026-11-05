@@ -1,0 +1,21 @@
+{
+  "schema_version": "audio-understanding-preview/1",
+  "preview": {
+    "operation": "audio_understand",
+    "provider": "gemini",
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    "model_id": "gemini-3.8-flash",
+    "source_sha256": "7ba400e2c109a49ac0c8aaa33aa94d7c186aa3578b166085362f518386b1dbbb",
+    "source_size_bytes": 1344078,
+    "audio_sha256": "7ba400e2c109a49ac0c8aaa33aa94d7c186aa3578b166085362f518386b1dbbb",
+    "audio_size_bytes": 1344078,
+    "duration_seconds": 28.0,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "5b4f1801d85abd94a7cf99d5022e7a339c481c9ef75178ebf06114fa0ca0efaf"
+  },
+  "network_calls": 0,
+  "production_acceptance": "NOT_EVALUATED",
+  "media_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/song-suno/listen/windows/T4-verse1-27-28.wav",
+  "analysis_audio_derivation": "exact_pcm_wav",
+  "human_acceptance": "NOT_EVALUATED"
+}

@@ -1,0 +1,9 @@
+{
+  "intent_sha256": "8dfaf22433353115aa32fc3e193fd41c108253d42a32d6f80431598bc7701dcd",
+  "guide_ordinal": 1,
+  "synthesis_speed": 1.0,
+  "post_output_speedup": false,
+  "phoneme_count": 450,
+  "automatic_retries": 0,
+  "consumed_at_utc": "2026-10-31T05:14:25.420374+00:00"
+}

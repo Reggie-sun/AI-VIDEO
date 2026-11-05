@@ -1,0 +1,2 @@
+{"check": "history independence", "method": "hyperframes render --format png-sequence with -w 1 vs -w 6 (different frame distribution and render order per worker), lossless RGB compare of all frames",
+ "frames": 300, "bit_identical": 300, "max_diff_levels": 0, "threshold_levels": 40, "verdict": "HISTORY-INDEPENDENT", "date": "2026-10-30"}

@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "error": null,
+  "status_message": "Generation completed successfully!",
+  "label": "G",
+  "intent_sha256": "4b437a5ba2d87aeb93afc6dfff7138741eae9881a3d31cc74d8324202737a07f",
+  "cumulative_attempt_ordinal": 7,
+  "elapsed_seconds": 4.9,
+  "peak_gpu_allocated_bytes": 8575714304,
+  "completed_at_utc": "2026-10-31T05:20:35.009014+00:00",
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/G-guided-retention/1358c281-0a0d-26b1-548a-82c5b306d7d7.wav",
+      "sha256": "b469c215138b3b517dad78c84de0614fdf97821d853059f7c7106f8e99f4df13",
+      "bytes": 5760044
+    }
+  ],
+  "human_listening": "NOT_EVALUATED",
+  "remote_generation_calls": 0,
+  "production_state_writes": 0
+}

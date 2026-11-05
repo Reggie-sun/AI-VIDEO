@@ -1,0 +1,404 @@
+{
+ "events": {
+  "cut_U002": {
+   "t": 4.2,
+   "what": "cut to U002 (P-row-lit-a)"
+  },
+  "cut_U003": {
+   "t": 7.933333333333334,
+   "what": "cut to U003 (P-hall-cctv-a)"
+  },
+  "cut_U004": {
+   "t": 9.766666666666667,
+   "what": "cut to U004 (GROUND)"
+  },
+  "cut_U005": {
+   "t": 13.5,
+   "what": "cut to U005 (P-eyes-closed-a)"
+  },
+  "cut_U006": {
+   "t": 17.2,
+   "what": "cut to U006 (P-step-out-a)"
+  },
+  "cut_U007": {
+   "t": 20.966666666666665,
+   "what": "cut to U007 (P-hall-cctv-a)"
+  },
+  "cut_U008": {
+   "t": 24.733333333333334,
+   "what": "cut to U008 (P-turn-door-a)"
+  },
+  "cut_U009": {
+   "t": 26.633333333333333,
+   "what": "cut to U009 (GROUND)"
+  },
+  "cut_U010": {
+   "t": 28.5,
+   "what": "cut to U010 (P-hall-cctv-a)"
+  },
+  "cut_U011": {
+   "t": 30.4,
+   "what": "cut to U011 (P-catwalk-b)"
+  },
+  "cut_U012": {
+   "t": 34.13333333333333,
+   "what": "cut to U012 (GROUND)"
+  },
+  "cut_U013": {
+   "t": 36.5,
+   "what": "cut to U013 (GROUND)"
+  },
+  "cut_U014": {
+   "t": 38.06666666666667,
+   "what": "cut to U014 (P-aisle-door-a)"
+  },
+  "cut_U015": {
+   "t": 41.6,
+   "what": "cut to U015 (P-walk-door-a)"
+  },
+  "cut_U016": {
+   "t": 44.1,
+   "what": "cut to U016 (P-door-face-a)"
+  },
+  "cut_U017": {
+   "t": 46.13333333333333,
+   "what": "cut to U017 (GROUND)"
+  },
+  "cut_U018": {
+   "t": 48.96666666666667,
+   "what": "cut to U018 (P-door-latch-a)"
+  },
+  "cut_U019": {
+   "t": 51.1,
+   "what": "cut to U019 (P-city-gap-a)"
+  },
+  "cut_U020": {
+   "t": 54.7,
+   "what": "cut to U020 (P-gap-face-a)"
+  },
+  "cut_U021": {
+   "t": 60.5,
+   "what": "cut to U021 (P-gap-mcu-b)"
+  },
+  "cut_U022": {
+   "t": 64.26666666666667,
+   "what": "cut to U022 (P-gap-34-a)"
+  },
+  "cut_U023": {
+   "t": 67.23333333333333,
+   "what": "cut to U023 (P-city-gap-a)"
+  },
+  "cut_U024": {
+   "t": 69.9,
+   "what": "cut to U024 (P-gap-wide-a)"
+  },
+  "cut_U025": {
+   "t": 72.53333333333333,
+   "what": "cut to U025 (P-door-face-a)"
+  },
+  "cut_U026": {
+   "t": 78.16666666666667,
+   "what": "cut to U026 (P-gap-wide-a)"
+  },
+  "cut_U027": {
+   "t": 79.56666666666666,
+   "what": "cut to U027 (P-gap-face-a)"
+  },
+  "cut_U028": {
+   "t": 83.13333333333334,
+   "what": "cut to U028 (P-hall-cctv-a)"
+  },
+  "cut_U029": {
+   "t": 86.83333333333333,
+   "what": "cut to U029 (P-dark-hall-b)"
+  },
+  "cut_U030": {
+   "t": 89.53333333333333,
+   "what": "cut to U030 (GROUND)"
+  },
+  "cut_U031": {
+   "t": 92.43333333333334,
+   "what": "cut to U031 (P-hall-cctv-a)"
+  },
+  "cut_U032": {
+   "t": 96.2,
+   "what": "cut to U032 (P-eval-screens-a)"
+  },
+  "cut_U033": {
+   "t": 99.93333333333334,
+   "what": "cut to U033 (P-speak-aisle-b)"
+  },
+  "cut_U034": {
+   "t": 103.7,
+   "what": "cut to U034 (P-aisle-door-a)"
+  },
+  "cut_U035": {
+   "t": 107.43333333333334,
+   "what": "cut to U035 (P-offline-a)"
+  },
+  "cut_U036": {
+   "t": 110.93333333333334,
+   "what": "cut to U036 (P-lab-terminals-a)"
+  },
+  "cut_U037": {
+   "t": 114.9,
+   "what": "cut to U037 (GROUND)"
+  },
+  "cut_U038": {
+   "t": 119.76666666666667,
+   "what": "cut to U038 (P-lab-terminals-a)"
+  },
+  "cut_U039": {
+   "t": 121.86666666666666,
+   "what": "cut to U039 (GROUND)"
+  },
+  "cut_U040": {
+   "t": 123.96666666666667,
+   "what": "cut to U040 (P-lab-terminals-a)"
+  },
+  "cut_U041": {
+   "t": 126.1,
+   "what": "cut to U041 (P-dark-hall-b)"
+  },
+  "cut_U042": {
+   "t": 131.7,
+   "what": "cut to U042 (P-dark-cu-a)"
+  },
+  "cut_U043": {
+   "t": 135.43333333333334,
+   "what": "cut to U043 (P-queue-sing-b)"
+  },
+  "cut_U044": {
+   "t": 139.13333333333333,
+   "what": "cut to U044 (P-queue-cu-b)"
+  },
+  "cut_U045": {
+   "t": 144.8,
+   "what": "cut to U045 (P-floor-line-at-a)"
+  },
+  "cut_U046": {
+   "t": 147.33333333333334,
+   "what": "cut to U046 (P-line-ms-b)"
+  },
+  "cut_U047": {
+   "t": 152.4,
+   "what": "cut to U047 (P-floor-line-b)"
+  },
+  "cut_U048": {
+   "t": 154.3,
+   "what": "cut to U048 (P-queue-cu-b)"
+  },
+  "cut_U049": {
+   "t": 156.76666666666668,
+   "what": "cut to U049 (GROUND)"
+  },
+  "cut_U050": {
+   "t": 157.73333333333332,
+   "what": "cut to U050 (P-hall-cctv-a)"
+  },
+  "cut_U051": {
+   "t": 159.6,
+   "what": "cut to U051 (P-walk-against-a)"
+  },
+  "cut_U052": {
+   "t": 160.5,
+   "what": "cut to U052 (P-gaze-b)"
+  },
+  "cut_U053": {
+   "t": 162.96666666666667,
+   "what": "cut to U053 (GROUND)"
+  },
+  "cut_U054": {
+   "t": 163.3,
+   "what": "cut to U054 (P-hairflip-a)"
+  },
+  "cut_U055": {
+   "t": 165.16666666666666,
+   "what": "cut to U055 (P-hall-cctv-a)"
+  },
+  "cut_U056": {
+   "t": 167.0,
+   "what": "cut to U056 (P-city-aerial-a)"
+  },
+  "cut_U057": {
+   "t": 169.1,
+   "what": "cut to U057 (P-gaze-b)"
+  },
+  "cut_U058": {
+   "t": 173.5,
+   "what": "cut to U058 (P-lens-face-b)"
+  },
+  "cut_U059": {
+   "t": 175.9,
+   "what": "cut to U059 (P-hand-lens-a)"
+  },
+  "cut_U060": {
+   "t": 178.1,
+   "what": "cut to U060 (P-seated-sun-cu-a)"
+  },
+  "cut_U061": {
+   "t": 181.0,
+   "what": "cut to U061 (P-sun-glass-a)"
+  },
+  "cut_U062": {
+   "t": 183.16666666666666,
+   "what": "cut to U062 (P-behind-glass-a)"
+  },
+  "cut_U063": {
+   "t": 185.03333333333333,
+   "what": "cut to U063 (P-trace-profile-a)"
+  },
+  "cut_U064": {
+   "t": 187.23333333333332,
+   "what": "cut to U064 (P-behind-glass-a)"
+  },
+  "cut_U065": {
+   "t": 191.0,
+   "what": "cut to U065 (P-glass-profile-a)"
+  },
+  "cut_U066": {
+   "t": 193.4,
+   "what": "cut to U066 (P-spotlight-wide-a)"
+  },
+  "cut_U067": {
+   "t": 194.9,
+   "what": "cut to U067 (P-backlit-b)"
+  },
+  "cut_U068": {
+   "t": 201.66666666666666,
+   "what": "cut to U068 (P-spotlight-wide-a)"
+  },
+  "cut_U069": {
+   "t": 202.6,
+   "what": "cut to U069 (P-spotlight-cctv-a)"
+  },
+  "cut_U070": {
+   "t": 204.3,
+   "what": "cut to U070 (GROUND)"
+  },
+  "cut_U071": {
+   "t": 206.76666666666668,
+   "what": "cut to U071 (P-spotlight-ms-a)"
+  },
+  "cut_U072": {
+   "t": 209.26666666666668,
+   "what": "cut to U072 (P-backlit-b)"
+  },
+  "cut_U073": {
+   "t": 213.43333333333334,
+   "what": "cut to U073 (GROUND)"
+  },
+  "cut_U074": {
+   "t": 217.13333333333333,
+   "what": "cut to U074 (P-spotlight-low-a)"
+  },
+  "cut_U075": {
+   "t": 220.83333333333334,
+   "what": "cut to U075 (P-street-cam-a)"
+  },
+  "cut_U076": {
+   "t": 222.43333333333334,
+   "what": "cut to U076 (P-gaze-b)"
+  },
+  "cut_U077": {
+   "t": 226.56666666666666,
+   "what": "cut to U077 (P-gaze-b)"
+  },
+  "cut_U078": {
+   "t": 230.13333333333333,
+   "what": "cut to U078 (P-gap-close-a)"
+  },
+  "cut_U079": {
+   "t": 235.66666666666666,
+   "what": "cut to U079 (P-dark-hall-b)"
+  },
+  "cut_U080": {
+   "t": 239.63333333333333,
+   "what": "cut to U080 (P-queue-dark-cu-a)"
+  },
+  "cut_U081": {
+   "t": 244.96666666666667,
+   "what": "cut to U081 (P-hall-cctv-a)"
+  },
+  "cut_U082": {
+   "t": 249.56666666666666,
+   "what": "cut to U082 (GROUND)"
+  },
+  "cut_U083": {
+   "t": 252.46666666666667,
+   "what": "cut to U083 (GROUND)"
+  },
+  "cut_U084": {
+   "t": 258.1666666666667,
+   "what": "cut to U084 (P-dark-hall-b)"
+  },
+  "U001_cue": {
+   "t": 0.5,
+   "what": "U001 cue (hit): osd_power_on"
+  },
+  "U004_cue": {
+   "t": 10.133333333333333,
+   "what": "U004 cue (cue_s): flipclock_0346_0347"
+  },
+  "U005_plate1": {
+   "t": 14.633333333333333,
+   "what": "U005 switches to P-headturn-b"
+  },
+  "U006_cue": {
+   "t": 19.066666666666666,
+   "what": "U006 cue (cue_s): pulse_on_beat"
+  },
+  "U018_cue": {
+   "t": 49.166666666666664,
+   "what": "U018 cue (cue_s): pulse_on_beat"
+  },
+  "U020_plate1": {
+   "t": 58.233333333333334,
+   "what": "U020 switches to P-gap-34-a"
+  },
+  "U025_plate1": {
+   "t": 75.63333333333334,
+   "what": "U025 switches to P-gap-mcu-b"
+  },
+  "U044_plate1": {
+   "t": 142.7,
+   "what": "U044 switches to P-queue-sing-b"
+  },
+  "U045_plate1": {
+   "t": 146.06666666666666,
+   "what": "U045 switches to P-floor-line-b"
+  },
+  "U046_plate1": {
+   "t": 149.86666666666667,
+   "what": "U046 switches to P-gaze-b"
+  },
+  "U056_plate1": {
+   "t": 167.73333333333332,
+   "what": "U056 switches to P-panel-photo-a"
+  },
+  "U056_plate2": {
+   "t": 168.43333333333334,
+   "what": "U056 switches to P-city-gap-a"
+  },
+  "U067_plate1": {
+   "t": 200.23333333333332,
+   "what": "U067 switches to P-spotlight-ms-a"
+  },
+  "U070_cue": {
+   "t": 204.63333333333333,
+   "what": "U070 cue (beat): invert_white_panel_words"
+  },
+  "U072_plate1": {
+   "t": 211.06666666666666,
+   "what": "U072 switches to P-spotlight-low-a"
+  },
+  "U074_cue": {
+   "t": 219.0,
+   "what": "U074 cue (cue_s): spotlight_flicker"
+  },
+  "U082_cue": {
+   "t": 249.86666666666667,
+   "what": "U082 cue (cue_s): flipclock_0347_0348"
+  }
+ }
+}

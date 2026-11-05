@@ -1,0 +1,14 @@
+{
+  "raw_analyzer_gate": "PASS",
+  "manifest_revision_before": 11,
+  "manifest_revision_after": 12,
+  "canonical_reader": "PASS",
+  "controlled_marked_2_evaluation": "PASS",
+  "observer_evidence_index": "PASS",
+  "paid_and_source_history_unchanged": true,
+  "exact_replay_no_new_mcp_calls": true,
+  "exact_replay_manifest_unchanged": true,
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "new_provider_calls": 0
+}

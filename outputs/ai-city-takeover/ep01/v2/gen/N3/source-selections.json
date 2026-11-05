@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v2-n3-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/N3-a.png",
+    "sha256": "4f3e63927ee96332bdff70e86ab41f6e2c11ea37d8a96c59e6a911f1e83b5659",
+    "size_bytes": 1915327,
+    "width": 1671,
+    "height": 941,
+    "role": "approved N3-a: the first frame",
+    "need_id": "window",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

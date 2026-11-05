@@ -1,0 +1,58 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S5r",
+  "shot_id": "ep01v2-s5",
+  "attempt_id": "iris-v2-s5r-source-001",
+  "repair_of": {
+    "unit": "S5",
+    "gate": "outputs/ai-city-takeover/ep01/v2/qa/gate-S5/post-media-gate.json",
+    "failed_requirement": "camera"
+  },
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S5r/project/state/video-generation/fetch/files/3f2224254e9453161301f7796dbf1a022d2dbfdaf15080d19ebe1a3f13f559dc.mp4",
+  "artifact_sha256": "3f2224254e9453161301f7796dbf1a022d2dbfdaf15080d19ebe1a3f13f559dc",
+  "intent": "board v2.1 S5 with the coverage's static camera: IRIS as a quiet observer at the window",
+  "source_audio_policy": "MUTE (final film uses the approved song v2; raw audio not counted)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 6.08 s, 145 frames (24 fps cadence on a 60 tbn grid), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S5r/mcp-frame-*.jpg, mcp-sheet.jpg (qa/gate_sheet.py)",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 0.0 s, issues []",
+    "frames": "first-mid-last.jpg, quarter-second-sheet.jpg, face-first-mid-last.jpg",
+    "camera_drift": {
+      "tool": "qa/frame_drift.py (ORB + RANSAC similarity from frame 0)",
+      "result": "scale +0.00% and shift <= 0.1 px at frames 24, 48, 72, 96, 120, 144 (772-796 of 800 inliers)",
+      "S5_for_comparison": "+0.57% scale and +27.6 px vertical by frame 144"
+    }
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same face as ID7b/K5b (brows, freckles, nose), black hook on the visible left ear, thin red light line on the left collar, charcoal high-collar coat, low bun; opens in profile facing frame-left toward the window"
+    },
+    {
+      "requirement_id": "observer",
+      "verdict": "PASS",
+      "reason": "calm gaze stays out of the window; the head eases slightly toward three-quarter without turning the body; lips closed, no speech (MCP speaking 0.0 s), hands out of frame"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "locked: no measurable zoom or shift over the full 6.08 s; framing class and placement held (chest-up profile, right of centre, window at left, as the sealed K5b framing text 中近景 describes); no reflection of her on the glass"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; no subtitles, titles, text or interface added"
+    }
+  ],
+  "observations": [
+    "like S5, the framing is looser than the K5b still: head about 32% of frame height versus about 43% in K5b, same side and screen direction"
+  ],
+  "verdict": "PASS",
+  "all_required_observed_pass": true,
+  "not_evaluated": [
+    "human 1.0x viewing in the assembled film",
+    "final audio (MUTE here)"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

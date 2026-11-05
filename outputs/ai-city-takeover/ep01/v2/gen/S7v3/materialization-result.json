@@ -1,0 +1,12 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/S7v3/project",
+  "task_id": "iris-v2-s7v3-source-001",
+  "request_hash": "9109534dc78f261229873cc12c873c40b042a314ac5edc84b1b2c693cdbf897b",
+  "resolved_reference_order": [
+    "iris-c-v3-s7-1-cache-room",
+    "iris-c-v3-s7-2-performance",
+    "iris-cf-details"
+  ],
+  "new_provider_calls": 0,
+  "new_attempt_started": false
+}

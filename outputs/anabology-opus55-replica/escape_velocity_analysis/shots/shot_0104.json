@@ -1,0 +1,880 @@
+{
+  "shot_id": "S0104",
+  "start_frame": 4954,
+  "end_frame": 4958,
+  "start_time": 206.4167,
+  "end_time": 206.625,
+  "duration_frames": 5,
+  "duration_s": 0.2083,
+  "start_tc": "00:03:26:10",
+  "end_tc": "00:03:26:14",
+  "boundary_in_id": "B3-009",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 4954,
+      "path": "keyframes/S0104_f04954.jpg",
+      "role": "first",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 4955,
+      "path": "keyframes/S0104_f04955.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 4956,
+      "path": "keyframes/S0104_f04956.jpg",
+      "role": "middle",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 4957,
+      "path": "keyframes/S0104_f04957.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 4958,
+      "path": "keyframes/S0104_f04958.jpg",
+      "role": "last",
+      "note": "Actually opened individually in Codex detail pass."
+    }
+  ],
+  "scene_type": "detail_insert",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Extreme close-up of the left eye",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Extreme close-up of the left eye. Freckled cheek and reflected blue window in iris; black hair frames upper right; white 01 lies over iris. 1. appears from frame 4956; negative/positive title box flashes.",
+  "composition": {
+    "shot_size": "detail",
+    "subject_position": "Extreme close-up of the left eye",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Extreme close-up of the left eye",
+      "background": "Freckled cheek and reflected blue window in iris; black hair frames upper right; white 01 lies over iris."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "1. appears from frame 4956; negative/positive title box flashes",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0104.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0016,
+      "pan_y_frac_per_s": -0.0001,
+      "zoom_per_s": -0.0097,
+      "median_flow_frac_per_s": 0.0037,
+      "pairs_measured": 4
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Freckled cheek and reflected blue window in iris; black hair frames upper right; white 01 lies over iris.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#3A342C",
+        "fraction": 0.267,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#4F4740",
+        "fraction": 0.264,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#20221D",
+        "fraction": 0.248,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#676164",
+        "fraction": 0.117,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#7E7A83",
+        "fraction": 0.097,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#DBDAD6",
+        "fraction": 0.008,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [62.0, 65.6, 62.4]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK label visible but digits not reliably legible against dark/coarse printed source; value unknown",
+      "evidence_frame": 4956,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74,
+      "legibility_note": "Halftone and dark-on-dark contrast partly obscure lettering. Do not infer digits from author chapter sequence."
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 4956
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 4956,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:26:10",
+      "end_value": "00:03:26:14"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright01 MONTHS/TO ESCAPE remains over eye crops",
+      "evidence_frame": 4956
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0104-E01",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Freckled cheek and reflected blue window in iris; black hair frames upper right; white 01 lies over iris.",
+      "start_frame": 4954,
+      "end_frame": 4958,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "1. appears from frame 4956; negative/positive title box flashes",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [4954, 4954]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [4958, 4958]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 4954,
+          "state": "present"
+        },
+        {
+          "frame": 4958,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4954,
+        4956,
+        4958
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          4954,
+          4954
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    },
+    {
+      "element_id": "S0104-E02",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "character",
+      "description": "Extreme close-up of the left eye",
+      "start_frame": 4954,
+      "end_frame": 4958,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "1. appears from frame 4956; negative/positive title box flashes",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [4954, 4954]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [4958, 4958]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 4954,
+          "state": "present"
+        },
+        {
+          "frame": 4958,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4954,
+        4956,
+        4958
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          4954,
+          4954
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    },
+    {
+      "element_id": "S0104-E03",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "counter",
+      "description": "Visible counter bearing 01",
+      "start_frame": 4954,
+      "end_frame": 4958,
+      "bounding_box": {
+        "x": 0.41,
+        "y": 0.41,
+        "w": 0.1,
+        "h": 0.1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "1. appears from frame 4956; negative/positive title box flashes",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [4954, 4954]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [4958, 4958]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 4954,
+          "state": "present"
+        },
+        {
+          "frame": 4958,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4954,
+        4956,
+        4958
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "01",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          4954,
+          4954
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    },
+    {
+      "element_id": "S0104-E04",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "Visible text_title bearing 1.",
+      "start_frame": 4956,
+      "end_frame": 4958,
+      "bounding_box": {
+        "x": 0.8,
+        "y": 0.62,
+        "w": 0.1,
+        "h": 0.28,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "1. appears from frame 4956; negative/positive title box flashes",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [4956, 4956]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [4958, 4958]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 4956,
+          "text": "1.",
+          "color": "#000000",
+          "backing": "white"
+        },
+        {
+          "frame": 4957,
+          "text": "1.",
+          "color": "#FFFFFF",
+          "backing": "none"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4956,
+        4958
+      ],
+      "confidence": 0.75,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "1.",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          4956,
+          4956
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    },
+    {
+      "element_id": "S0104-E05",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "hud_bracket",
+      "description": "Corner marks around eye",
+      "start_frame": 4954,
+      "end_frame": 4958,
+      "bounding_box": {
+        "x": 0.31,
+        "y": 0.2,
+        "w": 0.31,
+        "h": 0.52,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "1. appears from frame 4956; negative/positive title box flashes",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [4954, 4954]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [4958, 4958]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 4954,
+          "state": "present"
+        },
+        {
+          "frame": 4958,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4954,
+        4956,
+        4958
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          4954,
+          4954
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    },
+    {
+      "element_id": "S0104-E06",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "CROP 01 · EYE",
+      "start_frame": 4954,
+      "end_frame": 4958,
+      "bounding_box": {
+        "x": 0.041,
+        "y": 0.223,
+        "w": 0.07,
+        "h": 0.02,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "State/position as recorded in keyframes",
+        "easing": "step or typewriter; exact continuous curve unknown",
+        "entrance": "first confirmed at frame 4954",
+        "exit": "last confirmed at frame 4958"
+      },
+      "keyframes": [
+        {
+          "frame": 4954,
+          "state": "present"
+        },
+        {
+          "frame": 4958,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4954,
+        4958
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "CROP 01 · EYE",
+        "typography": {
+          "description": "Uppercase mono fine type",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          4954,
+          4954
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    },
+    {
+      "element_id": "S0104-E07",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "IRIS · OCR “01” 0.96",
+      "start_frame": 4955,
+      "end_frame": 4958,
+      "bounding_box": {
+        "x": 0.322,
+        "y": 0.205,
+        "w": 0.09,
+        "h": 0.018,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "State/position as recorded in keyframes",
+        "easing": "step or typewriter; exact continuous curve unknown",
+        "entrance": "first confirmed at frame 4955",
+        "exit": "last confirmed at frame 4958"
+      },
+      "keyframes": [
+        {
+          "frame": 4955,
+          "state": "present"
+        },
+        {
+          "frame": 4958,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4955,
+        4958
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "IRIS · OCR “01” 0.96",
+        "typography": {
+          "description": "Uppercase mono fine type",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          4955,
+          4955
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    },
+    {
+      "element_id": "S0104-E08",
+      "shot_id": "S0104",
+      "asset_id": null,
+      "type": "hud_marker",
+      "description": "Four small horizontal crop-step squares below CROP label, active square black, preceding squares outline",
+      "start_frame": 4954,
+      "end_frame": 4958,
+      "bounding_box": {
+        "x": 0.041,
+        "y": 0.26,
+        "w": 0.118,
+        "h": 0.03,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#101010",
+        "opacity": 1,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Spatial bounds estimated from actual 1920x1080 reference; confidence0.73; color from displayed pixels where explicit."
+      },
+      "motion": {
+        "path": "1. appears from frame 4956; negative/positive title box flashes",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [4954, 4954]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [4958, 4958]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 4954,
+          "active_index": 1
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        4954,
+        4958
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Original font, shader, source layer separability and exact physical photographic parameters unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          4954,
+          4954
+        ],
+        "exit_bounds": [
+          4958,
+          4958
+        ],
+        "method": "All-frame short-shot filmstrip plus individual first/mid/last; graphic step sequence inspected",
+        "precision_note": "Boundary-clipped visibility, does not claim lifetime outside shot"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0104-A01",
+      "target_element_ids": [
+        "S0104-E02",
+        "S0104-E03",
+        "S0104-E04",
+        "S0104-E05"
+      ],
+      "description": "1. appears from frame 4956; negative/positive title box flashes",
+      "start_frame": 4954,
+      "end_frame": 4958,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-009",
+      "span": [
+        4954,
+        4954
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-010",
+      "span": [
+        4958,
+        4958
+      ],
+      "description": "1. appears from frame 4956; negative/positive title box flashes",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AX0318",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 4938–4959; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 4954
+    },
+    {
+      "audio_event_id": "AW0329",
+      "relation": "vocal_word_candidate (unknown) at frame 4938–5032; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4954
+    },
+    {
+      "audio_event_id": "AB0457",
+      "relation": "beat_candidate (unknown) at frame 4954; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4954
+    },
+    {
+      "audio_event_id": "AH01988",
+      "relation": "band_onset_candidate (unknown) at frame 4954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4954
+    },
+    {
+      "audio_event_id": "AH01989",
+      "relation": "band_onset_candidate (unknown) at frame 4954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4954
+    },
+    {
+      "audio_event_id": "AH01990",
+      "relation": "band_onset_candidate (unknown) at frame 4954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4954
+    },
+    {
+      "audio_event_id": "AH01991",
+      "relation": "band_onset_candidate (unknown) at frame 4954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4954
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0104.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.75,
+  "uncertainties": [
+    "Exact original font and renderer curves are unknown, not observable from compressed MP4.",
+    "Plate-versus-overlay source decomposition inferred; visual components listed independently."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0104.jpg",
+      "keyframes/S0104_f04954.jpg",
+      "keyframes/S0104_f04955.jpg",
+      "keyframes/S0104_f04956.jpg",
+      "keyframes/S0104_f04957.jpg",
+      "keyframes/S0104_f04958.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "frames_actually_opened": [
+      4954,
+      4955,
+      4956,
+      4957,
+      4958
+    ],
+    "filmstrip_opened": true,
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "Individual 960px keyframes, dense per-frame ROI sheets and selected 1920px source crops. All geometric estimates explicitly tagged.",
+    "fullres_frames_actually_opened": [
+      4956
+    ],
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

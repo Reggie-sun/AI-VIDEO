@@ -1,0 +1,64 @@
+[
+ {
+  "name": "LSen1",
+  "take_sha256": "93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d",
+  "lag_s": -0.8037,
+  "ncc": 0.3815,
+  "copy": true,
+  "divergence": {
+   "frame": 184,
+   "rule": "stretch",
+   "last_match": 180,
+   "clip_s": 1.84,
+   "song_s": 20.614
+  },
+  "synced_until": {
+   "clip_s": 1.758,
+   "song_s": 20.532
+  },
+  "spans": [
+   {
+    "clip_s": [
+     0.04,
+     2.32
+    ],
+    "song_s": [
+     18.814,
+     21.094
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": -0.8037,
+   "method": "tool 15 waveform lag (copy)",
+   "song_t_of_clip0": 18.7737,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": -0.506,
+   "ncc": 0.648,
+   "max_dev_s": 0.312,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      1.875
+     ],
+     "lag_s": -0.811,
+     "windows": 5,
+     "min_ncc": 0.789
+    },
+    {
+     "clip_s": [
+      1.875,
+      4.375
+     ],
+     "lag_s": -0.489,
+     "windows": 10,
+     "min_ncc": 0.639
+    }
+   ]
+  }
+ }
+]

@@ -1,0 +1,37 @@
+artifact_id: iris-a01-first-frame-repair-story
+beats:
+- beat_id: intro
+  summary: 嘴唇自然静置观察，不把念白伪装成对嘴
+content_hash: 85db74bb2f6d57ed47248f4ed2c4bf5d6d199f90a10a18c14ae5a904029e96ee
+creation_receipt_id: iris-a01-first-frame-repair-authoring:story
+language: zh
+logline: 冷静观察者在雾城阳台停留
+revision: 4
+schema_version: '2.0'
+source_provenance:
+- content_hash: 3f99ea750e7024276baf6e2eeccadc0e83ae324ac7bd699ac6d3ce050f0222f0
+  kind: user_input
+  reference: evidence/authoring-input/3f99ea750e7024276baf6e2eeccadc0e83ae324ac7bd699ac6d3ce050f0222f0.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: 5230ac072d5945501db51e0591776ac61fdb8b3d1e76bbc484af3bb1c2a5a264
+  kind: user_input
+  reference: evidence/authoring-input/5230ac072d5945501db51e0591776ac61fdb8b3d1e76bbc484af3bb1c2a5a264.json
+- content_hash: 7e5be29b7df9c6cc4255c1a88a372e0ced5ee8c697b05f7df27685b373bbcecc
+  kind: user_input
+  reference: evidence/authoring-input/7e5be29b7df9c6cc4255c1a88a372e0ced5ee8c697b05f7df27685b373bbcecc.json
+- content_hash: 14ec671354a8ecc68b7b01f2a059855b90c847c1c26a18bc162ef8116df6f856
+  kind: user_input
+  reference: evidence/authoring-input/14ec671354a8ecc68b7b01f2a059855b90c847c1c26a18bc162ef8116df6f856.json
+- content_hash: 656fad5e78c2469ef7693ad0403cb6dffa5f1739cbeae136cbebd095fa993e01
+  kind: user_input
+  reference: evidence/authoring-input/656fad5e78c2469ef7693ad0403cb6dffa5f1739cbeae136cbebd095fa993e01.json
+source_references: []
+synopsis: 单独源片供后续完整歌曲剪辑使用

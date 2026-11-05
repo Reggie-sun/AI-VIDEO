@@ -1,0 +1,83 @@
+artifact_id: iris-v2-lszh2-project
+artifacts:
+  brief:
+    artifact_id: iris-v2-lszh2-brief
+    content_hash: 94fc22b69bd156efeb77e360ab861fa611f744a651b7627be6ac3186a392b6cc
+    path: creative/iris-v2-lszh2-brief/94fc22b69bd156efeb77e360ab861fa611f744a651b7627be6ac3186a392b6cc.yaml
+    revision: 1
+  characters:
+  - artifact_id: iris-a01-character
+    content_hash: 19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969
+    path: creative/iris-a01-character/19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969.yaml
+    revision: 6
+  scenes:
+  - artifact_id: iris-v2-lszh2-scene
+    content_hash: ba5a495287a1340dcd1ebc1e2281320991f0be2d807d551a5c237ff01ee7d5bd
+    path: creative/iris-v2-lszh2-scene/ba5a495287a1340dcd1ebc1e2281320991f0be2d807d551a5c237ff01ee7d5bd.yaml
+    revision: 1
+  shots:
+  - artifact_id: iris-v2-lszh2-shot
+    content_hash: f0c19f6b0a9b6a886358a035d65a8c6afb3490c17e8775beec7fedc2c6f337d4
+    path: creative/iris-v2-lszh2-shot/f0c19f6b0a9b6a886358a035d65a8c6afb3490c17e8775beec7fedc2c6f337d4.yaml
+    revision: 1
+  story:
+    artifact_id: iris-v2-lszh2-story
+    content_hash: ade60effdac1bae2770493bbf7502ba9ae76f7bfc5546137d8cfd6107dcda697
+    path: creative/iris-v2-lszh2-story/ade60effdac1bae2770493bbf7502ba9ae76f7bfc5546137d8cfd6107dcda697.yaml
+    revision: 1
+  storyboard:
+    artifact_id: iris-v2-lszh2-storyboard
+    content_hash: 91a8d6344bcb9c96e60f9cfccdd8705fd90e06f86189c702c84fe716150cec47
+    path: creative/iris-v2-lszh2-storyboard/91a8d6344bcb9c96e60f9cfccdd8705fd90e06f86189c702c84fe716150cec47.yaml
+    revision: 1
+asset_root: assets/files
+content_hash: 648ffa61eeb90860e33537acf11927bc6b68332da3c77786ef9480daba4de04e
+creation_receipt_id: iris-v2-lszh2-authoring
+default_language: zh
+delivery_profile:
+  codec_profile: h264
+  fps: 30
+  height: 1080
+  width: 1920
+project_id: iris-v2-lszh2-source
+renderer_policy:
+  allowed:
+  - hyperframes
+  default_preference: hyperframes
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 91cf271fa0f8b4d3053880c151a0031023be8b0da9ea144c01ec128cf23105fc
+  kind: user_input
+  reference: evidence/authoring-input/91cf271fa0f8b4d3053880c151a0031023be8b0da9ea144c01ec128cf23105fc.json
+- content_hash: feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d
+  kind: user_input
+  reference: evidence/authoring-input/feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 186d69ed29958b1f61771f70abdd49733908bfee6cfa16441b3d898ac7f4344b
+  kind: user_input
+  reference: evidence/authoring-input/186d69ed29958b1f61771f70abdd49733908bfee6cfa16441b3d898ac7f4344b.json
+- content_hash: 28b3803ef1a7f15b80b39140a11a193e959bd8875a4fe53451233f6a1a0731ed
+  kind: user_input
+  reference: evidence/authoring-input/28b3803ef1a7f15b80b39140a11a193e959bd8875a4fe53451233f6a1a0731ed.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+title: IRIS EP01 v2 LSzh2 source

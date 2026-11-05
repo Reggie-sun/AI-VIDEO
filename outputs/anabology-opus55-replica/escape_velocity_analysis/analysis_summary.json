@@ -1,0 +1,18 @@
+{
+ "schema": "ev-analysis-summary/v1",
+ "source_sha256": "bf3595f1f615a6bc66b8925680e28849e12eeb57ec5c7f93420a95e3fe37a40d",
+ "shots_expected": 153,
+ "shot_records": 153,
+ "detailed_visual_review": 153,
+ "elements": 1209,
+ "audio_events": 4242,
+ "overall_status": "ANALYSIS_INCOMPLETE",
+ "scope": "逆向分析与参考提取；未开始复刻，未生成视频，未调用付费生成模型",
+ "remaining_limits": [
+  "只有本地下载版本的7353个可解码帧得到覆盖；作者7354帧master与本地容器报告差异已保留。",
+  "原始engine、shot board、字体文件、原shader、逐词时间文件未公开；隐藏参数只允许估计或unknown。",
+  "当前模型工具返回audio content omitted because you do not support audio input，不能声称本会话已实际听审；本地ASR、CTC和频谱不是听觉验收。",
+  "153镜均有实际filmstrip、关键帧/原分辨率细节与密采视觉复核。坐标及显示时序给出置信度/有界误差；未知原字体、shader、随机翻牌序列与原始素材拆层仍保留unknown。",
+  "音频听审与SFX来源受当前工具输入边界阻塞，delivery validator继续保留ANALYSIS_INCOMPLETE；结构/视觉复核通过不等于整项高精度音画分析完成。"
+ ]
+}

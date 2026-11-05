@@ -1,0 +1,326 @@
+{
+ "events": {
+  "cut_S2": {
+   "t": 2.8666666666666667,
+   "what": "cut to S2"
+  },
+  "cut_S3": {
+   "t": 4.8,
+   "what": "cut to S3"
+  },
+  "cut_S4": {
+   "t": 8.133333333333333,
+   "what": "cut to S4"
+  },
+  "cut_S5": {
+   "t": 11.466666666666667,
+   "what": "cut to S5"
+  },
+  "cut_S6": {
+   "t": 13.366666666666667,
+   "what": "cut to S6"
+  },
+  "cut_S7": {
+   "t": 14.8,
+   "what": "cut to S7"
+  },
+  "cut_S8a": {
+   "t": 18.866666666666667,
+   "what": "cut to S8a"
+  },
+  "cut_S8b": {
+   "t": 22.566666666666666,
+   "what": "cut to S8b"
+  },
+  "cut_S9a": {
+   "t": 25.9,
+   "what": "cut to S9a"
+  },
+  "cut_S9b": {
+   "t": 28.3,
+   "what": "cut to S9b"
+  },
+  "cut_S3d": {
+   "t": 7.1,
+   "what": "cut to S3d"
+  },
+  "cut_S4c": {
+   "t": 9.733333333333333,
+   "what": "cut to S4c"
+  },
+  "cut_S5d": {
+   "t": 12.1,
+   "what": "cut to S5d"
+  },
+  "cut_S9h": {
+   "t": 29.133333333333333,
+   "what": "cut to S9h"
+  },
+  "cut_S9b2": {
+   "t": 29.733333333333334,
+   "what": "cut to S9b2"
+  },
+  "cut_S8p": {
+   "t": 21.366666666666667,
+   "what": "cut to S8p"
+  },
+  "cut_S8a2": {
+   "t": 21.866666666666667,
+   "what": "cut to S8a2"
+  },
+  "cut_S8b_x": {
+   "t": 24.066666666666666,
+   "what": "cut to S8b_x"
+  },
+  "cut_S8w": {
+   "t": 24.733333333333334,
+   "what": "cut to S8w"
+  },
+  "cut_S8b_x2": {
+   "t": 25.166666666666668,
+   "what": "cut to S8b_x2"
+  },
+  "cut_ST1": {
+   "t": 2.8666666666666667,
+   "what": "insert ST1 (take ST1)"
+  },
+  "cut_ST1_back": {
+   "t": 3.3666666666666667,
+   "what": "back from insert ST1"
+  },
+  "cut_N1": {
+   "t": 3.8333333333333335,
+   "what": "insert N1 (take N1)"
+  },
+  "cut_I1": {
+   "t": 4.333333333333333,
+   "what": "insert I1 (take S9a)"
+  },
+  "cut_I3": {
+   "t": 8.6,
+   "what": "insert I3 (take S9a)"
+  },
+  "cut_ST2": {
+   "t": 9.033333333333333,
+   "what": "insert ST2 (take ST2)"
+  },
+  "cut_ST3": {
+   "t": 14.0,
+   "what": "insert ST3 (take ST3)"
+  },
+  "cut_ST4": {
+   "t": 15.033333333333333,
+   "what": "insert ST4 (take ST4)"
+  },
+  "cut_ST4_back": {
+   "t": 15.533333333333333,
+   "what": "back from insert ST4"
+  },
+  "cut_N4": {
+   "t": 16.9,
+   "what": "insert N4 (take N4)"
+  },
+  "cut_N4_back": {
+   "t": 17.666666666666668,
+   "what": "back from insert N4"
+  },
+  "cut_N3": {
+   "t": 25.5,
+   "what": "insert N3 (take N3)"
+  },
+  "cut_I7": {
+   "t": 26.233333333333334,
+   "what": "insert I7 (still P8c)"
+  },
+  "cut_I7_back": {
+   "t": 26.7,
+   "what": "back from insert I7"
+  },
+  "cut_ST6": {
+   "t": 27.9,
+   "what": "insert ST6 (take ST6)"
+  },
+  "chorus_impact": {
+   "t": 19.066666666666666,
+   "what": "impact on the chorus entry hit (picture one frame early)"
+  },
+  "s1_timecode": {
+   "t": 0.5,
+   "what": "03:47 lands on beat 1",
+   "roi": [
+    1160,
+    400,
+    560,
+    260
+   ]
+  },
+  "s2_title": {
+   "t": 2.8666666666666667,
+   "what": "title slams in with the cut",
+   "roi": [
+    110,
+    380,
+    620,
+    130
+   ]
+  },
+  "s2_date": {
+   "t": 3.8333333333333335,
+   "what": "incident date OSD on 'September'",
+   "roi": [
+    1300,
+    70,
+    540,
+    60
+   ]
+  },
+  "s3_model": {
+   "t": 5.066666666666666,
+   "what": "研究模型 on 'training'",
+   "roi": [
+    230,
+    250,
+    260,
+    70
+   ]
+  },
+  "s3_resolver": {
+   "t": 6.1,
+   "what": "DNS 解析器 on 'resolver'",
+   "roi": [
+    800,
+    300,
+    300,
+    380
+   ]
+  },
+  "s3d_error": {
+   "t": 7.166666666666667,
+   "what": "resolver node turns red on 'misconfigured'",
+   "roi": [
+    810,
+    400,
+    300,
+    280
+   ]
+  },
+  "s4_reach": {
+   "t": 9.833333333333334,
+   "what": "the probe breaches the glass on 'reached'",
+   "roi": [
+    60,
+    500,
+    110,
+    120
+   ]
+  },
+  "s5d_count": {
+   "t": 12.166666666666666,
+   "what": "the eleven-day count starts on 'Eleven'",
+   "roi": [
+    560,
+    180,
+    800,
+    600
+   ]
+  },
+  "s5_window": {
+   "t": 11.533333333333333,
+   "what": "far window lights on 'around'",
+   "roi": [
+    330,
+    300,
+    100,
+    90
+   ]
+  },
+  "s6_pause": {
+   "t": 13.4,
+   "what": "最强模型训练 暂停 11 天",
+   "roi": [
+    120,
+    220,
+    600,
+    180
+   ]
+  },
+  "s7_offline": {
+   "t": 14.8,
+   "what": "离线 with the cut",
+   "roi": [
+    120,
+    160,
+    380,
+    140
+   ]
+  },
+  "s9a_shut": {
+   "t": 28.2,
+   "what": "door shut, 已修复 tag",
+   "roi": [
+    600,
+    120,
+    420,
+    120
+   ]
+  },
+  "s9b_redteam": {
+   "t": 28.333333333333332,
+   "what": "另一项红队测试",
+   "roi": [
+    1160,
+    190,
+    650,
+    140
+   ]
+  },
+  "s9b_card": {
+   "t": 30.1,
+   "what": "03:48 card",
+   "roi": [
+    1550,
+    480,
+    330,
+    110
+   ]
+  },
+  "k_still": {
+   "t": 14.066666666666666,
+   "what": "STILL on 'still'",
+   "roi": [
+    1250,
+    430,
+    520,
+    230
+   ]
+  },
+  "k_offline": {
+   "t": 15.666666666666666,
+   "what": "OFFLINE on 'offline'",
+   "roi": [
+    1300,
+    520,
+    520,
+    200
+   ]
+  },
+  "s9a_invert": {
+   "t": 27.166666666666668,
+   "what": "white-ground inversion on the beat of 'The door'"
+  },
+  "s9a_invert_end": {
+   "t": 27.9,
+   "what": "back to the dark ground 1.5 beats later"
+  },
+  "k_closed": {
+   "t": 27.533333333333335,
+   "what": "CLOSED on 'closed' (inverted ground)",
+   "roi": [
+    1120,
+    420,
+    600,
+    240
+   ]
+  }
+ }
+}

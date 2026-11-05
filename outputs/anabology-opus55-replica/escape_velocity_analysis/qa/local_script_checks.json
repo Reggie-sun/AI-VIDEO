@@ -1,0 +1,130 @@
+{
+ "schema": "ev-local-script-check/v1",
+ "scope": "Analysis helper syntax and failure paths only; synthetic tests are not audiovisual evidence or Harness receipt",
+ "ast_status": "PASS",
+ "files": [
+  {
+   "path": "scripts/01_probe_and_decode.py",
+   "sha256": "4618c8af4c648f6e5822dc3b68a9325518ab2bae178c12babad64c9757c6b301"
+  },
+  {
+   "path": "scripts/02_cut_candidates.py",
+   "sha256": "101c910d1ca84eb090fa01a843f181e1a73ff16333648bfac8ebefcf5c697b33"
+  },
+  {
+   "path": "scripts/03_audio_00_stems.py",
+   "sha256": "f60a1ff2f6a1b0cd0a29062d6752d29b279de8b72ee4dd0a0ab61c4db235f0d7"
+  },
+  {
+   "path": "scripts/03_audio_01_whisper.py",
+   "sha256": "781dd20340826610f1ae4d072176599ed604d39a3014547750e92c7b593765bc"
+  },
+  {
+   "path": "scripts/03_audio_02_align.py",
+   "sha256": "000d658571efad88b7b9b8f04969a153f1595ea7588b9d9b3a31160bca559b28"
+  },
+  {
+   "path": "scripts/03_audio_03_features.py",
+   "sha256": "325661e42fe4f3a570a0dfbfbb70b1776377814dae9ae5bf22c236ff923cd043"
+  },
+  {
+   "path": "scripts/03_audio_05_plots.py",
+   "sha256": "277f9dcb3cd0e1601ed901a2308daef0e6b325853d83add86776426b960b28f5"
+  },
+  {
+   "path": "scripts/03_disturbances.py",
+   "sha256": "6b5ee824d541f218e4a7e70b2c4f962b129c6ee169e4f5c79bdc34bf848d6dc6"
+  },
+  {
+   "path": "scripts/04_halftone_pitch.py",
+   "sha256": "286718fd99ec0eb5fbfd485eb2a037d83e243c51b0a55501e7766609f59c51bf"
+  },
+  {
+   "path": "scripts/05_months_counter_states.py",
+   "sha256": "7ba0d126c8266ecd4631b2f077f7b896e9523cf11ecba212430e20f456b76f4d"
+  },
+  {
+   "path": "scripts/06_shot_stats.py",
+   "sha256": "6d73dad1d681d77037fcbf4578ed4a4c44a04609bf2b7d2b13bdd2bfad58347d"
+  },
+  {
+   "path": "scripts/07_merge_boundaries.py",
+   "sha256": "e2942a70427c20910231c1315d96fd014b1c5d89e0390d2580b7416bb6e34b6f"
+  },
+  {
+   "path": "scripts/08_gen_shot_md.py",
+   "sha256": "8518e389e94dd0a5203bd136249514bf613914e485bbb294429a74235645f79a"
+  },
+  {
+   "path": "scripts/09_author_clip_hints.py",
+   "sha256": "002191b0130d5adad167419e4c6149f7f7aecf9cfa0d1de23c922c0fb993dcb4"
+  },
+  {
+   "path": "scripts/10_aggregate.py",
+   "sha256": "5588841b0e4c8330712d1a8c7369cbe6f2eb9daf661fe88993923308dc369e55"
+  },
+  {
+   "path": "scripts/13_match_plates.py",
+   "sha256": "3c22bae6f5d56853de4d70c53ff28ac1ea4c1064b7dc68e6e4d4ae2f86b3a55a"
+  },
+  {
+   "path": "scripts/14_audio_timeline.py",
+   "sha256": "e018a0cd7c81ceb76ca8614c3a4d76a68cac60b9759447efa137592e212a7dd9"
+  },
+  {
+   "path": "scripts/15_validate_delivery.py",
+   "sha256": "964f31b7cbbb193d04455116fb57d65f92058e892953d6cabd8ee041fb026a5f"
+  },
+  {
+   "path": "scripts/16_source_mapping.py",
+   "sha256": "a9fd5be02406c279019ce179ee630576821327ce41c21f8efaa2f8ccf6aa15e5"
+  },
+  {
+   "path": "scripts/17_build_documents.py",
+   "sha256": "3dc4d4e18f09b78c731af5562e12143dc369235de1d6febfdc36641f181bea2a"
+  },
+  {
+   "path": "scripts/18_synchronization.py",
+   "sha256": "936db3a3a0fc6bfd220674ef48c98d6ede0b80021d1c13e6db2d2e03eae9a5bc"
+  },
+  {
+   "path": "scripts/19_extract_review_batch.py",
+   "sha256": "75f94ff492c449c4e7b61ed64550e18cca56db2d027009d5ea8f17eebfadbd49"
+  },
+  {
+   "path": "scripts/20_refine_bridge.py",
+   "sha256": "7dffaef5b26230c5c6d9043c96beefcd53676de00a552de6d590580a7f392db9"
+  },
+  {
+   "path": "scripts/21_refine_tail.py",
+   "sha256": "7ed1068840f540325ab1e5b705479c69e4dfad4e6221c68ef9418618d492cd03"
+  },
+  {
+   "path": "scripts/extract_full.py",
+   "sha256": "49bd5f0877651d7133428b43d3308060de9b12104d5f654e244a32fb82d1e8eb"
+  },
+  {
+   "path": "scripts/test_delivery_validation.py",
+   "sha256": "690d7e1aa851c46c481a7fbd7d3f03519ae951dffd81d3300de6c797f5a889d9"
+  },
+  {
+   "path": "scripts/validate_all.py",
+   "sha256": "93361f2d4930da7a7d543fff901f8aa884543eef8db588a8bc1a50529d7cb936"
+  },
+  {
+   "path": "scripts/validate_phaseA.py",
+   "sha256": "5874bb8979dd41d91709e094a087c65cdf3806dc482eaf3d9863560a90827f9b"
+  },
+  {
+   "path": "scripts/validate_shot.py",
+   "sha256": "eed899ff1871f1be3f159a0803192858ad7a13da3d5668ce3119bd8cec45ac0c"
+  },
+  {
+   "path": "scripts/viz_frames.py",
+   "sha256": "6d961fb452be103cb5a8d3c1d72a0c2c07ad9a88f510ebf042eb89785d9cef26"
+  }
+ ],
+ "test_command": "python -I scripts/test_delivery_validation.py",
+ "test_exit_code": 0,
+ "test_output": "........\n----------------------------------------------------------------------\nRan 8 tests in 0.006s\n\nOK\n"
+}

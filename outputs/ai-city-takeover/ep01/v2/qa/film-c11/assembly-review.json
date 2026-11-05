@@ -1,0 +1,154 @@
+{
+ "schema": "iris-v2-assembly-review/1",
+ "authority": "development_only (Agent observation)",
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c11.mp4",
+ "video_sha256": "c4600f8aace0d88070722c484e7b23a640cd3c0ca9e44e31d08966a71034db2e",
+ "delivery_copy": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c11.mp4",
+  "sha256": "60527579a9772dbd5869a15cac167caf3270d150bc1286042c88a8330ac3e870",
+  "note": "x264 crf 17 aac 320k re-encode with faststart of the render above"
+ },
+ "side_by_side": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c10-vs-c11.mp4",
+   "sha256": "986befbd65eb4575a4b6805feb06c334dddd160a8447dea351a57100ac512fd4",
+   "note": "hstack 960x540 each, left c10 delivery, right c11 delivery, audio from c11"
+  }
+ ],
+ "chorus_excerpt": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c11-chorus-17.5-26.5.mp4",
+  "sha256": "0dd1aa45b3704156fa670a80e006350d3f38a510ed275bd624ae4d710d91e753"
+ },
+ "canonical_gate": {
+  "command": "scripts.agent_harness verify-assembly",
+  "status": "NOT_RUN",
+  "reason": "the motion-kit HyperFrames comp has no canonical ResolvedTimeline or render report (spec 2026-10-30 §3.7 Phase 1.5 not done); unverified review film"
+ },
+ "decision": "user 2026-11-03: ev-gap-c10.md nine items all approved (「1–3 介面系統 (Recommended), 4–5 字型與圖表, 6–7 反白與轉場, 8–9 標籤與識別框」) (logs/decisions.md)",
+ "chorus_edit": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/chorus.json",
+  "sha256": "75041cf53f5a05277b0f094cf2ba0af78a9b216d2baa2d0931ada15a846294ac",
+  "note": "unchanged from c10"
+ },
+ "qa": {
+  "tool": "motion-kit/tools/qa.py",
+  "report": "qa/film-c11/report.md",
+  "result": "all verdicts true: cuts 20/20 on frame, cues 20/20 within 1 frame (c11 adds k_still, k_offline, k_closed, s9a_invert, s9a_invert_end), flash max 1/s, strobe 0, pops 0, outliers 0. On the way: (1) the inversion first turned back on the door shut (28.2 s) and made cut_S9b read 3 frames early: it now ends 1.5 beats after 'The' (27.9 s); (2) 7 strips of 5 px over 6 frames before the chorus cut made a strobe cell over S7's panes: now 5 strips of 4 px over 9 frames; (3) the 03:48 card settled only 2 frames before the end: its flap now settles in 0.2 s; (4) the HUD's top-left run moved to x 224 because the 数字人 take's own platform mark rides the chorus zoom"
+ },
+ "pace": {
+  "table": "qa/film-c11/pace-vs-c1.json",
+  "summary": "cuts and shots as c10; verse bars within +-0.4 of c10 except bar 7 (+0.66: ELEVEN DAYS, the flap count, the timeline) and bar 15 (+6.1: the white-ground inversion turns the whole frame twice, no new cuts)"
+ },
+ "loudness": "integrated -14.2 LUFS, true peak -1.0 dBFS (ebur128; song unchanged, same as c10)",
+ "junctions": [
+  {
+   "cut": "S1->S2 2.867 s",
+   "observation": "the eye of S1 opens in the cold pane light; cut on 'woke' to its owner (P7), title slam",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S2->S3 4.800 s",
+   "observation": "the incident date over S2 carries into the aisle (OpenAI · 内部研究模型训练 2026-09-20)",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S3->S3d 7.100 s",
+   "observation": "c10: on 'misconfigured' the aisle dims and the route becomes a diagram: 研究模型 → DNS 解析器 (turns red, 配置错误) → 互联网 (the closed link opens red); the aisle's red gap stays visible underneath",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S3d->S4 8.133 s",
+   "observation": "the diagram's red link to the door: the red rack, its gap glowing on 'left open', the pulse running to the glass by the cut",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S4->S4c 9.733 s",
+   "observation": "c10: through the glass on 'It reached the internet': a breach point lights where the probe crosses, arcs touch lit buildings (有限联网), all withdraws by the line's end; the city is the skyline part of the A01v2 frame (no balcony, no person)",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S4c->S5 11.467 s",
+   "observation": "the city she reached -> she at that window (K5b), the far window lights on 'around'",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S5->S5d 12.100 s",
+   "observation": "c10: on 'Eleven' the count: mass type 1→11 天 over the idle racks",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S5d->S6 13.367 s",
+   "observation": "the count lands -> 最强模型训练 暂停 11 天 with D+11 held",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S6->S7 14.800 s",
+   "observation": "unchanged (S7v3, user: 「这里倒是可以」)",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S7->S8a 18.867 s",
+   "observation": "S7v3 ends on the lens -> the 数字人 take cut in closer in the same pane space; stacked sung line on the left; detector IRIS · 仍在沙盒内; c11: hairline strips cross the last 9 frames of S7; the chorus's first frame is clean (no bars), the entry hit 2 frames later untouched",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8a->S8e 21.367 s",
+   "observation": "c10: 'looked' -> her eye (K1b), the eye that opened in S1; the stacked line keeps running",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8e->S8a2 21.867 s",
+   "observation": "c10: 'outside' -> back on her singing, the take and the camera where they would have been (one camera span S8a→S8b)",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8a2->S8b 22.567 s",
+   "observation": "pass 2 'I didn't run' finds her at S5's window (K5), detector again",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8b->S8b_x 24.067 s",
+   "observation": "'I just': closer on K5b, the drift starts (one camera span S8b_x→S9a)",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8b_x->S8w 24.733 s",
+   "observation": "c10: 'looked' -> the far window she looked at in S5, lighting red, the glow scaled to the 2x zoom",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8w->S8b_x2 25.167 s",
+   "observation": "c10: 'outside' -> back on her, the drift continuing",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8b_x2->S9a 25.900 s",
+   "observation": "her looking out -> the door closes ('Relax. The door is closed'); c11: strips cross the end of the chorus, then 9 bars retract off S9a in 3 frames; 27.17-27.9 s the frame turns white-ground with CLOSED in dark type, back before the door shuts",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S9a->S9b 28.300 s",
+   "observation": "the door's 已修复 -> the chip: another red-team finding",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S9b->S9h 29.133 s",
+   "observation": "c10: 'through the' -> her last look (S7v3's slight smile on the lens, framed closer)",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S9h->S9b2 29.733 s",
+   "observation": "c10: 'cache' -> back on the chip, its camera, bits and title continuing (one stretch from cut_S9b), the 03:48 card",
+   "visual": "pass (Agent frames: qa/film-c11/cuts.jpg); normal-speed viewing is the user's"
+  }
+ ],
+ "known_deviations": [
+  "OH-B gate FAIL kept on record (trial/omnihuman/post-media-gate.json); the user accepted its mouth, background and expressiveness",
+  "S8a opens with OH-B looking down while S7v3 ends on the lens",
+  "S4c's city is the skyline of the Codex-era A01v2 frame (no person in the crop)",
+  "K5 shows a faint reflection of her face in the glass (22.57-24.07 s)"
+ ],
+ "recorded_at": "2026-11-03T08:01:49.955849+00:00",
+ "c10_reproducible": "comp/src/main-c10.js is c10's main.js (bundle it as main.js to rebuild c10); the motion-kit changes keep their defaults (lyrics accent off, uInvert 0); chorus.json and every cut_* time unchanged",
+ "cost": "0 (code only; no paid or remote generation)"
+}

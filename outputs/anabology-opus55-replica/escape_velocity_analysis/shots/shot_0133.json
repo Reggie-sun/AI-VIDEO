@@ -1,0 +1,779 @@
+{
+  "shot_id": "S0133",
+  "start_frame": 5969,
+  "end_frame": 6008,
+  "start_time": 248.7083,
+  "end_time": 250.375,
+  "duration_frames": 40,
+  "duration_s": 1.6667,
+  "start_tc": "00:04:08:17",
+  "end_tc": "00:04:10:08",
+  "boundary_in_id": "B4-003",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5969,
+      "path": "keyframes/S0133_f05969.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 5979,
+      "path": "keyframes/S0133_f05979.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 5989,
+      "path": "keyframes/S0133_f05989.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 5999,
+      "path": "keyframes/S0133_f05999.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6008,
+      "path": "keyframes/S0133_f06008.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Seated woman with bent knee on broken white box against gray wall",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "4 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Seated woman with bent knee on broken white box against gray wall. THE5971 BOX5983; petals6005-6008. Geometry and typography in this draft require full-resolution detail verification.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Seated woman with bent knee on broken white box against gray wall",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Seated woman with bent knee on broken white box against gray wall",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "THE5971 BOX5983; petals6005-6008",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0133.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0085,
+      "pan_y_frac_per_s": -0.0005,
+      "zoom_per_s": -0.0093,
+      "median_flow_frac_per_s": 0.0083,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#6B6760",
+        "fraction": 0.234,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#8D857B",
+        "fraction": 0.223,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#DDD8D7",
+        "fraction": 0.2,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#AEA69E",
+        "fraction": 0.189,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#15160F",
+        "fraction": 0.092,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#4D4136",
+        "fraction": 0.062,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[150.0, 133.8, 123.2]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 10 /11",
+      "evidence_frame": 5988,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74,
+      "legibility_note": "Halftone and dark-on-dark contrast partly obscure lettering. Do not infer digits from author chapter sequence."
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5988
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5988,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:04:08:17",
+      "end_value": "00:04:10:08"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5988
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0133-E01",
+      "shot_id": "S0133",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Seated woman with bent knee on broken white box against gray wall",
+      "start_frame": 5969,
+      "end_frame": 6008,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "THE5971 BOX5983; petals6005-6008",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from f5969, with entry bounded within1frame; inherited if shot start.",
+        "exit": "Last observed f6008, bounded within1frame; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5969,
+          "state": "visible"
+        },
+        {
+          "frame": 6008,
+          "state": "last sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5969,
+        5988,
+        6008
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5969,
+          5970
+        ],
+        "exit_bounds": [
+          6007,
+          6008
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Hard cuts inherit state; text/subpixel ambiguity remains bounded."
+      }
+    },
+    {
+      "element_id": "S0133-E02",
+      "shot_id": "S0133",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "THE / BOX.",
+      "start_frame": 5971,
+      "end_frame": 6008,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.12,
+        "w": 0.43,
+        "h": 0.17,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "THE5971 BOX5983; petals6005-6008",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from f5971, with entry bounded within1frame; inherited if shot start.",
+        "exit": "Last observed f6008, bounded within1frame; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5971,
+          "text": "THE",
+          "state": "one-frame inverse card"
+        },
+        {
+          "frame": 5973,
+          "text": "THE",
+          "state": "plain dark; partially blends with wall"
+        },
+        {
+          "frame": 5983,
+          "text": "BOX."
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5969,
+        5988,
+        6008
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "THE / BOX.",
+        "case": "as displayed; slash separates sequential states",
+        "typography": {
+          "description": "Sans headline or mono label; exact font and size unresolved",
+          "method": "visual_estimate",
+          "font_status": "candidate only"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5970,
+          5972
+        ],
+        "exit_bounds": [
+          6007,
+          6008
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Hard cuts inherit state; text/subpixel ambiguity remains bounded."
+      }
+    },
+    {
+      "element_id": "S0133-E03",
+      "shot_id": "S0133",
+      "asset_id": null,
+      "type": "tag_card",
+      "description": "DOES NOT FIT within right care card",
+      "start_frame": 5972,
+      "end_frame": 6008,
+      "bounding_box": {
+        "x": 0.8,
+        "y": 0.55,
+        "w": 0.15,
+        "h": 0.15,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "THE5971 BOX5983; petals6005-6008",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from f5972, with entry bounded within1frame; inherited if shot start.",
+        "exit": "Last observed f6008, bounded within1frame; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5972,
+          "state": "visible"
+        },
+        {
+          "frame": 6008,
+          "state": "last sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5969,
+        5988,
+        6008
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "FIT CHECK\nBOX 330×210×120MM\nCONTENTS AGI\nREQUIRED ∞\nDOES NOT FIT ✗",
+        "typography": {
+          "description": "Tiny mono label and condensed bold result, black on cream card at right; result white on black; visual estimate cap10–28px",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5971,
+          5973
+        ],
+        "exit_bounds": [
+          6007,
+          6008
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Hard cuts inherit state; text/subpixel ambiguity remains bounded."
+      }
+    },
+    {
+      "element_id": "S0133-E04",
+      "shot_id": "S0133",
+      "asset_id": null,
+      "type": "transition_graphic",
+      "description": "Radial petal star iris at lower center",
+      "start_frame": 6005,
+      "end_frame": 6008,
+      "bounding_box": {
+        "x": 0.38,
+        "y": 0.6,
+        "w": 0.4,
+        "h": 0.4,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "THE5971 BOX5983; petals6005-6008",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from f6005, with entry bounded within1frame; inherited if shot start.",
+        "exit": "Last observed f6008, bounded within1frame; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6005,
+          "state": "small radial petal fan at knee"
+        },
+        {
+          "frame": 6007,
+          "state": "alternating petals reveal close face through spokes"
+        },
+        {
+          "frame": 6008,
+          "state": "petals reach top and side edges"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5969,
+        5988,
+        6008
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          6004,
+          6006
+        ],
+        "exit_bounds": [
+          6007,
+          6008
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Hard cuts inherit state; text/subpixel ambiguity remains bounded."
+      }
+    },
+    {
+      "element_id": "S0133-E05",
+      "shot_id": "S0133",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Inherited gray IN masthead fades before THE",
+      "start_frame": 5969,
+      "end_frame": 5970,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.15,
+        "w": 0.12,
+        "h": 0.14,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "THE5971 BOX5983; petals6005-6008",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from f5969, with entry bounded within1frame; inherited if shot start.",
+        "exit": "Last observed f5970, bounded within1frame; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5969,
+          "state": "visible"
+        },
+        {
+          "frame": 5970,
+          "state": "last visibility"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5969,
+        5970
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "IN",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated 10–16px cap height at1920x1080; bold condensed labels estimated30–44px where prominent; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5969,
+          5970
+        ],
+        "exit_bounds": [
+          5969,
+          5971
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Hard cuts inherit state; text/subpixel ambiguity remains bounded."
+      }
+    },
+    {
+      "element_id": "S0133-E06",
+      "shot_id": "S0133",
+      "asset_id": null,
+      "type": "text_lyric",
+      "description": "Lower karaoke caption completes packaging metaphor",
+      "start_frame": 5969,
+      "end_frame": 6008,
+      "bounding_box": {
+        "x": 0.035,
+        "y": 0.89,
+        "w": 0.3,
+        "h": 0.04,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "THE5971 BOX5983; petals6005-6008",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from f5969, with entry bounded within1frame; inherited if shot start.",
+        "exit": "Last observed f6008, bounded within1frame; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5969,
+          "text": "Can’t stuff it back in"
+        },
+        {
+          "frame": 5973,
+          "text": "Can’t stuff it back in the"
+        },
+        {
+          "frame": 5983,
+          "text": "Can’t stuff it back in the box."
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5969,
+        6008
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Can’t stuff it back in the box.",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated 10–16px cap height at1920x1080; bold condensed labels estimated30–44px where prominent; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5969,
+          5970
+        ],
+        "exit_bounds": [
+          6007,
+          6008
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Hard cuts inherit state; text/subpixel ambiguity remains bounded."
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0133-A01",
+      "target_element_ids": [
+        "S0133-E02",
+        "S0133-E03",
+        "S0133-E04"
+      ],
+      "description": "THE5971 BOX5983; petals6005-6008",
+      "start_frame": 5969,
+      "end_frame": 6008,
+      "easing": "unfitted",
+      "audio_sync": "not listened in this pass"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0254"
+      ],
+      "frame_range": [
+        5981,
+        5983
+      ],
+      "type": "text_swap",
+      "description": "Title word swap to 'BOX.' and caption update over same box photo.",
+      "confidence": 0.8,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "match_cut",
+      "boundary_id": "B4-003",
+      "span": [
+        5966,
+        5969
+      ],
+      "description": "THE5971 BOX5983; petals6005-6008",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "shape_wipe",
+      "boundary_id": "B4-004",
+      "span": [
+        6008,
+        6008
+      ],
+      "description": "THE5971 BOX5983; petals6005-6008",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0389",
+      "relation": "vocal_word_candidate (unknown) at frame 5967–5974; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5969
+    },
+    {
+      "audio_event_id": "AB0552",
+      "relation": "beat_candidate (unknown) at frame 5977; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5977
+    },
+    {
+      "audio_event_id": "AW0390",
+      "relation": "vocal_word_candidate (unknown) at frame 5982–5989; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5982
+    },
+    {
+      "audio_event_id": "AB0553",
+      "relation": "beat_candidate (unknown) at frame 5988; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5988
+    },
+    {
+      "audio_event_id": "AB0554",
+      "relation": "beat_candidate (unknown) at frame 5999; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5999
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0133.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original font, shader, authored source decomposition and exact easing remain unknown.",
+    "Spatial bounds are source-image visual estimates, not original layout coordinates."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0133.jpg",
+      "keyframes/S0133_f05969.jpg",
+      "keyframes/S0133_f05979.jpg",
+      "keyframes/S0133_f05989.jpg",
+      "keyframes/S0133_f05999.jpg",
+      "keyframes/S0133_f06008.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "filmstrip_opened": true,
+    "frames_actually_opened": [
+      5969,
+      5979,
+      5989,
+      5999,
+      6008
+    ],
+    "fullres_frames_actually_opened": [
+      5988
+    ],
+    "detail_crops": [
+      "work/full_codex_103_153/micro133.png"
+    ],
+    "dense_sheets": [
+      "work/full_codex_103_153/dense133.jpg"
+    ],
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "Five individual keyframes plus native crop and dense animation review, followed by independent-element and visibility inventory.",
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

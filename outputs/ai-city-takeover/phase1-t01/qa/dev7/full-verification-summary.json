@@ -1,0 +1,36 @@
+{
+  "verification_purpose": "task-only verification clone; not original shared index",
+  "verification_root": "/tmp/ai-video-t01-verify-katu_0f1/repo",
+  "base_commit": "43c330bc9509d4e14ff91411d9cdf1b190f61810",
+  "snapshot_tree": "9128466b5e9c407fd623b3bd1634bea10b6f1084",
+  "status": "failed",
+  "verification_level": "full",
+  "failed_checks": [
+    {
+      "check_id": "policy_audit_check",
+      "status": "failed",
+      "exit_code": 1
+    }
+  ],
+  "baseline_failure_identity": {
+    "src/ai_video/production/dotenv_source.py": {
+      "baseline_sha256": "5d6ffad5719ff1a4c8e166a7ca5353cb0f002f07d8ee79a62b0bf87f0ffb0de5",
+      "verification_sha256": "5d6ffad5719ff1a4c8e166a7ca5353cb0f002f07d8ee79a62b0bf87f0ffb0de5",
+      "task_staged_delta": ""
+    },
+    "src/ai_video/production/preview_approval.py": {
+      "baseline_sha256": "9246bae1d191008a8c9189ae2e6c8ee554c6f3ca113dbac7e408abc3ab1b0ce0",
+      "verification_sha256": "9246bae1d191008a8c9189ae2e6c8ee554c6f3ca113dbac7e408abc3ab1b0ce0",
+      "task_staged_delta": ""
+    },
+    "tests/test_production_dotenv_source.py": {
+      "baseline_sha256": "55fd004e40bf9e63ca675bdb2af1d6619bc7b939f1820b8e76c6b3d018b91361",
+      "verification_sha256": "55fd004e40bf9e63ca675bdb2af1d6619bc7b939f1820b8e76c6b3d018b91361",
+      "task_staged_delta": ""
+    }
+  },
+  "receipt_copy": "outputs/ai-city-takeover/phase1-t01/qa/dev7/harness-full-20261030/receipt.json",
+  "original_receipt": "/tmp/ai-video-t01-verify-katu_0f1/repo/.agent/harness/runs/iris-t01-dev7-full-20261030/receipt.json",
+  "new_paid_requests": 0,
+  "original_index_mutated": false
+}

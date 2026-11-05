@@ -1,0 +1,1011 @@
+{
+  "shot_id": "S0057",
+  "start_frame": 2161,
+  "end_frame": 2247,
+  "duration_frames": 87,
+  "start_time": 90.0417,
+  "end_time": 93.6667,
+  "duration_s": 3.625,
+  "start_tc": "00:01:30:01",
+  "end_tc": "00:01:33:15",
+  "boundary_in_id": "B1-020",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    2161,
+    2161
+  ],
+  "boundary_out_id": "B1-021",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2189,
+        2190
+      ],
+      "description": "两行黑牌空格入场；2帧采样误差≤1帧，不是音频词对齐证据。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2201,
+        2202
+      ],
+      "description": "第一行橙色乱码开始翻；2帧采样误差≤1帧，不是音频词对齐证据。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2205,
+        2206
+      ],
+      "description": "ESCAPE全词已落定；2帧采样误差≤1帧，不是音频词对齐证据。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2219,
+        2220
+      ],
+      "description": "ESCAPE转白；2帧采样误差≤1帧，不是音频词对齐证据。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2223,
+        2224
+      ],
+      "description": "第二行翻牌开始；2帧采样误差≤1帧，不是音频词对齐证据。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2227,
+        2228
+      ],
+      "description": "VELOCITY…可读橙色；2帧采样误差≤1帧，不是音频词对齐证据。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2239,
+        2240
+      ],
+      "description": "第二行转白；2帧采样误差≤1帧，不是音频词对齐证据。"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以11.2公里每秒逃逸速度把片名转为可见物理隐喻。",
+  "subject": "少女朝右上仰望的侧脸从极近景快速退至胸像",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "少女朝右上仰望的侧脸从极近景快速退至胸像。左侧牛顿炮弹圆形示意图和速度值增长；顶部两行翻牌板先拼 ESCAPE 后拼 VELOCITY…，第二行落定稍晚。",
+  "reference_frames": [
+    {
+      "frame": 2161,
+      "path": "keyframes/S0057_f02161.jpg",
+      "role": "first",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 2182,
+      "path": "keyframes/S0057_f02182.jpg",
+      "role": "key_change",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 2204,
+      "path": "keyframes/S0057_f02204.jpg",
+      "role": "middle",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 2226,
+      "path": "keyframes/S0057_f02226.jpg",
+      "role": "key_change",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 2247,
+      "path": "keyframes/S0057_f02247.jpg",
+      "role": "last",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 2204,
+      "path": "work/full_batch/02204.jpg",
+      "role": "detail",
+      "note": "本轮1920x1080原始帧已实际查看，文字/仪表几何核查。"
+    }
+  ],
+  "composition": {
+    "shot_size": "close-up",
+    "subject_position": "left to center",
+    "subject_bbox": {
+      "x": 0.3,
+      "y": 0.13,
+      "w": 0.36,
+      "h": 0.87,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": 0.31,
+    "camera_angle": "近于眼平，面部仰角随表演变化",
+    "layers": {
+      "foreground": "图形、文字和追踪角标",
+      "midground": "少女与服装或靴子细节",
+      "background": "深色虚化空间"
+    },
+    "empty_field_for_type": "右侧黑暗留白，S0053左上也用于标题"
+  },
+  "camera": {
+    "movement": "明显拉远",
+    "direction": "向后",
+    "speed_profile": "视觉估计；数值flow含人物局部运动，不直接解释为相机运动",
+    "dof_focus": "面部清晰、背景柔化；无可确认的焦距",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0005, \"pan_y_frac_per_s\": 0.0031, \"zoom_per_s\": 0.0017, \"median_flow_frac_per_s\": 0.0029, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "暖色侧上方",
+    "quality": "皮肤暖高光与冷暗背景分离",
+    "effects": [
+      "global halftone"
+    ],
+    "temporal_change": "随表演和缩放变化；未确认独立灯光动画"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#242424",
+        "fraction": 0.292,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#16191A",
+        "fraction": 0.281,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#3C2D25",
+        "fraction": 0.21,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#533929",
+        "fraction": 0.163,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#806250",
+        "fraction": 0.036,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#B5A49A",
+        "fraction": 0.019,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[48.5, 43.1, 40.7]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 06 / 11",
+    "G-MONTHS-COUNTER": "18 MONTHS TO ESCAPE",
+    "G-TICKER": "可见底部滚动条；完整逐帧字符未转录",
+    "G-HALFTONE": "visible",
+    "G-CV-BRACKET": "PROFILE · GAZE +62°",
+    "G-FLAP-BOARD": "上方两行标题板见独立元素"
+  },
+  "elements": [
+    {
+      "element_id": "S0057-E01",
+      "shot_id": "S0057",
+      "type": "background_media",
+      "description": "少女朝右上仰望的侧脸从极近景快速退至胸像。左侧牛顿炮弹圆形示意图和速度值增长；顶部两行翻牌板先拼 ESCAPE 后拼 VELOCITY…，第二行落定稍晚。",
+      "start_frame": 2161,
+      "end_frame": 2247,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "人物与场景作为原片已合成底片；不假称存在独立人物遮罩。"
+      },
+      "motion": {
+        "path": "明显拉远",
+        "easing": "unknown",
+        "entrance": "first_visible≈2161, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2247; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 2161
+        },
+        {
+          "frame": 2204
+        },
+        {
+          "frame": 2247
+        }
+      ],
+      "effects": [
+        "halftone inherited"
+      ],
+      "reference_frames": [
+        2161,
+        2182,
+        2204,
+        2226,
+        2247
+      ],
+      "confidence": 0.75,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 2161,
+        "last_visible_frame_estimate": 2247,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    },
+    {
+      "element_id": "S0057-E02",
+      "shot_id": "S0057",
+      "type": "hud_chart",
+      "description": "白色斜线填圆和同心虚线轨道，白色小炮弹；7.0 FALLS BACK，7.9 ORBIT · STILL HERE；后加橙弧向右外逃逸。",
+      "start_frame": 2165,
+      "end_frame": 2247,
+      "bounding_box": {
+        "x": 0.1,
+        "y": 0.45,
+        "w": 0.38,
+        "h": 0.4,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#D97757",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "白色斜线填圆和同心虚线轨道，白色小炮弹；7.0 FALLS BACK，7.9 ORBIT · STILL HERE；后加橙弧向右外逃逸。"
+      },
+      "motion": {
+        "path": "白色斜线填圆和同心虚线轨道，白色小炮弹；7.0 FALLS BACK，7.9 ORBIT · STILL HERE；后加橙弧向右外逃逸。",
+        "easing": "snap/step for text; curve unknown",
+        "entrance": "first_visible≈2165, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2247; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 2165,
+          "state": "first observed"
+        },
+        {
+          "frame": 2247,
+          "state": "last observed"
+        }
+      ],
+      "effects": [
+        "print pass inherited"
+      ],
+      "reference_frames": [
+        2182,
+        2204,
+        2226,
+        2247
+      ],
+      "confidence": 0.7,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "text": {
+        "content": "NEWTON’S CANNONBALL",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "IBM Plex Mono 500"
+          ],
+          "candidate_only": true,
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none independently identifiable",
+          "size_note": "白色斜线填圆和同心虚线轨道，白色小炮弹；7.0 FALLS BACK，7.9 ORBIT · STILL HERE；后加橙弧向右外逃逸。"
+        }
+      },
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 2165,
+        "last_visible_frame_estimate": 2247,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    },
+    {
+      "element_id": "S0057-E03",
+      "shot_id": "S0057",
+      "type": "counter",
+      "description": "白色大号等宽速度数值增长；达到11.2转橙色。",
+      "start_frame": 2165,
+      "end_frame": 2247,
+      "bounding_box": {
+        "x": 0.11,
+        "y": 0.8,
+        "w": 0.23,
+        "h": 0.06,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "白色大号等宽速度数值增长；达到11.2转橙色。"
+      },
+      "motion": {
+        "path": "白色大号等宽速度数值增长；达到11.2转橙色。",
+        "easing": "snap/step for text; curve unknown",
+        "entrance": "first_visible≈2165, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2247; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 2165,
+          "state": "first observed"
+        },
+        {
+          "frame": 2247,
+          "state": "last observed"
+        }
+      ],
+      "effects": [
+        "print pass inherited"
+      ],
+      "reference_frames": [
+        2182,
+        2204,
+        2226,
+        2247
+      ],
+      "confidence": 0.7,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "text": {
+        "content": "v 1.4 → v 11.2 KM/S",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "Heros 700"
+          ],
+          "candidate_only": true,
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none independently identifiable",
+          "size_note": "白色大号等宽速度数值增长；达到11.2转橙色。"
+        }
+      },
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 2165,
+        "last_visible_frame_estimate": 2247,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    },
+    {
+      "element_id": "S0057-E04",
+      "shot_id": "S0057",
+      "type": "split_flap",
+      "description": "两排黑色方格翻牌，第一排于2206附近ESCAPE落定；第二排2225仍乱码，2228已可读VELOCITY…。",
+      "start_frame": 2189,
+      "end_frame": 2247,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.08,
+        "w": 0.46,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "两排黑色方格翻牌，第一排于2206附近ESCAPE落定；第二排2225仍乱码，2228已可读VELOCITY…。"
+      },
+      "motion": {
+        "path": "两排黑色方格翻牌，第一排于2206附近ESCAPE落定；第二排2225仍乱码，2228已可读VELOCITY…。",
+        "easing": "snap/step for text; curve unknown",
+        "entrance": "first_visible≈2189, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2247; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 2189,
+          "text": "empty cells"
+        },
+        {
+          "frame": 2201,
+          "text": "flipping row1"
+        },
+        {
+          "frame": 2205,
+          "text": "ESCAPE"
+        },
+        {
+          "frame": 2223,
+          "text": "ESCAPE / flipping"
+        },
+        {
+          "frame": 2227,
+          "text": "ESCAPE / VELOCITY…"
+        },
+        {
+          "frame": 2239,
+          "text": "ESCAPE / VELOCITY… white"
+        }
+      ],
+      "effects": [
+        "print pass inherited"
+      ],
+      "reference_frames": [
+        2204,
+        2226,
+        2247
+      ],
+      "confidence": 0.7,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "text": {
+        "content": "ESCAPE / VELOCITY…",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "Heros 700"
+          ],
+          "candidate_only": true,
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none independently identifiable",
+          "size_note": "两排黑色方格翻牌，第一排于2206附近ESCAPE落定；第二排2225仍乱码，2228已可读VELOCITY…。"
+        }
+      },
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 2189,
+        "last_visible_frame_estimate": 2247,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    },
+    {
+      "element_id": "S0057-E05",
+      "shot_id": "S0057",
+      "type": "text_lyric",
+      "description": "底部逐词小字；随后清空供标题呼吸。",
+      "start_frame": 2161,
+      "end_frame": 2202,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.89,
+        "w": 0.34,
+        "h": 0.045,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "底部逐词小字；随后清空供标题呼吸。"
+      },
+      "motion": {
+        "path": "底部逐词小字；随后清空供标题呼吸。",
+        "easing": "snap/step for text; curve unknown",
+        "entrance": "first_visible≈2161, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2202; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 2161,
+          "state": "first observed"
+        },
+        {
+          "frame": 2202,
+          "state": "last observed"
+        }
+      ],
+      "effects": [
+        "print pass inherited"
+      ],
+      "reference_frames": [
+        2161,
+        2182
+      ],
+      "confidence": 0.7,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "text": {
+        "content": "Feel the AGI, feel it coming fast.",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "Heros 700"
+          ],
+          "candidate_only": true,
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none independently identifiable",
+          "size_note": "底部逐词小字；随后清空供标题呼吸。"
+        }
+      },
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 2161,
+        "last_visible_frame_estimate": 2202,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0057-A02",
+      "target_element_ids": [
+        "S0057-E02"
+      ],
+      "description": "白色斜线填圆和同心虚线轨道，白色小炮弹；7.0 FALLS BACK，7.9 ORBIT · STILL HERE；后加橙弧向右外逃逸。",
+      "start_frame": 2165,
+      "end_frame": 2247,
+      "easing": "observed stepped state; continuous curve unknown",
+      "audio_sync": "未听音，本记录不确认音频同步。"
+    },
+    {
+      "anim_id": "S0057-A03",
+      "target_element_ids": [
+        "S0057-E03"
+      ],
+      "description": "白色大号等宽速度数值增长；达到11.2转橙色。",
+      "start_frame": 2165,
+      "end_frame": 2247,
+      "easing": "observed stepped state; continuous curve unknown",
+      "audio_sync": "未听音，本记录不确认音频同步。"
+    },
+    {
+      "anim_id": "S0057-A04",
+      "target_element_ids": [
+        "S0057-E04"
+      ],
+      "description": "两排黑色方格翻牌，第一排于2206附近ESCAPE落定；第二排2225仍乱码，2228已可读VELOCITY…。",
+      "start_frame": 2189,
+      "end_frame": 2247,
+      "easing": "observed stepped state; continuous curve unknown",
+      "audio_sync": "未听音，本记录不确认音频同步。"
+    },
+    {
+      "anim_id": "S0057-A05",
+      "target_element_ids": [
+        "S0057-E05"
+      ],
+      "description": "底部逐词小字；随后清空供标题呼吸。",
+      "start_frame": 2161,
+      "end_frame": 2202,
+      "easing": "observed stepped state; continuous curve unknown",
+      "audio_sync": "未听音，本记录不确认音频同步。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AW0152",
+      "relation": "vocal_word_candidate (unknown) at frame 2157–2168; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2161
+    },
+    {
+      "audio_event_id": "AH00750",
+      "relation": "band_onset_candidate (unknown) at frame 2161; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2161
+    },
+    {
+      "audio_event_id": "AH00751",
+      "relation": "band_onset_candidate (unknown) at frame 2161; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2161
+    },
+    {
+      "audio_event_id": "AH00752",
+      "relation": "band_onset_candidate (unknown) at frame 2161; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2161
+    },
+    {
+      "audio_event_id": "AB0199",
+      "relation": "beat_candidate (unknown) at frame 2161; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2161
+    },
+    {
+      "audio_event_id": "AH00753",
+      "relation": "band_onset_candidate (unknown) at frame 2162; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2162
+    },
+    {
+      "audio_event_id": "AH00754",
+      "relation": "band_onset_candidate (unknown) at frame 2162; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2162
+    },
+    {
+      "audio_event_id": "AH00755",
+      "relation": "band_onset_candidate (unknown) at frame 2166; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2166
+    },
+    {
+      "audio_event_id": "AW0153",
+      "relation": "vocal_word_candidate (unknown) at frame 2171–2180; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2171
+    },
+    {
+      "audio_event_id": "AH00756",
+      "relation": "band_onset_candidate (unknown) at frame 2172; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2172
+    },
+    {
+      "audio_event_id": "AB0200",
+      "relation": "beat_candidate (unknown) at frame 2172; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2172
+    },
+    {
+      "audio_event_id": "AH00757",
+      "relation": "band_onset_candidate (unknown) at frame 2172; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2172
+    },
+    {
+      "audio_event_id": "AH00758",
+      "relation": "band_onset_candidate (unknown) at frame 2172; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2172
+    },
+    {
+      "audio_event_id": "AH00759",
+      "relation": "band_onset_candidate (unknown) at frame 2172; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2172
+    },
+    {
+      "audio_event_id": "AH00760",
+      "relation": "band_onset_candidate (unknown) at frame 2173; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2173
+    },
+    {
+      "audio_event_id": "AW0154",
+      "relation": "vocal_word_candidate (unknown) at frame 2182–2210; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2182
+    },
+    {
+      "audio_event_id": "AH00761",
+      "relation": "band_onset_candidate (unknown) at frame 2183; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2183
+    },
+    {
+      "audio_event_id": "AH00762",
+      "relation": "band_onset_candidate (unknown) at frame 2183; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2183
+    },
+    {
+      "audio_event_id": "AB0201",
+      "relation": "beat_candidate (unknown) at frame 2183; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2183
+    },
+    {
+      "audio_event_id": "AH00763",
+      "relation": "band_onset_candidate (unknown) at frame 2183; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2183
+    },
+    {
+      "audio_event_id": "AH00764",
+      "relation": "band_onset_candidate (unknown) at frame 2184; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2184
+    },
+    {
+      "audio_event_id": "AB0202",
+      "relation": "beat_candidate (unknown) at frame 2194; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2194
+    },
+    {
+      "audio_event_id": "AH00765",
+      "relation": "band_onset_candidate (unknown) at frame 2194; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2194
+    },
+    {
+      "audio_event_id": "AH00766",
+      "relation": "band_onset_candidate (unknown) at frame 2194; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2194
+    },
+    {
+      "audio_event_id": "AH00767",
+      "relation": "band_onset_candidate (unknown) at frame 2194; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2194
+    },
+    {
+      "audio_event_id": "AH00768",
+      "relation": "band_onset_candidate (unknown) at frame 2195; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2195
+    },
+    {
+      "audio_event_id": "AB0203",
+      "relation": "beat_candidate (unknown) at frame 2205; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2205
+    },
+    {
+      "audio_event_id": "AH00769",
+      "relation": "band_onset_candidate (unknown) at frame 2205; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2205
+    },
+    {
+      "audio_event_id": "AH00770",
+      "relation": "band_onset_candidate (unknown) at frame 2205; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2205
+    },
+    {
+      "audio_event_id": "AH00771",
+      "relation": "band_onset_candidate (unknown) at frame 2205; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2205
+    },
+    {
+      "audio_event_id": "AH00772",
+      "relation": "band_onset_candidate (unknown) at frame 2205; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2205
+    },
+    {
+      "audio_event_id": "AH00773",
+      "relation": "band_onset_candidate (unknown) at frame 2206; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2206
+    },
+    {
+      "audio_event_id": "AH00774",
+      "relation": "band_onset_candidate (unknown) at frame 2210; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2210
+    },
+    {
+      "audio_event_id": "AW0155",
+      "relation": "vocal_word_candidate (unknown) at frame 2211–2220; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2211
+    },
+    {
+      "audio_event_id": "AH00775",
+      "relation": "band_onset_candidate (unknown) at frame 2216; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2216
+    },
+    {
+      "audio_event_id": "AH00776",
+      "relation": "band_onset_candidate (unknown) at frame 2216; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2216
+    },
+    {
+      "audio_event_id": "AB0204",
+      "relation": "beat_candidate (unknown) at frame 2216; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2216
+    },
+    {
+      "audio_event_id": "AH00777",
+      "relation": "band_onset_candidate (unknown) at frame 2216; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2216
+    },
+    {
+      "audio_event_id": "AH00778",
+      "relation": "band_onset_candidate (unknown) at frame 2216; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2216
+    },
+    {
+      "audio_event_id": "AH00779",
+      "relation": "band_onset_candidate (unknown) at frame 2217; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2217
+    },
+    {
+      "audio_event_id": "AW0156",
+      "relation": "vocal_word_candidate (unknown) at frame 2221–2236; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2221
+    },
+    {
+      "audio_event_id": "AB0205",
+      "relation": "beat_candidate (unknown) at frame 2227; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2227
+    },
+    {
+      "audio_event_id": "AH00780",
+      "relation": "band_onset_candidate (unknown) at frame 2227; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2227
+    },
+    {
+      "audio_event_id": "AH00781",
+      "relation": "band_onset_candidate (unknown) at frame 2227; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2227
+    },
+    {
+      "audio_event_id": "AH00782",
+      "relation": "band_onset_candidate (unknown) at frame 2227; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2227
+    },
+    {
+      "audio_event_id": "AH00783",
+      "relation": "band_onset_candidate (unknown) at frame 2227; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2227
+    },
+    {
+      "audio_event_id": "AH00784",
+      "relation": "band_onset_candidate (unknown) at frame 2227; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2227
+    },
+    {
+      "audio_event_id": "AW0157",
+      "relation": "vocal_word_candidate (unknown) at frame 2236–2286; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2236
+    },
+    {
+      "audio_event_id": "AB0206",
+      "relation": "beat_candidate (unknown) at frame 2238; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2238
+    },
+    {
+      "audio_event_id": "AH00785",
+      "relation": "band_onset_candidate (unknown) at frame 2238; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2238
+    },
+    {
+      "audio_event_id": "AH00786",
+      "relation": "band_onset_candidate (unknown) at frame 2238; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2238
+    },
+    {
+      "audio_event_id": "AH00787",
+      "relation": "band_onset_candidate (unknown) at frame 2238; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2238
+    },
+    {
+      "audio_event_id": "AH00788",
+      "relation": "band_onset_candidate (unknown) at frame 2238; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2238
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.72,
+  "uncertainties": [
+    "可见性关键时间由1–3帧采样给出，误差±2帧；不宣称每个像素的原始工程参数已恢复。",
+    "原字体、shader内部参数、alpha曲线、随机翻字seed无公开逐镜证据。",
+    "音频听证NOT_EVALUATED；音频link由主会话另合。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0057.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B1-020",
+      "description": "相邻样本呈硬切；未推断隐藏后期工程",
+      "span": [
+        2161,
+        2161
+      ],
+      "recommended_technique": "frame-exact edit"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B1-021",
+      "description": "相邻样本呈硬切；未推断隐藏后期工程",
+      "span": [
+        2247,
+        2247
+      ],
+      "recommended_technique": "frame-exact edit"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      2204
+    ],
+    "dense_sampling_stride_frames": 2,
+    "dense_sampling_regions": "文字/仪表区域裁切；本次临时观察联系表 /tmp/evdetail，canonical帧仍在work/f960及full_batch",
+    "second_pass_notes": "重新对照fullres中帧与dense区域，修正首批粗采样时间估计。",
+    "observations": [
+      {
+        "frame": 2189,
+        "description": "两行黑牌空格入场",
+        "timing_uncertainty_frames": 1
+      },
+      {
+        "frame": 2201,
+        "description": "第一行橙色乱码开始翻",
+        "timing_uncertainty_frames": 1
+      },
+      {
+        "frame": 2205,
+        "description": "ESCAPE全词已落定",
+        "timing_uncertainty_frames": 1
+      },
+      {
+        "frame": 2219,
+        "description": "ESCAPE转白",
+        "timing_uncertainty_frames": 1
+      },
+      {
+        "frame": 2223,
+        "description": "第二行翻牌开始",
+        "timing_uncertainty_frames": 1
+      },
+      {
+        "frame": 2227,
+        "description": "VELOCITY…可读橙色",
+        "timing_uncertainty_frames": 1
+      },
+      {
+        "frame": 2239,
+        "description": "第二行转白",
+        "timing_uncertainty_frames": 1
+      }
+    ],
+    "second_pass_status": "COMPLETED_FOR_VISIBLE_LAYERS_WITH_1_TO_3_FRAME_SAMPLING",
+    "limitations": "显示内容与可见事件已复核；原始工程隐藏参数unknown；audio listening NOT_EVALUATED。"
+  }
+}

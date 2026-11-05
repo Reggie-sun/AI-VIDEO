@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "actual_reference_order": true,
+    "native_reference_responsibilities": true,
+    "chinese_body": true,
+    "same_set_no_flip": true,
+    "quiet_observer": true,
+    "settled_camera": true,
+    "no_new_screen_text": true,
+    "independent_final_audio": true,
+    "exact_compiled_prompt": true,
+    "bound_output": true,
+    "cost_ceiling": true
+  },
+  "request_hash": "5a54bbcb9b474a81200672c89e063e3a5ecb99e56d3731e991b1c55321d6c112",
+  "new_paid_calls": 0
+}

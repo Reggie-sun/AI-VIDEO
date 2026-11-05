@@ -1,0 +1,40 @@
+{
+ "unit": "ST3",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "d914d6f54b057db2cf0c3711b3e556dd3ca721b89947ab1ad42a1b850bcd49a4",
+ "compiled_prompt_sha256": "0265fa5e4ee3388541a1684af678ff4663220488507bd97e132bcddfd0a184da",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/story/continuity-report.json",
+  "sha256": "230814b2dab63866c43cb584cad969bd8c39ae84d76270eddfc551577fc660ec",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS: ST3-a（3691c59e…）最前排的她正面朝镜头，耳挂在她的左耳（画面右侧），红线在她的左领；后排闭眼副本没有耳挂和红线，符合 prompt「后排灯线全部熄灭」；多个副本是认可的设定，不算身份漂移（见 R5）。",
+   "handoff": "PASS: 从 S6（红光机柜门、暂停 11 天、STILL）切到抽象空间，有「the rest of us stood still」这句歌词作为理由，属于明确的换空间切接。",
+   "axis_action_camera": "PASS: 规格是 dolly_in、向前、very_slow；首帧对称构图，主体在画面中央，推近方向与构图一致；人物静止，只有轻微呼吸。",
+   "prompt_fit": "PASS: compiled 与 approval prompts.ST3 逐字相同（0265fa5e…），只有一张首帧绑定，没有音频参考；所有人嘴唇闭合；推近后脸会变大（见 R6）。",
+   "lint": "PASS（本报告这一项除外）: failed=[continuity_report_ready]，其余 10 项都为 true；request_hash d914d6f5…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   6,
+   990
+  ]
+ },
+ "new_calls": 0
+}

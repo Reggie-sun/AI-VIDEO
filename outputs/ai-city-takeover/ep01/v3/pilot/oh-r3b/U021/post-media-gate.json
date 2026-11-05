@@ -1,0 +1,57 @@
+{
+ "unit": "U021",
+ "media": {
+  "path": "outputs/ai-city-takeover/ep01/v3/pilot/oh-r3b/U021/fetch/e2996be8a48bc86d21f62c8ca71db4df4de4aac0ae593e415c31c31c76a4c433.mp4",
+  "sha256": "e2996be8a48bc86d21f62c8ca71db4df4de4aac0ae593e415c31c31c76a4c433"
+ },
+ "reviewed_by": "shot-gate-reviewer",
+ "reviewed_at": "2026-11-05T08:39:24Z",
+ "tools": [
+  "sha256sum：开始与结束各核对一次，一致；封存输入 preview-inputs-r3b 70c5fd88…、preview-approval 0e1bb74e…、首帧 4cb7b152…、人声 b74a2cdb…、身份参考 IRIS-turnaround-c c4f37026…／IRIS-expressions-c e6ef0a4f… 均与封存值一致；continuity-report 当前 3399b73f…",
+  "video-analysis MCP video_probe（1920×1088，h264，109 帧，4.366 s，AAC 44.1 kHz 立体声，AIGC 元数据）",
+  "video-analysis MCP video_scene_detect（threshold 0.2，min_scene_length 0.1 s）：1 个场景",
+  "video-analysis MCP video_extract_frames（间隔 0.75 s，6 帧，480 px，已解码为 contact_sheet.jpg）",
+  "video-analysis MCP audio_understand 仅离线预览（execute=false，network_calls=0，未执行远程分析）",
+  "ffprobe 帧时间戳（best_effort，33/50 ms 交替，平均 25.15 fps）；ffmpeg select 场景分数与 scdet（阈值 3）",
+  "ffmpeg 解码全部 109 帧 PNG 与音轨 WAV；numpy/PIL 只读测量（脚本 /tmp/gate-u021-r3b/scripts/）",
+  "motion-kit/tools/sync_check.py（python3 -I，--out /tmp/gate-u021-r3b/sync）"
+ ],
+ "items": {
+  "sings": {
+   "verdict": "FAIL",
+   "evidence": "封存要求：开头闭眼合嘴静静等待（动作文本「开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴」），唱第一个字时张嘴，每个词都有嘴部动作，句中无冻脸，口型大致同步。实测（片内时间，人声已按 lag 0.025 s 对齐）：0.00–0.85 s 人声 −71 至 −82 dBFS（静音），嘴一直张着露上排牙，内口约 150×55 px（mouth_ruler.png f0），嘴部开口指标 29.5–31 px、暗区 4205–4390 恒定，嘴部逐帧运动能量均值 0.75（唱词段 4.7–8.3），即张着嘴冻住，没有合嘴；剪辑窗口入点 0.325 s 起到 0.88 s 约 0.55 s 是静音中张嘴静止的脸（face_grid f12/f20、detail_strips 第 1 行）。0.88 s 起嘴再张大，0.97–1.03 s 张成大圆口（内口约 165×140 px，见舌头），比「I」强起音（1.00–1.03 s，−57→−26 dB）早约 3 帧，起音对得上，但不是从合嘴张开。「didn't」（约 1.48–3.33 s）有多次开合：1.48–1.68 张、1.72–1.88 合（对应人声 −42/−46 dB 下陷）、1.92–2.13 张、2.20–2.28 合、2.37–2.68 张、2.72–2.88 合、2.92–3.08 张，长弱尾内嘴在动，不冻。「run」（约 3.33–3.63 s，−46 至 −51 dB 气声）：3.12–3.68 s 嘴只微开、近乎不动（开口 2–5 px，运动能量均值 1.69），看不出「run」的口型（detail_strips 第 2 行 f78–f92）。3.72 s 起在吸气与静音中嘴逐渐张大，到出点 4.085 s 开口 26 px 仍在张（为下一句 4.275 s 的「I」预备）。主要不符：前奏静音没有合嘴、张嘴冻脸，正是连续性报告列出的风险（「如果模型不合嘴，静音里会冻脸或假唱」）。判 FAIL。"
+  },
+  "identity": {
+   "verdict": "PASS",
+   "evidence": "封存要求：身份符合 referces/iris（新脸、齐下巴银白波波头、雀斑、银白眉睫、睁眼时冰灰眼），耳挂与立领红线在画面右侧，无漂移。identity_cmp.jpg（IRIS-turnaround-c 正面 vs f0/f74/f102）与 face_grid.jpg：银白齐下巴波波头、银白眉、淡雀斑全片可见；2.68 s 后睁眼为灰蓝浅色虹膜、深色眼线；左耳黑色耳挂与小红灯、耳骨银钉全片在画面右侧；五官与首帧一致，无镜像、无突跳（场景分最大 0.0089）。立领红线：领线区域（随身体位移跟踪）R≥250 亮芯像素每帧 513–741、强红像素 2483–3122，全部 109 帧亮着，无熄灭区间，collar_dark_interval 记 null。"
+  },
+  "artefacts": {
+   "verdict": "PASS",
+   "evidence": "封存要求：没有凭空出现的手或物体，没有牙齿碎裂。画面为头到上胸，全片无手入画（contact_sheet.jpg）；背景机柜结构（左侧把手 x 288–292、上下沿 y 531–532／744–747）与门侧不变，只有机柜灯闪烁，无新物体。牙齿：f0 上排牙、f24/f26 大张口上排牙、f38（1.52 s）上下两排牙在 1:1 原尺寸下排列完整、无碎裂或错位（mouth_ruler.png、detail_strips.jpg）。"
+  },
+  "camera_background": {
+   "verdict": "PASS",
+   "evidence": "封存要求：机位锁定、无硬切、门缝宽度不变、红色只在门侧。门侧区域相对 f0 的相位相关 dx −0.04…+0.11 px、dy −0.66…+0.04 px；左侧机柜把手位置 x 288–292、y 上沿 531–532 不变（左侧整块相位相关受灯闪烁与肩部入区干扰不可用，未采用）。MCP scene_detect 1 个场景；ffmpeg 场景分最大 0.0089，scdet 阈值 3 零命中，无硬切。门缝红线峰值列 x 1545–1546、宽 12 px 全片恒定。饱和红像素在 x<600 与 600–900 区间（抽样 28 帧）为 0，红色只在门缝一侧。"
+  },
+  "performance": {
+   "verdict": "FAIL",
+   "evidence": "封存要求（动作文本）：开头闭眼合嘴静静等待；唱时闭眼，神情平静淡然、带一点好奇、眉头舒展；唱到句尾慢慢睁开眼睛，带一点好奇平静地看镜头；不喊、不发空、前后同一种情绪。实测：闭眼 0.00–2.48 s（face_grid f0–f62）；睁眼发生在 2.48–2.68 s（左眼暗区 195→340→417，detail_strips 第 3 行 f62 闭、f63–f64 半睁、f66–f67 全睁），约 0.17 s（5 帧）睁开，在「didn't」长音中段、离「run」起音约 0.65 s、离句尾（约 3.63 s）约 0.95 s；不是「唱到句尾慢慢睁开」，连续性报告已点名此风险（「可能在 didn't 中段提前睁眼」）。2.80 s 起睁眼平视镜头，神情平静，看到出点（f70–f102），不发空的读法由用户判断。眉头全片舒展，无皱眉。「I」：0.97–1.03 s 大圆口（内口高宽比约 0.85，被否的上一条为 0.35），闭眼、眉舒展，是否读作在喊由用户判断，不作为本判定依据。1.52 s 前后嘴横向拉开露两排牙，读起来接近笑（face_grid f38），与平静淡然是否算同一种情绪由用户判断。头部：1.4–1.9 s 头下低、向画面左移约 50 px（发顶 +30 px），之后保持。判 FAIL 的依据是睁眼时机与速度不符合封存文本，以及开头静音未合嘴（见 sings）。"
+  },
+  "platform_label": {
+   "verdict": "PASS",
+   "evidence": "f0/f54/f108 四角 1:1 裁图（corners.png）与 MCP 总览帧均无可见水印、「AI生成」或平台字样；容器元数据带 AIGC 标签（Label 1，UserComment aigc_label_type 0，source_info dreamina），保留不动。"
+  },
+  "audio": {
+   "verdict": "PASS",
+   "evidence": "封存要求：片内音轨就是上传人声，对齐误差在 1 帧内。AAC 44.1 kHz 立体声 4.3654 s（左右相关 0.9997），上传 U021.wav 4.3600 s 单声道（b74a2cdb…）。全采样率互相关滞后 1105 样本 = 25.1 ms（小于 1 帧 40 ms），NCC 0.997，增益 0.986，残差 −22.3 dB；对齐后 50 ms 包络在 267 个有声帧上差值中位数 0.03 dB、最大 0.16 dB；0.30–0.90 s 静音最大 −78.2 dBFS；片尾多 5.4 ms。sync_check：lag 0.0251 s，NCC 0.9814，copy，无分歧点，包络滞后 0.025 s 稳定（NCC 0.998），歌曲时间 = 60.20 + 片内时间 − 0.0251。"
+  }
+ },
+ "collar_dark_interval": null,
+ "usable_span": [
+  0.325,
+  4.085
+ ],
+ "visible_platform_label": false,
+ "result": "FAIL",
+ "notes": "usable_span 只是剪辑窗口 60.50–64.26 s 按 sync_check（入点 = 歌曲时间 − 60.20 + 0.0251）映射到片内的 0.325–4.085 s（视频覆盖 0–4.333 s），不表示可用：窗口内 0.325–0.88 s 是静音中张嘴不动的脸（sings FAIL），2.48–2.68 s 在 didn't 中段快速睁眼（performance FAIL），3.12–3.68 s「run」口型近乎不动，出点前 3.72–4.085 s 在静音中张嘴预备下一句。窗口内没有能同时满足全部封存要求的子区间可以替代整个窗口。立领红线全程亮着，无需后期补画。观感（是否像喊、是否发空、1.52 s 是否像笑）由用户判断。主会话勿据此重新提交；是否推进由主会话裁决。证据图：contact_sheet.jpg、face_grid.jpg、detail_strips.jpg、mouth_ruler.png、identity_cmp.jpg、corners.png、sync/。"
+}

@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "one_image_exact_bytes": true,
+    "soft_reference_only": true,
+    "identity_not_empty": true,
+    "preview_hash_matches": true,
+    "coverage_hash_matches": true,
+    "exact_user_quote": true,
+    "exact_authored_prompt": true,
+    "chinese_body": true,
+    "single_marker": true,
+    "duration_resolution_nativeaudio": true,
+    "qualification_only": true,
+    "single_submit_zero_retry": true,
+    "profile_matches_fresh_native": true,
+    "no_video_attempt_at_preflight": true,
+    "offline_no_transport": true
+  },
+  "structure_verdict": "PASS",
+  "media_verdict": "NOT_EVALUATED",
+  "manifest_revision": 5,
+  "video_calls": 0
+}

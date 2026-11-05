@@ -1,0 +1,63 @@
+........................................................................ [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 66%]
+.............F.......................................................... [ 88%]
+....................................                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_real_pytest_duration_output_is_captured _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2049/test_real_pytest_duration_outp0')
+
+    def test_real_pytest_duration_output_is_captured(tmp_path):
+        (tmp_path / "test_slow.py").write_text(
+            "import time\ndef test_slow():\n    time.sleep(0.12)\n", encoding="utf-8",
+        )
+        config = agent_harness.load_policy(POLICY_PATH)["checks"]["full_tests"]
+        argv = agent_harness._check_argv(
+            {**config, "argv": [*config["argv"], str(tmp_path / "test_slow.py")]},
+            {"mode": "staged"}, tmp_path / "result.xml",
+        )
+        result = agent_harness.run_command(
+            argv, POLICY_PATH.parents[2], 15,
+            agent_harness.build_check_environment({"PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"}),
+        )
+>       assert result.status == "passed", result.stderr
+E       AssertionError: 
+E       assert 'timed_out' == 'passed'
+E         
+E         - passed
+E         + timed_out
+
+tests/test_agent_harness_policy.py:158: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_harness_canvas_data.py::test_referenced_image_bytes_are_checked_by_canonical_author[missing]
+tests/test_agent_harness_canvas_data.py::test_referenced_image_bytes_are_checked_by_canonical_author[bad_png]
+  /tmp/ai-video-harness-6s0w6zpv/checkout/src/ai_video/production/reference_authoring.py:141: UserWarning: adjacent multi-shot units repeat director categories (shot_scale, camera_treatment); vary them when it improves coverage, but repetition is permitted.
+    validate_director_coverage(coverage)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 20 durations =============================
+15.07s call     tests/test_agent_harness_policy.py::test_real_pytest_duration_output_is_captured
+0.53s call     tests/test_agent_harness.py::test_repository_policy_audit_has_no_unmapped_owned_files
+0.50s call     tests/test_agent_harness.py::test_runner_timeout_terminates_descendant_processes
+0.26s call     tests/test_agent_harness.py::test_receipt_freshness_requires_complete_routing_and_execution_proof
+0.22s call     tests/test_record_ai_video_session_hook.py::test_concurrent_post_tool_callbacks_preserve_both_owned_paths
+0.19s call     tests/test_agent_harness_levels.py::test_full_receipt_requires_every_suite_and_cli_rejects_related_proof
+0.14s call     tests/test_agent_harness_policy.py::test_causal_expression_selects_related_boundaries_without_full_suite[tests/test_typed_causal_native_expression.py]
+0.14s call     tests/test_agent_harness.py::test_ecommerce_production_job_routes_to_exact_application_suite[tests/test_production_ecommerce_job_projection.py]
+0.14s call     tests/test_agent_harness.py::test_video_planner_routes_to_exact_contract_suite
+0.13s call     tests/test_agent_harness.py::test_continuity_evaluator_routes_to_review_and_video_provider_suites
+0.13s call     tests/test_agent_harness.py::test_generation_feedback_routes_to_decision_and_provider_checks[src/ai_video/production/generation_execution.py]
+0.13s call     tests/test_agent_harness.py::test_commit_range_receipt_becomes_stale_after_new_staged_edit
+0.12s call     tests/test_agent_harness.py::test_previously_broad_fallback_paths_have_explicit_owners[.mcp.json-control_plane]
+0.12s call     tests/test_agent_harness.py::test_voice_binding_owners_also_route_to_voice_regressions[src/ai_video/production/_state_commit_voice_intent.py]
+0.12s call     tests/test_docs_contract_gate.py::test_current_complete_registry_passes
+0.12s call     tests/test_agent_harness_levels.py::test_receipt_level_is_bound_to_recomputed_selection
+0.11s call     tests/test_record_ai_video_session_hook.py::test_session_record_artifact_does_not_open_its_own_checkpoint
+0.10s call     tests/test_docs_contract_gate.py::test_cli_exit_codes
+0.10s call     tests/test_agent_harness.py::test_staged_receipt_rejects_snapshot_from_different_head
+
+(1 durations < 0.1s hidden.)
+=========================== short test summary info ============================
+FAILED tests/test_agent_harness_policy.py::test_real_pytest_duration_output_is_captured
+1 failed, 323 passed, 2 warnings in 29.78s

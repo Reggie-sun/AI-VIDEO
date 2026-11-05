@@ -1,0 +1,51 @@
+artifact_id: iris-v2-n2-shot
+character_ids:
+- IRIS
+composition_directives: []
+content_hash: 6c996320cad1ea98ae3d38846971292ef3943eb8643cc3aa4d6595e635ccb1bf
+continuity_constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）
+- 手掌在玻璃上停一会儿，指尖轻轻收拢，头微微低下又抬起望向城市，脸始终朝着窗外，嘴唇自然闭合
+- 镜头缓慢推近她贴在玻璃上的手
+- 画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡
+creation_receipt_id: iris-v2-N2-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: 镜头缓慢推近她贴在玻璃上的手。她的手掌在冰冷的玻璃上停了一会儿，指尖轻轻收拢，掌心周围的雾气慢慢散开；窗外雨丝落下，车流在高架桥上移动；她的头微微低下又抬起，望向城市，脸始终朝着窗外，嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-c-v2-n2-first-frame
+  role: first_frame
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: window
+schema_version: '2.0'
+shot_id: ep01v2-n2
+source_provenance:
+- content_hash: 5b5cb4691c84a4e11fe476bfb228f5ca88f2cc474e39c8fd422f4199b6ae67ba
+  kind: user_input
+  reference: evidence/authoring-input/5b5cb4691c84a4e11fe476bfb228f5ca88f2cc474e39c8fd422f4199b6ae67ba.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: e62fc8e0a4770bc76da778f97234a808b247f9e5487dc7eb268789cb9ee15c94
+  kind: user_input
+  reference: evidence/authoring-input/e62fc8e0a4770bc76da778f97234a808b247f9e5487dc7eb268789cb9ee15c94.json
+storyboard_beat_id: action-n2
+visual_strategy: generated_video

@@ -1,0 +1,15 @@
+{
+ "window": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+ "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+ "song_t0": 17.97,
+ "song_t1": 22.97,
+ "duration_s": 5.0,
+ "sample_rate": 44100,
+ "channels": 1,
+ "source": "outputs/ai-city-takeover/ep01/v2/song/isolation/chorus-18.6-26.0-isolated.mp3",
+ "source_sha256": "9a454000b362f094a35898f5f3b844548c5dd48c83bceb5dc89d79870f9050db",
+ "words": "I didn't run — I just looked outside. I",
+ "boundaries": "starts 0.63 s before 'I' (18.60) in the stem's silence; ends in the pause 22.97-23.09 after the next line's held 'I'; gaps inside are <= 0.35 s, so one phrase (toolkit §14)",
+ "end_level_db_vs_rms": -15.6,
+ "method": "author's exact vocal window (EV): the isolated lead vocal, which is from the bed without the Stella VO; -16 dBFS RMS, peaks <= -1 dBFS, 15 ms ramp at the end"
+}

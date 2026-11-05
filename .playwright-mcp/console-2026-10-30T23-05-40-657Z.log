@@ -1,0 +1,13 @@
+[-2948454ms] [INFO] This page uses Chrome's Built-In AI features (LanguageDetector)! We're always improving our models; please submit your feedback here: https://issues.chromium.org/issues/new?component=1583316 @ chrome-extension://bpoadfkcbjbfhfodiogcnhhhpibjhbnh/content_main.js:5638
+[-2951025ms] [WARNING]   WARN  [Statsig] Creating multiple Statsig clients with the same SDK key can lead to unexpected behavior. Multi-instance support requires different SDK keys. @ chrome-extension://fmkadmapgofadopljbjfkapdkoienihi/build/installHook.js:0
+[-2950940ms] [LOG] %c
+  ███████╗██╗   ██╗███╗   ██╗ ██████╗
+  ██╔════╝██║   ██║████╗  ██║██╔═══██╗
+  ███████╗██║   ██║██╔██╗ ██║██║   ██║
+  ╚════██║██║   ██║██║╚██╗██║██║   ██║
+  ███████║╚██████╔╝██║ ╚████║╚██████╔╝
+  ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝
+  We are hiring! Come join our amazing team!
+  https://suno.com/careers
+       color: #ff6b9d; font-weight: bold; text-shadow: 0 0 10px rgba(255, 107, 157, 0.5), 0 0 20px rgba(255, 107, 157, 0.3), 0 0 30px rgba(255, 107, 157, 0.2); font-family: "Courier New", monospace; @ https://suno.com/_next/static/immutable/chunks/27xkt4b8k4jvz.js:44
+[-2945162ms] [WARNING] [Stripe.js] It looks like Stripe.js was loaded more than one time. Please only load it once per page. @ chrome-extension://fmkadmapgofadopljbjfkapdkoienihi/build/installHook.js:0

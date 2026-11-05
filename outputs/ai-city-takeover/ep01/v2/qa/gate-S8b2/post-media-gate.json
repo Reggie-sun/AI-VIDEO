@@ -1,0 +1,72 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S8b2",
+  "shot_id": "ep01v2-s8b",
+  "attempt_id": "iris-v2-s8b2-source-001",
+  "retry_of": {
+    "unit": "S8b",
+    "outcome": "known_no_effect (reference upload failed before dispatch)"
+  },
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S8b2/project/state/video-generation/fetch/files/098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148.mp4",
+  "artifact_sha256": "098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148",
+  "intent": "board v2.1 S8b: second chorus pass on K8b, finish, close the mouth and look toward the city; criteria in s8a-lipsync-amendment.md S8b section, scoped to the film window (clip 0.367-3.70 s)",
+  "source_audio_policy": "MUTE in the film (master song only)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 4.064 s, 97 frames (24 fps cadence), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "5 frames at 1 s steps -> qa/gate-S8b2/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 3.9 s, issues []",
+    "frame_review": "qa/lipsync_review.py at 30 fps CFR: mouth-timeline.jpg, onsets.jpg; review clip with master audio renders/review/S8b2-film-window.mp4",
+    "camera_drift": "qa/frame_drift.py: scale 0.00%, shift <= 0.1 px through frame 96",
+    "clip_audio_dtw": {
+      "0.00": 0.02,
+      "0.25": 0.02,
+      "0.50": -0.05,
+      "0.75": -0.27,
+      "1.00": -0.32,
+      "1.25": -0.19,
+      "1.50": -0.19,
+      "1.75": -0.11,
+      "2.00": -0.11,
+      "2.25": -0.13,
+      "2.50": 0.02,
+      "2.75": -0.1,
+      "3.00": 0.34,
+      "3.25": 0.31,
+      "3.50": 0.3,
+      "3.75": 0.05
+    }
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same face as K8b/ID7b, left-ear hook, red collar line, low bun"
+    },
+    {
+      "requirement_id": "lip-sync",
+      "verdict": "FAIL",
+      "reason": "criterion 1: 'outside' (onset clip 3.033 s) narrows at 3.10-3.20 s and opens widest at 3.37-3.50 s, 4-8 frames late (the clip's own singing is also 0.3 s late here); criterion 2: the reference is silent from 3.40 s but the mouth stays open until about 3.67 s and closes by 3.73 s, about 7 frames after the 3-frame allowance. 'didn't' (0.90 s) and 'I just' (2.033 s) and the 0.767-0.90 s pause hold"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "locked; K8b framing held"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept; nothing added"
+    }
+  ],
+  "observations": [
+    "after the line she turns to profile and looks left into the distance (the board's look toward the city)",
+    "in the master a wordless vocal tail sounds at 25.74-25.90 s, which partly covers the late closing in the film"
+  ],
+  "verdict": "FAIL",
+  "all_required_observed_pass": false,
+  "next": "one bounded repair is allowed (approved budget); the most attributable change is the 0.20 s silent lead-in that kept S8a take 1 on time, which needs a new reference file and therefore a new user preview approval",
+  "not_evaluated": [
+    "human 1.0x viewing with the master audio"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

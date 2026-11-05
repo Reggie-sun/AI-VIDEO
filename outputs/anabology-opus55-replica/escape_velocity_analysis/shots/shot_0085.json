@@ -1,0 +1,1395 @@
+{
+  "shot_id": "S0085",
+  "start_frame": 3843,
+  "end_frame": 3907,
+  "duration_frames": 65,
+  "start_time": 160.125,
+  "end_time": 162.8333,
+  "duration_s": 2.7083,
+  "start_tc": "00:02:40:03",
+  "end_tc": "00:02:42:19",
+  "boundary_in_id": "B2-016",
+  "boundary_in_type": "shape_wipe",
+  "boundary_in_span": [
+    3838,
+    3844
+  ],
+  "boundary_out_id": "B2-017",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 3843,
+      "end_frame": 3845,
+      "event": "卷门残留",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3843,
+        3845
+      ],
+      "description": "卷门残留",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3846,
+      "end_frame": 3848,
+      "event": "公路全幅",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3846,
+        3848
+      ],
+      "description": "公路全幅",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3855,
+      "end_frame": 3857,
+      "event": "左巨6、底部6与距离标签",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3855,
+        3857
+      ],
+      "description": "左巨6、底部6与距离标签",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3870,
+      "end_frame": 3872,
+      "event": "月份翻牌卡进入；months",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3870,
+        3872
+      ],
+      "description": "月份翻牌卡进入；months",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3876,
+      "end_frame": 3878,
+      "event": "JUL落定",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3876,
+        3878
+      ],
+      "description": "JUL落定",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3882,
+      "end_frame": 3884,
+      "event": "AUG",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3882,
+        3884
+      ],
+      "description": "AUG",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3888,
+      "end_frame": 3890,
+      "event": "SEP",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3888,
+        3890
+      ],
+      "description": "SEP",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3891,
+      "end_frame": 3893,
+      "event": "OCT开始；to入词",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3891,
+        3893
+      ],
+      "description": "OCT开始；to入词",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3894,
+      "end_frame": 3896,
+      "event": "分钟264960",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3894,
+        3896
+      ],
+      "description": "分钟264960",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3897,
+      "end_frame": 3899,
+      "event": "escape、NOV",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3897,
+        3899
+      ],
+      "description": "escape、NOV",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3903,
+      "end_frame": 3905,
+      "event": "the、DEC落定",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3903,
+        3905
+      ],
+      "description": "the、DEC落定",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3906,
+      "end_frame": 3907,
+      "event": "分钟257760",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3906,
+        3907
+      ],
+      "description": "分钟257760",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "卷门抬升后，少女背向镜头走在晨光下的空公路中央，机位缓慢追近",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "卷门抬升后，少女朝向镜头走在晨光下的空公路中央，机位缓慢追近。左侧巨大黑色6出现，白卡列出剩余月份并动态减少分钟数，上左攀升速度卡加倍，底部歌词逐词推进。",
+  "reference_frames": [
+    {
+      "frame": 3843,
+      "path": "keyframes/S0085_f03843.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3859,
+      "path": "keyframes/S0085_f03859.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3875,
+      "path": "keyframes/S0085_f03875.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3891,
+      "path": "keyframes/S0085_f03891.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3907,
+      "path": "keyframes/S0085_f03907.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    }
+  ],
+  "composition": {
+    "shot_size": "full/long shot",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.39,
+      "y": 0.24,
+      "w": 0.19,
+      "h": 0.69,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "卷门抬升后，少女背向镜头走在晨光下的空公路中央，机位缓慢追近",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "卷门抬升后，少女背向镜头走在晨光下的空公路中央，机位缓慢追近。左侧巨大黑色6出现，白卡列出剩余月份并动态减少分钟数，上左攀升速度卡加倍，底部歌词逐词推进。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0008, \"pan_y_frac_per_s\": -0.0112, \"zoom_per_s\": -0.0053, \"median_flow_frac_per_s\": 0.0046, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[104.3, 132.7, 129.7]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#D2D8DD",
+        "fraction": 0.348,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#A0B4D8",
+        "fraction": 0.169,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#2F363D",
+        "fraction": 0.16,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#4D535D",
+        "fraction": 0.135,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#12191B",
+        "fraction": 0.125,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#808AA1",
+        "fraction": 0.063,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[104.3, 132.7, 129.7]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0085-E01",
+      "shot_id": "S0085",
+      "type": "background_media",
+      "description": "卷门抬升后，少女朝向镜头走在晨光下的空公路中央，机位缓慢追近。左侧巨大黑色6出现，白卡列出剩余月份并动态减少分钟数，上左攀升速度卡加倍，底部歌词逐词推进。",
+      "start_frame": 3843,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "卷门抬升后，少女背向镜头走在晨光下的空公路中央，机位缓慢追近。左侧巨大黑色6出现，白卡列出剩余月份并动态减少分钟数，上左攀升速度卡加倍，底部歌词逐词推进。"
+      },
+      "motion": {
+        "path": "卷门抬升后，少女背向镜头走在晨光下的空公路中央，机位缓慢追近。左侧巨大黑色6出现，白卡列出剩余月份并动态减少分钟数，上左攀升速度卡加倍，底部歌词逐词推进。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3843–3907；入口按密采事件区间±2帧。",
+        "exit": "3907为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3843,
+          "state": "卷门残留"
+        },
+        {
+          "frame": 3846,
+          "state": "公路全幅"
+        },
+        {
+          "frame": 3855,
+          "state": "左巨6、底部6与距离标签"
+        },
+        {
+          "frame": 3870,
+          "state": "月份翻牌卡进入；months"
+        },
+        {
+          "frame": 3876,
+          "state": "JUL落定"
+        },
+        {
+          "frame": 3882,
+          "state": "AUG"
+        },
+        {
+          "frame": 3888,
+          "state": "SEP"
+        },
+        {
+          "frame": 3891,
+          "state": "OCT开始；to入词"
+        },
+        {
+          "frame": 3894,
+          "state": "分钟264960"
+        },
+        {
+          "frame": 3897,
+          "state": "escape、NOV"
+        },
+        {
+          "frame": 3903,
+          "state": "the、DEC落定"
+        },
+        {
+          "frame": 3906,
+          "state": "分钟257760"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3843,
+        3859,
+        3875,
+        3891,
+        3907
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0085-E02",
+      "shot_id": "S0085",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 3843,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0.39,
+        "y": 0.24,
+        "w": 0.19,
+        "h": 0.69,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。卷门抬升后，少女背向镜头走在晨光下的空公路中央，机位缓慢追近。左侧巨大黑色6出现，白卡列出剩余月份并动态减少分钟数，上左攀升速度卡加倍，底部歌词逐词推进。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3843–3907；入口按密采事件区间±2帧。",
+        "exit": "3907为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3843,
+          "state": "卷门残留"
+        },
+        {
+          "frame": 3846,
+          "state": "公路全幅"
+        },
+        {
+          "frame": 3855,
+          "state": "左巨6、底部6与距离标签"
+        },
+        {
+          "frame": 3870,
+          "state": "月份翻牌卡进入；months"
+        },
+        {
+          "frame": 3876,
+          "state": "JUL落定"
+        },
+        {
+          "frame": 3882,
+          "state": "AUG"
+        },
+        {
+          "frame": 3888,
+          "state": "SEP"
+        },
+        {
+          "frame": 3891,
+          "state": "OCT开始；to入词"
+        },
+        {
+          "frame": 3894,
+          "state": "分钟264960"
+        },
+        {
+          "frame": 3897,
+          "state": "escape、NOV"
+        },
+        {
+          "frame": 3903,
+          "state": "the、DEC落定"
+        },
+        {
+          "frame": 3906,
+          "state": "分钟257760"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3843,
+        3859,
+        3875,
+        3891,
+        3907
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0085-E03",
+      "shot_id": "S0085",
+      "type": "hud_panel",
+      "description": "左上REQUIRED CLIMB RATE白卡，1 CLASS / 18.0 MO×1.0变11.1MO×1.6。",
+      "start_frame": 3843,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0.03,
+        "y": 0.09,
+        "w": 0.2,
+        "h": 0.12,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左上REQUIRED CLIMB RATE白卡，1 CLASS / 18.0 MO×1.0变11.1MO×1.6。"
+      },
+      "motion": {
+        "path": "左上REQUIRED CLIMB RATE白卡，1 CLASS / 18.0 MO×1.0变11.1MO×1.6。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3843–3907；入口按密采事件区间±2帧。",
+        "exit": "3907为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3843,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.03,
+            "y": 0.09,
+            "w": 0.2,
+            "h": 0.12,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3907,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3843,
+        3859,
+        3875,
+        3891,
+        3907
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "REQUIRED CLIMB RATE | CLASS / MONTH | 1 CLASS / 18.0 MO ×1.0 → 11.1 MO ×1.6 | CHORUS 1 · 18 MO | NOW · 6 MO",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0085-E04",
+      "shot_id": "S0085",
+      "type": "split_flap",
+      "description": "左侧白卡月份两行3组，黑格逐个翻到JUL AUG SEP / OCT NOV DEC。",
+      "start_frame": 3870,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0.16,
+        "y": 0.2,
+        "w": 0.23,
+        "h": 0.35,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左侧白卡月份两行3组，黑格逐个翻到JUL AUG SEP / OCT NOV DEC。"
+      },
+      "motion": {
+        "path": "左侧白卡月份两行3组，黑格逐个翻到JUL AUG SEP / OCT NOV DEC。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3870–3907；入口按密采事件区间±2帧。",
+        "exit": "3907为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3870,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.16,
+            "y": 0.2,
+            "w": 0.23,
+            "h": 0.35,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3907,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3875,
+        3891,
+        3907
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "LEFT IN 2026 · ONE PER EIGHTH | JUL AUG SEP / OCT NOV DEC",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        }
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0085-E05",
+      "shot_id": "S0085",
+      "type": "counter",
+      "description": "同卡MINUTES TO ESCAPE从约264960减至257760，-1 DAY PER16TH。",
+      "start_frame": 3891,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0.17,
+        "y": 0.4,
+        "w": 0.2,
+        "h": 0.1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "同卡MINUTES TO ESCAPE从约264960减至257760，-1 DAY PER16TH。"
+      },
+      "motion": {
+        "path": "同卡MINUTES TO ESCAPE从约264960减至257760，-1 DAY PER16TH。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3891–3907；入口按密采事件区间±2帧。",
+        "exit": "3907为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3894,
+          "value": 264960
+        },
+        {
+          "frame": 3907,
+          "value": 257760
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3891,
+        3907
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "MINUTES TO ESCAPE | 264,960 → 257,760 | −1 DAY PER 16TH",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "cap height approx 285 px at 1920x1080; visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0085-E06",
+      "shot_id": "S0085",
+      "type": "text_title",
+      "description": "左侧巨大黑6约400px cap高。",
+      "start_frame": 3855,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.26,
+        "w": 0.1,
+        "h": 0.36,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左侧巨大黑6约400px cap高。"
+      },
+      "motion": {
+        "path": "左侧巨大黑6约400px cap高。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3855–3907；入口按密采事件区间±2帧。",
+        "exit": "3907为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3855,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.26,
+            "w": 0.1,
+            "h": 0.36,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3907,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3859,
+        3875,
+        3891,
+        3907
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "6",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 285 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0085-E07",
+      "shot_id": "S0085",
+      "type": "text_lyric",
+      "description": "底左白字6 months to escape the逐词。",
+      "start_frame": 3855,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.89,
+        "w": 0.43,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "底左白字6 months to escape the逐词。"
+      },
+      "motion": {
+        "path": "底左白字6 months to escape the逐词。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3855–3907；入口按密采事件区间±2帧。",
+        "exit": "3907为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3855,
+          "text": "6",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3870,
+          "text": "6 months",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3891,
+          "text": "6 months to",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3897,
+          "text": "6 months to escape",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3903,
+          "text": "6 months to escape the",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3859,
+        3875,
+        3891,
+        3907
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "6 months to escape the",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0085-E08",
+      "shot_id": "S0085",
+      "type": "text_label",
+      "description": "人物右侧两条黑底白字步态遥测，DIST→LENS与CADENCE随行走更新。",
+      "start_frame": 3855,
+      "end_frame": 3907,
+      "bounding_box": {
+        "x": 0.577,
+        "y": 0.566,
+        "w": 0.077,
+        "h": 0.046,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "人物右侧两条黑底白字步态遥测，DIST→LENS与CADENCE随行走更新。"
+      },
+      "motion": {
+        "path": "人物右侧两条黑底白字步态遥测，DIST→LENS与CADENCE随行走更新。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3855起±2帧，参见逐3帧密采",
+        "exit": "3907末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3855,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.577,
+            "y": 0.566,
+            "w": 0.077,
+            "h": 0.046,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3907,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3859,
+        3875,
+        3891,
+        3907
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "DIST → LENS 6.1 M | CADENCE 132.5 SPM",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    },
+    {
+      "element_id": "S0085-E09",
+      "shot_id": "S0085",
+      "type": "transition_graphic",
+      "description": "DOCK06卷门继承上镜，3846前从画面上方完全退出。",
+      "start_frame": 3843,
+      "end_frame": 3845,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 0.46,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "DOCK06卷门继承上镜，3846前从画面上方完全退出。"
+      },
+      "motion": {
+        "path": "DOCK06卷门继承上镜，3846前从画面上方完全退出。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3843起±2帧，参见逐3帧密采",
+        "exit": "3845末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3843,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 0.46,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3845,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3843
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "DOCK 06",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "see observed frame; panel mono approx 10–15px",
+          "alignment": "left"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0085-A03",
+      "target_element_ids": [
+        "S0085-E03"
+      ],
+      "description": "左上REQUIRED CLIMB RATE白卡，1 CLASS / 18.0 MO×1.0变11.1MO×1.6。",
+      "start_frame": 3843,
+      "end_frame": 3907,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0085-A04",
+      "target_element_ids": [
+        "S0085-E04"
+      ],
+      "description": "左侧白卡月份两行3组，黑格逐个翻到JUL AUG SEP / OCT NOV DEC。",
+      "start_frame": 3870,
+      "end_frame": 3907,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0085-A05",
+      "target_element_ids": [
+        "S0085-E05"
+      ],
+      "description": "同卡MINUTES TO ESCAPE从约264960减至257760，-1 DAY PER16TH。",
+      "start_frame": 3891,
+      "end_frame": 3907,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0085-A06",
+      "target_element_ids": [
+        "S0085-E06"
+      ],
+      "description": "左侧巨大黑6约400px cap高。",
+      "start_frame": 3855,
+      "end_frame": 3907,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0085-A07",
+      "target_element_ids": [
+        "S0085-E07"
+      ],
+      "description": "底左白字6 months to escape the逐词。",
+      "start_frame": 3855,
+      "end_frame": 3907,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AH01552",
+      "relation": "band_onset_candidate (unknown) at frame 3843; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3843
+    },
+    {
+      "audio_event_id": "AH01553",
+      "relation": "band_onset_candidate (unknown) at frame 3844; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3844
+    },
+    {
+      "audio_event_id": "AH01554",
+      "relation": "band_onset_candidate (unknown) at frame 3844; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3844
+    },
+    {
+      "audio_event_id": "AB0354",
+      "relation": "beat_candidate (unknown) at frame 3844; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3844
+    },
+    {
+      "audio_event_id": "AH01555",
+      "relation": "band_onset_candidate (unknown) at frame 3844; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3844
+    },
+    {
+      "audio_event_id": "AH01556",
+      "relation": "band_onset_candidate (unknown) at frame 3844; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3844
+    },
+    {
+      "audio_event_id": "AW0265",
+      "relation": "vocal_word_candidate (unknown) at frame 3853–3860; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3853
+    },
+    {
+      "audio_event_id": "AB0355",
+      "relation": "beat_candidate (unknown) at frame 3854; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3854
+    },
+    {
+      "audio_event_id": "AH01557",
+      "relation": "band_onset_candidate (unknown) at frame 3854; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3854
+    },
+    {
+      "audio_event_id": "AH01558",
+      "relation": "band_onset_candidate (unknown) at frame 3854; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3854
+    },
+    {
+      "audio_event_id": "AH01559",
+      "relation": "band_onset_candidate (unknown) at frame 3854; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3854
+    },
+    {
+      "audio_event_id": "AH01560",
+      "relation": "band_onset_candidate (unknown) at frame 3855; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3855
+    },
+    {
+      "audio_event_id": "AH01561",
+      "relation": "band_onset_candidate (unknown) at frame 3859; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3859
+    },
+    {
+      "audio_event_id": "AH01562",
+      "relation": "band_onset_candidate (unknown) at frame 3859; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3859
+    },
+    {
+      "audio_event_id": "AB0356",
+      "relation": "beat_candidate (unknown) at frame 3865; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3865
+    },
+    {
+      "audio_event_id": "AH01563",
+      "relation": "band_onset_candidate (unknown) at frame 3865; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3865
+    },
+    {
+      "audio_event_id": "AH01564",
+      "relation": "band_onset_candidate (unknown) at frame 3865; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3865
+    },
+    {
+      "audio_event_id": "AH01565",
+      "relation": "band_onset_candidate (unknown) at frame 3865; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3865
+    },
+    {
+      "audio_event_id": "AH01566",
+      "relation": "band_onset_candidate (unknown) at frame 3866; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3866
+    },
+    {
+      "audio_event_id": "AW0266",
+      "relation": "vocal_word_candidate (unknown) at frame 3870–3879; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3870
+    },
+    {
+      "audio_event_id": "AH01567",
+      "relation": "band_onset_candidate (unknown) at frame 3871; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3871
+    },
+    {
+      "audio_event_id": "AH01568",
+      "relation": "band_onset_candidate (unknown) at frame 3871; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3871
+    },
+    {
+      "audio_event_id": "AH01569",
+      "relation": "band_onset_candidate (unknown) at frame 3876; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3876
+    },
+    {
+      "audio_event_id": "AB0357",
+      "relation": "beat_candidate (unknown) at frame 3876; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3876
+    },
+    {
+      "audio_event_id": "AH01570",
+      "relation": "band_onset_candidate (unknown) at frame 3876; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3876
+    },
+    {
+      "audio_event_id": "AH01571",
+      "relation": "band_onset_candidate (unknown) at frame 3876; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3876
+    },
+    {
+      "audio_event_id": "AH01572",
+      "relation": "band_onset_candidate (unknown) at frame 3876; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3876
+    },
+    {
+      "audio_event_id": "AH01573",
+      "relation": "band_onset_candidate (unknown) at frame 3876; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3876
+    },
+    {
+      "audio_event_id": "AW0267",
+      "relation": "vocal_word_candidate (unknown) at frame 3886–3890; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3886
+    },
+    {
+      "audio_event_id": "AB0358",
+      "relation": "beat_candidate (unknown) at frame 3887; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3887
+    },
+    {
+      "audio_event_id": "AH01574",
+      "relation": "band_onset_candidate (unknown) at frame 3887; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3887
+    },
+    {
+      "audio_event_id": "AH01575",
+      "relation": "band_onset_candidate (unknown) at frame 3887; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3887
+    },
+    {
+      "audio_event_id": "AH01576",
+      "relation": "band_onset_candidate (unknown) at frame 3887; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3887
+    },
+    {
+      "audio_event_id": "AH01577",
+      "relation": "band_onset_candidate (unknown) at frame 3887; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3887
+    },
+    {
+      "audio_event_id": "AW0268",
+      "relation": "vocal_word_candidate (unknown) at frame 3892–3902; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3892
+    },
+    {
+      "audio_event_id": "AB0359",
+      "relation": "beat_candidate (unknown) at frame 3897; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3897
+    },
+    {
+      "audio_event_id": "AH01578",
+      "relation": "band_onset_candidate (unknown) at frame 3897; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3897
+    },
+    {
+      "audio_event_id": "AH01579",
+      "relation": "band_onset_candidate (unknown) at frame 3897; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3897
+    },
+    {
+      "audio_event_id": "AH01580",
+      "relation": "band_onset_candidate (unknown) at frame 3897; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3897
+    },
+    {
+      "audio_event_id": "AH01581",
+      "relation": "band_onset_candidate (unknown) at frame 3898; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3898
+    },
+    {
+      "audio_event_id": "AW0269",
+      "relation": "vocal_word_candidate (unknown) at frame 3902–3905; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3902
+    },
+    {
+      "audio_event_id": "AH01582",
+      "relation": "band_onset_candidate (unknown) at frame 3903; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3903
+    },
+    {
+      "audio_event_id": "AH01583",
+      "relation": "band_onset_candidate (unknown) at frame 3903; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3903
+    },
+    {
+      "audio_event_id": "AH01584",
+      "relation": "band_onset_candidate (unknown) at frame 3903; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3903
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0085.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "shape_wipe",
+      "boundary_id": "B2-016",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        3838,
+        3844
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B2-017",
+      "description": "卷门抬升后，少女背向镜头走在晨光下的空公路中央，机位缓慢追近。左侧巨大黑色6出现，白卡列出剩余月份并动态减少分钟数，上左攀升速度卡加倍，底部歌词逐词推进。",
+      "span": [
+        3907,
+        3907
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "6",
+    "6 months to escape the",
+    "LEFT IN 2026 · ONE PER EIGHTH",
+    "JUL AUG SEP OCT NOV DEC",
+    "MINUTES TO ESCAPE"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      3875,
+      3907
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "failure_classes": [],
+  "failed_requirements": [],
+  "preserved_requirements": [
+    "camera",
+    "identity",
+    "monitor-back",
+    "observer"
+  ],
+  "evidence_hashes": [
+    "f80562cd71d2b7d83a580c8dc980b8962781bb7f9001fea21129f0bdafe6c294"
+  ],
+  "next_owner": "review_owner",
+  "all_required_observed_pass": true
+}

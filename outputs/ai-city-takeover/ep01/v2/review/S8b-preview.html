@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<title>IRIS 01 · S8b 參考包預覽</title>
+<style>
+  :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; }
+  body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+  h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:17px; font-weight:600; margin:26px 0 8px; }
+  .sub { color:var(--dim); } .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; max-width:1300px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px; }
+  img, video { width:100%; display:block; border-radius:3px; } audio { width:100%; margin-top:8px; }
+  .cap { color:var(--dim); font-size:13px; margin-top:6px; } code { color:#9fb7ff; }
+  li { margin:3px 0; }
+</style>
+<h1>S8b 參考包預覽：副歌第二遍</h1>
+<div class="sub">這三樣會送進即夢，全模態，4 秒，1080p，預計約 132 積分。做法照你選的 S8a 第一版。認可後才付費生成。</div>
+
+<h2>1. 首幀：K8b（分鏡 v2.1 已看過）</h2>
+<div class="grid">
+  <div class="card"><img src="K8b.jpg"><div class="cap">陽台 3/4 側面、固定機位。<code>keyframes/raw/K8b-a.png</code> sha256 e6c6e771…</div></div>
+  <div class="card"><img src="ID7b.jpg"><div class="cap">2. IRIS 身份圖 ID7b：只控制面貌、左耳耳掛、左領紅線，不取它的背景。<code>series/identity-cf/raw/CF-ID7b-a.png</code> sha256 e19d9473…</div></div>
+</div>
+
+<h2>3. 對嘴參考：副歌第二遍乾聲（從已認可的歌曲分離）</h2>
+<div class="grid">
+  <div class="card">
+    <div>送進即夢的乾聲，片內 0–4 秒對應母帶 22.20–26.20 秒：</div>
+    <audio controls src="../song/isolation/S8b-vocal-ref-22.20-26.20.wav"></audio>
+    <div class="cap">從第一遍「outside」的尾音起唱。整句約唱到 25.55 秒，之後是靜音。<code>song/isolation/S8b-vocal-ref-22.20-26.20.wav</code> sha256 8b391077…</div>
+  </div>
+  <div class="card">
+    <div>同一段的母帶（成片實際聲音，對照用）：</div>
+    <audio controls src="S8b-master-22.20-26.20.wav"></audio>
+    <div class="cap">成片只用母帶，不用生成檔的聲音。</div>
+  </div>
+</div>
+
+<h2>畫面與判定</h2>
+<div class="card" style="max-width:1268px"><ul>
+  <li>成片取 22.567–25.90 秒，她唱完第二遍；約 25.55 秒唱完後閉嘴，視線移向遠處的城市（分鏡「唱完閉嘴望向城市」）。</li>
+  <li>付費前封存的通過標準（<code>s8a-lipsync-amendment.md</code> S8b 段）：
+    <ul>
+      <li>didn't、I just、outside 開口在 ±2 幀內。</li>
+      <li>兩個停頓處收小。</li>
+      <li>唱完 3 幀內閉嘴、不再動。</li>
+      <li>身份、牙齒下巴、固定機位。</li>
+    </ul>
+  </li>
+  <li>若不過，可有界修復 1 次；仍不過再交你決定。</li>
+  <li>S8a 第一版供對照：<a href="../renders/review/S8a-take1-film-window.mp4" style="color:#9fb7ff">S8a-take1-film-window.mp4</a></li>
+</ul></div>
+
+<h2>S8b 修復選項（第一次生成的判定：FAIL）</h2>
+<div class="grid">
+  <div class="card">
+    <div>S8b2 成片段落，配母帶聲音：</div>
+    <video controls src="../renders/review/S8b2-film-window.mp4"></video>
+    <div class="cap">
+      <ul>
+        <li>最後的「outside」嘴型晚了約 0.15–0.25 秒。</li>
+        <li>歌聲停了之後，嘴又張了約 0.2 秒才閉上。</li>
+        <li>母帶在這裡有一小段無字的人聲尾音，可以蓋掉一部分。</li>
+        <li>其餘段落都對得上。</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <div>修復用的對嘴參考：同一段乾聲，前面多 0.2 秒靜音，總長 5 秒。</div>
+    <audio controls src="../song/isolation/S8br-vocal-ref-22.00-27.00.wav"></audio>
+    <div class="cap">
+      <ul>
+        <li>S8a 第一版就是這種做法，開口時機最準。</li>
+        <li>5 秒，約 165 積分；用完已核准 2,500 上限的最後一格。</li>
+        <li>檔案：<code>song/isolation/S8br-vocal-ref-22.00-27.00.wav</code>，sha256 9ba9442d…</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</html>

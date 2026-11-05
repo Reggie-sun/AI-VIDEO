@@ -1,0 +1,14 @@
+"""Offline exact-input lint; does not evaluate media or authorize submit."""
+from pathlib import Path
+import json,hashlib,re,py_compile
+from ai_video.production.project import load_production_project
+from ai_video.production.jimeng_contracts import JimengProfile
+from ai_video.production.hashing import canonical_sha256
+h=Path(__file__).resolve().parent;b=h.parent
+r=json.loads((h/'resolved-request.json').read_text());p=json.loads((h/'prepare-result.json').read_text());a=json.loads((h/'preview-approval.json').read_text());cfg=json.loads((h/'driver-configuration.json').read_text());row=cfg['row'];root=Path.cwd()/'runs/shizhen-awesome-remake-20261104/municipal';loaded=load_production_project(root/'project.yaml')
+prompt=(h/'native-prompt.zh.txt').read_text().strip();out=p['prepared']['compilation']['request']['output_requirement'];binding=r['image_bindings']
+checks={'one_image_exact_bytes':len(binding)==1 and binding[0]['asset_sha256']==hashlib.sha256((b/'refs/storyboard-v2.png').read_bytes()).hexdigest(),'soft_reference_only':binding[0]['role']=='reference','identity_not_empty':row['generation']['generation_intent']['identity_continuity']['character_ids']==['municipal-worker'],'preview_hash_matches':canonical_sha256(a)==row['generation']['generation_intent']['reference_planning']['preview_approval']['approval_hash'],'coverage_hash_matches':a['coverage_hash']==canonical_sha256(json.loads((b/'director-coverage.v4.json').read_text())),'exact_user_quote':a['user_quote']=='那你再用这个做出来视频我看看','exact_authored_prompt':r['prompt_text']==prompt,'chinese_body':not re.search('[A-Za-z]',re.sub(r'\{\{image:\d+\}\}','',prompt)),'single_marker':prompt.count('{{image:0}}')==1,'duration_resolution_nativeaudio':out['duration_seconds']==6 and out['resolution_label']=='1080p' and out['native_audio'],'qualification_only':cfg['routing_policy']['execution_purpose']=='qualification','single_submit_zero_retry':cfg['execution_limits']['paid_submit_ceiling']==1 and cfg['decision_policy']['max_resamples']==0,'profile_matches_fresh_native':cfg['jimeng_profile']==JimengProfile.model_validate_json((b/'native/municipal-profile.json').read_bytes()).model_dump(mode='json'),'no_video_attempt_at_preflight':not [x for x in loaded.manifest.attempts if x.operation=='video_generation'],'offline_no_transport':p['live_transport_supplied'] is False}
+assert all(checks.values()),checks
+for name in ['build.py','bootstrap.py','prepare.py','verify.py']:py_compile.compile(str(h/name),doraise=True)
+(h/'prompt-lint.json').write_text(json.dumps({'checks':checks,'structure_verdict':'PASS','media_verdict':'NOT_EVALUATED','manifest_revision':loaded.manifest.manifest_revision,'video_calls':0},ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'checks':len(checks),'all_pass':True,'manifest_revision':loaded.manifest.manifest_revision,'video_calls':0}))

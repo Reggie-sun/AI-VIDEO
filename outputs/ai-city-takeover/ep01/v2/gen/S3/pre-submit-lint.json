@@ -1,0 +1,28 @@
+{
+  "unit": "S3",
+  "checks": {
+    "exact_reference_K3": true,
+    "reference_role_reference": true,
+    "reference_duty_in_text": true,
+    "chinese_body_only": true,
+    "no_person": true,
+    "axis_and_camera": true,
+    "camera_endpoint": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "independent_final_audio": true,
+    "bound_output": true
+  },
+  "pass": true,
+  "request_hash": "c57f33ed2e2fbcc54f9e4fca62056df08d7c726cc8d3253d507d815dfdf70af9",
+  "continuity": "independent hard cut on the beat before 'A training run' (board v2.1); no carried state from S2",
+  "handoff": "S2 IRIS awake on the balcony -> S3 empty aisle; picture link is the narration 'A training run' and the red gap that S4 continues",
+  "axis_action_camera": "aisle centre axis, forward dolly-in only, ends closer to the red door gap; no people, only indicator lights and haze move",
+  "prompt_fit": "pure Chinese body 325 chars (<=500 advisory), one reference with its duty named, AI label kept, final audio separate",
+  "budget": {
+    "v2_submits_before": 0,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD": 2500
+  },
+  "new_calls": 0
+}

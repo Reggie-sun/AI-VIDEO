@@ -1,0 +1,19 @@
+{
+ "unit": "SC4",
+ "file": "trial/screentest/SC4/fetch/6f14eb3c0612b41d59e35820c672e5a344c34db28d0d1b49e8a5dc7404f4ce7c.mp4",
+ "sha256": "6f14eb3c0612b41d59e35820c672e5a344c34db28d0d1b49e8a5dc7404f4ce7c",
+ "bytes": 8545287,
+ "suggested_name": "jimeng-2026-11-03-7812-镜头固定近景。她冷艳地微微俯视镜头唱歌，嘴随歌词自然张合，嘴角平直，神情冷峻，眼....mp4",
+ "page_video": {
+  "w": 720,
+  "h": 960,
+  "dur": 5.16,
+  "box": [
+   566,
+   152,
+   504,
+   283.5
+  ]
+ },
+ "fetched_at": "2026-11-04T03:46:04.462Z"
+}

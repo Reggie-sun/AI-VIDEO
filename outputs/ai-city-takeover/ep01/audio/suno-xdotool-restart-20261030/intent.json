@@ -1,0 +1,42 @@
+{
+  "scope": "user-directed native official-UI Create",
+  "created_at_utc": "2026-10-31T01:08:00.170912+00:00",
+  "authorization_quote": "先解决suno的事情，接入了那个项目没有出歌，那还是用之前那个成功的办法xdotool",
+  "route": "xdotool-original-Chrome-official-Suno",
+  "account": "sunruijie42",
+  "profile": "cp-e7be810d639e",
+  "window_id": 205520910,
+  "prior_unknown_outcomes": "PRESERVED; this action does not claim to settle or replay prior UI/CLI requests",
+  "max_create_clicks": 1,
+  "automatic_retries": 0,
+  "baseline_credits": 2470,
+  "operator_credit_ceiling": 20,
+  "original_credit_ceiling_retained": 20,
+  "source_intent_path": "outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "source_intent_sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+  "field_sha256": {
+    "title": "61a217768f1f387fc5020cc2beb2e4ce096d168eb32dfcf8c731a1d61ac9ec62",
+    "style": "51c79e0583e6934a73b4350e8a882b4db9cf4ec9c62544b226bfc09fa5127456",
+    "exclude": "4a7800442f9ecea44555c85b196874a274ba1f18b3c55c10ef7bf2808a62b2b1",
+    "lyrics": "179b2bc93c75f4767837f0e09df6eb47ebaadc94a7f2134706fd835b7dbb57fe",
+    "model": "3e8286044388886ee0875bb280f40fc655f55c2016794d6eee8a6012f9555f29"
+  },
+  "duration": "0:30",
+  "model": "v6",
+  "female": true,
+  "original_window_geometry": {
+    "x": 3840,
+    "y": 0,
+    "width": 4643,
+    "height": 2529
+  },
+  "current_window_geometry": {
+    "x": 0,
+    "y": 0,
+    "width": 1920,
+    "height": 1080
+  },
+  "current_page_zoom_percent": 67,
+  "challenge_handling": "Human only; no challenge solving or token access",
+  "readonly_support": "CLI library/credits and CDP DOM/metadata observations; all form actions and Create use xdotool"
+}

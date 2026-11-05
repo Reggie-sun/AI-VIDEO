@@ -1,0 +1,43 @@
+artifact_id: iris-v2-st3-story
+beats:
+- beat_id: action-st3
+  summary: 分镜 v2.1 ST3
+content_hash: 8c8b2efe158110c9450e877dbf6276c6cb9f0823e1ef8539d09466714df97d7d
+creation_receipt_id: iris-v2-st3-authoring
+language: zh
+logline: IRIS EP01 v2 ST3
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 8eeef088b1bfd7b684b9b816bd593bddf0ebd4ec0e34ff3fc16326b96db490d2
+  kind: user_input
+  reference: evidence/authoring-input/8eeef088b1bfd7b684b9b816bd593bddf0ebd4ec0e34ff3fc16326b96db490d2.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: b4b2fe58dea11bf330f2f9580964134c84c2b3be97d8b4c620d304fb62e183e3
+  kind: user_input
+  reference: evidence/authoring-input/b4b2fe58dea11bf330f2f9580964134c84c2b3be97d8b4c620d304fb62e183e3.json
+- content_hash: a44ef2217a2ea739c4194271501778bdcdac3788d866703fc01880e4f01c5805
+  kind: user_input
+  reference: evidence/authoring-input/a44ef2217a2ea739c4194271501778bdcdac3788d866703fc01880e4f01c5805.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+source_references: []
+synopsis: 镜头极缓慢地向前推近最前排那个睁着眼的她。后排一排排闭着眼的她始终一动不动，像被暂停一样；她平静地看着镜头，只有轻微的呼吸。所有人嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。

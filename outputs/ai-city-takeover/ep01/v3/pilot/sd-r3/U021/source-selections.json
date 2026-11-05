@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v3-u021-reference",
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-sing.png",
+    "sha256": "4cb7b152e8e9ed40320e8dcdf73ce51e12c338bbb1d118a9ad2e6a1cc21bde2f",
+    "size_bytes": 1911697,
+    "width": 1672,
+    "height": 941,
+    "role": "approved P-gap-mcu-sing.png: the reference image",
+    "need_id": "door-gap-red",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v3-u021-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+    "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+    "size_bytes": 384630,
+    "kind": "audio",
+    "duration_millis": 4360,
+    "sample_rate_hz": 44100,
+    "role": "approved U021.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v2/song-v3/stems/htdemucs_ft/IRIS-01-T4/vocals.wav",
+      "song_window_seconds": [
+        60.2,
+        64.56
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v3/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

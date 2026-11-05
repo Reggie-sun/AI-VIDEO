@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v3-u021-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "574a55b0040d197dc5811fa74265676431326e3006997ef99952d7459c110922",
+  "creation_receipt_id": "iris-v3-U021-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/b3f8e60622e39ad5e49cec585cbaf43c61cc93311837b671dac88067e64e192a.json",
+      "content_hash": "b3f8e60622e39ad5e49cec585cbaf43c61cc93311837b671dac88067e64e192a"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/90a19e89db7d0ff08e93956adffea07fe673f877dba3f2bcb97af8f0a18467b8.json",
+      "content_hash": "90a19e89db7d0ff08e93956adffea07fe673f877dba3f2bcb97af8f0a18467b8"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/87679931317d23743265d7a208b2114836a5bc87c77dae81b4ce06e92ebb83ba.json",
+      "content_hash": "87679931317d23743265d7a208b2114836a5bc87c77dae81b4ce06e92ebb83ba"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/d48edd379123fab7cb6178c66e049aedf7897e4f76fdd17670b397dfcacf746f.json",
+      "content_hash": "d48edd379123fab7cb6178c66e049aedf7897e4f76fdd17670b397dfcacf746f"
+    }
+  ],
+  "scene_id": "door-gap-red",
+  "location": "门缝旁，背后是幽暗机房的冷蓝灯光，右侧门缝漏出红光",
+  "time": "凌晨",
+  "mood": "冷、静，投入",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左侧立领红灯线位置一致（canon v4）",
+    "冷色调；红色只做讯号灯，是唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v3-u021-reference"
+  ]
+}

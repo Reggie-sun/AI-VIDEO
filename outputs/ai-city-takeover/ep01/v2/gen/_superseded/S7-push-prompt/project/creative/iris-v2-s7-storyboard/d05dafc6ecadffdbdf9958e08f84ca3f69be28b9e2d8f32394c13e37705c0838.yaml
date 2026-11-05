@@ -1,0 +1,45 @@
+artifact_id: iris-v2-s7-storyboard
+beats:
+- beat_id: offline
+  narrative_intent: 分镜 v2.1 S7，由最终剪辑切接
+  scene_id: cache-room
+  shot_ids:
+  - ep01v2-s7
+content_hash: d05dafc6ecadffdbdf9958e08f84ca3f69be28b9e2d8f32394c13e37705c0838
+creation_receipt_id: iris-v2-s7-authoring
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: ffde1cd1d139de20842ef8adb025f62a9a8d7253be947519c02e4c018423bd58
+  kind: user_input
+  reference: evidence/authoring-input/ffde1cd1d139de20842ef8adb025f62a9a8d7253be947519c02e4c018423bd58.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 784fae6328896ff2ed2aecdded0360a5c6f2df43707b19f3a837ab31074d1c50
+  kind: user_input
+  reference: evidence/authoring-input/784fae6328896ff2ed2aecdded0360a5c6f2df43707b19f3a837ab31074d1c50.json
+- content_hash: 795a274fbbaa30662bf387e3f49290f52045281234fa0c1a870fb2c7a6a6e49d
+  kind: user_input
+  reference: evidence/authoring-input/795a274fbbaa30662bf387e3f49290f52045281234fa0c1a870fb2c7a6a6e49d.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json

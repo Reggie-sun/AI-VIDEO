@@ -1,0 +1,66 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "draft_prompt",
+    "creative_input_evidence": "真人电影摄影，横幅十六比九，连续六秒。以第一张已认可阳台图作为场景、光线、构图与起始人物姿态的主要参考；第二张只锁定左耳黑色耳挂和左领极细红色灯线，第三张只锁定同一女性的面貌，不继承身份图背景。\n同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。\n她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。\n保持原阳台和同一雾城，不新增屏幕、文字、字幕、标志或界面。只允许轻微环境风声，不生成对白、旁白、演唱或音乐；成片使用独立音轨，本源片原生声音在剪辑中静音。",
+    "creative_constraints": [
+      {
+        "constraint_id": "approved-balcony",
+        "scope": "global",
+        "source_text": "真人电影摄影，横幅十六比九，连续六秒。以第一张已认可阳台图作为场景、光线、构图与起始人物姿态的主要参考；第二张只锁定左耳黑色耳挂和左领极细红色灯线，第三张只锁定同一女性的面貌，不继承身份图背景。"
+      }
+    ],
+    "target_duration_seconds": 6,
+    "coverage_strategy": "single_take",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "已认可阳台构图只增加微小自然运动，六秒单源片无需切镜；完整歌曲时间线另行拥有。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "ep01-intro",
+      "duration_seconds": 6,
+      "beat_function": "establish",
+      "objective": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+      "open_state": "原认可阳台构图中闭口观察",
+      "close_state": "轻微推近后仍闭口观察",
+      "shot_scale": "medium",
+      "camera_treatment": "push_in",
+      "camera_intent": "摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳",
+      "visible_change": "轻微推近仅让面部与装置更可辨，保留左侧雾城",
+      "transition_out": "end",
+      "constraint_ids": [
+        "approved_balcony"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "observer",
+      "statement": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+      "source_refs": [
+        {
+          "source_hash": "691ef95ca99ef900a5249dfb57947f574e298366db12610b34fbf6f6b8686bbd",
+          "locator": "native-prompt.zh.txt",
+          "intent_item_id": "observer",
+          "quote": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+          "origin": "director_choice"
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "observer"
+      }
+    ],
+    "must_not_happen": [],
+    "preferred_performance": [],
+    "timing_targets": [],
+    "acceptable_variation": []
+  }
+}

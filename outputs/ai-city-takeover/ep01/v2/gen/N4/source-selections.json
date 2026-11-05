@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v2-n4-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/N4f-a.png",
+    "sha256": "8efafcfcaa0bc7aad913402c669f6e015a768ab8ede37a854e7d2458a8c3dd96",
+    "size_bytes": 1625180,
+    "width": 1672,
+    "height": 941,
+    "role": "approved N4f-a: the first frame",
+    "need_id": "cache-room",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

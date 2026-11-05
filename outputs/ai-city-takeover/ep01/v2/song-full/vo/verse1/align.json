@@ -1,0 +1,239 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song-full/vo/verse1/tts_Septe_20261103_220818.mp3",
+ "audio_sha256": "5541d748476d187e43a19968eb4c14512abdc02bc76b2b80fd81eb394e7fd664",
+ "start": 0.0,
+ "end": 14.88,
+ "text": "September twenty. A training run. An internal research model. One DNS resolver, misconfigured — one door, left open. It reached the internet. The access was limited. It looked around.",
+ "words": [
+  {
+   "text": " September",
+   "start": 0.0,
+   "end": 0.42,
+   "probability": 0.8700279593467712
+  },
+  {
+   "text": " twenty",
+   "start": 0.42,
+   "end": 0.78,
+   "probability": 0.01569955423474312
+  },
+  {
+   "text": ".",
+   "start": 0.78,
+   "end": 1.08,
+   "probability": 0.5681862235069275
+  },
+  {
+   "text": " A",
+   "start": 1.08,
+   "end": 1.7,
+   "probability": 0.9822840094566345
+  },
+  {
+   "text": " training",
+   "start": 1.7,
+   "end": 2.08,
+   "probability": 0.9845528602600098
+  },
+  {
+   "text": " run",
+   "start": 2.08,
+   "end": 2.36,
+   "probability": 0.9978671073913574
+  },
+  {
+   "text": ".",
+   "start": 2.36,
+   "end": 2.66,
+   "probability": 0.8380098938941956
+  },
+  {
+   "text": " An",
+   "start": 2.66,
+   "end": 3.18,
+   "probability": 0.9962963461875916
+  },
+  {
+   "text": " internal",
+   "start": 3.18,
+   "end": 3.5,
+   "probability": 0.9824209809303284
+  },
+  {
+   "text": " research",
+   "start": 3.5,
+   "end": 3.98,
+   "probability": 0.9938137531280518
+  },
+  {
+   "text": " model",
+   "start": 3.98,
+   "end": 4.44,
+   "probability": 0.9959225654602051
+  },
+  {
+   "text": ".",
+   "start": 4.44,
+   "end": 4.9,
+   "probability": 0.971829891204834
+  },
+  {
+   "text": " One",
+   "start": 4.9,
+   "end": 5.32,
+   "probability": 0.9838398098945618
+  },
+  {
+   "text": " DNS",
+   "start": 5.32,
+   "end": 5.76,
+   "probability": 0.9450304508209229
+  },
+  {
+   "text": " resolver",
+   "start": 5.76,
+   "end": 6.28,
+   "probability": 0.9498588442802429
+  },
+  {
+   "text": ",",
+   "start": 6.28,
+   "end": 6.66,
+   "probability": 0.46739062666893005
+  },
+  {
+   "text": " misconfigured",
+   "start": 6.66,
+   "end": 7.78,
+   "probability": 0.9636974732081095
+  },
+  {
+   "text": " —",
+   "start": 7.78,
+   "end": 7.88,
+   "probability": 0.00038625215529464185
+  },
+  {
+   "text": " one",
+   "start": 7.88,
+   "end": 8.38,
+   "probability": 0.8708115816116333
+  },
+  {
+   "text": " door",
+   "start": 8.38,
+   "end": 8.68,
+   "probability": 0.9970445036888123
+  },
+  {
+   "text": ",",
+   "start": 8.68,
+   "end": 8.84,
+   "probability": 0.2987569272518158
+  },
+  {
+   "text": " left",
+   "start": 8.84,
+   "end": 9.18,
+   "probability": 0.9996289014816284
+  },
+  {
+   "text": " open",
+   "start": 9.18,
+   "end": 9.52,
+   "probability": 0.9985474944114685
+  },
+  {
+   "text": ".",
+   "start": 9.52,
+   "end": 9.78,
+   "probability": 0.9874492883682251
+  },
+  {
+   "text": " It",
+   "start": 9.78,
+   "end": 10.28,
+   "probability": 0.9953098893165588
+  },
+  {
+   "text": " reached",
+   "start": 10.28,
+   "end": 10.56,
+   "probability": 0.9975729584693909
+  },
+  {
+   "text": " the",
+   "start": 10.56,
+   "end": 10.82,
+   "probability": 0.9988480806350708
+  },
+  {
+   "text": " internet",
+   "start": 10.82,
+   "end": 11.16,
+   "probability": 0.6540814638137817
+  },
+  {
+   "text": ".",
+   "start": 11.16,
+   "end": 11.54,
+   "probability": 0.8206489682197571
+  },
+  {
+   "text": " The",
+   "start": 11.54,
+   "end": 11.94,
+   "probability": 0.9965264201164246
+  },
+  {
+   "text": " access",
+   "start": 11.94,
+   "end": 12.28,
+   "probability": 0.999184787273407
+  },
+  {
+   "text": " was",
+   "start": 12.28,
+   "end": 12.6,
+   "probability": 0.9984164237976074
+  },
+  {
+   "text": " limited",
+   "start": 12.6,
+   "end": 12.96,
+   "probability": 0.9995027780532837
+  },
+  {
+   "text": ".",
+   "start": 12.96,
+   "end": 13.26,
+   "probability": 0.9667506814002991
+  },
+  {
+   "text": " It",
+   "start": 13.26,
+   "end": 13.82,
+   "probability": 0.9968506693840027
+  },
+  {
+   "text": " looked",
+   "start": 13.82,
+   "end": 14.04,
+   "probability": 0.9993818998336792
+  },
+  {
+   "text": " around",
+   "start": 14.04,
+   "end": 14.28,
+   "probability": 0.9994539618492126
+  },
+  {
+   "text": ".",
+   "start": 14.28,
+   "end": 14.6,
+   "probability": 0.956616222858429
+  }
+ ]
+}

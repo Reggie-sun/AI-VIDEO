@@ -1,0 +1,79 @@
+{
+ "schema": "ev-boundary-second-review/v1",
+ "method": "Root actually viewed six sheets; every flagged boundary at f-2, f-1, f, f+1 from decoded source frames",
+ "boundary_ids_seen": [
+  "B0-005",
+  "B0-011",
+  "B0-027",
+  "B0-032",
+  "B1-008",
+  "B1-011",
+  "B1-013",
+  "B1-014",
+  "B1-025",
+  "B1-026",
+  "B1-029",
+  "B2-005",
+  "B2-009",
+  "B2-010",
+  "B2-012",
+  "B2-013",
+  "B2-021",
+  "B3-010",
+  "B3-011",
+  "B3-012",
+  "B3-015",
+  "B3-018",
+  "B3-019",
+  "B4-003",
+  "B4-005",
+  "B4-016",
+  "B4-020",
+  "B4-022",
+  "B4-023"
+ ],
+ "sheets": [
+  "work/root_review/boundaries_00.jpg",
+  "work/root_review/boundaries_01.jpg",
+  "work/root_review/boundaries_02.jpg",
+  "work/root_review/boundaries_03.jpg",
+  "work/root_review/boundaries_04.jpg",
+  "work/root_review/boundaries_05.jpg"
+ ],
+ "result": "UNRESOLVED_CLASSIFICATION_PRESERVED",
+ "observations": [
+  {
+   "boundary_id": "B0-005",
+   "observation": "f187 to f188 is an abrupt tighter waist/tag composition. Edit boundary observable; separate original take vs crop jump unknown."
+  },
+  {
+   "boundary_id": "B0-011",
+   "observation": "f269 to f270 swaps full AGENTS typography layout; timing supported, semantic shot versus graphic event classification remains editorial."
+  },
+  {
+   "boundary_id": "B1-013",
+   "observation": "f1905 abrupt barcode enlargement; following f1910 returns hand LOCK composition through flash."
+  },
+  {
+   "boundary_id": "B2-012",
+   "observation": "four-frame strip is insufficient to establish exact 50 percent dissolve dominance. Retain +/-1-frame uncertainty and original wider-span evidence."
+  },
+  {
+   "boundary_id": "B3-010/B3-011/B3-012",
+   "observation": "f4959/4965/4970 switch eye crop positions and HUD size in 5-6-frame intervals. Real visible graphic/crop edits; cannot infer separate generated clips."
+  },
+  {
+   "boundary_id": "B4-020",
+   "observation": "f6924 changes hand/tag pose within same composition and starts Made text; abrupt visible edit, source clip identity unknown."
+  },
+  {
+   "boundary_id": "B4-022",
+   "observation": "f7225 cuts from flat/planar spark treatment to hair close-up with dimensional orange spark."
+  },
+  {
+   "boundary_id": "B4-023",
+   "observation": "f7346 begins black geometric coverage over same hair scene; do not call it an independent generated shot. Last black-tail state requires full sequence."
+  }
+ ],
+ "policy": "No boundary mutation. IDs retained to avoid invalidating concurrent shot writers. Source-change versus compositor-event ambiguity is explicit, not a claim of verified original storyboard."
+}

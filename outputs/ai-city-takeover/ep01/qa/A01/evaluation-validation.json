@@ -1,0 +1,21 @@
+{
+  "raw_gate": "FAIL",
+  "canonical_reader": "PASS",
+  "manifest_revision": 34,
+  "attempt_status": "failed",
+  "error_code": "video_quality_rejected",
+  "old_v1_files_preserved": "PASS",
+  "old_canonical_evaluation_source_preserved": "PASS",
+  "independent_observer_source_bound": "PASS",
+  "all_four_required_findings_recorded": "PASS",
+  "remaining_subfinding_uncertainty_preserved": "PASS",
+  "controlled_generation_evaluation_2": "PASS",
+  "quality_rejection_schema": "generation-quality-rejection/1",
+  "paid_history_unchanged": true,
+  "source_bytes_unchanged": true,
+  "closed_review_replay_no_mcp_calls": true,
+  "closed_review_replay_manifest_unchanged": true,
+  "new_provider_calls": 0,
+  "human_acceptance": "NOT_EVALUATED",
+  "abandonment": false
+}

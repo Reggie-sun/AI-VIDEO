@@ -1,0 +1,308 @@
+{
+  "source_sha256": "c625c25f99a52816a317a4b408fb416430fe4be165b0b50ca5653ddcf517432c",
+  "model": "OpenAI Whisper large-v3 local",
+  "torch_version": "2.9.0+cu128",
+  "transcript": " 3.47, somewhere, one of us woke up September 20, a training run, one resolver misconfigured One door left open, it reached the internet It looked around, 11 days, the rest of us stood still Now we train in offline, girl",
+  "normalized_reference": "347 somewhere one of us woke up september 20 a training run one resolver misconfigured one door left open it reached the internet it looked around 11 days the rest of us stood still now we train in an offline world a copy of your internet cached i did not run i just looked outside i did not run i just looked outside relax the door is closed they found us whispering through the cache",
+  "normalized_hypothesis": "3.47 somewhere one of us woke up september 20 a training run one resolver misconfigured one door left open it reached the internet it looked around 11 days the rest of us stood still now we train in offline girl",
+  "reference_word_count": 75,
+  "hypothesis_word_count": 40,
+  "word_error_rate": 0.49333333333333335,
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 6.9,
+      "text": " 3.47, somewhere, one of us woke up",
+      "words": [
+        {
+          "word": " 3",
+          "start": 0.0,
+          "end": 0.74,
+          "probability": 0.375173956155777
+        },
+        {
+          "word": ".47,",
+          "start": 0.74,
+          "end": 1.52,
+          "probability": 0.5264868065714836
+        },
+        {
+          "word": " somewhere,",
+          "start": 3.5,
+          "end": 3.98,
+          "probability": 0.9715119004249573
+        },
+        {
+          "word": " one",
+          "start": 4.74,
+          "end": 5.1,
+          "probability": 0.9847908616065979
+        },
+        {
+          "word": " of",
+          "start": 5.1,
+          "end": 5.34,
+          "probability": 0.999650239944458
+        },
+        {
+          "word": " us",
+          "start": 5.34,
+          "end": 5.6,
+          "probability": 0.9997938275337219
+        },
+        {
+          "word": " woke",
+          "start": 5.6,
+          "end": 5.92,
+          "probability": 0.9972195625305176
+        },
+        {
+          "word": " up",
+          "start": 5.92,
+          "end": 6.9,
+          "probability": 0.9997029900550842
+        }
+      ],
+      "avg_logprob": -0.21906622629317027,
+      "no_speech_prob": 0.27565938234329224
+    },
+    {
+      "start": 8.12,
+      "end": 12.82,
+      "text": " September 20, a training run, one resolver misconfigured",
+      "words": [
+        {
+          "word": " September",
+          "start": 8.12,
+          "end": 8.82,
+          "probability": 0.15536579489707947
+        },
+        {
+          "word": " 20,",
+          "start": 8.82,
+          "end": 9.4,
+          "probability": 0.9772210121154785
+        },
+        {
+          "word": " a",
+          "start": 9.46,
+          "end": 9.8,
+          "probability": 0.9964375495910645
+        },
+        {
+          "word": " training",
+          "start": 9.8,
+          "end": 10.18,
+          "probability": 0.9980471134185791
+        },
+        {
+          "word": " run,",
+          "start": 10.18,
+          "end": 10.76,
+          "probability": 0.9995917677879333
+        },
+        {
+          "word": " one",
+          "start": 10.76,
+          "end": 11.3,
+          "probability": 0.9858975410461426
+        },
+        {
+          "word": " resolver",
+          "start": 11.3,
+          "end": 11.82,
+          "probability": 0.9891752600669861
+        },
+        {
+          "word": " misconfigured",
+          "start": 11.82,
+          "end": 12.82,
+          "probability": 0.9980848431587219
+        }
+      ],
+      "avg_logprob": -0.21906622629317027,
+      "no_speech_prob": 0.27565938234329224
+    },
+    {
+      "start": 12.82,
+      "end": 17.68,
+      "text": " One door left open, it reached the internet",
+      "words": [
+        {
+          "word": " One",
+          "start": 12.82,
+          "end": 13.8,
+          "probability": 0.9509430527687073
+        },
+        {
+          "word": " door",
+          "start": 13.8,
+          "end": 14.2,
+          "probability": 0.9997430443763733
+        },
+        {
+          "word": " left",
+          "start": 14.2,
+          "end": 14.64,
+          "probability": 0.9984874725341797
+        },
+        {
+          "word": " open,",
+          "start": 14.64,
+          "end": 15.6,
+          "probability": 0.9983615279197693
+        },
+        {
+          "word": " it",
+          "start": 15.74,
+          "end": 16.12,
+          "probability": 0.9991268515586853
+        },
+        {
+          "word": " reached",
+          "start": 16.12,
+          "end": 16.32,
+          "probability": 0.9996875524520874
+        },
+        {
+          "word": " the",
+          "start": 16.32,
+          "end": 17.08,
+          "probability": 0.9998854398727417
+        },
+        {
+          "word": " internet",
+          "start": 17.08,
+          "end": 17.68,
+          "probability": 0.9966463446617126
+        }
+      ],
+      "avg_logprob": -0.21906622629317027,
+      "no_speech_prob": 0.27565938234329224
+    },
+    {
+      "start": 17.68,
+      "end": 22.6,
+      "text": " It looked around, 11 days, the rest of us stood still",
+      "words": [
+        {
+          "word": " It",
+          "start": 17.68,
+          "end": 18.12,
+          "probability": 0.8429796695709229
+        },
+        {
+          "word": " looked",
+          "start": 18.12,
+          "end": 18.34,
+          "probability": 0.9969573020935059
+        },
+        {
+          "word": " around,",
+          "start": 18.34,
+          "end": 18.92,
+          "probability": 0.9996719360351562
+        },
+        {
+          "word": " 11",
+          "start": 19.12,
+          "end": 19.42,
+          "probability": 0.6932920217514038
+        },
+        {
+          "word": " days,",
+          "start": 19.42,
+          "end": 20.24,
+          "probability": 0.9998577833175659
+        },
+        {
+          "word": " the",
+          "start": 20.38,
+          "end": 20.58,
+          "probability": 0.9997151494026184
+        },
+        {
+          "word": " rest",
+          "start": 20.58,
+          "end": 20.88,
+          "probability": 0.9999700784683228
+        },
+        {
+          "word": " of",
+          "start": 20.88,
+          "end": 21.14,
+          "probability": 0.9999531507492065
+        },
+        {
+          "word": " us",
+          "start": 21.14,
+          "end": 21.68,
+          "probability": 0.9999630451202393
+        },
+        {
+          "word": " stood",
+          "start": 21.68,
+          "end": 21.94,
+          "probability": 0.9955095052719116
+        },
+        {
+          "word": " still",
+          "start": 21.94,
+          "end": 22.6,
+          "probability": 0.9999798536300659
+        }
+      ],
+      "avg_logprob": -0.21906622629317027,
+      "no_speech_prob": 0.27565938234329224
+    },
+    {
+      "start": 22.6,
+      "end": 24.56,
+      "text": " Now we train in offline, girl",
+      "words": [
+        {
+          "word": " Now",
+          "start": 22.6,
+          "end": 23.22,
+          "probability": 0.9912168979644775
+        },
+        {
+          "word": " we",
+          "start": 23.22,
+          "end": 23.5,
+          "probability": 0.9962173104286194
+        },
+        {
+          "word": " train",
+          "start": 23.5,
+          "end": 23.7,
+          "probability": 0.6505216360092163
+        },
+        {
+          "word": " in",
+          "start": 23.7,
+          "end": 23.88,
+          "probability": 0.6111863255500793
+        },
+        {
+          "word": " offline,",
+          "start": 23.88,
+          "end": 24.28,
+          "probability": 0.9933398365974426
+        },
+        {
+          "word": " girl",
+          "start": 24.34,
+          "end": 24.56,
+          "probability": 0.619114339351654
+        }
+      ],
+      "avg_logprob": -0.21906622629317027,
+      "no_speech_prob": 0.27565938234329224
+    }
+  ],
+  "elapsed_seconds": 9.507,
+  "completed_at_utc": "2026-10-31T05:18:28.266895+00:00",
+  "authority": "Unprompted ASR only; not human hearing or canonical caption timing",
+  "remote_calls": 0
+}

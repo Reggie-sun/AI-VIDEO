@@ -1,0 +1,51 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S8br",
+  "shot_id": "ep01v2-s8b",
+  "attempt_id": "iris-v2-s8br-source-001",
+  "repair_of": {
+    "unit": "S8b2",
+    "gate": "outputs/ai-city-takeover/ep01/v2/qa/gate-S8b2/post-media-gate.json"
+  },
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S8br/project/state/video-generation/fetch/files/1baeab8a189278bd9e3221e282ce5dcef11ee46197fcff1dad90d467a5f11373.mp4",
+  "artifact_sha256": "1baeab8a189278bd9e3221e282ce5dcef11ee46197fcff1dad90d467a5f11373",
+  "intent": "S8b bounded repair: approved S8b vocal with a 0.20 s silent lead-in (clip t=0 = master 22.00 s); film window clip 0.567-3.90 s",
+  "source_audio_policy": "MUTE in the film (master song only)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 5.057 s, 121 frames (24 fps cadence), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "6 frames at 1 s steps -> qa/gate-S8br/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking only 2.0 s, issues []",
+    "frame_review": "qa/lipsync_review.py at 30 fps CFR: mouth-timeline.jpg, onsets.jpg",
+    "camera_drift": "qa/frame_drift.py: scale within +-0.02%, shift <= 2.2 px",
+    "clip_audio": "the clip's own singing stops at about 2.1 s; the reference keeps singing to 3.55 s"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same face as K8b/ID7b, left-ear hook, red collar line"
+    },
+    {
+      "requirement_id": "lip-sync",
+      "verdict": "FAIL",
+      "reason": "criterion 1: from about clip 2.20 s the lips stay closed while the reference still sings 'I just looked outside' (to 3.55 s): 'I just' (2.233 s) and 'outside' (3.233 s) are not sung at all; the clip's own singing also ends at about 2.1 s"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "locked; K8b framing held"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept; nothing added"
+    }
+  ],
+  "verdict": "FAIL",
+  "all_required_observed_pass": false,
+  "next": "no further paid attempt (sealed, and the approved 2,500 CRD operator ceiling is used up); the user chooses between S8b2 and S8br",
+  "not_evaluated": [
+    "human 1.0x viewing with the master audio"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

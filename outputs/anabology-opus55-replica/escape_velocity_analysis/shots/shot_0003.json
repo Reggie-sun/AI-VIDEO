@@ -1,0 +1,575 @@
+{
+  "shot_id": "S0003",
+  "start_frame": 95,
+  "end_frame": 138,
+  "start_time": 3.9583,
+  "end_time": 5.7917,
+  "duration_frames": 44,
+  "duration_s": 1.8333,
+  "start_tc": "00:00:03:23",
+  "end_tc": "00:00:05:18",
+  "boundary_in_id": "B0-002",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 95,
+      "path": "keyframes/S0003_f00095.jpg",
+      "role": "first",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 106,
+      "path": "keyframes/S0003_f00106.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 117,
+      "path": "keyframes/S0003_f00117.jpg",
+      "role": "middle",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 128,
+      "path": "keyframes/S0003_f00128.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 138,
+      "path": "keyframes/S0003_f00138.jpg",
+      "role": "last",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 130,
+      "path": "work/full_batch/00130.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    }
+  ],
+  "scene_type": "character_plate",
+  "narrative_role": "以摄影层与独立信息层推进序章、服装展示和机器观众主题",
+  "subject": "回到车内女主近景；女主从正对镜头转向右侧",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "回到车内女主近景；女主从正对镜头转向右侧，脸框跟随。底部大翻牌在开头收缩至右上小控件，右侧白色服装标签卡从右边滑入，标题 ESCAPE VELOCITY；一条宽斜白色漏光在面部扫过。",
+  "composition": {
+    "shot_size": "近景",
+    "subject_position": "见subject_bbox；视觉估计",
+    "subject_bbox": {
+      "x": 0.05,
+      "y": 0,
+      "w": 0.67,
+      "h": 1,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "腰部插镜近水平；汽车大远景略俯；其他平视，实际焦距未知",
+    "layers": {
+      "foreground": "独立文字/检测框，及近处主体",
+      "midground": "人物、汽车或无摄影层的统计图",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "首/中/末与filmstrip已检查；光流观测 {'pan_x_frac_per_s': 0.0171, 'pan_y_frac_per_s': -0.0009, 'zoom_per_s': 0.0317, 'median_flow_frac_per_s': 0.0419, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": 0.0171,
+      "pan_y_frac_per_s": -0.0009,
+      "zoom_per_s": 0.0317,
+      "median_flow_frac_per_s": 0.0419,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "视觉估计：冷蓝环境照明；红色点光或侧光见描述",
+    "quality": "低照度深阴影、反光表面与高亮屏幕；图形层自发光",
+    "effects": [
+      "可见彩色网点/细颗粒"
+    ],
+    "temporal_change": "见逐镜描述，精确亮度变化使用shot_stats luma"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#070B05",
+        "fraction": 0.51,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#58372C",
+        "fraction": 0.136,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#7E4E41",
+        "fraction": 0.124,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#2D2019",
+        "fraction": 0.119,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#E2E0DA",
+        "fraction": 0.07,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#888282",
+        "fraction": 0.041,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "亮度首中末 [36.9, 70.5, 54.2]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 00 / 11",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "18 MONTHS TO ESCAPE（S0001开头在底部大板内滚动）",
+    "G-FLAP-BOARD": "大板从镜首缩小并迁往右上，f130已成为x1490 y125 w230 h83小控件；末态18 MONTHS / TO ESCAPE，非第二块底部板。",
+    "G-TICKER": "下沿持续左滚；条目与速度由visual_system登记，逐帧可见窗口随源时间变化",
+    "G-CORNER-MARKS": "四角浅色细十字保持",
+    "G-AUDIO-SPECTRUM": "右上细白音量条保持且高度变化",
+    "G-LEFT-RULER": "左缘刻度与y540橙指针保持",
+    "G-TIMECODE": {
+      "first": "00:00:03:23",
+      "last": "00:00:05:18",
+      "format": "MM:SS:FF"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0003-E01",
+      "shot_id": "S0003",
+      "type": "background_media",
+      "description": "回到车内女主近景；女主从正对镜头转向右侧，脸框跟随。底部大翻牌在开头收缩至右上小控件，右侧白色服装标签卡从右边滑入，标题 ESCAPE VELOCITY；一条宽斜白色漏光在面部扫过。",
+      "start_frame": 95,
+      "end_frame": 138,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "摄影层内随镜头/人物运动",
+        "easing": "unknown",
+        "entrance": "f95首次可见；起显过程以已记录密集keyframes为准",
+        "exit": "f138保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 95,
+          "observed_state": "回到车内女主近景；女主从正对镜头转向右侧，脸框跟随。底部大翻牌在开头收缩至右上小控件，右侧白色服装标签卡从右边滑入，标题 ESCAPE VELOCITY；一条宽斜白色漏光在面部扫过。"
+        },
+        {
+          "frame": 138,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        95,
+        106,
+        117,
+        128,
+        138
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0003-E02",
+      "shot_id": "S0003",
+      "type": "hud_bracket",
+      "description": "跟踪面部的四角细线框",
+      "start_frame": 95,
+      "end_frame": 138,
+      "bounding_box": {
+        "x": 0.3515625,
+        "y": 0.012962962962962963,
+        "w": 0.3614583333333333,
+        "h": 0.7777777777777778,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定或跟随主体；位置见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f95首次可见；起显过程以已记录密集keyframes为准",
+        "exit": "f138保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 95,
+          "observed_state": "跟踪面部的四角细线框"
+        },
+        {
+          "frame": 138,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        95,
+        106,
+        117,
+        128,
+        130,
+        138
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "MODEL 01 · LOOK 00 · 0.97",
+        "transcription_status": "READ_AT_FULL_RESOLUTION",
+        "typography": {
+          "font_status": "candidate_only",
+          "visual_family": "凝缩无衬线/小型monospace；Look00为斜体衬线",
+          "font_candidates": [],
+          "cap_height_px": 11,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "line_height_px": 18,
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0003-E03",
+      "shot_id": "S0003",
+      "type": "tag_card",
+      "description": "右侧白底服装条码标签卡；主标题黑色粗体；下沿洗护符号依次为30水洗槽、三角形、打叉方形、圆形、方内圆形；右下CODE128样式竖条码。",
+      "start_frame": 106,
+      "end_frame": 138,
+      "bounding_box": {
+        "x": 0.7296875,
+        "y": 0.21851851851851853,
+        "w": 0.22239583333333332,
+        "h": 0.3351851851851852,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定或跟随主体；位置见bbox，变化见keyframes",
+        "easing": "快速ease-out加轻微旋转回正，系视觉形状判断",
+        "entrance": "f106右边缘出现，f107快速滑入，f108接近目标位置，f109–111微小摆动稳定",
+        "exit": "f138保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 106,
+          "x": 0.94,
+          "visible_fraction": "右侧部分"
+        },
+        {
+          "frame": 107,
+          "x": 0.74,
+          "text_visible": "ESCAPE VELOCITY / MODEL 01"
+        },
+        {
+          "frame": 108,
+          "x": 0.72,
+          "rotation_deg_estimate": 2
+        },
+        {
+          "frame": 111,
+          "x": 0.73,
+          "rotation_deg_estimate": 0,
+          "text_visible": "SHELL OPTIMISM"
+        },
+        {
+          "frame": 115,
+          "text_visible": "SIZE AGI"
+        },
+        {
+          "frame": 118,
+          "text_visible": "MIC ON"
+        },
+        {
+          "frame": 124,
+          "text_visible": "MADE IN SAN FRANCISCO"
+        },
+        {
+          "frame": 138,
+          "text_visible": "all rows settled"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        106,
+        117,
+        128,
+        130,
+        138
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "LOOK 00 / 11 · TITLE CARD / SS27\nESCAPE VELOCITY\nMODEL 01\nSHELL OPTIMISM\nSIZE AGI\nMIC ON\nMADE IN SAN FRANCISCO\nEV-00 / 18",
+        "transcription_status": "READ_AT_FULL_RESOLUTION",
+        "typography": {
+          "font_status": "candidate_only",
+          "visual_family": "heading condensed sans; metadata monospace",
+          "font_candidates": [],
+          "cap_height_px": 36,
+          "tracking": "normal",
+          "alignment": "left",
+          "line_height_px": 28,
+          "weight": "bold heading / medium fields",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "secondary_cap_height_px": 11
+        }
+      }
+    },
+    {
+      "element_id": "S0003-E04",
+      "shot_id": "S0003",
+      "type": "light_streak",
+      "description": "斜向宽白色半透明漏光扫过脸部",
+      "start_frame": 114,
+      "end_frame": 122,
+      "bounding_box": {
+        "x": 0.12,
+        "y": 0,
+        "w": 0.7,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定或跟随主体；位置见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f114首次可见；起显过程以已记录密集keyframes为准",
+        "exit": "f122保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 114,
+          "observed_state": "斜向宽白色半透明漏光扫过脸部"
+        },
+        {
+          "frame": 122,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        117
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0003"
+      ],
+      "frame_range": [
+        105,
+        111
+      ],
+      "type": "hud_swap",
+      "description": "Escape Velocity title card slides in from right over same face shot",
+      "confidence": 0.9,
+      "chunk": 0
+    },
+    {
+      "dist_ids": [
+        "D0004"
+      ],
+      "frame_range": [
+        114,
+        122
+      ],
+      "type": "light_leak",
+      "description": "Diagonal white light-leak sweep across the same side-profile face shot (f116-f119 strongest)",
+      "confidence": 0.9,
+      "chunk": 0
+    },
+    {
+      "dist_ids": [],
+      "frame_range": [
+        97,
+        104
+      ],
+      "type": "hud_swap",
+      "description": "Bottom ticker 18 MONTHS TO ESCAPE... glitches (f97-98) and collapses into small 18 MONTHS block at right while the face shot continues",
+      "confidence": 0.85,
+      "chunk": 0
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B0-002",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-003",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AH00001",
+      "relation": "band_onset_candidate (unknown) at frame 96; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 96
+    },
+    {
+      "audio_event_id": "AH00002",
+      "relation": "band_onset_candidate (unknown) at frame 96; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 96
+    },
+    {
+      "audio_event_id": "AB0010",
+      "relation": "beat_candidate (unknown) at frame 100; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 100
+    },
+    {
+      "audio_event_id": "AB0011",
+      "relation": "beat_candidate (unknown) at frame 111; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 111
+    },
+    {
+      "audio_event_id": "AB0012",
+      "relation": "beat_candidate (unknown) at frame 122; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 122
+    },
+    {
+      "audio_event_id": "AB0013",
+      "relation": "beat_candidate (unknown) at frame 132; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 132
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "视觉几何为原分辨率视觉像素估计，误差约±4–12px；非程序源坐标。",
+    "密集采样时点精度见keyframes；真实插值函数和字体identity未知。",
+    "摄影层是否独立抠像与图形原始shader无法从成片唯一反推。",
+    "音频事件待主会话整合。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0003.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      130
+    ],
+    "finding": "补充独立标签和主卡完整可辨小字；逐帧右侧卡片crop检查f95–138，分行打字与快速滑入记录在keyframes",
+    "remaining": "原始字体、shader、不可辨半翻字符保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        95,
+        138,
+        1
+      ]
+    ],
+    "closure": "逐帧/2帧时间复核及本轮fullres逐层查缺；新增遗漏表头、深度标尺、零席位条、出口虚线；bbox与text.content逐元素核对"
+  }
+}

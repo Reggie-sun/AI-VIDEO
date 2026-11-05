@@ -1,0 +1,42 @@
+[
+  {
+    "source_key": "dns",
+    "asset_id": "iris-assembly-dns",
+    "source_path": "outputs/ai-city-takeover/ep01/graphics/renders/dns.mp4",
+    "sha256": "2f15da162ed6db67f13d6a5e93b29a6d37f4d6925ae3aee074d56a8270120b03",
+    "size_bytes": 113338,
+    "destination": "assets/files/2f15da162ed6db67f13d6a5e93b29a6d37f4d6925ae3aee074d56a8270120b03.mp4",
+    "receipt_path": "evidence/authoring-input/a3e12ae0995c67075f5272557e01c552f071c10e084a9b304333822ced147fb7.json",
+    "receipt_sha256": "0ec5b348f9e48304dcc7d1d86b6b27a09af3830ae6f5fdcabe2b8d173f23ad84"
+  },
+  {
+    "source_key": "pause",
+    "asset_id": "iris-assembly-pause",
+    "source_path": "outputs/ai-city-takeover/ep01/graphics/renders/pause.mp4",
+    "sha256": "af43f9a3d842398d043f098e219f4a0d3d4780daba9f79651535ef92171b7f1f",
+    "size_bytes": 131584,
+    "destination": "assets/files/af43f9a3d842398d043f098e219f4a0d3d4780daba9f79651535ef92171b7f1f.mp4",
+    "receipt_path": "evidence/authoring-input/b1483f02aeba67a4b4a0d84f9df52f928eba35a33d5019ca335fc6706c77c6ac.json",
+    "receipt_sha256": "1d7ee2d0d9c431eebb7278c4eb75a00eebaa071df9831396d25583d4c49dca54"
+  },
+  {
+    "source_key": "web-cache",
+    "asset_id": "iris-assembly-web-cache",
+    "source_path": "outputs/ai-city-takeover/ep01/graphics/renders/web-cache.mp4",
+    "sha256": "54c190609411845492cf876ecec389e7496619866c7097dc550a5bed56baf172",
+    "size_bytes": 154192,
+    "destination": "assets/files/54c190609411845492cf876ecec389e7496619866c7097dc550a5bed56baf172.mp4",
+    "receipt_path": "evidence/authoring-input/469e19d265dff0c23d6264e4ff665cf253acd443b6d945b8156e6098450fb339.json",
+    "receipt_sha256": "b56ba555c9cb573539ca0bcd6575c90ba67902deca85392780c6e634f50484f2"
+  },
+  {
+    "source_key": "cpu-cache",
+    "asset_id": "iris-assembly-cpu-cache",
+    "source_path": "outputs/ai-city-takeover/ep01/graphics/renders/cpu-cache.mp4",
+    "sha256": "dbf491acd79334df6df01e3c530c0f65bf7c0d658a0d92deed994860cb1497cb",
+    "size_bytes": 118712,
+    "destination": "assets/files/dbf491acd79334df6df01e3c530c0f65bf7c0d658a0d92deed994860cb1497cb.mp4",
+    "receipt_path": "evidence/authoring-input/e612b3b04fdec0614ffda325df62a823bdd6a04772924cdce29db6955ba765d2.json",
+    "receipt_sha256": "ab8a3626ce8f3375258e91e835607ae37f13a78085066295b24e819030a3c54f"
+  }
+]

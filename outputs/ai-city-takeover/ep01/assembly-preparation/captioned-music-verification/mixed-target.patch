@@ -1,0 +1,1431 @@
+diff --git a/.agent/harness/policy.yaml b/.agent/harness/policy.yaml
+index 5e069b052e4c4502187b06869242b48127446e49..9826374b7b419b642a9f3ccc5cf352eca0eedbce 100644
+--- a/.agent/harness/policy.yaml
++++ b/.agent/harness/policy.yaml
+@@ -264,9 +264,9 @@ checks:
+     cwd: .
+     description: Verify MiniMax speech batch orchestration and voice candidate lifecycle.
+   elevenlabs_speech_tests:
+-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_elevenlabs.py, tests/test_production_elevenlabs_batch.py, tests/test_voice_routing_elevenlabs.py, -q]
++    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_elevenlabs.py, tests/test_production_elevenlabs_batch.py, tests/test_voice_routing_elevenlabs.py, tests/test_production_dotenv_source.py, -q]
+     cwd: .
+-    description: Verify ElevenLabs transport, bounded speech execution, and selected voice routing.
++    description: Verify ElevenLabs transport, bounded speech execution, selected voice routing and shared fail-closed credential-source suppliers.
+   architecture_tests:
+     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_architecture_gate.py, tests/test_architecture_gate_cli.py, -q]
+     cwd: .
+@@ -530,6 +530,7 @@ categories:
+       - src/ai_video/production/reference_planning_contracts.py
+       - src/ai_video/production/reference_strategy.py
+       - src/ai_video/production/reference_authoring.py
++      - src/ai_video/production/preview_approval.py
+       - src/ai_video/production/director_coverage.py
+       - src/ai_video/planning/_reference_planning.py
+       - tests/test_reference_planning.py
+@@ -751,6 +752,7 @@ categories:
+       - src/ai_video/production/performance_direction.py
+       - src/ai_video/production/performance_authoring.py
+       - src/ai_video/production/reference_authoring.py
++      - src/ai_video/production/preview_approval.py
+       - tests/test_performance_direction.py
+       - tests/test_performance_authoring.py
+       - tests/test_reference_authoring.py
+@@ -1789,6 +1791,16 @@ categories:
+     check_ids:
+       - experience_learning_skill_tests
+       - task_architecture_gate
++  provider_credential_source:
++    patterns:
++      - src/ai_video/production/dotenv_source.py
++      - tests/test_production_dotenv_source.py
++    focused_check_ids: [elevenlabs_speech_tests]
++    check_ids:
++      - elevenlabs_speech_tests
++      - minimax_speech_batch_tests
++      - mcp_tests
++      - task_architecture_gate
+   minimax_speech_batch:
+     patterns:
+       - scripts/minimax_speech_batch.py
+diff --git a/docs/agent-primary-contract-matrix.md b/docs/agent-primary-contract-matrix.md
+index c1f0ccf2152833d90e8312f5181a7881ea808150..5e23e9588618502c3cf14042f8be365a6c119731 100644
+--- a/docs/agent-primary-contract-matrix.md
++++ b/docs/agent-primary-contract-matrix.md
+@@ -321,6 +321,7 @@ receipt中的V1 map必须为identity，layer不得携带retime map，voice_sourc
+ `_composition_visual`按exact admission限制音轨，resolver产生`development_audio_preview`，
+ HyperFrames消费同一时间线混音；所有非Production scope与captured bytes仍由原activation fence拒绝。
+ 此扩展不改变旧`/2,/3`行为，不资格化失败素材，不推进原Shot barrier或Final Acceptance。
++`development-qualification-preview/2` 在原正常速度 `replacement_audio_preview` 上显式封存 `captioned_music`：唯一 global MUSIC/BGM 音轨、exact 音讯 SHA 与样本裁切，以及每条字幕的 asset ID、bytes SHA、script/transcript hashes。外部歌曲保留真实 IMPORTED/GENERATED 来源，record 与 audio metadata 的 kind、tool、input fingerprint 必须一致，不冒充原片 DIALOGUE。reader 仅对匹配该已验证 receipt 的歌曲字幕接纳无 voice script 的 MUSIC，其他 BGM/SFX 与旧 speech script 检查保持；所有参与捕获须同一歌曲和字幕 binding。resolver 要求实际选用这些 `/2` 视觉、字幕精确绑定封存音轨，并保持歌曲完整覆盖成片样本窗口；沿原 P4 CaptionTrack 核验字词、trim、style，由唯一 ResolvedTimeline 产生 `development_audio_preview`，不建立新时钟或绕过 activation fence。此契约仅证明明确选定的歌曲和字幕身份，不证明听写、对嘴、真人观感或 Production 验收。
+ `video_cleanup_contracts.py` / `video_cleanup_pixels.py` 独占显式逐帧clean-plate recipe、仿射采样、羽化与foreground保护；
+ `video_cleanup_media.py`只用注入的本地工具准备同帧数/PTS的lossless RGB派生源，重解码验证像素并比较原声PCM/时间。
+ 它不拥有剪辑顺序、trim/speed或最终renderer；无自动tracking/生成填补。
+@@ -1045,7 +1046,7 @@ Harness check owner为`drama_authoring_source_binding_tests`；实际当前run
+ 
+ 禁止按固定秒数计算图片量、把持久资产计入时间密度、把规划图数或 Provider 上限当上传数量、把普通 reference 当精确时间控制、以静态图替代连续运动约束、自动拆分声明为 continuous 的 Shot，或另建 capability Registry/timeline/committer。未知或未支持的控制、缺少 required reference、素材职责冲突均显式阻断；QA 建议不授权重试或改变已验收项。缺省字段省略保留历史封存语义，旧输入重开只得到 advisory 规划，不追溯改写历史请求。
+ 
+-`production/reference_authoring.py` 在 `GenerationDecisionExecutionBinding.create` fresh creation 时、既有表演／commercial／Seedance 表达检查之后执行（`GenerationFeedbackOrchestrator.prepare` 经此创建，供给当前 Project）：新生成须有 `reference_planning`；运动机位须有 `composition` event（有 `primary_camera_motion` 时以其非 locked 判断；v1–v3 无该字段时，`camera_intent.movement` 除精确 `unspecified`／`locked`／`locked-off` 外均按运动处理）；导演证据按领域分开：剧情须有 `director_coverage={coverage_hash, unit_id}`，供给当前 Project 时以 Project／Shot provenance 中 content-addressed authoring input 重开 bytes，经 `production/director_coverage.py` 结构校验并核对 unit；电商以 commercial binding 的 `ad_creative_plan_hash` 绑定 AdCreativePlan，由既有 commercial owners 核对，不接受剧情 coverage。剧情另须 `preview_approval={approval_hash}` 绑定封存的用户预览认可（`production/preview_approval.py` 结构校验，须同一 coverage 与 unit）；所有领域 `visibility=visible` 的表演者必须在 `identity_continuity.character_ids` 中。`director_coverage.py` 是 Director coverage 结构校验的唯一实现，open-video 脚本只薄封装并加作者检查；Product Runtime 不认 Skill 身份。门禁只证明声明存在与证据一致，不判断镜头类型、参考数量、白模取舍或运镜意图优劣，也不自动补字段。资格试验链（`_QualificationExecutionBinding`）不经此门禁，其产物不得作为作品镜头交付（advisory，暂无 Harness 检查）。检查归 `reference_planning_tests`、`open_video_skill_tests`、`product_runtime_skill_boundary_tests` 与现有 Planner/Router/compiler/feedback suites；不证明真实模型服从或媒体质量。
++`production/reference_authoring.py` 在 `GenerationDecisionExecutionBinding.create` fresh creation 时、既有表演／commercial／Seedance 表达检查之后执行（`GenerationFeedbackOrchestrator.prepare` 经此创建，供给当前 Project）：新生成须有 `reference_planning`；运动机位须有 `composition` event（有 `primary_camera_motion` 时以其非 locked 判断；v1–v3 无该字段时，`camera_intent.movement` 除精确 `unspecified`／`locked`／`locked-off` 外均按运动处理）；导演证据按领域分开：剧情须有 `director_coverage={coverage_hash, unit_id}`，供给当前 Project 时以 Project／Shot provenance 中 content-addressed authoring input 重开 bytes，经 `production/director_coverage.py` 结构校验并核对 unit；电商以 commercial binding 的 `ad_creative_plan_hash` 绑定 AdCreativePlan，由既有 commercial owners 核对，不接受剧情 coverage。剧情另须 `preview_approval={approval_hash}` 绑定封存的用户预览认可（`production/preview_approval.py` 结构校验，须同一 coverage 与 unit）；所有领域 `visibility=visible` 的表演者须在 `identity_continuity.character_ids` 中、有其 required identity anchor，或在 `identity_waivers` 显式写 `{character_id, reason}`；豁免不重复、不与 identity_continuity 矛盾，剧情供给 Project 时还须在 sealed preview payload `identity_waivers` 中逐人获认可。已有身份延续不能被 preferred anchor 降级。`director_coverage.py` 是 Director coverage 结构校验的唯一实现，open-video 脚本只薄封装并加作者检查；Product Runtime 不认 Skill 身份。证据核验需要 source_project；preview 图尚未与实际 Provider 资产交叉核验，可见角色仅以 performance 声明为准（边界见 [参考规划](shot-reference-planning.md#reference-package-before-preview-2026-10-30)）。门禁只证明声明存在与证据一致，不判断镜头类型、参考数量、白模取舍或运镜意图优劣，也不自动补字段。资格试验链（`_QualificationExecutionBinding`）不经此门禁，其产物不得作为作品镜头交付（advisory，暂无 Harness 检查）。检查归 `reference_planning_tests`、`open_video_skill_tests`、`product_runtime_skill_boundary_tests` 与现有 Planner/Router/compiler/feedback suites；不证明真实模型服从或媒体质量。
+ 
+ ### Existing Canonical Entries
+ 
+diff --git a/docs/shot-reference-planning.md b/docs/shot-reference-planning.md
+index 5b4d580965c852b1446c9aca65fbb9dc36e16638..c4996a81e5856e3194582ec475fa7daec65fd435 100644
+--- a/docs/shot-reference-planning.md
++++ b/docs/shot-reference-planning.md
+@@ -4,7 +4,7 @@
+ 
+ Director 在既有 `generation.generation_intent.reference_planning` 中声明组合特征、视觉事件和参考职责。该字段随 `ProviderNeutralGenerationIntentProjection`、`VideoPlanningRequest`、neutral requirement 的既有 hashes 封存；不会新建 Production artifact 或 mutable lifecycle。历史数据重开、读取与 replay 不变，缺该字段时读取给出明确标注 `legacy_advisory` 的建议。
+ 
+-**新生成的声明义务（`reference_authoring.py`）。** 在 `GenerationDecisionExecutionBinding.create`（fresh creation，排在既有表演／commercial／Seedance 表达检查之后，保留原错误优先级；`GenerationFeedbackOrchestrator.prepare` 经此创建）检查，不在历史读取运行：缺 `reference_planning` 阻断；机位非 `locked` 时至少一个 `composition` event，用 `visual_state/purpose` 说明移动让观众看见什么（编译器随后要求其进入实际 prompt）；导演证据按领域分开：剧情须有 `director_coverage={coverage_hash, unit_id}`，且当前 Project 已供给时，该 hash 必须是 Project／Shot provenance 中封存的 content-addressed authoring input，bytes 经 `director_coverage.py` 结构校验并含该 unit；电商（`commercial_execution_class` 或 commercial binding）的导演层是 AdCreativePlan，执行绑定创建时须有含 `ad_creative_plan_hash` 的 commercial binding（由既有 commercial owners 核对计划），不得挂剧情 coverage。共享的 `reference_planning` 与机位 composition 义务两个领域都适用。程序只核对声明存在与证据一致，不判断镜头类型、参考数量、白模取舍或移动是否有戏；这些仍归 Director Skill。剧情另须 `preview_approval={approval_hash}`：用户已看过的预览（`user-preview-approval/1`：`coverage_hash`、`unit_ids`、`preview_artifacts[{path, sha256, role}]`、`user_quote` 用户原话）同样以 content-addressed authoring input 封存在 Project／Shot provenance，并须绑定同一 coverage 与本 unit；程序只核对证据结构与封存，不能证明原话真实、也不评判预览，伪造或改写用户原话属违规。所有领域另有身份义务：`performance_intent.character_directions` 中 `visibility=visible` 的人物必须列入 `identity_continuity.character_ids`（Planner 随之要求身份参考），不得为免做参考图把可见表演者移出身份延续。Canvas 项目经 `direction.director_coverages` 与 `direction.preview_approvals` 封存；非 Canvas 项目用 `reference_authoring.director_coverage_authoring_input()` 取得 artifact，随生成 Shot 的修订一起经 `ProductionStateCommitter` 提交，并把该引用写入 Shot `source_provenance`。Runtime 只做结构校验，不核对 coverage 由哪个 Skill 产出（作者检查只在 open-video 入口脚本）；有结构化 `primary_camera_motion`（v4 必填）时以它判断是否运动；v1–v3 requirement 不能携带该字段，此时 `camera_intent.movement` 除精确的 `unspecified`／`locked`／`locked-off`（编译器已认可的静止 token）外一律视为可能运动，同样须声明 composition event。门禁只做精确 token 比较，不解析自由文本含义。M0／source qualification 等资格试验链经 `_QualificationExecutionBinding` 生成，验证的是连续性机制本身，不受本门禁约束；其产物不得作为作品镜头交付属 advisory 约束，目前没有 Harness 检查保证。
++**新生成的声明义务（`reference_authoring.py`）。** 在 `GenerationDecisionExecutionBinding.create`（fresh creation，排在既有表演／commercial／Seedance 表达检查之后，保留原错误优先级；`GenerationFeedbackOrchestrator.prepare` 经此创建）检查，不在历史读取运行：缺 `reference_planning` 阻断；机位非 `locked` 时至少一个 `composition` event，用 `visual_state/purpose` 说明移动让观众看见什么（编译器随后要求其进入实际 prompt）；导演证据按领域分开：剧情须有 `director_coverage={coverage_hash, unit_id}`，且当前 Project 已供给时，该 hash 必须是 Project／Shot provenance 中封存的 content-addressed authoring input，bytes 经 `director_coverage.py` 结构校验并含该 unit；电商（`commercial_execution_class` 或 commercial binding）的导演层是 AdCreativePlan，执行绑定创建时须有含 `ad_creative_plan_hash` 的 commercial binding（由既有 commercial owners 核对计划），不得挂剧情 coverage。共享的 `reference_planning` 与机位 composition 义务两个领域都适用。程序只核对声明存在与证据一致，不判断镜头类型、参考数量、白模取舍或移动是否有戏；这些仍归 Director Skill。剧情另须 `preview_approval={approval_hash}`：用户已看过的预览（`user-preview-approval/1`：`coverage_hash`、`unit_ids`、`preview_artifacts[{path, sha256, role}]`、`user_quote` 用户原话）同样以 content-addressed authoring input 封存在 Project／Shot provenance，并须绑定同一 coverage 与本 unit；程序只核对证据结构与封存，不能证明原话真实、也不评判预览，伪造或改写用户原话属违规。所有领域另有身份义务：`performance_intent.character_directions` 中 `visibility=visible` 的人物必须列入 `identity_continuity.character_ids` 或有 `role=identity` 且 `owner_id` 为该人物的 anchor（Planner 随之要求身份参考）；确不做身份参考时，Director 须在 `identity_waivers` 写明 `{character_id, reason}`，不得悄悄移出身份延续。Canvas 项目经 `direction.director_coverages` 与 `direction.preview_approvals` 封存；非 Canvas 项目用 `reference_authoring.director_coverage_authoring_input()` 取得 artifact，随生成 Shot 的修订一起经 `ProductionStateCommitter` 提交，并把该引用写入 Shot `source_provenance`。Runtime 只做结构校验，不核对 coverage 由哪个 Skill 产出（作者检查只在 open-video 入口脚本）；有结构化 `primary_camera_motion`（v4 必填）时以它判断是否运动；v1–v3 requirement 不能携带该字段，此时 `camera_intent.movement` 除精确的 `unspecified`／`locked`／`locked-off`（编译器已认可的静止 token）外一律视为可能运动，同样须声明 composition event。门禁只做精确 token 比较，不解析自由文本含义。M0／source qualification 等资格试验链经 `_QualificationExecutionBinding` 生成，验证的是连续性机制本身，不受本门禁约束；其产物不得作为作品镜头交付属 advisory 约束，目前没有 Harness 检查保证。
+ 
+ ```mermaid
+ flowchart LR
+@@ -152,9 +152,11 @@ selected capability 直接投影现有 variant，不维护第二张能力表；s
+ 
+ “不为填满上限追加图片”不等于“越少越好”。每个新创作镜头在预览前先按实际事件准备参考包，再选进模型输入：
+ 
+-- 每个可见表演者一份身份参考（多角度），由 `scenario-identity-library` 准备；只出现一次的人物同样需要，除非其不可辨认（背影、剪影）且 Director 在 `natural_generation` 写明理由。
++- 每个可见表演者一份身份参考（多角度），由 `scenario-identity-library` 准备；只出现一次的人物同样需要，除非其不可辨认（背影、剪影）且 Director 在 `identity_waivers` 写明理由。剧情类豁免的 `character_id` 必须同时列入用户认可并封存的 preview payload `identity_waivers`，不能重复或与 `identity_continuity.character_ids` 矛盾。
+ - 每个决定性时刻一张关键帧：起态、改变发生、人物反应、终态；由 `scenario-seedance-storyboard` 准备。异常或剧情转折必须在镜头内发生并有人看见、有反应，旁白不能代替画面证据。
+ - 证据所依赖的道具细节、环境的关键角度，以及项目已有认可片段时的风格帧（色调、质感、人物比例）。
+ - 选入模型的数量按所选模式与能力决定；未选入的图仍作为预览与审看依据。
+ 
+-这套关键帧同时就是交给用户的预览；用户认可后封存 `preview_approval`，同一批图进入生成。程序门禁只检查声明与封存，不判断参考包是否充分或好看。
++这套关键帧同时就是交给用户的预览；用户认可后封存 `preview_approval`，同一批图进入生成。身份义务只认可 `required` identity anchor；已有 `identity_continuity` 不能被 `preferred` anchor 降级。程序不判断参考包是否充分或好看。
++
++当前确定性检查的边界：可见身份义务只读取 `performance_intent.character_directions` 中的 visible 声明；封存核验只在执行绑定收到 `source_project` 时运行；preview artifact 的 path/hash 尚未与最终选入 Provider 的资产逐一交叉核验。作者仍须遵守上述完整流程，不能把这些缺口视为免预览、换图或隐藏人物的许可。真实付费生成与人工验收不由离线测试证明。
+diff --git a/src/ai_video/production/_composition_visual.py b/src/ai_video/production/_composition_visual.py
+index bfe2eafb4ed2a8083e88ffcb0b7fa58908e34481..7e858cfb94731bcf46460ff757a691e26e626222 100644
+--- a/src/ai_video/production/_composition_visual.py
++++ b/src/ai_video/production/_composition_visual.py
+@@ -54,6 +54,7 @@ def resolve_preview_layer_ids(
+ ) -> set[str]:
+     preview_layer_ids: set[str] = set()
+     preview_scopes: set[str] = set()
++    preview_receipts = []
+     roles_by_shot = {
+         shot_id: {role.role: role for role in shots_by_id[shot_id].required_asset_roles}
+         for shot_id in spec.shot_ids
+@@ -74,7 +75,19 @@ def resolve_preview_layer_ids(
+         if allows_repair_preview_layer(project, layer, shot):
+             preview_layer_ids.add(layer.layer_id)
+             asset = next(a for a in project.registry.assets if a.asset_id == layer.asset_id)
+-            preview_scopes.add(verify_repair_input(asset, project.root).preview_use.scope)
++            receipt = verify_repair_input(asset, project.root)
++            preview_receipts.append(receipt)
++            preview_scopes.add(receipt.preview_use.scope)
++    if not preview_layer_ids and spec.caption_tracks:
++        from ai_video.production.qualification_preview_input import allows_captioned_music_caption
++
++        assets = {asset.asset_id: asset for asset in project.registry.assets}
++        for binding in spec.caption_tracks:
++            caption = assets.get(binding.caption_asset_id)
++            metadata = caption.caption_metadata if caption is not None else None
++            source = assets.get(metadata.source_audio_asset_id) if metadata is not None else None
++            if source is not None and allows_captioned_music_caption(project, caption, source):
++                raise invalid("Captioned music captions require their actual qualification preview visuals.")
+     if preview_layer_ids:
+         if spec.schema_version not in {"2.3", "2.4"}:
+             raise invalid("Development repair previews require CompositionSpec 2.3 or 2.4.")
+@@ -92,7 +105,10 @@ def resolve_preview_layer_ids(
+                     } for t in spec.audio_tracks)
+                     or spec.voice_sources):
+                 raise invalid("Replacement audio preview requires supported P4 audio tracks and no voice sources.")
+-            if dialogue_tracks:
++            music = _captioned_music_binding(preview_receipts, invalid=invalid)
++            if music is not None:
++                _validate_captioned_music_layout(project, spec, music, invalid=invalid)
++            elif dialogue_tracks:
+                 if not _captured_dialogue_layout_valid(
+                     spec, dialogue_tracks,
+                     silent_image_shots=_speech_free_visual_shots(project, spec, shots_by_id),
+@@ -107,6 +123,59 @@ def resolve_preview_layer_ids(
+     return preview_layer_ids
+ 
+ 
++def _captioned_music_binding(receipts, *, invalid):
++    version = "development-qualification-preview/2"
++    opted_in = [r for r in receipts if getattr(r, "contract_version", None) == version]
++    if not opted_in:
++        return None
++    music = opted_in[0].captioned_music
++    if len(opted_in) != len(receipts) or any(r.captioned_music != music for r in opted_in):
++        raise invalid("Captioned music preview requires the same explicit song binding on every captured clip.")
++    return music
++
++
++def _validate_captioned_music_layout(project, spec, music, *, invalid):
++    if (spec.audio_tracks != (music.track,) or not spec.caption_tracks or spec.voice_sources
++            or {binding.caption_asset_id for binding in spec.caption_tracks}
++            != {caption.caption_asset_id for caption in music.captions}
++            or any(binding.source_audio_track_id != music.track.track_id or binding.shot_id is not None
++                   for binding in spec.caption_tracks)
++            or any(layer.source_time_map is not None or layer.source_audio_policy not in {"MUTE", "REPLACE"}
++                   or not layer.source_audio_reason or not layer.source_audio_reason.strip()
++                   for layer in spec.layers if layer.layer_id not in spec.graphic_layer_ids)):
++        raise invalid("Captioned music preview requires only its exact song, global captions and explicitly muted source visuals.")
++    try:
++        music.validate_asset(next((a for a in project.registry.assets if a.asset_id == music.track.asset_id), None))
++        music.validate_captions(project.registry.assets)
++    except ValueError as exc:
++        raise invalid("Captioned music preview source is invalid.", str(exc)) from exc
++
++
++def _validate_captioned_music_timeline(project, spec, timeline, shots_by_id, *, invalid):
++    from ai_video.production.repair_input_admission import allows_repair_preview_layer, verify_repair_input
++
++    assets = {asset.asset_id: asset for asset in project.registry.assets}
++    receipts = [verify_repair_input(assets[layer.asset_id], project.root)
++                for layer in spec.layers if layer.shot_id in shots_by_id
++                and allows_repair_preview_layer(project, layer, shots_by_id[layer.shot_id])]
++    music = _captioned_music_binding(receipts, invalid=invalid)
++    if music is None:
++        return
++    _validate_captioned_music_layout(project, spec, music, invalid=invalid)
++    if len(timeline.audio_spans) != 1:
++        raise invalid("Captioned music preview must resolve exactly one song span.")
++    span = timeline.audio_spans[0]
++    if (span.track_id != music.track.track_id or span.asset_id != music.track.asset_id
++            or span.asset_sha256 != music.audio_asset_sha256 or span.audio_kind is not AudioKind.BGM
++            or span.start_sample != 0 or span.duration_samples != timeline.total_samples
++            or span.source_start_sample != music.track.trim_start_sample
++            or span.source_duration_samples != music.track.trim_duration_samples
++            or span.duration_samples != span.source_duration_samples
++            or span.gain_millidb != 0 or span.fade_in_samples != 0 or span.fade_out_samples != 0
++            or span.ducking is not None):
++        raise invalid("Captioned music preview must preserve its exact song samples across the complete film.")
++
++
+ def validate_replacement_preview_narration(
+     project: LoadedProductionProject,
+     spec: CompositionSpec,
+@@ -115,6 +184,7 @@ def validate_replacement_preview_narration(
+     *,
+     invalid: Callable[..., AiVideoError],
+ ) -> None:
++    _validate_captioned_music_timeline(project, spec, timeline, shots_by_id, invalid=invalid)
+     dialogue_tracks = tuple(
+         track for track in spec.audio_tracks
+         if track.audio_kind is AudioKind.DIALOGUE
+diff --git a/src/ai_video/production/preview_approval.py b/src/ai_video/production/preview_approval.py
+index f7064206c4e5f82fdc8e62a95446daaeb4f34ae5..6f778023227ae05473ece1b37e05b1d7f443e445 100644
+--- a/src/ai_video/production/preview_approval.py
++++ b/src/ai_video/production/preview_approval.py
+@@ -1,7 +1,8 @@
+ """User approval of a cheap visual preview before paid drama generation.
+ 
+ The Director shows the user the decisive keyframes (the same reference package
+-the generation will use) and records the user's exact words. This module only
++the generation will use) and records the user's exact words, including any performer
++the user agreed to generate without an identity sheet. This module only
+ checks that such evidence is well formed and sealed; it cannot prove the quote
+ was spoken, judge the preview or replace the user's normal-speed review.
+ """
+@@ -20,13 +21,15 @@ class PreviewApprovalError(ValueError):
+ 
+ 
+ def validate_preview_approval(payload) -> None:
+-    if not isinstance(payload, dict) or set(payload) != _FIELDS or payload["kind"] != KIND:
++    if (not isinstance(payload, dict) or not _FIELDS <= set(payload) <= _FIELDS | {"identity_waivers"}
++            or payload["kind"] != KIND):
+         raise PreviewApprovalError("preview approval must use the exact user-preview-approval/1 fields")
+     if not isinstance(payload["coverage_hash"], str) or not _SHA256.fullmatch(payload["coverage_hash"]):
+         raise PreviewApprovalError("coverage_hash must bind exact Director coverage")
+     units = payload["unit_ids"]
+-    if (not isinstance(units, list) or not units or len(set(units)) != len(units)
+-            or not all(isinstance(unit, str) and unit.strip() for unit in units)):
++    if (not isinstance(units, list) or not units
++            or not all(isinstance(unit, str) and unit.strip() for unit in units)
++            or len(set(units)) != len(units)):
+         raise PreviewApprovalError("unit_ids must list the approved coverage units once each")
+     artifacts = payload["preview_artifacts"]
+     if not isinstance(artifacts, list) or not artifacts:
+@@ -36,6 +39,11 @@ def validate_preview_approval(payload) -> None:
+                 or not all(isinstance(artifact[key], str) and artifact[key].strip() for key in _ARTIFACT_FIELDS)
+                 or not _SHA256.fullmatch(artifact["sha256"])):
+             raise PreviewApprovalError("each preview artifact needs path, exact sha256 and its role")
++    waivers = payload.get("identity_waivers", [])
++    if (not isinstance(waivers, list)
++            or not all(isinstance(w, str) and w.strip() for w in waivers)
++            or len(set(waivers)) != len(waivers)):
++        raise PreviewApprovalError("identity_waivers must list each performer the user agreed to generate without a sheet")
+     quote = payload["user_quote"]
+     if not isinstance(quote, str) or not quote.strip():
+         raise PreviewApprovalError("user_quote must be the user's exact approval words")
+diff --git a/src/ai_video/production/qualification_preview_input.py b/src/ai_video/production/qualification_preview_input.py
+index e620b815619bd6e5cbe2002becea8cebd52e4fc1..4dce172073d779216207cad3894303d232220fbe 100644
+--- a/src/ai_video/production/qualification_preview_input.py
++++ b/src/ai_video/production/qualification_preview_input.py
+@@ -9,9 +9,13 @@ import hashlib
+ from pathlib import Path
+ from typing import Literal
+ 
++from pydantic import Field, model_validator
++
++from ai_video.production.artifact_contracts import StrictModel
++from ai_video.production.composition_contracts import AudioTrackSpec
+ from ai_video.production.hashing import canonical_sha256
+ from ai_video.production.models import (
+-    AssetRecord, AssetRegistrySnapshot, AssetSourceKind, AssetType, ProductionManifest,
++    AssetRecord, AssetRegistrySnapshot, AssetSourceKind, AssetType, AudioKind, ProductionManifest,
+ )
+ from ai_video.production.paths import _read_regular_file_nofollow, canonical_video_asset_path
+ from ai_video.production.repair_input_admission import (
+@@ -25,6 +29,100 @@ class QualificationPreviewInputReceipt(RepairPreviewInputAdmissionReceipt):
+     contract_version: Literal["development-qualification-preview/1"] = "development-qualification-preview/1"
+ 
+ 
++class CaptionedMusicCaption(StrictModel):
++    caption_asset_id: str = Field(min_length=1)
++    caption_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
++    script_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
++    transcript_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
++
++
++class CaptionedMusicPreview(StrictModel):
++    """One exact song and sample window, never captured dialogue."""
++
++    track: AudioTrackSpec
++    audio_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
++    captions: tuple[CaptionedMusicCaption, ...] = Field(min_length=1)
++
++    @model_validator(mode="after")
++    def _normal_speed_global_song(self):
++        track = self.track
++        if (track.audio_kind is not AudioKind.BGM or track.shot_id is not None
++                or track.start_sample != 0 or track.trim_duration_samples is None
++                or track.gain_millidb != 0 or track.fade_in_samples != 0
++                or track.fade_out_samples != 0 or track.ducking is not None):
++            raise ValueError("Captioned music preview requires one explicit unmodified global BGM window")
++        if len({caption.caption_asset_id for caption in self.captions}) != len(self.captions):
++            raise ValueError("Captioned music preview caption IDs must be unique")
++        return self
++
++    def validate_asset(self, asset):
++        metadata = asset.audio_metadata if asset is not None else None
++        if (asset is None or asset.asset_id != self.track.asset_id
++                or asset.asset_type is not AssetType.MUSIC
++                or asset.source_kind not in {AssetSourceKind.IMPORTED, AssetSourceKind.GENERATED}
++                or asset.sha256 != self.audio_asset_sha256 or metadata is None
++                or metadata.audio_kind is not AudioKind.BGM
++                or metadata.source.kind is not asset.source_kind
++                or metadata.source.provider_or_tool != asset.tool
++                or metadata.source.input_fingerprint != asset.input_fingerprint
++                or self.track.trim_start_sample + self.track.trim_duration_samples
++                > metadata.duration_samples):
++            raise ValueError("Captioned music preview differs from its exact song provenance and samples")
++
++    def validate_caption(self, asset):
++        expected = next((c for c in self.captions if c.caption_asset_id == asset.asset_id), None)
++        metadata = asset.caption_metadata
++        if (expected is None or asset.asset_type is not AssetType.CAPTION or metadata is None
++                or asset.sha256 != expected.caption_asset_sha256
++                or metadata.source_audio_asset_id != self.track.asset_id
++                or metadata.source_audio_sha256 != self.audio_asset_sha256
++                or metadata.script_hash != expected.script_hash
++                or metadata.transcript_hash != expected.transcript_hash):
++            raise ValueError("Captioned music preview differs from its exact sealed caption identity")
++
++    def validate_captions(self, assets):
++        by_id = {asset.asset_id: asset for asset in assets}
++        for caption in self.captions:
++            asset = by_id.get(caption.caption_asset_id)
++            if asset is None:
++                raise ValueError("Captioned music preview is missing its sealed caption asset")
++            self.validate_caption(asset)
++
++
++class CaptionedMusicQualificationPreviewInputReceipt(QualificationPreviewInputReceipt):
++    contract_version: Literal["development-qualification-preview/2"] = "development-qualification-preview/2"
++    captioned_music: CaptionedMusicPreview
++
++
++def allows_captioned_music_caption(project, caption, source):
++    """A narrowly sealed development source exception, never general music captions."""
++    from ai_video.production.repair_input_admission import is_repair_input_record, verify_repair_input
++
++    if source.asset_type is not AssetType.MUSIC or source.audio_metadata is None:
++        return False
++    receipts = []
++    for asset in project.registry.assets:
++        if not is_repair_input_record(asset, project.root):
++            continue
++        receipt = verify_repair_input(asset, project.root)
++        if (receipt.contract_version != "development-qualification-preview/2"
++                or receipt.target_project_id != project.project.project_id
++                or receipt.target_project_hash != project.project.content_hash):
++            continue
++        receipts.append(receipt)
++    if not receipts:
++        return False
++    music = receipts[0].captioned_music
++    if any(receipt.captioned_music != music for receipt in receipts):
++        return False
++    try:
++        music.validate_asset(source)
++        music.validate_caption(caption)
++    except ValueError:
++        return False
++    return True
++
++
+ def _source_state(manifest, attempt_id):
+     attempt = next((a for a in manifest.attempts if a.attempt_id == attempt_id), None)
+     state = attempt.video_generation_state if attempt else None
+@@ -109,7 +207,8 @@ def validate_qualification_capture(receipt):
+ 
+ 
+ def _prepare_qualification_preview_input(*, target_root, project, registry, source_root,
+-        source_attempt_id, source_sha256, asset_id, usage_license, preview_use, preview_probe):
++        source_attempt_id, source_sha256, asset_id, usage_license, preview_use, preview_probe,
++        captioned_music=None):
+     """Read-only preparation for canonical bootstrap_initial_state; no side effects."""
+     from ai_video.production.project import load_production_project
+     from ai_video.production.registry import registry_semantic_sha256
+@@ -142,8 +241,17 @@ def _prepare_qualification_preview_input(*, target_root, project, registry, sour
+         source_attempt_id=source_attempt_id, source_manifest_json=raw.decode(),
+         source_manifest_sha256=hashlib.sha256(raw).hexdigest(), documents=docs,
+         preview_use=RepairPreviewUse.model_validate(preview_use), preview_probe=preview_probe)
+-    provisional = QualificationPreviewInputReceipt.model_construct(**values, content_hash="0" * 64)
+-    receipt = QualificationPreviewInputReceipt.model_validate({**provisional.model_dump(mode="python"),
++    receipt_type = QualificationPreviewInputReceipt
++    if captioned_music is not None:
++        if isinstance(captioned_music, CaptionedMusicPreview):
++            captioned_music = captioned_music.model_dump(mode="python")
++        music = CaptionedMusicPreview.model_validate(captioned_music)
++        music.validate_asset(next((a for a in registry.assets if a.asset_id == music.track.asset_id), None))
++        music.validate_captions(registry.assets)
++        values['captioned_music'] = music
++        receipt_type = CaptionedMusicQualificationPreviewInputReceipt
++    provisional = receipt_type.model_construct(**values, content_hash="0" * 64)
++    receipt = receipt_type.model_validate({**provisional.model_dump(mode="python"),
+         "content_hash": canonical_sha256(provisional.model_dump(mode="json"))})
+     measured = receipt.preview_probe.measured
+     asset = AssetRecord(asset_id=asset_id, asset_type=AssetType.VIDEO,
+diff --git a/src/ai_video/production/reference_authoring.py b/src/ai_video/production/reference_authoring.py
+index ce22c33a456f13c2ff1c18506310cf651ccaf93f..1986a4bbbb0bf22563e481c10023ebd5dd06074d 100644
+--- a/src/ai_video/production/reference_authoring.py
++++ b/src/ai_video/production/reference_authoring.py
+@@ -12,8 +12,9 @@ which the commercial owners verify. Neither domain borrows the other's layer.
+ 
+ Two obligations close shortcuts observed in practice (2026-10-30): drama must
+ bind the user's approval of a cheap visual preview before paid generation, and a
+-visibly performing character cannot be left out of identity continuity, because
+-that silently removes the identity reference the planner would otherwise require.
++visibly performing character cannot silently leave identity continuity (which drops
++the identity reference the planner would require) unless the Director states an
++explicit ``identity_waivers`` entry with its reason.
+ """
+ from ai_video.errors import AiVideoError, ErrorCode
+ 
+@@ -58,10 +59,18 @@ def reference_authoring_issues(intent, *, ecommerce: bool = False) -> tuple[str,
+         return (_ROOT,)
+     issues = []
+     identities = set(intent.identity_continuity.character_ids)
++    waivers = [waiver.character_id for waiver in authored.identity_waivers]
++    if len(set(waivers)) != len(waivers) or set(waivers) & identities:
++        issues.append(f"{_ROOT}.identity_waivers")
++    # Only a required identity anchor creates a reference duty the planner enforces;
++    # a preferred one would let the identity sheet silently drop out again.
++    covered = identities | set(waivers) | {
++        anchor.owner_id for anchor in authored.anchors
++        if anchor.role.value == "identity" and anchor.priority == "required" and anchor.owner_id is not None}
+     for character_id in _visible_performers(intent):
+-        if character_id not in identities:
+-            # Dropping a performer from identity continuity is how a Shot dodges the
+-            # identity reference; the Director must prepare that reference instead.
++        if character_id not in covered:
++            # Silently dropping a performer from identity continuity is how a Shot dodged
++            # the identity reference; prepare it (identity/required anchor) or waive it explicitly.
+             issues.append(f"generation_intent.identity_continuity.character_ids[{character_id}]")
+     if _camera_moves(intent) and not any(event.kind == "composition" for event in authored.events):
+         # A moving camera must name the visible relation it changes; the existing
+@@ -124,6 +133,21 @@ def preview_approval_evidence_issues(binding, coverage, project) -> tuple[str, .
+     return ()
+ 
+ 
++def identity_waiver_approval_issues(planning, project) -> tuple[str, ...]:
++    """Each identity waiver must be one the user saw and approved in the sealed preview."""
++    from ai_video.production.authoring_input import PREFIX, reopen_authoring_input
++    from ai_video.production.models import SourceReference
++
++    if not planning.identity_waivers:
++        return ()
++    binding = planning.preview_approval
++    reference = SourceReference(kind="user_input", reference=f"{PREFIX}{binding.approval_hash}.json",
++                                content_hash=binding.approval_hash)
++    approved = set(reopen_authoring_input(project.root, reference).get("identity_waivers", ()))
++    missing = [w.character_id for w in planning.identity_waivers if w.character_id not in approved]
++    return tuple(f"{_ROOT}.identity_waivers[{character_id}][not_in_preview_approval]" for character_id in missing)
++
++
+ def director_coverage_authoring_input(coverage):
+     """Validate drama Director coverage and return its sealable authoring input.
+ 
+@@ -163,10 +187,15 @@ def require_reference_authoring(requirement, *, project=None, commercial_binding
+         if not issues:
+             issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                            planning.director_coverage, project))
++        if not issues:
++            issues.extend(identity_waiver_approval_issues(planning, project))
+     if issues:
+         raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+-            user_message="Author Director reference planning before new generation: " + ", ".join(issues))
++            user_message="Author Director reference planning before new generation: " + ", ".join(issues),
++            technical_detail=("A visible performer needs identity_continuity, a required identity anchor, "
++                              "or a user-approved identity_waivers entry; drama needs a sealed preview_approval."))
+ 
+ 
+ __all__ = ["director_coverage_authoring_input", "director_coverage_evidence_issues", "is_ecommerce_requirement",
+-           "preview_approval_evidence_issues", "reference_authoring_issues", "require_reference_authoring"]
++           "identity_waiver_approval_issues", "preview_approval_evidence_issues", "reference_authoring_issues",
++           "require_reference_authoring"]
+diff --git a/src/ai_video/production/reference_planning.py b/src/ai_video/production/reference_planning.py
+index 56b7973a6defb3dc3d372925cc307c6b8698a5bf..f3354962be54e6e635659ec2a9608df33603ef20 100644
+--- a/src/ai_video/production/reference_planning.py
++++ b/src/ai_video/production/reference_planning.py
+@@ -71,8 +71,11 @@ def plan_shot_references(intent) -> ShotReferencePlan:
+             purpose=purpose, mechanism=mechanism, priority=priority, **kw))
+ 
+     for anchor in authored.anchors:
++        # An optional anchor cannot downgrade the independently declared identity duty.
++        priority = ("required" if anchor.role is Role.IDENTITY
++                    and anchor.owner_id in intent.identity_continuity.character_ids else anchor.priority)
+         add(anchor.anchor_id, anchor.role, "persistent", anchor.purpose,
+-            priority=anchor.priority, owner_id=anchor.owner_id)
++            priority=priority, owner_id=anchor.owner_id)
+     anchored = {(n.role, n.owner_id) for n in needs}
+     for character_id in intent.identity_continuity.character_ids:
+         if (Role.IDENTITY, character_id) not in anchored:
+diff --git a/src/ai_video/production/reference_planning_contracts.py b/src/ai_video/production/reference_planning_contracts.py
+index e439650d01a9fdb50eedb987a98cb7c7052e7214..354dfcc3c127d52f22ac8aaecc136a9eb2a69ead 100644
+--- a/src/ai_video/production/reference_planning_contracts.py
++++ b/src/ai_video/production/reference_planning_contracts.py
+@@ -108,6 +108,13 @@ class PreviewApprovalBinding(StrictModel):
+     approval_hash: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+ 
+ 
++class IdentityWaiver(StrictModel):
++    """Director's explicit choice to generate a visible performer without an identity sheet."""
++
++    character_id: Identifier
++    reason: Text
++
++
+ class ReferencePlanningIntent(StrictModel):
+     contract_version: Literal["shot-reference-intent/1"] = "shot-reference-intent/1"
+     facets: tuple[ShotFacet, ...] = ()
+@@ -120,6 +127,7 @@ class ReferencePlanningIntent(StrictModel):
+     motion_reference_policy: Literal["auto", "required"] = "auto"
+     director_coverage: DirectorCoverageBinding | None = None
+     preview_approval: PreviewApprovalBinding | None = None
++    identity_waivers: tuple[IdentityWaiver, ...] = ()
+ 
+     @model_serializer(mode="wrap")
+     def _serialize(self, handler):
+@@ -130,6 +138,8 @@ class ReferencePlanningIntent(StrictModel):
+             payload.pop("director_coverage", None)
+         if self.preview_approval is None:
+             payload.pop("preview_approval", None)
++        if not self.identity_waivers:
++            payload.pop("identity_waivers", None)
+         return payload
+ 
+     @field_validator("facets")
+diff --git a/src/ai_video/production/repair_input_admission.py b/src/ai_video/production/repair_input_admission.py
+index 331bb98cf8f7e217a26ec4adc74ba9fc80d7bfa9..aa3936ea567ba3b169fb26d901dbb2fa143387d8 100644
+--- a/src/ai_video/production/repair_input_admission.py
++++ b/src/ai_video/production/repair_input_admission.py
+@@ -97,7 +97,7 @@ class RepairInputAdmissionReceipt(StrictModel):
+ 
+     @model_validator(mode="after")
+     def _source_chain(self):
+-        if self.contract_version == "development-qualification-preview/1":
++        if self.contract_version in {"development-qualification-preview/1", "development-qualification-preview/2"}:
+             from ai_video.production.qualification_preview_input import validate_qualification_capture
+             validate_qualification_capture(self)
+             return self
+@@ -282,6 +282,8 @@ class RepairReplacementPreviewInputAdmissionReceipt(RepairPreviewInputAdmissionR
+ 
+ 
+ def _preview_input_tool(receipt):
++    if receipt.contract_version == "development-qualification-preview/2":
++        return ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="8")
+     if receipt.contract_version == "development-qualification-preview/1":
+         return ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="7")
+     if receipt.contract_version == "development-repair-input/6":
+@@ -444,6 +446,9 @@ def verify_repair_input(record, root):
+     if version == "development-qualification-preview/1":
+         from ai_video.production.qualification_preview_input import QualificationPreviewInputReceipt
+         receipt_type = QualificationPreviewInputReceipt
++    elif version == "development-qualification-preview/2":
++        from ai_video.production.qualification_preview_input import CaptionedMusicQualificationPreviewInputReceipt
++        receipt_type = CaptionedMusicQualificationPreviewInputReceipt
+     if receipt_type is None:
+         raise ValueError("Development repair input version is unsupported")
+     receipt = receipt_type.model_validate_json(payload)
+diff --git a/src/ai_video/production/validation.py b/src/ai_video/production/validation.py
+index 51ce7c1e0840e4b64523b5c39e33170f3bd2a182..3ebf9a9bc634f69bb7b4455ed7e441857f9916e9 100644
+--- a/src/ai_video/production/validation.py
++++ b/src/ai_video/production/validation.py
+@@ -310,7 +310,10 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
+         if source.sha256 != metadata.source_audio_sha256:
+             raise _invalid(f"Caption asset {asset.asset_id} source audio hash is invalid.")
+         if source_metadata.script_hash != metadata.script_hash:
+-            raise _invalid(f"Caption asset {asset.asset_id} script hash is invalid.")
++            from ai_video.production.qualification_preview_input import allows_captioned_music_caption
++
++            if not allows_captioned_music_caption(bundle, asset, source):
++                raise _invalid(f"Caption asset {asset.asset_id} script hash is invalid.")
+         if (
+             asset.input_artifact_ids != (source.asset_id,)
+             or asset.input_fingerprint != source.sha256
+diff --git a/tests/production_generation_execution_factory.py b/tests/production_generation_execution_factory.py
+index b4804d7d932ee3c14a501e2acb88cadf8ec258b2..f0e409611e2037f5b6e5a0a8be921b2ef57eaa9a 100644
+--- a/tests/production_generation_execution_factory.py
++++ b/tests/production_generation_execution_factory.py
+@@ -91,8 +91,9 @@ from tests.performance_fixture import (
+ )
+ from tests.reference_authoring_fixture import (
+     fixture_director_coverage_artifact,
++    fixture_preview_approval,
+     fixture_preview_approval_artifact,
+-    fixture_reference_planning,
++    with_fixture_reference_planning,
+ )
+ 
+ 
+@@ -330,17 +331,22 @@ def activate_generated_video_shot(
+     coverage_reference = SourceReference(kind="user_input",
+         reference=coverage_artifact.relative_path.as_posix(),
+         content_hash=coverage_artifact.relative_path.stem)
+-    approval_artifact = fixture_preview_approval_artifact()
+-    approval_reference = SourceReference(kind="user_input",
+-        reference=approval_artifact.relative_path.as_posix(),
+-        content_hash=approval_artifact.relative_path.stem)
++    # Some tests preserve cast identity; lifecycle fixtures without identity sheets
++    # explicitly approve their visible cast's waivers in a distinct sealed payload.
++    approval_artifacts = (fixture_preview_approval_artifact(),)
++    if authored_shot.character_ids:
++        approval_artifacts += (fixture_preview_approval_artifact(fixture_preview_approval(
++            identity_waivers=authored_shot.character_ids)),)
++    approval_references = tuple(SourceReference(kind="user_input",
++        reference=artifact.relative_path.as_posix(), content_hash=artifact.relative_path.stem)
++        for artifact in approval_artifacts)
+     generated_shot = seal_artifact(
+         authored_shot.model_copy(
+             update={
+                 "revision": authored_shot.revision + 1,
+                 "content_hash": "0" * 64,
+                 "source_provenance": tuple(dict.fromkeys(
+-                    (*authored_shot.source_provenance, coverage_reference, approval_reference))),
++                    (*authored_shot.source_provenance, coverage_reference, *approval_references))),
+                 "visual_strategy": VisualStrategy.GENERATED_VIDEO,
+                 "generated_video_rationale": "fixture lifecycle generation",
+                 "required_asset_roles": (
+@@ -440,7 +446,7 @@ def activate_generated_video_shot(
+                         hashlib.sha256(shot_bytes).hexdigest(),
+                     ),
+                     coverage_artifact,
+-                    approval_artifact,
++                    *approval_artifacts,
+                 ),
+                 key=lambda item: item.relative_path.as_posix(),
+             )
+@@ -541,7 +547,7 @@ def prepare_generation_execution(
+         ),
+         continuity_mode="none",
+         motion_requirement=MotionRequirement.FREE_COMPLEX,
+-        generation_intent=GenerationIntent(
++        generation_intent=with_fixture_reference_planning(GenerationIntent(
+             performance_intent=fixture_performance_intent(
+                 tuple(item for item in project.characters if item.character_id in shot.character_ids),
+                 trigger="The shot opens on the hero in the room",
+@@ -551,9 +557,8 @@ def prepare_generation_execution(
+                 breathing="quiet, even breathing",
+                 body_behavior="stands at ease and settles weight subtly",
+             ) if shot.character_ids else None,
+-            # Ecommerce binds its AdCreativePlan via commercial_binding, not drama coverage.
+-            reference_planning=fixture_reference_planning(ecommerce=request.commercial_binding is not None),
+-        ),
++        ), ecommerce=request.commercial_binding is not None),
++        # Ecommerce binds its AdCreativePlan via commercial_binding, not drama coverage.
+         semantic_reference_roles=(
+             (SemanticReferenceRole.FIRST_FRAME,) if source is not None else ()
+         ),
+diff --git a/tests/reference_authoring_fixture.py b/tests/reference_authoring_fixture.py
+index 18dad372accce2eb9fcea43abf60fd11414f4cc3..fdffa3f16de518ed8d11cd6cd2a67af3fc16729b 100644
+--- a/tests/reference_authoring_fixture.py
++++ b/tests/reference_authoring_fixture.py
+@@ -10,6 +10,7 @@ from ai_video.production.hashing import canonical_sha256
+ from ai_video.production.reference_planning_contracts import ReferencePlanningIntent
+ 
+ FIXTURE_UNIT_ID = "fixture-unit"
++FIXTURE_WAIVED_PERFORMERS = ("hero", "robot", "lead", "villain", "sidekick", "COCO", "Nosha", "talent-presenter")
+ FIXTURE_REVEAL = {"event_id": "fixture-camera-purpose", "kind": "composition", "phase": "end",
+                   "visual_state": "Generate 4 seconds.", "purpose": "Generate 4 seconds."}
+ 
+@@ -49,15 +50,21 @@ def fixture_director_coverage_artifact(coverage: dict | None = None):
+     return director_coverage_authoring_input(coverage or fixture_director_coverage())[1]
+ 
+ 
+-def fixture_preview_approval(coverage: dict | None = None) -> dict:
++def fixture_preview_approval(coverage: dict | None = None, *, identity_waivers=()) -> dict:
+     """Synthetic user approval of the fixture's visual preview, bound to its coverage unit."""
+ 
+     coverage = coverage or fixture_director_coverage()
+-    return {"kind": "user-preview-approval/1", "coverage_hash": canonical_sha256(coverage),
++    approval = {"kind": "user-preview-approval/1", "coverage_hash": canonical_sha256(coverage),
+             "unit_ids": [FIXTURE_UNIT_ID],
+             "preview_artifacts": [{"path": "fixture/preview/keyframe-01.png", "sha256": "f" * 64,
+                                    "role": "decisive keyframe"}],
+-            "user_quote": "fixture user approves this preview"}
++            "user_quote": "fixture user approves this preview",
++            # Fixture performers carry no identity sheets; the synthetic user approved generating them without.
++            "identity_waivers": list(FIXTURE_WAIVED_PERFORMERS)}
++    waiver_ids = sorted(identity_waivers)
++    if waiver_ids:
++        approval["identity_waivers"] = waiver_ids
++    return approval
+ 
+ 
+ def fixture_preview_approval_binding(approval: dict | None = None) -> dict:
+@@ -82,11 +89,28 @@ def _camera_purpose(intent):
+     return FIXTURE_REVEAL["visual_state"]
+ 
+ 
++def _identity_waivers(intent) -> tuple[dict[str, str], ...]:
++    """Fixture performers have no identity sheets; state that explicitly instead of hiding them."""
++
++    performance = getattr(intent, "performance_intent", None)
++    if performance is None:
++        return ()
++    identities = set(intent.identity_continuity.character_ids)
++    return tuple({"character_id": d.character_id, "reason": "synthetic fixture performer has no identity sheet"}
++                 for d in performance.character_directions
++                 if d.visibility == "visible" and d.character_id not in identities)
++
++
+ def fixture_reference_planning(*, camera_moves: bool | None = None, ecommerce: bool = False,
+                                intent=None, **planning) -> ReferencePlanningIntent:
+     """Declare a stable fixture Shot; moving cameras state what the move shows."""
+ 
+     planning.setdefault("facets", ("stable",))
++    waivers = _identity_waivers(intent)
++    if waivers:
++        present = {w["character_id"] for w in planning.get("identity_waivers", ())}
++        planning["identity_waivers"] = (*planning.get("identity_waivers", ()),
++                                       *(w for w in waivers if w["character_id"] not in present))
+     if camera_moves is None:
+         from ai_video.production.reference_authoring import _camera_moves
+ 
+@@ -97,7 +121,9 @@ def fixture_reference_planning(*, camera_moves: bool | None = None, ecommerce: b
+                               {**FIXTURE_REVEAL, "visual_state": text, "purpose": text})
+     if not ecommerce:
+         planning.setdefault("director_coverage", fixture_director_coverage_binding())
+-        planning.setdefault("preview_approval", fixture_preview_approval_binding())
++        approval = fixture_preview_approval(
++            identity_waivers=(w["character_id"] for w in planning.get("identity_waivers", ())))
++        planning.setdefault("preview_approval", fixture_preview_approval_binding(approval))
+     return ReferencePlanningIntent.model_validate(planning)
+ 
+ 
+@@ -105,7 +131,25 @@ def with_fixture_reference_planning(intent, **kwargs):
+     """Return the same GenerationIntent with explicitly declared fixture planning."""
+ 
+     if intent.reference_planning is not None:
+-        return intent
++        planning = intent.reference_planning
++        present = {w.character_id for w in planning.identity_waivers}
++        missing = tuple(w for w in _identity_waivers(intent) if w["character_id"] not in present)
++        waivers = [*planning.model_dump(mode="json").get("identity_waivers", []), *missing]
++        updates = {"identity_waivers": waivers} if missing else {}
++        # Refresh only approvals created by this helper, never an explicit/custom approval.
++        prior_approval = fixture_preview_approval(identity_waivers=tuple(present))
++        if (planning.preview_approval is not None
++                and planning.preview_approval.approval_hash in {
++                    canonical_sha256(prior_approval), canonical_sha256(fixture_preview_approval())}):
++            approval = fixture_preview_approval_binding(fixture_preview_approval(
++                identity_waivers=tuple(w["character_id"] for w in waivers)))
++            if planning.preview_approval.approval_hash != approval["approval_hash"]:
++                updates["preview_approval"] = approval
++        if not updates:
++            return intent
++        return intent.model_copy(update={"reference_planning": ReferencePlanningIntent.model_validate({
++            **planning.model_dump(mode="json"),
++            **updates})})
+     return intent.model_copy(update={"reference_planning": fixture_reference_planning(intent=intent, **kwargs)})
+ 
+ 
+diff --git a/tests/test_canvas_project_data.py b/tests/test_canvas_project_data.py
+index a7b890ca770fa2670d1238751a6db6804b18adb6..ab5932a7ae158e3183c048967c6a532202ce294a 100644
+--- a/tests/test_canvas_project_data.py
++++ b/tests/test_canvas_project_data.py
+@@ -815,6 +815,17 @@ def test_nominal_15_second_example_uses_real_seedance_compiler_without_effects(t
+     baseline = {row["shot"]["shot_id"]: unit for unit, row in
+         zip(service.packet["units"], service.direction["shots"], strict=True)}
+     baseline_rows = {row["shot"]["shot_id"]: row for row in service.direction["shots"]}
++    # The checked-in example carries Director coverage but no user preview approval
++    # (none was ever given for it): seal a synthetic one over the exact coverage and
++    # bind it per Shot, so the fresh-generation gate is exercised rather than relaxed.
++    from tests.reference_authoring_fixture import fixture_preview_approval, fixture_preview_approval_binding
++    coverage = data["director_coverages"][0]
++    approval = {**fixture_preview_approval(coverage),
++                "unit_ids": [u["unit_id"] for u in coverage["coverage_units"]]}
++    data["preview_approvals"] = [approval]
++    for row in data["shots"]:
++        row["generation"]["generation_intent"]["reference_planning"]["preview_approval"] = (
++            fixture_preview_approval_binding(approval))
+     for unit, row in zip(packet["units"], data["shots"], strict=True):
+         old_parts = baseline[row["shot"]["shot_id"]]["prompt_source"]["parts"]
+         current_parts = unit["prompt_source"]["parts"]
+diff --git a/tests/test_caption_development_preview.py b/tests/test_caption_development_preview.py
+index 97882921ed6c15b355626e86d19b092c681d5c68..0bc8cf86377a958f19621ee16a7cc6cfef215ff9 100644
+--- a/tests/test_caption_development_preview.py
++++ b/tests/test_caption_development_preview.py
+@@ -466,3 +466,41 @@ def test_captured_dialogue_preview_can_add_silent_image_title_and_score(monkeypa
+     else:
+         with pytest.raises(ValueError):
+             check()
++
++
++@pytest.mark.parametrize('changes', [
++    {'audio_kind': 'dialogue', 'shot_id': 'shot-s01'},
++    {'audio_kind': 'narration', 'shot_id': 'shot-s01'},
++    {'start_sample': 1}, {'shot_id': 'shot-s01'}, {'trim_duration_samples': None},
++    {'gain_millidb': -1}, {'fade_in_samples': 1}, {'fade_out_samples': 1},
++    {'ducking': {'sidechain_track_ids': ('other',), 'attenuation_millidb': -1000,
++                 'attack_samples': 0, 'release_samples': 0}},
++])
++def test_captioned_music_binding_requires_explicit_unmodified_global_song(changes):
++    from ai_video.production.qualification_preview_input import CaptionedMusicPreview
++    track = dict(track_id='song', asset_id='song-asset', audio_kind='bgm',
++                 start_sample=0, trim_duration_samples=96_000)
++    track.update(changes)
++    with pytest.raises(ValueError):
++        CaptionedMusicPreview.model_validate({'track': track, 'audio_asset_sha256': 'a'*64,
++            'captions': ({'caption_asset_id': 'lyrics', 'caption_asset_sha256': 'b'*64,
++                          'script_hash': 'c'*64, 'transcript_hash': 'd'*64},)})
++
++
++@pytest.mark.parametrize('failure', ['mixed_version', 'different_song'])
++def test_captioned_music_clips_require_the_same_opt_in(failure):
++    from ai_video.production._composition_visual import _captioned_music_binding
++    from ai_video.production.qualification_preview_input import CaptionedMusicPreview
++    music = CaptionedMusicPreview.model_validate({'track': {
++        'track_id': 'song', 'asset_id': 'song-asset', 'audio_kind': 'bgm',
++        'start_sample': 0, 'trim_duration_samples': 96_000}, 'audio_asset_sha256': 'a'*64,
++        'captions': ({'caption_asset_id': 'lyrics', 'caption_asset_sha256': 'b'*64,
++                      'script_hash': 'c'*64, 'transcript_hash': 'd'*64},)})
++    first = SimpleNamespace(contract_version='development-qualification-preview/2', captioned_music=music)
++    second = SimpleNamespace(contract_version='development-qualification-preview/2', captioned_music=music)
++    if failure == 'mixed_version':
++        second.contract_version = 'development-qualification-preview/1'
++    else:
++        second.captioned_music = music.model_copy(update={'audio_asset_sha256': 'b'*64})
++    with pytest.raises(ValueError, match='same explicit song binding'):
++        _captioned_music_binding([first, second], invalid=lambda message, *_: ValueError(message))
+diff --git a/tests/test_generation_history_import_receipt.py b/tests/test_generation_history_import_receipt.py
+index 3256f15537002062bc5883407258a45157b49f3c..3a323dc0fc1b5e939b806ea8a7cf49705bf3ad23 100644
+--- a/tests/test_generation_history_import_receipt.py
++++ b/tests/test_generation_history_import_receipt.py
+@@ -148,10 +148,11 @@ def test_prepares_and_reopens_a_strict_legacy_remote_snapshot(tmp_path):
+     assert source.schema_version == "generation-evaluation/1"
+     # This fixture is freshly authored, then projected into legacy receipt
+     # shape; its fingerprints include the new explicit acting input/rubric and the
+-    # declared reference_planning with its sealed Director coverage input.
+-    assert source.source_sha256 == "9c8d3314f7809cb9707676a00d3bbc0baf530b7a38fc29f17664f278094e20ee"
+-    assert experience.evidence[0].evidence_hash == "c8c3caac8757db1583c74960bc7f8b37eb4cd0660c4c3deb047e6802ba76793c"
+-    assert canonical_sha256(experience.model_dump(mode="json")) == "e6fd410572e83d1d5007dcdd41e188dcfb4d16f0d57ccf0326e006f429776a92"
++    # declared planning with sealed coverage and the approved identity waiver.
++    # Historical /1 payload hashes remain frozen in test_generation_evaluation.py.
++    assert source.source_sha256 == "2f8536a33511852c29b0d76e56daed90c7c98602e666d7fe1262f20c7351f0e5"
++    assert experience.evidence[0].evidence_hash == "a6d933045ade09568c07bd120536c659ddbd3c6fc3751e9fc429fef5b60ad61a"
++    assert canonical_sha256(experience.model_dump(mode="json")) == "c9d33e08a303b4934aa2849dadb956f28fce8ef4e4e609d4cc57bda72ab1599a"
+     assert "analysis_evidence" not in source_payload
+     assert GenerationEvaluationSource.model_validate(source_payload).model_dump(mode="json") == source_payload
+     expected = hashlib.sha256((tmp_path / "state/manifest.json").read_bytes()).hexdigest()
+diff --git a/tests/test_generation_quality_rejection.py b/tests/test_generation_quality_rejection.py
+index 13c62e6b2bce7a3eed002b2c8804bde8a971ee95..e6eeef5231e0d0541d20cb40cf3e12421c41212d 100644
+--- a/tests/test_generation_quality_rejection.py
++++ b/tests/test_generation_quality_rejection.py
+@@ -161,14 +161,15 @@ def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path)
+         "generation-evaluation/1", "generation-evaluation/1", "generation-evaluation/1",
+     )
+     # Freshly authored fixture: fingerprints bind its declared reference_planning
+-    # and sealed Director coverage input, like its explicit acting input.
++    # and sealed Director coverage/approved identity waiver, like its acting input.
++    # Historical /1 payload hashes remain frozen in test_generation_evaluation.py.
+     assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
+-        "e95ebdf7eada31349c79d87a16a904948efa23d3df47ab9bd5ef27ab3976ce17",
+-        "17b3229ff6ebcc773b509d41f3d93e0a947060abcb28c02fd5c9ac1ece81c4bf",
+-        "010273e2b71a8610d7fa7571e93886b90a0a4f770407f1d8cc8afb2b1841dd8a",
++        "3e6a0ae1f86d12850545a1eef472f2461230541e4870dd62c3ea8961bc546229",
++        "b49d0b54d62ee464d2c09d64d51d54371537ddc341895aa7c151347655cd03ff",
++        "3691ae8f75147e785102229e4c077e66cc3f12d99c7d8c2068f1c55db91bf309",
+     )
+-    assert experience.evidence[0].evidence_hash == "b82648ecefb9bf04b5cf252cdc08b2aecbae9c51f72eca7057909565404f7669"
+-    assert canonical_sha256(experience.model_dump(mode="json")) == "92251603ca9dd55e6defa94096cf46c338798398c1c190b131eb85373c27d784"
++    assert experience.evidence[0].evidence_hash == "3da2e100242cd9cbe3b78c25b96b4c168482de851fbd1262c9342ee6865df959"
++    assert canonical_sha256(experience.model_dump(mode="json")) == "aa6b4bde74c6b98ff737f5758949779789a277143524ecf4adcdb21d331465d9"
+     assert diagnose_exact_result(
+         experience.evidence[0], experience.evidence, experience.candidate.recipe
+     ).failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
+diff --git a/tests/test_performance_direction.py b/tests/test_performance_direction.py
+index 6e563bb2c8160200c62ccb7f708a40af25e21b4e..d4c896e2148398e33bc8f1a175497f09d00337a8 100644
+--- a/tests/test_performance_direction.py
++++ b/tests/test_performance_direction.py
+@@ -170,12 +170,14 @@ def test_empty_directions_keep_the_legacy_six_field_hash() -> None:
+         "b33f58485e4c0f9a2fef257335cac9cc1bc5e39dff589b989ef35aea49310206"
+     )
+     # The pre-planning golden is unchanged once the newly declared fixture
+-    # reference_planning is the only difference.
++    # reference_planning is the only difference.  The full fixture intent hash
++    # moved only because fresh fixture planning now also binds preview_approval;
++    # without that single field it equals the previous golden (3580...3bab).
+     assert canonical_sha256(
+         _complete_intent().model_copy(update={"reference_planning": None}).model_dump(mode="json")
+     ) == "6c61c0afdc861ff99c956003e4e9d84adb53467560bc25ec5eb578d2d4fc9ed0"
+     assert canonical_sha256(_complete_intent().model_dump(mode="json")) == (
+-        "35802402540570e79a1349c0f21eee8e1594b64ee242170bbf43aed3c62b3bab"
++        "c26544616de7f89f2b1a7d23250c7068bb53f23f3e6c3026600d4d2a5d16918c"
+     )
+ 
+ 
+diff --git a/tests/test_production_vidu_subjects.py b/tests/test_production_vidu_subjects.py
+index 05bb439d8cb5a3a114d0c0d199701ddc79b04f60..0b88aa0bfef0f6fcffca8f853dfcb487272e56d4 100644
+--- a/tests/test_production_vidu_subjects.py
++++ b/tests/test_production_vidu_subjects.py
+@@ -93,11 +93,12 @@ def _named_route(*, compiler_version="4", capability_id="viduq3-r2v-subjects-v1"
+                 ),
+             ),
+         )
+-        intent = _complete_intent().model_copy(update={
++        from tests.reference_authoring_fixture import with_fixture_reference_planning
++        intent = with_fixture_reference_planning(_complete_intent().model_copy(update={
+             "pacing": Pacing(shot_duration_seconds=5),
+             "performance_intent": performance,
+             "camera_subject_relation": _complete_intent().camera_subject_relation.model_copy(update={"subject_id": "COCO"}),
+-        })
++        }))
+     projection = _replace_requirement(_verified_requirement(context), scene=scene, characters=characters,
+         contract_version="provider-neutral-video-requirement/4" if complete else "provider-neutral-video-requirement/1",
+         generation_mode=GenerationMode.REFERENCE_TO_VIDEO,
+diff --git a/tests/test_qualification_preview_input.py b/tests/test_qualification_preview_input.py
+index a3903ecf277a8c9cbcab0ce43ad01bbe0b519084..377f1e0a8bcf7442698f0792c1a2f3f86f3c6344 100644
+--- a/tests/test_qualification_preview_input.py
++++ b/tests/test_qualification_preview_input.py
+@@ -56,6 +56,8 @@ def test_exact_paid_trial_capture_strict_reopens_and_cannot_promote(tmp_path):
+     asset=next(a for a in loaded.registry.assets if a.asset_id=='trial-preview')
+     receipt=verify_repair_input(asset,target)
+     assert receipt.contract_version=='development-qualification-preview/1'
++    assert 'captioned_music' not in receipt.model_dump()
++    assert asset.tool.version == '7'
+     assert receipt.qualification=='NOT_EVALUATED'
+     assert loaded.manifest.attempts==()
+     assert loaded.manifest.active_paid_provider_budget is None
+@@ -101,3 +103,232 @@ def test_production_fetch_cannot_be_relabelled_as_qualification_preview(tmp_path
+             usage_license='fixture only',preview_use=use,preview_probe=probe)
+     assert 'exact paid source chain' in error.value.technical_detail
+     assert {p.relative_to(target):p.read_bytes() for p in target.rglob('*') if p.is_file()}==before
++
++
++def _captioned_music_preview(tmp_path, *, opt_in=True, duration_samples=96_000,
++        generated=False, bilingual=False, pending=False, conflict=False, ordinary_target=False):
++    """Use real fixture WAV/canonical captions through public bootstrap and reopen."""
++    import hashlib
++    import yaml
++    from ai_video.production.captions import CaptionImportRequest, caption_timing_fingerprint
++    from ai_video.production.composition_contracts import AudioTrackSpec, CaptionTrackBinding, CompositionLayerSpec, CompositionSpec
++    from ai_video.production.models import AssetRoleRequirement, AssetSourceKind, AssetType, CaptionTrack, DurationPolicy, Shot, VisualStrategy
++    from ai_video.production.project import load_production_project
++    from ai_video.production.registry import registry_semantic_sha256
++    from ai_video.production.state_commit import PreparedArtifact, prepare_audio_registry_commit
++    from production_project_factory import make_p4_composition_fixture
++
++    writer, arguments, artifacts = _qualification_bundle(tmp_path)
++    root = arguments['target_root']
++    reference = arguments['project'].artifacts.shots[0]
++    shot_payload = next(a.payload for a in artifacts if a.relative_path == reference.path)
++    changes = {'duration_policy': DurationPolicy(mode='fixed', seconds=2)}
++    if not ordinary_target:
++        changes.update({
++        'visual_strategy': VisualStrategy.GENERATED_VIDEO,
++        'generated_video_rationale': 'Offline qualification preview fixture',
++        'required_asset_roles': (AssetRoleRequirement(role='final_visual', asset_ids=(),
++            allowed_asset_types=(AssetType.VIDEO,)),)})
++    shot = seal_artifact(Shot.model_validate(yaml.safe_load(shot_payload)).model_copy(update=changes))
++    payload = yaml.safe_dump(shot.model_dump(mode='json'), sort_keys=False).encode()
++    def artifact(path, data):
++        return PreparedArtifact(path, data, hashlib.sha256(data).hexdigest())
++    artifacts = tuple(artifact(reference.path, payload) if a.relative_path == reference.path else a
++                      for a in artifacts)
++    arguments['project'] = seal_artifact(arguments['project'].model_copy(update={
++        'artifacts': arguments['project'].artifacts.model_copy(update={'shots': tuple(
++            r.model_copy(update={'content_hash': shot.content_hash}) if r == reference else r
++            for r in arguments['project'].artifacts.shots)})}))
++    arguments['preview_use'].update(transform={'video_fit': 'cover'})
++    sound_root = tmp_path / 'sound'
++    sound_root.mkdir()
++    sound, sound_spec = make_p4_composition_fixture(sound_root)
++    music = next(a for a in sound.registry.assets if a.asset_id == 'bgm-theme')
++    if generated:
++        music = music.model_copy(update={'source_kind': AssetSourceKind.GENERATED,
++            'audio_metadata': music.audio_metadata.model_copy(update={
++                'source': music.audio_metadata.source.model_copy(update={'kind': AssetSourceKind.GENERATED})})})
++    caption = next(a for a in sound.registry.assets if a.asset_type is AssetType.CAPTION)
++    track = CaptionTrack.model_validate_json((sound_root / caption.artifact_path).read_bytes())
++    track = track.model_copy(update={'source_audio_asset_id': music.asset_id,
++                                    'source_audio_sha256': music.sha256})
++    track = seal_artifact(track.model_copy(update={'timing_fingerprint': caption_timing_fingerprint(track)}))
++    style = sound_spec.caption_tracks[0].style_reference
++    style_bytes = (sound_root / style.path).read_bytes()
++    imported = CaptionImportRequest.create(caption_track=track, style_reference=style, style_bytes=style_bytes)
++    metadata = caption.caption_metadata.model_copy(update={
++        'source_audio_asset_id': music.asset_id, 'source_audio_sha256': music.sha256,
++        'timing_fingerprint': track.timing_fingerprint})
++    caption = caption.model_copy(update={'sha256': hashlib.sha256(imported.track_bytes).hexdigest(),
++        'size_bytes': len(imported.track_bytes), 'input_artifact_ids': (music.asset_id,),
++        'input_fingerprint': music.sha256, 'caption_metadata': metadata})
++    caption_inputs = [(caption, imported.track_bytes)]
++    if bilingual:
++        translated = track.model_copy(update={'artifact_id': 'caption-artifact-zh',
++            'caption_track_id': 'caption-track-zh', 'language': 'zh-CN',
++            'script_hash': hashlib.sha256('中文译句脚本'.encode()).hexdigest(),
++            'transcript_hash': hashlib.sha256('你好世界'.encode()).hexdigest(),
++            'segments': tuple(segment.model_copy(update={'text': text})
++                for segment, text in zip(track.segments, ('你好', '世界')))})
++        translated = seal_artifact(translated.model_copy(update={
++            'timing_fingerprint': caption_timing_fingerprint(translated)}))
++        imported_zh = CaptionImportRequest.create(caption_track=translated,
++            style_reference=style, style_bytes=style_bytes)
++        translated_asset = caption.model_copy(update={'asset_id': 'caption-asset-zh',
++            'artifact_path': caption.artifact_path.with_name('caption-track-zh.json'),
++            'sha256': hashlib.sha256(imported_zh.track_bytes).hexdigest(),
++            'size_bytes': len(imported_zh.track_bytes),
++            'caption_metadata': metadata.model_copy(update={
++                'caption_track_id': translated.caption_track_id, 'language': translated.language,
++                'script_hash': translated.script_hash, 'transcript_hash': translated.transcript_hash,
++                'timing_fingerprint': translated.timing_fingerprint})})
++        caption_inputs.append((translated_asset, imported_zh.track_bytes))
++    caption_assets = tuple(asset for asset, _ in caption_inputs)
++    base_registry = arguments['registry']
++    registry = base_registry.model_copy(update={
++        'schema_version': '2.1', 'assets': (*base_registry.assets, music, *caption_assets)})
++    digest = registry_semantic_sha256(registry)
++    arguments['registry'] = registry.model_copy(update={'revision_id': digest, 'content_hash': digest})
++    music_track = AudioTrackSpec(track_id='song', asset_id=music.asset_id, audio_kind='bgm',
++        start_sample=0, trim_start_sample=0, trim_duration_samples=duration_samples)
++    if opt_in:
++        arguments['captioned_music'] = {'track': music_track, 'audio_asset_sha256': music.sha256,
++            'captions': tuple({'caption_asset_id': asset.asset_id, 'caption_asset_sha256': asset.sha256,
++                'script_hash': asset.caption_metadata.script_hash,
++                'transcript_hash': asset.caption_metadata.transcript_hash} for asset in caption_assets)}
++    spec = seal_artifact(CompositionSpec(artifact_id='song-preview', revision=1, content_hash='0'*64,
++        creation_receipt_id='song-preview', source_provenance=arguments['project'].source_provenance,
++        schema_version='2.3', composition_id='song-preview', shot_ids=(shot.shot_id,),
++        delivery_profile=arguments['project'].delivery_profile,
++        layers=(CompositionLayerSpec(layer_id='visual', shot_id=shot.shot_id,
++            asset_role='final_visual', asset_id=arguments['asset_id'], trim_start_frame=0,
++            trim_duration_frames=48, transform={'video_fit': 'cover'}, source_audio_policy='REPLACE',
++            source_audio_reason='Use only the explicitly bound external fixture song.'),),
++        audio_tracks=(music_track,), caption_tracks=tuple(CaptionTrackBinding(
++            binding_id=asset.asset_id, caption_asset_id=asset.asset_id,
++            source_audio_track_id=music_track.track_id, style_reference=style)
++            for asset in caption_assets)))
++    before = {p.relative_to(arguments['source_root']): p.read_bytes()
++              for p in arguments['source_root'].rglob('*') if p.is_file()}
++    registry, captured = prepare_qualification_preview_input(**arguments)
++    captured_record = next(a for a in registry.assets if a.asset_id == arguments['asset_id'])
++    capture_records = [captured_record]
++    if conflict:
++        other = {**arguments, 'asset_id': 'other-preview', 'captioned_music': {
++            **arguments['captioned_music'], 'track': music_track.model_copy(update={'track_id': 'other-song'})}}
++        other_registry, other_artifacts = prepare_qualification_preview_input(**other)
++        capture_records.append(next(a for a in other_registry.assets if a.asset_id == other['asset_id']))
++        captured += tuple(a for a in other_artifacts
++                          if a.relative_path not in {old.relative_path for old in captured})
++    registry = base_registry.model_copy(update={
++        'schema_version': '2.2', 'assets': (*base_registry.assets, *capture_records)})
++    digest = registry_semantic_sha256(registry)
++    registry = registry.model_copy(update={'revision_id': digest, 'content_hash': digest})
++    writer.bootstrap_initial_state(attempt_id='song-preview-bootstrap', project=arguments['project'],
++        registry=registry, artifacts=(*artifacts, *captured))
++    loaded = load_production_project(root / 'project.yaml')
++    assert music.asset_id not in loaded.asset_paths
++    assert caption.asset_id not in loaded.asset_paths
++    assert loaded.manifest.attempts == ()
++    from ai_video.production.composition import resolve_composition
++    with pytest.raises(AiVideoError):
++        resolve_composition(loaded, spec, '0.7.103')
++    if pending:
++        return loaded, spec, arguments, before
++    registry = loaded.registry.model_copy(update={'assets': (*loaded.registry.assets, music, *caption_assets)})
++    digest = registry_semantic_sha256(registry)
++    registry = registry.model_copy(update={'revision_id': digest, 'content_hash': digest})
++    pointer = loaded.manifest.active_project
++    writer.commit(prepare_audio_registry_commit(manifest=loaded.manifest, project=loaded.project,
++        base_registry=loaded.registry, registry=registry, attempt_id='song-caption-import',
++        artifacts=(artifact(music.artifact_path, (sound_root / music.artifact_path).read_bytes()),
++            *(artifact(asset.artifact_path, data) for asset, data in caption_inputs), artifact(style.path, style_bytes)),
++        active_project_artifact=artifact(pointer.path, (root / pointer.path).read_bytes())))
++    loaded = load_production_project(root / 'project.yaml')
++    return loaded, spec, arguments, before
++
++
++@pytest.mark.parametrize('generated', [False, True])
++def test_captioned_music_qualification_preview_public_resolution_stays_unaccepted(tmp_path, generated):
++    from ai_video.production.composition import resolve_composition
++    from ai_video.production.repair_input_admission import require_production_render_sources, verify_repair_input
++    loaded, spec, arguments, before = _captioned_music_preview(tmp_path,
++        generated=generated, bilingual=generated)
++    timeline = resolve_composition(loaded, spec, '0.7.103')
++    asset = next(a for a in loaded.registry.assets if a.asset_id == arguments['asset_id'])
++    receipt = verify_repair_input(asset, loaded.root)
++    assert receipt.contract_version == 'development-qualification-preview/2'
++    assert receipt.qualification == 'NOT_EVALUATED'
++    assert timeline.usage_scope == 'development_audio_preview'
++    assert timeline.total_samples == 96_000
++    assert timeline.audio_spans[0].track_id == 'song'
++    assert {cue.text for cue in timeline.caption_cues} == (
++        {'Hello', 'world', '你好', '世界'} if generated else {'Hello', 'world'})
++    assert {attempt.operation for attempt in loaded.manifest.attempts} == {'audio_import'}
++    assert {p.relative_to(arguments['source_root']): p.read_bytes()
++            for p in arguments['source_root'].rglob('*') if p.is_file()} == before
++    with pytest.raises(ValueError, match='cannot be activated'):
++        require_production_render_sources(loaded.root, loaded.manifest.active_registry, timeline)
++
++
++def test_song_captions_without_explicit_qualification_binding_are_rejected(tmp_path):
++    with pytest.raises(AiVideoError, match='script hash is invalid'):
++        _captioned_music_preview(tmp_path, opt_in=False)
++
++
++def test_conflicting_captioned_music_captures_do_not_authorize_reader(tmp_path):
++    with pytest.raises(AiVideoError, match='script hash is invalid'):
++        _captioned_music_preview(tmp_path, conflict=True)
++
++
++def test_unconsumed_captioned_music_capture_is_reopenable_but_not_resolvable(tmp_path):
++    from ai_video.production.composition import resolve_composition
++    loaded, spec, _, _ = _captioned_music_preview(tmp_path, pending=True)
++    with pytest.raises(AiVideoError):
++        resolve_composition(loaded, spec, '0.7.103')
++
++
++def test_unused_capture_cannot_launder_song_captions_into_production(tmp_path):
++    from ai_video.production.composition import resolve_composition
++    from ai_video.production.composition_contracts import CompositionLayerSpec
++    loaded, spec, _, _ = _captioned_music_preview(tmp_path, ordinary_target=True)
++    role = loaded.shots[0].required_asset_roles[0]
++    assert role.asset_ids
++    ordinary = CompositionLayerSpec(layer_id='ordinary-visual', shot_id=loaded.shots[0].shot_id,
++        asset_role=role.role, asset_id=role.asset_ids[0])
++    spec = seal_artifact(spec.model_copy(update={'layers': (ordinary,)}))
++    with pytest.raises(AiVideoError, match='actual qualification preview visuals'):
++        resolve_composition(loaded, spec, '0.7.103')
++
++
++@pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
++    'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
++def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
++    from ai_video.production.composition import resolve_composition
++    loaded, spec, _, _ = _captioned_music_preview(tmp_path,
++        duration_samples=95_999 if failure == 'short_song' else 96_000)
++    if failure == 'changed_song_sha':
++        source = next(a for a in loaded.registry.assets if a.asset_id == spec.audio_tracks[0].asset_id)
++        registry = loaded.registry.model_copy(update={'assets': tuple(
++            a.model_copy(update={'sha256': 'b'*64}) if a == source else a
++            for a in loaded.registry.assets)})
++        loaded = loaded.model_copy(update={'registry': registry})
++    elif failure == 'extra_track':
++        spec = seal_artifact(spec.model_copy(update={'audio_tracks': (
++            *spec.audio_tracks, spec.audio_tracks[0].model_copy(update={'track_id': 'extra-song'}))}))
++    elif failure in {'wrong_caption_track', 'shot_caption'}:
++        update = {'source_audio_track_id': 'other-song'} if failure == 'wrong_caption_track' else {
++            'shot_id': spec.shot_ids[0]}
++        spec = seal_artifact(spec.model_copy(update={'caption_tracks': (
++            spec.caption_tracks[0].model_copy(update=update),)}))
++    elif failure == 'keep_native_audio':
++        spec = seal_artifact(spec.model_copy(update={'layers': (
++            spec.layers[0].model_copy(update={'source_audio_policy': 'KEEP'}),)}))
++    elif failure == 'retimed_visual':
++        from ai_video.production.video_retime import VideoTimeMap
++        time_map = VideoTimeMap.model_validate({'audio_policy': 'mute', 'points': [
++            {'source_frame': 0, 'output_frame': 0}, {'source_frame': 48, 'output_frame': 40}]})
++        spec = seal_artifact(spec.model_copy(update={'layers': (
++            spec.layers[0].model_copy(update={'source_time_map': time_map}),)}))
++    with pytest.raises(AiVideoError):
++        resolve_composition(loaded, spec, '0.7.103')
+diff --git a/tests/test_reference_authoring.py b/tests/test_reference_authoring.py
+index 92888923b9898eadfc2ce90012a55840a66116f3..8c721f37a5ffe9dbc62957880c49f590e4569fbe 100644
+--- a/tests/test_reference_authoring.py
++++ b/tests/test_reference_authoring.py
+@@ -159,6 +159,20 @@ def test_visible_performer_cannot_be_dropped_from_identity_continuity():
+     covered = dodged.model_copy(update={"identity_continuity": dodged.identity_continuity.model_copy(
+         update={"character_ids": ("resident",), "preservation": "exact"})})
+     assert reference_authoring_issues(covered) == ()
++    waived = dodged.model_copy(update={"reference_planning": ReferencePlanningIntent.model_validate({
++        **planning, "identity_waivers": [{"character_id": "resident", "reason": "只露背影的路人，不可辨认"}]})})
++    assert reference_authoring_issues(waived) == ()
++    anchored = dodged.model_copy(update={"reference_planning": ReferencePlanningIntent.model_validate({
++        **planning, "anchors": [{"anchor_id": "resident-id", "role": "identity", "purpose": "住户脸", "owner_id": "resident"}]})})
++    assert reference_authoring_issues(anchored) == ()
++    preferred = anchored.model_copy(update={"reference_planning": ReferencePlanningIntent.model_validate({
++        **planning, "anchors": [{"anchor_id": "resident-id", "role": "identity", "purpose": "住户脸",
++                                "owner_id": "resident", "priority": "preferred"}]})})
++    assert reference_authoring_issues(preferred) == (
++        "generation_intent.identity_continuity.character_ids[resident]",)
++    with pytest.raises(ValueError):
++        ReferencePlanningIntent.model_validate({"identity_waivers": [{"character_id": "resident", "reason": " "}]})
++    assert "identity_waivers" not in ReferencePlanningIntent().model_dump(mode="json")
+     offscreen = GenerationIntent.model_validate({"reference_planning": planning, "performance_intent": {**_PERFORMANCE,
+         "character_directions": [{**direction, "visibility": "offscreen", "offscreen_reason": "画外声", "beats": []}]}})
+     assert reference_authoring_issues(offscreen) == ()
+@@ -187,6 +201,44 @@ def test_shared_reference_planning_still_applies_to_ecommerce():
+         require_reference_authoring(missing)
+ 
+ 
++@pytest.mark.parametrize("field", ["unit_ids", "identity_waivers"])
++@pytest.mark.parametrize("invalid", [[{}], [[]], [1], ["resident", "resident"], [" "]])
++def test_preview_approval_rejects_invalid_identifier_lists_as_typed_errors(field, invalid):
++    from ai_video.production.preview_approval import PreviewApprovalError, validate_preview_approval
++
++    with pytest.raises(PreviewApprovalError):
++        validate_preview_approval({**_approval(), field: invalid})
++
++
++@pytest.mark.parametrize("approved", [False, True])
++def test_identity_waiver_must_be_present_in_exact_sealed_preview(tmp_path, approved):
++    approval = _approval()
++    if approved:
++        approval["identity_waivers"] = ["resident"]
++    intent = _intent(binding=_binding()).model_copy(update={"reference_planning": ReferencePlanningIntent(
++        director_coverage=_binding(), preview_approval=_approval_binding(approval),
++        identity_waivers=({"character_id": "resident", "reason": "不可辨认的剪影"},))})
++    requirement = SimpleNamespace(generation_intent=intent)
++    project = _project(tmp_path, _payload(), approval=approval)
++    if approved:
++        require_reference_authoring(requirement, project=project)
++    else:
++        with pytest.raises(AiVideoError, match=r"identity_waivers\[resident\]\[not_in_preview_approval\]"):
++            require_reference_authoring(requirement, project=project)
++
++
++@pytest.mark.parametrize("conflict", ["duplicate", "identity"])
++def test_identity_waivers_cannot_duplicate_or_contradict_identity_obligations(conflict):
++    waiver = {"character_id": "resident", "reason": "不可辨认的剪影"}
++    intent = _intent(binding=_binding()).model_copy(update={"reference_planning": ReferencePlanningIntent(
++        director_coverage=_binding(), preview_approval=_approval_binding(),
++        identity_waivers=(waiver, waiver) if conflict == "duplicate" else (waiver,))})
++    if conflict == "identity":
++        intent = intent.model_copy(update={"identity_continuity": intent.identity_continuity.model_copy(
++            update={"character_ids": ("resident",)})})
++    assert reference_authoring_issues(intent) == ("generation_intent.reference_planning.identity_waivers",)
++
++
+ @pytest.mark.parametrize("movement", ["unspecified", "locked", "locked-off"])
+ def test_still_camera_tokens_need_no_composition_without_structured_motion(movement):
+     intent = GenerationIntent.model_validate({"camera_intent": {"movement": movement},
+diff --git a/tests/test_reference_planning.py b/tests/test_reference_planning.py
+index 3f82e71ecd6a67234402a4b05ad4c0af75e5bbaa..73a5ac67f0ab8233614f2ec82fff042d99a411a5 100644
+--- a/tests/test_reference_planning.py
++++ b/tests/test_reference_planning.py
+@@ -115,6 +115,21 @@ def test_persistent_roles_are_separate_from_temporal_frames_and_missing_product_
+     assert "MISSING_REFERENCE:auto:product" in result.reference_plan["execution_gaps"]
+ 
+ 
++@pytest.mark.parametrize("priority", ["preferred", "required"])
++def test_identity_continuity_cannot_be_downgraded_by_an_anchor(priority):
++    directed = intent(anchors=({"anchor_id": "hero-id", "role": "identity", "owner_id": "hero",
++                               "purpose": "保持人物身份", "priority": priority},)).model_copy(
++        update={"identity_continuity": IdentityContinuity(character_ids=("hero",))})
++    plan = plan_shot_references(directed)
++    identity = [need for need in plan.needs if need.role is ReferenceRole.IDENTITY]
++    assert len(identity) == 1
++    assert identity[0].priority == "required"
++    result = VideoPlanner().plan(request_for(directed, shot=make_shot(
++        visual_strategy=VisualStrategy.GENERATED_VIDEO, character_ids=("hero",))))
++    assert result.outcome is PlanOutcome.BLOCKED
++    assert "MISSING_REFERENCE:hero-id" in result.reference_plan["execution_gaps"]
++
++
+ @pytest.mark.parametrize("payload", [
+     dict(events=(event("cut", "cut"),)),
+     dict(structure="multi_shot"),
+diff --git a/tests/test_reference_planning_integration.py b/tests/test_reference_planning_integration.py
+index f826c69501a402a49e52da04d5f987d322252091..e5bbcdbd6351146336ed3c7b05d60a1eb87dca14 100644
+--- a/tests/test_reference_planning_integration.py
++++ b/tests/test_reference_planning_integration.py
+@@ -19,10 +19,13 @@ from tests.test_generation_feedback import NativeFixtureProvider
+ from tests.test_production_generation_decision import setup_decision
+ 
+ 
+-def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True):
+-    from tests.reference_authoring_fixture import fixture_director_coverage, fixture_preview_approval, fixture_director_coverage_binding
++def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True, seal_approval=True):
++    from tests.reference_authoring_fixture import (
++        fixture_director_coverage, fixture_director_coverage_binding, fixture_preview_approval,
++        fixture_preview_approval_binding)
+     if isinstance(planning, dict) and bind_coverage:
+-        planning = {"director_coverage": fixture_director_coverage_binding(), **planning}
++        planning = {"director_coverage": fixture_director_coverage_binding(),
++                    "preview_approval": fixture_preview_approval_binding(), **planning}
+     raw = document()
+     raw["edges"] = []
+     for node in raw["nodes"]:
+@@ -35,7 +38,8 @@ def load_canvas(tmp_path, planning, *, seal_coverage=True, bind_coverage=True):
+     data["delivery_profile"] = {"width": 1024, "height": 576, "fps": 24}
+     if seal_coverage:
+         data["director_coverages"] = [fixture_director_coverage()]
+-    data["preview_approvals"] = [fixture_preview_approval()]
++    if seal_approval:
++        data["preview_approvals"] = [fixture_preview_approval()]
+     row = data["shots"][0]
+     row["shot"]["duration_policy"]["seconds"] = 4
+     row["generation"] = {"generation_intent": {
+@@ -135,9 +139,10 @@ def motion_preparer(*, supports_video=True, cardinality_conflict=False):
+         source_registry_revision_id="f" * 64, mime_type=asset.mime_type, size_bytes=asset.size_bytes,
+         width=asset.width, height=asset.height, duration_millis=asset.duration_millis, fps=asset.fps)
+     context = _context(important=False, reference_videos=(routed_asset,))
+-    from tests.reference_authoring_fixture import fixture_director_coverage_binding
++    from tests.reference_authoring_fixture import fixture_director_coverage_binding, fixture_preview_approval_binding
+     authored = intent(facets=("contact_timing",), selections=({"need_id": "auto:motion", "asset_id": "motion"},),
+-                      director_coverage=fixture_director_coverage_binding())
++                      director_coverage=fixture_director_coverage_binding(),
++                      preview_approval=fixture_preview_approval_binding())
+     authored = authored.model_copy(update={"subject_action": authored.subject_action.model_copy(
+         update={"progression": "Generate 4 seconds."})})
+     original = setup["projection"].requirement
+@@ -272,6 +277,7 @@ def test_drama_director_coverage_sealed_through_canvas_authoring_reaches_executi
+ @pytest.mark.parametrize("load,message", [
+     ({"seal_coverage": False}, "director_coverage.coverage_hash"),
+     ({"bind_coverage": False}, "director_coverage"),
++    ({"seal_approval": False}, "preview_approval"),
+ ])
+ def test_unsealed_or_unbound_drama_coverage_blocks_before_any_effect(tmp_path, load, message):
+     from ai_video.errors import AiVideoError
+diff --git a/tests/test_seedance_durable_fidelity.py b/tests/test_seedance_durable_fidelity.py
+index 383e842e3c3f0317967f3987fad9e5eb1c07cc93..a19691cbdbc0eae82affb49c6ac677f2bd63c1fa 100644
+--- a/tests/test_seedance_durable_fidelity.py
++++ b/tests/test_seedance_durable_fidelity.py
+@@ -21,6 +21,7 @@ from ai_video.production.video_compiler import CompiledProviderVideoRequest
+ from ai_video.production.video_generation import VideoGenerationService
+ from ai_video.production.video_requirement import AudioNeed, OutputNeed, Pacing
+ from production_project_factory import make_p8_video_generation_base
++from reference_authoring_fixture import with_fixture_reference_planning
+ from production_generation_execution_factory import (
+     activate_generated_video_shot, activate_fixture_generation_qa_policy, fixture_performance_intent,
+ )
+@@ -52,8 +53,8 @@ def _project_execution(root, *, ordinary_compiler_version="2"):
+         emotion="focused curiosity", facial_expression="brows lift slightly",
+         gaze_target="the room ahead", breathing="quiet even breathing",
+         body_behavior="stands balanced and attentive")
+-    intent = _complete_intent().model_copy(update={"performance_intent": performance,
+-        "pacing": Pacing(shot_duration_seconds=output.duration_seconds)})
++    intent = with_fixture_reference_planning(_complete_intent().model_copy(update={
++        "performance_intent": performance, "pacing": Pacing(shot_duration_seconds=output.duration_seconds)}))
+     projection = _replace_requirement(_verified_requirement(context),
+         contract_version="provider-neutral-video-requirement/4", target_shot=shot,
+         scene=scene, characters=characters, generation_intent=intent,
+diff --git a/tests/test_seedance_prompt_fidelity.py b/tests/test_seedance_prompt_fidelity.py
+index f340bef3a37ad4a09f3e46a61339c2c9ca02d6bb..bd99ba2a3b02e157fa0258f9200eb6b02672c76f 100644
+--- a/tests/test_seedance_prompt_fidelity.py
++++ b/tests/test_seedance_prompt_fidelity.py
+@@ -172,7 +172,7 @@ def _performance_fixture(final_text=None, *, cast_shape="single", compiler_versi
+         "activated_shot": authored_shot,
+         "target_shot_content_hash": authored_shot.content_hash,
+     })
+-    from tests.reference_authoring_fixture import fixture_reference_planning
++    from tests.reference_authoring_fixture import with_fixture_reference_planning
+     base = _verified_requirement(context)
+     source = base.requirement.target_shot.intent
+     performance = PerformanceIntent(
+@@ -186,18 +186,16 @@ def _performance_fixture(final_text=None, *, cast_shape="single", compiler_versi
+     )
+     current_performance = performance_intent_override or performance
+     qa_performance = qa_performance_override or performance
+-    intent = GenerationIntent(
++    intent = with_fixture_reference_planning(GenerationIntent(
+         subject_action=SubjectAction(progression=source),
+         pacing=Pacing(shot_duration_seconds=output.duration_seconds),
+         performance_intent=current_performance,
+-        reference_planning=fixture_reference_planning(),
+-    )
+-    qa_intent = GenerationIntent(
++    ))
++    qa_intent = with_fixture_reference_planning(GenerationIntent(
+         subject_action=SubjectAction(progression=source),
+         pacing=Pacing(shot_duration_seconds=output.duration_seconds),
+         performance_intent=qa_performance,
+-        reference_planning=fixture_reference_planning(),
+-    )
++    ))
+     projection = _replace_requirement(
+         base,
+         generation_intent=intent,
+diff --git a/tests/test_typed_causal_native_expression.py b/tests/test_typed_causal_native_expression.py
+index b5f260f7750a3ee22274271b63af6b0b5806c6d1..70e9e6e9e5d0a4b78e4b2e1ba13e78a68b58ac4a 100644
+--- a/tests/test_typed_causal_native_expression.py
++++ b/tests/test_typed_causal_native_expression.py
+@@ -26,6 +26,7 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
+     from ai_video.production.project import load_production_project
+     from ai_video.production.video_requirement import ConditioningLane
+     from performance_fixture import fixture_performance_intent
++    from reference_authoring_fixture import with_fixture_reference_planning
+ 
+     source = source or s._activated_source(tmp_path)
+     inputs = s._edge_inputs(source, **({"boundary": s.BoundaryKind.WITHIN_CONTINUOUS_TAKE}
+@@ -59,6 +60,7 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
+         intent = intent.model_copy(update={"close_state": intent.open_state})
+     elif arbitrary_close:
+         intent = intent.model_copy(update={"close_state": TypedStateReference(kind="typed_hash", state_hash="f" * 64)})
++    intent = with_fixture_reference_planning(intent)
+     first = next(a for a in seed.available_assets if a.role.value == (
+         "previous_shot_terminal" if exact_terminal else "approved_keyframe"))
+     authored = ProviderNeutralGenerationIntentProjection.create(**{
+diff --git a/tests/test_voice_routing_identity.py b/tests/test_voice_routing_identity.py
+index 881cd2a57b4743329bda0198d9950c33e4b66b5b..2996e837873f647725f6329f24d747fa11965b42 100644
+--- a/tests/test_voice_routing_identity.py
++++ b/tests/test_voice_routing_identity.py
+@@ -322,12 +322,13 @@ def _author_voice_routing(runtime, voice: VoiceRoutingRequirement | None):
+     refs = []
+     artifacts: list[PreparedArtifact] = []
+     from tests.reference_authoring_fixture import (
+-        fixture_director_coverage_artifact, fixture_preview_approval_artifact,
++        fixture_director_coverage_artifact, fixture_preview_approval, fixture_preview_approval_artifact,
+     )
+     coverage = fixture_director_coverage_artifact()
+     coverage_reference = SourceReference(kind="user_input", reference=coverage.relative_path.as_posix(),
+                                          content_hash=coverage.relative_path.stem)
+-    approval = fixture_preview_approval_artifact()
++    approval = fixture_preview_approval_artifact(fixture_preview_approval(
++        identity_waivers=next(shot.character_ids for shot in loaded.shots if shot.shot_id == "shot-1")))
+     approval_reference = SourceReference(kind="user_input", reference=approval.relative_path.as_posix(),
+                                          content_hash=approval.relative_path.stem)
+     for shot, reference in zip(loaded.shots, loaded.project.artifacts.shots, strict=True):
+diff --git a/tests/test_voice_routing_integration.py b/tests/test_voice_routing_integration.py
+index 4b7d88520d6892259f53b17cf793a07bce19d8c0..7c0ecd42d1086747585453cb80a75acfdae1561b 100644
+--- a/tests/test_voice_routing_integration.py
++++ b/tests/test_voice_routing_integration.py
+@@ -345,7 +345,9 @@ def _voice_projection(setup, output):
+         breathing="quiet, steady breathing",
+         body_behavior="relaxed shoulders with small natural weight shifts",
+     )
+-    intent = _complete_intent().model_copy(update={
++    from reference_authoring_fixture import with_fixture_reference_planning
++
++    intent = with_fixture_reference_planning(_complete_intent().model_copy(update={
+         "pacing": Pacing(shot_duration_seconds=output.duration_seconds or 4),
+         "performance_intent": performance,
+         "ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True),
+@@ -359,7 +361,7 @@ def _voice_projection(setup, output):
+             on_screen=False,
+             response_obligation="The hero opens the gate.",
+         ),
+-    })
++    }))
+     from ai_video.production.video_requirement import (
+         GenerationOperation,
+         ProviderNeutralGenerationIntentProjection,

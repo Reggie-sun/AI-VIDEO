@@ -1,0 +1,9 @@
+{
+ "schema": "ev-source-audio-identity/v1",
+ "source_sha256": "bf3595f1f615a6bc66b8925680e28849e12eeb57ec5c7f93420a95e3fe37a40d",
+ "method": "Fresh ffmpeg decode to stereo44100 pcm_s16le, raw PCM sha256 vs stored mix.wav PCM bytes read by soundfile",
+ "fresh_decoded_pcm_sha256": "bc51cd1f914f01548dcd6c6a7ac1517462d19e56490afc130564781df3100b3c",
+ "stored_mix_pcm_sha256": "bc51cd1f914f01548dcd6c6a7ac1517462d19e56490afc130564781df3100b3c",
+ "result": "PASS",
+ "claim": "Stored mix.wav is sample-identical to fresh source decode; not perceptual QA or stem/model accuracy"
+}

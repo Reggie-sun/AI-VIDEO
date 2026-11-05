@@ -1,0 +1,30 @@
+{
+  "unit": "S8br",
+  "checks": {
+    "exact_images_K8b_then_ID7b": true,
+    "exact_audio_reference": true,
+    "every_input_in_user_preview": true,
+    "chinese_body_only": true,
+    "repair_variable_only": true,
+    "locked_camera": true,
+    "ai_label_preserved": true,
+    "bound_output_5s": true,
+    "operator_ceiling_matches_preview": true,
+    "v2_budget_room": true,
+    "repair_budget": true
+  },
+  "pass": true,
+  "request_hash": "a314f9e7ca508b98b76e96df7d6c59fc6ac2204e02c4408791592268c668a743",
+  "continuity": "as S8b; clip t=0 = master 22.00 s, film window clip 0.567-3.90 s",
+  "handoff": "S8a take 1 -> S8b (this repair) -> S9a",
+  "axis_action_camera": "as S8b: K8b 3/4 view, locked, singing then closing and looking toward the city",
+  "prompt_fit": "pure Chinese body 431 chars; the only change from S8b is the lead-in wording",
+  "budget": {
+    "v2_spent_submits_before": 9,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 2250,
+    "v2_ceiling_CRD": 2500,
+    "expected_cost_5s_CRD": 165
+  },
+  "new_calls": 0
+}

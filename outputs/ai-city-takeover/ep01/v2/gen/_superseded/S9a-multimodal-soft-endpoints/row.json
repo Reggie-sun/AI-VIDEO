@@ -1,0 +1,291 @@
+{
+  "shot": {
+    "shot_id": "ep01v2-s9a",
+    "scene_id": "rack-door",
+    "storyboard_beat_id": "closed",
+    "intent": "真人电影摄影，横幅十六比九，连续六秒。第一张图是这个镜头的起始画面：机房里一扇半开的黑色机柜门，门缝透出强烈的红光，线缆沿地面通往右侧的落地窗；第二张图是这个镜头的结束画面：同一机位，那扇机柜门已经完全关上，红光熄灭，只剩冷蓝。\n画面中没有人。开头红光门缝保持片刻，随后那扇机柜门平稳地转动关上，门缝逐渐变窄直到消失，红光随之熄灭，地面上的红色反光也消失。门关上后画面保持静止。\n摄影机固定不动，窗外城市灯光不变。蓝黑与钢蓝冷色，红色只在门缝里，门关上后不再有红色。\n保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。可以有一声轻微的机柜门关上声和极轻的机房环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨。",
+    "dialogue": "",
+    "narration": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 6.0,
+      "minimum_seconds": null,
+      "maximum_seconds": null
+    },
+    "character_ids": [],
+    "continuity_constraints": [
+      "机柜门平稳关上，门缝变窄直到消失，红光熄灭，之后画面静止",
+      "同一机位：从K4起始画面到K9e结束画面，摄影机固定不动",
+      "保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "reference",
+        "asset_ids": [
+          "iris-c-v2-s9a-1-door-open",
+          "iris-c-v2-s9a-2-door-closed"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ],
+    "motion_directives": [],
+    "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+    "hybrid_layers": [],
+    "composition_directives": [],
+    "review_policy": {
+      "required_checks": []
+    }
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "scene_reference",
+        "asset_id": "iris-c-v2-s9a-1-door-open"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "iris-c-v2-s9a-2-door-closed"
+      }
+    ],
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "slow_camera",
+          "stable"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [
+          {
+            "event_id": "open-composition",
+            "kind": "composition",
+            "visual_state": "一扇半开的黑色机柜门，门缝透出强烈的红光",
+            "purpose": "开头红光门缝保持片刻",
+            "phase": "start",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "close-composition",
+            "kind": "composition",
+            "visual_state": "那扇机柜门已经完全关上，红光熄灭，只剩冷蓝",
+            "purpose": "门关上后画面保持静止",
+            "phase": "end",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          }
+        ],
+        "anchors": [
+          {
+            "anchor_id": "door-open",
+            "role": "scene_environment",
+            "purpose": "这个镜头的起始画面",
+            "owner_id": "rack-door",
+            "priority": "required"
+          },
+          {
+            "anchor_id": "door-closed",
+            "role": "composition",
+            "purpose": "这个镜头的结束画面",
+            "owner_id": "rack-door",
+            "priority": "required"
+          }
+        ],
+        "selections": [
+          {
+            "need_id": "door-open",
+            "asset_id": "iris-c-v2-s9a-1-door-open"
+          },
+          {
+            "need_id": "door-closed",
+            "asset_id": "iris-c-v2-s9a-2-door-closed"
+          }
+        ],
+        "natural_generation": [
+          "窗外城市灯光不变"
+        ],
+        "director_coverage": {
+          "coverage_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d",
+          "unit_id": "S9a"
+        },
+        "preview_approval": {
+          "approval_hash": "53d1b791e5c37796a532d12e9a9c5e85a7d26fe2107114522e9e2a070e0557ed"
+        }
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "K4起始画面：一扇半开的黑色机柜门，门缝透出强烈的红光",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "K9e结束画面：机柜门完全关上，红光熄灭",
+        "state_hash": null,
+        "required_change": false
+      },
+      "identity_continuity": {
+        "character_ids": [],
+        "preservation": "unspecified",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "rack-door",
+        "time_of_day": "同一凌晨",
+        "mood": "冷静、收束",
+        "state_constraints": [
+          "K4起始画面：一扇半开的黑色机柜门，门缝透出强烈的红光",
+          "不新增人物、设备、文字或界面"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "机柜门在画面左侧",
+        "screen_direction": "保持参考图方向",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不换位、不翻轴"
+      },
+      "axis_continuity": {
+        "camera_axis": "参考图原机位视轴",
+        "framing_continuity": "K4与K9e同一机位",
+        "crossing_policy": "不翻轴、不环绕"
+      },
+      "subject_action": {
+        "start_state": "半开的机柜门透出红光",
+        "progression": "机柜门平稳转动关上，门缝变窄直到消失，红光熄灭",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "门完全关上，只剩冷蓝",
+          "state_hash": null,
+          "required_change": false
+        }
+      },
+      "motion_envelope": {
+        "onset": "平滑开始",
+        "peak": "门缝变窄直到消失",
+        "settle": "末段平滑收稳",
+        "direction": "向前",
+        "amplitude_class": "很小"
+      },
+      "pacing": {
+        "cadence": "六秒连续原速",
+        "tempo_class": "正常原速",
+        "shot_duration_seconds": 6.0
+      },
+      "camera_intent": {
+        "movement": "摄影机固定不动",
+        "stability": "平稳连续，末段收稳",
+        "framing_intent": "K4与K9e同一机位",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "K4原始构图",
+        "end_framing": "K9e同一构图",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "门被关上",
+        "visible_response": "门缝逐渐变窄直到消失，红光随之熄灭",
+        "gaze_target": "画面中没有人物；构图把视线引向那扇机柜门",
+        "body_behavior": "画面中没有人物",
+        "hand_behavior": "画面中没有人物",
+        "terminal_performance_state": "门完全关上，只剩冷蓝"
+      },
+      "visual_treatment": {
+        "medium_look": "真人电影摄影",
+        "palette": "蓝黑钢蓝，红色只在指定位置",
+        "material_treatment": "自然材质与真实光影",
+        "prohibited_visual_drift": [
+          "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+          "改变参考图的场景与光线"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "门缝红光熄灭后只剩冷蓝",
+        "direction": "参考图方向",
+        "exposure_priority": "保留暗部细节",
+        "continuity_state": "同一凌晨冷光"
+      },
+      "ambience_intent": {
+        "environment_bed": "一声轻微的机柜门关上声与极轻机房环境声",
+        "foley_cues": [],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "rack-door",
+        "relation_kind": "fixed_frame",
+        "start_relation": "半开的机柜门在画面左侧",
+        "end_relation": "关上的机柜门仍在画面左侧"
+      }
+    },
+    "intent_evidence": {
+      "character_action_required": false,
+      "state_change_required": false,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 6,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "optional",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": true,
+    "source_audio_policy": "MUTE",
+    "source_audio_reason": "成片使用已认可歌曲 v2 独立音轨"
+  },
+  "boundary": {
+    "independent": true,
+    "reason": "按分镜 v2.1 由最终剪辑切接；不要求复制前镜终态"
+  }
+}

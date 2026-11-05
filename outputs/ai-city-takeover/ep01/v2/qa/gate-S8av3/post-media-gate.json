@@ -1,0 +1,56 @@
+{
+ "schema": "iris-v2-post-media-gate/1",
+ "unit": "S8av3",
+ "shot_id": "ep01v2-s8a",
+ "attempt_id": "iris-s8av3-source-001",
+ "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S8av3/project/state/video-generation/fetch/files/20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f.mp4",
+ "artifact_sha256": "20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f",
+ "intent": "v3 performance redo of the first chorus pass (calm but alive), criteria sealed before payment in s8a-lipsync-amendment.md section 'v3 表演重做'",
+ "source_audio_policy": "MUTE in the film (master song only); the clip's own audio is evidence only",
+ "evidence": {
+  "mcp_video_probe": "1920x1080, 5.062 s, 121 frames (24 fps cadence), h264, aac",
+  "mcp_video_extract_frames": "qa/gate-S8av3/mcp-frame-*.jpg, mcp-sheet.jpg",
+  "mcp_video_review": "speaking about 5.0 s, issues []",
+  "lipsync_review": "qa/gate-S8av3/mouth-timeline.jpg, onsets.jpg, dtw.json (clip audio vs reference -0.15..+0.05 s)",
+  "pause_closeup": "qa/gate-S8av3/pause-2.10-2.67.jpg (every frame 2.067-2.633 s, 30 fps CFR)",
+  "performance": "qa/gate-S8av3/face-performance.jpg, quarter-second-sheet.jpg",
+  "camera": "qa/region_drift.py on the left background 0,0,480,700: dx -0.6..+0.1 px over 5 s (a 2 % push would move it about -15 px); frame_drift scale +2-3 % is her lean toward the lens, not the camera",
+  "review_clips": "renders/review/S8av3-sealed-master-audio.mp4 (in 0.4667), renders/review/S8av3-slip2f-master-audio.mp4 (in 0.5333), both with the master song",
+  "onset_closeups": "qa/gate-S8av3/onset-0.67-1.03.jpg, pause-2.10-2.67.jpg, onset-3.27-3.63.jpg (every frame, 30 fps CFR, same mouth box)"
+ },
+ "required_findings": [
+  {
+   "requirement_id": "onsets",
+   "verdict": "FAIL",
+   "reason": "0.85 s (19.25 'didn't'): mouth closes from the open 'I' to the narrow 'di' shape at 0.767-0.833, about 1 frame early, on time. 3.50 s (21.90 'outside'): mouth already open, rounds by 3.567, on time. 2.33 s (20.73 'I just'): mouth is narrow 2.333-2.433 and opens again at 2.467-2.50, about +4 to +5 frames late (limit +-2)"
+  },
+  {
+   "requirement_id": "pause-20.57-20.73",
+   "verdict": "FAIL",
+   "reason": "the mouth stays wide open through clip 2.167-2.267 and only narrows at 2.30-2.333, then stays narrow into the sung 'I' until 2.433: the closure sits about 0.13 s after the reference pause"
+  },
+  {
+   "requirement_id": "performance",
+   "verdict": "PASS",
+   "reason": "eyes on the lens throughout; visible head tilts with the phrases (0.47, 1.0, 3.0 s); brows and eyes lift on the last long note (3.7-4.0 s); calm but clearly singing"
+  },
+  {
+   "requirement_id": "even-push",
+   "verdict": "PASS",
+   "reason": "no measurable acceleration: the background does not move at all, so the camera is effectively locked (the intended very slow push is absent; her lean makes the face grow slightly)"
+  },
+  {
+   "requirement_id": "identity-teeth-jaw",
+   "verdict": "PASS",
+   "reason": "same IRIS face, black hook on the left ear, thin red line on the left collar, charcoal high collar, slicked-back hair; teeth and jaw stable"
+  }
+ ],
+ "edit_note": "no single in-point meets +-2 frames: the clip's 'didn't' closure is about 1 frame early and its 'I just' opening about +4 to +5 frames late, so the two landmarks are about 5 frames apart relative to the reference. A slip of +2 frames (in-point 0.5333) gives about -3 frames (mouth early) on 'didn't' and +2 frames on 'I just'; mouth-early is the less noticeable direction. It changes the sealed mapping (clip 0 = master 18.40), so it is a user decision, not a pass",
+ "verdict": "FAIL",
+ "all_required_observed_pass": false,
+ "not_evaluated": [
+  "human 1.0x viewing with sound in the assembled film"
+ ],
+ "next": "stopped at the user's request ('记录文档然后停下'); options for the user: accept the slip edit, a bounded repair (1 allowed, about 165 credits; changing the reference audio needs a new preview approval), or keep S8a take 1",
+ "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

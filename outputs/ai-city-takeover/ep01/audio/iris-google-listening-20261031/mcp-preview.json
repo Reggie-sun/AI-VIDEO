@@ -1,0 +1,21 @@
+{
+  "schema_version": "audio-understanding-preview/1",
+  "preview": {
+    "operation": "audio_understand",
+    "provider": "gemini",
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    "model_id": "gemini-3.8-flash",
+    "source_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+    "source_size_bytes": 5760044,
+    "audio_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+    "audio_size_bytes": 5760044,
+    "duration_seconds": 30.0,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "0769a0cd79f929905f12e58576bfda57b5b686d7583154aa268fd01b7d869b3a"
+  },
+  "network_calls": 0,
+  "production_acceptance": "NOT_EVALUATED",
+  "media_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.wav",
+  "analysis_audio_derivation": "exact_pcm_wav",
+  "human_acceptance": "NOT_EVALUATED"
+}

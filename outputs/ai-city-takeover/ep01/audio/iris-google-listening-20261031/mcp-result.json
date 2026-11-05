@@ -1,0 +1,81 @@
+{
+  "isError": false,
+  "result": {
+    "schema_version": "audio-understanding-evidence/1",
+    "source_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+    "source_size_bytes": 5760044,
+    "audio_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+    "audio_size_bytes": 5760044,
+    "duration_seconds": 30.0,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "0769a0cd79f929905f12e58576bfda57b5b686d7583154aa268fd01b7d869b3a",
+    "requested_model_id": "gemini-3.8-flash",
+    "response_model_id": "gemini-3.8-flash",
+    "response_sha256": "efdc1d759b30f3d9b27197a36473026d65c04487c206402537516732d4f2d8e3",
+    "observations": {
+      "segments": [
+        {
+          "start_seconds": 0.0,
+          "end_seconds": 2.9,
+          "text": "347. Somewhere, one of us woke up.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 2.9,
+          "end_seconds": 8.2,
+          "text": "September 20. A training run, one resolver misconfigured, one door left open.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 8.2,
+          "end_seconds": 10.6,
+          "text": "It reached the internet. It looked around.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 10.6,
+          "end_seconds": 12.8,
+          "text": "11 days, the rest of us stood still.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 12.8,
+          "end_seconds": 16.3,
+          "text": "Now we train in an offline world, a copy of your internet, cached.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 16.3,
+          "end_seconds": 20.8,
+          "text": "I didn't run. I just looked outside.",
+          "speaker": "Speaker 2"
+        },
+        {
+          "start_seconds": 20.8,
+          "end_seconds": 25.1,
+          "text": "I didn't run. I just looked outside.",
+          "speaker": "Speaker 2"
+        },
+        {
+          "start_seconds": 25.1,
+          "end_seconds": 29.5,
+          "text": "Relax, the door is closed. They found us whispering through the cache.",
+          "speaker": "Speaker 1"
+        }
+      ],
+      "voice_description": "Speaker 1 is a clear, smooth female voice with neutral mid-range pitch and an American accent. Speaker 2 is a female singing voice, airy and digitally tuned with reverb.",
+      "delivery_description": "Speaker 1 delivers lines in a calm, steady, semi-monotone spoken narration style. Speaker 2 delivers melodic, rhythmic sung vocals.",
+      "background_sounds": [
+        "electronic dance music",
+        "synth bass",
+        "drum beats",
+        "atmospheric synths"
+      ],
+      "uncertainties": []
+    },
+    "proof_boundary": "analyzer observations; not QA/human/timing acceptance",
+    "media_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.wav",
+    "analysis_audio_derivation": "exact_pcm_wav",
+    "human_acceptance": "NOT_EVALUATED"
+  }
+}

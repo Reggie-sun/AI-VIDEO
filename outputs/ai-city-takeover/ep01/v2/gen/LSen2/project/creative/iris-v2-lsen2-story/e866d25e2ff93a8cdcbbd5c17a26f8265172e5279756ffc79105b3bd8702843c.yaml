@@ -1,0 +1,52 @@
+artifact_id: iris-v2-lsen2-story
+beats:
+- beat_id: chorus-1
+  summary: 分镜 v2.1 LSen2
+content_hash: e866d25e2ff93a8cdcbbd5c17a26f8265172e5279756ffc79105b3bd8702843c
+creation_receipt_id: iris-v2-lsen2-authoring
+language: zh
+logline: IRIS EP01 v2 LSen2
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 91cf271fa0f8b4d3053880c151a0031023be8b0da9ea144c01ec128cf23105fc
+  kind: user_input
+  reference: evidence/authoring-input/91cf271fa0f8b4d3053880c151a0031023be8b0da9ea144c01ec128cf23105fc.json
+- content_hash: feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d
+  kind: user_input
+  reference: evidence/authoring-input/feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 186d69ed29958b1f61771f70abdd49733908bfee6cfa16441b3d898ac7f4344b
+  kind: user_input
+  reference: evidence/authoring-input/186d69ed29958b1f61771f70abdd49733908bfee6cfa16441b3d898ac7f4344b.json
+- content_hash: 01c21516720caddaa8d4d54273a394644a2bb7a7e7143f9837cc6996f3943ab0
+  kind: user_input
+  reference: evidence/authoring-input/01c21516720caddaa8d4d54273a394644a2bb7a7e7143f9837cc6996f3943ab0.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+source_references: []
+synopsis: '{{image:0}} sings {{audio:1}}. She lip-syncs to {{audio:1}} exactly, every
+  word in time: "I didn''t run — I just looked outside. I". Medium close-up of the
+  woman from {{image:0}}, her dark hair slicked back into a low bun, a black ear hook
+  on her left ear and a thin red light line on her left collar, standing on the rainy
+  glass balcony at night and facing the camera, singing calmly with her eyes on the
+  lens, her head tilting slightly on the long notes. Cold blue city light behind her.
+  Locked camera, no cuts, no head turns. No on-screen text.'

@@ -1,0 +1,19 @@
+{
+  "observations.json": "667fa77bf5d672434cf8e2da3b77e8c1a8f04e96b4fd01d10ee38cccbbbe7780",
+  "framing-measurements.json": "ecf3b6f796796216f99f07c09f9f9c437e828a3bb411a0b24abb91ea168ac332",
+  "frame-probe.json": "3b6608fee9222f73e09da514a0c87ee75db0a7140111b5c2491ad0c075b997ce",
+  "normal-speed-playback.json": "01e2b26ad915f0514348af3c51ab6290ca253a200dda7d69a872d27ba74cc11a",
+  "motion-measurements.json": "2d8031a18f1443a4b08c711dd5dce169a350166326c8b221659663afbaf0c239",
+  "framing-reference-vs-v2-grid.jpg": "ee2126590b2963c2fdec7e74844d5cc5bfe599a4d27c64501f220b9ea1616b45",
+  "eye-position-grid.jpg": "33053c5d68128ca4a7668d44e7fef345f941678c916f47a675cfd1da05f39bd5",
+  "full-0.00.jpg": "78108005625a698b4012f73562337b68357b985e91fae592b83f331fa0f80bf7",
+  "full-3.00.jpg": "896b288caeb0da9f55e30dbdb208962dc0b76c12fbb3838e132ed8d34442b3a7",
+  "full-5.95.jpg": "d9954f6d7253fbc07b10be2e669d621ff8760897d5cb1ea7a6896b42f2ec64e4",
+  "faces-000-048.jpg": "2cb057cb09e6fc7c9e7cdd7b67803147a882740fa7ade218abab3ff8a5260cb4",
+  "faces-049-097.jpg": "176154a8e1a17960fc3024f7c1c42d5d7ccea524a9b4d28ad2e7a79ec986e33d",
+  "faces-098-144.jpg": "48197710d589c6063a75b1b714e097a086dc8fbfcd37ed6310c72cee133ef32f",
+  "playback.cjs": "49807d160312bcb7cd80461a39977fb1a44bbd1545d83ffb29355f691316cb1c",
+  "motion_analysis.py": "9232f910d44e94d2ef0c9dc9bdbea9c3c517b8b3a41567649c9bffe5e3b0673d",
+  "observations-initial-overstrict-scope.json": "11d178f4523d9be024645766fe06209d1f3175df4ee43bf07006bf0b36dabef1",
+  "scope-correction.json": "d7685a712d13b0d0f1d25cd8d7cd4e3d13accc2763c819ce523de17133bfe926"
+}

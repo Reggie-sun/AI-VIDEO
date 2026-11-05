@@ -1,0 +1,48 @@
+{
+  "artifact_id": "iris-v2-s8b2-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "fcb6a9825c63691a8957b746071e0250128e577681bcdb7982fe647d532b3788",
+  "creation_receipt_id": "iris-v2-S8b2-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c52e416520b5fec0339215f04a6d3d5c7fc380395fc5a8d02cf1aa790e0bdb72.json",
+      "content_hash": "c52e416520b5fec0339215f04a6d3d5c7fc380395fc5a8d02cf1aa790e0bdb72"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json",
+      "content_hash": "ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/2314d4808e0ff49fec0938988861065a01f76af1e200f2e84ec0da3c2a8a749d.json",
+      "content_hash": "2314d4808e0ff49fec0938988861065a01f76af1e200f2e84ec0da3c2a8a749d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/26a3be6bc47866929e669b8aef8a138725243eeff166464900afda0d71a0c14b.json",
+      "content_hash": "26a3be6bc47866929e669b8aef8a138725243eeff166464900afda0d71a0c14b"
+    }
+  ],
+  "scene_id": "balcony",
+  "location": "雨夜高层建筑的玻璃阳台",
+  "time": "凌晨",
+  "mood": "冷静、克制",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左领红光位置一致",
+    "蓝黑/钢蓝，红为唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v2-s8b-balcony"
+  ]
+}

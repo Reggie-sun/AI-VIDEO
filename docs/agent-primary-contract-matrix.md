@@ -321,6 +321,7 @@ receipt中的V1 map必须为identity，layer不得携带retime map，voice_sourc
 `_composition_visual`按exact admission限制音轨，resolver产生`development_audio_preview`，
 HyperFrames消费同一时间线混音；所有非Production scope与captured bytes仍由原activation fence拒绝。
 此扩展不改变旧`/2,/3`行为，不资格化失败素材，不推进原Shot barrier或Final Acceptance。
+`development-qualification-preview/2` 在原正常速度 `replacement_audio_preview` 上显式封存 `captioned_music`：唯一 global MUSIC/BGM 音轨、exact 音讯 SHA 与样本裁切，以及每条字幕的 asset ID、bytes SHA、script/transcript hashes。外部歌曲保留真实 IMPORTED/GENERATED 来源，record 与 audio metadata 的 kind、tool、input fingerprint 必须一致，不冒充原片 DIALOGUE。reader 仅对匹配该已验证 receipt 的歌曲字幕接纳无 voice script 的 MUSIC，其他 BGM/SFX 与旧 speech script 检查保持；所有参与捕获须同一歌曲和字幕 binding。resolver 要求实际选用这些 `/2` 视觉、字幕精确绑定封存音轨，并保持歌曲完整覆盖成片样本窗口；沿原 P4 CaptionTrack 核验字词、trim、style，由唯一 ResolvedTimeline 产生 `development_audio_preview`，不建立新时钟或绕过 activation fence。此契约仅证明明确选定的歌曲和字幕身份，不证明听写、对嘴、真人观感或 Production 验收。
 `video_cleanup_contracts.py` / `video_cleanup_pixels.py` 独占显式逐帧clean-plate recipe、仿射采样、羽化与foreground保护；
 `video_cleanup_media.py`只用注入的本地工具准备同帧数/PTS的lossless RGB派生源，重解码验证像素并比较原声PCM/时间。
 它不拥有剪辑顺序、trim/speed或最终renderer；无自动tracking/生成填补。

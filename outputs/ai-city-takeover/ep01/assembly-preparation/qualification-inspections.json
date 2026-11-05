@@ -1,0 +1,42 @@
+[
+  {
+    "source_key": "a01-v2",
+    "asset_id": "iris-assembly-a01-v2",
+    "source_path": "outputs/ai-city-takeover/ep01/a01-first-frame-repair/project/state/video-generation/fetch/files/850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c.mp4",
+    "sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+    "size_bytes": 15395561,
+    "destination": "assets/files/850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c.mp4",
+    "receipt_path": "evidence/authoring-input/d749dca791cfa3eddaa3f733600260301f25242e74fdccdfc74dbe911694ae93.json",
+    "receipt_sha256": "31cafca693734686f3296325297b7e2ab0ead584dd272c1e576fe115e983bdb5",
+    "required_admission": "prepare_qualification_preview_input",
+    "probe_receipt_path": "probe-receipts/a01-v2.json",
+    "probe_admission_path": "probe-admission/a01-v2.json",
+    "gate_verdict": "PASS",
+    "measurement_scope": "development_preview_measurement_only",
+    "measurement_scope_path": "development-measurements/a01-v2.json",
+    "source_native_frame_count": 145,
+    "preview_trim_guard": "trim_start_frame + trim_duration_frames <= source_native_frame_count",
+    "ordinary_production_30fps_compatible": false,
+    "candidate_only": true
+  },
+  {
+    "source_key": "c",
+    "asset_id": "iris-assembly-c",
+    "source_path": "outputs/ai-city-takeover/ep01/generation-c-draft/project/state/video-generation/fetch/files/974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15.mp4",
+    "sha256": "974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15",
+    "size_bytes": 12706989,
+    "destination": "assets/files/974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15.mp4",
+    "receipt_path": "evidence/authoring-input/427ceb08502745da93050748f5a3e4487dcf478d6617f90645c2daa7e6ccba8e.json",
+    "receipt_sha256": "c06529600241c061edbc8cd92aeef0fa256319bc224f0bda09761326de113d0d",
+    "required_admission": "prepare_qualification_preview_input",
+    "probe_receipt_path": "probe-receipts/c.json",
+    "probe_admission_path": "probe-admission/c.json",
+    "gate_verdict": "PASS",
+    "measurement_scope": "development_preview_measurement_only",
+    "measurement_scope_path": "development-measurements/c.json",
+    "source_native_frame_count": 145,
+    "preview_trim_guard": "trim_start_frame + trim_duration_frames <= source_native_frame_count",
+    "ordinary_production_30fps_compatible": false,
+    "candidate_only": true
+  }
+]

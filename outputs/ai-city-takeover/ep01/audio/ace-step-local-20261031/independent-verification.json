@@ -1,0 +1,24 @@
+{
+  "reviewer_surface": "Codex native verifier read-only result",
+  "evaluator_kind": "explicit_evaluator",
+  "captured_at_utc": "2026-10-31T03:15:08.418671+00:00",
+  "artifact_sha256": [
+    "1f7f567a439384a25a7491ce42cf281027326b3501f4852018deb3dad3c86e19",
+    "ab0000749101d9cc9d85526683b760ae1d2e20b5dad455ac2eb67c8c0d509b06"
+  ],
+  "summary_sha256": "a3e6bde95b2e550a2fc13741d18e506ab8d0737745ac32f3273fad664959d7a5",
+  "checks": {
+    "audio_artifacts": "PASS independent ffprobe/full-decode/PCM check",
+    "intent_consume_result_binding": "PASS",
+    "original_brief_hash_and_words": "PASS",
+    "preserved_main_index": "PASS",
+    "playable_sources_and_mp3_hashes": "PASS",
+    "asr_bindings_and_reported_rates": "PASS",
+    "actual_local_generation_count": 2,
+    "human_listening": "NOT_EVALUATED",
+    "complete_lyric_acceptance": "NOT_EVALUATED",
+    "history_network_audit": "NOT_EVALUATED",
+    "general_recovery_contract": "NOT_CLAIMED; bounded experimental runner snapshots only"
+  },
+  "supports": "Two actual playable30s local candidates with unchanged original lyric inputs; no full-song/human-quality acceptance claim"
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "iris-listening-scope/1",
+  "authorization_reference": "user-20261031-iris-google-env-listening",
+  "user_quote": "我记得google有key，.env",
+  "source_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+  "purpose": "Blind actual-audio observation, then compare music and voice to the existing song brief",
+  "submit_limit": 1,
+  "operator_upper_bound_USD": 0.05,
+  "upper_bound_is_price_or_settlement": false,
+  "key_route": "Existing injected dotenv-first exact supplier; no values exposed",
+  "media_generation": false,
+  "ACE_generation_count_unchanged": 10,
+  "new_music_generation_or_Product_state_writes": 0,
+  "UNKNOWN": "STOP and inspect existing outcome, no replay or remint",
+  "actual_cost": "Pending settlement, not established by internal ceiling",
+  "host_direct_audio_hearing": "UNAVAILABLE; Gemini model observations will be attributed"
+}

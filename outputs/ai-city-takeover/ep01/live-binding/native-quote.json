@@ -1,0 +1,48 @@
+{
+  "action": {
+    "scene": "video.generate",
+    "source": "canvas_generation",
+    "options": {
+      "model": "seedance_2.0_vip",
+      "resolution": "1080p",
+      "durationSeconds": 6,
+      "outputCount": 1,
+      "videoMode": "multi_modal",
+      "hasInputVideo": false,
+      "isLongVideo": false,
+      "materialTypes": [
+        "image"
+      ]
+    }
+  },
+  "quote": {
+    "status": "available",
+    "credits": 198,
+    "items": [
+      {
+        "id": "iris-ep01-a01-preview",
+        "credits": 198,
+        "outputs": [
+          {
+            "index": 0,
+            "credits": 198
+          }
+        ]
+      }
+    ]
+  },
+  "state": {
+    "status": "allowed",
+    "activation": "execute",
+    "quote": {
+      "credits": 198,
+      "priceDisplayStatus": "available",
+      "isFree": false,
+      "requiredVipLevel": "standard",
+      "policyVersion": "1"
+    }
+  },
+  "balance": 68189,
+  "observed_at": "2026-10-30T22:29:53.439Z",
+  "generation_POSTs": 0
+}

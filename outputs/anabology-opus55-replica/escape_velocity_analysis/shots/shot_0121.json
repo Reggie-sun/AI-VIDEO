@@ -1,0 +1,1544 @@
+{
+  "shot_id": "S0121",
+  "start_frame": 5568,
+  "end_frame": 5631,
+  "start_time": 232.0,
+  "end_time": 234.6667,
+  "duration_frames": 64,
+  "duration_s": 2.6667,
+  "start_tc": "00:03:52:00",
+  "end_tc": "00:03:54:15",
+  "boundary_in_id": "B3-026",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5568,
+      "path": "keyframes/S0121_f05568.jpg",
+      "role": "first",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5584,
+      "path": "keyframes/S0121_f05584.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5600,
+      "path": "keyframes/S0121_f05600.jpg",
+      "role": "middle",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5616,
+      "path": "keyframes/S0121_f05616.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5631,
+      "path": "keyframes/S0121_f05631.jpg",
+      "role": "last",
+      "note": "Actually opened individually during detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Woman walking right with black-and-white dog",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "6 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Woman walking right with black-and-white dog. Full body side-profile on seamless white; black boots, white sleeves, pleated skirt, dog trotting close behind calves. ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Woman walking right with black-and-white dog",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Woman walking right with black-and-white dog",
+      "background": "Full body side-profile on seamless white; black boots, white sleeves, pleated skirt, dog trotting close behind calves."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0121.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0055,
+      "pan_y_frac_per_s": -0.0014,
+      "zoom_per_s": -0.0107,
+      "median_flow_frac_per_s": 0.0103,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Full body side-profile on seamless white; black boots, white sleeves, pleated skirt, dog trotting close behind calves.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E8E8E8",
+        "fraction": 0.655,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#D1D0D0",
+        "fraction": 0.154,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#0C0F0B",
+        "fraction": 0.064,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#43403D",
+        "fraction": 0.043,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#A9A5A3",
+        "fraction": 0.043,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#7F7267",
+        "fraction": 0.041,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [204.9, 195.5, 192.1]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 07 /11",
+      "evidence_frame": 5599,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5599
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5599,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:52:00",
+      "end_value": "00:03:54:15"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5599
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0121-E01",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Full body side-profile on seamless white; black boots, white sleeves, pleated skirt, dog trotting close behind calves.",
+      "start_frame": 5568,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5568, 5571]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5628, 5631]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5631
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E02",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "character",
+      "description": "Woman walking right with black-and-white dog",
+      "start_frame": 5568,
+      "end_frame": 5631,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5568, 5571]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5628, 5631]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5631
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E03",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "character",
+      "description": "Black-and-white small dog walking beside model",
+      "start_frame": 5572,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.66,
+        "w": 0.3,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5572, 5575]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5628, 5631]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5572,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5572,
+        5631
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5572,
+          5575
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E04",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "PHAGES. / ENZYMES. / KIDNEYS. / GOOD / BOYS.",
+      "start_frame": 5568,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.12,
+        "w": 0.48,
+        "h": 0.15,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5568, 5571]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5628, 5631]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "text": "PHAGES.",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5574,
+          "text": "ENZYMES.",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5594,
+          "text": "KIDNEYS.",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5612,
+          "text": "GOOD",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5616,
+          "text": "BOYS.",
+          "inverted_backing_flash": true
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5631
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "PHAGES. → ENZYMES. → KIDNEYS. → GOOD → BOYS.",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E05",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "Card-stack container; render individual PHAGE/ENZYME/KIDNEY/GOOD BOY child records below, not an extra visible overlay.",
+      "start_frame": 5568,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.76,
+        "y": 0.2,
+        "w": 0.19,
+        "h": 0.64,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5568, 5571]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5628, 5631]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5631
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "is_group_container": true,
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E06",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_bracket",
+      "description": "Separate tracking brackets around woman and dog",
+      "start_frame": 5568,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.23,
+        "y": 0.13,
+        "w": 0.38,
+        "h": 0.78,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5568, 5571]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5628, 5631]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5631
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E07",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "SPECIMEN03/05 ENZYME·ART: 200,000+ REVERSE TRANSCRIPTASES;3500CANDIDATES;20TOP; ~950CLAUDES;21H; FUNCTION STILL UNKNOWN",
+      "start_frame": 5574,
+      "end_frame": 5611,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.28,
+        "w": 0.2,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5574,
+          "position": "top",
+          "bars_visible": 1
+        },
+        {
+          "frame": 5580,
+          "position": "top",
+          "bars_visible": 2
+        },
+        {
+          "frame": 5583,
+          "position": "top",
+          "bars_visible": 3
+        },
+        {
+          "frame": 5586,
+          "bars_visible": 4,
+          "last_label": "1ART"
+        },
+        {
+          "frame": 5594,
+          "position": "bottom"
+        },
+        {
+          "frame": 5611,
+          "state": "last bottom frame"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5574,
+        5611
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5574,
+          5577
+        ],
+        "exit_bounds": [
+          5608,
+          5611
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E08",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "SPECIMEN04/05 KIDNEY: PIG→HUMAN;169→271DAYS; DONOR GENE-EDITED PIG; BRIDGE271DAYS; THEN HUMAN KIDNEY",
+      "start_frame": 5594,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.28,
+        "w": 0.2,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5595,
+          "position": "top",
+          "days": 38
+        },
+        {
+          "frame": 5598,
+          "position": "top",
+          "days": 125
+        },
+        {
+          "frame": 5601,
+          "days": 188
+        },
+        {
+          "frame": 5607,
+          "days": 254
+        },
+        {
+          "frame": 5612,
+          "position": "bottom",
+          "days": 270
+        },
+        {
+          "frame": 5616,
+          "position": "bottom",
+          "days": 271
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5594,
+        5631
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5594,
+          5597
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E09",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "SPECIMEN05/05 GOOD BOY: efficacy checked; safety pending; MFG pending; FDA APPROVAL—; DRUG LOY-002; FOR LIFESPAN·DOGS; NOT APPROVED(YET)",
+      "start_frame": 5612,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.28,
+        "w": 0.2,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5612,
+          "state": "GOOD BOY header"
+        },
+        {
+          "frame": 5616,
+          "state": "EFFICACY checked"
+        },
+        {
+          "frame": 5619,
+          "state": "SAFETY pending"
+        },
+        {
+          "frame": 5622,
+          "state": "MFG pending / FDA APPROVAL dash"
+        },
+        {
+          "frame": 5625,
+          "state": "NEARLY APPROVED stamp"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5612,
+        5631
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5612,
+          5615
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E10",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "sticker",
+      "description": "NEARLY APPROVED",
+      "start_frame": 5624,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.81,
+        "y": 0.46,
+        "w": 0.13,
+        "h": 0.06,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5624,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5624,
+        5631
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5624,
+          5627
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E11",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_bracket",
+      "description": "Dog box and GOOD BOY ·0.99 label",
+      "start_frame": 5612,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.1,
+        "y": 0.62,
+        "w": 0.25,
+        "h": 0.29,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5612,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5612,
+        5631
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5612,
+          5615
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E12",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "text_caption",
+      "description": "Lean proofs. Phages. Enzymes. Kidneys. Good boys.",
+      "start_frame": 5568,
+      "end_frame": 5631,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.89,
+        "w": 0.48,
+        "h": 0.04,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "state": "present"
+        },
+        {
+          "frame": 5631,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5631
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Lean proofs. Phages. Enzymes. Kidneys. Good boys.",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5628,
+          5631
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E13",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "PHAGE card, cube capsid/tail/legs and GENOME LM/VIABLE16/AI-DESIGNED footer",
+      "start_frame": 5568,
+      "end_frame": 5593,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.28,
+        "w": 0.2,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "state": "present"
+        },
+        {
+          "frame": 5593,
+          "state": "last before replacement"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5593
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5590,
+          5593
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0121-E14",
+      "shot_id": "S0121",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "LEAN PROOF bottom card inherited from preceding shot",
+      "start_frame": 5568,
+      "end_frame": 5573,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.28,
+        "w": 0.2,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5568,
+          "state": "present"
+        },
+        {
+          "frame": 5573,
+          "state": "last before replacement"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5568,
+        5573
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5568,
+          5571
+        ],
+        "exit_bounds": [
+          5570,
+          5573
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0121-A01",
+      "target_element_ids": [
+        "S0121-E02",
+        "S0121-E03",
+        "S0121-E04",
+        "S0121-E05",
+        "S0121-E06"
+      ],
+      "description": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+      "start_frame": 5568,
+      "end_frame": 5631,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0224",
+        "D0225",
+        "D0226",
+        "D0227",
+        "D0228",
+        "D0229",
+        "D0230",
+        "D0231",
+        "D0232"
+      ],
+      "frame_range": [
+        5573,
+        5629
+      ],
+      "type": "text_swap",
+      "description": "PHAGES -> ENZYMES -> KIDNEYS -> GOOD -> BOYS captions and side panels over the walking-with-dog shot (subject walks continuously).",
+      "confidence": 0.85,
+      "chunk": 3,
+      "verification": "Consistent at filmstrip resolution; candidate span from Phase A, not independently frame-exact verified"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-026",
+      "span": [
+        5568,
+        5568
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-027",
+      "span": [
+        5631,
+        5631
+      ],
+      "description": "ENZYMES f5576, KIDNEYS f5595, GOOD f5612, BOYS f5617; dog and legs move continuously",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0357",
+      "relation": "vocal_word_candidate (unknown) at frame 5551–5568; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5568
+    },
+    {
+      "audio_event_id": "AH02321",
+      "relation": "band_onset_candidate (unknown) at frame 5568; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5568
+    },
+    {
+      "audio_event_id": "AH02322",
+      "relation": "band_onset_candidate (unknown) at frame 5568; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5568
+    },
+    {
+      "audio_event_id": "AB0514",
+      "relation": "beat_candidate (unknown) at frame 5568; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5568
+    },
+    {
+      "audio_event_id": "AH02323",
+      "relation": "band_onset_candidate (unknown) at frame 5568; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5568
+    },
+    {
+      "audio_event_id": "AH02324",
+      "relation": "band_onset_candidate (unknown) at frame 5569; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5569
+    },
+    {
+      "audio_event_id": "AH02325",
+      "relation": "band_onset_candidate (unknown) at frame 5573; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5573
+    },
+    {
+      "audio_event_id": "AH02326",
+      "relation": "band_onset_candidate (unknown) at frame 5574; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5574
+    },
+    {
+      "audio_event_id": "AW0358",
+      "relation": "vocal_word_candidate (unknown) at frame 5574–5595; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5574
+    },
+    {
+      "audio_event_id": "AB0515",
+      "relation": "beat_candidate (unknown) at frame 5579; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5579
+    },
+    {
+      "audio_event_id": "AH02327",
+      "relation": "band_onset_candidate (unknown) at frame 5579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5579
+    },
+    {
+      "audio_event_id": "AH02328",
+      "relation": "band_onset_candidate (unknown) at frame 5579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5579
+    },
+    {
+      "audio_event_id": "AH02329",
+      "relation": "band_onset_candidate (unknown) at frame 5579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5579
+    },
+    {
+      "audio_event_id": "AH02330",
+      "relation": "band_onset_candidate (unknown) at frame 5579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5579
+    },
+    {
+      "audio_event_id": "AH02331",
+      "relation": "band_onset_candidate (unknown) at frame 5579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5579
+    },
+    {
+      "audio_event_id": "AH02332",
+      "relation": "band_onset_candidate (unknown) at frame 5584; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5584
+    },
+    {
+      "audio_event_id": "AH02333",
+      "relation": "band_onset_candidate (unknown) at frame 5584; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5584
+    },
+    {
+      "audio_event_id": "AH02334",
+      "relation": "band_onset_candidate (unknown) at frame 5589; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5589
+    },
+    {
+      "audio_event_id": "AH02335",
+      "relation": "band_onset_candidate (unknown) at frame 5589; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5589
+    },
+    {
+      "audio_event_id": "AH02336",
+      "relation": "band_onset_candidate (unknown) at frame 5589; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5589
+    },
+    {
+      "audio_event_id": "AB0516",
+      "relation": "beat_candidate (unknown) at frame 5590; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5590
+    },
+    {
+      "audio_event_id": "AH02337",
+      "relation": "band_onset_candidate (unknown) at frame 5590; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5590
+    },
+    {
+      "audio_event_id": "AH02338",
+      "relation": "band_onset_candidate (unknown) at frame 5590; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5590
+    },
+    {
+      "audio_event_id": "AW0359",
+      "relation": "vocal_word_candidate (unknown) at frame 5595–5609; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5595
+    },
+    {
+      "audio_event_id": "AH02339",
+      "relation": "band_onset_candidate (unknown) at frame 5595; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5595
+    },
+    {
+      "audio_event_id": "AH02340",
+      "relation": "band_onset_candidate (unknown) at frame 5595; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5595
+    },
+    {
+      "audio_event_id": "AH02341",
+      "relation": "band_onset_candidate (unknown) at frame 5595; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5595
+    },
+    {
+      "audio_event_id": "AB0517",
+      "relation": "beat_candidate (unknown) at frame 5600; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5600
+    },
+    {
+      "audio_event_id": "AH02342",
+      "relation": "band_onset_candidate (unknown) at frame 5600; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5600
+    },
+    {
+      "audio_event_id": "AH02343",
+      "relation": "band_onset_candidate (unknown) at frame 5600; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5600
+    },
+    {
+      "audio_event_id": "AH02344",
+      "relation": "band_onset_candidate (unknown) at frame 5600; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5600
+    },
+    {
+      "audio_event_id": "AH02345",
+      "relation": "band_onset_candidate (unknown) at frame 5600; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5600
+    },
+    {
+      "audio_event_id": "AH02346",
+      "relation": "band_onset_candidate (unknown) at frame 5601; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5601
+    },
+    {
+      "audio_event_id": "AH02347",
+      "relation": "band_onset_candidate (unknown) at frame 5606; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5606
+    },
+    {
+      "audio_event_id": "AH02348",
+      "relation": "band_onset_candidate (unknown) at frame 5606; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5606
+    },
+    {
+      "audio_event_id": "AH02349",
+      "relation": "band_onset_candidate (unknown) at frame 5606; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5606
+    },
+    {
+      "audio_event_id": "AH02350",
+      "relation": "band_onset_candidate (unknown) at frame 5611; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5611
+    },
+    {
+      "audio_event_id": "AH02351",
+      "relation": "band_onset_candidate (unknown) at frame 5611; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5611
+    },
+    {
+      "audio_event_id": "AB0518",
+      "relation": "beat_candidate (unknown) at frame 5611; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5611
+    },
+    {
+      "audio_event_id": "AH02352",
+      "relation": "band_onset_candidate (unknown) at frame 5611; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5611
+    },
+    {
+      "audio_event_id": "AW0360",
+      "relation": "vocal_word_candidate (unknown) at frame 5611–5613; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5611
+    },
+    {
+      "audio_event_id": "AH02353",
+      "relation": "band_onset_candidate (unknown) at frame 5611; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5611
+    },
+    {
+      "audio_event_id": "AH02354",
+      "relation": "band_onset_candidate (unknown) at frame 5612; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5612
+    },
+    {
+      "audio_event_id": "AW0361",
+      "relation": "vocal_word_candidate (unknown) at frame 5616–5630; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5616
+    },
+    {
+      "audio_event_id": "AH02355",
+      "relation": "band_onset_candidate (unknown) at frame 5616; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5616
+    },
+    {
+      "audio_event_id": "AH02356",
+      "relation": "band_onset_candidate (unknown) at frame 5617; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5617
+    },
+    {
+      "audio_event_id": "AH02357",
+      "relation": "band_onset_candidate (unknown) at frame 5622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5622
+    },
+    {
+      "audio_event_id": "AH02358",
+      "relation": "band_onset_candidate (unknown) at frame 5622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5622
+    },
+    {
+      "audio_event_id": "AH02359",
+      "relation": "band_onset_candidate (unknown) at frame 5622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5622
+    },
+    {
+      "audio_event_id": "AB0519",
+      "relation": "beat_candidate (unknown) at frame 5622; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5622
+    },
+    {
+      "audio_event_id": "AH02360",
+      "relation": "band_onset_candidate (unknown) at frame 5622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5622
+    },
+    {
+      "audio_event_id": "AH02361",
+      "relation": "band_onset_candidate (unknown) at frame 5622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5622
+    },
+    {
+      "audio_event_id": "AH02362",
+      "relation": "band_onset_candidate (unknown) at frame 5627; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5627
+    },
+    {
+      "audio_event_id": "AH02363",
+      "relation": "band_onset_candidate (unknown) at frame 5627; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5627
+    },
+    {
+      "audio_event_id": "AH02364",
+      "relation": "band_onset_candidate (unknown) at frame 5628; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5628
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0121.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original shader, font and easing coefficients unknown.",
+    "Microtext repeats are recorded as a texture family with exact readable tokens, not original authored per-row source code."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0121.jpg",
+      "keyframes/S0121_f05568.jpg",
+      "keyframes/S0121_f05584.jpg",
+      "keyframes/S0121_f05600.jpg",
+      "keyframes/S0121_f05616.jpg",
+      "keyframes/S0121_f05631.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "frames_actually_opened": [
+      5568,
+      5584,
+      5600,
+      5616,
+      5631
+    ],
+    "filmstrip_opened": true,
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "All five 960px keyframes opened individually; selected source-detail crops and per-frame headline sheets inspected.",
+    "detail_crops": [
+      "work/full_codex_103_153/detail5631.png"
+    ],
+    "dense_sheets": [
+      "work/full_codex_103_153/boys121.jpg",
+      "work/full_codex_103_153/cards121.jpg"
+    ],
+    "fullres_frames_actually_opened": [
+      5599
+    ],
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

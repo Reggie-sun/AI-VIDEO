@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 成片 c9（與 c1 並排）</title>
+<style>
+ :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; --ok:#9fd3a8; }
+ body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK TC","Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+ h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:18px; font-weight:600; margin:28px 0 8px; }
+ .dim { color:var(--dim); font-size:13px; } .row { display:flex; gap:12px; flex-wrap:wrap; } figure { margin:8px 0; }
+ video { width:min(900px,45vw); background:#000; display:block; } figcaption { color:var(--dim); font-size:13px; }
+ table { border-collapse:collapse; width:100%; max-width:1600px; } td, th { border-bottom:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top; }
+ th { color:var(--dim); font-weight:500; } .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 16px; max-width:1580px; }
+ td.up { color:#ffb35c; } td.down { color:#8fc3ff; } td.same { color:var(--dim); } button { font-size:15px; padding:6px 14px; margin:6px 8px 0 0; }
+ img { max-width:1600px; width:100%; border:1px solid var(--line); }
+</style>
+<h1>IRIS 01 · Looked Outside — 成片 c9（待你審看）</h1>
+<div class="dim">1920×1080 · 30fps · 30.5 s · 整合響度 −14.2 LUFS、峰值 −1.0 dBFS · 交付檔 <code>renders/IRIS-EP01-Looked-Outside-v2-c9.mp4</code>（SHA e73a8eb6c385…）</div>
+<h2>c8 與 c9 並排（左 c8、右 c9；聲音是 c9）</h2>
+<video controls preload="auto" src="../renders/review/c8-vs-c9.mp4" style="width:min(1600px,96vw)"></video>
+<h2>副歌片段 17.5–26.5 s（正常速度、有聲）</h2>
+<video controls preload="auto" src="../renders/review/c9-chorus-17.5-26.5.mp4" style="width:min(1600px,96vw)"></video>
+<h2>c9 成片（正常速度、有聲）</h2>
+<video controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c9.mp4" style="width:min(1600px,96vw)"></video>
+<h2>c1 與 c9 並排</h2>
+<div><button onclick="both('play')">兩支一起從頭播</button><button onclick="both('pause')">暫停</button><span class="dim">（聲音來自右邊的 c9；兩支用同一首歌，左邊靜音）</span></div>
+<div class="row">
+ <figure><video id="v1" muted controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c1.mp4"></video><figcaption>c1（你較滿意節奏的那一版）</figcaption></figure>
+ <figure><video id="v3" controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c9.mp4"></video><figcaption>c9</figcaption></figure>
+</div>
+<div class="dim">也可以看合成好的並排檔 <code>renders/review/c1-vs-c9.mp4</code>（左 c1、右 c9，各 960×540，聲音是 c9）：</div>
+<video controls preload="metadata" src="../renders/review/c1-vs-c9.mp4" style="width:min(1600px,96vw)"></video>
+<script>
+const a = document.getElementById('v1'), b = document.getElementById('v3');
+function both(k) { if (k === 'play') { a.currentTime = 0; b.currentTime = 0; a.play(); b.play(); } else { a.pause(); b.pause(); } }
+b.addEventListener('seeked', () => { if (Math.abs(a.currentTime - b.currentTime) > 0.05) a.currentTime = b.currentTime; });
+b.addEventListener('pause', () => a.pause()); b.addEventListener('play', () => { a.currentTime = b.currentTime; a.play(); });
+</script>
+
+<h2>這版改了什麼（相對你剛看的 c8）</h2>
+<div class="box"><ul><li><b>系列的畫框</b>：每一鏡都包在同一個 HUD 框裡：四角框線和四邊中央的小刻度。這是同系列 T01 的畫框，作者的密度規則也要求每鏡都有。框線縮到離邊 18 px，避開左上角的「AI生成」標識；比 T01 稍微清楚一點（線寬 1.5、透明度 0.42），因為 IRIS 的畫面顆粒比較重，1 px 會看不見。</li><li><b>剪點的印刷轉場</b>：每個剪點落下時，有 3 格的半色調和套印錯位遞減，把鏡頭和鏡頭黏起來（規格裡的「抖動轉場」）。沒有閃白。</li><li><b>不加任何字</b>：這兩樣都是純圖形。</li><li><b>其他</b>：和 c8 相同。花費 0。</li></ul></div>
+
+<h2>節奏：每小節畫面動態（c1 對 c9）</h2>
+<div class="dim">畫面動態＝qa.py 每小節平均幀差（192×108 灰階，含剪點）；音樂＝母帶每小節 RMS · 中頻包絡（副歌約 0.35、其他約 0.18）。橘色＝c9 比 c1 動，藍色＝比 c1 靜。</div>
+<table><tr><th>小節</th><th>時間 (s)</th><th>段落</th><th>音樂</th><th>c1</th><th>c9</th><th>差</th><th>為什麼</th></tr><tr><td>1</td><td>0.04–1.92</td><td>開場</td><td>-12.8 dB · 0.17</td><td>0.91</td><td>1.98</td><td class=up>+1.08</td><td>S1v3 開頭有一道車燈光掃過下臉頰（0.1–0.8 s），同 c3/c4</td></tr><tr><td>2</td><td>1.92–3.82</td><td>開場</td><td>-14.0 dB · 0.18</td><td>1.99</td><td>3.34</td><td class=up>+1.35</td><td>睜眼；2.87 s 切到 P7 靜圖（c4 這裡是 A01-v2 影片）</td></tr><tr><td>3</td><td>3.82–5.72</td><td>主歌</td><td>-12.9 dB · 0.18</td><td>2.96</td><td>2.74</td><td class=down>-0.21</td><td>S2 靜圖緩推；4.8 s 接 S3，同 c1</td></tr><tr><td>4</td><td>5.72–7.63</td><td>主歌</td><td>-13.0 dB · 0.19</td><td>3.02</td><td>3.02</td><td class=same>-0.00</td><td>同 c1</td></tr><tr><td>5</td><td>7.63–9.53</td><td>主歌</td><td>-14.1 dB · 0.17</td><td>1.84</td><td>1.92</td><td class=same>+0.08</td><td>同 c1</td></tr><tr><td>6</td><td>9.53–11.44</td><td>主歌</td><td>-13.2 dB · 0.18</td><td>2.13</td><td>2.10</td><td class=same>-0.03</td><td>同 c1</td></tr><tr><td>7</td><td>11.44–13.35</td><td>主歌</td><td>-13.4 dB · 0.18</td><td>1.94</td><td>1.92</td><td class=same>-0.02</td><td>S5 改成 K5b 靜圖（c4 是 S5v3 影片）</td></tr><tr><td>8</td><td>13.35–15.26</td><td>主歌</td><td>-14.1 dB · 0.18</td><td>3.11</td><td>2.29</td><td class=down>-0.82</td><td>S7v3，同 c3/c4</td></tr><tr><td>9</td><td>15.26–17.16</td><td>主歌</td><td>-14.0 dB · 0.17</td><td>5.79</td><td>1.71</td><td class=down>-4.09</td><td>同上</td></tr><tr><td>10</td><td>17.16–19.06</td><td>主歌</td><td>-14.2 dB · 0.22</td><td>3.39</td><td>2.80</td><td class=down>-0.58</td><td>S7v3 結尾看鏡頭；19.03 s impact 的第一幀落在這小節尾</td></tr><tr><td>11</td><td>19.06–20.98</td><td>副歌</td><td>-14.2 dB · 0.36</td><td>0.84</td><td>3.29</td><td class=up>+2.45</td><td>副歌：數字人 OH-B 唱＋識別框＋進入 impact＋punch</td></tr><tr><td>12</td><td>20.98–22.87</td><td>副歌</td><td>-15.1 dB · 0.38</td><td>1.78</td><td>2.70</td><td class=up>+0.92</td><td>副歌：OH-B 唱「I just looked outside」（不再有探針）</td></tr><tr><td>13</td><td>22.87–24.78</td><td>副歌</td><td>-14.4 dB · 0.38</td><td>0.84</td><td>2.33</td><td class=up>+1.49</td><td>副歌：窗前 K5＋識別框＋punch</td></tr><tr><td>14</td><td>24.78–26.68</td><td>副歌</td><td>-14.3 dB · 0.34</td><td>1.63</td><td>3.81</td><td class=up>+2.18</td><td>副歌：K5b 近景，遠窗亮起，25.9 s 接 S9a</td></tr><tr><td>15</td><td>26.68–28.58</td><td>尾段</td><td>-13.4 dB · 0.20</td><td>1.71</td><td>1.83</td><td class=same>+0.12</td><td>同 c1</td></tr><tr><td>16</td><td>28.58–30.48</td><td>尾段</td><td>-13.3 dB · 0.16</td><td>1.80</td><td>1.80</td><td class=same>-0.00</td><td>同 c1</td></tr></table>
+
+<h2>QA（motion-kit/tools/qa.py）</h2>
+<div class="box"><ul>
+ <li>剪點 11/11 在預期幀；圖形與動效時機 13/13 在 ±1 幀內（副歌 impact 依設計早一幀）。</li>
+ <li>閃爍每秒最多 1 次（上限 3）；頻閃格 0；單幀突跳 0；離群幀 0。</li>
+ <li>每個剪點前後 −6／−1／0／+6 幀的聯繫圖：<code>qa/film-c9/cuts.jpg</code>。</li>
+</ul></div>
+<img src="../qa/film-c9/cuts.jpg" alt="cuts">
+
+<h2>還沒驗證、要你判斷的</h2>
+<div class="box"><ul><li>倉庫的拼接 Gate（verify-assembly）還接不上 motion-kit 合成，所以接點<b>沒經過 Harness 驗證</b>，這是一部審看片。</li><li>OH-B 的逐鏡檢查原判 FAIL，紀錄照留（<code>trial/omnihuman/post-media-gate.json</code>）。嘴型和背景你已經說可以。其餘照實列：約 19.2 s 起臉變得較光滑、雀斑變淡；第二句中段（約 20.8–21.9 s）嘴幾乎停住；約 21.98 s 下排牙有幾格糊掉；鏡頭會小幅漂移；紅邊面板下多一顆光點。</li><li>進副歌那一下（18.87 s），OH-B 是低頭往下看，S7 結尾則是看著鏡頭，視線會斷一下；約 19.2 s 她才抬眼看鏡頭。</li><li>識別框「IRIS · 仍在沙盒內」和右上角時鐘還在；如果這些字也看不懂，告訴我就一起拿掉。</li><li>如果少的不是這個：我另外看到兩處可以補。一是結尾 28.3 s 之後只有晶片，她沒有再出現；二是副歌第二遍是靜圖，第一遍她在唱。告訴我是哪一種感覺。</li><li>聲音我沒辦法聽；唱得像不像、裝飾會不會太多，以你看、聽為準。</li></ul></div>
+</html>

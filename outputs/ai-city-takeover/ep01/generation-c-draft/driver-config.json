@@ -1,0 +1,370 @@
+{
+  "schema_version": "jimeng-feedback-driver/1",
+  "row": {
+    "shot": {
+      "shot_id": "ep01-dns",
+      "scene_id": "interior",
+      "storyboard_beat_id": "dns",
+      "intent": "真人电影摄影，横幅十六比九，连续六秒。以第一张已认可室内图作为场景、光线、构图与起始人物姿态的主要参考；第二张已认可正面头胸身份图控制同一女性的完整面貌、身份、左耳装置和左领极细红线，不继承身份图背景。\n同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，在原窗边设备前保持原站位。观察者看到的始终是显示器背面，保持背壳、支架和原人物相对位置；不转屏幕、不展示屏幕正面、不向背面贴图，不生成任何屏幕内容。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持自然皮肤与衣料。\n她保持原图身体朝向与设备视线，嘴唇自然静置、平静观察；允许自然呼吸、轻微自然眨眼与极轻视线反应；不说话、不唱歌、不出现说话或演唱的连续口型、不抬手、不敲键盘、不操作设备、不转身，不把她演成黑客。摄影机沿原视轴极缓慢微幅推近，保持原观察侧与人物、显示器背面的相对位置，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍嘴唇自然静置，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。\n保持原室内与窗外冷光，保留平台正常人工智能生成标识，不删除、不遮挡它；不新增剧情字幕、片名、新闻图形、人物、屏幕或界面。新闻解释图形由独立剪辑承接，不出现在这个人物镜头中。只允许极轻房间环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨，本源片原生声音在剪辑中静音。",
+      "dialogue": "",
+      "narration": "September twenty. A training run.\nOne resolver, misconfigured — one door, left open.",
+      "duration_policy": {
+        "mode": "fixed",
+        "seconds": 6.0,
+        "minimum_seconds": null,
+        "maximum_seconds": null
+      },
+      "character_ids": [
+        "IRIS"
+      ],
+      "continuity_constraints": [
+        "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+        "保持认可A03的身体朝向与设备视线，嘴唇自然静置，不出现说话或演唱的连续口型；不操作设备、不敲键盘、不抬手；自然呼吸或眨眼属可接受变化，不要求必须观察到某次事件",
+        "沿原视轴极缓慢微幅推近，保持原观察侧与人物、显示器背面的相对位置，末段平滑收稳",
+        "保持显示器背面、背壳与支架，绝不转向正面或向背面贴图；新闻解释图形由独立剪辑承接"
+      ],
+      "visual_strategy": "generated_video",
+      "required_asset_roles": [
+        {
+          "role": "primary_visual",
+          "asset_ids": [],
+          "allowed_asset_types": [
+            "video"
+          ]
+        },
+        {
+          "role": "reference",
+          "asset_ids": [
+            "iris-c-interior",
+            "iris-cf-details"
+          ],
+          "allowed_asset_types": [
+            "image"
+          ]
+        }
+      ],
+      "motion_directives": [],
+      "generated_video_rationale": "需要真实人物表演与同一空间内的自然运动；静帧不证明视频或对嘴已完成。",
+      "hybrid_layers": [],
+      "composition_directives": [],
+      "review_policy": {
+        "required_checks": []
+      }
+    },
+    "generation": {
+      "references": [
+        {
+          "role": "character_reference",
+          "asset_id": "iris-cf-details",
+          "owner_id": "IRIS"
+        },
+        {
+          "role": "scene_reference",
+          "asset_id": "iris-c-interior"
+        }
+      ],
+      "generation_intent": {
+        "reference_planning": {
+          "contract_version": "shot-reference-intent/1",
+          "facets": [
+            "identity_consistency",
+            "slow_camera",
+            "stable"
+          ],
+          "structure": "continuous",
+          "segment_ids": [],
+          "events": [
+            {
+              "event_id": "open-composition",
+              "kind": "composition",
+              "visual_state": "观察者看到的始终是显示器背面",
+              "purpose": "保持背壳、支架和原人物相对位置",
+              "phase": "start",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "review_only",
+              "priority": "preferred"
+            },
+            {
+              "event_id": "close-composition",
+              "kind": "composition",
+              "visual_state": "末段平滑收稳，人物仍嘴唇自然静置，服装、耳挂和灯线位置不变",
+              "purpose": "保持原观察侧与人物、显示器背面的相对位置",
+              "phase": "end",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "review_only",
+              "priority": "preferred"
+            }
+          ],
+          "anchors": [
+            {
+              "anchor_id": "identity",
+              "role": "identity",
+              "purpose": "同一女性的完整面貌、身份、左耳装置和左领极细红线",
+              "owner_id": "IRIS",
+              "priority": "required"
+            },
+            {
+              "anchor_id": "interior",
+              "role": "scene_environment",
+              "purpose": "场景、光线、构图与起始人物姿态",
+              "owner_id": "interior",
+              "priority": "required"
+            }
+          ],
+          "selections": [
+            {
+              "need_id": "identity",
+              "asset_id": "iris-cf-details"
+            },
+            {
+              "need_id": "interior",
+              "asset_id": "iris-c-interior"
+            }
+          ],
+          "natural_generation": [
+            "允许自然呼吸、轻微自然眨眼与极轻视线反应"
+          ],
+          "director_coverage": {
+            "coverage_hash": "0786263c62b6bb16fed178d912cb3de91e86fe541c9fdeb987ffc2b4f078acd6",
+            "unit_id": "ep01-dns"
+          },
+          "preview_approval": {
+            "approval_hash": "d651f50bcc5714eabb6a72a0185813c160a81423777f87f838a29156aecad414"
+          }
+        },
+        "open_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "以认可A03室内图开始，同一人物嘴唇自然静置观察，显示器背面朝向观察者",
+          "state_hash": null,
+          "required_change": false
+        },
+        "close_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "微幅推近收稳，嘴唇自然静置观察与显示器背面关系保持",
+          "state_hash": null,
+          "required_change": false
+        },
+        "identity_continuity": {
+          "character_ids": [
+            "IRIS"
+          ],
+          "preservation": "exact",
+          "allowed_variation": [
+            "微小透视、自然呼吸、眨眼与视线反应"
+          ]
+        },
+        "scene_continuity": {
+          "scene_id": "interior",
+          "time_of_day": "同一凌晨",
+          "mood": "冷静精密疏离",
+          "state_constraints": [
+            "保持显示器背面、背壳与支架，绝不转向正面或向背面贴图；新闻解释图形由独立剪辑承接",
+            "同一室内与原窗外冷光，不新增设备或人物"
+          ]
+        },
+        "space_continuity": {
+          "subject_position": "原设备前，保持A03站位",
+          "screen_direction": "保持原设备方向",
+          "entrance_state": null,
+          "exit_state": null,
+          "crossing_policy": "人物不换位，摄影机不绕到显示器正面"
+        },
+        "axis_continuity": {
+          "camera_axis": "原A03观察侧与视轴",
+          "framing_continuity": "同一人物、显示器背面与原窗位置关系",
+          "crossing_policy": "不翻轴、不环绕"
+        },
+        "subject_action": {
+          "start_state": "嘴唇自然静置看向原设备",
+          "progression": "保持认可A03的身体朝向与设备视线，嘴唇自然静置，不出现说话或演唱的连续口型；不操作设备、不敲键盘、不抬手；自然呼吸或眨眼属可接受变化，不要求必须观察到某次事件",
+          "endpoint": {
+            "state_ref": null,
+            "state_text": "仍嘴唇自然静置观察，不操作设备",
+            "state_hash": null,
+            "required_change": false
+          }
+        },
+        "motion_envelope": {
+          "onset": "原轴微幅推近平滑开始",
+          "peak": "自然呼吸、轻微眨眼与极轻视线反应",
+          "settle": "推近收稳，原设备关系保持",
+          "direction": "原视轴前进",
+          "amplitude_class": "极小"
+        },
+        "pacing": {
+          "cadence": "六秒连续自然观察",
+          "tempo_class": "正常原速",
+          "shot_duration_seconds": 6.0
+        },
+        "camera_intent": {
+          "movement": "沿原视轴极缓慢微幅推近，保持原观察侧与人物、显示器背面的相对位置，末段平滑收稳",
+          "stability": "平稳连续，末段收稳",
+          "framing_intent": "保持A03人物与显示器背面构图",
+          "expression_strength": "semantic_prompt_allowed"
+        },
+        "camera_endpoint": {
+          "start_framing": "原A03人物与显示器背面",
+          "end_framing": "略近但仍是同一观察侧与显示器背面",
+          "position_lock": false,
+          "orientation_lock": false
+        },
+        "performance_intent": {
+          "trigger": "原室内设备前静静观察",
+          "visible_response": "保持认可A03的身体朝向与设备视线，嘴唇自然静置，不出现说话或演唱的连续口型；不操作设备、不敲键盘、不抬手；自然呼吸或眨眼属可接受变化，不要求必须观察到某次事件",
+          "gaze_target": "原参考设备方向，保持微小视线反应",
+          "body_behavior": "原位自然呼吸，不转身、不抬手",
+          "hand_behavior": "保持原参考静置或不可见状态，不敲键盘、不操作设备",
+          "terminal_performance_state": "嘴唇自然静置平静观察，显示器仍以背面朝向观察者",
+          "character_directions": [
+            {
+              "character_id": "IRIS",
+              "screen_identity": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+              "role": "principal",
+              "visibility": "visible",
+              "offscreen_reason": null,
+              "beats": [
+                {
+                  "phase": "throughout",
+                  "trigger": "原室内设备前静静观察",
+                  "emotion": "冷静克制",
+                  "intensity": "subtle",
+                  "facial_expression": "嘴唇自然静置平静，轻微自然眨眼",
+                  "gaze_target": "原设备方向",
+                  "breathing": "自然平稳",
+                  "body_behavior": "原位观察，仅极轻视线反应与呼吸"
+                }
+              ]
+            }
+          ]
+        },
+        "visual_treatment": {
+          "medium_look": "真人电影摄影",
+          "palette": "蓝黑钢蓝，红色仅限原左领极细灯线",
+          "material_treatment": "自然皮肤、衣料、设备背壳",
+          "prohibited_visual_drift": [
+            "向显示器背面贴图或切换正面",
+            "新增剧情字幕、新闻图形、人物或设备操作；平台正常人工智能标识保留",
+            "改变面貌、装置侧别或服装"
+          ]
+        },
+        "lighting_intent": {
+          "motivated_source": "原窗外冷光",
+          "direction": "原A03方向",
+          "exposure_priority": "同一面貌、耳挂与显示器背面关系可辨",
+          "continuity_state": "原凌晨室内冷光"
+        },
+        "ambience_intent": {
+          "environment_bed": "极轻房间环境声",
+          "foley_cues": [],
+          "explicitly_silent": false
+        },
+        "dialogue_intent": {
+          "mode": "none",
+          "speaker_id": null,
+          "verbatim_text": null,
+          "start_seconds": null,
+          "end_seconds": null,
+          "on_screen": null,
+          "response_obligation": null,
+          "lip_sync_required": false
+        },
+        "music_intent": {
+          "mode": "none",
+          "instrumentation": null,
+          "tempo_rhythm": null,
+          "dynamics": null
+        },
+        "primary_camera_motion": {
+          "movement_kind": "dolly_in",
+          "direction": "forward",
+          "amplitude_class": "subtle",
+          "speed_class": "very_slow",
+          "start_motion_state": "stationary",
+          "end_motion_state": "settled"
+        },
+        "camera_subject_relation": {
+          "subject_id": "IRIS",
+          "relation_kind": "maintain_offset",
+          "start_relation": "原A03人物与设备背面同框",
+          "end_relation": "同轴略近，设备背面关系不变"
+        }
+      },
+      "intent_evidence": {
+        "character_action_required": true,
+        "state_change_required": false,
+        "subject_motion_directive_present": true
+      },
+      "output_need": {
+        "timing_mode": "content_driven",
+        "duration_seconds": 6,
+        "geometry_policy": "adaptive",
+        "aspect_ratio": "16:9",
+        "container_mime": "video/mp4"
+      },
+      "audio_need": "optional",
+      "quality_need": {
+        "objective_tier": "preview"
+      }
+    },
+    "composition": {
+      "muted": true,
+      "source_audio_policy": "MUTE",
+      "source_audio_reason": "新闻歌曲或念白由最终剪辑独立音轨承载"
+    },
+    "boundary": {
+      "independent": true,
+      "reason": "独立室内观察覆盖；非从阳台连续走入，A01与C由最终剪辑选择，不要求复制未验收前镜终态"
+    }
+  },
+  "routing_policy": {
+    "identity": {
+      "policy_id": "iris-c-qualification",
+      "policy_version": "1",
+      "policy_sha256": "3eebe793532f012bcd380c89858f65666653c2f47a8f92b00e97c8845e827393"
+    },
+    "local_resources_available": false,
+    "remote_authorized": true,
+    "budget_authorized": true,
+    "execution_purpose": "qualification"
+  },
+  "decision_policy": {
+    "policy_id": "generation-decision",
+    "version": "3",
+    "repeated_failure_threshold": 3,
+    "max_resamples": 0,
+    "allow_bounded_exploration": true
+  },
+  "execution_limits": {
+    "task_id": "iris-ep01-c-source-003",
+    "generation_forbidden": false,
+    "allowed_remote_candidates": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1"
+    ],
+    "paid_submit_ceiling": 1,
+    "paid_submits_used": 0,
+    "local_batch_limit": 1,
+    "local_batch_used": 0,
+    "local_total_limit": null,
+    "local_total_used": 0,
+    "local_resource_available": false,
+    "batch_review_evidence_hash": null
+  },
+  "jimeng_profile": {
+    "model_id": "seedance_2.0_vip",
+    "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+    "project_id": "829df260-5a63-4f0d-8265-8353dc693b3b",
+    "node_id": "node_vdk8wx4zs5",
+    "duration_seconds": 6,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "benefit_amount": 6,
+    "benefit_type": "seedance_20_pro_1080p_output",
+    "credit_upper_bound": 250
+  }
+}

@@ -1,0 +1,814 @@
+{
+  "shot_id": "S0111",
+  "start_frame": 5095,
+  "end_frame": 5148,
+  "start_time": 212.2917,
+  "end_time": 214.5417,
+  "duration_frames": 54,
+  "duration_s": 2.25,
+  "start_tc": "00:03:32:07",
+  "end_tc": "00:03:34:12",
+  "boundary_in_id": "B3-016",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5095,
+      "path": "keyframes/S0111_f05095.jpg",
+      "role": "first",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 5108,
+      "path": "keyframes/S0111_f05108.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 5122,
+      "path": "keyframes/S0111_f05122.jpg",
+      "role": "middle",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 5135,
+      "path": "keyframes/S0111_f05135.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in Codex detail pass."
+    },
+    {
+      "frame": 5148,
+      "path": "keyframes/S0111_f05148.jpg",
+      "role": "last",
+      "note": "Actually opened individually in Codex detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Frontal waist-up woman before split-flap departures boards",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Frontal waist-up woman before split-flap departures boards. Gray concrete runway, centered white blouse and black belt; black overhead boards animate from months countdown to closing thesis. Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Frontal waist-up woman before split-flap departures boards",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Frontal waist-up woman before split-flap departures boards",
+      "background": "Gray concrete runway, centered white blouse and black belt; black overhead boards animate from months countdown to closing thesis."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0111.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0008,
+      "pan_y_frac_per_s": -0.0002,
+      "zoom_per_s": 0.0003,
+      "median_flow_frac_per_s": 0.0021,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Gray concrete runway, centered white blouse and black belt; black overhead boards animate from months countdown to closing thesis.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E0E2E7",
+        "fraction": 0.208,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#777671",
+        "fraction": 0.199,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#BDBDC5",
+        "fraction": 0.172,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#9E9EA1",
+        "fraction": 0.155,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#232920",
+        "fraction": 0.143,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#4C4C46",
+        "fraction": 0.123,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [142.7, 142.7, 142.9]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 11 /11",
+      "evidence_frame": 5121,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5121
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5121,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:32:07",
+      "end_value": "00:03:34:12"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Compact top-right widget absent; large lowerleft two-row board changes00 MONTHS/TO ESCAPE into THERE IS NO/UNDERCLASS; rear gantries also settle thesis",
+      "evidence_frame": 5121
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0111-E01",
+      "shot_id": "S0111",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Gray concrete runway, centered white blouse and black belt; black overhead boards animate from months countdown to closing thesis.",
+      "start_frame": 5095,
+      "end_frame": 5148,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5095, 5097]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5146, 5148]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5095,
+          "state": "present"
+        },
+        {
+          "frame": 5148,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5095,
+        5148
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds visually estimated; original font/shader/source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5095,
+          5097
+        ],
+        "exit_bounds": [
+          5146,
+          5148
+        ],
+        "method": "Dense event sheets/individual keyframes; frame bounds allow subpixel/fade ambiguity"
+      }
+    },
+    {
+      "element_id": "S0111-E02",
+      "shot_id": "S0111",
+      "asset_id": null,
+      "type": "character",
+      "description": "Frontal waist-up woman before split-flap departures boards",
+      "start_frame": 5095,
+      "end_frame": 5148,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5095, 5097]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5146, 5148]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5095,
+          "state": "present"
+        },
+        {
+          "frame": 5148,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5095,
+        5148
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds visually estimated; original font/shader/source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5095,
+          5097
+        ],
+        "exit_bounds": [
+          5146,
+          5148
+        ],
+        "method": "Dense event sheets/individual keyframes; frame bounds allow subpixel/fade ambiguity"
+      }
+    },
+    {
+      "element_id": "S0111-E03",
+      "shot_id": "S0111",
+      "asset_id": null,
+      "type": "split_flap",
+      "description": "THERE IS / NO and UNDER / CLASS rear board text",
+      "start_frame": 5095,
+      "end_frame": 5148,
+      "bounding_box": {
+        "x": 0.01,
+        "y": 0.24,
+        "w": 0.98,
+        "h": 0.21,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5095, 5097]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5146, 5148]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5095,
+          "text": "00 MONTHS / 00 MONTHS"
+        },
+        {
+          "frame": 5108,
+          "text": "THERE IS NO left / right scrambling"
+        },
+        {
+          "frame": 5118,
+          "text": "THERE IS NO / UNDER CLASS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5095,
+        5148
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds visually estimated; original font/shader/source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "THERE IS / NO and UNDER / CLASS rear board text",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5095,
+          5097
+        ],
+        "exit_bounds": [
+          5146,
+          5148
+        ],
+        "method": "Dense event sheets/individual keyframes; frame bounds allow subpixel/fade ambiguity"
+      }
+    },
+    {
+      "element_id": "S0111-E04",
+      "shot_id": "S0111",
+      "asset_id": null,
+      "type": "split_flap",
+      "description": "THERE IS NO / UNDERCLASS lower-left board",
+      "start_frame": 5095,
+      "end_frame": 5148,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.52,
+        "w": 0.24,
+        "h": 0.21,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5095, 5097]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5146, 5148]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5095,
+          "text": "00 MONTHS / TO ESCAPE"
+        },
+        {
+          "frame": 5104,
+          "text": "scrambling starts"
+        },
+        {
+          "frame": 5116,
+          "text": "THERE IS NO / UNDERCL…"
+        },
+        {
+          "frame": 5118,
+          "text": "THERE IS NO / UNDERCLASS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5095,
+        5148
+      ],
+      "confidence": 0.75,
+      "uncertainties": [
+        "Spatial bounds visually estimated; original font/shader/source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "THERE IS NO / UNDERCLASS lower-left board",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5095,
+          5097
+        ],
+        "exit_bounds": [
+          5146,
+          5148
+        ],
+        "method": "Dense event sheets/individual keyframes; frame bounds allow subpixel/fade ambiguity"
+      }
+    },
+    {
+      "element_id": "S0111-E05",
+      "shot_id": "S0111",
+      "asset_id": null,
+      "type": "hud_bracket",
+      "description": "Head and torso tracking box",
+      "start_frame": 5095,
+      "end_frame": 5148,
+      "bounding_box": {
+        "x": 0.34,
+        "y": 0.02,
+        "w": 0.34,
+        "h": 0.88,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5095, 5097]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5146, 5148]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5095,
+          "state": "present"
+        },
+        {
+          "frame": 5148,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5095,
+        5148
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds visually estimated; original font/shader/source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5095,
+          5097
+        ],
+        "exit_bounds": [
+          5146,
+          5148
+        ],
+        "method": "Dense event sheets/individual keyframes; frame bounds allow subpixel/fade ambiguity"
+      }
+    },
+    {
+      "element_id": "S0111-E06",
+      "shot_id": "S0111",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "DEPARTURES · SS27 · BOARD · FINAL",
+      "start_frame": 5095,
+      "end_frame": 5148,
+      "bounding_box": {
+        "x": 0.037,
+        "y": 0.49,
+        "w": 0.19,
+        "h": 0.018,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "State/position as recorded in keyframes",
+        "easing": "step or typewriter; exact continuous curve unknown",
+        "entrance": "first confirmed at frame 5095",
+        "exit": "last confirmed at frame 5148"
+      },
+      "keyframes": [
+        {
+          "frame": 5095,
+          "state": "present"
+        },
+        {
+          "frame": 5148,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5095,
+        5148
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds visually estimated; original font/shader/source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "DEPARTURES · SS27 · BOARD · FINAL",
+        "typography": {
+          "description": "Uppercase mono fine type",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5095,
+          5097
+        ],
+        "exit_bounds": [
+          5146,
+          5148
+        ],
+        "method": "Dense event sheets/individual keyframes; frame bounds allow subpixel/fade ambiguity"
+      }
+    },
+    {
+      "element_id": "S0111-E07",
+      "shot_id": "S0111",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "UNDERCLASS: NONE / THE WHITE PILL. CLASS: NONE",
+      "start_frame": 5148,
+      "end_frame": 5148,
+      "bounding_box": {
+        "x": 0.037,
+        "y": 0.7,
+        "w": 0.22,
+        "h": 0.043,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "State/position as recorded in keyframes",
+        "easing": "step or typewriter; exact continuous curve unknown",
+        "entrance": "first confirmed at frame 5148",
+        "exit": "last confirmed at frame 5148"
+      },
+      "keyframes": [
+        {
+          "frame": 5148,
+          "state": "present"
+        },
+        {
+          "frame": 5148,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5148,
+        5148
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds visually estimated; original font/shader/source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "UNDERCLASS: NONE / THE WHITE PILL. CLASS: NONE",
+        "typography": {
+          "description": "Uppercase mono fine type",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5148,
+          5148
+        ],
+        "exit_bounds": [
+          5148,
+          5148
+        ],
+        "method": "Dense event sheets/individual keyframes; frame bounds allow subpixel/fade ambiguity"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0111-A01",
+      "target_element_ids": [
+        "S0111-E02",
+        "S0111-E03",
+        "S0111-E04",
+        "S0111-E05"
+      ],
+      "description": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+      "start_frame": 5095,
+      "end_frame": 5148,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-016",
+      "span": [
+        5095,
+        5095
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-017",
+      "span": [
+        5148,
+        5148
+      ],
+      "description": "Flap letters clatter through random glyphs f5095-5117; lower-left phrase settles by f5118",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0470",
+      "relation": "beat_candidate (unknown) at frame 5095; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5095
+    },
+    {
+      "audio_event_id": "AB0471",
+      "relation": "beat_candidate (unknown) at frame 5106; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5106
+    },
+    {
+      "audio_event_id": "AB0472",
+      "relation": "beat_candidate (unknown) at frame 5116; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5116
+    },
+    {
+      "audio_event_id": "AB0473",
+      "relation": "beat_candidate (unknown) at frame 5127; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5127
+    },
+    {
+      "audio_event_id": "AB0474",
+      "relation": "beat_candidate (unknown) at frame 5138; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5138
+    },
+    {
+      "audio_event_id": "AB0475",
+      "relation": "beat_candidate (unknown) at frame 5148; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5148
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0111.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original font, easing coefficients and physical photographic metadata unknown.",
+    "Some tiny debug text anti-aliasing ambiguous; listed readable content and candidate typewriter ranges, not original source strings."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0111.jpg",
+      "keyframes/S0111_f05095.jpg",
+      "keyframes/S0111_f05108.jpg",
+      "keyframes/S0111_f05122.jpg",
+      "keyframes/S0111_f05135.jpg",
+      "keyframes/S0111_f05148.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "frames_actually_opened": [
+      5095,
+      5108,
+      5122,
+      5135,
+      5148
+    ],
+    "filmstrip_opened": true,
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "Individual 960px keyframes, dense per-frame ROI sheets and selected 1920px source crops. All geometric estimates explicitly tagged.",
+    "dense_sheets": [
+      "work/full_codex_103_153/flap111.jpg"
+    ],
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

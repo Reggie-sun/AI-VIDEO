@@ -1,0 +1,18 @@
+{
+  "evaluator": "Codex native verifier",
+  "evaluator_kind": "explicit_evaluator",
+  "recorded_at_utc": "2026-10-31T05:28:19.579549+00:00",
+  "candidate_source_sha256": "b469c215138b3b517dad78c84de0614fdf97821d853059f7c7106f8e99f4df13",
+  "summary_sha256": "a6b18465e09b1e342f615382b1d2ea05ae4fcdc1575c2d1731909b71cbff5345",
+  "scope": "C–G intent/runner/series/inputs/consume/results, guide source/reference PCM, old source brief/index and fixed runtime metadata",
+  "technical_execution": "PASS",
+  "lyric_ASR_evidence": "PASS with human and musical boundaries retained",
+  "human_music_singing_acceptance": "NOT_EVALUATED",
+  "known_gaps": [
+    "ASR was not rerun by verifier",
+    "Large weights were not re-read by verifier",
+    "No outside-scope Manifest audit",
+    "Preflight Path failure process history has only limited independent corroboration"
+  ],
+  "supported_statement": "G is a real30s local candidate whose words appear completely in two unprompted ASR observations; exact listening and singing/music quality still need evaluation"
+}

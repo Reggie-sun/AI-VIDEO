@@ -1,0 +1,15 @@
+{
+  "canonical_reader": "PASS",
+  "exact_old_qa_findings": "PASS",
+  "generation_evaluation_2": "PASS",
+  "controlled_criterion_hashes": "PASS",
+  "archived_actual_mcp_bound": "PASS",
+  "exact_replay_zero_new_mcp_calls": "PASS",
+  "exact_replay_manifest_revision_unchanged": "PASS",
+  "manifest_revision": 32,
+  "experience_receipt_content_hash": "72eba7e2357b6c9de09b58032d4a9bc2a5e6300ceaff5e15ea888704dfecb3b8",
+  "source_sha256": "322c6a162e2685591eb48ee7aef2a3b105f60b293b18e844c6835e3104bd734f",
+  "raw_gate": "FAIL",
+  "new_provider_calls": 0,
+  "quality_close": "NOT_ATTEMPTED"
+}

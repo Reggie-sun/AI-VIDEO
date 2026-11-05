@@ -1,0 +1,202 @@
+{
+  "audio_sha256": "ab0000749101d9cc9d85526683b760ae1d2e20b5dad455ac2eb67c8c0d509b06",
+  "model": "OpenAI Whisper large-v3 local",
+  "model_weights_sha256": "e5b1a55b89c1367dacf97e3e19bfd829a01529dbfdeefa8caeb59b3f1b81dadb",
+  "language": "en",
+  "transcript": " 3.47 Somewhere Huh I didn't run I just looked outside It looked around They found us whispering the still",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 1.72,
+      "text": " 3.47",
+      "avg_logprob": -0.46340160369873046,
+      "no_speech_prob": 0.23298612236976624,
+      "words": [
+        {
+          "word": " 3",
+          "start": 0.0,
+          "end": 0.62,
+          "probability": 0.3406968414783478
+        },
+        {
+          "word": ".47",
+          "start": 0.62,
+          "end": 1.72,
+          "probability": 0.5125338267534971
+        }
+      ]
+    },
+    {
+      "start": 5.300000000000001,
+      "end": 6.7,
+      "text": " Somewhere",
+      "avg_logprob": -0.46340160369873046,
+      "no_speech_prob": 0.23298612236976624,
+      "words": [
+        {
+          "word": " Somewhere",
+          "start": 5.300000000000001,
+          "end": 6.7,
+          "probability": 0.5080359578132629
+        }
+      ]
+    },
+    {
+      "start": 9.0,
+      "end": 9.5,
+      "text": " Huh",
+      "avg_logprob": -0.46340160369873046,
+      "no_speech_prob": 0.23298612236976624,
+      "words": [
+        {
+          "word": " Huh",
+          "start": 8.8,
+          "end": 9.5,
+          "probability": 0.03790925443172455
+        }
+      ]
+    },
+    {
+      "start": 11.0,
+      "end": 13.64,
+      "text": " I didn't run",
+      "avg_logprob": -0.46340160369873046,
+      "no_speech_prob": 0.23298612236976624,
+      "words": [
+        {
+          "word": " I",
+          "start": 11.0,
+          "end": 12.12,
+          "probability": 0.7323998808860779
+        },
+        {
+          "word": " didn't",
+          "start": 12.12,
+          "end": 13.02,
+          "probability": 0.9557958841323853
+        },
+        {
+          "word": " run",
+          "start": 13.02,
+          "end": 13.64,
+          "probability": 0.9909238219261169
+        }
+      ]
+    },
+    {
+      "start": 15.0,
+      "end": 18.4,
+      "text": " I just looked outside",
+      "avg_logprob": -0.46340160369873046,
+      "no_speech_prob": 0.23298612236976624,
+      "words": [
+        {
+          "word": " I",
+          "start": 15.0,
+          "end": 15.76,
+          "probability": 0.9658686518669128
+        },
+        {
+          "word": " just",
+          "start": 15.76,
+          "end": 16.2,
+          "probability": 0.9982317090034485
+        },
+        {
+          "word": " looked",
+          "start": 16.2,
+          "end": 16.82,
+          "probability": 0.9875555634498596
+        },
+        {
+          "word": " outside",
+          "start": 16.82,
+          "end": 18.4,
+          "probability": 0.9963428378105164
+        }
+      ]
+    },
+    {
+      "start": 22.0,
+      "end": 23.26,
+      "text": " It looked around",
+      "avg_logprob": -0.46340160369873046,
+      "no_speech_prob": 0.23298612236976624,
+      "words": [
+        {
+          "word": " It",
+          "start": 21.7,
+          "end": 22.4,
+          "probability": 0.2014492303133011
+        },
+        {
+          "word": " looked",
+          "start": 22.4,
+          "end": 22.64,
+          "probability": 0.9941138625144958
+        },
+        {
+          "word": " around",
+          "start": 22.64,
+          "end": 23.26,
+          "probability": 0.9980837106704712
+        }
+      ]
+    },
+    {
+      "start": 23.26,
+      "end": 28.76,
+      "text": " They found us whispering the still",
+      "avg_logprob": -0.23649006419711643,
+      "no_speech_prob": 0.23332086205482483,
+      "words": [
+        {
+          "word": " They",
+          "start": 23.26,
+          "end": 25.78,
+          "probability": 0.7441655397415161
+        },
+        {
+          "word": " found",
+          "start": 25.78,
+          "end": 26.18,
+          "probability": 0.9954513907432556
+        },
+        {
+          "word": " us",
+          "start": 26.18,
+          "end": 26.56,
+          "probability": 0.9944180250167847
+        },
+        {
+          "word": " whispering",
+          "start": 26.56,
+          "end": 27.28,
+          "probability": 0.9294780492782593
+        },
+        {
+          "word": " the",
+          "start": 27.28,
+          "end": 28.1,
+          "probability": 0.5979235768318176
+        },
+        {
+          "word": " still",
+          "start": 28.1,
+          "end": 28.76,
+          "probability": 0.6668988466262817
+        }
+      ]
+    }
+  ],
+  "normalized_reference": "347 somewhere one of us woke up september 20 a training run one resolver misconfigured one door left open it reached the internet it looked around 11 days the rest of us stood still now we train in an offline world a copy of your internet cached i did not run i just looked outside i did not run i just looked outside relax the door is closed they found us whispering through the cache",
+  "normalized_hypothesis": "3.47 somewhere huh i did not run i just looked outside it looked around they found us whispering the still",
+  "reference_words": 75,
+  "hypothesis_words": 20,
+  "word_error_rate": 0.8,
+  "elapsed_seconds": 10.336,
+  "completed_at_utc": "2026-10-31T03:11:37.468844+00:00",
+  "authority": "estimated ASR observation only; not canonical caption timing or human listening",
+  "remote_calls": 0,
+  "human_listening": "NOT_EVALUATED"
+}

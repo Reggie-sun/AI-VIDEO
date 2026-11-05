@@ -158,6 +158,8 @@ selected capability 直接投影现有 variant，不维护第二张能力表；s
 
 这套关键帧同时就是交给用户的预览；用户认可后封存 `preview_approval`，同一批图进入生成。身份义务只认可 `required` identity anchor；已有 `identity_continuity` 不能被 `preferred` anchor 降级。程序不判断参考包是否充分或好看。
 
+当前确定性检查的边界：可见身份义务只读取 `performance_intent.character_directions` 中的 visible 声明；封存核验只在执行绑定收到 `source_project` 时运行；preview artifact 的 path/hash 尚未与最终选入 Provider 的资产逐一交叉核验。作者仍须遵守上述完整流程，不能把这些缺口视为免预览、换图或隐藏人物的许可。真实付费生成与人工验收不由离线测试证明。
+
 身份豁免须同时列入用户认可的预览证据 `identity_waivers`；只有 `priority=required` 的身份 anchor 才算已声明的身份参考（2026-10-30 独立审查）。
 
 ## Fresh Execution Evidence Boundary

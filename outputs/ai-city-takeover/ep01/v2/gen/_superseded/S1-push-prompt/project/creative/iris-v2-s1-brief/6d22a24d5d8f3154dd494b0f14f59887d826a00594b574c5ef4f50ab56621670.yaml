@@ -1,0 +1,50 @@
+artifact_id: iris-v2-s1-brief
+audience: 中文短视频观众
+constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 左眼始终闭着不睁开，只有眼球与睫毛的极轻微动作
+- 摄影机几乎不动，只极缓慢微微推近，末段平滑收稳
+- 保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。
+content_hash: 6d22a24d5d8f3154dd494b0f14f59887d826a00594b574c5ef4f50ab56621670
+creation_receipt_id: iris-v2-s1-authoring
+format: 1920×1080 30fps horizontal source
+language: zh
+objective: 分镜 v2.1 S1 六秒源片
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 101349875fe008a36dd1087c74b2aa96bfbc06305027dac2abcf9dec8d9fb83f
+  kind: user_input
+  reference: evidence/authoring-input/101349875fe008a36dd1087c74b2aa96bfbc06305027dac2abcf9dec8d9fb83f.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 13c4cb67b96f1a8f64e0c041cfe09d8eec5e7ec510d370bd322de8c6cf19b4a8
+  kind: user_input
+  reference: evidence/authoring-input/13c4cb67b96f1a8f64e0c041cfe09d8eec5e7ec510d370bd322de8c6cf19b4a8.json
+- content_hash: 9108987c265694f24aec04c7ce4ac5b9f7f659c0b9f7cb5fb6bc8db947c4473e
+  kind: user_input
+  reference: evidence/authoring-input/9108987c265694f24aec04c7ce4ac5b9f7f659c0b9f7cb5fb6bc8db947c4473e.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+title: IRIS EP01 v2 S1 source

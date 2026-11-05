@@ -1,0 +1,40 @@
+{
+ "unit": "ST4",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "28fc57e4947e930ca22d565068f8f2b0d3e5be0e12cff9d639eb93343d9a3b8a",
+ "compiled_prompt_sha256": "7f1d7ef8de875e591e0d05f984da5a39a05581e8d255505b9931098242eff6ce",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/story/continuity-report.json",
+  "sha256": "230814b2dab63866c43cb584cad969bd8c39ae84d76270eddfc551577fc660ec",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS: ST4-a（462dfb26…）里她面朝画面左上方，左耳戴耳挂，近侧（左）领口有红线，后梳低髻，炭黑大衣；悬浮薄片、黑色背景和地面冷光斑与 c13 S7 和 N4 一致。",
+   "handoff": "PASS: 作为插入镜头放在 S7「train in an offline world」处，空间与光线相同；不能紧接 N4 的行走出点（见 R4）。",
+   "axis_action_camera": "PASS: 规格是 truck_left、left，envelope_direction 向左；她朝左，向左横移能让她视线前方留出更多空间，与 end_framing 一致；屏幕方向与 N4、S7 一致（都朝左）。prompt 没写方向（见 R4）。",
+   "prompt_fit": "PASS: compiled 与 approval prompts.ST4 逐字相同（7f1d7ef8…），只有一张首帧绑定，没有音频参考；首帧嘴唇微张、薄片带红边，见 R6、R7。",
+   "lint": "PASS（本报告这一项除外）: failed=[continuity_report_ready]，其余 10 项都为 true；request_hash 28fc57e4…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   6,
+   990
+  ]
+ },
+ "new_calls": 0
+}

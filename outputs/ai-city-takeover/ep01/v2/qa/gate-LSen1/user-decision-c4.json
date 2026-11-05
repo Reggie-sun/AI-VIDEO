@@ -1,0 +1,19 @@
+{
+ "schema": "iris-v2-user-gate-decision/1",
+ "unit": "LSen1",
+ "artifact_sha256": "93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d",
+ "gate": "qa/gate-LSen1/post-media-gate.json (shot-gate-reviewer: identity, picture, camera PASS; singing FAIL: lips stay apart in the pause after 'run', clip 2.58-2.75 s, and before 'outside', clip 3.71-3.94 s)",
+ "film": "c4",
+ "question": "看完 LSen1 作者式放法（IN SYNC 那段），試驗接下來怎麼做？",
+ "user_answer": "先停，用 LSen1 的同步段＋靜圖後製",
+ "user_words": [
+  "嘴没有对好,然后我记得原作者不是就是这样简单的放一个视频还有很多后期处理"
+ ],
+ "scope": "c4 chorus pass 1 plays LSen1 at its own soundtrack lag -0.8037 s (in-point 0.0930), film 18.867-20.500 s = clip 0.093-1.726 s, cut on the last eighth note before its measured divergence; both failed pauses (clip 2.58-2.75 s and 3.71-3.94 s) lie outside that range",
+ "review": [
+  "trial/lipsync-ev/LSen1/sync/LSen1/review-LSen1-93c52d27192b-placement-lag-0.804.mp4",
+  "review/film-c4.html"
+ ],
+ "recorded_at": "2026-11-03T01:30:32.344512+00:00",
+ "authority": "user decision on a FAIL verdict for the c4 cut; the sealed gate verdict is unchanged"
+}

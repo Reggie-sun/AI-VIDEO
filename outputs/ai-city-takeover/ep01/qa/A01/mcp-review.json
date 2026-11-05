@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"video_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/generation/project/state/video-generation/fetch/files/65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5.mp4\",\n  \"analysis_summary\": {\n    \"duration_hms\": \"00:00:06.061\",\n    \"resolution\": \"1920x1080\",\n    \"has_audio\": true,\n    \"estimated_speaking_duration_seconds\": 0.0,\n    \"scene_count\": 1,\n    \"frames_extracted\": 13\n  },\n  \"quality_metrics\": {\n    \"duration_seconds\": 6.061,\n    \"fps\": 60.0,\n    \"resolution\": \"1920x1080\",\n    \"scene_count\": 1,\n    \"sampled_frame_count\": 267,\n    \"unique_frame_count\": 267,\n    \"unique_frame_ratio\": 1.0,\n    \"has_audio\": true,\n    \"estimated_speaking_duration_seconds\": 0.0\n  },\n  \"issues\": []\n}"
+    }
+  ],
+  "isError": false
+}

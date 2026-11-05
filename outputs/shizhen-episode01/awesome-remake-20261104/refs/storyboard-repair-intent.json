@@ -1,0 +1,7 @@
+{
+  "source_sha256": "d6c1933380bedad9b93b0d308f908d92050a23b23d4f79755eee030235fa5abc",
+  "calls_ceiling": 1,
+  "auto_retry": false,
+  "purpose": "correct cells03/04/05 only; preserve new full opening design",
+  "status": "not_user_approved"
+}

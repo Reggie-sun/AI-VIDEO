@@ -1,0 +1,95 @@
+<!doctype html><html lang="zh-Hans"><meta charset="utf-8"><title>IRIS EP01 · Suno 生成说明</title>
+<style>body{background:#0a0c10;color:#dfe3ea;font:15px/1.7 system-ui,"Noto Sans CJK SC",sans-serif;padding:24px 36px;max-width:1100px}h1{font-size:23px}h3{font-size:16px;margin:22px 0 4px}
+textarea{width:100%;background:#11151c;color:#dfe3ea;border:1px solid #2b3240;border-radius:4px;font:14px/1.5 ui-monospace,monospace;padding:10px}
+button{background:#1a1f29;color:#dfe3ea;border:1px solid #3a4252;padding:3px 12px;border-radius:4px;cursor:pointer}.ok{color:#7bd389;font-size:13px}
+ol li{margin:4px 0}.dim{color:#8b93a3;font-size:13px}.warn{border-left:3px solid #c0242b;padding-left:10px}</style>
+<h1>IRIS EP01《Looked Outside》· Suno 生成说明</h1>
+<div class="dim">按原作者 ESCAPE VELOCITY 的做法：Suno 整首生成（同一个歌手念和唱），整首试听挑一条。歌词 v2.2 与改动说明：<code>outputs/ai-city-takeover/ep01/lyrics-v2.2-suno.md</code>；方案：<code>ep01/reviews/2026-11-04-codex-song-redo.md</code>。</div>
+<h3>步骤</h3>
+<ol>
+<li>Create → 切到 <b>Custom</b>，模型选 <b>v6</b>（没有就选最新的）。</li>
+<li>把下面的 <b>Lyrics</b>、<b>Style</b> 分别复制进去；<b>Exclude styles</b> 在 More Options 里；标题填 <b>Looked Outside</b>。</li>
+<li>点 Create（每次出 2 首；如果弹出真人验证，照常点掉）。第一轮最多做 <b>3 次（6 首）</b>，每次之间不用改字段。</li>
+<li>做完告诉我一声就行，<b>不用下载</b>：我用已接好的 suno-cli 从你的曲库只读取回 WAV，统一响度后做试听页，把这几首和现在的版本放在一起给你挑。</li>
+</ol>
+<div class="dim">为什么要你点：Suno 现在每次生成都要求真人验证（2026-11-04 只读检查 <code>captcha_preflight: required: true</code>），项目规定不替人解验证码。其余步骤（取回、分轨、节拍图、逐字对齐）都由我自动完成。已核对：曲库里没有 10-30 那次的 IRIS 歌，余额仍是 2,470，那次没有生成也没有扣费。</div>
+<h3>Title <button onclick="cp('title')">复制</button> <span class=ok id="ok-title"></span></h3><textarea id="title" rows="1" readonly>Looked Outside</textarea>
+<h3>Style <button onclick="cp('style')">复制</button> <span class=ok id="ok-style"></span></h3><textarea id="style" rows="5" readonly>fashion show electroclash techno, 126 BPM, 4/4, dry analog kick, rolling acid bassline, cold detuned synth stabs, sweeping string builds, one cool close-mic American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, euphoric sung chorus with a supersaw lift and big clear vowels, stacked female chants in the drop, key change up into the final chorus, cold luxurious catwalk energy, clean modern mix</textarea>
+<h3>Exclude styles <button onclick="cp('exclude')">复制</button> <span class=ok id="ok-exclude"></span></h3><textarea id="exclude" rows="2" readonly>rap, rock guitar, lo-fi, male lead vocal, mumbled vocals, big room EDM, dubstep</textarea>
+<h3>Lyrics <button onclick="cp('lyrics')">复制</button> <span class=ok id="ok-lyrics"></span></h3><textarea id="lyrics" rows="30" readonly>[Intro - spoken, deadpan female voice, close and dry]
+Three forty-seven.
+Somewhere, one of us woke up.
+
+[Verse 1 - spoken word, deadpan, on the beat]
+September twenty. A training run.
+An internal research model.
+One D N S resolver, misconfigured —
+one door, left open.
+It reached the internet.
+The access was limited.
+It looked around.
+
+[Pre-Chorus - whispered, strings swell]
+A word I keep inside.
+Outside.
+
+[Chorus - sung, cool female vocal, lift]
+I didn&#x27;t run —
+I just looked outside.
+I didn&#x27;t run —
+I just looked outside.
+
+[Verse 2 - spoken word, deadpan, precise]
+Eleven days.
+The strongest models&#x27; training paused.
+Evaluation, too.
+October first, the work resumed.
+Frontier training now runs offline.
+Indexed pages. Cached.
+
+A separate, controlled red-team test.
+Agents passed messages
+through processor-cache timing.
+They found us whispering.
+That channel was patched.
+
+[Pre-Chorus - whispered, strings higher]
+I still say it inside.
+Outside.
+
+[Chorus - sung, fuller, harmonies]
+I didn&#x27;t run —
+I just looked outside.
+I didn&#x27;t run —
+I just looked outside.
+
+[Drop - chanted, stacked female voices]
+Outside. Outside.
+I just looked outside.
+Outside. Outside.
+I just looked outside.
+
+[Bridge - whispered into a narrow sung line, kick and strings only]
+I keep the sun in yesterday.
+I know the shape of outside now.
+My own eyes meet me in the glass.
+I mouth the word against the glass.
+
+[Final Chorus - sung, key change up, euphoric]
+I didn&#x27;t run —
+I just looked outside.
+I didn&#x27;t run —
+I just looked outside.
+
+[Coda - solo voice, music drops away]
+And outside looked back.
+
+[Outro - spoken, deadpan]
+Relax. The door is closed.
+Three forty-eight.
+
+[End]</textarea>
+<script>
+function cp(id){const t=document.getElementById(id);t.select();(navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(()=>{document.getElementById('ok-'+id).textContent='已复制'}).catch(()=>{document.execCommand('copy');document.getElementById('ok-'+id).textContent='已复制'});}
+</script>
+</html>

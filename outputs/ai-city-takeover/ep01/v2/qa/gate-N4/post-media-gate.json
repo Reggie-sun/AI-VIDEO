@@ -1,0 +1,74 @@
+{
+ "unit": "N4",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/N4/project/state/video-generation/fetch/files/101622dd94a7533623a7879fbda82cbff5160b06dc3176b42a1412d40b2e754b.mp4",
+ "sha256": "101622dd94a7533623a7879fbda82cbff5160b06dc3176b42a1412d40b2e754b",
+ "verdict": "FAIL",
+ "items": [
+  {
+   "id": "identity_of_mp4",
+   "result": "PASS",
+   "evidence": "sha256sum matches; video_probe 1920x1080, 121 frames, 5.057 s, AAC stereo"
+  },
+  {
+   "id": "single_continuous_side_fullbody_framing",
+   "result": "FAIL",
+   "evidence": "hard cut at 1.083 s (ffmpeg scene, frame 26; MCP frames 1.01 vs 1.26); after the cut a frontal bust close-up that slowly pulls back; MCP scene_detect at 0.25/0.1 missed it"
+  },
+  {
+   "id": "walks_among_panels",
+   "result": "FAIL",
+   "evidence": "walks only in 0-1.04 s; standing still in 1.26-4.80 s"
+  },
+  {
+   "id": "raise_hand_fingertip_touch",
+   "result": "FAIL",
+   "evidence": "hand already raised at frame 0; the touch mostly happens after the cut, 1.26-1.77 s close-up; before the cut only a near-touch with a small ring at 0.5-1.0 s"
+  },
+  {
+   "id": "panel_glow_then_drift_away",
+   "result": "FAIL",
+   "evidence": "concentric glow 1.77-2.28 s; no readable drift away, the panel stays behind her 2.5-4.8 s"
+  },
+  {
+   "id": "withdraw_hand_walk_on",
+   "result": "FAIL",
+   "evidence": "hand lowers about 2.8-3.5 s; she does not walk on, still standing at 3.5-4.8 s"
+  },
+  {
+   "id": "camera_truck_left_follow",
+   "result": "FAIL",
+   "evidence": "pre-cut floor phase-correlation 0 px over frames 1-25 (camera near static relative to floor); upper background +2 px/frame read as panel drift; post-cut frontal close-up then pull-back, no lateral follow"
+  },
+  {
+   "id": "gait_no_foot_sliding",
+   "result": "FAIL",
+   "evidence": "0-1.04 s feet stepping, subject moves only about 70 px of 1920 left while the floor is static; reads as walking in place; medium confidence, manual check advised (feet.jpg)"
+  },
+  {
+   "id": "no_mouth_movement_no_singing",
+   "result": "PASS",
+   "evidence": "face crops 1.13-4.89 s every 6 frames show lips closed; Whisper empty; audio_understand preview only (semantic audio NOT_EVALUATED, final uses a separate track)"
+  },
+  {
+   "id": "identity_canon_earpiece_redline",
+   "result": "FAIL",
+   "evidence": "earpiece stays on the left ear (PASS part), but from 1.13 s the red line is a glowing ring around the whole turtleneck collar reaching the right side (clear at 3.13-4.89 s; K7 has it only on the left collar edge); earpiece changes from K7 ear-hook to in-ear bud; collar changes from coat high collar to turtleneck"
+  },
+  {
+   "id": "space_light_continuity_K7_S7",
+   "result": "PASS",
+   "evidence": "dark room, floating cold-white panels, cold floor light spots, blue-black palette consistent with N4f-a and K7-a"
+  },
+  {
+   "id": "no_model_text_platform_label_kept",
+   "result": "PASS",
+   "evidence": "no text, letters or watermark in sampled frames; metadata UserComment aigc_label_type:0, source_info dreamina kept"
+  }
+ ],
+ "usable_span": [
+  0.0,
+  1.04
+ ],
+ "notes": "Only pre-cut segment, frames 0-25, continuous with first frame N4f-a. It shows a side-view walk with a fingertip near-touch and small ring glow; it lacks drift away, withdraw and walk on, and carries the camera and gait findings. Main session decides whether to use it. scene_detect missed the 1.083 s cut (analyzer limitation). Contact sheets in /tmp/n4gate/.",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

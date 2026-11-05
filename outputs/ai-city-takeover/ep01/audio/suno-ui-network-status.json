@@ -1,0 +1,22 @@
+{
+  "events": [
+    {
+      "event": "explicit_user_requested_Create_clicked",
+      "click_count_this_restart": 1
+    },
+    {
+      "event": "request",
+      "host": "suno.com",
+      "path": "/a/api/video_gen/pending_batches",
+      "method": "POST",
+      "at": "2026-10-30T22:16:29.839Z"
+    },
+    {
+      "event": "response",
+      "host": "suno.com",
+      "path": "/a/api/video_gen/pending_batches",
+      "status": 200,
+      "at": "2026-10-30T22:16:30.220Z"
+    }
+  ]
+}

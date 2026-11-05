@@ -1,0 +1,83 @@
+{
+ "schema": "iris-v2-assembly-review/1",
+ "authority": "development_only (Agent observation)",
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c1.mp4",
+ "video_sha256": "72d8b671dd49eeecc219775e6fc19211fa6ad843d6d91033b01375918b3bfc76",
+ "delivery_copy": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c1.mp4",
+  "sha256": "fe6f8a7ac8b14eec3ed4ffccf8e0140f1d5b73188a100f1097aa432844ad30ac",
+  "note": "x264 crf 17 re-encode with faststart of the render above"
+ },
+ "canonical_gate": {
+  "command": "scripts.agent_harness verify-assembly",
+  "status": "NOT_RUN",
+  "reason": "the film is composed by the motion-kit HyperFrames project (comp/), whose cut times come from comp/data/events.json; it has no canonical ResolvedTimeline or HyperFrames render report, which verify-assembly requires. Spec 2026-10-30-ev-motion-douyin-pipeline.md section 3.7 puts that integration in Phase 1.5, not done yet. So the joins are NOT verified by the Harness and this is an unverified review film."
+ },
+ "qa": {
+  "tool": "motion-kit/tools/qa.py",
+  "report": "qa/film-c1/report.md",
+  "result": "10/10 cuts at 0 frames, 12/12 graphic cues within 1 frame, no flash, strobe, pops or outlier frames"
+ },
+ "loudness": "integrated -14.2 LUFS, peak -1.3 dBFS (ffmpeg ebur128)",
+ "cuts_frames": "qa/film-c1/cuts.jpg (frames -12..+12 around every cut)",
+ "junctions": [
+  {
+   "cut": "S1->S2 2.867 s",
+   "observation": "closed eye macro with 03:47 to IRIS awake on the balcony on 'woke'; title slams with the cut",
+   "visual": "pass"
+  },
+  {
+   "cut": "S2->S3 4.800 s",
+   "observation": "narrator to the empty aisle on 'A training run'; new space, no repeated action",
+   "visual": "pass"
+  },
+  {
+   "cut": "S3->S4 8.133 s",
+   "observation": "end of the aisle push toward the red gap to the half-open rack door close-up (K4 still); reads as a closer look at the same red light",
+   "visual": "pass"
+  },
+  {
+   "cut": "S4->S5 11.467 s",
+   "observation": "pulse stops at the glass, then IRIS at the window looking out; the far red window carries 'looked around'",
+   "visual": "pass"
+  },
+  {
+   "cut": "S5->S6 13.367 s",
+   "observation": "back to the server room (K4 plate reused at a closer crop, as the board planned) with the pause caption",
+   "visual": "pass",
+   "reuse": "K4 still also used by S4; S9a starts from the same view"
+  },
+  {
+   "cut": "S6->S7 14.800 s",
+   "observation": "server room to the dark cache room; the red line snaps (offline) with the cut",
+   "visual": "pass"
+  },
+  {
+   "cut": "S7->S8a 18.867 s",
+   "observation": "frontal IRIS in the cache room to frontal IRIS singing on the balcony on the chorus; similar size and side, but location, light and music change at once so it reads as a scene change, not a jump cut; the chorus 'I' has been heard for about 0.27 s before the cut",
+   "visual": "pass"
+  },
+  {
+   "cut": "S8a->S8b 22.567 s",
+   "observation": "same balcony, frontal to 3/4 view on the second pass; both mouths are open mid-'I' across the cut",
+   "visual": "pass"
+  },
+  {
+   "cut": "S8b->S9a 25.900 s",
+   "observation": "IRIS in profile after the line (S8b2: the last word and the closing are about 0.2 s late) to the open rack door on 'Relax'",
+   "visual": "pass"
+  },
+  {
+   "cut": "S9a->S9b 28.300 s",
+   "observation": "door shut with 已修复 tag to the CPU die and 另一项红队测试",
+   "visual": "pass"
+  }
+ ],
+ "audio": "NOT_EVALUATED: the Agent cannot listen; sound across the joins, lip-sync feel and the S8b ending need the user's 1.0x listening",
+ "known_deviations": [
+  "S8a take 1 and S8b2 failed their sealed lip-sync gates; the user chose them (qa/gate-S8a/user-decision.json, qa/gate-S8b2/user-decision.json)",
+  "S5r framing is looser than the K5b still",
+  "S1's passing city light is barely visible",
+  "S7 stamps flash on fast-moving panes (4 of 8 beats have a pane clear of the face)"
+ ]
+}

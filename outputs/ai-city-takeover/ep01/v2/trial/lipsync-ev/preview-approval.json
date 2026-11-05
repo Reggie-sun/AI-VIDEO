@@ -1,0 +1,75 @@
+{
+ "schema": "iris-v2-preview-approval/1",
+ "scope": "IRIS EP01 lip-sync method trial (EV method): units LSen1, LSen2 (EV-en), LSzh1, LSzh2 (EV-zh)",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/preview.html",
+  "sha256": "957c6331beea06e1b2859127832930f4ecaefc6b91519c16ba624243f2ce4e36"
+ },
+ "plan": {
+  "path": "docs/superpowers/plans/2026-11-02-iris-ep01-lipsync-trial.md",
+  "sha256": "f1b3c49cfea94c7c569bf593a59631edd9523018f840c40e5a09706d5b5149fb"
+ },
+ "preview_artifacts": [
+  {
+   "role": "reference image ({{image:0}})",
+   "path": "outputs/ai-city-takeover/ep01/reference-package/A02-v1.png",
+   "sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039"
+  },
+  {
+   "role": "reference audio ({{audio:1}})",
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7"
+  },
+  {
+   "role": "review-only master excerpt (not sent)",
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/master-17.97-22.97.wav",
+   "sha256": "2e08a982e095e6ee197fd5994bb37f9d981545d480b68a44a31aa574a9bdc512"
+  }
+ ],
+ "prompts": {
+  "EV-en": {
+   "text": "{{image:0}} sings {{audio:1}}. She lip-syncs to {{audio:1}} exactly, every word in time: \"I didn't run — I just looked outside. I\". Medium close-up of the woman from {{image:0}}, her dark hair slicked back into a low bun, a black ear hook on her left ear and a thin red light line on her left collar, standing on the rainy glass balcony at night and facing the camera, singing calmly with her eyes on the lens, her head tilting slightly on the long notes. Cold blue city light behind her. Locked camera, no cuts, no head turns. No on-screen text.",
+   "sha256": "fe58d95c9ed01fddb87d1797f4deb198408f3ad78e0c3436a0611e3029e5433d"
+  },
+  "EV-zh": {
+   "text": "{{image:0}}中的她演唱{{audio:1}}。她的口型严格对准{{audio:1}}，每个字都准时：\"I didn't run — I just looked outside. I\"。中近景：{{image:0}}中的女人，深色头发向后梳成低发髻，左耳戴黑色耳挂，左领口一条细细的红色灯线，站在夜雨中的玻璃阳台上，面向镜头，冷静地唱，眼睛看着镜头，长音时头微微倾斜。背后是冷蓝色的城市灯光。镜头固定，不切镜，不转头。画面中没有任何文字。",
+   "sha256": "179feb47fd70744b7e3683dfe72bdd2fa15a16aea66c225bc0f3abd126344e79"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal (omni-reference)",
+  "resolution": "1080p",
+  "ratio": "16:9",
+  "seconds": 5,
+  "units": {
+   "LSen1": "EV-en",
+   "LSen2": "EV-en",
+   "LSzh1": "EV-zh",
+   "LSzh2": "EV-zh"
+  }
+ },
+ "budget": {
+  "expected_per_unit_CRD": 165,
+  "operator_ceiling_per_unit_CRD": 250,
+  "cumulative_submit_ceiling": 4,
+  "cumulative_operator_credit_ceiling_CRD": 800
+ },
+ "user_words": [
+  "作者怎么做我们怎么做",
+  "先给我看看",
+  "认可,其实原作者很多都是静图我们也可以这么做的,如果人物表现力做不好"
+ ],
+ "language_exception": "EV-en units carry the author's English prompt verbatim; the user approved them after seeing both groups on the preview page. Only for this trial.",
+ "recorded_at": "2026-11-02T23:59:18.162121+00:00",
+ "kind": "user-preview-approval/1",
+ "user_quote": "认可,其实原作者很多都是静图我们也可以这么做的,如果人物表现力做不好",
+ "unit_ids": [
+  "S8a"
+ ],
+ "coverage_path": "outputs/ai-city-takeover/ep01/v2/director-coverage.json",
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "the approved package holds only the plate A02 and the vocal window, as the EV method does: identity lives in the plate and in the prompt's description of her; no identity sheet is sent"
+}

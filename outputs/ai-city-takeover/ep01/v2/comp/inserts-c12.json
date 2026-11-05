@@ -1,0 +1,35 @@
+{
+ "about": "c12 inserts (user on c11: 「還不夠，繼續加」, then reuse existing material for free). Each insert cuts away from a c11 shot and back without moving any c11 cut: the c11 shot keeps its own clock underneath (main.js pickShot), so it resumes where it would have been. A 'take' insert plays a window of an earlier generated take at normal speed (seq.py writes seq/<id>, source SHA-256 checked); a 'still' insert is an approved plate moved by the code camera. Camera [centre x, centre y, zoom] in source px, 'from' -> 'to'. start: 'at_word' [line, word] two frames early like build.py's vocal cuts, or 'at_beat' (index into beats.json). end: the same, or 'cut' (the insert runs into that c11 cut). Rule (user on the takes): no visible singing mouth, no frown; only hands/profile/eyes/hair/wide/environment moments. 'pips' are picture-in-picture insets (480x270 frames under comp/pip/<id>, drawn on the feed layer by main.js).",
+ "decision": "user 2026-11-03 on c11: 「還不夠，繼續加」; direction 「兩條都做 (Recommended)」, c12 = free reuse of existing material (logs/decisions.md)",
+ "inserts": [
+  {"id": "I1", "kind": "take", "take": "S9a", "in": 3.4, "from": [960, 540, 1.0], "to": [960, 540, 1.0],
+   "start": {"at_word": [2, 1]}, "end": {"cut": "S3"},
+   "why": "'twenty.': where it happened - the server room by the glass, the city outside (S9a after the door has shut: no red, no person)"},
+  {"id": "I2", "kind": "still", "plate": "K9b", "from": [836, 470, 1.1], "to": [800, 470, 1.18],
+   "start": {"at_word": [2, 4]}, "end": {"at_beat": 12},
+   "why": "'run.': the training run - the chip, pushing in"},
+  {"id": "I3", "kind": "take", "take": "S9a", "in": 0.0, "from": [560, 540, 1.5], "to": [560, 560, 1.56],
+   "start": {"at_beat": 18}, "end": {"at_word": [4, 2]},
+   "why": "'one door,': the door itself, still open and lit red (S9a's first frames, before it starts to shut), framed on the gap"},
+  {"id": "I4", "kind": "take", "take": "S3", "in": 0.5, "from": [960, 540, 1.0], "to": [960, 540, 1.0],
+   "start": {"at_word": [9, 2]}, "end": {"at_word": [9, 4]},
+   "why": "'train': the training aisle (S3's early push, which c11 does not use)"},
+  {"id": "I5", "kind": "take", "take": "S7", "in": 2.2, "from": [440, 470, 2.2], "to": [470, 470, 2.2],
+   "start": {"at_word": [10, 1]}, "end": {"at_word": [10, 4]},
+   "why": "'a copy': the cached panes of the first S7 take sliding past, framed on the panes only (her face and mouth stay out of frame)"},
+  {"id": "I6", "kind": "take", "take": "S5r", "in": 1.0, "from": [1180, 360, 1.6], "to": [1205, 360, 1.6],
+   "start": {"at_word": [13, 2]}, "end": {"at_beat": 50},
+   "why": "chorus 'run' (second pass): she stands at the glass, a closer profile than the K5 still around it (at 1.25 it read as a jump cut), mouth closed - she did not run"},
+  {"id": "I7", "kind": "still", "plate": "P8c", "from": [880, 380, 1.12], "to": [900, 372, 1.18],
+   "start": {"at_beat": 55}, "end": {"at_beat": 56},
+   "why": "after 'Relax.': her, calm at the glass, mouth closed (P8c, approved, not used before)"}
+ ],
+ "pips": [
+  {"id": "pipK4", "kind": "still", "plate": "K4", "crop": [380, 60, 440, 248], "to": [400, 90, 400, 225],
+   "why": "S3d: the resolver on the diagram is the red gap in the machine room (K4)"},
+  {"id": "pipS5", "kind": "take", "take": "S5", "in": 1.0, "frames": 44,
+   "why": "S6: while the rest stood still, IRIS at the glass (the first S5 take, profile, mouth closed)"},
+  {"id": "pipK9e", "kind": "still", "plate": "K9e", "crop": [180, 100, 840, 473], "to": [230, 130, 760, 428],
+   "why": "S9b: the door shut in the machine room (K9e) beside 另一项红队测试"}
+ ]
+}

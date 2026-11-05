@@ -1,0 +1,30 @@
+artifact_id: iris-v2-s9a-brief
+audience: 中文短视频观众
+constraints:
+- 机柜门平稳关上，门缝变窄直到消失，红光熄灭，之后画面静止
+- 同一机位：从K4起始画面到K9e结束画面，摄影机固定不动
+- 保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。
+content_hash: 2106300b84224ab61e7aeaba1d88780c4ffdaa6b3b01f0e631ce2781d59bce8e
+creation_receipt_id: iris-v2-s9a-authoring
+format: 1920×1080 30fps horizontal source
+language: zh
+objective: 分镜 v2.1 S9a 六秒源片
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 4b80e9faf55ce864802a67ac872efa9a62ed3568073df56c153afa1a9ca4f8f8
+  kind: user_input
+  reference: evidence/authoring-input/4b80e9faf55ce864802a67ac872efa9a62ed3568073df56c153afa1a9ca4f8f8.json
+- content_hash: 7cdd3a65989ac64e2b1de4921d9ecb80d84fdacedef6552f251270e13d2caaeb
+  kind: user_input
+  reference: evidence/authoring-input/7cdd3a65989ac64e2b1de4921d9ecb80d84fdacedef6552f251270e13d2caaeb.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 53d1b791e5c37796a532d12e9a9c5e85a7d26fe2107114522e9e2a070e0557ed
+  kind: user_input
+  reference: evidence/authoring-input/53d1b791e5c37796a532d12e9a9c5e85a7d26fe2107114522e9e2a070e0557ed.json
+- content_hash: 62350a5852980995c9e19b470386318af8e9eed7e4587c938383cde306a5d648
+  kind: user_input
+  reference: evidence/authoring-input/62350a5852980995c9e19b470386318af8e9eed7e4587c938383cde306a5d648.json
+title: IRIS EP01 v2 S9a source

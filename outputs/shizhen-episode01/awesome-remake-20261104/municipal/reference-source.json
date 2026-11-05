@@ -1,0 +1,14 @@
+{
+  "kind": "task-generated-reference-observation/1",
+  "path": "outputs/shizhen-episode01/awesome-remake-20261104/refs/storyboard-v2.png",
+  "sha256": "1509083877457f82b02f8ef471353ade303c21b997c913f0d6640c812c76c177",
+  "generator": "image_gen.imagegen",
+  "generation_intent": "outputs/shizhen-episode01/awesome-remake-20261104/refs/generation-intent.json",
+  "repair_intent": "outputs/shizhen-episode01/awesome-remake-20261104/refs/storyboard-repair-intent.json",
+  "role": "soft reference; identity and visual relations in cells 01/02 only",
+  "user_preview": "approved whole storyboard; no clean frame shown",
+  "video_acceptance": "NOT_EVALUATED",
+  "width": 1448,
+  "height": 1086,
+  "size_bytes": 2433989
+}

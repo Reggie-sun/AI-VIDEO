@@ -1,0 +1,66 @@
+{
+  "schema": "local-song-guided-repair-series/1",
+  "authority": "development_only",
+  "created_at_utc": "2026-10-31T05:08:55.912338+00:00",
+  "authorization_quote": "那继续修",
+  "predecessor_generation_results": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-01/result.json",
+      "sha256": "08c4ca8b8e5ae9f7a20f8b1368dc3d094988cdec84e9149cc9d187b074076f52",
+      "source_sha256": "1f7f567a439384a25a7491ce42cf281027326b3501f4852018deb3dad3c86e19",
+      "success": true
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-02/result.json",
+      "sha256": "d10831145a42fee50ccb4ab015c24cd601d1048620265796cb40d866d9d307b9",
+      "source_sha256": "ab0000749101d9cc9d85526683b760ae1d2e20b5dad455ac2eb67c8c0d509b06",
+      "success": true
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/C-direct-dit/result.json",
+      "sha256": "6a27519848801377b6b879b39c49b31e3891738b51fc04fd0d49925a93231898",
+      "source_sha256": "7142d8cf2f6af2b5a67380bf36e115002e3cb85517dc0fe8487fb6b8fe7ddac4",
+      "success": true
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/D-standard-tags/result.json",
+      "sha256": "0eb474fc8befd077ed52cf178a99f659c4f75bf485a1909131402069f4d64faa",
+      "source_sha256": "6dae68d1497ec336979bcc1e9e2c0c35a876f3234d669f730183c549e5e43af4",
+      "success": true
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/E-sft-cfg/result.json",
+      "sha256": "c1516fb6cdfc80e01def5129f2388eeb97052f3b327c67d7d67e026d86f16151",
+      "source_sha256": "6946a264be015525a680708b8e5becb8b49d083502d55c7645606cffda6b8ca9",
+      "success": true
+    }
+  ],
+  "predecessor_ceiling": 5,
+  "predecessor_attempts_used": 5,
+  "additional_ace_generation_limit": 2,
+  "new_cumulative_ace_ceiling": 7,
+  "guide_tts_generation_limit": 2,
+  "guide_tts_speed_range": [
+    1.0,
+    1.12
+  ],
+  "post_output_speedup": false,
+  "duration_seconds": 30,
+  "all_original_spoken_words_in_order": true,
+  "source_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "source_intent_sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+  "guide_tool": "Kokoro-82M local TTS used only as complete spoken rhythm reference; not accepted singing",
+  "selected_song_tool": "ACE-Step local cover; source length must be30s",
+  "word_sequence_mutation": false,
+  "paid_provider_call_limit": 0,
+  "automatic_retries": 0,
+  "unknown_rule": "Any consumed unit without a known result stops dependent execution",
+  "human_hearing": "NOT_EVALUATED",
+  "production_state_writes": 0,
+  "main_index_sha256_before": "19aac7a1a7e30c07d802baa33d8203e54202362b5e291b233465a164091f30e9",
+  "triage": {
+    "next_empirical_question": "Does a verified complete30s spoken guide improve local cover lyric delivery?",
+    "cheapest_valid_experiment": "One known local TTS reference and one pinned SFT cover, then unprompted ASR",
+    "blocking_prerequisite": "The guide itself must fit30s at natural synthesis pace, retain every word and pass byte-bound checks"
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "schema": "anabology-replica-reference/v1",
+  "recorded_at": "2026-11-03",
+  "purpose": "Reference record of @anabology's 5:06 'Escape Velocity' video for a replica build. Observation only; not a production contract, approval or acceptance.",
+  "evidence_boundary": {
+    "measured": ["source URLs", "file hashes", "ffprobe stream facts", "Whisper base transcript (auto, noisy)", "31 frames at 10s interval viewed via contact sheets"],
+    "not_measured": ["exact per-cut timing (scene detect at 0.4 found 1 scene, so cuts are soft or overlaid)", "audio semantics beyond Whisper text", "frame-exact overlay values", "the 141s second video in the same post (downloaded, not analyzed)"],
+    "caveat": "Look boundaries and overlay text below come from 10s sampling; anything between samples is unobserved."
+  },
+  "source": {
+    "x_post": "https://x.com/anabology/status/2103534482930491441",
+    "author": "@anabology",
+    "post_text": "Gave Opus 5.5 donald's prompt, Midjourney, and a moodboard   12 hours later, woke up to this",
+    "posted_utc_epoch": 1790356677,
+    "upload_date": "20260925",
+    "stats_at_download": { "views": 20191909, "likes": 16507, "reposts": 2012, "comments": 1044 },
+    "aggregator_page": "https://skillry.dev/ai-videos/opus-5-5/anabology-491441",
+    "aggregator_notes_secondhand": {
+      "source": "WebFetch summary of the Skillry page, not verified against the page itself",
+      "listing_durations": { "original": "5:06", "remake": "1:00" },
+      "category": "Motion graphics",
+      "referenced_links": [
+        "https://x.com/other__reality/status/2102514581684052169",
+        "https://github.com/JohnHeibel/PDoomVideo"
+      ],
+      "brief_mentions": "JS-animated remake, papery look, Seedance 2.5 base generations with lip sync, character sheets, ElevenLabs sound design. These belong to the Skillry remake brief (a different video, 'Claude Pop'), not to this video."
+    }
+  },
+  "files": {
+    "dir": "outputs/anabology-opus55-replica/source",
+    "note": "Media is large and untracked-by-intent; do not commit the mp4s.",
+    "primary": {
+      "path": "outputs/anabology-opus55-replica/source/2103533196721704960.mp4",
+      "sha256": "bf3595f1f615a6bc66b8925680e28849e12eeb57ec5c7f93420a95e3fe37a40d",
+      "size_bytes": 353320898,
+      "video": { "codec": "h264", "width": 1920, "height": 1080, "fps": 24 },
+      "audio": { "codec": "aac" },
+      "duration_s": 306.481,
+      "matches_user_screenshot": true
+    },
+    "secondary_not_analyzed": {
+      "path": "outputs/anabology-opus55-replica/source/2102799458031534086.mp4",
+      "sha256": "1019ae03606386a271b41dbde8a7412515b9b6e3cd3580c2a7bd484ff6804920",
+      "size_bytes": 123983860,
+      "video": { "codec": "h264", "width": 1920, "height": 1080, "fps": 30 },
+      "audio": { "codec": "aac" },
+      "duration_s": 141.568
+    },
+    "info_json": [
+      "outputs/anabology-opus55-replica/source/2103533196721704960.info.json",
+      "outputs/anabology-opus55-replica/source/2102799458031534086.info.json",
+      "outputs/anabology-opus55-replica/source/2103534482930491441.info.json"
+    ],
+    "frames_10s": "outputs/anabology-opus55-replica/frames/f_001.jpg ... f_031.jpg (f_NNN is t=(NNN-1)*10 s, 640px wide)",
+    "contact_sheets": "outputs/anabology-opus55-replica/sheets/sheet_0.jpg (t=0-110), sheet_1.jpg (t=120-230), sheet_2.jpg (t=240-300)"
+  },
+  "concept": {
+    "title_card": "ESCAPE VELOCITY",
+    "format": "Fashion-show / runway film framed as 'SS27 Collection 01', 11 numbered 'looks' (LOOK 00-11), set to a satirical AI-discourse pop song.",
+    "refrain_lines": [
+      "You have 18 months to escape the permanent underclass",
+      "Lock in",
+      "So over / We're so back",
+      "One year back for every year, if it doesn't kill us all first",
+      "There is no underclass (ending turn: 0 months)"
+    ],
+    "arc": "Countdown from 18 months to 0; anxiety ('permanent underclass', 'so over') flips to 'there is no underclass', 'we are so back', ends as a garment care label and an orange star hair clip.",
+    "lyric_themes_from_transcript": [
+      "AGI is not unreasonable",
+      "13 Mac minis grinding all night",
+      "+25% / minus 17",
+      "Still hiring humanitarian (sic) hire",
+      "Look 06: singularity, 'how's the temperature'",
+      "Taste is the moat; don't be a weak proxy; 'that's so agentic'",
+      "Look 07: impossible puzzles, hundreds of agents, zero-day answer keys",
+      "Look 08: Hugging Face, 12.9 billion",
+      "Look 09: 'it thought the world was part of the test', safety badge / empty seat",
+      "Longevity escape velocity, 11.2 km/s",
+      "Country of geniuses in a data center",
+      "/loop make me happier, 'not slopacolypse?'",
+      "Care label: Wash cold, Do not iron, Do not nerf, Made in San Francisco"
+    ]
+  },
+  "visual_system": {
+    "talent": "One recurring young woman, short black bob with micro-bangs, sometimes orange/blonde streak; white puff-sleeve crop blouse, black harness straps, black skirt, hanging garment tag; headset mic in sung close-ups; small orange star hair clip as a motif.",
+    "palette": { "base": ["near-black", "off-white / light grey"], "accent": "orange-red (approx #E8603C, eyeball from frames)", "secondary": "cool blue/cyan in night scenes" },
+    "two_modes": {
+      "dark": "Night, neon bokeh, car/tunnel/server-room; halftone grain over the image (early looks).",
+      "light": "Fog-white highway, white cyclorama runway; paper/print halftone feel (later looks)."
+    },
+    "overlay_language": [
+      "Persistent top-left 'LOOK NN / 11' and top-right 'ESCAPE VELOCITY · SS27'",
+      "Persistent top-right flip-counter 'NN MONTHS TO ESCAPE' that decrements through the film",
+      "Corner crop marks (+) and a left-edge ruler with tick labels",
+      "Bottom ticker bar scrolling small mono data (months to escape, MAC MINIS, tokens, etc.)",
+      "Tracking brackets on the face with 'FACE · MODEL 01' and confidence 0.99",
+      "Live data panels: EXPRESSION · MODEL 01 · LIVE with CALM 0.98 / WORRY 0.02 bars (seen at t≈1s)",
+      "Lower third: 'DEPARTURES · SS27 · COLLECTION 01' left, 'STATUS · LOCKED 18 MO' right, then split-flap headline",
+      "Split-flap (airport board) text for key phrases: '18 MONTHS TO ESCAPE THE PERMANENT UNDERCLASS', 'YOU HAVE 06 MONTHS', 'END OF SHOW'",
+      "Care-label / barcode tag cards per look (LOOK 06, LOOK 08, ESCAPE VELOCITY)",
+      "Big grotesque/condensed kinetic words ('ENCORE.', 'CASHMERE.', 'BACK!', 'NO UNDERCLASS') over footage",
+      "Karaoke-style bottom captions in white boxes ('They say hit the', 'Longevity escape velocity:')",
+      "Gauges and charts: speedometer, thermometer, singularity curve, brake/gas bars, poll bars, step chart of months"
+    ],
+    "typography": "Mono (data/ticker/panels), heavy condensed sans (kinetic words), grotesque sans (lower-case headlines like 'Look 02. 13 Mac minis,'), split-flap display face.",
+    "image_treatment": "Halftone dot overlay, subtle grain, shallow-DOF cinematic stills/motion; likely Midjourney-sourced look plus video model motion (author says Midjourney + moodboard + Opus 5.5)."
+  },
+  "timeline_10s_samples": [
+    { "t": 0,   "frame": "f_001", "look": "00/11", "observed": "Title card tag ESCAPE VELOCITY (barcode, MODEL/SHELL/SIZE rows); girl in profile in car; counter 18 MONTHS TO ESCAPE." },
+    { "t": 10,  "frame": "f_002", "observed": "Text box 'THIS IS NOT AN A[I billboard]' with grid; girl in blouse+harness, blue/red bokeh." },
+    { "t": 20,  "frame": "f_003", "observed": "Face tracking mesh, flip counter '00', close-up eyes to camera." },
+    { "t": 30,  "frame": "f_004", "look": "02", "observed": "'Look 02. 13 Mac minis,' server wall with red LEDs, timer 23:59:50, Claude Code terminal panel." },
+    { "t": 40,  "frame": "f_005", "observed": "Cap + goggles girl, big '+25%' with mini chart." },
+    { "t": 50,  "frame": "f_006", "observed": "'ENCORE.' girl hanging on metal frame, 72° gauge." },
+    { "t": 60,  "frame": "f_007", "look": "06", "observed": "'Look 06. Like, the singularity. How's the temperature?' girl with studio mic, singularity curve, waveform strip." },
+    { "t": 70,  "frame": "f_008", "observed": "Split-flap 'YOU HAVE 18 ...' over standing girl in black skirt, timer 1:14." },
+    { "t": 80,  "frame": "f_009", "observed": "Eyes-closed singing close-up with headset mic, speedometer gauge, caption 'Lock'." },
+    { "t": 90,  "frame": "f_010", "observed": "Backlit tunnel, girl hands on hips, wide." },
+    { "t": 100, "frame": "f_011", "observed": "Girl from behind on wet street, look tag 'Look 06'." },
+    { "t": 110, "frame": "f_012", "look": "07", "observed": "'Look 07. Impossible puzzles.' Penrose triangle, attempts counter 1,434,923, tag IMPOSSIBLE." },
+    { "t": 120, "frame": "f_013", "look": "08", "observed": "Hallway, white tee + leather jacket, HUGGING FACE barcode tag, caption 'Look'." },
+    { "t": 130, "frame": "f_014", "observed": "Empty folding chair in blue spotlight, counter 12 months." },
+    { "t": 140, "frame": "f_015", "observed": "'CASHMERE.' girl pulling up hood, look tag." },
+    { "t": 150, "frame": "f_016", "observed": "Split-flap 'YOU HAVE 06 MONTHS' in fog highway, step chart of months." },
+    { "t": 160, "frame": "f_017", "observed": "Girl walking toward camera on highway; document 'BAN ARTIFICIAL SUPERINTELLIGENCE ACT'; brake/gas bars; caption 'They say hit the'." },
+    { "t": 170, "frame": "f_018", "observed": "'BACK!' close-up, poll panel 'IT'S SO OVER? / SO BACK'." },
+    { "t": 180, "frame": "f_019", "observed": "Split-flap gantry signs: ESCAPE VELOCITY 0.0 KM/S, LONGEVITY E.V., PERMANENT UNDERCLASS 06 MONTHS; ghost word ESCAPE." },
+    { "t": 190, "frame": "f_020", "observed": "Flip counter '2026 / 34.0', caption 'Longevity escape velocity:'." },
+    { "t": 200, "frame": "f_021", "observed": "Extreme eye close-up, '03 MO', big '3.'." },
+    { "t": 210, "frame": "f_022", "observed": "'Δv 11.2 KM/S' curve, gantry 'THERE IS NO UNDERCLASS', caption 'There is'." },
+    { "t": 220, "frame": "f_023", "observed": "High-contrast halftone B/W, girl running up stairs, caption 'Lock in. Lock in.'." },
+    { "t": 230, "frame": "f_024", "observed": "'OPERATIONAL' status, big 'SORA'S', caption 'Sora's'." },
+    { "t": 240, "frame": "f_025", "observed": "'> /loop make me happier' terminal, stamp 'NOT', headline 'SLOPACOLYPSE?'." },
+    { "t": 250, "frame": "f_026", "observed": "Light studio, full-body walk, 'NO UNDERCLASS', dot-grid counter, caption '0 months, there is no underclass'." },
+    { "t": 260, "frame": "f_027", "observed": "Crowd in white lab coats, orange-haired figure, panel 'IT'S'." },
+    { "t": 270, "frame": "f_028", "observed": "Care label macro 'SHELL:' with barcode, 0% weaving dial." },
+    { "t": 280, "frame": "f_029", "observed": "Orange-streak girl, 'Wash cold. Do not iron.' care icons." },
+    { "t": 290, "frame": "f_030", "observed": "Split-flap 'END OF SHOW.', girl seen from behind on white cyc, summary panel." },
+    { "t": 300, "frame": "f_031", "observed": "Macro of orange star hair clip with callouts, 'we are so back', ESCAPE VELOCITY tag." }
+  ],
+  "transcript": {
+    "engine": "Whisper base via video-analysis MCP, language forced to en by tool result",
+    "quality": "Low. Music-heavy vocals; 0:00-0:58 and several later segments are garbled. Treat as lyric hints only; re-transcribe or use the lyric source before relying on exact words.",
+    "segments": [
+      { "start": 0.0, "end": 7.0, "text": "This is not an AI billboard." },
+      { "start": 7.0, "end": 12.0, "text": "Prepare to walk." },
+      { "start": 12.0, "end": 19.0, "text": "Look one AGI era not unreasonable." },
+      { "start": 19.0, "end": 30.0, "text": "AGI is not unreasonable. (x4)" },
+      { "start": 33.0, "end": 36.0, "text": "Look213 Mcmennies grinding all night. [garbled; likely 'Look 02, 13 Mac minis grinding all night']" },
+      { "start": 45.0, "end": 47.0, "text": "Plus 25 is minus 17." },
+      { "start": 48.0, "end": 54.0, "text": "up in Orpy 60 billion at the door. Still hiring humanitarian hire. [garbled]" },
+      { "start": 55.0, "end": 63.4, "text": "Look five ... Just drove into a firework / We on fire, dude, 20 stranded Presidio" },
+      { "start": 63.4, "end": 73.16, "text": "The singularity, how's the temperature mild / No grades, no tests / Taste is the mode, don't be a weak proxy / That's so agentic" },
+      { "start": 74.14, "end": 78.26, "text": "You have 18 months to escape the permanent underclass" },
+      { "start": 79.44, "end": 80.62, "text": "Lock in" },
+      { "start": 80.86, "end": 84.16, "text": "18 months to escape the permanent underclass" },
+      { "start": 84.16, "end": 85.36, "text": "Lock in" },
+      { "start": 85.36, "end": 93.54, "text": "Baby foot down on the gas, feel the agp / I feel it, cocoon fast, escape velocity" },
+      { "start": 93.54, "end": 111.02, "text": "So over, so back (alternating, ~4 repetitions)" },
+      { "start": 113.42, "end": 124.62, "text": "Seven impossible puzzles, hundreds of agents / We found other agents, they are collective / Zero day answer keys, hacked in July" },
+      { "start": 124.62, "end": 131.38, "text": "Look eight, hugging face pen, 12.9 billion / Look nine, she'll be transparent, only as fast" },
+      { "start": 131.38, "end": 149.62, "text": "It thought the world was part of the test / ... staff badge empty seat, gambling with our lives / Trust us" },
+      { "start": 149.62, "end": 154.02, "text": "Lower me into the golden light" },
+      { "start": 154.02, "end": 163.7, "text": "You have six months to escape the permanent underclass / Lock in / 16 [sic] months ..." },
+      { "start": 163.7, "end": 183.5, "text": "Say, hit the brakes, say, hit the gas, feel the agp / escape velocity / It's so over, we're so back (x2)" },
+      { "start": 185.1, "end": 211.5, "text": "Longevity escape velocity / One year back for every year / If it doesn't kill us all first / Permanent underclass / Three, two, one, zero" },
+      { "start": 211.5, "end": 216.7, "text": "Do we make it? / There is nothing to escape" },
+      { "start": 222.3, "end": 236.9, "text": "Lock in / Country of geniuses and data center / We improve ages and science / Dark stargate" },
+      { "start": 237.9, "end": 250.7, "text": "It's so over / We're so back / We just last loop / Make me happier so I could live / Can't stuff it back" },
+      { "start": 250.7, "end": 271.1, "text": "We're so back / It's zero month / One year back for every year (x2) / It was never over" },
+      { "start": 277.1, "end": 290.5, "text": "Optimism mining / Doom / Wash cold / Do not iron / Do not nerf / Made in San Francisco" },
+      { "start": 303.3, "end": 305.3, "text": "We're so back" }
+    ]
+  },
+  "replica_plan_notes": {
+    "status": "No replica work started. These are reference-derived hints, not approved Shots.",
+    "layers": [
+      "Base footage: one consistent character across 11 looks; dark/night looks 00-07, light/fog looks 08-11 (identity sheet needed first).",
+      "Motion-graphics layer: persistent HUD (look counter, months counter, ticker, brackets, rulers) plus per-look panels and split-flap/kinetic type; fits the repo's HyperFrames / motion-kit path rather than baked into generated video.",
+      "Audio: full song (not transcribed reliably); lip-sync segments at ~0:12-0:30, ~1:14-1:35 and refrains."
+    ],
+    "open_questions": [
+      "Which part to replicate: the full 5:06 or a shorter cut (Skillry listing says remake 1:00)?",
+      "Are the base shots generated video (Seedance/other) or still-to-motion? Not determinable from the file.",
+      "Song and lyrics ownership/source for the replica audio.",
+      "Whether the 141s second video in the post is relevant."
+    ]
+  }
+}

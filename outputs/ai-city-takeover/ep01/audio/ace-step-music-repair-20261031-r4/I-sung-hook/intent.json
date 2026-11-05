@@ -1,0 +1,58 @@
+{
+  "schema": "local-song-source-unit/1",
+  "series": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/series-intent.json",
+    "sha256": "a217deaa718a8767d6e8908047b8d47914d59a380b998fbe4c9d7426deac30a8"
+  },
+  "label": "I",
+  "role": "sung_hook",
+  "ordinal": 9,
+  "runtime_root": "/home/reggie/.local/share/ai-video/ace-step/runtime-ca1e85fe",
+  "code_sha": "ca1e85fe9430179831e6bc6be790c332190a3866",
+  "model": "acestep-v15-sft",
+  "weights_manifest": {
+    "path": "/home/reggie/.local/share/ai-video/ace-step/weights-sft-manifest.json",
+    "sha256": "09fec3e95fbeed0862d1e468863e11be2e50336bfe9f9259d29ec54b8a324ee2"
+  },
+  "weights_revision": "c410d249e71ea9385a7b586865e65b1473e1098d",
+  "inputs": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/I-sung-hook/inputs.json",
+    "sha256": "fd86658fc3ebb1ab77bc8652085cad635c15cad19b87b196291beb643ec53a11"
+  },
+  "predecessors": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-01/result.json",
+      "sha256": "08c4ca8b8e5ae9f7a20f8b1368dc3d094988cdec84e9149cc9d187b074076f52"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-02/result.json",
+      "sha256": "d10831145a42fee50ccb4ab015c24cd601d1048620265796cb40d866d9d307b9"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/C-direct-dit/result.json",
+      "sha256": "6a27519848801377b6b879b39c49b31e3891738b51fc04fd0d49925a93231898"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/D-standard-tags/result.json",
+      "sha256": "0eb474fc8befd077ed52cf178a99f659c4f75bf485a1909131402069f4d64faa"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/E-sft-cfg/result.json",
+      "sha256": "c1516fb6cdfc80e01def5129f2388eeb97052f3b327c67d7d67e026d86f16151"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/F-guided-cover/result.json",
+      "sha256": "3626b6a236f88f0082e7a9ba3ee2971ae10ba9b80c005ddba9feccbf82755474"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/G-guided-retention/result.json",
+      "sha256": "9dbbc03fbee1acf5616d23effd82d066bfe1e406d1d30432cdf47390b8a347f0"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/H-instrumental/result.json",
+      "sha256": "2f3eb1e93e94c807370a45f825392eebd51a491a93ede1ac4f485510fa1a2520"
+    }
+  ],
+  "runner_sha256": "e35e60dd2cddc0e42f7ccb2f4aa485d10b91715677caf6db7c6d2bd243228638",
+  "creative_delta": "Generate only exact original chorus as actual sung source at same declared126BPM/Eminor, no speech-reference cover. Complete original verse/prechorus/outro retained separately, not deleted."
+}

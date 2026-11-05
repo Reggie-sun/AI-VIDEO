@@ -1,0 +1,34 @@
+{
+  "project_id": "829df260-5a63-4f0d-8265-8353dc693b3b",
+  "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+  "nodes": [
+    {
+      "id": "node_nxqx68czn9",
+      "type": "video",
+      "data_keys": [
+        "source",
+        "tags",
+        "title",
+        "resourceBatches",
+        "generationDraft"
+      ],
+      "generationDraft": {
+        "kind": "video",
+        "parts": [],
+        "contentSettings": {
+          "mode": "multiModal",
+          "modelName": "seedance_2.0_vip",
+          "aspectRatio": "16:9",
+          "resolution": "720p",
+          "durationSeconds": 4,
+          "isLongVideo": false
+        },
+        "outputCount": 1,
+        "references": []
+      }
+    }
+  ],
+  "credits": "Credits: 68189 · 超级会员",
+  "observed_at": "2026-10-30T22:29:20.701Z",
+  "generation_POSTs": 0
+}

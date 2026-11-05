@@ -1,0 +1,49 @@
+{
+ "unit": "LSzh2",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "9c4a5e7a3cd091d699220fa63e1b6ee2485ff51b9cb8e96dbe195678ca779b9b",
+ "compiled_prompt_sha256": "179feb47fd70744b7e3683dfe72bdd2fa15a16aea66c225bc0f3abd126344e79",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/continuity-report.json",
+  "sha256": "46c65da61c12ebcea04f6e5cbfd9215909edd2001259527982fd9344aa9cde4e",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS：與 LSzh1 相同的輸入與判定（row.json、source-selections.json 與 LSzh1 位元相同，是事先登記的重複）。見 shared_findings.continuity。",
+   "handoff": "PASS：同 LSzh1；出點接法待決（R4）。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：同 LSzh1（R6 用詞差異；動作階段風險見 R1）。",
+   "prompt_fit": "PASS：去檔尾換行後與 EV-zh 逐字相同（sha256 179feb47fd70744b7e3683dfe72bdd2fa15a16aea66c225bc0f3abd126344e79）；標記與綁定經 jimeng_meta_list 驗證；只送 1 圖＋1 音訊，皆在使用者預覽中；獨立 node_wr3xr898vj、attempt iris-lszh2-source-001。",
+   "lint": "PASS（continuity_report_ready 待本報告）：pre-submit-lint.json（34b3b84e…）10 項 true，已獨立重算；request_hash 9c4a5e7a3cd091d699220fa63e1b6ee2485ff51b9cb8e96dbe195678ca779b9b 等於 prepare-result。",
+   "gaps": [],
+   "risks": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 250,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   4,
+   800
+  ]
+ },
+ "new_calls": 0
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": "2.0",
+  "revision_id": "199fb9f92a25367b7c2f1d00e1c722d7f852defdf945faea0442532c56761cab",
+  "content_hash": "199fb9f92a25367b7c2f1d00e1c722d7f852defdf945faea0442532c56761cab",
+  "assets": [
+    {
+      "asset_id": "iris-c-v3-s1-1-eye-closed",
+      "asset_type": "image",
+      "artifact_path": "assets/files/a1b3319973ed8ba508c6ccc686f91d35f76367781178d27a81fbbd829aadf996.png",
+      "sha256": "a1b3319973ed8ba508c6ccc686f91d35f76367781178d27a81fbbd829aadf996",
+      "size_bytes": 1997741,
+      "mime_type": "image/png",
+      "duration_seconds": null,
+      "width": 1672,
+      "height": 941,
+      "source_kind": "imported",
+      "tool": {
+        "name": "approved-local-source-import",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "721b2483dd323a159493005eb709b539080dd578d30adbee48cbf14cfe8dbadb",
+      "creation_receipt_id": "iris-v2-local-import:a1b3319973ed8ba508c6ccc686f91d35f76367781178d27a81fbbd829aadf996",
+      "usage_license": "User-authorized project reference; no platform ownership claim.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null
+    },
+    {
+      "asset_id": "iris-c-v3-s1-2-eye-open",
+      "asset_type": "image",
+      "artifact_path": "assets/files/b97d604fc44626308e789dd6ab886626d4be4da3ee4d42619cadf475bda268b9.png",
+      "sha256": "b97d604fc44626308e789dd6ab886626d4be4da3ee4d42619cadf475bda268b9",
+      "size_bytes": 1959073,
+      "mime_type": "image/png",
+      "duration_seconds": null,
+      "width": 1672,
+      "height": 941,
+      "source_kind": "imported",
+      "tool": {
+        "name": "approved-local-source-import",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "dcce9c4f0c0b27f4f9ec1321f0b9f2809530aed3d18de55ec742544277e6dcd2",
+      "creation_receipt_id": "iris-v2-local-import:b97d604fc44626308e789dd6ab886626d4be4da3ee4d42619cadf475bda268b9",
+      "usage_license": "User-authorized project reference; no platform ownership claim.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null
+    }
+  ]
+}

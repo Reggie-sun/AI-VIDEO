@@ -1,0 +1,21 @@
+{
+  "schema_version": "audio-understanding-preview/1",
+  "preview": {
+    "operation": "audio_understand",
+    "provider": "gemini",
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    "model_id": "gemini-3.8-flash",
+    "source_sha256": "e3586edc46b12d670211e9f223e25fc7280a7f69abe1cbbe0d868fc0068ea986",
+    "source_size_bytes": 1344078,
+    "audio_sha256": "e3586edc46b12d670211e9f223e25fc7280a7f69abe1cbbe0d868fc0068ea986",
+    "audio_size_bytes": 1344078,
+    "duration_seconds": 28.0,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "12c829cc64cc1e682ad38e07d6af5acde48ce01893ee60fbe9dbcf4459b02c75"
+  },
+  "network_calls": 0,
+  "production_acceptance": "NOT_EVALUATED",
+  "media_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/song-suno/listen/windows/T4-chorus1-60.5-28.wav",
+  "analysis_audio_derivation": "exact_pcm_wav",
+  "human_acceptance": "NOT_EVALUATED"
+}

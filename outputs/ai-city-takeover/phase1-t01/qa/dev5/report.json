@@ -1,0 +1,183 @@
+{
+ "video": "outputs/ai-city-takeover/phase1-t01/renders/T01-dev5.mp4",
+ "spec": {
+  "size": [
+   1920,
+   1080
+  ],
+  "fps": "30/1",
+  "frames": 300,
+  "pix_fmt": "yuv420p",
+  "color": [
+   "bt709",
+   "bt709",
+   "bt709",
+   "tv"
+  ],
+  "video_kbps": 79330,
+  "audio": {
+   "codec": "aac",
+   "rate": "48000",
+   "ch": 2
+  },
+  "duration": 10.022,
+  "video_duration": 10.0
+ },
+ "sync": [
+  {
+   "id": "s1_title",
+   "what": "片名 slam",
+   "key": "B",
+   "t": 0.5,
+   "expected_frame": 15,
+   "detected_frame": 15,
+   "offset_frames": 0,
+   "strength": 39.05,
+   "pass": true
+  },
+  {
+   "id": "s1_ptz1",
+   "what": "PTZ 變焦第一級",
+   "key": "B",
+   "t": 1.0,
+   "expected_frame": 30,
+   "detected_frame": 31,
+   "offset_frames": 1,
+   "strength": 12.91,
+   "pass": true
+  },
+  {
+   "id": "s1_ptz2",
+   "what": "PTZ 變焦第二級",
+   "key": "B",
+   "t": 1.25,
+   "expected_frame": 38,
+   "detected_frame": 38,
+   "offset_frames": 0,
+   "strength": 9.8,
+   "pass": true
+  },
+  {
+   "id": "s1_census",
+   "what": "片名退場 + 計數卡第一行",
+   "key": "B",
+   "t": 2.0,
+   "expected_frame": 60,
+   "detected_frame": 60,
+   "offset_frames": 0,
+   "strength": 22.68,
+   "pass": true
+  },
+  {
+   "id": "s1_census2",
+   "what": "計數卡第二行（人类驾驶 1）",
+   "key": "B",
+   "t": 2.125,
+   "expected_frame": 64,
+   "detected_frame": 64,
+   "offset_frames": 0,
+   "strength": 14.82,
+   "pass": true
+  },
+  {
+   "id": "cut_s2",
+   "what": "切 S2 車內",
+   "key": "B",
+   "t": 4.0,
+   "expected_frame": 120,
+   "detected_frame": 120,
+   "offset_frames": 0,
+   "strength": 31.26,
+   "pass": true
+  },
+  {
+   "id": "s2_disable",
+   "what": "保持手动 變灰",
+   "key": "B",
+   "t": 5.5,
+   "expected_frame": 165,
+   "detected_frame": 165,
+   "offset_frames": 0,
+   "strength": 5.94,
+   "pass": true
+  },
+  {
+   "id": "cut_s3_drop",
+   "what": "DROP：切 S3 + 人类驾驶 0",
+   "key": "H",
+   "t": 6.0,
+   "expected_frame": 180,
+   "detected_frame": 180,
+   "offset_frames": 0,
+   "strength": 37.67,
+   "pass": true
+  },
+  {
+   "id": "s3_box",
+   "what": "最後入相光軌被框",
+   "key": "B",
+   "t": 6.5,
+   "expected_frame": 195,
+   "detected_frame": 195,
+   "offset_frames": 0,
+   "strength": 4.03,
+   "pass": true
+  },
+  {
+   "id": "s3_time",
+   "what": "03:48 小字",
+   "key": "B",
+   "t": 8.0,
+   "expected_frame": 240,
+   "detected_frame": 240,
+   "offset_frames": 0,
+   "strength": 5.14,
+   "pass": true
+  }
+ ],
+ "flash": {
+  "transitions": [],
+  "flashes": [],
+  "max_flashes_per_s": 0,
+  "pass": true,
+  "single_frame_pops": []
+ },
+ "strobe_cells": [],
+ "outlier_frames": [],
+ "motion_per_bar": [
+  {
+   "bar": 1,
+   "t0": 0.0,
+   "motion": 1.476
+  },
+  {
+   "bar": 2,
+   "t0": 2.0,
+   "motion": 1.922
+  },
+  {
+   "bar": 3,
+   "t0": 4.0,
+   "motion": 1.68
+  },
+  {
+   "bar": 4,
+   "t0": 6.0,
+   "motion": 1.843
+  },
+  {
+   "bar": 5,
+   "t0": 8.0,
+   "motion": 1.3
+  }
+ ],
+ "verdicts": {
+  "spec": true,
+  "sync": true,
+  "flash": true,
+  "frames_match_comp": true,
+  "pops": true,
+  "strobe": true,
+  "outliers": true
+ }
+}

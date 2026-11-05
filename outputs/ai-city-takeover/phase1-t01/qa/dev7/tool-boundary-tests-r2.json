@@ -1,0 +1,20 @@
+{
+  "validation_kind": "direct_targeted_pytest_not_Harness",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "tests/test_motionkit_tools.py",
+    "-q"
+  ],
+  "observed_result": "9 passed in 1.29s",
+  "exit_code": 0,
+  "source_sha256": {
+    "motion-kit/tools/beatmap.py": "bdf001740747837c965cad6e90898200d563f088a98009447e50258d00d2a8c7",
+    "motion-kit/tools/qa.py": "12116aa8de604c0e1515ffbb64b90d092bfb97d55ece599997ba5f17c232d57b",
+    "motion-kit/tools/codex_plate.py": "be5d294be29d5a93a4cdc0953354f33a7f8ebfbb0d8f5c3dd38088ec80f485bf",
+    "tests/test_motionkit_tools.py": "548a3c32be90ce713c1f9b0de0275b83420b43bd8ce758dfb5e501f3c071ff83"
+  },
+  "test_location_supersedes": "motion-kit/tests/test_tool_boundaries.py",
+  "reason": "Use existing pytest testpaths so full_tests truly covers the regression suite without changing default full argv."
+}

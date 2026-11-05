@@ -1,0 +1,49 @@
+artifact_id: iris-v2-s8br-story
+beats:
+- beat_id: chorus-2
+  summary: 分镜 v2.1 S8br
+content_hash: cbb8c740194e986bb216ebbdcc12955e48be5672f0f7bd8d7e3d4af0ec511c49
+creation_receipt_id: iris-v2-s8br-authoring
+language: zh
+logline: IRIS EP01 v2 S8br
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: c52e416520b5fec0339215f04a6d3d5c7fc380395fc5a8d02cf1aa790e0bdb72
+  kind: user_input
+  reference: evidence/authoring-input/c52e416520b5fec0339215f04a6d3d5c7fc380395fc5a8d02cf1aa790e0bdb72.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 870ebca7abba1423e71bbc24a241f5e6ac3d99eb50b86510c526964c402111df
+  kind: user_input
+  reference: evidence/authoring-input/870ebca7abba1423e71bbc24a241f5e6ac3d99eb50b86510c526964c402111df.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 97041d843bd559f16c9bc577bdbb3a42cbc8084b64f52bd15f677d7eb2dc8f36
+  kind: user_input
+  reference: evidence/authoring-input/97041d843bd559f16c9bc577bdbb3a42cbc8084b64f52bd15f677d7eb2dc8f36.json
+- content_hash: e0efa6b5bf00aa7489bf223259c74354751b99a69aa885fca7da072595f6e53a
+  kind: user_input
+  reference: evidence/authoring-input/e0efa6b5bf00aa7489bf223259c74354751b99a69aa885fca7da072595f6e53a.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+source_references: []
+synopsis: 真人电影摄影，横幅十六比九，连续五秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性站在雨夜高层建筑的玻璃阳台上，四分之三侧面望向画面左侧，城市在她身后的右侧；第二张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第二张图的背景。

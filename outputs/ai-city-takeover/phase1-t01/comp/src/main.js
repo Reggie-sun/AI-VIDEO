@@ -151,18 +151,23 @@ function S1(t, k) {
   const cardOn = ev(k, 's1_census');
   if (t >= cardOn) {
     const ai = rollNumber(1284180, 1284329, t, cardOn, at(1, 1), 8);
+    // a soft scrim separates the card from the guard-rail highlights behind it
+    const sk = clamp((t - cardOn) / 0.06);
+    const g = o.createRadialGradient(330, 700, 20, 330, 700, 420);
+    g.addColorStop(0, `rgba(4,7,10,${0.42 * sk})`); g.addColorStop(1, 'rgba(4,7,10,0)');
+    o.fillStyle = g; o.fillRect(0, 420, 900, 560);
     slam(o, c => {
       font(c, F.mono, 18, 3); c.fillStyle = 'rgba(236,241,244,0.55)';
-      c.fillText('VEHICLE CENSUS · 03:47', 120, 724);
-      c.fillStyle = 'rgba(236,241,244,0.35)'; c.fillRect(120, 740, 640, 1);
-      font(c, F.sansR, 46, 4); c.fillStyle = '#E9EEF1'; c.fillText('自动驾驶', 120, 806);
-      font(c, F.mono, 54, 0); c.textAlign = 'right'; c.fillText(thousands(ai), 760, 806); c.textAlign = 'left';
-    }, { t, t0: cardOn, dur: 0.06, s0: 1.05, ax: 120, ay: 780 });
+      c.fillText('VEHICLE CENSUS · 03:47', 120, 604);
+      c.fillStyle = 'rgba(236,241,244,0.35)'; c.fillRect(120, 620, 520, 1);
+      font(c, F.sansR, 46, 4); c.fillStyle = '#E9EEF1'; c.fillText('自动驾驶', 120, 690);
+      font(c, F.mono, 54, 0); c.textAlign = 'right'; c.fillText(thousands(ai), 640, 690); c.textAlign = 'left';
+    }, { t, t0: cardOn, dur: 0.06, s0: 1.05, ax: 120, ay: 664 });
     slam(o, c => {
-      font(c, F.sansR, 46, 4); c.fillStyle = '#E9EEF1'; c.fillText('人类驾驶', 120, 884);
-      font(c, F.mono, 54, 0); c.fillStyle = RED; c.textAlign = 'right'; c.fillText('1', 760, 884); c.textAlign = 'left';
-      c.fillStyle = RED; c.fillRect(120, 902, 18, 4);
-    }, { t, t0: ev(k, 's1_census2'), dur: 0.06, s0: 1.05, ax: 120, ay: 860 });
+      font(c, F.sansR, 46, 4); c.fillStyle = '#E9EEF1'; c.fillText('人类驾驶', 120, 770);
+      font(c, F.monoB, 64, 0); c.fillStyle = RED; c.textAlign = 'right'; c.fillText('1', 640, 772); c.textAlign = 'left';
+      c.fillStyle = RED; c.fillRect(120, 788, 18, 4);
+    }, { t, t0: ev(k, 's1_census2'), dur: 0.06, s0: 1.05, ax: 120, ay: 744 });
   }
 
   return {
@@ -186,15 +191,25 @@ function S2(t, k) {
   let z = 1.06 * (1 + 0.03 * easeInOutCubic(u));
   const amp = 3.5 * rz * rz;
   const shake = [2.4 * noise1(t * 0.7, 21) + amp * noise1(t * 9.0, 22), 1.8 * noise1(t * 0.6, 23) + amp * noise1(t * 8.0, 24)];
-  const view = clampView(960, 470, z);
+  const view = clampView(1000, 470, z);
   const cm = cam(view, shake);
 
-  // street lamps sweep over the dash and shoulders on beats 1 and 3
-  const b = clock.beat(t);
-  const beatInBar = Math.min(3, Math.floor(clock.bar(t).frac * 4 + 1e-6));
-  const sweepAge = (beatInBar % 2) * b.len + b.frac * b.len;               // seconds since beat 1 or 3
-  const sweepPos = lerp(-300, 1500, clamp(sweepAge / 0.42));
-  const sweepGain = 0.85 * Math.exp(-sweepAge / 0.5);
+  // a street lamp passes on beats 1 and 3: the band peaks over the dash exactly on the beat
+  const beats13 = [ev(k, 'cut_s2'), clock.at(2, 2)];
+  const tb = beats13.reduce((m, x) => (Math.abs(t - x) < Math.abs(t - m) ? x : m), beats13[0]);
+  const sweepP = (t - tb) / 0.42 + 0.5;
+  const sweepPos = lerp(-200, 2380, clamp(sweepP));
+  const sweepGain = 0.9 * Math.exp(-Math.pow((t - tb) / 0.28, 2));
+
+  // the AI convoy ahead: evenly spaced, same speed, so they hold their place in the fog
+  const ahead = [];
+  [[1005, 333, 9, 0.55], [1062, 327, 6, 0.32], [962, 323, 4, 0.2]].forEach(([x, y, sep, I], i) => {
+    const bob = 0.6 * Math.sin(t * 2.1 + i * 1.7);
+    for (const dx of [-0.5, 0.5]) {
+      const [ox, oy] = cm.out([x + dx * sep, y + bob]);
+      ahead.push({ x: ox, y: oy, r: Math.max(0.9, 0.12 * sep * cm.s), I: I * 2.2, c: [1.0, 0.045, 0.02], refl: 0 });
+    }
+  });
 
   // the system dialog on the car's own screen
   const ui = layers.ui;
@@ -209,7 +224,8 @@ function S2(t, k) {
   const pulse = 1 + 0.05 * clock.pulse('kick', t, 0.15);
 
   return {
-    plate: 'P2L', view, fit: FIT, shake, mask: 'P2Lmask', flowVP: [VP2[0], VP2[1], 1 + 0.10 * u],
+    plate: 'P2L', view, fit: FIT, shake, mask: 'P2Lmask', flowVP: [VP2[0], VP2[1], 1.0],
+    road: [1005, 318, 0.0065, 1.0], lights: packLights(ahead),
     sweep: [0.35, 0.94, sweepPos, 150], sweepGain,
     fogA: [0.10, 0.006, 6, 0], fogB: [0.06, 0.013, -8, 1], fogTint: [0.05, 0.065, 0.085], fogLift: 0.1,
     screen: { H: Hcol, gain: 1.15 * pulse, spill: 0.55 * pulse, spillColor: [0.55, 0.70, 0.95], center: [cx, cy], radius: 520 },
@@ -223,7 +239,8 @@ function S3(t, k) {
   const { clock, frame, layers, data, t0 } = k;
   const at = (b, be = 0, s = 0) => clock.at(b, be, s);
   const dt = t - t0;
-  let z = lerp(1.10, 1.03, easeInOutCubic(clamp(dt / (DURATION - t0))));
+  const tStill = clock.at(4, 3);                                            // the last beat holds still
+  let z = lerp(1.10, 1.03, easeInOutCubic(clamp((t - t0) / (tStill - t0))));
   z *= 1 + 0.06 * impactKick(dt);
   const view = clampView(836, 520, z);
   const cm = cam(view);
@@ -233,13 +250,14 @@ function S3(t, k) {
   const b = clock.beat(t);
   const beatPos = b.idx + easeOutCubic(clamp(b.frac / 0.35));
   const settleStart = t0 + 5 / FPS;
+  const takeoverAt = ev(k, 's3_takeover');
   const e = layers.emit.ctx;
   const LAMBDA = 110, DASH = 58;
   let hero = null;
   const bpRef = clock.beat(t0 + b.len).pos;                                // hero pulse sits ~120 px into its path one beat after the drop
   data.paths.paths.forEach((path, i) => {
     const isHero = path.id === 'f';
-    const settle = (isHero ? 1.0 : 0.5) * b.len;
+    const settle = isHero ? takeoverAt - settleStart : 0.5 * b.len;
     const chaos = 1 - easeInOutCubic(clamp((t - settleStart) / settle));
     const pts = path.points, arc = path.arc, len = arc[arc.length - 1];
     const at_s = s => {
@@ -269,30 +287,35 @@ function S3(t, k) {
     [{ text: 'AERIAL · CAM 01' }, { text: '环城立交', family: F.sansR, size: 22 }],
     [{ text: `03:48:${String(Math.max(0, Math.floor(dt))).padStart(2, '0')}` }],
   ]);
-  if (hero && t >= t0 + b.len * 1.0) {
+  // the last car is tracked while it falls into phase, then released: it is one of them now
+  const release = 1 - clamp((t - ev(k, 's3_time')) / 0.2);
+  if (hero && t >= ev(k, 's3_box') && release > 0) {
     const conf = (0.96 + 0.03 * hash2(frame, 9)).toFixed(2);
-    detector(f, [hero[0] - 44, hero[1] - 30, 88, 60], { t, t0: t0 + b.len * 1.0, frame, label: `car ${conf}`, sub: 'AI', subColor: 'rgba(240,244,246,0.92)' });
+    const flipped = t >= takeoverAt;                                    // the label and census change on the same beat
+    detector(f, [hero[0] - 52, hero[1] - 36, 104, 72], { t, t0: ev(k, 's3_box'), frame, label: `car ${conf}`,
+      sub: flipped ? 'AI' : 'HUMAN', subColor: flipped ? 'rgba(240,244,246,0.92)' : RED, alpha: release, size: 38 });
   }
 
-  // the payoff: one event on the impact frame
+  // Hold the last human long enough to read, then change both devices on the next beat.
   const o = layers.overlay.ctx;
+  const zero = frame >= Math.ceil(takeoverAt * FPS - 1e-6);
   slam(o, c => {
     font(c, F.sansR, 48, 6); c.fillStyle = '#E9EEF1'; c.fillText('人类驾驶', 124, 300);
-    font(c, F.sans, 300, 0); c.fillStyle = '#F4F6F8'; c.fillText('0', 108, 590);
+    font(c, F.sans, 300, 0); c.fillStyle = zero ? '#F4F6F8' : RED; c.fillText(zero ? '0' : '1', 108, 590);
   }, { t, t0, dur: 0.05, s0: 1.16, ax: 120, ay: 440, ghosts: 2 });
-  const tc = clamp((t - ev(k, 's3_time')) / 0.25);
+  const tc = clamp((t - ev(k, 's3_time')) / 0.06);
   if (tc > 0) {
-    o.save(); o.globalAlpha = tc; font(o, F.mono, 34, 4); o.fillStyle = 'rgba(236,241,244,0.82)';
-    o.fillText('03:48', 128, 652); o.restore();
+    o.save(); o.globalAlpha = tc; font(o, F.mono, 56, 4); o.fillStyle = 'rgba(236,241,244,0.86)';
+    o.fillText('· 03:48', 300, 588); o.restore();
   }
 
-  const mis = 4 * Math.max(0, 1 - dt / (3 / FPS));
+  const mis = 0;
   return {
     plate: 'P3L', view, fit: FIT,
     fogA: [0.16, 0.003, 7, -1], fogB: [0.10, 0.008, -10, 1], fogTint: [0.055, 0.07, 0.092], fogLift: 0.12,
-    emitGain: 2.0 + 0.4 * clock.pulse('kick', t, 0.12),
+    emitGain: 2.0 + 0.9 * clock.pulse('kick', t, 0.12),
     bloomThreshold: 1.0, feedGlow: 0.10, overlayGlow: 0.05,
-    grade: { uMisreg: mis, uHalftone: 0.10 + 0.25 * Math.max(0, 1 - dt / (4 / FPS)), uFlash: frame === Math.ceil(t0 * FPS - 1e-6) ? 0.06 : 0,
+    grade: { uMisreg: mis, uHalftone: 0.10 + 0.25 * Math.max(0, 1 - dt / (4 / FPS)), uFlash: frame === Math.ceil(t0 * FPS - 1e-6) ? 0.10 : 0,
       uWeave: [(hash2(frame, 13) - 0.5) * 0.5, (hash2(frame, 14) - 0.5) * 0.5] },
   };
 }

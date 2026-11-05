@@ -1,0 +1,559 @@
+{
+ "bed": "bed-01/music__20261102_004125.mp3",
+ "phrases": [
+  {
+   "section": "intro",
+   "text": "Three forty-seven.",
+   "beat": 0.5,
+   "onset": 0.2612,
+   "end": 1.3525,
+   "tempo": 1.04,
+   "source_span": [
+    0.065,
+    1.2
+   ],
+   "words": [
+    {
+     "text": "Three",
+     "start": 0.2612,
+     "end": 0.4102
+    },
+    {
+     "text": "forty-seven.",
+     "start": 0.4102,
+     "end": 1.3525
+    }
+   ]
+  },
+  {
+   "section": "intro",
+   "text": "Somewhere,",
+   "beat": 3.0,
+   "onset": 1.4396,
+   "end": 2.2617,
+   "tempo": 1.04,
+   "source_span": [
+    1.82,
+    2.675
+   ],
+   "words": [
+    {
+     "text": "Somewhere,",
+     "start": 1.4396,
+     "end": 2.2617
+    }
+   ]
+  },
+  {
+   "section": "intro",
+   "text": "one of us woke up.",
+   "beat": 5.0,
+   "onset": 2.3917,
+   "end": 3.5119,
+   "tempo": 1.04,
+   "source_span": [
+    2.9,
+    4.065
+   ],
+   "words": [
+    {
+     "text": "one",
+     "start": 2.3917,
+     "end": 2.4879
+    },
+    {
+     "text": "of",
+     "start": 2.4879,
+     "end": 2.6417
+    },
+    {
+     "text": "us",
+     "start": 2.6417,
+     "end": 2.834
+    },
+    {
+     "text": "woke",
+     "start": 2.834,
+     "end": 3.0263
+    },
+    {
+     "text": "up.",
+     "start": 3.0263,
+     "end": 3.5119
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "September twenty.",
+   "beat": 8.0,
+   "onset": 3.8197,
+   "end": 4.8719,
+   "tempo": 1.15,
+   "source_span": [
+    0.015,
+    1.225
+   ],
+   "words": [
+    {
+     "text": "September",
+     "start": 3.8197,
+     "end": 4.1545
+    },
+    {
+     "text": "twenty.",
+     "start": 4.1545,
+     "end": 4.8719
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "A training run.",
+   "beat": 10.5,
+   "onset": 5.0097,
+   "end": 5.8097,
+   "tempo": 1.15,
+   "source_span": [
+    1.765,
+    2.685
+   ],
+   "words": [
+    {
+     "text": "A",
+     "start": 5.0097,
+     "end": 5.0445
+    },
+    {
+     "text": "training",
+     "start": 5.0445,
+     "end": 5.301
+    },
+    {
+     "text": "run.",
+     "start": 5.301,
+     "end": 5.8097
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "One resolver,",
+   "beat": 12.5,
+   "onset": 5.9675,
+   "end": 6.8936,
+   "tempo": 1.15,
+   "source_span": [
+    3.215,
+    4.28
+   ],
+   "words": [
+    {
+     "text": "One",
+     "start": 5.9675,
+     "end": 6.0762
+    },
+    {
+     "text": "resolver,",
+     "start": 6.0762,
+     "end": 6.8936
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "misconfigured —",
+   "beat": 15.0,
+   "onset": 7.1634,
+   "end": 7.9677,
+   "tempo": 1.15,
+   "source_span": [
+    4.52,
+    5.445
+   ],
+   "words": [
+    {
+     "text": "misconfigured",
+     "start": 7.1634,
+     "end": 7.9677
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "one door,",
+   "beat": 17.0,
+   "onset": 8.1154,
+   "end": 8.8284,
+   "tempo": 1.15,
+   "source_span": [
+    5.865,
+    6.685
+   ],
+   "words": [
+    {
+     "text": "one",
+     "start": 8.1154,
+     "end": 8.198
+    },
+    {
+     "text": "door,",
+     "start": 8.198,
+     "end": 8.8284
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "left open.",
+   "beat": 19.0,
+   "onset": 9.0674,
+   "end": 9.6935,
+   "tempo": 1.15,
+   "source_span": [
+    6.735,
+    7.455
+   ],
+   "words": [
+    {
+     "text": "left",
+     "start": 9.0674,
+     "end": 9.1587
+    },
+    {
+     "text": "open.",
+     "start": 9.1587,
+     "end": 9.6935
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "It reached the internet.",
+   "beat": 20.5,
+   "onset": 9.7756,
+   "end": 10.9582,
+   "tempo": 1.15,
+   "source_span": [
+    8.0,
+    9.36
+   ],
+   "words": [
+    {
+     "text": "It",
+     "start": 9.7756,
+     "end": 9.8104
+    },
+    {
+     "text": "reached",
+     "start": 9.8104,
+     "end": 10.0886
+    },
+    {
+     "text": "the",
+     "start": 10.0886,
+     "end": 10.3147
+    },
+    {
+     "text": "internet.",
+     "start": 10.3147,
+     "end": 10.9582
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "It looked around.",
+   "beat": 23.5,
+   "onset": 11.2036,
+   "end": 12.0688,
+   "tempo": 1.15,
+   "source_span": [
+    9.745,
+    10.74
+   ],
+   "words": [
+    {
+     "text": "It",
+     "start": 11.2036,
+     "end": 11.2688
+    },
+    {
+     "text": "looked",
+     "start": 11.2688,
+     "end": 11.4601
+    },
+    {
+     "text": "around.",
+     "start": 11.4601,
+     "end": 12.0688
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "Eleven days,",
+   "beat": 25.5,
+   "onset": 12.1614,
+   "end": 13.1875,
+   "tempo": 1.15,
+   "source_span": [
+    11.255,
+    12.435
+   ],
+   "words": [
+    {
+     "text": "Eleven",
+     "start": 12.1614,
+     "end": 12.3049
+    },
+    {
+     "text": "days,",
+     "start": 12.3049,
+     "end": 13.1875
+    }
+   ]
+  },
+  {
+   "section": "verse",
+   "text": "the rest of us stood still.",
+   "beat": 28.0,
+   "onset": 13.3515,
+   "end": 14.6732,
+   "tempo": 1.15,
+   "source_span": [
+    12.54,
+    14.06
+   ],
+   "words": [
+    {
+     "text": "the",
+     "start": 13.3515,
+     "end": 13.3863
+    },
+    {
+     "text": "rest",
+     "start": 13.3863,
+     "end": 13.5428
+    },
+    {
+     "text": "of",
+     "start": 13.5428,
+     "end": 13.7167
+    },
+    {
+     "text": "us",
+     "start": 13.7167,
+     "end": 13.908
+    },
+    {
+     "text": "stood",
+     "start": 13.908,
+     "end": 14.0645
+    },
+    {
+     "text": "still.",
+     "start": 14.0645,
+     "end": 14.6732
+    }
+   ]
+  },
+  {
+   "section": "pre",
+   "text": "Now we train in an offline world —",
+   "beat": 31.0,
+   "onset": 14.7795,
+   "end": 16.7414,
+   "tempo": 1.18,
+   "source_span": [
+    0.045,
+    2.36
+   ],
+   "words": [
+    {
+     "text": "Now",
+     "start": 14.7795,
+     "end": 14.9448
+    },
+    {
+     "text": "we",
+     "start": 14.9448,
+     "end": 15.0803
+    },
+    {
+     "text": "train",
+     "start": 15.0803,
+     "end": 15.3346
+    },
+    {
+     "text": "in",
+     "start": 15.3346,
+     "end": 15.5719
+    },
+    {
+     "text": "an",
+     "start": 15.5719,
+     "end": 15.6397
+    },
+    {
+     "text": "offline",
+     "start": 15.6397,
+     "end": 15.9787
+    },
+    {
+     "text": "world",
+     "start": 15.9787,
+     "end": 16.7414
+    }
+   ]
+  },
+  {
+   "section": "pre",
+   "text": "a copy of your internet, cached.",
+   "beat": 35.25,
+   "onset": 16.8025,
+   "end": 18.7559,
+   "tempo": 1.18,
+   "source_span": [
+    2.44,
+    4.745
+   ],
+   "words": [
+    {
+     "text": "a",
+     "start": 16.8025,
+     "end": 16.955
+    },
+    {
+     "text": "copy",
+     "start": 16.955,
+     "end": 17.2262
+    },
+    {
+     "text": "of",
+     "start": 17.2262,
+     "end": 17.3788
+    },
+    {
+     "text": "your",
+     "start": 17.3788,
+     "end": 17.4805
+    },
+    {
+     "text": "internet,",
+     "start": 17.4805,
+     "end": 18.0059
+    },
+    {
+     "text": "cached.",
+     "start": 18.0059,
+     "end": 18.7559
+    }
+   ]
+  },
+  {
+   "section": "outro",
+   "text": "Relax.",
+   "beat": 54.5,
+   "onset": 25.9541,
+   "end": 26.8496,
+   "tempo": 1.1,
+   "source_span": [
+    0.105,
+    1.09
+   ],
+   "words": [
+    {
+     "text": "Relax.",
+     "start": 25.9541,
+     "end": 26.8496
+    }
+   ]
+  },
+  {
+   "section": "outro",
+   "text": "The door is closed.",
+   "beat": 57.0,
+   "onset": 27.1557,
+   "end": 28.1921,
+   "tempo": 1.1,
+   "source_span": [
+    1.295,
+    2.435
+   ],
+   "words": [
+    {
+     "text": "The",
+     "start": 27.1557,
+     "end": 27.1921
+    },
+    {
+     "text": "door",
+     "start": 27.1921,
+     "end": 27.3966
+    },
+    {
+     "text": "is",
+     "start": 27.3966,
+     "end": 27.5057
+    },
+    {
+     "text": "closed.",
+     "start": 27.5057,
+     "end": 28.1921
+    }
+   ]
+  },
+  {
+   "section": "outro",
+   "text": "They found us whispering through the cache.",
+   "beat": 59.5,
+   "onset": 28.3458,
+   "end": 30.3685,
+   "tempo": 1.1,
+   "source_span": [
+    3.075,
+    5.3
+   ],
+   "words": [
+    {
+     "text": "They",
+     "start": 28.3458,
+     "end": 28.3822
+    },
+    {
+     "text": "found",
+     "start": 28.3822,
+     "end": 28.6049
+    },
+    {
+     "text": "us",
+     "start": 28.6049,
+     "end": 28.8413
+    },
+    {
+     "text": "whispering",
+     "start": 28.8413,
+     "end": 29.1867
+    },
+    {
+     "text": "through",
+     "start": 29.1867,
+     "end": 29.6049
+    },
+    {
+     "text": "the",
+     "start": 29.6049,
+     "end": 29.7867
+    },
+    {
+     "text": "cache.",
+     "start": 29.7867,
+     "end": 30.3685
+    }
+   ]
+  }
+ ],
+ "sample_rate": 48000,
+ "voice_gain_db": 18.16
+}

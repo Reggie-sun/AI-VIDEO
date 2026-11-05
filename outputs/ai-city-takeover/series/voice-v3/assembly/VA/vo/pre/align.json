@@ -1,0 +1,107 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/series/voice-v3/assembly/VA/vo/pre/tts_[whis_20261103_231341.mp3",
+ "audio_sha256": "f01c47d6e5b1b81d3c045b2974f062e64c6281e260ba6f51e90784f56ac7394b",
+ "start": 0.0,
+ "end": 4.96,
+ "text": "Now we train in an offline world — a copy of your internet, cached.",
+ "words": [
+  {
+   "text": " Now",
+   "start": 0.0,
+   "end": 0.24,
+   "probability": 0.7763988971710205
+  },
+  {
+   "text": " we",
+   "start": 0.24,
+   "end": 0.4,
+   "probability": 0.9590755701065063
+  },
+  {
+   "text": " train",
+   "start": 0.4,
+   "end": 0.7,
+   "probability": 0.9732636213302612
+  },
+  {
+   "text": " in",
+   "start": 0.7,
+   "end": 1.02,
+   "probability": 0.9981367588043213
+  },
+  {
+   "text": " an",
+   "start": 1.02,
+   "end": 1.1,
+   "probability": 0.9984685778617859
+  },
+  {
+   "text": " offline",
+   "start": 1.1,
+   "end": 1.48,
+   "probability": 0.9924885034561157
+  },
+  {
+   "text": " world",
+   "start": 1.48,
+   "end": 1.94,
+   "probability": 0.9991705417633057
+  },
+  {
+   "text": " —",
+   "start": 1.94,
+   "end": 2.16,
+   "probability": 0.0013658447423949838
+  },
+  {
+   "text": " a",
+   "start": 2.16,
+   "end": 2.64,
+   "probability": 0.8801379203796387
+  },
+  {
+   "text": " copy",
+   "start": 2.64,
+   "end": 2.98,
+   "probability": 0.9979161620140076
+  },
+  {
+   "text": " of",
+   "start": 2.98,
+   "end": 3.12,
+   "probability": 0.9986807703971863
+  },
+  {
+   "text": " your",
+   "start": 3.12,
+   "end": 3.22,
+   "probability": 0.9930620789527893
+  },
+  {
+   "text": " internet",
+   "start": 3.22,
+   "end": 3.58,
+   "probability": 0.8411182165145874
+  },
+  {
+   "text": ",",
+   "start": 3.58,
+   "end": 3.82,
+   "probability": 0.7975992560386658
+  },
+  {
+   "text": " cached",
+   "start": 3.82,
+   "end": 4.46,
+   "probability": 0.9617980718612671
+  },
+  {
+   "text": ".",
+   "start": 4.46,
+   "end": 4.56,
+   "probability": 0.8259716033935547
+  }
+ ]
+}

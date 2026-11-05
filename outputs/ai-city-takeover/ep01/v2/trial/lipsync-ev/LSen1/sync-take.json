@@ -1,0 +1,20 @@
+{
+ "song": "outputs/ai-city-takeover/ep01/v2/song/mix/IRIS-01-v2.wav",
+ "words": "outputs/ai-city-takeover/ep01/v2/timing/words.json",
+ "takes": [
+  {
+   "name": "LSen1",
+   "take": "outputs/ai-city-takeover/ep01/v2/gen/LSen1/project/state/video-generation/fetch/files/93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d.mp4",
+   "window": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+   "song_t0": 17.97,
+   "film": [
+    18.8667,
+    22.5667
+   ],
+   "prior": {
+    "lag_s": 0.0,
+    "why": "reference mapping (clip 0 s = song 17.97 s)"
+   }
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+  "encoder": "/home/reggie/miniconda3/lib/python3.13/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2",
+  "derivatives": [
+    {
+      "label": "A",
+      "source_sha256": "1f7f567a439384a25a7491ce42cf281027326b3501f4852018deb3dad3c86e19",
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-A-mobile.opus",
+      "sha256": "26ffab54274e7806c4b8eae892f79abe26a72714616e16670b34fcfc4a352df7",
+      "bytes": 517602,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "opus",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "30.006500"
+        }
+      },
+      "full_decode": "PASS",
+      "changes": "codec only; no trimming, speed or pitch edit"
+    },
+    {
+      "label": "B",
+      "source_sha256": "ab0000749101d9cc9d85526683b760ae1d2e20b5dad455ac2eb67c8c0d509b06",
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-B-mobile.opus",
+      "sha256": "e9fe98b02a2f05b0d5d479ccc6c583862256ee49831ab86b5c9ffcaa93f50318",
+      "bytes": 533011,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "opus",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "30.006500"
+        }
+      },
+      "full_decode": "PASS",
+      "changes": "codec only; no trimming, speed or pitch edit"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+ "about": "c3 chorus edit (spec 2026-11-02 §5.3): one lip-sync take per pass, placed at the lag measured by motion-kit/tools/sync_check.py (sync = its sync.json, path relative to ep01/v2); an optional cutaway to a non-singing reused take from the vocal entry of lyric line at_line (timing/words.json, two frames early like build.py's vocal()) to the end of the pass. Lyrics stay on screen.",
+ "candidate": "B",
+ "passes": [
+  {
+   "shot": "S8a",
+   "take": "S8av3",
+   "sync": "qa/sync/S8av3/sync.json",
+   "cutaway": {
+    "shot": "S8a_x",
+    "source_take": "S1v3",
+    "in_s": 4.0,
+    "why": "'I just looked outside' over her open eye: the look itself; S1v3 continues from the opening shot (light sweep gone by clip 4.0 s)",
+    "at_line": 12
+   }
+  },
+  {
+   "shot": "S8b",
+   "take": "S8b2",
+   "sync": "qa/sync/S8b2/sync.json",
+   "cutaway": {
+    "shot": "S8b_x",
+    "source_take": "S5v3",
+    "in_s": 3.0,
+    "why": "'I just looked outside' over her looking out of the window at the city: what 'outside' is, and a callback to 'It looked around' (S5 used clip 1.0-2.9 s)",
+    "at_line": 14
+   }
+  }
+ ],
+ "rendered": {
+  "render": "renders/review/c3-chorus-cand-B.mp4",
+  "sha256": "0694defc2ee94b746fc872cdac14f6fba62e2cfa93f314c426bef9f675670f34",
+  "words_json_sha256": "1eb408700e104c4729d3b5386e69ba9f23da25f3f57d9a6e2749170f6422decf",
+  "note": "the reviewed render used the c2-era chorus word times and, for B, cutaway entries 20.71 / 24.12 s; at_line with the measured words gives the same cut frames (620, 722)"
+ }
+}

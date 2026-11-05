@@ -84,6 +84,25 @@
       "command": "/home/reggie/.local/share/minimax-direct/launch.sh",
       "args": [],
       "env": {}
+    },
+    "patchright": {
+      "command": "/home/reggie/.local/bin/node",
+      "args": [
+        "/home/reggie/vscode_folder/AI-VIDEO/scripts/patchright_mcp.cjs",
+        "--runtime-dir",
+        "/home/reggie/.local/share/ai-video/patchright-mcp",
+        "--mcp-runtime-dir",
+        "/home/reggie/.local/share/ai-video/playwright-mcp",
+        "--profile-dir",
+        "/home/reggie/.config/chrome-profiles/cp-e7be810d639e",
+        "--output-dir",
+        "/home/reggie/.local/share/ai-video/patchright-mcp/output"
+      ],
+      "env": {
+        "DISPLAY": ":1",
+        "XAUTHORITY": "/run/user/1000/gdm/Xauthority",
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      }
     }
   }
 }

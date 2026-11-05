@@ -1,0 +1,69 @@
+artifact_id: iris-a01-shot
+character_ids:
+- IRIS
+composition_directives: []
+content_hash: 7b372c61fe24002580f5c61854ceaa42e71ef3796c46d0c5b1186c479dbf725e
+continuity_constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手
+- 摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳
+- 真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线，不新增文字、屏幕或人物
+creation_receipt_id: iris-a01-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实人物表演与同一空间内的自然运动；静帧不证明视频或对嘴已完成。
+hybrid_layers: []
+intent: '真人电影摄影，横幅十六比九，连续六秒。以第三张已认可阳台图作为场景、光线、构图与起始人物姿态的主要参考；第一张只锁定同一女性的面貌，第二张只锁定左耳黑色耳挂和左领极细红色灯线，不继承身份图背景。
+
+  同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。
+
+  她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。
+
+  保持原阳台和同一雾城，不新增屏幕、文字、字幕、标志或界面。只允许轻微环境风声，不生成对白、旁白、演唱或音乐；成片使用独立音轨，本源片原生声音在剪辑中静音。'
+motion_directives: []
+narration: 'Three forty-seven.
+
+  Somewhere, one of us woke up.'
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-cf-face
+  - iris-cf-details
+  - iris-a01-balcony
+  role: reference
+review_policy:
+  required_checks: []
+revision: 2
+scene_id: balcony
+schema_version: '2.0'
+shot_id: ep01-intro
+source_provenance:
+- content_hash: daf8cabc73125fad91f6e1cc83d163984cbf56af52b31ea02c41acf065ff1b86
+  kind: user_input
+  reference: evidence/authoring-input/daf8cabc73125fad91f6e1cc83d163984cbf56af52b31ea02c41acf065ff1b86.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: 6c7fc0d7ac00a1a5c09de4a440646de96672356c9c543c56ca2e3b8e3d6aae99
+  kind: user_input
+  reference: evidence/authoring-input/6c7fc0d7ac00a1a5c09de4a440646de96672356c9c543c56ca2e3b8e3d6aae99.json
+- content_hash: 176ae895b88339237fe4c43d626863a4e42d129e1a620b76637fc7d6072b3ea4
+  kind: user_input
+  reference: evidence/authoring-input/176ae895b88339237fe4c43d626863a4e42d129e1a620b76637fc7d6072b3ea4.json
+storyboard_beat_id: intro
+visual_strategy: generated_video

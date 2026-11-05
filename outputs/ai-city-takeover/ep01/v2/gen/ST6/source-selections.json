@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v2-st6-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/ST6-a.png",
+    "sha256": "d1c3c60004f41c639d681eecd3a941dc68b71ba864e0fc7475636ef5e0caa9b8",
+    "size_bytes": 1914214,
+    "width": 1672,
+    "height": 941,
+    "role": "approved ST6-a: the first frame",
+    "need_id": "rack-door",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

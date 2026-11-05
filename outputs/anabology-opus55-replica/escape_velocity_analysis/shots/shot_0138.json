@@ -1,0 +1,1764 @@
+{
+  "shot_id": "S0138",
+  "start_frame": 6213,
+  "end_frame": 6266,
+  "start_time": 258.875,
+  "end_time": 261.125,
+  "duration_frames": 54,
+  "duration_s": 2.25,
+  "start_tc": "00:04:18:21",
+  "end_tc": "00:04:21:02",
+  "boundary_in_id": "B4-008",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 6213,
+      "path": "keyframes/S0138_f06213.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6226,
+      "path": "keyframes/S0138_f06226.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6240,
+      "path": "keyframes/S0138_f06240.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6253,
+      "path": "keyframes/S0138_f06253.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6266,
+      "path": "keyframes/S0138_f06266.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Profile woman walking past receding rack of white garments and foreground black jacket",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "4 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Profile woman walking past receding rack of white garments and foreground black jacket. FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left. Geometry and typography in this draft require full-resolution detail verification.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Profile woman walking past receding rack of white garments and foreground black jacket",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Profile woman walking past receding rack of white garments and foreground black jacket",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0138.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0024,
+      "pan_y_frac_per_s": 0.0001,
+      "zoom_per_s": 0.0016,
+      "median_flow_frac_per_s": 0.0063,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#CBCDD4",
+        "fraction": 0.35,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#BBB4B5",
+        "fraction": 0.215,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#1F261A",
+        "fraction": 0.182,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#A99E9B",
+        "fraction": 0.135,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#44453E",
+        "fraction": 0.07,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#7C726D",
+        "fraction": 0.049,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[147.4, 152.1, 158.5]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 11 /11 · ALL",
+      "evidence_frame": 6239,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 6239
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 6239,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:04:18:21",
+      "end_value": "00:04:21:02"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright cream rectangular status card, crossed orange00, THERE IS NO UNDERCLASS, MONTHS ·BOARD01 ·FINAL",
+      "evidence_frame": 6239
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0138-E01",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Profile woman walking past receding rack of white garments and foreground black jacket",
+      "start_frame": 6213,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6213; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6213,
+          "state": "visible"
+        },
+        {
+          "frame": 6266,
+          "state": "last sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6213,
+        6239,
+        6266
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          6213,
+          6214
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E02",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "FEEL / THE / AGI.",
+      "start_frame": 6214,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.55,
+        "y": 0.1,
+        "w": 0.3,
+        "h": 0.18,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6214; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6214,
+          "text": "FEEL"
+        },
+        {
+          "frame": 6219,
+          "text": "THE",
+          "state": "orange backing flash"
+        },
+        {
+          "frame": 6228,
+          "text": "AGI."
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6213,
+        6239,
+        6266
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "FEEL / THE / AGI.",
+        "case": "as displayed; slash separates sequential states",
+        "typography": {
+          "description": "Tall condensed black sans about160px cap, x1110px y90px behind rightward walking subject; cream/orange word-entry flash",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6213,
+          6215
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E03",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "hud_marker",
+      "description": "Eleven garment identification tags with leaders; each individual tag split below",
+      "start_frame": 6213,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.34,
+        "w": 0.5,
+        "h": 0.55,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6213; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6213,
+          "state": "visible"
+        },
+        {
+          "frame": 6266,
+          "state": "last sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6213,
+        6239,
+        6266
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "is_group_container": true,
+      "visibility_evidence": {
+        "entry_bounds": [
+          6213,
+          6214
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E04",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "sticker",
+      "description": "RETIRED · SS27",
+      "start_frame": 6263,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.54,
+        "w": 0.3,
+        "h": 0.14,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6263; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6263,
+          "state": "visible"
+        },
+        {
+          "frame": 6266,
+          "state": "last sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6213,
+        6239,
+        6266
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          6261,
+          6264
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E05",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK01 garment leader and cream tag switches from AGI ERA to RETIRED",
+      "start_frame": 6214,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.6,
+        "y": 0.68,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6214; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6214,
+          "text": "LOOK01\nAGI ERA"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK01\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6214,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK01\nAGI ERA →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6213,
+          6215
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E06",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK02 garment leader and cream tag switches from 13 MAC MINIS to RETIRED",
+      "start_frame": 6217,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.57,
+        "y": 0.72,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6217; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6217,
+          "text": "LOOK02\n13 MAC MINIS"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK02\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6217,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK02\n13 MAC MINIS →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6215,
+          6218
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E07",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK04 garment leader and cream tag switches from SHOES OFF to RETIRED",
+      "start_frame": 6220,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.54,
+        "y": 0.65,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6220; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6220,
+          "text": "LOOK04\nSHOES OFF"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK04\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6220,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK04\nSHOES OFF →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6218,
+          6221
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E08",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK05 garment leader and cream tag switches from FIREWORK to RETIRED",
+      "start_frame": 6223,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.5,
+        "y": 0.69,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6223; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6223,
+          "text": "LOOK05\nFIREWORK"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK05\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6223,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK05\nFIREWORK →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6221,
+          6224
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E09",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK06 garment leader and cream tag switches from MILD to RETIRED",
+      "start_frame": 6225,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.46,
+        "y": 0.63,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6225; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6225,
+          "text": "LOOK06\nMILD"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK06\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6225,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK06\nMILD →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6223,
+          6226
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E10",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK07 garment leader and cream tag switches from PUZZLES to RETIRED",
+      "start_frame": 6228,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.42,
+        "y": 0.68,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6228; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6228,
+          "text": "LOOK07\nPUZZLES"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK07\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6228,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK07\nPUZZLES →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6226,
+          6229
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E11",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK09 garment leader and cream tag switches from SHEER to RETIRED",
+      "start_frame": 6231,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.29,
+        "y": 0.43,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6231; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6231,
+          "text": "LOOK09\nSHEER"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK09\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6231,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK09\nSHEER →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6229,
+          6232
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E12",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK10 garment leader and cream tag switches from STAFF BADGE to RETIRED",
+      "start_frame": 6234,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.34,
+        "y": 0.51,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6234; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6234,
+          "text": "LOOK10\nSTAFF BADGE"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK10\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6234,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK10\nSTAFF BADGE →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6232,
+          6235
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E13",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK08 garment leader and cream tag switches from HF PIN to RETIRED",
+      "start_frame": 6237,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.17,
+        "y": 0.39,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6237; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6237,
+          "text": "LOOK08\nHF PIN"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK08\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6237,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK08\nHF PIN →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6235,
+          6238
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E14",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK03 garment leader and cream tag switches from DAD CAP to RETIRED",
+      "start_frame": 6236,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.11,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6240; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6236,
+          "text": "LOOK03\nDAD CAP"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK03\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6240,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK03\nDAD CAP →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6235,
+          6237
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E15",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOOK11 garment leader and cream tag switches from THE IMMORTALS to RETIRED",
+      "start_frame": 6243,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.59,
+        "w": 0.07,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6243; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6243,
+          "text": "LOOK11\nTHE IMMORTALS"
+        },
+        {
+          "frame": 6263,
+          "text": "LOOK11\nRETIRED"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6243,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOK11\nTHE IMMORTALS →RETIRED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6241,
+          6244
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E16",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Collection progress strip fills eleven orange ticks then changes to retired",
+      "start_frame": 6213,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.035,
+        "y": 0.16,
+        "w": 0.15,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6213; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6213,
+          "value": 1
+        },
+        {
+          "frame": 6226,
+          "value": 6
+        },
+        {
+          "frame": 6240,
+          "value": 11
+        },
+        {
+          "frame": 6263,
+          "state": "RETIRED11/11; ticks pale"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6213,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "COLLECTION SS27 ·SHOWN11/11 →RETIRED11/11",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6213,
+          6214
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0138-E17",
+      "shot_id": "S0138",
+      "asset_id": null,
+      "type": "text_lyric",
+      "description": "Karaoke caption continues Feel the AGI, feel it",
+      "start_frame": 6214,
+      "end_frame": 6266,
+      "bounding_box": {
+        "x": 0.03,
+        "y": 0.84,
+        "w": 0.24,
+        "h": 0.09,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6214; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6266; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6214,
+          "text": "Feel"
+        },
+        {
+          "frame": 6219,
+          "text": "Feel the"
+        },
+        {
+          "frame": 6228,
+          "text": "Feel the AGI,"
+        },
+        {
+          "frame": 6257,
+          "text": "Feel the AGI, feel"
+        },
+        {
+          "frame": 6265,
+          "text": "Feel the AGI, feel it"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6214,
+        6266
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Feel the AGI, feel it",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6213,
+          6215
+        ],
+        "exit_bounds": [
+          6264,
+          6266
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0138-A01",
+      "target_element_ids": [
+        "S0138-E02",
+        "S0138-E03",
+        "S0138-E04"
+      ],
+      "description": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+      "start_frame": 6213,
+      "end_frame": 6266,
+      "easing": "unfitted",
+      "audio_sync": "not listened in this pass"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0270"
+      ],
+      "frame_range": [
+        6236,
+        6241
+      ],
+      "type": "other",
+      "description": "Slow camera drift/push over the jacket rack (rack and model shift ~5% left) with HUD tag boxes moving; same take, no image replacement.",
+      "confidence": 0.7,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B4-008",
+      "span": [
+        6213,
+        6213
+      ],
+      "description": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B4-009",
+      "span": [
+        6266,
+        6266
+      ],
+      "description": "FEEL6215 THE6220 AGI6229; RETIRED6264; rack drifts left",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0410",
+      "relation": "vocal_word_candidate (unknown) at frame 6202–6213; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6213
+    },
+    {
+      "audio_event_id": "AX0358",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 6207–6215; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 6213
+    },
+    {
+      "audio_event_id": "AW0411",
+      "relation": "vocal_word_candidate (unknown) at frame 6213–6219; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6213
+    },
+    {
+      "audio_event_id": "AH02676",
+      "relation": "band_onset_candidate (unknown) at frame 6213; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6213
+    },
+    {
+      "audio_event_id": "AH02677",
+      "relation": "band_onset_candidate (unknown) at frame 6213; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6213
+    },
+    {
+      "audio_event_id": "AB0574",
+      "relation": "beat_candidate (unknown) at frame 6213; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6213
+    },
+    {
+      "audio_event_id": "AH02678",
+      "relation": "band_onset_candidate (unknown) at frame 6214; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6214
+    },
+    {
+      "audio_event_id": "AH02679",
+      "relation": "band_onset_candidate (unknown) at frame 6214; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6214
+    },
+    {
+      "audio_event_id": "AX0359",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 6215–6220; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 6215
+    },
+    {
+      "audio_event_id": "AW0412",
+      "relation": "vocal_word_candidate (unknown) at frame 6219–6221; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6219
+    },
+    {
+      "audio_event_id": "AH02680",
+      "relation": "band_onset_candidate (unknown) at frame 6224; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6224
+    },
+    {
+      "audio_event_id": "AH02681",
+      "relation": "band_onset_candidate (unknown) at frame 6224; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6224
+    },
+    {
+      "audio_event_id": "AB0575",
+      "relation": "beat_candidate (unknown) at frame 6224; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6224
+    },
+    {
+      "audio_event_id": "AH02682",
+      "relation": "band_onset_candidate (unknown) at frame 6224; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6224
+    },
+    {
+      "audio_event_id": "AH02683",
+      "relation": "band_onset_candidate (unknown) at frame 6225; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6225
+    },
+    {
+      "audio_event_id": "AW0413",
+      "relation": "vocal_word_candidate (unknown) at frame 6228; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6228
+    },
+    {
+      "audio_event_id": "AH02684",
+      "relation": "band_onset_candidate (unknown) at frame 6230; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6230
+    },
+    {
+      "audio_event_id": "AH02685",
+      "relation": "band_onset_candidate (unknown) at frame 6230; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6230
+    },
+    {
+      "audio_event_id": "AW0414",
+      "relation": "vocal_word_candidate (unknown) at frame 6234; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6234
+    },
+    {
+      "audio_event_id": "AB0576",
+      "relation": "beat_candidate (unknown) at frame 6235; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6235
+    },
+    {
+      "audio_event_id": "AH02686",
+      "relation": "band_onset_candidate (unknown) at frame 6235; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6235
+    },
+    {
+      "audio_event_id": "AH02687",
+      "relation": "band_onset_candidate (unknown) at frame 6235; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6235
+    },
+    {
+      "audio_event_id": "AH02688",
+      "relation": "band_onset_candidate (unknown) at frame 6235; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6235
+    },
+    {
+      "audio_event_id": "AW0415",
+      "relation": "vocal_word_candidate (unknown) at frame 6235–6236; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6235
+    },
+    {
+      "audio_event_id": "AH02689",
+      "relation": "band_onset_candidate (unknown) at frame 6236; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6236
+    },
+    {
+      "audio_event_id": "AH02690",
+      "relation": "band_onset_candidate (unknown) at frame 6241; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6241
+    },
+    {
+      "audio_event_id": "AH02691",
+      "relation": "band_onset_candidate (unknown) at frame 6246; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6246
+    },
+    {
+      "audio_event_id": "AH02692",
+      "relation": "band_onset_candidate (unknown) at frame 6246; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6246
+    },
+    {
+      "audio_event_id": "AH02693",
+      "relation": "band_onset_candidate (unknown) at frame 6246; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6246
+    },
+    {
+      "audio_event_id": "AB0577",
+      "relation": "beat_candidate (unknown) at frame 6246; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6246
+    },
+    {
+      "audio_event_id": "AH02694",
+      "relation": "band_onset_candidate (unknown) at frame 6246; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6246
+    },
+    {
+      "audio_event_id": "AH02695",
+      "relation": "band_onset_candidate (unknown) at frame 6246; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6246
+    },
+    {
+      "audio_event_id": "AH02696",
+      "relation": "band_onset_candidate (unknown) at frame 6251; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6251
+    },
+    {
+      "audio_event_id": "AH02697",
+      "relation": "band_onset_candidate (unknown) at frame 6251; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6251
+    },
+    {
+      "audio_event_id": "AW0416",
+      "relation": "vocal_word_candidate (unknown) at frame 6255–6262; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6255
+    },
+    {
+      "audio_event_id": "AH02698",
+      "relation": "band_onset_candidate (unknown) at frame 6256; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6256
+    },
+    {
+      "audio_event_id": "AB0578",
+      "relation": "beat_candidate (unknown) at frame 6256; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6256
+    },
+    {
+      "audio_event_id": "AH02699",
+      "relation": "band_onset_candidate (unknown) at frame 6256; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6256
+    },
+    {
+      "audio_event_id": "AH02700",
+      "relation": "band_onset_candidate (unknown) at frame 6257; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6257
+    },
+    {
+      "audio_event_id": "AH02701",
+      "relation": "band_onset_candidate (unknown) at frame 6257; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6257
+    },
+    {
+      "audio_event_id": "AH02702",
+      "relation": "band_onset_candidate (unknown) at frame 6262; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6262
+    },
+    {
+      "audio_event_id": "AH02703",
+      "relation": "band_onset_candidate (unknown) at frame 6262; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6262
+    },
+    {
+      "audio_event_id": "AW0417",
+      "relation": "vocal_word_candidate (unknown) at frame 6263–6268; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6263
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0138.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original font, shader, authored layer decomposition and exact easing remain unknown.",
+    "Spatial bounds are source-image visual estimates, not original layout coordinates."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0138.jpg",
+      "keyframes/S0138_f06213.jpg",
+      "keyframes/S0138_f06226.jpg",
+      "keyframes/S0138_f06240.jpg",
+      "keyframes/S0138_f06253.jpg",
+      "keyframes/S0138_f06266.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "filmstrip_opened": true,
+    "frames_actually_opened": [
+      6213,
+      6226,
+      6240,
+      6253,
+      6266
+    ],
+    "fullres_frames_actually_opened": [
+      6239
+    ],
+    "detail_crops": [
+      "work/full_codex_103_153/micro138.png"
+    ],
+    "dense_sheets": [
+      "work/full_codex_103_153/dense138.jpg"
+    ],
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "Five individual keyframes plus native crop and dense animation review; second independent-element and visibility inventory.",
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

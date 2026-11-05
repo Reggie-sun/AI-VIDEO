@@ -1,0 +1,11 @@
+[11/03/26 23:42:37] INFO     Processing request of type            server.py:733
+                             ListToolsRequest                                   
+                    INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+                    INFO     Processing request of type            server.py:733
+                             CallToolRequest                                    
+[11/03/26 23:42:52] INFO     HTTP Request: POST                  _client.py:1025
+                             https://generativelanguage.googleap                
+                             is.com/v1beta/models/gemini-3.8-fla                
+                             sh:generateContent "HTTP/1.1 200                   
+                             OK"                                                

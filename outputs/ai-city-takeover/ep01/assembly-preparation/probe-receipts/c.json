@@ -1,0 +1,19 @@
+{
+  "request_receipt_fingerprint": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+  "resolved_generation_hash": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+  "fetch_fingerprint": "05a2b1a31a17b4c83ddddcf6b078b805b65fa81741a47e3dc586751439422d49",
+  "measured": {
+    "container_name": "mp4",
+    "codec_name": "h264",
+    "width": 1920,
+    "height": 1080,
+    "fps_numerator": 8700,
+    "fps_denominator": 361,
+    "duration_milliseconds": 6017,
+    "frame_count": 145,
+    "audio_stream_count": 1,
+    "size_bytes": 12706989,
+    "artifact_sha256": "974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15"
+  },
+  "content_hash": "3f83c960cc9c2280bf8769cb9a5dfa3002d317263daa0015e826a60cfaa59327"
+}

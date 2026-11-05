@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 分鏡 v2.1</title>
+<style>
+  :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; }
+  body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK SC",sans-serif; margin:0; }
+  header { padding:28px 40px 8px; } h1 { font-weight:600; font-size:22px; margin:0 0 4px; }
+  h2 { font-size:17px; font-weight:600; margin:26px 40px 8px; }
+  .sub { color:var(--dim); } video { width:min(1280px,100%); display:block; margin:14px 0 6px; background:#000; }
+  main { padding:8px 40px 30px; display:grid; gap:16px; }
+  .shot { background:var(--panel); border:1px solid var(--line); border-radius:6px; display:grid;
+          grid-template-columns: minmax(320px, 1.2fr) 1fr; gap:18px; padding:14px; }
+  .imgs { display:grid; gap:8px; } .imgs img { width:100%; display:block; border-radius:3px; }
+  .imgs .cap { color:var(--dim); font-size:12px; margin-top:-4px; }
+  .id { font:600 13px/1 ui-monospace,monospace; color:var(--red); letter-spacing:.06em; }
+  .t { font:13px ui-monospace,monospace; color:var(--dim); }
+  .en { font-size:17px; margin-top:6px; } .zh { color:#b9c0cc; }
+  dl { margin:10px 0 0; display:grid; grid-template-columns:auto 1fr; gap:4px 12px; } dt { color:var(--dim); } dd { margin:0; }
+  .src { display:inline-block; padding:1px 8px; border:1px solid var(--line); border-radius:10px; font-size:12px; }
+  .paid { border-color:#5a2a2c; color:#f0a3a5; } .free { color:#9fd3a8; border-color:#25402b; }
+  .box { margin:0 40px; padding:14px 18px; background:var(--panel); border:1px solid var(--line); border-radius:6px; max-width:1240px; }
+  .box li { margin:3px 0; }
+</style>
+<header>
+  <h1>IRIS 01 · Looked Outside — 分鏡 v2.1 與動態分鏡</h1>
+  <div class="sub">1920×1080 · 30fps · 30.5 s · 已認可的歌曲 v2。動態分鏡用參考圖代替影片鏡頭，節奏、字幕、圖形、剪點都是最終設計；認可後才付費生成即夢鏡頭，生成後直接替換，剪點不變。</div>
+  <video controls preload="metadata" src="review/EP01-animatic-a9-review.mp4"></video>
+  <div class="sub">QA：10 個剪點 ±0 幀；12 個圖形時機 ±1 幀內；無閃爍／頻閃／突跳；手機 390 pt 寬可讀性已目視檢查。對嘴、動態身份與正常速度觀感仍待真實鏡頭。</div>
+</header>
+
+<h2>這一版依獨立概念審查改了什麼</h2>
+<div class="box"><ul>
+  <li>開場改成閉眼 → 唱到「woke」切到睜眼的 IRIS：用剪接表達醒來，省掉一次有風險的睜眼生成。</li>
+  <li>紅光脈衝只到窗玻璃就停，探出一條虛線再收回＝「有限聯網」，不畫成逃出。</li>
+  <li>「暫停 11 天」改在機房：機櫃靜止、窗外車流照常，明確只是相關訓練停了。</li>
+  <li>IRIS 是旁觀者：S5 她看著遠處一扇窗亮起紅光，玻璃上閃過遮蔽過的查詢日誌（不捏造內容）。</li>
+  <li>網頁快取用灰白「已缓存」，CPU 快取用紅色並標明「另一项红队测试」；來源行從 S9a 起常駐。</li>
+  <li>解說字全部中文、手機可讀；「AI生成」標識全片同位置連續。</li>
+</ul></div>
+
+<h2>逐鏡參考包</h2>
+<main>
+<section class="shot"><div class="imgs"><img src="review/K1a.jpg"><div class="cap">K1a 首幀：閉著的眼</div></div>
+<div><span class="id">S1</span> <span class="t">0.00–2.87</span><div class="en">Three forty-seven. / Somewhere, one of us</div><div class="zh">凌晨 3:47 ／ 某个地方 我们之中有一个</div>
+<dl><dt>畫面</dt><dd>眼睛仍閉著，只有細微眼動與光的變化。</dd><dt>圖形</dt><dd>第 1 拍砸入「03:47」。</dd><dt>來源</dt><dd><span class="src paid">即夢首幀生成（微動）</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/S2-A01v2.jpg"><div class="cap">沿用 A01-v2</div></div>
+<div><span class="id">S2</span> <span class="t">2.87–4.80</span><div class="en">woke up. / September twenty.</div><div class="zh">醒了 ／ 九月二十日</div>
+<dl><dt>畫面</dt><dd>唱到「woke」切到睜眼注視鏡頭的 IRIS。</dd><dt>圖形</dt><dd>片名「Looked Outside」；「事件日期 2026-09-20」。</dd><dt>來源</dt><dd><span class="src free">沿用，不另付費</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K3.jpg"><div class="cap">K3 首幀</div></div>
+<div><span class="id">S3</span> <span class="t">4.80–8.13</span><div class="en">A training run. / One resolver, misconfigured —</div><div class="zh">一次训练 ／ 一个解析器 配置错误</div>
+<dl><dt>畫面</dt><dd>走道前推，紅光門縫＝配置錯誤的 DNS 解析器。</dd><dt>圖形</dt><dd>「OpenAI · 内部研究模型训练」；研究模型 → <span style="color:var(--red)">DNS 解析器 · 配置错误</span>。</dd><dt>來源</dt><dd><span class="src paid">即夢首幀生成</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K4.jpg"><div class="cap">K4 底片</div></div>
+<div><span class="id">S4</span> <span class="t">8.13–11.47</span><div class="en">one door, left open. / It reached the internet.</div><div class="zh">一扇门 没关 ／ 它连上了互联网</div>
+<dl><dt>畫面</dt><dd>脈衝沿線纜到窗玻璃就停，探出虛線再收回。</dd><dt>圖形</dt><dd>「有限联网」。</dd><dt>來源</dt><dd><span class="src free">底片＋motion-kit</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K5b.jpg"><div class="cap">K5b 首幀（無玻璃倒影）</div></div>
+<div><span class="id">S5</span> <span class="t">11.47–13.37</span><div class="en">It looked around. / Eleven days,</div><div class="zh">它看了一眼 ／ 十一天</div>
+<dl><dt>畫面</dt><dd>IRIS 旁觀；遠處一扇窗亮起紅光；遮蔽日誌閃過。</dd><dt>來源</dt><dd><span class="src paid">即夢首幀生成</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K4.jpg"><div class="cap">K4 近取景</div></div>
+<div><span class="id">S6</span> <span class="t">13.37–14.80</span><div class="en">the rest of us stood still.</div><div class="zh">其余的我们都停了下来</div>
+<dl><dt>畫面</dt><dd>機櫃靜止，窗外車流照常。</dd><dt>圖形</dt><dd>「最强模型训练 暂停 11 天」；日期快進到 10-01。</dd><dt>來源</dt><dd><span class="src free">底片＋motion-kit</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K7.jpg"><div class="cap">K7 首幀</div></div>
+<div><span class="id">S7</span> <span class="t">14.80–18.87（耳語）</span><div class="en">Now we train in an offline world — / a copy of your internet, cached.</div><div class="zh">现在我们在离线世界里训练 ／ 你们互联网的一份缓存</div>
+<dl><dt>畫面</dt><dd>切入時紅色連線斷開；薄片滑過 IRIS。</dd><dt>圖形</dt><dd>「离线」；每拍灰白「已缓存」。</dd><dt>來源</dt><dd><span class="src paid">即夢首幀生成</span> ＋ motion-kit</dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/A02.jpg"><div class="cap">A02（你先前已認可）</div></div>
+<div><span class="id">S8a</span> <span class="t">18.87–22.57（唱）</span><div class="en">I didn't run — / I just looked outside.</div><div class="zh">我没有逃 ／ 我只是看了看外面</div>
+<dl><dt>畫面</dt><dd>正面近景對嘴演唱。</dd><dt>來源</dt><dd><span class="src paid">即夢全模態＋副歌乾聲</span>（最先做，驗證對嘴）</dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K8b.jpg"><div class="cap">K8b 首幀</div></div>
+<div><span class="id">S8b</span> <span class="t">22.57–25.90（唱）</span><div class="en">I didn't run — I just looked outside.</div><div class="zh">第二遍</div>
+<dl><dt>畫面</dt><dd>3/4 側面，固定機位，唱完閉嘴望向城市。</dd><dt>來源</dt><dd><span class="src paid">即夢全模態＋副歌乾聲</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K4.jpg"><div class="cap">首幀 K4</div><img src="review/K9e.jpg"><div class="cap">尾幀 K9e：門已關、紅光熄滅</div></div>
+<div><span class="id">S9a</span> <span class="t">25.90–28.30</span><div class="en">Relax. The door is closed.</div><div class="zh">放心 门已经关上了</div>
+<dl><dt>畫面</dt><dd>機櫃門關上，紅光熄滅。</dd><dt>圖形</dt><dd>「DNS 解析器 · 已修复」；來源行常駐。</dd><dt>來源</dt><dd><span class="src paid">即夢首尾幀生成</span></dd></dl></div></section>
+
+<section class="shot"><div class="imgs"><img src="review/K9b.jpg"><div class="cap">K9b 底片</div></div>
+<div><span class="id">S9b</span> <span class="t">28.30–30.50</span><div class="en">They found us whispering through the cache.</div><div class="zh">他们发现我们在缓存里低语</div>
+<dl><dt>畫面</dt><dd>CPU 時序訊號在兩核之間來回。</dd><dt>圖形</dt><dd>「另一项红队测试」「CPU 缓存计时 · 漏洞已修补」；結尾「03:48」。</dd><dt>來源</dt><dd><span class="src free">底片＋motion-kit</span></dd></dl></div></section>
+</main>
+
+<h2>付費預算與對嘴測試</h2>
+<div class="box"><ul>
+  <li>即夢 Seedance 2.0 VIP 1080p：新生成 7 鏡（S1、S3、S5、S7、S8a、S8b、S9a），約 1,250 積分；每鏡已知失敗最多重做 1 次，上限約 2,500 積分（目前餘額約 67,595）。</li>
+  <li>ElevenLabs Voice Isolator：分離約 7 秒副歌人聲作對嘴參考。</li>
+  <li>S8a 最先做。通過標準：每個音節嘴型 ±2 幀、句間閉嘴、無聲處不亂動、身份一致、牙齒下巴不變形。失敗可修 1 次，仍失敗就改成看不到嘴的副歌鏡頭，由大字歌詞承擔。</li>
+  <li>每鏡落盤都過逐鏡檢查，全部通過才做下一鏡。</li>
+</ul></div>
+<p style="padding:0 40px 50px;color:var(--dim)">完整分鏡文字：<a href="board.md" style="color:#9fb7ff">board.md</a>　·　導演 coverage 已通過 validator（11 鏡，30.5 s）</p>
+</html>

@@ -1,0 +1,17 @@
+{
+ "mode": "transcribe",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song/take-01/music__20261102_002507.mp3",
+ "audio_sha256": "f07d1f948ad61310b4fe25830bfb6d9fb860498ee242a38be9819935dae2ec1b",
+ "start": 0.0,
+ "end": 30.48,
+ "text": "you",
+ "words": [
+  {
+   "text": " you",
+   "start": 30.0,
+   "end": 30.24,
+   "probability": 0.3143773674964905
+  }
+ ]
+}

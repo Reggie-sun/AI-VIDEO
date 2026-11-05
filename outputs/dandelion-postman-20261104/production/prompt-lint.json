@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "checks": {
+    "single_new_image": true,
+    "approved_quote": true,
+    "same_approved_image": true,
+    "twelve_seconds": true,
+    "native_audio": true,
+    "resolution": true,
+    "qualification": true,
+    "single_submit_no_resample": true,
+    "single_robot": true,
+    "continuous": true,
+    "soft_not_firstframe": true,
+    "right_bag": true,
+    "no_old_story": true,
+    "no_dialogue_music": true,
+    "no_exact_timestamps": true
+  },
+  "scope": "input structure and exact bindings only; video quality NOT_EVALUATED"
+}

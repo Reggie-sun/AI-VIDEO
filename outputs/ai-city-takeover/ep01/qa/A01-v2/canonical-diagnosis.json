@@ -1,0 +1,15 @@
+{
+  "failure_classes": [],
+  "failed_requirements": [],
+  "preserved_requirements": [
+    "camera-space",
+    "identity",
+    "quiet-observer",
+    "visual"
+  ],
+  "evidence_hashes": [
+    "e78e0a9ada8031d141bdcadc241092bf3b181ccb0e1014b56f733e8f4ab6293e"
+  ],
+  "next_owner": "review_owner",
+  "all_required_observed_pass": true
+}

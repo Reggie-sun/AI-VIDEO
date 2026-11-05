@@ -1,0 +1,36 @@
+{
+ "schema": "iris-v3-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-05T06:30:52Z",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/oh-r3/preview-approval.json",
+   "sha256": "ccfd6900fff815b4fb7972ba625b04065e40e4e4915f43e8e27116b8f447e6e3"
+  }
+ },
+ "units": {
+  "U021": {
+   "verdict": "not_ready",
+   "continuity": "PASS：本镜之前没有已接受的实拍（第一条 U021 已被否决，pilot/oh/U021/post-media-gate.json 结果 FAIL），按使用者认可的新身份参考和邻镜新首帧比对。首帧 plates/raw/P-gap-mcu-sing.png（4cb7b152…，1672×941）与 referces/iris/raw/P-gap-mcu-sing-b.png 字节相同（README 登记的 U021 首帧候选），对照 referces/iris/raw/IRIS-expressions-c.png（e6ef0a4f…，第三格「闭眼唱歌」）与 IRIS-turnaround-c.png（c4f37026…）：新脸，银白齐下巴波波头、侧分短刘海，银白眉，冷白皮肤与淡雀斑（/tmp/cont-u021-r3/eyes-U021.jpg 放大 2 倍可见），双眼闭合且两眼都有眼尾深色眼线，冷裸色唇，张嘴露上排牙；左耳黑色耳挂与小红灯、耳骨一排银钉在画面右侧（约 x 1130–1190），左侧立领红色灯线亮着、在画面右侧（y>600、x 900–1300 区域 R≥250 亮芯 463 px），没有镜像。服装：白色雕塑感立领外套＋黑色高领，与 turnaround-c 及 U020 首帧 P-gap-face-whisper.png（d52cfed2…）、U022 首帧 P-gap-34-sing.png（24638a5f…）一致。光：门缝红光从画面右侧打在右半张脸，左半是冷蓝；三张首帧的饱和红像素全部在 x≥944（U021）、x≥951（U020）、x≥1146（U022），左侧走道与机柜区 0 个，符合 canon-v4「只有她的灯和门缝是红的」。布景三张一致：左边虚化蓝灯机柜，右边一指宽红色门缝（门缝 x 约 U020 1455、U021 1340、U022 1530，随取景变化）。",
+   "handoff": "PASS（邻镜都还没实拍，按已认可的新首帧和现行 coverage／shots-map 判断）。切入 60.50 s：U021.wav 片内 0.00–0.95 s（歌曲 60.20–61.15）为 −72 至 −82 dBFS 静音，I 在片内 0.95–1.00 s 起音（−55→−24 dB，/tmp/cont-u021-r3/rms.py），切点落在人声空档；语义是同时同地连续、进副歌的有动机硬切（coverage transition_out motivated_cut），不是省略或重置。现行 director-coverage U020 与 shots-map 写明 U020 唱 Outside 时切到四分之三近景（plates from 0.606，约 58.21 s），所以 U020 末态是四分之三近景、睁眼看镜头；U021 首帧是正面近景、闭眼张嘴、头微后仰：角度变化约 30 度，景别相近，耳挂、领线、门缝都在画面右侧，人物在画面中偏右，屏幕方向一致。睁眼→闭眼发生在 0.6 s 的静音里，读作她闭眼开唱。切出 64.26 s（片内 4.06 s）：run 在片内约 3.40–3.60 s 结束，3.85–4.00 s 有 −50 dB 的气声，4.25 s 才是下一句 I，切点在两句之间。文本「唱到句尾慢慢睁开眼睛，平静地看着镜头」让她在切点前睁眼看镜头，接 U022 首帧（四分之三近景、睁眼看镜头、嘴微张），符合 I-EYEJUMP「睁眼与下一镜是同一人、同一动作」；正面→四分之三，双眼间距 230→240 px（侧脸缩短，实际约放大 1.2 倍），不是跳切；耳挂、领线、门缝都在画面右侧。与已认可 a2 的差别（a2 帧 1814/1815、1927/1928，/tmp/cont-u021-r3/a2-cuts.jpg）：a2 是 四分之三近景→腰以上中景（脸约缩到三分之一）→四分之三近景，两次切都靠大景别反差；新首帧是胸口以上的近景，变成 近景→近景→近景，两次切改靠角度变化，中景「站在门缝旁」的全身信息没有了（使用者已认可这张首帧）。",
+   "axis_action_camera": "PASS：单人对镜头，没有两人之间的 180 度线；三张首帧的工作侧相同（走道在画面左，门缝在画面右，她左耳装置和左领线在画面右），没有过轴或镜像。机位：文本「镜头固定中近景」与首帧（头到上胸、正面、固定）一致；shots-map 的 hold（1–2% 慢漂）是后期做的，不交给模型。动作阶段对 4.36 s 人声（片内时间，0 s = 歌曲 60.20 s）：0–0.95 s 前奏静音；0.95–1.25 s 唱 I（全片最响，−24 dB）；1.45–3.30 s 是 didn't 长拖腔；3.30–3.60 s 是很轻的 run；3.85–4.00 s 吸气；4.06 s 出点；4.25 s 起的下一句 I 在出点之后，会被裁掉。闭眼唱的时间是 0.95–3.60 s，句尾睁眼只能放在约 3.4–4.06 s（约 0.5 s）。肩膀放松、身体站定和首帧不冲突；脚和腰不入画，「身体稳稳站定」只能从肩和头的位置看出。",
+   "prompt_fit": "FAIL：动作文本（76 字，UTF-8 SHA-256 2230ef35…，与 oh-r3/preview-approval.json、preview-inputs-r3.json、r3/u021-take.html（06d5b3b0…）第 7 行逐字相同）否定字扫描命中 1 处：「无」，在「神情平静，面无表情」里（字符下标 27）。本 lane 规定动作文本只用正向说法，扫描 不/没/无/别/勿/非/未/莫/否/禁/免，没有成语例外；先例是 SC4「几乎不笑」被场记判为不可提交，U020「头几乎不动」、U027「停住不动」都是经使用者「同意这两处改写」后才改（logs/decisions.md 第 551 行、pilot/build_lane_approvals.py）。其余：纯中文（只有汉字和「，；。」，没有 ASCII）；只写镜头、状态和动作，没写外观、灯光和场景；「闭眼唱→句尾睁眼看镜头」与闭眼张嘴首帧和 U022 首帧相符；「身体稳稳站定」是 close_state「身体不退」的正向写法。前奏静音（已知风险）：首帧嘴张得很大，片内 0–0.95 s 是静音，剪辑入点 0.30 s 也在静音里。文本只用「嘴随歌词自然张合」暗示静音时闭嘴，没有明写前奏时先合上嘴，也就是没有处理这个风险。另外，accept 第 3 条要求「面无表情、带点好奇」，文本里没有「好奇」，句尾只写「平静地看着镜头」，使用者上次否决过「后面神情发空」。与 coverage 的差别：U021 coverage／board-table／shots-map 仍写 medium、开场「下巴微压、眼睛上抬」、底图 P-gap-mcu-b.png。新首帧是近景、闭眼、头微后仰，这是使用者在后面明确认可的（「首帧行…」「确认，开拍」），按冲突规则以使用者为准，不判为多加或遗漏，但 coverage 没有改。",
+   "lint": "PASS（12 项中 11 项为 true；第 12 项取决于本报告）：没有运行 gen/omnihuman.py lint（它会建 oh-r3/U021/ 并写 lint.json）。按 omnihuman.py（2f27f793…）的 lint() 逻辑，在 OMNI_TRIAL=outputs/ai-city-takeover/ep01/v3/pilot/oh-r3 下用 /tmp/cont-u021-r3/lintcheck.py 只读重算：unit_in_approved_preview、user_approval_quoted（「确认，开拍」）、take_has_own_image_and_audio、approved_inputs_unchanged（图 4cb7b152…、音频 b74a2cdb…、页面 06d5b3b0…、preview-inputs-r3 68880658…，与封存值一致）、take_inputs_in_preview、audio_seconds_match_file（192276 帧 / 44100 Hz = 4.36 s，单声道 16 bit）、action_text_is_approved_text（2230ef35…）、action_text_pure_chinese、mode_is_master（「即梦 数字人 · 大师模式 · output size follows the still」）、never_submitted（oh-r3/ 下只有 preview-approval.json，没有 U021/）、ledger_has_room（oh-r3/ledger.json 不存在＝0 条；上限 1 条、165 积分、每条 165、retries 0）都是 true。continuity_report_ready 现在是 false，因为报告还没存档；本报告 verdict 是 not_ready，存档后脚本仍会判 false，lint 不会通过。omnihuman.py lint 不做否定字扫描，「面无表情」的命中只在 prompt_fit 里报告。",
+   "gaps": [
+    "动作文本「神情平静，面无表情」含否定字「无」，违反本 lane 的正向文本规则。要么改成正向说法，要么由使用者当次明确接受这个成语作为例外；文本改了 SHA 就变，要重做预览页、取得使用者原话认可、新写一份 approval，再重做本报告。",
+    "U021 的 coverage／board-table／shots-map 还是旧的（medium、「下巴微压、眼睛上抬」、P-gap-mcu-b.png），没有按使用者认可的新首帧（近景、闭眼张嘴、头微后仰）改或登记。这不挡本条 take 的提交，但逐镜 Gate 和后续拼接审看要以哪份为准，主会话需要写明。"
+   ],
+   "risks": [
+    "前奏嘴型：首帧张大嘴，片内 0–0.95 s 是静音，剪辑入点 0.30 s 也在静音里。模型如果在静音里保持张嘴或做假唱，入点到 I（约 0.65 s）会口型不同步、像冻脸；Gate 要逐帧看 0.30–0.95 s。",
+    "句尾睁眼时机：能睁眼的窗口只有片内约 3.4–4.06 s。「慢慢睁开」可能到出点还是半睁，接 U022 睁眼看镜头时会跳；模型也可能在 didn't 中段提前睁眼。Gate 要看 3.4–4.06 s 每一帧的眼睛状态和视线。",
+    "U020→U021 跳切：只有 U020 保留现行 coverage 的「唱 Outside 时切到四分之三近景」，交接才成立。如果 U020 r3 只用正面近景 P-gap-face-whisper，切到 U021 就是同轴正面近景→正面近景：双眼间距 270→230 px（约 85%），背景构图相同，眼睛由睁变闭，会碰 C-NOJUMP（「这里又跳会又显得很突兀」）。a2 当时靠近景→中景（约三分之一）避开了这个问题。要在 U020 报告前定下来。",
+    "立领红线：上一条在片内 1.12 s 起熄灭，Gate 判 FAIL。这次首帧领线亮着，但模型行为没变。u021-take.html 写的是「如果又熄灭，按调研结论在后期补画」，而 accept 第 2 条只写「耳挂与立领红线在画面右侧」，canon-v4 要求灯线亮。熄灭时 Gate 判 FAIL，还是允许后期补画后判 PASS，要在提交前封存为 Gate 判据；改判由使用者当次决定。",
+    "神情：「面无表情、平静」加上闭眼，没有写「好奇」，可能演成使用者否决过的「发空」；也可能因为首帧头后仰、嘴张大，而且 I 是全片最响的起音（−24 dB），再演成「像在喊」。观感由使用者判断。",
+    "牙齿与口腔：首帧露上排牙，嘴张得大，模型生成时牙齿可能糊掉或碎裂（accept 第 4 条）。",
+    "预算账：oh-r3 有自己的上限（1 条、165）和新的 ledger。旧 lane 的 oh/ledger.json 已记 U021 一条 24 积分，仍然开着（1/5 条、24/825 积分）。两个 lane 的累计花费不在同一本账上，最后汇报要合并计算。",
+    "输出尺寸：首帧 1672×941，输出跟随首帧。上次 16:9 输出是 1920×1088，放进 1920×1080 要裁或缩放（C-1080），用 sync_check 对齐后只取 [60.50, 64.26]。",
+    "同一页面上的 Seedance 线 prompt 也写了「面无表情」，那条 lane 要单独出连续性报告，不在本报告范围。"
+   ]
+  }
+ }
+}

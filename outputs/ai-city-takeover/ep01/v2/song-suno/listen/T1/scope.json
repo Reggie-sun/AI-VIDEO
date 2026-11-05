@@ -1,0 +1,26 @@
+{
+  "schema": "iris-listening-scope/1",
+  "authorization_reference": "user-20261104-suno-take-selection",
+  "user_quote": "我都觉得可以,不考虑时常,你得从观众和质量角度考虑,和人物背景符合",
+  "take": {
+    "label": "T1",
+    "clip_id": "378d574e-4eec-4944-86c0-6f477cb7b4f8",
+    "wav": "outputs/ai-city-takeover/ep01/v2/song-suno/takes/378d574e-4eec-4944-86c0-6f477cb7b4f8.wav",
+    "wav_sha256": "8f68fcf01f3d8ee2fb319f480f621b0c099d92c4b3be5b689a63670381489555"
+  },
+  "window": {
+    "path": "outputs/ai-city-takeover/ep01/v2/song-suno/listen/windows/T1-0-110.wav",
+    "sha256": "e257c62b977cd0306dcf0875ce6e6871500f137fad63e46f0cea3ab25c0e38d3",
+    "start_s": 0,
+    "duration_s": 110,
+    "derivation": "ffmpeg -t 110 -ac 1 -ar 24000 pcm_s16le from the take WAV"
+  },
+  "purpose": "Blind observation of voice and delivery in the opening (intro, verse 1, pre-chorus, chorus 1) to rank takes for audience, quality and fit with IRIS",
+  "submit_limit": 1,
+  "operator_upper_bound_USD": 0.05,
+  "upper_bound_is_price_or_settlement": false,
+  "key_route": "Existing injected dotenv-first exact supplier; no values exposed",
+  "UNKNOWN": "STOP and inspect existing outcome, no replay or remint",
+  "actual_cost": "Pending settlement",
+  "host_direct_audio_hearing": "UNAVAILABLE; Gemini model observations will be attributed"
+}

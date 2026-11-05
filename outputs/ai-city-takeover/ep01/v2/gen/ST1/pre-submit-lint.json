@@ -1,0 +1,40 @@
+{
+ "unit": "ST1",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "459d2cabe1a5025052ee8747d1ecbd4259a9c26899a52bdfa955f2666b14350b",
+ "compiled_prompt_sha256": "abd9991738389d047651117dba92acb7b2e750cdbf3807ad2a8f039153027662",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/story/continuity-report.json",
+  "sha256": "230814b2dab63866c43cb584cad969bd8c39ae84d76270eddfc551577fc660ec",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS: ST1-a（ebae1f6e…）里她在对称机房走道中央，人很小；炭黑高领大衣、后梳发型、红线在她的左领，人太小看不见耳挂；冷蓝机柜灯和地面光雾与 c13 的 S2/N1 机房色调一致。",
+   "handoff": "PASS: 按规格接在 S1 闭眼之后（unit.py 第 729 行），用「醒来起身」把闭眼和 S2 特写连起来，剪切理由明确；不能放在 S2 站姿特写之后（见 R3）。",
+   "axis_action_camera": "PASS: 规格是 LOCKED，首帧是对称走道全景、正面机位；动作从半蹲到站直再抬头望向走道深处，可读；不涉及屏幕方向的问题。",
+   "prompt_fit": "PASS: compiled 与 approval prompts.ST1 逐字相同（abd99917…），只有一张首帧绑定，没有音频参考；prompt 写了「她的脸很小，看不清嘴」，首帧里的脸确实很小。",
+   "lint": "PASS（本报告这一项除外）: failed=[continuity_report_ready]，其余 10 项都为 true；request_hash 459d2cab…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   6,
+   990
+  ]
+ },
+ "new_calls": 0
+}

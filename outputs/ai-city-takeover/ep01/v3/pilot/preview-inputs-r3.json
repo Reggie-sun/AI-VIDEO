@@ -1,0 +1,53 @@
+{
+ "schema": "iris-v3-preview-inputs/r3",
+ "unit": "U021",
+ "image": {
+  "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-sing.png",
+  "sha256": "4cb7b152e8e9ed40320e8dcdf73ce51e12c338bbb1d118a9ad2e6a1cc21bde2f"
+ },
+ "audio": {
+  "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+  "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+  "seconds": 4.36,
+  "song_window": [
+   60.2,
+   64.56
+  ]
+ },
+ "digital_human": {
+  "action_prompt": "镜头固定中近景。她闭着眼睛投入地轻声唱歌，神情平静，面无表情，眉头舒展，嘴随歌词自然张合；唱到句尾慢慢睁开眼睛，平静地看着镜头，肩膀放松，身体稳稳站定。",
+  "action_prompt_sha256": "2230ef35effb3259aac0f12ca1ac34816c7aec04da75c3a2620cb6980bc4e06d"
+ },
+ "seedance_multimodal": {
+  "prompt": "{{image:1}}中的她对着镜头唱歌，口型与{{audio:1}}里的人声逐字精确同步。中近景，她闭着眼睛投入地唱，神情平静，面无表情，眉头舒展；唱到句尾慢慢睁开眼睛，平静地看着镜头。镜头全程锁定，一镜到底。",
+  "prompt_sha256": "6a80355ddba5d1fe125a91dd281db39b7a7747ad837b6226328b679150de87d6",
+  "bindings": [
+   {
+    "kind": "image",
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-sing.png"
+   },
+   {
+    "kind": "audio",
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav"
+   }
+  ]
+ },
+ "edit_window": 60.5,
+ "accept": [
+  "正常速度和原曲合在一起看，她是在唱，口型大致同步",
+  "身份符合 referces/iris（新脸、波波头），耳挂与立领红线在画面右侧",
+  "神情：面无表情、带点好奇；不凶、不喊、不发空，前后同一种情绪",
+  "没有凭空出现的手或物体、没有牙齿碎裂",
+  "背景与机位稳定（不漂、不晃）"
+ ],
+ "user_decisions": [
+  "「人物表情不对」",
+  "「开头太凶, 唱 I 像在喊, 后面神情发空, 前后不连贯」",
+  "「看下作者是怎么做的」",
+  "「先出图我看看,referces都没有」",
+  "「新脸但改回波波头」",
+  "「可以，定下来」",
+  "「首帧行，两条各拍一条对比 (Recommended)」",
+  "「确认，开拍」"
+ ]
+}

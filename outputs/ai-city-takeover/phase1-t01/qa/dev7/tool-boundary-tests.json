@@ -1,0 +1,22 @@
+{
+  "validation_kind": "direct_targeted_pytest_not_Harness",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "motion-kit/tests/test_tool_boundaries.py",
+    "-q"
+  ],
+  "observed_result": "9 passed in 0.69s",
+  "exit_code": 0,
+  "independent_code_review": "APPROVE; 0 open issues in these four files",
+  "source_sha256": {
+    "motion-kit/tools/beatmap.py": "bdf001740747837c965cad6e90898200d563f088a98009447e50258d00d2a8c7",
+    "motion-kit/tools/qa.py": "12116aa8de604c0e1515ffbb64b90d092bfb97d55ece599997ba5f17c232d57b",
+    "motion-kit/tools/codex_plate.py": "be5d294be29d5a93a4cdc0953354f33a7f8ebfbb0d8f5c3dd38088ec80f485bf",
+    "motion-kit/tests/test_tool_boundaries.py": "481742957f5c86ee82f11bdb81c553bd554032732c95de55da2ff1599333630b"
+  },
+  "real_provider_calls": 0,
+  "media_regenerated": false,
+  "full_harness_status": "blocked_by_preexisting_policy_audit_failure; initial_snapshot_receipt_retained; not a current full PASS"
+}

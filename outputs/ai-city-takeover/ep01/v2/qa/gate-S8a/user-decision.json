@@ -1,0 +1,14 @@
+{
+  "schema": "iris-v2-user-gate-decision/1",
+  "unit": "S8a",
+  "gate": "qa/gate-S8a/post-media-gate.json (FAIL, sealed)",
+  "alternatives": {
+    "take 2": "qa/gate-S8ar/post-media-gate.json (FAIL)",
+    "fallback": "no-visible-mouth coverage"
+  },
+  "question": "S8a 對嘴要用哪一版？（S8b 會照你選的做法生成）",
+  "user_answer": "用第一版 (Recommended)",
+  "scope": "use take 1 only inside the film window master 18.867-22.567 s (clip 0.467-4.167 s); its failed items (open mouth in the 0.20 s lead-in, slight gap after the line) lie outside that window",
+  "recorded_at": "2026-11-02T08:22:51.879102+00:00",
+  "authority": "user decision on a FAIL verdict (AGENTS.md: 改判次要、移出或延后须用户当次决定); the sealed gate verdict itself is unchanged"
+}

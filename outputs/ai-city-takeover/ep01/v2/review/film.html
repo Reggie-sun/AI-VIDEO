@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 成片 c1</title>
+<style>
+  :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; --ok:#9fd3a8; }
+  body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+  h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:17px; font-weight:600; margin:26px 0 8px; }
+  .sub { color:var(--dim); } video { width:min(1280px,100%); display:block; margin:14px 0 6px; background:#000; }
+  table { border-collapse:collapse; max-width:1280px; width:100%; } td, th { border-bottom:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; }
+  th { color:var(--dim); font-weight:500; } .pass { color:var(--ok); } .fail { color:var(--red); } code { color:#9fb7ff; }
+  .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:12px 16px; max-width:1248px; } li { margin:3px 0; }
+</style>
+<h1>IRIS 01 · Looked Outside — 成片 c1（待你審看）</h1>
+<div class="sub">1920×1080 · 30fps · 30.5 s · 整合響度 −14.2 LUFS · 交付檔 <code>renders/IRIS-EP01-Looked-Outside-v2-c1.mp4</code></div>
+<video controls preload="metadata" src="../renders/IRIS-EP01-Looked-Outside-v2-c1.mp4"></video>
+<div class="sub">
+  <ul>
+    <li><b>QA</b>：10 個剪點 ±0 幀；12 個圖形時機都在 ±1 幀內；沒有閃爍、頻閃或單幀錯畫面。</li>
+    <li><b>拼接檢查</b>：倉庫的拼接 Gate（verify-assembly）需要 canonical ResolvedTimeline。本片用 motion-kit 合成，還沒接上這條路徑，所以接點<b>未經 Harness 驗證</b>，這是一部審看片。</li>
+    <li><b>聲音</b>：聲音與對嘴的聽感由你判斷，我無法聆聽。</li>
+  </ul>
+</div>
+
+<h2>逐鏡來源與逐鏡檢查</h2>
+<table>
+<tr><th>鏡</th><th>時間</th><th>來源</th><th>逐鏡檢查</th></tr>
+<tr><td>S1</td><td>0.00–2.87</td><td>即夢 S1（閉眼微距，固定）</td><td class="pass">PASS</td></tr>
+<tr><td>S2</td><td>2.87–4.80</td><td>沿用 A01-v2</td><td class="pass">先前已過</td></tr>
+<tr><td>S3</td><td>4.80–8.13</td><td>即夢 S3（走道前推）</td><td class="pass">PASS</td></tr>
+<tr><td>S4</td><td>8.13–11.47</td><td>K4 底片＋motion-kit</td><td>不付費</td></tr>
+<tr><td>S5</td><td>11.47–13.37</td><td>即夢 S5r（S5 末段加速推近 FAIL 後的修復版）</td><td class="pass">PASS</td></tr>
+<tr><td>S6</td><td>13.37–14.80</td><td>K4 底片＋motion-kit</td><td>不付費</td></tr>
+<tr><td>S7</td><td>14.80–18.87</td><td>即夢 S7（離線房間）</td><td class="pass">PASS</td></tr>
+<tr><td>S8a</td><td>18.87–22.57</td><td>即夢 S8a 第一版（你選定）</td><td class="fail">FAIL，不合格點在成片窗口外</td></tr>
+<tr><td>S8b</td><td>22.57–25.90</td><td>即夢 S8b2（你選定）</td><td class="fail">FAIL：句尾與閉嘴各晚約 0.2 s</td></tr>
+<tr><td>S9a</td><td>25.90–28.30</td><td>即夢 S9a（原生首尾幀，門關上）</td><td class="pass">PASS</td></tr>
+<tr><td>S9b</td><td>28.30–30.50</td><td>K9b 底片＋motion-kit</td><td>不付費</td></tr>
+</table>
+
+<h2>花費</h2>
+<div class="box"><ul>
+  <li><b>即夢</b>：
+    <ul>
+      <li>共 11 次送出，其中 1 次上傳失敗沒有送出，所以實際 10 次付費。</li>
+      <li>合計約 1,815 積分：6 秒片 198 × 6、5 秒片 165 × 3、4 秒片 132 × 1。最後一筆 S8br 還待餘額讀數確認。</li>
+      <li>已核准的 2,500 上限已用完。</li>
+    </ul>
+  </li>
+  <li><b>ElevenLabs</b>：副歌分離約 7 秒。讀數沒有變化，結算待確認。</li>
+</ul></div>
+
+<h2>已知差異（請你看片時特別判斷）</h2>
+<div class="box"><ul>
+  <li>S5r 的景別比 K5b 參考圖寬一些。</li>
+  <li>S1 窗外光掠過眼皮的變化很弱。</li>
+  <li>S7 的「已缓存」戳記是閃現的：薄片移動太快，貼不住。8 拍中有 4 拍找得到不擋臉的薄片。</li>
+  <li>S8b 句尾「outside」與閉嘴各晚約 0.2 s。</li>
+  <li>副歌第一個「I」實際比字幕點亮早約 0.3 s；字幕在剪點處才點亮。</li>
+</ul></div>
+</html>

@@ -1,0 +1,88 @@
+{
+  "schema_version": "2.1",
+  "revision_id": "548fe4756ffe78f0e9f3be216c085cace5450dd5b0183446f0375acf5a7dd3cb",
+  "content_hash": "548fe4756ffe78f0e9f3be216c085cace5450dd5b0183446f0375acf5a7dd3cb",
+  "assets": [
+    {
+      "asset_id": "iris-ls-1-a02",
+      "asset_type": "image",
+      "artifact_path": "assets/files/f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039.png",
+      "sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039",
+      "size_bytes": 2051790,
+      "mime_type": "image/png",
+      "duration_seconds": null,
+      "width": 1672,
+      "height": 941,
+      "source_kind": "imported",
+      "tool": {
+        "name": "approved-local-source-import",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "91cf271fa0f8b4d3053880c151a0031023be8b0da9ea144c01ec128cf23105fc",
+      "creation_receipt_id": "iris-v2-local-import:f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039",
+      "usage_license": "User-authorized project reference; no platform ownership claim.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null
+    },
+    {
+      "asset_id": "iris-ls-vocal",
+      "asset_type": "voice",
+      "artifact_path": "assets/audio/851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7.wav",
+      "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+      "size_bytes": 441078,
+      "mime_type": "audio/wav",
+      "duration_seconds": 5.0,
+      "width": null,
+      "height": null,
+      "source_kind": "derived",
+      "tool": {
+        "name": "elevenlabs-voice-isolator+ffmpeg-trim",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d",
+      "creation_receipt_id": "iris-v2-vocal-derivation:851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+      "usage_license": "Derived from the user-approved song v2; project reference only.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null,
+      "audio_metadata": {
+        "audio_kind": "dialogue",
+        "source": {
+          "kind": "derived",
+          "provider_or_tool": {
+            "name": "elevenlabs-voice-isolator+ffmpeg-trim",
+            "version": "1"
+          },
+          "input_artifact_ids": [],
+          "input_fingerprint": "feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d",
+          "original_reference": "outputs/ai-city-takeover/ep01/v2/song/bed-01/music__20261102_004125.mp3"
+        },
+        "speaker_id": "IRIS",
+        "voice_id": null,
+        "language": "en",
+        "script_hash": "44feb2e56055db890fb3ea231b44f3744c53f909452789aed3bc6d3fc734e4c0",
+        "duration_samples": 220500,
+        "sample_rate_hz": 44100,
+        "channels": 1,
+        "channel_layout": "mono",
+        "codec_name": "pcm_s16le",
+        "loudness": {
+          "integrated_lufs_milli": null,
+          "true_peak_dbfs_milli": null,
+          "measurement_standard": null
+        },
+        "provenance_receipt_id": "iris-v2-vocal-derivation:851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+        "alignment_receipt_id": null
+      }
+    }
+  ]
+}

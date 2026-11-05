@@ -1,0 +1,19 @@
+{
+  "failure_classes": [
+    "QUALITY_FAILURE"
+  ],
+  "failed_requirements": [
+    "camera-space",
+    "quiet-observer",
+    "visual"
+  ],
+  "preserved_requirements": [
+    "identity"
+  ],
+  "evidence_hashes": [
+    "18ec6f63f48485f24d02e01def5102fdf32ec6ebdff20842a48cef700aa10f92",
+    "c1e52bd5c6cbf2fd68225fdb034a7096ae037a0ab1ff757add6eabd5fd0c1c0e"
+  ],
+  "next_owner": "shot_router",
+  "all_required_observed_pass": false
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "asset_id": "iris-c-interior",
+    "path": "outputs/ai-city-takeover/ep01/reference-package/A03-v1.png",
+    "sha256": "24e5bb452e90e1c9566ad914ac11213cfaecb9596131db6a1b8b5f585199ca0f",
+    "size_bytes": 1927115,
+    "width": 1672,
+    "height": 941,
+    "role": "approved interior composition; visible monitor back",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-cf-details",
+    "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+    "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+    "size_bytes": 1843560,
+    "width": 1672,
+    "height": 941,
+    "role": "approved full front-ish IRIS identity, face, left-ear and collar",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-cf-face",
+    "path": "outputs/ai-city-takeover/series/casting/raw/CF-a.png",
+    "sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb",
+    "size_bytes": 1989742,
+    "width": 1672,
+    "height": 941,
+    "role": "canonical provenance only; side/back CF-a NOT selected for provider",
+    "selected_for_provider": false
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.wav",
+      "sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+      "bytes": 5760044
+    }
+  ],
+  "source_editor_sha256": "7d8debabc932f62e3db08d7e7adff4cceb26b7f7e4a3dfb02e575e8bc576878c",
+  "source_edit_intent_sha256": "82a4aa77f2fc01ce7da8b693473bdce8125711373b7927f5d4f44072497d7239",
+  "operation": "Upstream song source editing and linear summing; no Product state or final-film composition",
+  "duration_seconds": 30.0,
+  "voice_duration_before_padding": 29.523,
+  "phrase_seconds": 4.314,
+  "peak_scale": 0.9899392144333021,
+  "no_speed_change": true,
+  "human_hearing": "NOT_EVALUATED",
+  "remote_generation_calls": 0,
+  "new_ACE_generations": 0
+}

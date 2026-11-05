@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v2-n4-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "71796c649e90ca60f833786ccd58a116c47362a37c2fe20b8c63f3dbab5d7715",
+  "creation_receipt_id": "iris-v2-N4-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a962449099864b88bceb082c1297eb959b93c5706a27a3f2ee1565fd4892cbc0.json",
+      "content_hash": "a962449099864b88bceb082c1297eb959b93c5706a27a3f2ee1565fd4892cbc0"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e07551fa8b808ff385f87cfad5ad777dac0238755521b0cf9d522baab5b26786.json",
+      "content_hash": "e07551fa8b808ff385f87cfad5ad777dac0238755521b0cf9d522baab5b26786"
+    }
+  ],
+  "scene_id": "cache-room",
+  "location": "几乎全黑的房间，悬浮着半透明发光薄片",
+  "time": "凌晨",
+  "mood": "安静、疏离",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左领红光位置一致",
+    "蓝黑/钢蓝，红为唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v2-n4-first-frame"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+ "unit": "ST2",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/ST2/project/state/video-generation/fetch/files/f0fce5ad53655bd19592f9b97e99da403d98d4424b82ec24fe7f7025a8091e76.mp4",
+ "sha256": "f0fce5ad53655bd19592f9b97e99da403d98d4424b82ec24fe7f7025a8091e76",
+ "verdict": "PASS",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum与给定值一致"
+  },
+  {
+   "id": "no_hard_cut",
+   "result": "PASS",
+   "evidence": "帧差中位数0.24，最大0.89(f1)"
+  },
+  {
+   "id": "camera_locked",
+   "result": "PASS",
+   "evidence": "累计位移0,0；缩放1.000"
+  },
+  {
+   "id": "action_hand_on_door_lean_in",
+   "result": "PASS",
+   "evidence": "手指在0-4.98s轻搭门边；1.0-3.0s身体前倾，头靠近门缝"
+  },
+  {
+   "id": "no_mouth_movement",
+   "result": "PASS",
+   "evidence": "侧脸放大f0-f120嘴唇全程闭合"
+  },
+  {
+   "id": "red_only_collar_and_door_seam",
+   "result": "PASS",
+   "evidence": "红色来自门缝、领口细线，以及门缝红光照在脸上和衣服上（prompt要求的红光颤动）"
+  },
+  {
+   "id": "identity_canon_earpiece_redline",
+   "result": "PASS",
+   "evidence": "从0.5s起露出的左耳有耳挂；近侧领口有细红线，约1.0s起可见，未成圈"
+  },
+  {
+   "id": "no_model_text",
+   "result": "PASS",
+   "evidence": "未见文字"
+  },
+  {
+   "id": "watermark_corners",
+   "result": "PASS",
+   "evidence": "四角无水印"
+  }
+ ],
+ "usable_span": [
+  1.0,
+  3.5
+ ],
+ "notes": "",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

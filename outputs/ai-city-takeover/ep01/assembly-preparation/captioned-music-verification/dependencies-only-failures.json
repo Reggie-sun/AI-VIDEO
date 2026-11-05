@@ -1,0 +1,18 @@
+{
+  "scope": "Pre-existing dependency snapshot, without the six owned source/test changes",
+  "index_tree": "2b95b504a9991af74a1efc4c882934e9c929afe9",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_performance_direction.py::test_empty_directions_keep_the_legacy_six_field_hash",
+    "tests/test_generation_history_import_receipt.py::test_prepares_and_reopens_a_strict_legacy_remote_snapshot",
+    "tests/test_generation_quality_rejection.py::test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay",
+    "-q",
+    "--tb=short",
+    "--junitxml=/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/assembly-preparation/captioned-music-verification/dependencies-only-failures.junit.xml"
+  ],
+  "exit_code": 1
+}

@@ -1,0 +1,25 @@
+{
+ "about": "EP01 chorus lip-sync takes for motion-kit/tools/sync_check.py. window = the exact vocal file sent with the take (sha matches gen/<unit>/registry-draft.json); song_t0 = song time of the window's first sample; film = the chorus pass window in song time; prior = the placement used by an earlier cut (lag implied by its in-point), kept for comparison.",
+ "song": "outputs/ai-city-takeover/ep01/v2/song/mix/IRIS-01-v2.wav",
+ "words": "outputs/ai-city-takeover/ep01/v2/timing/words.json",
+ "takes": [
+  {"name": "S8a", "take": "outputs/ai-city-takeover/ep01/v2/gen/S8a/project/state/video-generation/fetch/files/8631894f86f4bedd10bdc8b7f41402e8236405a43499a0a032da6f5bcf21eda7.mp4",
+   "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8a-vocal-ref-18.40-23.40.wav", "song_t0": 18.40, "film": [18.8667, 22.5667],
+   "prior": {"lag_s": 0.0, "why": "c1 cut, in-point 0.4667 (sealed mapping)"}},
+  {"name": "S8ar", "take": "outputs/ai-city-takeover/ep01/v2/gen/S8ar/project/state/video-generation/fetch/files/474fc1db7ff5cd98921fd06f9005a13cc9ca264a7999ef60b83039e612dd1704.mp4",
+   "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8ar-vocal-ref-18.60-23.60.wav", "song_t0": 18.60, "film": [18.8667, 22.5667],
+   "prior": {"lag_s": 0.0, "why": "sealed mapping (never cut in)"}},
+  {"name": "S8av3", "take": "outputs/ai-city-takeover/ep01/v2/gen/S8av3/project/state/video-generation/fetch/files/20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f.mp4",
+   "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8a-vocal-ref-18.40-23.40.wav", "song_t0": 18.40, "film": [18.8667, 22.5667],
+   "prior": {"lag_s": 0.0667, "why": "c2 cut, in-point 0.5333 (user-chosen 2-frame slip)"}},
+  {"name": "S8b2", "take": "outputs/ai-city-takeover/ep01/v2/gen/S8b2/project/state/video-generation/fetch/files/098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148.mp4",
+   "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8b-vocal-ref-22.20-26.20.wav", "song_t0": 22.20, "film": [22.5667, 25.9],
+   "prior": {"lag_s": 0.0, "why": "c1 cut, in-point 0.3667 (sealed mapping)"}},
+  {"name": "S8br", "take": "outputs/ai-city-takeover/ep01/v2/gen/S8br/project/state/video-generation/fetch/files/1baeab8a189278bd9e3221e282ce5dcef11ee46197fcff1dad90d467a5f11373.mp4",
+   "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8br-vocal-ref-22.00-27.00.wav", "song_t0": 22.00, "film": [22.5667, 25.9],
+   "prior": {"lag_s": 0.0, "why": "sealed mapping (never cut in)"}},
+  {"name": "S8bv3b", "take": "outputs/ai-city-takeover/ep01/v2/gen/S8bv3b/project/state/video-generation/fetch/files/83576dce4c71fe88cdda4e2f93679e9a58f6cd564214dbc681f04bd69443a4b4.mp4",
+   "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8br-vocal-ref-22.00-27.00.wav", "song_t0": 22.00, "film": [22.5667, 25.9],
+   "prior": {"lag_s": 0.0, "why": "c2 cut, in-point 0.5667 (sealed mapping)"}}
+ ]
+}

@@ -1,0 +1,54 @@
+{
+  "method": "manual principal-hair-crown/chin and pupil-center estimates on the normalized 1920x1080 grid images; approximate, no automatic face detector or new numeric acceptance tolerance",
+  "reference_normalization": "A01-v1.png resized from1672x941 to1920x1080 for coordinate comparison only, not a media edit",
+  "samples": {
+    "approved_A01": {
+      "head_crown_y_approx": 28,
+      "chin_y_approx": 537,
+      "head_height_px_approx": 509,
+      "head_fraction_height_approx": 0.47129629629629627,
+      "interpupil_distance_px_approx": 131
+    },
+    "v2_first": {
+      "head_crown_y_approx": 54,
+      "chin_y_approx": 545,
+      "head_height_px_approx": 491,
+      "head_fraction_height_approx": 0.4546296296296296,
+      "interpupil_distance_px_approx": 126
+    },
+    "v2_end": {
+      "head_crown_y_approx": 30,
+      "chin_y_approx": 550,
+      "head_height_px_approx": 520,
+      "head_fraction_height_approx": 0.48148148148148145,
+      "interpupil_distance_px_approx": 130
+    }
+  },
+  "estimated_initial_size_difference_relative": {
+    "head_height": -0.035363457760314354,
+    "interpupil_distance": -0.03816793893129766
+  },
+  "estimated_first_to_end_size_increase_relative": {
+    "head_height": 0.05906313645621175,
+    "interpupil_distance": 0.031746031746031855
+  },
+  "measurement_uncertainty": "manual crown/chin approximately +/-6px each; pupil distance approximately +/-2px. Treat reported 3-5 percent initial size difference as approximate, not pixel-exact ground truth.",
+  "evidence": [
+    "framing-reference-vs-v2-grid.jpg",
+    "eye-position-grid.jpg",
+    "full-0.00.jpg",
+    "full-5.95.jpg"
+  ],
+  "local_crop_suggestion_only": {
+    "scale_approx": 1.0434782608695652,
+    "source_crop_candidate": {
+      "x": 16,
+      "y": 16,
+      "width": 1840,
+      "height": 1035
+    },
+    "output_geometry": "1920x1080",
+    "preserve_original_ai_mark": "Keep crop origin at or before about x20/y20; the original mark starts near x22/y25. Candidate not rendered or validated.",
+    "limits": "Uniform crop can restore approximate size, cannot prove perfect registration or breathing, and shifts framing slightly right; re-review any derived exact MP4 through the existing owner."
+  }
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 成片 c4（與 c1 並排）</title>
+<style>
+ :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; --ok:#9fd3a8; }
+ body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK TC","Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+ h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:18px; font-weight:600; margin:28px 0 8px; }
+ .dim { color:var(--dim); font-size:13px; } .row { display:flex; gap:12px; flex-wrap:wrap; } figure { margin:8px 0; }
+ video { width:min(900px,45vw); background:#000; display:block; } figcaption { color:var(--dim); font-size:13px; }
+ table { border-collapse:collapse; width:100%; max-width:1600px; } td, th { border-bottom:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top; }
+ th { color:var(--dim); font-weight:500; } .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 16px; max-width:1580px; }
+ td.up { color:#ffb35c; } td.down { color:#8fc3ff; } td.same { color:var(--dim); } button { font-size:15px; padding:6px 14px; margin:6px 8px 0 0; }
+ img { max-width:1600px; width:100%; border:1px solid var(--line); }
+</style>
+<h1>IRIS 01 · Looked Outside — 成片 c4（待你審看）</h1>
+<div class="dim">1920×1080 · 30fps · 30.5 s · 整合響度 −14.2 LUFS、峰值 −1.0 dBFS · 交付檔 <code>renders/IRIS-EP01-Looked-Outside-v2-c4.mp4</code>（SHA a036b45f90b7…）</div>
+<h2>c1 與 c4 並排</h2>
+<div><button onclick="both('play')">兩支一起從頭播</button><button onclick="both('pause')">暫停</button><span class="dim">（聲音來自右邊的 c4；兩支用同一首歌，左邊靜音）</span></div>
+<div class="row">
+ <figure><video id="v1" muted controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c1.mp4"></video><figcaption>c1（你較滿意節奏的那一版）</figcaption></figure>
+ <figure><video id="v3" controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c4.mp4"></video><figcaption>c4</figcaption></figure>
+</div>
+<div class="dim">也可以看合成好的並排檔 <code>renders/review/c1-vs-c4.mp4</code>（左 c1、右 c4，各 960×540，聲音是 c4）：</div>
+<video controls preload="metadata" src="../renders/review/c1-vs-c4.mp4" style="width:min(1600px,96vw)"></video>
+<script>
+const a = document.getElementById('v1'), b = document.getElementById('v3');
+function both(k) { if (k === 'play') { a.currentTime = 0; b.currentTime = 0; a.play(); b.play(); } else { a.pause(); b.pause(); } }
+b.addEventListener('seeked', () => { if (Math.abs(a.currentTime - b.currentTime) > 0.05) a.currentTime = b.currentTime; });
+b.addEventListener('pause', () => a.pause()); b.addEventListener('play', () => { a.currentTime = b.currentTime; a.play(); });
+</script>
+
+<h2>這版改了什麼（相對 c1）</h2>
+<div class="box"><ul><li><b>開場、S5、S7</b>：同 c3（S1v3 睜眼後 2.867 s 切到 S2；S5v3、S7v3）。</li><li><b>副歌第一遍</b>：對嘴試驗的 LSen1，照作者的放法依它自帶音軌的延遲（−0.80 s）放，唱「I didn't run」；在它分歧前最後一個八分音符（20.5 s）剪到靜圖 P8c（同一陽台，閉嘴望向遠方，鏡頭緩推），「I just looked outside」照樣上屏。</li><li><b>副歌第二遍</b>：全用靜圖。P8b（閉眼仰頭）配「I didn't run」，24.07 s 換行處接 K5b（窗前平靜看城市，不皺眉），25.9 s 接機櫃門。不再用 S8b2。</li><li><b>副歌動效</b>：kick punch 與進入 impact 同 c3，靜圖也跟著推；靜圖上畫平台「AI生成」標識。</li><li><b>副歌字幕</b>：依實測人聲校正（同 c3）。</li><li><b>花費</b>：對嘴試驗只送了 LSen1 一支，實扣 115 積分；其餘 3 支依你的決定沒送。</li></ul></div>
+
+<h2>節奏：每小節畫面動態（c1 對 c4）</h2>
+<div class="dim">畫面動態＝qa.py 每小節平均幀差（192×108 灰階，含剪點）；音樂＝母帶每小節 RMS · 中頻包絡（副歌約 0.35、其他約 0.18）。橘色＝c4 比 c1 動，藍色＝比 c1 靜。</div>
+<table><tr><th>小節</th><th>時間 (s)</th><th>段落</th><th>音樂</th><th>c1</th><th>c4</th><th>差</th><th>為什麼</th></tr><tr><td>1</td><td>0.04–1.92</td><td>開場</td><td>-12.8 dB · 0.17</td><td>0.91</td><td>1.98</td><td class=up>+1.08</td><td>S1v3 開頭一道車燈光掃過下臉頰（0.1–0.8 s），同 c3</td></tr><tr><td>2</td><td>1.92–3.82</td><td>開場</td><td>-14.0 dB · 0.18</td><td>1.99</td><td>3.37</td><td class=up>+1.38</td><td>你要的睜眼加第二道光掃，同 c3</td></tr><tr><td>3</td><td>3.82–5.72</td><td>主歌</td><td>-12.9 dB · 0.18</td><td>2.96</td><td>2.96</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>4</td><td>5.72–7.63</td><td>主歌</td><td>-13.0 dB · 0.19</td><td>3.02</td><td>3.02</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>5</td><td>7.63–9.53</td><td>主歌</td><td>-14.1 dB · 0.17</td><td>1.84</td><td>1.84</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>6</td><td>9.53–11.44</td><td>主歌</td><td>-13.2 dB · 0.18</td><td>2.13</td><td>2.10</td><td class=same>-0.03</td><td>同 c1</td></tr><tr><td>7</td><td>11.44–13.35</td><td>主歌</td><td>-13.4 dB · 0.18</td><td>1.94</td><td>1.88</td><td class=same>-0.06</td><td>S5v3（同 c3）</td></tr><tr><td>8</td><td>13.35–15.26</td><td>主歌</td><td>-14.1 dB · 0.18</td><td>3.11</td><td>2.10</td><td class=down>-1.00</td><td>S7v3（同 c3），比 c1 的 S7 靜</td></tr><tr><td>9</td><td>15.26–17.16</td><td>主歌</td><td>-14.0 dB · 0.17</td><td>5.79</td><td>1.71</td><td class=down>-4.09</td><td>同上</td></tr><tr><td>10</td><td>17.16–19.06</td><td>主歌</td><td>-14.2 dB · 0.22</td><td>3.39</td><td>2.73</td><td class=down>-0.66</td><td>S7v3 較靜；19.03 s impact 的第一幀落在這小節尾</td></tr><tr><td>11</td><td>19.06–20.98</td><td>副歌</td><td>-14.2 dB · 0.36</td><td>0.84</td><td>3.20</td><td class=up>+2.36</td><td>副歌：LSen1 唱＋進入 impact＋punch</td></tr><tr><td>12</td><td>20.98–22.87</td><td>副歌</td><td>-15.1 dB · 0.38</td><td>1.78</td><td>3.01</td><td class=up>+1.23</td><td>副歌：20.5 s 剪到 P8c 靜圖緩推＋punch</td></tr><tr><td>13</td><td>22.87–24.78</td><td>副歌</td><td>-14.4 dB · 0.38</td><td>0.84</td><td>3.30</td><td class=up>+2.46</td><td>副歌：P8b 靜圖＋punch</td></tr><tr><td>14</td><td>24.78–26.68</td><td>副歌</td><td>-14.3 dB · 0.34</td><td>1.63</td><td>2.69</td><td class=up>+1.06</td><td>副歌：24.07 s 接 K5b，25.9 s 接 S9a</td></tr><tr><td>15</td><td>26.68–28.58</td><td>尾段</td><td>-13.4 dB · 0.20</td><td>1.71</td><td>1.71</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>16</td><td>28.58–30.48</td><td>尾段</td><td>-13.3 dB · 0.16</td><td>1.80</td><td>1.80</td><td class=same>+0.00</td><td>同 c1</td></tr></table>
+
+<h2>QA（motion-kit/tools/qa.py）</h2>
+<div class="box"><ul>
+ <li>剪點 12/12 在預期幀；圖形與動效時機 13/13 在 ±1 幀內（副歌 impact 依設計早一幀）。</li>
+ <li>閃爍每秒最多 1 次（上限 3）；頻閃格 0；單幀突跳 0；離群幀 0。</li>
+ <li>每個剪點前後 −6／−1／0／+6 幀的聯繫圖：<code>qa/film-c4/cuts.jpg</code>。</li>
+</ul></div>
+<img src="../qa/film-c4/cuts.jpg" alt="cuts">
+
+<h2>還沒驗證、要你判斷的</h2>
+<div class="box"><ul><li>倉庫的拼接 Gate（verify-assembly）仍接不上 motion-kit 合成，接點<b>未經 Harness 驗證</b>，這是一部審看片。</li><li>聲音與對嘴的聽感我無法聆聽，以你看、聽為準。LSen1 的逐鏡檢查：身份、畫面、鏡頭 PASS；唱 FAIL（「run」後與「outside」前兩處停頓沒閉嘴，片內 2.58–2.75、3.71–3.94 s），兩處都不在 c4 用到的片內 0.09–1.73 s；c4 用它是你當次的決定，記在 <code>qa/gate-LSen1/user-decision-c4.json</code>，Gate 判定不變。</li><li>P8b 是唱歌姿勢的靜圖，人聲在唱、畫面不動，像一張照片。</li><li>開場 0.1–0.8 s S1v3 素材裡的車燈光仍在（同 c3）。</li></ul></div>
+</html>

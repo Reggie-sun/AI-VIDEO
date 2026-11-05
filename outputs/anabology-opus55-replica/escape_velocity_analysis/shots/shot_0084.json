@@ -1,0 +1,1100 @@
+{
+  "shot_id": "S0084",
+  "start_frame": 3811,
+  "end_frame": 3842,
+  "duration_frames": 32,
+  "start_time": 158.7917,
+  "end_time": 160.125,
+  "duration_s": 1.3333,
+  "start_tc": "00:02:38:19",
+  "end_tc": "00:02:40:02",
+  "boundary_in_id": "B2-015",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    3811,
+    3811
+  ],
+  "boundary_out_id": "B2-016",
+  "boundary_out_type": "shape_wipe",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 3811,
+      "end_frame": 3813,
+      "event": "手拉方扣；CROP01/06",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3811,
+        3813
+      ],
+      "description": "手拉方扣；CROP01/06",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3817,
+      "end_frame": 3819,
+      "event": "LOCK-IN卡出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3817,
+        3819
+      ],
+      "description": "LOCK-IN卡出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3820,
+      "end_frame": 3822,
+      "event": "压力0.1 KN",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3820,
+        3822
+      ],
+      "description": "压力0.1 KN",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3823,
+      "end_frame": 3825,
+      "event": "LOCK白字；压力2.0",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3823,
+        3825
+      ],
+      "description": "LOCK白字；压力2.0",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3826,
+      "end_frame": 3828,
+      "event": "2.5 KN，CROP03/06",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3826,
+        3828
+      ],
+      "description": "2.5 KN，CROP03/06",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3835,
+      "end_frame": 3837,
+      "event": "IN.、LOCKED框章；3.6 KN",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3835,
+        3837
+      ],
+      "description": "IN.、LOCKED框章；3.6 KN",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3838,
+      "end_frame": 3840,
+      "event": "DOCK06横卷门覆盖",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3838,
+        3840
+      ],
+      "description": "DOCK06横卷门覆盖",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3841,
+      "end_frame": 3842,
+      "event": "门下露公路",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3841,
+        3842
+      ],
+      "description": "门下露公路",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具。左下白色压力表指针升至3.6KN，右侧LOCK IN.逐词进入，橙色LOCKED印章出现后横向卷门图覆盖上方。",
+  "reference_frames": [
+    {
+      "frame": 3811,
+      "path": "keyframes/S0084_f03811.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3819,
+      "path": "keyframes/S0084_f03819.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3827,
+      "path": "keyframes/S0084_f03827.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3835,
+      "path": "keyframes/S0084_f03835.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3842,
+      "path": "keyframes/S0084_f03842.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3826,
+      "path": "work/full_batch/03826.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    }
+  ],
+  "composition": {
+    "shot_size": "extreme close-up",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.15,
+      "y": 0.1,
+      "w": 0.55,
+      "h": 0.85,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具。左下白色压力表指针升至3.6KN，右侧LOCK IN.逐词进入，橙色LOCKED印章出现后横向卷门图覆盖上方。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0002, \"pan_y_frac_per_s\": -0.0001, \"zoom_per_s\": -0.0032, \"median_flow_frac_per_s\": 0.0092, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[85.4, 73.3, 88.9]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#252821",
+        "fraction": 0.427,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#413B3A",
+        "fraction": 0.177,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#625758",
+        "fraction": 0.134,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#DDDBD9",
+        "fraction": 0.118,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#B07164",
+        "fraction": 0.082,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#98969C",
+        "fraction": 0.062,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[85.4, 73.3, 88.9]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0084-E01",
+      "shot_id": "S0084",
+      "type": "background_media",
+      "description": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具。左下白色压力表指针升至3.6KN，右侧LOCK IN.逐词进入，橙色LOCKED印章出现后横向卷门图覆盖上方。",
+      "start_frame": 3811,
+      "end_frame": 3842,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具。左下白色压力表指针升至3.6KN，右侧LOCK IN.逐词进入，橙色LOCKED印章出现后横向卷门图覆盖上方。"
+      },
+      "motion": {
+        "path": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具。左下白色压力表指针升至3.6KN，右侧LOCK IN.逐词进入，橙色LOCKED印章出现后横向卷门图覆盖上方。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3811–3842；入口按密采事件区间±2帧。",
+        "exit": "3842为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3811,
+          "state": "手拉方扣；CROP01/06"
+        },
+        {
+          "frame": 3817,
+          "state": "LOCK-IN卡出现"
+        },
+        {
+          "frame": 3820,
+          "state": "压力0.1 KN"
+        },
+        {
+          "frame": 3823,
+          "state": "LOCK白字；压力2.0"
+        },
+        {
+          "frame": 3826,
+          "state": "2.5 KN，CROP03/06"
+        },
+        {
+          "frame": 3835,
+          "state": "IN.、LOCKED框章；3.6 KN"
+        },
+        {
+          "frame": 3838,
+          "state": "DOCK06横卷门覆盖"
+        },
+        {
+          "frame": 3841,
+          "state": "门下露公路"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3811,
+        3819,
+        3827,
+        3835,
+        3842
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0084-E02",
+      "shot_id": "S0084",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 3811,
+      "end_frame": 3842,
+      "bounding_box": {
+        "x": 0.15,
+        "y": 0.1,
+        "w": 0.55,
+        "h": 0.85,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具。左下白色压力表指针升至3.6KN，右侧LOCK IN.逐词进入，橙色LOCKED印章出现后横向卷门图覆盖上方。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3811–3842；入口按密采事件区间±2帧。",
+        "exit": "3842为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3811,
+          "state": "手拉方扣；CROP01/06"
+        },
+        {
+          "frame": 3817,
+          "state": "LOCK-IN卡出现"
+        },
+        {
+          "frame": 3820,
+          "state": "压力0.1 KN"
+        },
+        {
+          "frame": 3823,
+          "state": "LOCK白字；压力2.0"
+        },
+        {
+          "frame": 3826,
+          "state": "2.5 KN，CROP03/06"
+        },
+        {
+          "frame": 3835,
+          "state": "IN.、LOCKED框章；3.6 KN"
+        },
+        {
+          "frame": 3838,
+          "state": "DOCK06横卷门覆盖"
+        },
+        {
+          "frame": 3841,
+          "state": "门下露公路"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3811,
+        3819,
+        3827,
+        3835,
+        3842
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0084-E03",
+      "shot_id": "S0084",
+      "type": "prop",
+      "description": "双手、织物腰带与金属方扣中心细节，逐次裁切从1.05倍到4倍，左上CROP01/06到06/06。",
+      "start_frame": 3811,
+      "end_frame": 3837,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "双手、织物腰带与金属方扣中心细节，逐次裁切从1.05倍到4倍，左上CROP01/06到06/06。"
+      },
+      "motion": {
+        "path": "双手、织物腰带与金属方扣中心细节，逐次裁切从1.05倍到4倍，左上CROP01/06到06/06。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3811–3837；入口按密采事件区间±2帧。",
+        "exit": "3837为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3811,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3837,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3811,
+        3819,
+        3827,
+        3835
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "CROP 01/06 → 06/06 · BUCKLE | BUCKLE · CLAMPING 0.99",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0084-E04",
+      "shot_id": "S0084",
+      "type": "hud_gauge",
+      "description": "左下白压力表x0.04 y0.56 w0.27 h0.29，半圆刻度，数值从0.1至3.6KN。",
+      "start_frame": 3817,
+      "end_frame": 3842,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.56,
+        "w": 0.27,
+        "h": 0.29,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左下白压力表x0.04 y0.56 w0.27 h0.29，半圆刻度，数值从0.1至3.6KN。"
+      },
+      "motion": {
+        "path": "左下白压力表x0.04 y0.56 w0.27 h0.29，半圆刻度，数值从0.1至3.6KN。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3817–3842；入口按密采事件区间±2帧。",
+        "exit": "3842为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3817,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.56,
+            "w": 0.27,
+            "h": 0.29,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3842,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3819,
+        3827,
+        3835,
+        3842
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "LOCK-IN MODE · CH.2 | ARMED | CLAMP · 3.6 KN | 0.1 KN → 2.5 KN → 3.6 KN",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0084-E05",
+      "shot_id": "S0084",
+      "type": "text_title",
+      "description": "3822 LOCK右上出现，3833 IN.补下行；橙底短闪后白色。",
+      "start_frame": 3823,
+      "end_frame": 3842,
+      "bounding_box": {
+        "x": 0.68,
+        "y": 0.18,
+        "w": 0.27,
+        "h": 0.66,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "3822 LOCK右上出现，3833 IN.补下行；橙底短闪后白色。"
+      },
+      "motion": {
+        "path": "3822 LOCK右上出现，3833 IN.补下行；橙底短闪后白色。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3823–3842；入口按密采事件区间±2帧。",
+        "exit": "3842为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3823,
+          "text": "LOCK",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3835,
+          "text": "LOCK\nIN.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3827,
+        3835,
+        3842
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "LOCK\nIN.",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 230 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0084-E06",
+      "shot_id": "S0084",
+      "type": "sticker",
+      "description": "3833 LOCKED橙框印章位于扣具上，轻微负角度旋转。",
+      "start_frame": 3835,
+      "end_frame": 3842,
+      "bounding_box": {
+        "x": 0.34,
+        "y": 0.36,
+        "w": 0.31,
+        "h": 0.3,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "3833 LOCKED橙框印章位于扣具上，轻微负角度旋转。"
+      },
+      "motion": {
+        "path": "3833 LOCKED橙框印章位于扣具上，轻微负角度旋转。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3835–3842；入口按密采事件区间±2帧。",
+        "exit": "3842为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3835,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.34,
+            "y": 0.36,
+            "w": 0.31,
+            "h": 0.3,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3842,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3835,
+        3842
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "LOCKED",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0084-E07",
+      "shot_id": "S0084",
+      "type": "transition_graphic",
+      "description": "3838卷门DOCK06从上覆盖，末段门向上提起露公路。",
+      "start_frame": 3838,
+      "end_frame": 3842,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "unknown",
+        "details": "3838卷门DOCK06从上覆盖，末段门向上提起露公路。"
+      },
+      "motion": {
+        "path": "3838卷门DOCK06从上覆盖，末段门向上提起露公路。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3838–3842；入口按密采事件区间±2帧。",
+        "exit": "3842为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3838,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3842,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3842
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "DOCK 06",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0084-E08",
+      "shot_id": "S0084",
+      "type": "text_label",
+      "description": "左上裁切倍率白条与6格步进指示，随着扣具推近更新CROP序号与倍率。",
+      "start_frame": 3811,
+      "end_frame": 3842,
+      "bounding_box": {
+        "x": 0.033,
+        "y": 0.157,
+        "w": 0.172,
+        "h": 0.047,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "左上裁切倍率白条与6格步进指示，随着扣具推近更新CROP序号与倍率。"
+      },
+      "motion": {
+        "path": "左上裁切倍率白条与6格步进指示，随着扣具推近更新CROP序号与倍率。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3811起±2帧，参见逐3帧密采",
+        "exit": "3842末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3811,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.033,
+            "y": 0.157,
+            "w": 0.172,
+            "h": 0.047,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3842,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3811,
+        3819,
+        3827,
+        3835,
+        3842,
+        3826
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "CROP 01/06 → 06/06 · BUCKLE · 1.05× → 4.00×",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0084-A03",
+      "target_element_ids": [
+        "S0084-E03"
+      ],
+      "description": "双手、织物腰带与金属方扣中心细节，逐次裁切从1.05倍到4倍，左上CROP01/06到06/06。",
+      "start_frame": 3811,
+      "end_frame": 3837,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0084-A04",
+      "target_element_ids": [
+        "S0084-E04"
+      ],
+      "description": "左下白压力表x0.04 y0.56 w0.27 h0.29，半圆刻度，数值从0.1至3.6KN。",
+      "start_frame": 3817,
+      "end_frame": 3842,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0084-A05",
+      "target_element_ids": [
+        "S0084-E05"
+      ],
+      "description": "3822 LOCK右上出现，3833 IN.补下行；橙底短闪后白色。",
+      "start_frame": 3823,
+      "end_frame": 3842,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0084-A06",
+      "target_element_ids": [
+        "S0084-E06"
+      ],
+      "description": "3833 LOCKED橙框印章位于扣具上，轻微负角度旋转。",
+      "start_frame": 3835,
+      "end_frame": 3842,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0084-A07",
+      "target_element_ids": [
+        "S0084-E07"
+      ],
+      "description": "3838卷门DOCK06从上覆盖，末段门向上提起露公路。",
+      "start_frame": 3838,
+      "end_frame": 3842,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AH01538",
+      "relation": "band_onset_candidate (unknown) at frame 3811; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3811
+    },
+    {
+      "audio_event_id": "AH01539",
+      "relation": "band_onset_candidate (unknown) at frame 3811; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3811
+    },
+    {
+      "audio_event_id": "AH01540",
+      "relation": "band_onset_candidate (unknown) at frame 3811; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3811
+    },
+    {
+      "audio_event_id": "AB0351",
+      "relation": "beat_candidate (unknown) at frame 3811; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3811
+    },
+    {
+      "audio_event_id": "AH01541",
+      "relation": "band_onset_candidate (unknown) at frame 3811; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3811
+    },
+    {
+      "audio_event_id": "AH01542",
+      "relation": "band_onset_candidate (unknown) at frame 3812; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3812
+    },
+    {
+      "audio_event_id": "AW0263",
+      "relation": "vocal_word_candidate (unknown) at frame 3821–3829; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3821
+    },
+    {
+      "audio_event_id": "AB0352",
+      "relation": "beat_candidate (unknown) at frame 3822; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3822
+    },
+    {
+      "audio_event_id": "AH01543",
+      "relation": "band_onset_candidate (unknown) at frame 3822; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3822
+    },
+    {
+      "audio_event_id": "AH01544",
+      "relation": "band_onset_candidate (unknown) at frame 3822; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3822
+    },
+    {
+      "audio_event_id": "AH01545",
+      "relation": "band_onset_candidate (unknown) at frame 3822; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3822
+    },
+    {
+      "audio_event_id": "AH01546",
+      "relation": "band_onset_candidate (unknown) at frame 3822; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3822
+    },
+    {
+      "audio_event_id": "AH01547",
+      "relation": "band_onset_candidate (unknown) at frame 3823; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3823
+    },
+    {
+      "audio_event_id": "AH01548",
+      "relation": "band_onset_candidate (unknown) at frame 3833; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3833
+    },
+    {
+      "audio_event_id": "AB0353",
+      "relation": "beat_candidate (unknown) at frame 3833; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3833
+    },
+    {
+      "audio_event_id": "AH01549",
+      "relation": "band_onset_candidate (unknown) at frame 3833; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3833
+    },
+    {
+      "audio_event_id": "AH01550",
+      "relation": "band_onset_candidate (unknown) at frame 3833; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3833
+    },
+    {
+      "audio_event_id": "AH01551",
+      "relation": "band_onset_candidate (unknown) at frame 3834; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3834
+    },
+    {
+      "audio_event_id": "AW0264",
+      "relation": "vocal_word_candidate (unknown) at frame 3834–3838; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3834
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0084.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B2-015",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        3811,
+        3811
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "shape_wipe",
+      "boundary_id": "B2-016",
+      "description": "双手在黑色亮裙腰部拉紧方形扣带，机位快速推近扣具。左下白色压力表指针升至3.6KN，右侧LOCK IN.逐词进入，橙色LOCKED印章出现后横向卷门图覆盖上方。",
+      "span": [
+        3842,
+        3842
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "LOCK IN.",
+    "LOCKED",
+    "LOCK-IN MODE · CH.2",
+    "CLAMP · 3.6 KN · HARD STOP",
+    "DOCK 06"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      3826
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

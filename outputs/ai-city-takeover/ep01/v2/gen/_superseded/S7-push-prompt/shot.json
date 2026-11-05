@@ -1,0 +1,78 @@
+{
+  "artifact_id": "iris-v2-s7-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "b072d735dc2a1e53e6cbabb4ad1cd4359b20c573f1ca3f8be680f86643e63eee",
+  "creation_receipt_id": "iris-v2-S7-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ffde1cd1d139de20842ef8adb025f62a9a8d7253be947519c02e4c018423bd58.json",
+      "content_hash": "ffde1cd1d139de20842ef8adb025f62a9a8d7253be947519c02e4c018423bd58"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json",
+      "content_hash": "ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/784fae6328896ff2ed2aecdded0360a5c6f2df43707b19f3a837ab31074d1c50.json",
+      "content_hash": "784fae6328896ff2ed2aecdded0360a5c6f2df43707b19f3a837ab31074d1c50"
+    }
+  ],
+  "shot_id": "ep01v2-s7",
+  "scene_id": "cache-room",
+  "storyboard_beat_id": "offline",
+  "intent": "真人电影摄影，横幅十六比九，连续六秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性站在几乎全黑的房间里，几块半透明的发光薄片悬浮在她身前和身侧；第二张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第二张图的背景。\n她平静地直视镜头，嘴唇自然闭合，不说话、不唱歌；只有自然呼吸与轻微眨眼。半透明薄片在她面前缓慢横向滑过，薄片发出的冷白光斑缓缓扫过她的脸和立领。薄片上没有任何可读内容。\n摄影机固定在原位，极缓慢地微微推近，末段平滑收稳。蓝黑与钢蓝冷色，红色只在一块薄片的边缘和她左领口的细灯线。\n保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。只有极轻的环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "她平静直视镜头，嘴唇闭合，不说话、不唱歌；薄片缓慢滑过，光斑扫过脸",
+    "摄影机固定在原位，极缓慢微微推近，末段平滑收稳；薄片上没有可读内容",
+    "保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v2-s7-cache-room",
+        "iris-cf-details"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

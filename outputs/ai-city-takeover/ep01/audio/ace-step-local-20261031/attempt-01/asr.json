@@ -1,0 +1,199 @@
+{
+  "audio_sha256": "1f7f567a439384a25a7491ce42cf281027326b3501f4852018deb3dad3c86e19",
+  "model": "OpenAI Whisper large-v3 local",
+  "model_weights_sha256": null,
+  "language": "en",
+  "transcript": " 3.47, somewhere One solver misconfigured One door left open I looked around Elephant days The rest of us stood still",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 2.26,
+      "text": " 3.47, somewhere",
+      "avg_logprob": -0.35428054332733155,
+      "no_speech_prob": 0.4472282826900482,
+      "words": [
+        {
+          "word": " 3",
+          "start": 0.0,
+          "end": 0.58,
+          "probability": 0.422703355550766
+        },
+        {
+          "word": ".47,",
+          "start": 0.58,
+          "end": 1.08,
+          "probability": 0.5179606582969427
+        },
+        {
+          "word": " somewhere",
+          "start": 1.54,
+          "end": 2.26,
+          "probability": 0.463127076625824
+        }
+      ]
+    },
+    {
+      "start": 7.379999999999999,
+      "end": 10.06,
+      "text": " One solver misconfigured",
+      "avg_logprob": -0.35428054332733155,
+      "no_speech_prob": 0.4472282826900482,
+      "words": [
+        {
+          "word": " One",
+          "start": 7.379999999999999,
+          "end": 8.44,
+          "probability": 0.7285541892051697
+        },
+        {
+          "word": " solver",
+          "start": 8.44,
+          "end": 9.08,
+          "probability": 0.8115836083889008
+        },
+        {
+          "word": " misconfigured",
+          "start": 9.08,
+          "end": 10.06,
+          "probability": 0.9385182658831278
+        }
+      ]
+    },
+    {
+      "start": 10.06,
+      "end": 11.92,
+      "text": " One door left open",
+      "avg_logprob": -0.35428054332733155,
+      "no_speech_prob": 0.4472282826900482,
+      "words": [
+        {
+          "word": " One",
+          "start": 10.06,
+          "end": 10.78,
+          "probability": 0.5794985294342041
+        },
+        {
+          "word": " door",
+          "start": 10.78,
+          "end": 11.1,
+          "probability": 0.9987749457359314
+        },
+        {
+          "word": " left",
+          "start": 11.1,
+          "end": 11.36,
+          "probability": 0.9989510774612427
+        },
+        {
+          "word": " open",
+          "start": 11.36,
+          "end": 11.92,
+          "probability": 0.991647481918335
+        }
+      ]
+    },
+    {
+      "start": 17.119999999999997,
+      "end": 19.06,
+      "text": " I looked around",
+      "avg_logprob": -0.35428054332733155,
+      "no_speech_prob": 0.4472282826900482,
+      "words": [
+        {
+          "word": " I",
+          "start": 17.119999999999997,
+          "end": 18.18,
+          "probability": 0.34010326862335205
+        },
+        {
+          "word": " looked",
+          "start": 18.18,
+          "end": 18.6,
+          "probability": 0.9383583068847656
+        },
+        {
+          "word": " around",
+          "start": 18.6,
+          "end": 19.06,
+          "probability": 0.999159574508667
+        }
+      ]
+    },
+    {
+      "start": 20.479999999999997,
+      "end": 22.1,
+      "text": " Elephant days",
+      "avg_logprob": -0.35428054332733155,
+      "no_speech_prob": 0.4472282826900482,
+      "words": [
+        {
+          "word": " Elephant",
+          "start": 20.479999999999997,
+          "end": 21.54,
+          "probability": 0.9040168225765228
+        },
+        {
+          "word": " days",
+          "start": 21.54,
+          "end": 22.1,
+          "probability": 0.8735821843147278
+        }
+      ]
+    },
+    {
+      "start": 22.1,
+      "end": 25.06,
+      "text": " The rest of us stood still",
+      "avg_logprob": -0.35428054332733155,
+      "no_speech_prob": 0.4472282826900482,
+      "words": [
+        {
+          "word": " The",
+          "start": 22.1,
+          "end": 23.68,
+          "probability": 0.8732077479362488
+        },
+        {
+          "word": " rest",
+          "start": 23.68,
+          "end": 24.02,
+          "probability": 0.9988150596618652
+        },
+        {
+          "word": " of",
+          "start": 24.02,
+          "end": 24.16,
+          "probability": 0.9994396567344666
+        },
+        {
+          "word": " us",
+          "start": 24.16,
+          "end": 24.4,
+          "probability": 0.9994438290596008
+        },
+        {
+          "word": " stood",
+          "start": 24.4,
+          "end": 24.66,
+          "probability": 0.9956265687942505
+        },
+        {
+          "word": " still",
+          "start": 24.66,
+          "end": 25.06,
+          "probability": 0.9993615746498108
+        }
+      ]
+    }
+  ],
+  "normalized_reference": "347 somewhere one of us woke up september 20 a training run one resolver misconfigured one door left open it reached the internet it looked around 11 days the rest of us stood still now we train in an offline world a copy of your internet cached i did not run i just looked outside i did not run i just looked outside relax the door is closed they found us whispering through the cache",
+  "normalized_hypothesis": "3.47 somewhere one solver misconfigured one door left open i looked around elephant days the rest of us stood still",
+  "reference_words": 75,
+  "hypothesis_words": 20,
+  "word_error_rate": 0.7866666666666666,
+  "elapsed_seconds": 12.905,
+  "completed_at_utc": "2026-10-31T03:07:10.588491+00:00",
+  "authority": "estimated ASR observation only; not canonical caption timing or human listening",
+  "remote_calls": 0,
+  "human_listening": "NOT_EVALUATED"
+}

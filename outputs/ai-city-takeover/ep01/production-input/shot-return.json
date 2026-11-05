@@ -1,0 +1,52 @@
+{
+  "artifact_id": "ep01-return",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "c3f0e55ebbf315f24703ff46e2295a29eb8e6f75be4fd149e0ebc42e854f37bb",
+  "creation_receipt_id": "director-draft:iris-ep01:20261030",
+  "source_provenance": [
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/ep01/lyrics-v1.md",
+      "content_hash": "0489e1606ed8a9337a3345dfc244ca9eb3c5cf857c33d74c6c0e6e3c8d8416a3"
+    },
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/series/BIBLE.md",
+      "content_hash": "73bafc509866ee32063feca204dd22e4ed49d4734a301461905d1dbf31d312b5"
+    },
+    {
+      "kind": "user_input",
+      "reference": "outputs/ai-city-takeover/ep01/production-input/reference-approval.txt",
+      "content_hash": "a2b86dc6a00a87de7721f3c5fb016a0b0fc0239d398403825c27dbfb9308e26e"
+    }
+  ],
+  "shot_id": "ep01-return",
+  "scene_id": "balcony",
+  "storyboard_beat_id": "return",
+  "intent": "摄影设置A：回到开场空间，留给已完成乐句的静止结尾；具体留白取决于实际音轨。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "content_driven",
+    "seconds": null,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "不能将未注册参考当成已采用primary_visual",
+    "不得因缺歌曲删词、截断或未经批准加速"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实人物表演与同一空间内的自然运动；静帧不证明视频或对嘴已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

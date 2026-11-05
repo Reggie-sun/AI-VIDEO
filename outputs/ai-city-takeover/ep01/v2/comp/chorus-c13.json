@@ -1,0 +1,172 @@
+{
+ "about": "Chorus edit (spec 2026-11-02 §5.3, then the author's post-production after the lip-sync trial). Each pass is a list of segments. A 'take' segment plays a take at the lag motion-kit/tools/sync_check.py measured (sync = its sync.json, relative to ep01/v2); a 'still' segment is an approved plate moved by the code camera from 'from' to 'to' ([centre x, centre y, zoom] in plate px); a 'take' with from/to is framed by the code camera like a still. 'span' [first shot, shot after] makes split segments share one camera move over that whole stretch, so a cutaway does not restart it. A later segment starts at a lyric line's vocal entry ('at_line'), on one word ('at_word' [line, word]), both two frames early like build.py's vocal(), or on the last eighth note before a take stops being in sync ('eighth_before_sync_end_of'). Sung lines are drawn in the EV 'stack' mode on the left (main.js). Earlier edits: chorus-c4.json, chorus-c6.json.",
+ "decision": "user 2026-11-03 on c9: 「都没问题,但是对比原作者还是太单调,元素太少,片段太少,内容太少,也不够高级还」; the 数字人 take OH-B kept from c7 (「这个表现力确实可以了」) (logs/decisions.md); c13: S8b plays the paid take N2 framed toward the hand (user 「合成时裁向手」, clip 1.0-2.5 s of the allowed 1.0-3.5 s)",
+ "passes": [
+  {
+   "segments": [
+    {
+     "shot": "S8a",
+     "kind": "take",
+     "take": "OH-B",
+     "sync": "trial/omnihuman/OH-B/sync/OH-B/sync.json",
+     "from": [
+      1040,
+      474,
+      1.14
+     ],
+     "to": [
+      960,
+      470,
+      1.2
+     ],
+     "span": [
+      "S8a",
+      "S8b"
+     ],
+     "why": "the 数字人 take OH-B sings the first pass (user: 「这个表现力确实可以了」); cut in closer like c5/c6 and follow her drift to the centre"
+    },
+    {
+     "shot": "S8e",
+     "kind": "still",
+     "plate": "K1b",
+     "start": {
+      "at_word": [
+       12,
+       2
+      ]
+     },
+     "from": [
+      700,
+      470,
+      1.3
+     ],
+     "to": [
+      690,
+      466,
+      1.36
+     ],
+     "why": "'looked': her eye, the eye that opened in S1, pushing into the iris"
+    },
+    {
+     "shot": "S8a2",
+     "kind": "take",
+     "take": "OH-B",
+     "sync": "trial/omnihuman/OH-B/sync/OH-B/sync.json",
+     "start": {
+      "at_word": [
+       12,
+       3
+      ]
+     },
+     "from": [
+      1040,
+      474,
+      1.14
+     ],
+     "to": [
+      960,
+      470,
+      1.2
+     ],
+     "span": [
+      "S8a",
+      "S8b"
+     ],
+     "why": "'outside': back on her singing, the take and the camera where they would have been"
+    }
+   ]
+  },
+  {
+   "segments": [
+    {
+     "shot": "S8b",
+     "kind": "take",
+     "take": "N2",
+     "in": 1.0,
+     "from": [
+      820,
+      500,
+      1.1
+     ],
+     "to": [
+      620,
+      600,
+      1.6
+     ],
+     "why": "the repeat 'I didn't run': her hand on the rainy glass at S5's window (N2). The take's own camera pushed toward her head (gate FAIL on camera); user 「合成时裁向手」: the code camera pushes to the hand instead, so the push reads as moving to the hand; c12's K5 still: chorus-c12.json"
+    },
+    {
+     "shot": "S8b_x",
+     "kind": "still",
+     "plate": "K5b",
+     "start": {
+      "at_line": 14
+     },
+     "from": [
+      998,
+      380,
+      1.24
+     ],
+     "to": [
+      820,
+      400,
+      1.24
+     ],
+     "span": [
+      "S8b_x",
+      "S9a"
+     ],
+     "why": "'I just': closer, her eyes come up to the city, the camera drifts the way she looks"
+    },
+    {
+     "shot": "S8w",
+     "kind": "still",
+     "plate": "K5b",
+     "start": {
+      "at_word": [
+       14,
+       2
+      ]
+     },
+     "from": [
+      418,
+      300,
+      2.0
+     ],
+     "to": [
+      418,
+      296,
+      2.1
+     ],
+     "why": "'looked': the far window she looked at in S5, lighting red again"
+    },
+    {
+     "shot": "S8b_x2",
+     "kind": "still",
+     "plate": "K5b",
+     "start": {
+      "at_word": [
+       14,
+       3
+      ]
+     },
+     "from": [
+      998,
+      380,
+      1.24
+     ],
+     "to": [
+      820,
+      400,
+      1.24
+     ],
+     "span": [
+      "S8b_x",
+      "S9a"
+     ],
+     "why": "'outside': back on her, the drift continuing"
+    }
+   ]
+  }
+ ]
+}

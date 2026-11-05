@@ -1,0 +1,21 @@
+{
+  "created_at": "2026-10-30T23:26:04.574316+00:00",
+  "route": "patchright-1.64.2-MCP-public-context-existing-Chrome-35567",
+  "source_intent_sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+  "checks": {
+    "account": true,
+    "v6": true,
+    "female": true,
+    "duration": true,
+    "enabled": true,
+    "lyrics": true,
+    "style": true,
+    "exclude": true,
+    "title": true
+  },
+  "max_create_clicks": 1,
+  "automatic_retries": 0,
+  "baseline_credits": 2470,
+  "operator_credit_ceiling": 20,
+  "scope": "One native Create action for approved IRIS song; no CAPTCHA solving; no Production activation."
+}

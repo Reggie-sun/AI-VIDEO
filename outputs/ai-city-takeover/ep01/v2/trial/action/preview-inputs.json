@@ -1,0 +1,45 @@
+{
+ "about": "Preview for new character action shots (user on c11: 「還不夠，繼續加」→「兩條都做 (Recommended)」). Seedance 2.0 VIP on Jimeng, first-frame image-to-video, 5 s, 1080p 16:9, pure Chinese prompt, no audio reference. Nothing is submitted before the user approves.",
+ "model": "seedance_2.0_vip · 首帧 · 5 s · 1080p · 16:9",
+ "budget": {
+  "per_shot_credits_estimate": 165,
+  "basis": "~33 credits/s observed for 2.0 VIP 1080p",
+  "shots": 4,
+  "total_estimate": 660,
+  "retries": 0
+ },
+ "shots": {
+  "N1": {
+   "name": "机房走道背影走向红门",
+   "first_frame": "keyframes/raw/N1-a.png",
+   "first_frame_sha256": "f5afc9637788287044e6ea96af4d7cef93fc82224106e9ffa3f25b732e82888c",
+   "prompt": "镜头固定。她背对镜头，沿数据中心走道中央向尽头的红光门缝不紧不慢地走去，步伐平稳，大衣下摆随步子轻轻摆动，两侧机柜的指示灯闪烁，地面上的倒影跟着她移动。始终看不到她的脸。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "36ddbc5a90e06e61a314ebfe9428234603c33c11f8f37a5533f27ff2ac1e0601",
+   "placement": "主歌「September twenty. A training run」一帶，或 S3 的走道推鏡之前"
+  },
+  "N2": {
+   "name": "手掌贴着窗玻璃",
+   "first_frame": "keyframes/raw/N2-a.png",
+   "first_frame_sha256": "9f2b74e7c8f09d679b2f6e7ce720e7ddfb9522021bf71cb6756188afa015f3f2",
+   "prompt": "镜头缓慢推近她贴在玻璃上的手。她的手掌在冰冷的玻璃上停了一会儿，指尖轻轻收拢，掌心周围的雾气慢慢散开；窗外雨丝落下，车流在高架桥上移动；她的头微微低下又抬起，望向城市，脸始终朝着窗外，嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "6fbc62d9a494122d1942a56483ed28e8ade9bb931264fca27702bf5caf8bc31a",
+   "placement": "副歌第二遍「I didn't run」，取代現在的 K5 靜圖"
+  },
+  "N3": {
+   "name": "落地窗前的全身背影",
+   "first_frame": "keyframes/raw/N3-a.png",
+   "first_frame_sha256": "4f3e63927ee96332bdff70e86ab41f6e2c11ea37d8a96c59e6a911f1e83b5659",
+   "prompt": "镜头从她身后极缓慢地后拉。她静静站在落地窗前望着城市，过了一会儿头微微侧向一边，窗外的雾缓缓流动，城市灯光闪烁，地面映出她的倒影。始终看不到她的脸。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "1851065488b4419bc018557b6bffb49394a6ada880c750d66b32e22f0316c763",
+   "placement": "「It looked around」或結尾「Relax. The door is closed」之前"
+  },
+  "N4": {
+   "name": "发光薄片间行走、伸手触碰",
+   "first_frame": "keyframes/raw/N4-a.png",
+   "first_frame_sha256": "5c4f178988557051276003c1e1a071a24741ee447b10577e33bcb2bd3e726a1f",
+   "prompt": "镜头缓慢横移跟随。她在悬浮的发光薄片之间慢慢走，抬手用指尖碰到一块薄片，薄片泛起一圈柔光后微微漂开，她收回手继续向前走，神情平静，嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "24ad649486dcef5a1a54a3437daf3d158337acf4bff5592e5571f4aa7ef72a5c",
+   "placement": "「Now we train offline / a copy of your internet」S7 一帶的插入"
+  }
+ }
+}

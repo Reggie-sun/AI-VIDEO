@@ -1,0 +1,14 @@
+{
+  "duration": "0:30",
+  "account": true,
+  "model": true,
+  "female": true,
+  "createEnabled": true,
+  "hoverCreate": true,
+  "fields_match": {
+    "lyrics": true,
+    "style": true,
+    "exclude": true,
+    "title": true
+  }
+}

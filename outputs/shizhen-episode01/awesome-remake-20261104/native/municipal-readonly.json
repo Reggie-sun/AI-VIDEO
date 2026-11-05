@@ -1,0 +1,102 @@
+{
+  "account_verified": true,
+  "mode": {
+    "aspectRatioDefault": "16:9",
+    "aspectRatios": [
+      "21:9",
+      "16:9",
+      "4:3",
+      "1:1",
+      "3:4",
+      "9:16"
+    ],
+    "count": {
+      "defaultValue": 1,
+      "maxValue": 4
+    },
+    "duration": {
+      "defaultMs": 4000,
+      "valuesMs": [
+        4000,
+        5000,
+        6000,
+        7000,
+        8000,
+        9000,
+        10000,
+        11000,
+        12000,
+        13000,
+        14000,
+        15000
+      ]
+    },
+    "longVideo": {
+      "defaultValue": false,
+      "supported": false
+    },
+    "materials": {
+      "acceptedTypes": [
+        2,
+        3,
+        4
+      ],
+      "maxCount": 12,
+      "minCount": 1,
+      "promptRequired": false,
+      "requiresRole": false,
+      "roles": []
+    },
+    "mode": 4,
+    "promptMaxCharacters": 4000,
+    "resolutionDefault": "720p",
+    "resolutions": [
+      "720p",
+      "1080p",
+      "4k"
+    ],
+    "toolKinds": [
+      "style",
+      "palette",
+      "camera_motion"
+    ],
+    "toolMaxCounts": {
+      "camera_motion": 5
+    },
+    "supportsPromptEnhancement": true
+  },
+  "benefits": [
+    {
+      "path": "modelConfig.seedance_2.0_vip.benefitKey.benefitType",
+      "value": "seedance_20_pro_720p_output"
+    },
+    {
+      "path": "modelConfig.seedance_2.0_vip.resolutionBenefitKeys.1080p.benefitType",
+      "value": "seedance_20_pro_1080p_output"
+    },
+    {
+      "path": "modelConfig.seedance_2.0_vip.resolutionBenefitKeys.4k.benefitType",
+      "value": "seedance_20_pro_4k_output"
+    }
+  ],
+  "quote": {
+    "status": "available",
+    "credits": 198
+  },
+  "state_status": "allowed",
+  "local_credit": 62842,
+  "sufficient_balance": true,
+  "base": {
+    "model_id": "seedance_2.0_vip",
+    "input_mode": "multimodal",
+    "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+    "project_id": "e09b617d-5af1-40ee-9136-d36a7422d40c",
+    "duration_seconds": 6,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "benefit_amount": 6
+  },
+  "checked_at": "2026-11-05T06:20:51.608Z",
+  "generation_POSTs": 0,
+  "uploads": 0
+}

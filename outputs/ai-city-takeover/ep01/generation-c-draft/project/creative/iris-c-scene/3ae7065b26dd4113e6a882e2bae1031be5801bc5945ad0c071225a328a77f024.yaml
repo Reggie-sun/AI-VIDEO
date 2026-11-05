@@ -1,0 +1,32 @@
+artifact_id: iris-c-scene
+content_hash: 3ae7065b26dd4113e6a882e2bae1031be5801bc5945ad0c071225a328a77f024
+continuity_constraints:
+- 人物身份、左耳装置与左领红光位置一致
+- 蓝黑/钢蓝，红为唯一暖色
+creation_receipt_id: iris-c-draft-authoring:scene
+location: 同一建筑的窗边设备；A03实际可见屏幕背面
+mood: 冷静、精密、疏离
+participant_ids:
+- IRIS
+revision: 1
+scene_id: interior
+schema_version: '2.0'
+source_provenance:
+- content_hash: 97c7bbecd09bbb939c3e00e2cf6178c942b8d5f8acf8af98a6e2d1c892fd2324
+  kind: user_input
+  reference: evidence/authoring-input/97c7bbecd09bbb939c3e00e2cf6178c942b8d5f8acf8af98a6e2d1c892fd2324.json
+- content_hash: a0df3da2d491ce7b5de699e0998482aabaf4657441e61fa81b0ced19af5546bd
+  kind: user_input
+  reference: evidence/authoring-input/a0df3da2d491ce7b5de699e0998482aabaf4657441e61fa81b0ced19af5546bd.json
+- content_hash: 28318591450187d862a17d8ba599bd03ff25914de4646ca8b53db62f98cb6430
+  kind: user_input
+  reference: evidence/authoring-input/28318591450187d862a17d8ba599bd03ff25914de4646ca8b53db62f98cb6430.json
+- content_hash: 0786263c62b6bb16fed178d912cb3de91e86fe541c9fdeb987ffc2b4f078acd6
+  kind: user_input
+  reference: evidence/authoring-input/0786263c62b6bb16fed178d912cb3de91e86fe541c9fdeb987ffc2b4f078acd6.json
+- content_hash: d651f50bcc5714eabb6a72a0185813c160a81423777f87f838a29156aecad414
+  kind: user_input
+  reference: evidence/authoring-input/d651f50bcc5714eabb6a72a0185813c160a81423777f87f838a29156aecad414.json
+time: 凌晨；03:47为虚构系列时钟
+visual_reference_asset_ids:
+- iris-c-interior

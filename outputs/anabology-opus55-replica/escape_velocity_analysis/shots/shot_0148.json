@@ -1,0 +1,861 @@
+{
+  "shot_id": "S0148",
+  "start_frame": 6751,
+  "end_frame": 6793,
+  "start_time": 281.2917,
+  "end_time": 283.0833,
+  "duration_frames": 43,
+  "duration_s": 1.7917,
+  "start_tc": "00:04:41:07",
+  "end_tc": "00:04:43:01",
+  "boundary_in_id": "B4-018",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 6751,
+      "path": "keyframes/S0148_f06751.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6761,
+      "path": "keyframes/S0148_f06761.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6772,
+      "path": "keyframes/S0148_f06772.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6783,
+      "path": "keyframes/S0148_f06783.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6793,
+      "path": "keyframes/S0148_f06793.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6772,
+      "path": "work/full_batch/06772.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 reference"
+    }
+  ],
+  "scene_type": "detail_insert",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Macro white stitched washing label in textured fabric, undulating plots",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Macro white stitched washing label in textured fabric, undulating plots. Wash6753 cold6763;30°6764; orange accent becomes black. 独立图层、时序与屏幕坐标已根据实际参考帧复核；隐藏原参数保留unknown。",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Macro white stitched washing label in textured fabric, undulating plots",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Macro white stitched washing label in textured fabric, undulating plots",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "Wash6753 cold6763;30°6764; orange accent becomes black",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0148.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0016,
+      "pan_y_frac_per_s": -0.001,
+      "zoom_per_s": -0.0005,
+      "median_flow_frac_per_s": 0.0051,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E4E4E7",
+        "fraction": 0.378,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#D8D8DB",
+        "fraction": 0.343,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#C7C9CC",
+        "fraction": 0.222,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#B1ADAD",
+        "fraction": 0.042,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#7A7877",
+        "fraction": 0.012,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#333334",
+        "fraction": 0.004,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[213.6, 209.3, 209.2]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "Small upper-left chrome present in filmstrip; exact look digits require full-resolution review"
+    },
+    "G-TITLE-TAG": {
+      "state": "Upper-right small collection chrome visible except final black"
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Zero-month / final no-underclass state after countdown; exact per-frame widget content unresolved"
+    },
+    "G-TICKER": {
+      "state": "Bottom ticker visible; microtext not transcribed from thumbnail"
+    },
+    "G-TIMECODE": {
+      "state": "Bottom-right timecode; exact per-frame expected time from supplied timeline"
+    },
+    "G-HALFTONE": {
+      "state": "Colored print dots visible; finale coarse-dot modulation especially S0151-S0152"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0148-E01",
+      "shot_id": "S0148",
+      "type": "background_media",
+      "description": "Macro white stitched washing label in textured fabric, undulating plots. Wash6753 cold6763;30°6764; orange accent becomes black.",
+      "start_frame": 6751,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Macro white stitched washing label in textured fabric, undulating plots. Wash6753 cold6763;30°6764; orange accent becomes black."
+      },
+      "motion": {
+        "path": "Macro white stitched washing label in textured fabric, undulating plots. Wash6753 cold6763;30°6764; orange accent becomes black.",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6751; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6751,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6751,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0148-E02",
+      "shot_id": "S0148",
+      "type": "prop",
+      "description": "White stitched care label with textile seams fills frame, black/grey flowing contour lines cross cloth",
+      "start_frame": 6751,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.11979166666666667,
+        "y": 0.09259259259259259,
+        "w": 0.7552083333333334,
+        "h": 0.7870370370370371,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "White stitched care label with textile seams fills frame, black/grey flowing contour lines cross cloth"
+      },
+      "motion": {
+        "path": "White stitched care label with textile seams fills frame, black/grey flowing contour lines cross cloth",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6751; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6751,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6751,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0148-E03",
+      "shot_id": "S0148",
+      "type": "text_label",
+      "description": "Care header and two dashed instruction placeholders",
+      "start_frame": 6751,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.17708333333333334,
+        "y": 0.17592592592592593,
+        "w": 0.6145833333333334,
+        "h": 0.35185185185185186,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Care header and two dashed instruction placeholders"
+      },
+      "motion": {
+        "path": "Care header and two dashed instruction placeholders",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6751; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6751,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6751,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "CARE INSTRUCTIONS · ISO [typing] / INSTRUCTION 02 · PENDING / INSTRUCTION 03 · PENDING",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 14,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0148-E04",
+      "shot_id": "S0148",
+      "type": "text_lyric",
+      "description": "Wash then cold type orange and settle black",
+      "start_frame": 6753,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.23958333333333334,
+        "y": 0.27037037037037037,
+        "w": 0.2552083333333333,
+        "h": 0.06296296296296296,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Wash then cold type orange and settle black"
+      },
+      "motion": {
+        "path": "Wash then cold type orange and settle black",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6753; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6753,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6753,
+          "text": "Was"
+        },
+        {
+          "frame": 6755,
+          "text": "Wash"
+        },
+        {
+          "frame": 6763,
+          "text": "Wash co"
+        },
+        {
+          "frame": 6765,
+          "text": "Wash cold."
+        },
+        {
+          "frame": 6771,
+          "state": "all black"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6753,
+        6755,
+        6763,
+        6765,
+        6771,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "Wash cold.",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 66,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0148-E05",
+      "shot_id": "S0148",
+      "type": "icon",
+      "description": "Wash-tub30 icon appears with cold word",
+      "start_frame": 6762,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.17708333333333334,
+        "y": 0.2759259259259259,
+        "w": 0.044270833333333336,
+        "h": 0.06018518518518518,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 24,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Wash-tub30 icon appears with cold word"
+      },
+      "motion": {
+        "path": "Wash-tub30 icon appears with cold word",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6762; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6762,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6762,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0148-E06",
+      "shot_id": "S0148",
+      "type": "counter",
+      "description": "Large black30degree temperature at right with small orange max-wash note",
+      "start_frame": 6762,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.6338541666666667,
+        "y": 0.3333333333333333,
+        "w": 0.1875,
+        "h": 0.17592592592592593,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Large black30degree temperature at right with small orange max-wash note"
+      },
+      "motion": {
+        "path": "Large black30degree temperature at right with small orange max-wash note",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6762; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6762,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6763,
+          "state": "pale30"
+        },
+        {
+          "frame": 6765,
+          "state": "black30"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6762,
+        6763,
+        6765,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "30° / MAX WASH · °C · MILD PROCESS",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 200,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0148-E07",
+      "shot_id": "S0148",
+      "type": "hud_gauge",
+      "description": "Lower temperature rule and ticks30/40/60/95 with orange pointer at30 and COLD30C tag",
+      "start_frame": 6762,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.18697916666666667,
+        "y": 0.5740740740740741,
+        "w": 0.578125,
+        "h": 0.09722222222222222,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 25,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Lower temperature rule and ticks30/40/60/95 with orange pointer at30 and COLD30C tag"
+      },
+      "motion": {
+        "path": "Lower temperature rule and ticks30/40/60/95 with orange pointer at30 and COLD30C tag",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6762; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6762,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6762,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "WASH TEMPERATURE · °C · MAX / COLD · 30°C / 30 / 40 / 60 / 95",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 13,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0148-E08",
+      "shot_id": "S0148",
+      "type": "deco_graphic",
+      "description": "Thin black wavy contour strands move across white fabric at intervals, independent of text",
+      "start_frame": 6751,
+      "end_frame": 6793,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 0.9259259259259259,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Thin black wavy contour strands move across white fabric at intervals, independent of text"
+      },
+      "motion": {
+        "path": "Thin black wavy contour strands move across white fabric at intervals, independent of text",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6751; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6793"
+      },
+      "keyframes": [
+        {
+          "frame": 6751,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6755,
+          "state": "wave rises from lower-left"
+        },
+        {
+          "frame": 6765,
+          "state": "wave falls over30"
+        },
+        {
+          "frame": 6777,
+          "state": "next wave enters"
+        },
+        {
+          "frame": 6789,
+          "state": "third wave"
+        },
+        {
+          "frame": 6793,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6751,
+        6755,
+        6765,
+        6777,
+        6789,
+        6793
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0148-A04",
+      "target_element_ids": [
+        "S0148-E04"
+      ],
+      "description": "Wash then cold type orange and settle black",
+      "start_frame": 6753,
+      "end_frame": 6793,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0148-A06",
+      "target_element_ids": [
+        "S0148-E06"
+      ],
+      "description": "Large black30degree temperature at right with small orange max-wash note",
+      "start_frame": 6762,
+      "end_frame": 6793,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0148-A08",
+      "target_element_ids": [
+        "S0148-E08"
+      ],
+      "description": "Thin black wavy contour strands move across white fabric at intervals, independent of text",
+      "start_frame": 6751,
+      "end_frame": 6793,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    }
+  ],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B4-018",
+      "span": [
+        6751,
+        6751
+      ],
+      "description": "Wash6753 cold6763;30°6764; orange accent becomes black",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B4-019",
+      "span": [
+        6793,
+        6793
+      ],
+      "description": "Wash6753 cold6763;30°6764; orange accent becomes black",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0624",
+      "relation": "beat_candidate (unknown) at frame 6752; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6752
+    },
+    {
+      "audio_event_id": "AW0436",
+      "relation": "vocal_word_candidate (unknown) at frame 6752–6759; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6752
+    },
+    {
+      "audio_event_id": "AH02866",
+      "relation": "band_onset_candidate (unknown) at frame 6757; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6757
+    },
+    {
+      "audio_event_id": "AW0437",
+      "relation": "vocal_word_candidate (unknown) at frame 6762–6771; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6762
+    },
+    {
+      "audio_event_id": "AB0625",
+      "relation": "beat_candidate (unknown) at frame 6762; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6762
+    },
+    {
+      "audio_event_id": "AH02867",
+      "relation": "band_onset_candidate (unknown) at frame 6771; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6771
+    },
+    {
+      "audio_event_id": "AB0626",
+      "relation": "beat_candidate (unknown) at frame 6773; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6773
+    },
+    {
+      "audio_event_id": "AB0627",
+      "relation": "beat_candidate (unknown) at frame 6784; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6784
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0148.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Unknown font files, physical plate/overlay decomposition, original curve, alpha and random flip seed",
+    "Measured visual boxes +/-0.02 normalized; event start bounds +/-3f; precise audio alignment still requires listening",
+    "Author eight-point star statement does not override observed nine-point ending; uncounted clips remain unknown"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0148.jpg",
+      "keyframes/S0148_f06751.jpg",
+      "keyframes/S0148_f06761.jpg",
+      "keyframes/S0148_f06772.jpg",
+      "keyframes/S0148_f06783.jpg",
+      "keyframes/S0148_f06793.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "reviewer": "root",
+    "method": "whole filmstrip, native1920 midpoint and independent1–4f regional/whole-shot second pass",
+    "timing_precision_frames": 3,
+    "reference_sheet": "work/root_review/tail_micro_S0148.jpg",
+    "pending": []
+  },
+  "observed_text_inventory": [
+    "CARE INSTRUCTIONS · ISO [typing] / INSTRUCTION 02 · PENDING / INSTRUCTION 03 · PENDING",
+    "Wash cold.",
+    "30° / MAX WASH · °C · MILD PROCESS",
+    "WASH TEMPERATURE · °C · MAX / COLD · 30°C / 30 / 40 / 60 / 95"
+  ]
+}

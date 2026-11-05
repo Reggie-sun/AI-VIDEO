@@ -54,6 +54,7 @@ def resolve_preview_layer_ids(
 ) -> set[str]:
     preview_layer_ids: set[str] = set()
     preview_scopes: set[str] = set()
+    preview_receipts = []
     roles_by_shot = {
         shot_id: {role.role: role for role in shots_by_id[shot_id].required_asset_roles}
         for shot_id in spec.shot_ids
@@ -74,7 +75,19 @@ def resolve_preview_layer_ids(
         if allows_repair_preview_layer(project, layer, shot):
             preview_layer_ids.add(layer.layer_id)
             asset = next(a for a in project.registry.assets if a.asset_id == layer.asset_id)
-            preview_scopes.add(verify_repair_input(asset, project.root).preview_use.scope)
+            receipt = verify_repair_input(asset, project.root)
+            preview_receipts.append(receipt)
+            preview_scopes.add(receipt.preview_use.scope)
+    if not preview_layer_ids and spec.caption_tracks:
+        from ai_video.production.qualification_preview_input import allows_captioned_music_caption
+
+        assets = {asset.asset_id: asset for asset in project.registry.assets}
+        for binding in spec.caption_tracks:
+            caption = assets.get(binding.caption_asset_id)
+            metadata = caption.caption_metadata if caption is not None else None
+            source = assets.get(metadata.source_audio_asset_id) if metadata is not None else None
+            if source is not None and allows_captioned_music_caption(project, caption, source):
+                raise invalid("Captioned music captions require their actual qualification preview visuals.")
     if preview_layer_ids:
         if spec.schema_version not in {"2.3", "2.4"}:
             raise invalid("Development repair previews require CompositionSpec 2.3 or 2.4.")
@@ -92,7 +105,10 @@ def resolve_preview_layer_ids(
                     } for t in spec.audio_tracks)
                     or spec.voice_sources):
                 raise invalid("Replacement audio preview requires supported P4 audio tracks and no voice sources.")
-            if dialogue_tracks:
+            music = _captioned_music_binding(preview_receipts, invalid=invalid)
+            if music is not None:
+                _validate_captioned_music_layout(project, spec, music, invalid=invalid)
+            elif dialogue_tracks:
                 if not _captured_dialogue_layout_valid(
                     spec, dialogue_tracks,
                     silent_image_shots=_speech_free_visual_shots(project, spec, shots_by_id),
@@ -107,6 +123,59 @@ def resolve_preview_layer_ids(
     return preview_layer_ids
 
 
+def _captioned_music_binding(receipts, *, invalid):
+    version = "development-qualification-preview/2"
+    opted_in = [r for r in receipts if getattr(r, "contract_version", None) == version]
+    if not opted_in:
+        return None
+    music = opted_in[0].captioned_music
+    if len(opted_in) != len(receipts) or any(r.captioned_music != music for r in opted_in):
+        raise invalid("Captioned music preview requires the same explicit song binding on every captured clip.")
+    return music
+
+
+def _validate_captioned_music_layout(project, spec, music, *, invalid):
+    if (spec.audio_tracks != (music.track,) or not spec.caption_tracks or spec.voice_sources
+            or {binding.caption_asset_id for binding in spec.caption_tracks}
+            != {caption.caption_asset_id for caption in music.captions}
+            or any(binding.source_audio_track_id != music.track.track_id or binding.shot_id is not None
+                   for binding in spec.caption_tracks)
+            or any(layer.source_time_map is not None or layer.source_audio_policy not in {"MUTE", "REPLACE"}
+                   or not layer.source_audio_reason or not layer.source_audio_reason.strip()
+                   for layer in spec.layers if layer.layer_id not in spec.graphic_layer_ids)):
+        raise invalid("Captioned music preview requires only its exact song, global captions and explicitly muted source visuals.")
+    try:
+        music.validate_asset(next((a for a in project.registry.assets if a.asset_id == music.track.asset_id), None))
+        music.validate_captions(project.registry.assets)
+    except ValueError as exc:
+        raise invalid("Captioned music preview source is invalid.", str(exc)) from exc
+
+
+def _validate_captioned_music_timeline(project, spec, timeline, shots_by_id, *, invalid):
+    from ai_video.production.repair_input_admission import allows_repair_preview_layer, verify_repair_input
+
+    assets = {asset.asset_id: asset for asset in project.registry.assets}
+    receipts = [verify_repair_input(assets[layer.asset_id], project.root)
+                for layer in spec.layers if layer.shot_id in shots_by_id
+                and allows_repair_preview_layer(project, layer, shots_by_id[layer.shot_id])]
+    music = _captioned_music_binding(receipts, invalid=invalid)
+    if music is None:
+        return
+    _validate_captioned_music_layout(project, spec, music, invalid=invalid)
+    if len(timeline.audio_spans) != 1:
+        raise invalid("Captioned music preview must resolve exactly one song span.")
+    span = timeline.audio_spans[0]
+    if (span.track_id != music.track.track_id or span.asset_id != music.track.asset_id
+            or span.asset_sha256 != music.audio_asset_sha256 or span.audio_kind is not AudioKind.BGM
+            or span.start_sample != 0 or span.duration_samples != timeline.total_samples
+            or span.source_start_sample != music.track.trim_start_sample
+            or span.source_duration_samples != music.track.trim_duration_samples
+            or span.duration_samples != span.source_duration_samples
+            or span.gain_millidb != 0 or span.fade_in_samples != 0 or span.fade_out_samples != 0
+            or span.ducking is not None):
+        raise invalid("Captioned music preview must preserve its exact song samples across the complete film.")
+
+
 def validate_replacement_preview_narration(
     project: LoadedProductionProject,
     spec: CompositionSpec,
@@ -115,6 +184,7 @@ def validate_replacement_preview_narration(
     *,
     invalid: Callable[..., AiVideoError],
 ) -> None:
+    _validate_captioned_music_timeline(project, spec, timeline, shots_by_id, invalid=invalid)
     dialogue_tracks = tuple(
         track for track in spec.audio_tracks
         if track.audio_kind is AudioKind.DIALOGUE

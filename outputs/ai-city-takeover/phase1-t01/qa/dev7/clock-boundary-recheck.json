@@ -1,0 +1,20 @@
+{
+  "expected_approved_media_sha256": "5e4601b0824b2cb82a42c9041178b0d3f06827f1d66de4e14755bf83b47a3697",
+  "rendered_media_sha256": "5e4601b0824b2cb82a42c9041178b0d3f06827f1d66de4e14755bf83b47a3697",
+  "bit_identical_to_approved_media": true,
+  "source_sha256": {
+    "motion-kit/src/clock.js": "802fb81e82e6fd53608b9e59742d56f1be3dee66511d5763330a1228c6996b01",
+    "outputs/ai-city-takeover/phase1-t01/comp/engine.js": "3d67ab43b11639cfade011dca6731c04a5d561bf4c6a83bf0997e120abcb06b0",
+    "motion-kit/tests/runtime.test.mjs": "dfeecdca9185776b2b45fe718bec289afe7dd721fbee0cb621a1c5e24fb1e8c8"
+  },
+  "render_log": "/tmp/ai-video-t01-clock-recheck-render.log",
+  "node_tests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "tool_tests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "old_software_evidence_reused": false
+}

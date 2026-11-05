@@ -1,0 +1,29 @@
+{
+  "schema_version": "iris-v2-unit/1",
+  "unit": "S8bv3b",
+  "task": "IRIS EP01 v3 S8b: chorus pass 2 on K8b, last line opens up, then mouth closed looking at the city; K8b + P8b + P8c + ID7b + vocal",
+  "user_quote": "認可，S1 用原生首尾幀 (Recommended)",
+  "scope_quote": "S1 睁眼＋副歌＋S5/S7 反應 (Recommended)",
+  "direction_quote": "冷靜但活著 (Recommended)",
+  "ai_label_quote": "保留 AI 标识，只禁止新增剧情字幕和图形",
+  "attempt_id": "iris-s8bv3b-source-001",
+  "policy_id": "iris-s8bv3b-source-001",
+  "reservation_id": "iris-s8bv3b-reservation-001",
+  "max_submit_count": 1,
+  "automatic_retries": 0,
+  "operator_currency": "CRD",
+  "operator_ceiling": 250,
+  "ledger": "ledger-v3.json",
+  "cumulative_submit_ceiling": 10,
+  "cumulative_operator_credit_ceiling": 1850,
+  "issued_at": "2026-11-02T11:18:57.452399+00:00",
+  "expires_at": "2026-11-02T14:18:57.452399+00:00",
+  "stop_on_unknown": true,
+  "retry_of": {
+    "unit": "S8bv3",
+    "attempt_id": "iris-s8bv3-source-001",
+    "outcome": "known_no_effect",
+    "receipt": "gen/S8bv3/project/state/paid-provider/submits/9f5a0c11c5e9ea6f3d3facbcfcea30df546169cf58122901caccfb99cfb72c05.json",
+    "why": "reference upload failed before any generation request; same request retried once as a fresh attempt"
+  }
+}

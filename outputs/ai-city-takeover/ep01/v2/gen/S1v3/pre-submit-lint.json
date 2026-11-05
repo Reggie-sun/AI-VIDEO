@@ -1,0 +1,29 @@
+{
+  "unit": "S1v3",
+  "checks": {
+    "native_endpoints_K1a_K1c": true,
+    "frame_conditioned_mode": true,
+    "every_input_in_user_preview": true,
+    "identity_waiver_approved": true,
+    "no_reference_markers": true,
+    "chinese_body_only": true,
+    "eye_opens_then_stays_open": true,
+    "locked_camera": true,
+    "ai_label_preserved": true,
+    "bound_output_6s": true,
+    "operator_ceiling_matches_preview": true
+  },
+  "pass": true,
+  "request_hash": "ea8b2e8a7cfa9582d47185777da2fcefde32ae65d91c45a5715616d0bc029288",
+  "continuity": "opening shot; the eye now opens on 'woke' (~2.83 s) and the S1/S2 cut moves to about 3.2 s, after the eye has focused",
+  "handoff": "closed eye with 03:47 -> the eye opens and focuses on 'woke' -> cut to S2 (A01-v2, IRIS awake looking at us) with the title",
+  "axis_action_camera": "same macro framing K1a -> K1c, locked camera; eye closed with small movement for about 4 s, then the lid lifts and the pupil focuses",
+  "prompt_fit": "pure Chinese body 364 chars; native first/last frame roles, no markers; identity sheet waived by the user for this macro",
+  "budget": {
+    "v3_spent_submits_before": 0,
+    "operator_ceiling_CRD": 250,
+    "v3_ceiling_CRD": 1850,
+    "expected_cost_6s_CRD": 198
+  },
+  "new_calls": 0
+}

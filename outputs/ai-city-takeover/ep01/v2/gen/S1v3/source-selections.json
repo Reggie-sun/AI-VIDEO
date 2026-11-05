@@ -1,0 +1,26 @@
+[
+  {
+    "asset_id": "iris-c-v3-s1-1-eye-closed",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K1a-a.png",
+    "sha256": "a1b3319973ed8ba508c6ccc686f91d35f76367781178d27a81fbbd829aadf996",
+    "size_bytes": 1997741,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K1a: start frame, eye closed",
+    "need_id": "eye-closed",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v3-s1-2-eye-open",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K1c-a.png",
+    "sha256": "b97d604fc44626308e789dd6ab886626d4be4da3ee4d42619cadf475bda268b9",
+    "size_bytes": 1959073,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K1c: end frame, same framing with the eye open",
+    "need_id": "eye-open",
+    "anchor_role": "composition",
+    "selected_for_provider": true
+  }
+]

@@ -1,0 +1,43 @@
+{
+ "about": "Preview for two stronger-performance 数字人 takes after c7 (user: 「人物表演还差点」). Same inputs as OH-A/OH-B; the action text targets the gate findings: eyes down at the start, a static mouth mid phrase 2, identity drift when the head turns frontal. Nothing is submitted before the user approves.",
+ "image": {
+  "path": "keyframes/raw/K7-a.png",
+  "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+  "size": [
+   1672,
+   941
+  ],
+  "role": "the singer; unmodified"
+ },
+ "audio": {
+  "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+  "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+  "seconds": 5.0,
+  "song_window": [
+   17.97,
+   22.97
+  ],
+  "role": "uploaded vocal (isolated), not TTS or a cloned voice; chorus pass 1 'I didn't run / I just looked outside'"
+ },
+ "mode": "即梦 数字人 · 大师模式 · 1080P · single subject (not 生动模式, which crops to 1:1)",
+ "takes": {
+  "OH-C": {
+   "action_prompt": "镜头固定特写，保持原图的构图和头部角度。她从第一个字起就抬眼直视镜头，投入地唱，每个字嘴唇都清楚地张合，乐句之间轻轻换气，肩膀随呼吸微微起伏；第一句结尾眉眼微微用力，最后一句眼神变柔，嘴角带一点笑意。",
+   "action_prompt_sha256": "b4819c2f0cfe2d05b8597e0890f1656c2403210d03276913b2b015871a16a085",
+   "why": "eyes on the lens from the first word; every word moves the mouth; keep the original head angle; a slight smile at the end (the user liked S7's)"
+  },
+  "OH-D": {
+   "action_prompt": "镜头固定特写，保持原图的构图和头部角度。她闭着眼轻声唱起，第一句唱到一半睁开眼直视镜头，情绪越来越饱满，每个字嘴唇都清楚地张合，乐句之间深深吸一口气，肩膀随之起伏，最后一句唱得温柔而坚定，嘴角带一点笑意。",
+   "action_prompt_sha256": "797080a54f28a061f013bc94219d121945bc18b8de83f054156b5e9dc57f9ab6",
+   "why": "eyes closed at first, open to the lens mid phrase 1, building; deeper breaths; same angle and mouth rules"
+  }
+ },
+ "budget": {
+  "generations": 2,
+  "retries": 0,
+  "price_seen_per_take": 30,
+  "ceiling_per_take": 60,
+  "ceiling_total": 120,
+  "note": "OH-A/OH-B were 30 each; stop and ask if the page shows more than 60"
+ }
+}

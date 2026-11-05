@@ -1,0 +1,19 @@
+{
+ "a02": {
+  "path": "outputs/ai-city-takeover/ep01/reference-package/A02-v1.png",
+  "sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039"
+ },
+ "window": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+  "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7"
+ },
+ "master_excerpt": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/master-17.97-22.97.wav",
+  "sha256": "2e08a982e095e6ee197fd5994bb37f9d981545d480b68a44a31aa574a9bdc512"
+ },
+ "prompts": {
+  "EV-en": "{{image:0}} sings {{audio:1}}. She lip-syncs to {{audio:1}} exactly, every word in time: \"I didn't run — I just looked outside. I\". Medium close-up of the woman from {{image:0}}, her dark hair slicked back into a low bun, a black ear hook on her left ear and a thin red light line on her left collar, standing on the rainy glass balcony at night and facing the camera, singing calmly with her eyes on the lens, her head tilting slightly on the long notes. Cold blue city light behind her. Locked camera, no cuts, no head turns. No on-screen text.",
+  "EV-zh": "{{image:0}}中的她演唱{{audio:1}}。她的口型严格对准{{audio:1}}，每个字都准时：\"I didn't run — I just looked outside. I\"。中近景：{{image:0}}中的女人，深色头发向后梳成低发髻，左耳戴黑色耳挂，左领口一条细细的红色灯线，站在夜雨中的玻璃阳台上，面向镜头，冷静地唱，眼睛看着镜头，长音时头微微倾斜。背后是冷蓝色的城市灯光。镜头固定，不切镜，不转头。画面中没有任何文字。"
+ },
+ "plan": "docs/superpowers/plans/2026-11-02-iris-ep01-lipsync-trial.md"
+}

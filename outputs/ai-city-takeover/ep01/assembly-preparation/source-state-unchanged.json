@@ -1,0 +1,9 @@
+{
+  "source_state_files_verified": 39,
+  "source_state_bytes_unchanged": true,
+  "source_roots": [
+    "outputs/ai-city-takeover/ep01/a01-first-frame-repair/project/state",
+    "outputs/ai-city-takeover/ep01/generation-c-draft/project/state"
+  ],
+  "canonical_state_writes": 0
+}

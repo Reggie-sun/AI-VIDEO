@@ -1,0 +1,40 @@
+{
+ "unit": "ST2",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "74a6204f536dca10c283bf6796825772e3eb3d402106caa42e1bc111c8cf3daf",
+ "compiled_prompt_sha256": "3c05dff6664a3f991e73555447b32500888939644f429ebaec467d1c2f88e70d",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/story/continuity-report.json",
+  "sha256": "230814b2dab63866c43cb584cad969bd8c39ae84d76270eddfc551577fc660ec",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS: ST2-a（0aa1c5e7…）里她面朝画面左侧，左耳戴黑色耳挂，近侧（左）领口有红线，后梳低髻，炭黑高领长大衣；机房角落、半开的红光门和落地窗外城市与 c13 S4（8.3–10.8 s）是同一机位。",
+   "handoff": "PASS: 作为插入镜头放在 S4 的「one door, left open」处，门半开的状态与 c13 S4 一致；在原本空无一人的门前加入她，剪切理由明确。",
+   "axis_action_camera": "PASS: 规格是 LOCKED，与 c13 S4 机位相同；她朝左、门在画面左侧，与 ST6 和 S9a 的方向一致；前倾向门缝里望的动作可读。",
+   "prompt_fit": "PASS: compiled 与 approval prompts.ST2 逐字相同（3c05dff6…），只有一张首帧绑定，没有音频参考；侧脸嘴唇闭合（见 R6）。",
+   "lint": "PASS（本报告这一项除外）: failed=[continuity_report_ready]，其余 10 项都为 true；request_hash 74a6204f…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   6,
+   990
+  ]
+ },
+ "new_calls": 0
+}

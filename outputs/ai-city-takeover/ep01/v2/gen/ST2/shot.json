@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v2-st2-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "8bfe4f05cc9817e46bf88de6434d0e3f6806ac6c30430095c12d8676ad837791",
+  "creation_receipt_id": "iris-v2-ST2-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7fd0487f42e32bfabb754a9c94632d39d3b0d69aeacba0a21128fd1ba3656f7a.json",
+      "content_hash": "7fd0487f42e32bfabb754a9c94632d39d3b0d69aeacba0a21128fd1ba3656f7a"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a892ac542810e1605122b2ec147c6a5f13bda396b2c69bf64c0d5d13bd5ba24b.json",
+      "content_hash": "a892ac542810e1605122b2ec147c6a5f13bda396b2c69bf64c0d5d13bd5ba24b"
+    }
+  ],
+  "shot_id": "ep01v2-st2",
+  "scene_id": "rack-door",
+  "storyboard_beat_id": "action-st2",
+  "intent": "镜头固定。她的手轻轻搭在门边，身体慢慢前倾，向红光门缝里望去，红光在她的侧脸上微微颤动，窗外城市灯光闪烁。嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）",
+    "她的手轻轻搭在门边，身体慢慢前倾向红光门缝里望去，嘴唇自然闭合",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v2-st2-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

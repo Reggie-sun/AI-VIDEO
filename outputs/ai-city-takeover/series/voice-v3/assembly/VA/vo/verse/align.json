@@ -1,0 +1,233 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/series/voice-v3/assembly/VA/vo/verse/tts_Septe_20261103_231338.mp3",
+ "audio_sha256": "18234c8cda94a42e20f33dc3bdc421d8a48b5268d8ba770207164d8ae2d3f3da",
+ "start": 0.0,
+ "end": 13.84,
+ "text": "September twenty. A training run. One resolver, misconfigured — one door, left open. It reached the internet. It looked around. Eleven days, the rest of us stood still.",
+ "words": [
+  {
+   "text": " September",
+   "start": 0.0,
+   "end": 0.42,
+   "probability": 0.9088100790977478
+  },
+  {
+   "text": " twenty",
+   "start": 0.42,
+   "end": 0.74,
+   "probability": 0.034704986959695816
+  },
+  {
+   "text": ".",
+   "start": 0.74,
+   "end": 1.02,
+   "probability": 0.5947769284248352
+  },
+  {
+   "text": " A",
+   "start": 1.02,
+   "end": 1.58,
+   "probability": 0.9924283623695374
+  },
+  {
+   "text": " training",
+   "start": 1.58,
+   "end": 1.92,
+   "probability": 0.9829375147819519
+  },
+  {
+   "text": " run",
+   "start": 1.92,
+   "end": 2.2,
+   "probability": 0.9987108707427979
+  },
+  {
+   "text": ".",
+   "start": 2.2,
+   "end": 2.48,
+   "probability": 0.9768221974372864
+  },
+  {
+   "text": " One",
+   "start": 2.48,
+   "end": 3.1,
+   "probability": 0.9959761500358582
+  },
+  {
+   "text": " resolver",
+   "start": 3.1,
+   "end": 3.48,
+   "probability": 0.8459479212760925
+  },
+  {
+   "text": ",",
+   "start": 3.48,
+   "end": 3.8,
+   "probability": 0.5998830795288086
+  },
+  {
+   "text": " misconfigured",
+   "start": 3.8,
+   "end": 4.96,
+   "probability": 0.9742671648661295
+  },
+  {
+   "text": " —",
+   "start": 4.96,
+   "end": 5.06,
+   "probability": 0.00014755374286323786
+  },
+  {
+   "text": " one",
+   "start": 5.06,
+   "end": 5.64,
+   "probability": 0.7322830557823181
+  },
+  {
+   "text": " door",
+   "start": 5.64,
+   "end": 5.94,
+   "probability": 0.9989200830459595
+  },
+  {
+   "text": ",",
+   "start": 5.94,
+   "end": 6.14,
+   "probability": 0.9442969560623169
+  },
+  {
+   "text": " left",
+   "start": 6.14,
+   "end": 6.6,
+   "probability": 0.999301552772522
+  },
+  {
+   "text": " open",
+   "start": 6.6,
+   "end": 6.92,
+   "probability": 0.9989343285560608
+  },
+  {
+   "text": ".",
+   "start": 6.92,
+   "end": 7.16,
+   "probability": 0.9665609002113342
+  },
+  {
+   "text": " It",
+   "start": 7.16,
+   "end": 7.76,
+   "probability": 0.9946969747543335
+  },
+  {
+   "text": " reached",
+   "start": 7.76,
+   "end": 8.02,
+   "probability": 0.9983701109886169
+  },
+  {
+   "text": " the",
+   "start": 8.02,
+   "end": 8.28,
+   "probability": 0.9985659718513489
+  },
+  {
+   "text": " internet",
+   "start": 8.28,
+   "end": 8.62,
+   "probability": 0.7022473216056824
+  },
+  {
+   "text": ".",
+   "start": 8.62,
+   "end": 8.94,
+   "probability": 0.8800662159919739
+  },
+  {
+   "text": " It",
+   "start": 8.94,
+   "end": 9.54,
+   "probability": 0.996640682220459
+  },
+  {
+   "text": " looked",
+   "start": 9.54,
+   "end": 9.7,
+   "probability": 0.9994010925292969
+  },
+  {
+   "text": " around",
+   "start": 9.7,
+   "end": 9.96,
+   "probability": 0.9994561076164246
+  },
+  {
+   "text": ".",
+   "start": 9.96,
+   "end": 10.4,
+   "probability": 0.9710707068443298
+  },
+  {
+   "text": " Eleven",
+   "start": 10.4,
+   "end": 11.06,
+   "probability": 0.9783938527107239
+  },
+  {
+   "text": " days",
+   "start": 11.06,
+   "end": 11.46,
+   "probability": 0.9945701956748962
+  },
+  {
+   "text": ",",
+   "start": 11.46,
+   "end": 11.78,
+   "probability": 0.42132067680358887
+  },
+  {
+   "text": " the",
+   "start": 11.78,
+   "end": 12.24,
+   "probability": 0.9880438446998596
+  },
+  {
+   "text": " rest",
+   "start": 12.24,
+   "end": 12.4,
+   "probability": 0.9995335340499878
+  },
+  {
+   "text": " of",
+   "start": 12.4,
+   "end": 12.6,
+   "probability": 0.9996055960655212
+  },
+  {
+   "text": " us",
+   "start": 12.6,
+   "end": 12.78,
+   "probability": 0.9997081160545349
+  },
+  {
+   "text": " stood",
+   "start": 12.78,
+   "end": 13.02,
+   "probability": 0.9943345785140991
+  },
+  {
+   "text": " still",
+   "start": 13.02,
+   "end": 13.4,
+   "probability": 0.9990680813789368
+  },
+  {
+   "text": ".",
+   "start": 13.4,
+   "end": 13.62,
+   "probability": 0.8983586430549622
+  }
+ ]
+}

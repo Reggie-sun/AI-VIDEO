@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/music-restored-preview/IRIS-01-BGM-restored-preview.wav",
+      "sha256": "80ac904d248e6c0f18f213a4fc615fc1e95cc0cc6686621b5ebe7dc8e0324f5b",
+      "bytes": 5760044
+    }
+  ],
+  "kind": "Source preparation only; not ACE generation; cumulative ACE count remains10"
+}

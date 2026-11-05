@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 成片 c3（與 c1 並排）</title>
+<style>
+ :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; --ok:#9fd3a8; }
+ body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK TC","Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+ h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:18px; font-weight:600; margin:28px 0 8px; }
+ .dim { color:var(--dim); font-size:13px; } .row { display:flex; gap:12px; flex-wrap:wrap; } figure { margin:8px 0; }
+ video { width:min(900px,45vw); background:#000; display:block; } figcaption { color:var(--dim); font-size:13px; }
+ table { border-collapse:collapse; width:100%; max-width:1600px; } td, th { border-bottom:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top; }
+ th { color:var(--dim); font-weight:500; } .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 16px; max-width:1580px; }
+ td.up { color:#ffb35c; } td.down { color:#8fc3ff; } td.same { color:var(--dim); } button { font-size:15px; padding:6px 14px; margin:6px 8px 0 0; }
+ img { max-width:1600px; width:100%; border:1px solid var(--line); }
+</style>
+<h1>IRIS 01 · Looked Outside — 成片 c3（待你審看）</h1>
+<div class="dim">1920×1080 · 30fps · 30.5 s · 整合響度 −14.2 LUFS、峰值 −1.0 dBFS · 交付檔 <code>renders/IRIS-EP01-Looked-Outside-v2-c3.mp4</code>（SHA 437fddcb4c8a…）</div>
+<h2>c1 與 c3 並排</h2>
+<div><button onclick="both('play')">兩支一起從頭播</button><button onclick="both('pause')">暫停</button><span class="dim">（聲音來自右邊的 c3；兩支用同一首歌，左邊靜音）</span></div>
+<div class="row">
+ <figure><video id="v1" muted controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c1.mp4"></video><figcaption>c1（你較滿意節奏的那一版）</figcaption></figure>
+ <figure><video id="v3" controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c3.mp4"></video><figcaption>c3</figcaption></figure>
+</div>
+<div class="dim">也可以看合成好的並排檔 <code>renders/review/c1-vs-c3.mp4</code>（左 c1、右 c3，各 960×540，聲音是 c3）：</div>
+<video controls preload="metadata" src="../renders/review/c1-vs-c3.mp4" style="width:min(1600px,96vw)"></video>
+<script>
+const a = document.getElementById('v1'), b = document.getElementById('v3');
+function both(k) { if (k === 'play') { a.currentTime = 0; b.currentTime = 0; a.play(); b.play(); } else { a.pause(); b.pause(); } }
+b.addEventListener('seeked', () => { if (Math.abs(a.currentTime - b.currentTime) > 0.05) a.currentTime = b.currentTime; });
+b.addEventListener('pause', () => a.pause()); b.addEventListener('play', () => { a.currentTime = b.currentTime; a.play(); });
+</script>
+
+<h2>這版改了什麼（相對 c1）</h2>
+<div class="box"><ul><li><b>開場</b>：S1 換成 S1v3，入點 0.6667：眼睛約 1.9 s 開始睜、2.63 s 全開；2.867 s 在「woke」切到 S2，回到 c1 的剪點（c2 是 3.37 s）。</li><li><b>S5、S7</b>：用 v3（S5v3 入點 1.0、S7v3 入點 1.4，逐鏡檢查都 PASS），和 c2 相同；S7 的紅色斷線在臉下方、戳記在安全區內。</li><li><b>副歌第一遍</b>：S8av3 依量到的延遲（−0.107 s）唱「I didn't run —」；20.67 s 停頓處切到她睜開的眼睛，「I just looked outside」照樣上屏。</li><li><b>副歌第二遍</b>：S8b2 依量到的延遲（−0.133 s）唱「I didn't run —」；24.07 s 換行處切到她在窗前看城市；25.90 s 接機櫃門關上。</li><li><b>副歌動效</b>：每個 kick 輕推（約 1.5–1.9%），進入副歌的 19.06 s 一次 impact（6%）；主歌與開場不動。平台「AI生成」標識放大時也保持在畫面內。</li><li><b>副歌字幕</b>：依分離人聲實測校正，例如第一遍「I just looked outside」改在 20.66 s 上屏（原本 20.27 s，她還在唱「run」）。</li><li><b>花費</b>：0 次付費生成。</li></ul></div>
+
+<h2>節奏：每小節畫面動態（c1 對 c3）</h2>
+<div class="dim">畫面動態＝qa.py 每小節平均幀差（192×108 灰階，含剪點）；音樂＝母帶每小節 RMS · 中頻包絡（副歌約 0.35、其他約 0.18）。橘色＝c3 比 c1 動，藍色＝比 c1 靜。</div>
+<table><tr><th>小節</th><th>時間 (s)</th><th>段落</th><th>音樂</th><th>c1</th><th>c3</th><th>差</th><th>為什麼</th></tr><tr><td>1</td><td>0.04–1.92</td><td>開場</td><td>-12.8 dB · 0.17</td><td>0.91</td><td>1.98</td><td class=up>+1.08</td><td>S1v3 開頭一道車燈光從下臉頰掃過（0.1–0.8 s），c1 的 S1 沒有；剪點與 c1 相同</td></tr><tr><td>2</td><td>1.92–3.82</td><td>開場</td><td>-14.0 dB · 0.18</td><td>1.99</td><td>3.37</td><td class=up>+1.38</td><td>你要的睜眼（1.9–2.63 s）加第二道光掃；2.867 s 切到 S2，剪點與 c1 相同</td></tr><tr><td>3</td><td>3.82–5.72</td><td>主歌</td><td>-12.9 dB · 0.18</td><td>2.96</td><td>2.96</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>4</td><td>5.72–7.63</td><td>主歌</td><td>-13.0 dB · 0.19</td><td>3.02</td><td>3.02</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>5</td><td>7.63–9.53</td><td>主歌</td><td>-14.1 dB · 0.17</td><td>1.84</td><td>1.84</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>6</td><td>9.53–11.44</td><td>主歌</td><td>-13.2 dB · 0.18</td><td>2.13</td><td>2.10</td><td class=same>-0.03</td><td>同 c1</td></tr><tr><td>7</td><td>11.44–13.35</td><td>主歌</td><td>-13.4 dB · 0.18</td><td>1.94</td><td>1.88</td><td class=same>-0.06</td><td>S5 用 S5v3（同 c2），動態接近 c1</td></tr><tr><td>8</td><td>13.35–15.26</td><td>主歌</td><td>-14.1 dB · 0.18</td><td>3.11</td><td>2.10</td><td class=down>-1.00</td><td>S7 用 S7v3（同 c2），薄片滑得比 c1 的 S7 慢</td></tr><tr><td>9</td><td>15.26–17.16</td><td>主歌</td><td>-14.0 dB · 0.17</td><td>5.79</td><td>1.71</td><td class=down>-4.09</td><td>同上：c1 的 S7 這裡最忙，c3 較靜</td></tr><tr><td>10</td><td>17.16–19.06</td><td>主歌</td><td>-14.2 dB · 0.22</td><td>3.39</td><td>2.68</td><td class=down>-0.71</td><td>S7v3 較靜；18.867 s 切入副歌，19.03 s 的 impact 第一幀落在這小節尾</td></tr><tr><td>11</td><td>19.06–20.98</td><td>副歌</td><td>-14.2 dB · 0.36</td><td>0.84</td><td>3.10</td><td class=up>+2.26</td><td>副歌：kick punch＋進入 impact；音樂中頻約為主歌兩倍，刻意變強</td></tr><tr><td>12</td><td>20.98–22.87</td><td>副歌</td><td>-15.1 dB · 0.38</td><td>1.78</td><td>2.97</td><td class=up>+1.19</td><td>副歌：20.67 s 切到眼睛＋punch</td></tr><tr><td>13</td><td>22.87–24.78</td><td>副歌</td><td>-14.4 dB · 0.38</td><td>0.84</td><td>2.63</td><td class=up>+1.79</td><td>副歌：第二遍＋punch</td></tr><tr><td>14</td><td>24.78–26.68</td><td>副歌</td><td>-14.3 dB · 0.34</td><td>1.63</td><td>2.17</td><td class=up>+0.53</td><td>副歌：24.07 s 切到窗前＋punch，25.9 s 接 S9a</td></tr><tr><td>15</td><td>26.68–28.58</td><td>尾段</td><td>-13.4 dB · 0.20</td><td>1.71</td><td>1.71</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>16</td><td>28.58–30.48</td><td>尾段</td><td>-13.3 dB · 0.16</td><td>1.80</td><td>1.80</td><td class=same>+0.00</td><td>同 c1</td></tr></table>
+
+<h2>QA（motion-kit/tools/qa.py）</h2>
+<div class="box"><ul>
+ <li>剪點 12/12 在預期幀；圖形與動效時機 13/13 在 ±1 幀內（副歌 impact 依設計早一幀）。</li>
+ <li>閃爍每秒最多 1 次（上限 3）；頻閃格 0；單幀突跳 0；離群幀 0。</li>
+ <li>每個剪點前後 −6／−1／0／+6 幀的聯繫圖：<code>qa/film-c3/cuts.jpg</code>。</li>
+</ul></div>
+<img src="../qa/film-c3/cuts.jpg" alt="cuts">
+
+<h2>還沒驗證、要你判斷的</h2>
+<div class="box"><ul><li>倉庫的拼接 Gate（verify-assembly）仍接不上 motion-kit 合成，接點<b>未經 Harness 驗證</b>，這是一部審看片。</li><li>聲音與對嘴的聽感我無法聆聽，以你看、聽為準。副歌唱的兩段，是量測判定為同步的部分；第二遍開頭 22.57–22.97 s 的長音「I」不在同步區段內，未驗證。</li><li><b>24.07 s 接點</b>：S8b2→S5v3 兩鏡都臉朝左、景別相近，她從畫面左側換到右側，可能像跳接。</li><li><b>開場 0.1–0.8 s</b>：S1v3 素材裡有一道車燈光掃過下臉頰，第 1 小節因此比 c1 動，「Three forty-seven」字幕在 0.3–0.4 s 對比變差。這是你指定入點 0.6667 下素材本身的內容，我沒有改。</li><li>獨立審查、完整驗證、會話記錄、commit 與 push 都等你認可成片後才做。</li></ul></div>
+</html>

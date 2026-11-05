@@ -1,0 +1,315 @@
+{
+  "schema_version": "jimeng-feedback-driver/1",
+  "row": {
+    "shot": {
+      "shot_id": "postman",
+      "scene_id": "sunlit-meadow",
+      "storyboard_beat_id": "postman",
+      "intent": "{{image:0}}只参考机器人外观、右胯邮袋和草地空间；不锁住姿势，不作为硬首帧。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n先向右迈两小步：一只脚抬起前移落地，另一只脚前移落地；双脚站稳后不再迈步。随后风吹草叶，部分白色种子从右侧花托脱离，向左上方飘过；它看见种子后缓缓抬头。一粒种子沿可见轨迹下降，轻落在头顶，它保持好奇的仰头姿态停顿。\n双臂随两步自然轻摆，停下后放松；双玻璃眼不变形，机器人不做呼吸动作。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n稳定的午后侧后方暖光，浅青金属和黄帆布的磨损、草绿背景清楚，白色种子可读；精致微缩定格动画，正常动作速度。种子不变成鸟或光点，无瞬移、无新增角色、无宫格。",
+      "dialogue": "",
+      "duration_policy": {
+        "mode": "fixed",
+        "seconds": 12
+      },
+      "character_ids": [
+        "postman-robot"
+      ],
+      "continuity_constraints": [
+        "唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。",
+        "先向右迈两小步：一只脚抬起前移落地，另一只脚前移落地；双脚站稳后不再迈步。随后风吹草叶，部分白色种子从右侧花托脱离，向左上方飘过；它看见种子后缓缓抬头。一粒种子沿可见轨迹下降，轻落在头顶，它保持好奇的仰头姿态停顿。",
+        "12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。",
+        "原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。"
+      ],
+      "visual_strategy": "generated_video",
+      "required_asset_roles": [
+        {
+          "role": "primary_visual",
+          "asset_ids": [],
+          "allowed_asset_types": [
+            "video"
+          ]
+        }
+      ],
+      "generated_video_rationale": "展示连续行走与种子飘落的完整温暖事件"
+    },
+    "generation": {
+      "references": [
+        {
+          "role": "character_reference",
+          "asset_id": "postman-reference-v1",
+          "owner_id": "postman-robot"
+        }
+      ],
+      "intent_evidence": {
+        "character_action_required": true,
+        "state_change_required": true,
+        "subject_motion_directive_present": true
+      },
+      "generation_intent": {
+        "reference_planning": {
+          "contract_version": "shot-reference-intent/1",
+          "facets": [
+            "identity_consistency",
+            "slow_camera"
+          ],
+          "structure": "continuous",
+          "segment_ids": [],
+          "events": [
+            {
+              "event_id": "start",
+              "kind": "composition",
+              "visual_state": "机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。",
+              "purpose": "建立唯一机器人与蒲公英的左右关系",
+              "phase": "start",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "model_guidance",
+              "priority": "required"
+            }
+          ],
+          "anchors": [
+            {
+              "anchor_id": "robot-identity",
+              "role": "identity",
+              "purpose": "唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。",
+              "owner_id": "postman-robot",
+              "priority": "required"
+            }
+          ],
+          "selections": [
+            {
+              "need_id": "robot-identity",
+              "asset_id": "postman-reference-v1"
+            },
+            {
+              "need_id": "start",
+              "asset_id": "postman-reference-v1"
+            }
+          ],
+          "natural_generation": [],
+          "director_coverage": {
+            "coverage_hash": "01b727c3f5c8aa070da446fa712ba0a610ab266d4b6c1584b16fdc2de1d0c75f",
+            "unit_id": "postman"
+          },
+          "preview_approval": {
+            "approval_hash": "a61841a6a7746c4f97c4cdd4803440a2d9f606bc1e5edb6a37f1ac27f29929fd"
+          }
+        },
+        "open_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。",
+          "state_hash": null,
+          "required_change": false
+        },
+        "close_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。",
+          "state_hash": null,
+          "required_change": true
+        },
+        "identity_continuity": {
+          "character_ids": [
+            "postman-robot"
+          ],
+          "preservation": "exact",
+          "allowed_variation": []
+        },
+        "scene_continuity": {
+          "scene_id": "sunlit-meadow",
+          "time_of_day": "午后",
+          "mood": "温暖幽默",
+          "state_constraints": [
+            "机器人左、蒲公英右",
+            "种子来自唯一蒲公英"
+          ]
+        },
+        "space_continuity": {
+          "subject_position": "机器人左、蒲公英右",
+          "screen_direction": "机器人向右，种子向左上方",
+          "entrance_state": null,
+          "exit_state": null,
+          "crossing_policy": "不越轴"
+        },
+        "axis_continuity": {
+          "camera_axis": "机器人正侧前方",
+          "framing_continuity": "中景微距持续保留机器人和蒲公英",
+          "crossing_policy": "不越轴"
+        },
+        "subject_action": {
+          "start_state": "机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。",
+          "progression": "先向右迈两小步：一只脚抬起前移落地，另一只脚前移落地；双脚站稳后不再迈步。随后风吹草叶，部分白色种子从右侧花托脱离，向左上方飘过；它看见种子后缓缓抬头。一粒种子沿可见轨迹下降，轻落在头顶，它保持好奇的仰头姿态停顿。",
+          "endpoint": {
+            "state_ref": null,
+            "state_text": "机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。",
+            "state_hash": null,
+            "required_change": true
+          }
+        },
+        "motion_envelope": {
+          "onset": "迈两步",
+          "peak": "种子飞散、抬头",
+          "settle": "种子落头、停住",
+          "direction": "向右行走，种子向左上漂",
+          "amplitude_class": "轻微自然"
+        },
+        "pacing": {
+          "cadence": "走近、站稳、风吹、抬头、落头、停顿",
+          "tempo_class": "自然原速",
+          "shot_duration_seconds": 12.0
+        },
+        "camera_intent": {
+          "movement": "缓慢微推",
+          "stability": "稳定",
+          "framing_intent": "12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。",
+          "expression_strength": "semantic_prompt_allowed"
+        },
+        "camera_endpoint": {
+          "start_framing": "机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。",
+          "end_framing": "机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。",
+          "position_lock": false,
+          "orientation_lock": true
+        },
+        "performance_intent": {
+          "trigger": "种子飘过",
+          "visible_response": "缓慢抬头后停住",
+          "gaze_target": "飘动种子",
+          "body_behavior": "走两步后站稳",
+          "hand_behavior": "双臂自然随步轻摆然后放松",
+          "terminal_performance_state": "抬头静止片刻",
+          "character_directions": [
+            {
+              "character_id": "postman-robot",
+              "screen_identity": "唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。",
+              "role": "principal",
+              "visibility": "visible",
+              "offscreen_reason": null,
+              "beats": [
+                {
+                  "phase": "throughout",
+                  "trigger": "种子飘过",
+                  "emotion": "好奇",
+                  "intensity": "subtle",
+                  "facial_expression": "玻璃眼不变形",
+                  "gaze_target": "飘动种子",
+                  "breathing": "机器人无呼吸动作",
+                  "body_behavior": "两步停下后抬头"
+                }
+              ]
+            }
+          ]
+        },
+        "visual_treatment": {
+          "medium_look": "微缩定格动画",
+          "palette": "暖金草绿与浅青",
+          "material_treatment": "有磨损的金属、帆布和真实草叶",
+          "prohibited_visual_drift": [
+            "种子变成鸟或光点",
+            "多机器人、字幕或宫格"
+          ]
+        },
+        "lighting_intent": {
+          "motivated_source": "午后阳光",
+          "direction": "侧后方",
+          "exposure_priority": "机器人和白色种子均可读",
+          "continuity_state": "暖光稳定"
+        },
+        "ambience_intent": {
+          "environment_bed": "轻风与草叶声",
+          "foley_cues": [
+            "两步轻金属脚步声"
+          ],
+          "explicitly_silent": false
+        },
+        "dialogue_intent": {
+          "mode": "none",
+          "speaker_id": null,
+          "verbatim_text": null,
+          "start_seconds": null,
+          "end_seconds": null,
+          "on_screen": null,
+          "response_obligation": null,
+          "lip_sync_required": false
+        },
+        "music_intent": {
+          "mode": "none",
+          "instrumentation": null,
+          "tempo_rhythm": null,
+          "dynamics": null
+        },
+        "primary_camera_motion": {
+          "movement_kind": "dolly_in",
+          "direction": "forward",
+          "amplitude_class": "subtle",
+          "speed_class": "slow",
+          "start_motion_state": "in_motion",
+          "end_motion_state": "settled"
+        },
+        "camera_subject_relation": {
+          "subject_id": "postman-robot",
+          "relation_kind": "reveal",
+          "start_relation": "机器人及蒲公英均可见",
+          "end_relation": "机器人头顶种子可见"
+        }
+      },
+      "output_need": {
+        "timing_mode": "content_driven",
+        "duration_seconds": 12,
+        "geometry_policy": "adaptive",
+        "aspect_ratio": "16:9",
+        "fps": null,
+        "container_mime": "video/mp4"
+      },
+      "audio_need": "required",
+      "quality_need": {
+        "objective_tier": "preview"
+      }
+    },
+    "composition": {
+      "muted": false,
+      "source_audio_policy": "KEEP"
+    }
+  },
+  "routing_policy": {
+    "identity": {
+      "policy_id": "dandelion-postman-local-qualification",
+      "policy_version": "1",
+      "policy_sha256": "6c2cfc4c1ca495ef6d05acdc9b4adf5bca3356af050cd242a2c8a4363a61d0d9"
+    },
+    "local_resources_available": false,
+    "remote_authorized": true,
+    "budget_authorized": true,
+    "execution_purpose": "qualification"
+  },
+  "decision_policy": {
+    "max_resamples": 0,
+    "allow_bounded_exploration": true
+  },
+  "execution_limits": {
+    "task_id": "dandelion-postman-local-preview",
+    "generation_forbidden": false,
+    "allowed_remote_candidates": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1"
+    ],
+    "paid_submit_ceiling": 1,
+    "paid_submits_used": 0,
+    "local_batch_limit": 1,
+    "local_batch_used": 0,
+    "local_total_used": 0,
+    "local_resource_available": false
+  },
+  "jimeng_profile": {
+    "model_id": "seedance_2.0_vip",
+    "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+    "project_id": "e09b617d-5af1-40ee-9136-d36a7422d40c",
+    "node_id": "node_4zzbk1megx",
+    "duration_seconds": 12,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "benefit_amount": 12,
+    "benefit_type": "seedance_20_pro_1080p_output",
+    "credit_upper_bound": 1500
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/dandelion-postman-20261104/qa/postman/audio-operator",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/dandelion-postman-20261104/qa/postman/audio-operator/intent.json",
+  "intent_sha256": "3fbc690c11d16bdad426be61e64fa60af6bd1d52009dfa8b350ccb1570f72d34",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/dandelion-postman-20261104/qa/postman/audio-operator/reservation.json",
+  "reservation_sha256": "f9add1ccf189e0ea1eec499ce9c6053b64d668ddd5d816f491721611ea3f48d0",
+  "source_sha256": "554aad1f910e2c142385a236e7ff72a32bd880e6eef4eadc974e2224799af0da",
+  "source_size_bytes": 31778915,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

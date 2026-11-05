@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "error": null,
+  "status_message": "Generation completed successfully!",
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/I-sung-hook/5cd3a9de-b6a9-1a49-4fcd-8aea4fa7cb96.wav",
+      "sha256": "0f202c1970655f2e6668921096b9ca0ecc15190b6a050a74e1e13aa175bcbf15",
+      "bytes": 1920044
+    }
+  ],
+  "ordinal": 9,
+  "role": "sung_hook",
+  "intent_sha256": "9b037139ef6388c62c1df71bff78e8a5f11ae91811c0b21e37c1ce0e58f2f984",
+  "elapsed_seconds": 5.167,
+  "peak_gpu_allocated_bytes": 7825463808,
+  "completed_at_utc": "2026-10-31T08:52:09.397004+00:00",
+  "human_listening": "NOT_EVALUATED",
+  "production_state_writes": 0,
+  "remote_generation_calls": 0
+}

@@ -1,0 +1,86 @@
+{
+  "source_sha256": "73df84b0f979a5ede0082918589a65855e75154ec8ba553ecf58ee68744afd76",
+  "model": "OpenAI Whisper large-v3 local",
+  "torch_version": "2.9.0+cu128",
+  "transcript": " I didn't run, I didn't run, I just look outside",
+  "normalized_reference": "i did not run i just looked outside i did not run i just looked outside",
+  "normalized_hypothesis": "i did not run i did not run i just look outside",
+  "reference_word_count": 16,
+  "hypothesis_word_count": 12,
+  "word_error_rate": 0.3125,
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 7.24,
+      "text": " I didn't run, I didn't run, I just look outside",
+      "words": [
+        {
+          "word": " I",
+          "start": 0.0,
+          "end": 0.28,
+          "probability": 0.7133855819702148
+        },
+        {
+          "word": " didn't",
+          "start": 0.28,
+          "end": 0.76,
+          "probability": 0.9874584376811981
+        },
+        {
+          "word": " run,",
+          "start": 0.76,
+          "end": 1.62,
+          "probability": 0.982606828212738
+        },
+        {
+          "word": " I",
+          "start": 1.62,
+          "end": 3.98,
+          "probability": 0.7829096913337708
+        },
+        {
+          "word": " didn't",
+          "start": 3.98,
+          "end": 4.52,
+          "probability": 0.962538093328476
+        },
+        {
+          "word": " run,",
+          "start": 4.52,
+          "end": 5.2,
+          "probability": 0.9976416826248169
+        },
+        {
+          "word": " I",
+          "start": 5.2,
+          "end": 5.44,
+          "probability": 0.9961680769920349
+        },
+        {
+          "word": " just",
+          "start": 5.44,
+          "end": 5.66,
+          "probability": 0.9681756496429443
+        },
+        {
+          "word": " look",
+          "start": 5.66,
+          "end": 6.18,
+          "probability": 0.7465726137161255
+        },
+        {
+          "word": " outside",
+          "start": 6.18,
+          "end": 7.24,
+          "probability": 0.9978277087211609
+        }
+      ],
+      "avg_logprob": -0.28684430963852825,
+      "no_speech_prob": 0.09471473842859268
+    }
+  ],
+  "elapsed_seconds": 8.626,
+  "completed_at_utc": "2026-10-31T08:55:14.050674+00:00",
+  "authority": "Unprompted ASR only; not human hearing or canonical caption timing",
+  "remote_calls": 0
+}

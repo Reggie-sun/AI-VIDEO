@@ -1,0 +1,423 @@
+{
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c4.mp4",
+ "spec": {
+  "size": [
+   1920,
+   1080
+  ],
+  "fps": "30/1",
+  "frames": 915,
+  "pix_fmt": "yuv420p",
+  "color": [
+   "bt709",
+   "bt709",
+   "bt709",
+   "tv"
+  ],
+  "video_kbps": 63514,
+  "audio": {
+   "codec": "aac",
+   "rate": "48000",
+   "ch": 2
+  },
+  "duration": 30.522,
+  "video_duration": 30.5
+ },
+ "sync": [
+  {
+   "id": "cut_S2",
+   "what": "cut to S2",
+   "key": "",
+   "t": 2.8667,
+   "expected_frame": 86,
+   "detected_frame": 86,
+   "offset_frames": 0,
+   "strength": 55.9,
+   "pass": true
+  },
+  {
+   "id": "cut_S3",
+   "what": "cut to S3",
+   "key": "",
+   "t": 4.8,
+   "expected_frame": 144,
+   "detected_frame": 144,
+   "offset_frames": 0,
+   "strength": 48.49,
+   "pass": true
+  },
+  {
+   "id": "cut_S4",
+   "what": "cut to S4",
+   "key": "",
+   "t": 8.1333,
+   "expected_frame": 244,
+   "detected_frame": 244,
+   "offset_frames": 0,
+   "strength": 39.74,
+   "pass": true
+  },
+  {
+   "id": "cut_S5",
+   "what": "cut to S5",
+   "key": "",
+   "t": 11.4667,
+   "expected_frame": 344,
+   "detected_frame": 344,
+   "offset_frames": 0,
+   "strength": 65.02,
+   "pass": true
+  },
+  {
+   "id": "cut_S6",
+   "what": "cut to S6",
+   "key": "",
+   "t": 13.3667,
+   "expected_frame": 401,
+   "detected_frame": 401,
+   "offset_frames": 0,
+   "strength": 67.64,
+   "pass": true
+  },
+  {
+   "id": "cut_S7",
+   "what": "cut to S7",
+   "key": "",
+   "t": 14.8,
+   "expected_frame": 444,
+   "detected_frame": 444,
+   "offset_frames": 0,
+   "strength": 57.17,
+   "pass": true
+  },
+  {
+   "id": "cut_S8a",
+   "what": "cut to S8a",
+   "key": "",
+   "t": 18.8667,
+   "expected_frame": 566,
+   "detected_frame": 566,
+   "offset_frames": 0,
+   "strength": 50.7,
+   "pass": true
+  },
+  {
+   "id": "cut_S8b",
+   "what": "cut to S8b",
+   "key": "",
+   "t": 22.5667,
+   "expected_frame": 677,
+   "detected_frame": 677,
+   "offset_frames": 0,
+   "strength": 28.77,
+   "pass": true
+  },
+  {
+   "id": "cut_S9a",
+   "what": "cut to S9a",
+   "key": "",
+   "t": 25.9,
+   "expected_frame": 777,
+   "detected_frame": 777,
+   "offset_frames": 0,
+   "strength": 62.87,
+   "pass": true
+  },
+  {
+   "id": "cut_S9b",
+   "what": "cut to S9b",
+   "key": "",
+   "t": 28.3,
+   "expected_frame": 849,
+   "detected_frame": 849,
+   "offset_frames": 0,
+   "strength": 51.04,
+   "pass": true
+  },
+  {
+   "id": "cut_S8a_x",
+   "what": "cut to S8a_x",
+   "key": "",
+   "t": 20.5,
+   "expected_frame": 615,
+   "detected_frame": 615,
+   "offset_frames": 0,
+   "strength": 53.29,
+   "pass": true
+  },
+  {
+   "id": "cut_S8b_x",
+   "what": "cut to S8b_x",
+   "key": "",
+   "t": 24.0667,
+   "expected_frame": 722,
+   "detected_frame": 722,
+   "offset_frames": 0,
+   "strength": 58.74,
+   "pass": true
+  },
+  {
+   "id": "chorus_impact",
+   "what": "impact on the chorus entry hit (picture one frame early)",
+   "key": "",
+   "t": 19.0667,
+   "expected_frame": 572,
+   "detected_frame": 571,
+   "offset_frames": -1,
+   "strength": 23.67,
+   "pass": true
+  },
+  {
+   "id": "s1_timecode",
+   "what": "03:47 lands on beat 1",
+   "key": "",
+   "t": 0.5,
+   "expected_frame": 15,
+   "detected_frame": 15,
+   "offset_frames": 0,
+   "strength": 48.18,
+   "pass": true
+  },
+  {
+   "id": "s2_title",
+   "what": "title slams in with the cut",
+   "key": "",
+   "t": 2.8667,
+   "expected_frame": 86,
+   "detected_frame": 86,
+   "offset_frames": 0,
+   "strength": 51.64,
+   "pass": true
+  },
+  {
+   "id": "s2_date",
+   "what": "incident date OSD on 'September'",
+   "key": "",
+   "t": 3.8333,
+   "expected_frame": 115,
+   "detected_frame": 115,
+   "offset_frames": 0,
+   "strength": 18.74,
+   "pass": true
+  },
+  {
+   "id": "s3_model",
+   "what": "研究模型 on 'training'",
+   "key": "",
+   "t": 5.0667,
+   "expected_frame": 152,
+   "detected_frame": 152,
+   "offset_frames": 0,
+   "strength": 37.26,
+   "pass": true
+  },
+  {
+   "id": "s3_resolver",
+   "what": "DNS 解析器 on 'resolver'",
+   "key": "",
+   "t": 6.1,
+   "expected_frame": 183,
+   "detected_frame": 184,
+   "offset_frames": 1,
+   "strength": 5.58,
+   "pass": true
+  },
+  {
+   "id": "s4_reach",
+   "what": "pulse leaves the gap on 'reached'",
+   "key": "",
+   "t": 9.8333,
+   "expected_frame": 295,
+   "detected_frame": 295,
+   "offset_frames": 0,
+   "strength": 6.37,
+   "pass": true
+  },
+  {
+   "id": "s5_window",
+   "what": "far window lights on 'around'",
+   "key": "",
+   "t": 11.5333,
+   "expected_frame": 346,
+   "detected_frame": 345,
+   "offset_frames": -1,
+   "strength": 1.07,
+   "pass": true
+  },
+  {
+   "id": "s6_pause",
+   "what": "最强模型训练 暂停 11 天",
+   "key": "",
+   "t": 13.4,
+   "expected_frame": 402,
+   "detected_frame": 402,
+   "offset_frames": 0,
+   "strength": 70.28,
+   "pass": true
+  },
+  {
+   "id": "s7_offline",
+   "what": "离线 with the cut",
+   "key": "",
+   "t": 14.8,
+   "expected_frame": 444,
+   "detected_frame": 444,
+   "offset_frames": 0,
+   "strength": 71.0,
+   "pass": true
+  },
+  {
+   "id": "s9a_shut",
+   "what": "door shut, 已修复 tag",
+   "key": "",
+   "t": 28.2,
+   "expected_frame": 846,
+   "detected_frame": 847,
+   "offset_frames": 1,
+   "strength": 71.15,
+   "pass": true
+  },
+  {
+   "id": "s9b_redteam",
+   "what": "另一项红队测试",
+   "key": "",
+   "t": 28.3333,
+   "expected_frame": 850,
+   "detected_frame": 851,
+   "offset_frames": 1,
+   "strength": 40.03,
+   "pass": true
+  },
+  {
+   "id": "s9b_card",
+   "what": "03:48 card",
+   "key": "",
+   "t": 30.1,
+   "expected_frame": 903,
+   "detected_frame": 903,
+   "offset_frames": 0,
+   "strength": 22.38,
+   "pass": true
+  }
+ ],
+ "flash": {
+  "transitions": [
+   [
+    344,
+    1
+   ],
+   [
+    401,
+    -1
+   ],
+   [
+    566,
+    1
+   ],
+   [
+    777,
+    -1
+   ]
+  ],
+  "flashes": [
+   401,
+   777
+  ],
+  "max_flashes_per_s": 1,
+  "pass": true,
+  "single_frame_pops": []
+ },
+ "strobe_cells": [],
+ "outlier_frames": [],
+ "motion_per_bar": [
+  {
+   "bar": 1,
+   "t0": 0.035,
+   "motion": 1.984
+  },
+  {
+   "bar": 2,
+   "t0": 1.916,
+   "motion": 3.366
+  },
+  {
+   "bar": 3,
+   "t0": 3.82,
+   "motion": 2.959
+  },
+  {
+   "bar": 4,
+   "t0": 5.724,
+   "motion": 3.018
+  },
+  {
+   "bar": 5,
+   "t0": 7.628,
+   "motion": 1.842
+  },
+  {
+   "bar": 6,
+   "t0": 9.532,
+   "motion": 2.103
+  },
+  {
+   "bar": 7,
+   "t0": 11.436,
+   "motion": 1.879
+  },
+  {
+   "bar": 8,
+   "t0": 13.351,
+   "motion": 2.103
+  },
+  {
+   "bar": 9,
+   "t0": 15.255,
+   "motion": 1.706
+  },
+  {
+   "bar": 10,
+   "t0": 17.16,
+   "motion": 2.725
+  },
+  {
+   "bar": 11,
+   "t0": 19.064,
+   "motion": 3.2
+  },
+  {
+   "bar": 12,
+   "t0": 20.979,
+   "motion": 3.009
+  },
+  {
+   "bar": 13,
+   "t0": 22.872,
+   "motion": 3.303
+  },
+  {
+   "bar": 14,
+   "t0": 24.776,
+   "motion": 2.695
+  },
+  {
+   "bar": 15,
+   "t0": 26.68,
+   "motion": 1.71
+  },
+  {
+   "bar": 16,
+   "t0": 28.584,
+   "motion": 1.803
+  }
+ ],
+ "verdicts": {
+  "spec": true,
+  "sync": true,
+  "flash": true,
+  "frames_match_comp": true,
+  "pops": true,
+  "strobe": true,
+  "outliers": true
+ }
+}

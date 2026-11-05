@@ -1,0 +1,325 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "那你用awesome-seedance测试下我看看",
+    "creative_constraints": [
+      {
+        "constraint_id": "use-awesome",
+        "scope": "global",
+        "source_text": "用awesome-seedance测试"
+      },
+      {
+        "constraint_id": "show-result",
+        "scope": "global",
+        "source_text": "我看看"
+      }
+    ],
+    "target_duration_seconds": 12,
+    "coverage_strategy": "single_take",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "固定同框呈现面部、手指、按钮与扬声器，使接触—通话—释放—等待因果可见；这是导演对本试镜的选择，不是模型能力限制，也不是用户指定。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "U01",
+      "duration_seconds": 3,
+      "beat_function": "establish",
+      "objective": "建立职业平静与异常声音触发",
+      "open_state": "调度员平静记录，右手未触按钮，麦克风与扬声器可见",
+      "close_state": "短电流声后她停止记录并看向扬声器",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "固定略侧中近景，面部和右手、红色PTT按钮同框，保持可见接触因果与表演。",
+      "visible_change": "听到异常后注意力从记录转向声音",
+      "transition_out": "continuous",
+      "constraint_ids": [
+        "use-awesome",
+        "show-result"
+      ]
+    },
+    {
+      "unit_id": "U02",
+      "duration_seconds": 5,
+      "beat_function": "decision",
+      "objective": "让观众看到按住通话、说完再释放的完整因果",
+      "open_state": "右手离按钮，职业镇定开始收紧",
+      "close_state": "按住红键说完唯一台词后松开，右手退回桌面",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "固定略侧中近景，面部和右手、红色PTT按钮同框，保持可见接触因果与表演。",
+      "visible_change": "手指触键、保持接触、说话、释放均可见",
+      "transition_out": "continuous",
+      "constraint_ids": [
+        "use-awesome",
+        "show-result"
+      ]
+    },
+    {
+      "unit_id": "U03",
+      "duration_seconds": 4,
+      "beat_function": "reaction",
+      "objective": "通过等待中的脸部变化表现无回应的不安",
+      "open_state": "按钮已释放，右手在桌上",
+      "close_state": "视线指向小扬声器，眉头收紧，呼吸短停，没有回复",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "固定略侧中近景，面部和右手、红色PTT按钮同框，保持可见接触因果与表演。",
+      "visible_change": "由主动询问转为紧张等待",
+      "transition_out": "end",
+      "constraint_ids": [
+        "use-awesome",
+        "show-result"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "user-method",
+      "statement": "用awesome-seedance测试",
+      "source_refs": [
+        {
+          "source_hash": "cdff45c1e3ac7cf15afe6866b52153f9a7c35bf49dffcbffd0d93b156d37cf3c",
+          "locator": "creative-input.txt",
+          "intent_item_id": "user-method",
+          "quote": "用awesome-seedance测试",
+          "origin": "explicit_user",
+          "fixed": true
+        }
+      ],
+      "origin": "explicit_user",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "user-review",
+      "statement": "测试结果交用户观看",
+      "source_refs": [
+        {
+          "source_hash": "cdff45c1e3ac7cf15afe6866b52153f9a7c35bf49dffcbffd0d93b156d37cf3c",
+          "locator": "creative-input.txt",
+          "intent_item_id": "user-review",
+          "quote": "我看看",
+          "origin": "explicit_user",
+          "fixed": true
+        }
+      ],
+      "origin": "explicit_user",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "contact",
+      "statement": "右食指可见按住按钮",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "contact",
+          "quote": "右食指可见按住按钮",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "dialogue",
+      "statement": "克制急促说“三号岗，收到请回答。”",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "dialogue",
+          "quote": "克制急促说“三号岗，收到请回答。”",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "release",
+      "statement": "说完可见松开，手退到桌面",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "release",
+          "quote": "说完可见松开，手退到桌面",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "reaction",
+      "statement": "等不到回应，视线转向小扬声器，眉头收紧、呼吸短暂停顿",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "reaction",
+          "quote": "等不到回应，视线转向小扬声器，眉头收紧、呼吸短暂停顿",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "continuity",
+      "statement": "人物、衣服、麦克风、按钮、扬声器与空间保持一致",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "continuity",
+          "quote": "人物、衣服、麦克风、按钮、扬声器与空间保持一致",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-shortcuts",
+      "statement": "禁止以切镜、遮挡或道具消失代替接触与释放过程",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "no-shortcuts",
+          "quote": "禁止以切镜、遮挡或道具消失代替接触与释放过程",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-extras",
+      "statement": "不增加对白、字幕或logo",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "no-extras",
+          "quote": "不增加对白、字幕或logo",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "performance",
+      "statement": "表达职业镇定被沉默打破",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "performance",
+          "quote": "表达职业镇定被沉默打破",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": [
+        "reaction"
+      ]
+    },
+    {
+      "intent_item_id": "duration",
+      "statement": "12秒",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "duration",
+          "quote": "12秒",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "variation",
+      "statement": "动作节拍可在12秒内自然变化，不承诺精确时点控制",
+      "source_refs": [
+        {
+          "source_hash": "1a67890f406900406d4028926507bcaff5055bca87255adb1b88e36fa3551f81",
+          "locator": "director-choices.txt",
+          "intent_item_id": "variation",
+          "quote": "动作节拍可在12秒内自然变化，不承诺精确时点控制",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": [
+        "duration"
+      ]
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "user-method"
+      },
+      {
+        "intent_item_id": "user-review"
+      },
+      {
+        "intent_item_id": "contact"
+      },
+      {
+        "intent_item_id": "dialogue"
+      },
+      {
+        "intent_item_id": "release"
+      },
+      {
+        "intent_item_id": "reaction"
+      },
+      {
+        "intent_item_id": "continuity"
+      }
+    ],
+    "must_not_happen": [
+      {
+        "intent_item_id": "no-shortcuts"
+      },
+      {
+        "intent_item_id": "no-extras"
+      }
+    ],
+    "preferred_performance": [
+      {
+        "intent_item_id": "performance"
+      }
+    ],
+    "timing_targets": [
+      {
+        "intent_item_id": "duration",
+        "target_kind": "delivery_constraint"
+      }
+    ],
+    "acceptable_variation": [
+      {
+        "intent_item_id": "variation"
+      }
+    ]
+  }
+}

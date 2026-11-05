@@ -1,0 +1,11 @@
+{
+  "source_sha256": "b469c215138b3b517dad78c84de0614fdf97821d853059f7c7106f8e99f4df13",
+  "voice_reference_sha256": "e89ff4fb11b06423e6b40a714a2106d827b0236a77283a7c1bd493ffcdc80c18",
+  "comparison_tail_window_seconds": [
+    26.5,
+    30.0
+  ],
+  "guide_tail_rms": 0.0,
+  "generated_tail_rms": 0.0022080595256529956,
+  "human_music_or_singing_verdict": "NOT_EVALUATED; nonzero tail is not a music quality verdict"
+}

@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-10-30T23:29:10.013396+00:00",
+  "adapter_sha256": "c31470c64871ec12466bc157bd6d4236b117aa3977fd4a4fd3723d9c5226604e",
+  "runtime_versions": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "patchright": "1.64.2"
+  },
+  "project_mcp_configs": [
+    ".mcp.json",
+    ".codex/config.toml"
+  ],
+  "native_sdk_account_read": "PASS",
+  "mcp_tools": [
+    "browser_tabs",
+    "browser_snapshot",
+    "browser_evaluate",
+    "browser_fill_form",
+    "browser_click",
+    "browser_take_screenshot"
+  ],
+  "mcp_form_and_one_create": "PASS",
+  "new_route_create_clicks": 1,
+  "create_intent_sha256": "e7981fc7b00d79a1a0bc3d3c4cabf3cd8114c7eadded6854d25d18a0c88f00fc",
+  "original_chrome_reachable": true,
+  "suno_tabs_retained": 1,
+  "screenshot_sha256": "81ab1c9ae92257bc64f7d3c1790d298a7d7f1b3b341666c4593ebd6d46e8ed34",
+  "actual_visible_gate": "Cloudflare Verify you are human",
+  "music_generation": "NOT_CONFIRMED",
+  "captcha_solving_performed": false,
+  "baseline_credits": 2470,
+  "fresh_credits_before_create": 2470,
+  "music_credit_charge": "not yet confirmed",
+  "production_activation": false
+}

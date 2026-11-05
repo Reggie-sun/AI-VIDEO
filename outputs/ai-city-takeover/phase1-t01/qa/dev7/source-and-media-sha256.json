@@ -1,0 +1,17 @@
+{
+  "motion-kit/src/draw2d.js": "cba6c0f6ebd27504bd2bca12f0d6f86966f606284700925c25611746115adbf1",
+  "motion-kit/src/math.js": "5b26e7e269cc66cc74a0bcf1ec5aa62333ed4e0da545247aa15277f53d546b57",
+  "motion-kit/src/shaders.js": "a8614505c36e242f1003280bba3e184e9b96464eb0702b74f73963a2e6d4d636",
+  "motion-kit/src/clock.js": "8624a855a623a75549cee797895969772b85351ed12b81144d901225995250dc",
+  "motion-kit/src/gl.js": "ababc8305b07f924bd1aaaf569df46be7048b3fed9ee520492fcd67eca403953",
+  "motion-kit/src/runtime.js": "4980394e26147dd4826f261f9bfbd5aa76d157a66e70a6b363363bd3ce3bc1dc",
+  "outputs/ai-city-takeover/phase1-t01/comp/src/main.js": "9f80f9a76403fa21abce72b01c6011fbf9ad04029353c4d53febcfa358f0936f",
+  "outputs/ai-city-takeover/phase1-t01/comp/data/beats.json": "d7a5d7dba81a220f4611ae8568d6b0874e61050a1fa51b08ab45f76d172cc8f7",
+  "outputs/ai-city-takeover/phase1-t01/comp/data/music.json": "da35c16701d0460d243c8ba246c42d88a163bede2a3360520ccda4a96401e814",
+  "outputs/ai-city-takeover/phase1-t01/comp/data/hits.json": "f121fb9f69d8f079dd7f6584b74d5c631aa866871aca069d10fe34d084a21cce",
+  "outputs/ai-city-takeover/phase1-t01/comp/data/P3L-paths.json": "bdb8aa2c99fbcd849665c2f758b616413202670f496188ff3f408ba06a76528c",
+  "outputs/ai-city-takeover/phase1-t01/comp/data/events.json": "7950842641ebd63d7f07c25b177384533768f933ddbfbd1e153f894967e94bd4",
+  "outputs/ai-city-takeover/phase1-t01/renders/T01-dev7.mp4": "5e4601b0824b2cb82a42c9041178b0d3f06827f1d66de4e14755bf83b47a3697",
+  "outputs/ai-city-takeover/phase1-t01/review/T01-dev7-review.mp4": "f14a007a5ae6570336adc1edfb1b89d382247e00485be83f9f3c1e11e1009165",
+  "outputs/ai-city-takeover/phase1-t01/comp/engine.js": "200e01ba0ea2609c3ce46d44742844b977dfbccea9e08d72e3c658d5bea66fd7"
+}

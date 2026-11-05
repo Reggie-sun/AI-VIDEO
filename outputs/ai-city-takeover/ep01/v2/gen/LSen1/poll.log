@@ -1,0 +1,15 @@
+19:30:16 {"state": "running", "progress_milli": 500}
+19:30:49 {"state": "running", "progress_milli": 500}
+19:31:22 {"state": "running", "progress_milli": 500}
+19:31:55 {"state": "running", "progress_milli": 500}
+19:32:27 {"state": "running", "progress_milli": 500}
+19:33:00 {"state": "running", "progress_milli": 500}
+19:33:32 {"state": "running", "progress_milli": 500}
+19:34:05 {"state": "running", "progress_milli": 500}
+19:34:40 {"state": "running", "progress_milli": 500}
+19:35:18 {"state": "running", "progress_milli": 500}
+19:35:57 {"state": "running", "progress_milli": 500}
+19:36:34 {"state": "running", "progress_milli": 500}
+19:37:11 {"state": "running", "progress_milli": 500}
+19:37:49 {"state": "succeeded", "progress_milli": 1000}
+{"artifact_path": "state/video-generation/fetch/files/93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d.mp4", "sha256": "93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d", "bytes": 9702787}

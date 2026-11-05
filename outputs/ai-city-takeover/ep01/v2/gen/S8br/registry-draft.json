@@ -1,0 +1,114 @@
+{
+  "schema_version": "2.1",
+  "revision_id": "f51b19be304425878c227f4b6a7938cc7d109812a4bb0a2a0fb0c7b7b2d3a626",
+  "content_hash": "f51b19be304425878c227f4b6a7938cc7d109812a4bb0a2a0fb0c7b7b2d3a626",
+  "assets": [
+    {
+      "asset_id": "iris-c-v2-s8b-balcony",
+      "asset_type": "image",
+      "artifact_path": "assets/files/e6c6e7714ef4b18009a91bb17663c9a4ff871d67268291719007f2d3fea86af6.png",
+      "sha256": "e6c6e7714ef4b18009a91bb17663c9a4ff871d67268291719007f2d3fea86af6",
+      "size_bytes": 1990291,
+      "mime_type": "image/png",
+      "duration_seconds": null,
+      "width": 1672,
+      "height": 941,
+      "source_kind": "imported",
+      "tool": {
+        "name": "approved-local-source-import",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "c52e416520b5fec0339215f04a6d3d5c7fc380395fc5a8d02cf1aa790e0bdb72",
+      "creation_receipt_id": "iris-v2-local-import:e6c6e7714ef4b18009a91bb17663c9a4ff871d67268291719007f2d3fea86af6",
+      "usage_license": "User-authorized project reference; no platform ownership claim.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null
+    },
+    {
+      "asset_id": "iris-c-v2-s8b-vocal",
+      "asset_type": "voice",
+      "artifact_path": "assets/audio/9ba9442d9d7c516f41251e410c8c8540cd0bd339d4923b08f0405e1a5326318a.wav",
+      "sha256": "9ba9442d9d7c516f41251e410c8c8540cd0bd339d4923b08f0405e1a5326318a",
+      "size_bytes": 441044,
+      "mime_type": "audio/wav",
+      "duration_seconds": 5.0,
+      "width": null,
+      "height": null,
+      "source_kind": "derived",
+      "tool": {
+        "name": "elevenlabs-voice-isolator+ffmpeg-trim",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "870ebca7abba1423e71bbc24a241f5e6ac3d99eb50b86510c526964c402111df",
+      "creation_receipt_id": "iris-v2-vocal-derivation:9ba9442d9d7c516f41251e410c8c8540cd0bd339d4923b08f0405e1a5326318a",
+      "usage_license": "Derived from the user-approved song v2; project reference only.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null,
+      "audio_metadata": {
+        "audio_kind": "dialogue",
+        "source": {
+          "kind": "derived",
+          "provider_or_tool": {
+            "name": "elevenlabs-voice-isolator+ffmpeg-trim",
+            "version": "1"
+          },
+          "input_artifact_ids": [],
+          "input_fingerprint": "870ebca7abba1423e71bbc24a241f5e6ac3d99eb50b86510c526964c402111df",
+          "original_reference": "outputs/ai-city-takeover/ep01/v2/song/bed-01/music__20261102_004125.mp3"
+        },
+        "speaker_id": "IRIS",
+        "voice_id": null,
+        "language": "en",
+        "script_hash": "89349c2c9bccb27df2ae16fc4442660540c5379474becd3981f69dea47aee81c",
+        "duration_samples": 220500,
+        "sample_rate_hz": 44100,
+        "channels": 1,
+        "channel_layout": "mono",
+        "codec_name": "pcm_s16le",
+        "loudness": {
+          "integrated_lufs_milli": null,
+          "true_peak_dbfs_milli": null,
+          "measurement_standard": null
+        },
+        "provenance_receipt_id": "iris-v2-vocal-derivation:9ba9442d9d7c516f41251e410c8c8540cd0bd339d4923b08f0405e1a5326318a",
+        "alignment_receipt_id": null
+      }
+    },
+    {
+      "asset_id": "iris-cf-details",
+      "asset_type": "image",
+      "artifact_path": "assets/files/e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea.png",
+      "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+      "size_bytes": 1843560,
+      "mime_type": "image/png",
+      "duration_seconds": null,
+      "width": 1672,
+      "height": 941,
+      "source_kind": "imported",
+      "tool": {
+        "name": "approved-local-source-import",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3",
+      "creation_receipt_id": "iris-v2-local-import:e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+      "usage_license": "User-authorized project reference; no platform ownership claim.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null
+    }
+  ]
+}

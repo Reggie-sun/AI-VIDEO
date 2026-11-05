@@ -1,0 +1,33 @@
+{
+  "scope": "Read-only host/method/status metadata after native click; query strings, headers, bodies, tokens and variable challenge paths omitted",
+  "events": [
+    {
+      "event": "request",
+      "host": "challenges.cloudflare.com",
+      "path": "/cdn-cgi/challenge-platform/[variable-path-omitted]",
+      "method": "GET",
+      "at_utc": "2026-10-31T01:08:40.413281+00:00"
+    },
+    {
+      "event": "response",
+      "host": "challenges.cloudflare.com",
+      "path": "/cdn-cgi/challenge-platform/[variable-path-omitted]",
+      "status": 200,
+      "at_utc": "2026-10-31T01:08:41.044774+00:00"
+    },
+    {
+      "event": "request",
+      "host": "suno.com",
+      "path": "/a/api/challenge/progress",
+      "method": "GET",
+      "at_utc": "2026-10-31T01:08:46.588273+00:00"
+    },
+    {
+      "event": "response",
+      "host": "suno.com",
+      "path": "/a/api/challenge/progress",
+      "status": 200,
+      "at_utc": "2026-10-31T01:08:46.893715+00:00"
+    }
+  ]
+}

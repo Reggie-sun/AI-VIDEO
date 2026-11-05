@@ -1,0 +1,178 @@
+[harness] START scope_diff_check timeout=900s
+[harness] PASSED scope_diff_check duration=0.038s
+[harness] START docs_contract_check timeout=900s
+[harness] PASSED docs_contract_check duration=0.197s
+Documentation contract gate passed.
+[harness] START agent_rules_check timeout=900s
+[harness] PASSED agent_rules_check duration=0.101s
+{"ok": true, "proof": "development_governance_only", "errors": []}
+[harness] START policy_audit_check timeout=900s
+[harness] PASSED policy_audit_check duration=0.579s
+{
+  "candidate_count": 1247,
+  "docs_contract_diagnostics": [],
+  "missing_check_test_paths": [],
+  "unmapped_paths": [],
+  "unreferenced_test_paths": [],
+  "unverified_paths": []
+}
+[harness] START product_runtime_skill_boundary_tests timeout=900s
+[harness] PASSED product_runtime_skill_boundary_tests duration=3.825s
+..                                                                       [100%]
+2 passed in 3.22s
+[harness] START motionkit_runtime_tests timeout=120s
+[harness] PASSED motionkit_runtime_tests duration=0.076s
+TAP version 13
+# (node:404229) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///tmp/ai-video-harness-16xqbsab/checkout/motion-kit/src/clock.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /tmp/ai-video-harness-16xqbsab/checkout/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: window-relative bars and beat subdivisions follow changing tempo
+ok 1 - window-relative bars and beat subdivisions follow changing tempo
+  ---
+  duration_ms: 0.864724
+  type: 'test'
+  ...
+# Subtest: cuts land on the first frame at or after the requested time
+ok 2 - cuts land on the first frame at or after the requested time
+  ---
+  duration_ms: 1.001335
+  type: 'test'
+  ...
+# Subtest: events remain silent before onset, peak exactly at onset, and decay
+ok 3 - events remain silent before onset, peak exactly at onset, and decay
+  ---
+  duration_ms: 0.232728
+  type: 'test'
+  ...
+# Subtest: a decimal event still peaks on its exact rendered frame with a song offset
+ok 4 - a decimal event still peaks on its exact rendered frame with a song offset
+  ---
+  duration_ms: 0.091012
+  type: 'test'
+  ...
+# Subtest: hash and noise values do not depend on frame evaluation order
+ok 5 - hash and noise values do not depend on frame evaluation order
+  ---
+  duration_ms: 1.078631
+  type: 'test'
+  ...
+# Subtest: perspective projection places corners and the diagonal intersection correctly
+ok 6 - perspective projection places corners and the diagonal intersection correctly
+  ---
+  duration_ms: 0.167775
+  type: 'test'
+  ...
+# Subtest: screen homography round trips interior points through a measured oblique screen
+ok 7 - screen homography round trips interior points through a measured oblique screen
+  ---
+  duration_ms: 0.167742
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 50.169881
+[harness] START motionkit_tool_tests timeout=120s
+[harness] PASSED motionkit_tool_tests duration=2.164s
+.........                                                                [100%]
+9 passed in 1.52s
+[harness] START task_architecture_gate timeout=900s
+[harness] PASSED task_architecture_gate duration=4.088s
+Architecture gate: PASS (0 error(s), 0 warning(s), 0 info finding(s))
+[harness] START harness_tests timeout=900s
+[harness] PASSED harness_tests duration=17.291s
+........................................................................ [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 66%]
+........................................................................ [ 88%]
+....................................                                     [100%]
+=============================== warnings summary ===============================
+tests/test_agent_harness_canvas_data.py::test_referenced_image_bytes_are_checked_by_canonical_author[missing]
+tests/test_agent_harness_canvas_data.py::test_referenced_image_bytes_are_checked_by_canonical_author[bad_png]
+  /tmp/ai-video-harness-16xqbsab/checkout/src/ai_video/production/reference_authoring.py:141: UserWarning: adjacent multi-shot units repeat director categories (shot_scale, camera_treatment); vary them when it improves coverage, but repetition is permitted.
+    validate_director_coverage(coverage)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 20 durations =============================
+1.95s call     tests/test_agent_harness_policy.py::test_real_pytest_duration_output_is_captured
+0.62s call     tests/test_agent_harness.py::test_repository_policy_audit_has_no_unmapped_owned_files
+0.53s call     tests/test_agent_harness.py::test_runner_timeout_terminates_descendant_processes
+0.51s call     tests/test_agent_harness.py::test_receipt_freshness_requires_complete_routing_and_execution_proof
+0.22s call     tests/test_record_ai_video_session_hook.py::test_concurrent_post_tool_callbacks_preserve_both_owned_paths
+0.18s call     tests/test_agent_harness_levels.py::test_full_receipt_requires_every_suite_and_cli_rejects_related_proof
+0.15s call     tests/test_agent_harness_policy.py::test_image_keeps_domain_e2e_and_shared_owners_keep_their_checks
+0.14s call     tests/test_agent_harness.py::test_approved_repair_freshness_routes_to_state_and_review_suites
+0.14s call     tests/test_agent_harness.py::test_generated_video_audio_routes_to_composition_audio_suite
+0.14s call     tests/test_agent_harness.py::test_project_skill_installation_routes_to_control_plane_harness[.gitattributes]
+0.14s call     tests/test_agent_harness.py::test_generation_feedback_routes_to_decision_and_provider_checks[src/ai_video/production/generation_execution.py]
+0.13s call     tests/test_agent_harness.py::test_visual_quality_changes_require_executable_gate_checks[configs/visual-quality/ninebot.json]
+0.13s call     tests/test_agent_harness.py::test_product_runtime_paths_select_agent_skill_boundary_guard[tests/test_runtime_skill_boundary.py]
+0.12s call     tests/test_docs_contract_gate.py::test_current_complete_registry_passes
+0.11s call     tests/test_agent_harness.py::test_commit_range_receipt_becomes_stale_after_new_staged_edit
+
+(5 durations < 0.1s hidden.)
+324 passed, 2 warnings in 16.50s
+[harness] START agent_rule_invariants timeout=900s
+[harness] FAILED agent_rule_invariants duration=4.124s
+...........................................F                             [100%]
+=================================== FAILURES ===================================
+__ test_close_retains_exact_request_history_budget_and_replays_without_writes __
+
+tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2057/test_close_retains_exact_reque0')
+
+    def test_close_retains_exact_request_history_budget_and_replays_without_writes(tmp_path):
+>       writer, _, _, prior = _pending(tmp_path)
+                              ^^^^^^^^^^^^^^^^^^
+
+tests/test_production_video_unsubmitted.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_production_paid_submit_quota.py:441: in _pending
+    _, provider, resolved, committer = e2e._reach_fetch(tmp_path, activate_second_shot=True)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_production_generated_video_e2e.py:955: in _reach_fetch
+    inputs, provider, resolved, execution_binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+project = None, commercial_binding = None
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -> None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+>           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError
+=========================== short test summary info ============================
+FAILED tests/test_production_video_unsubmitted.py::test_close_retains_exact_request_history_budget_and_replays_without_writes
+1 failed, 43 passed in 3.37s
+{"receipt": ".agent/harness/runs/iris-mapping-related-r4-20261030/receipt.json", "status": "failed"}

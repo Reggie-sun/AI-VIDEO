@@ -1,0 +1,14 @@
+{
+  "source_sha256": "e89ff4fb11b06423e6b40a714a2106d827b0236a77283a7c1bd493ffcdc80c18",
+  "sample_rate": 48000,
+  "channels": 2,
+  "frames": 1440000,
+  "duration_seconds": 30.0,
+  "native_spoken_seconds": 25.175,
+  "padding_seconds": 4.824999999999999,
+  "speed": 1.0,
+  "waveform_time_stretch": false,
+  "returned_graphemes_equal_original_body": true,
+  "full_decode": "PASS",
+  "human_hearing": "NOT_EVALUATED"
+}

@@ -1,0 +1,10 @@
+{
+  "isError": false,
+  "result": {
+    "error": "invalid_response",
+    "outcome": "EVIDENCE_GAP",
+    "message": "The audio analyzer response has an invalid shape.",
+    "retryable": false,
+    "production_acceptance": "NOT_EVALUATED"
+  }
+}

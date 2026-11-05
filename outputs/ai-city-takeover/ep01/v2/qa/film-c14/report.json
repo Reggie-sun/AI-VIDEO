@@ -1,0 +1,765 @@
+{
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c14.mp4",
+ "spec": {
+  "size": [
+   1920,
+   1080
+  ],
+  "fps": "30/1",
+  "frames": 915,
+  "pix_fmt": "yuv420p",
+  "color": [
+   "bt709",
+   "bt709",
+   "bt709",
+   "tv"
+  ],
+  "video_kbps": 65555,
+  "audio": {
+   "codec": "aac",
+   "rate": "48000",
+   "ch": 2
+  },
+  "duration": 30.522,
+  "video_duration": 30.5
+ },
+ "sync": [
+  {
+   "id": "cut_S2",
+   "what": "cut to S2",
+   "key": "",
+   "t": 2.8667,
+   "expected_frame": 86,
+   "detected_frame": 86,
+   "offset_frames": 0,
+   "strength": 63.68,
+   "pass": true
+  },
+  {
+   "id": "cut_S3",
+   "what": "cut to S3",
+   "key": "",
+   "t": 4.8,
+   "expected_frame": 144,
+   "detected_frame": 144,
+   "offset_frames": 0,
+   "strength": 36.4,
+   "pass": true
+  },
+  {
+   "id": "cut_S4",
+   "what": "cut to S4",
+   "key": "",
+   "t": 8.1333,
+   "expected_frame": 244,
+   "detected_frame": 244,
+   "offset_frames": 0,
+   "strength": 29.91,
+   "pass": true
+  },
+  {
+   "id": "cut_S5",
+   "what": "cut to S5",
+   "key": "",
+   "t": 11.4667,
+   "expected_frame": 344,
+   "detected_frame": 344,
+   "offset_frames": 0,
+   "strength": 46.85,
+   "pass": true
+  },
+  {
+   "id": "cut_S6",
+   "what": "cut to S6",
+   "key": "",
+   "t": 13.3667,
+   "expected_frame": 401,
+   "detected_frame": 401,
+   "offset_frames": 0,
+   "strength": 36.43,
+   "pass": true
+  },
+  {
+   "id": "cut_S7",
+   "what": "cut to S7",
+   "key": "",
+   "t": 14.8,
+   "expected_frame": 444,
+   "detected_frame": 444,
+   "offset_frames": 0,
+   "strength": 61.01,
+   "pass": true
+  },
+  {
+   "id": "cut_S8a",
+   "what": "cut to S8a",
+   "key": "",
+   "t": 18.8667,
+   "expected_frame": 566,
+   "detected_frame": 566,
+   "offset_frames": 0,
+   "strength": 47.69,
+   "pass": true
+  },
+  {
+   "id": "cut_S8b",
+   "what": "cut to S8b",
+   "key": "",
+   "t": 22.5667,
+   "expected_frame": 677,
+   "detected_frame": 677,
+   "offset_frames": 0,
+   "strength": 55.65,
+   "pass": true
+  },
+  {
+   "id": "cut_S9a",
+   "what": "cut to S9a",
+   "key": "",
+   "t": 25.9,
+   "expected_frame": 777,
+   "detected_frame": 777,
+   "offset_frames": 0,
+   "strength": 33.73,
+   "pass": true
+  },
+  {
+   "id": "cut_S9b",
+   "what": "cut to S9b",
+   "key": "",
+   "t": 28.3,
+   "expected_frame": 849,
+   "detected_frame": 849,
+   "offset_frames": 0,
+   "strength": 50.83,
+   "pass": true
+  },
+  {
+   "id": "cut_S3d",
+   "what": "cut to S3d",
+   "key": "",
+   "t": 7.1,
+   "expected_frame": 213,
+   "detected_frame": 213,
+   "offset_frames": 0,
+   "strength": 26.13,
+   "pass": true
+  },
+  {
+   "id": "cut_S4c",
+   "what": "cut to S4c",
+   "key": "",
+   "t": 9.7333,
+   "expected_frame": 292,
+   "detected_frame": 292,
+   "offset_frames": 0,
+   "strength": 61.5,
+   "pass": true
+  },
+  {
+   "id": "cut_S5d",
+   "what": "cut to S5d",
+   "key": "",
+   "t": 12.1,
+   "expected_frame": 363,
+   "detected_frame": 363,
+   "offset_frames": 0,
+   "strength": 55.75,
+   "pass": true
+  },
+  {
+   "id": "cut_S9h",
+   "what": "cut to S9h",
+   "key": "",
+   "t": 29.1333,
+   "expected_frame": 874,
+   "detected_frame": 874,
+   "offset_frames": 0,
+   "strength": 39.32,
+   "pass": true
+  },
+  {
+   "id": "cut_S9b2",
+   "what": "cut to S9b2",
+   "key": "",
+   "t": 29.7333,
+   "expected_frame": 892,
+   "detected_frame": 892,
+   "offset_frames": 0,
+   "strength": 41.16,
+   "pass": true
+  },
+  {
+   "id": "cut_S8e",
+   "what": "cut to S8e",
+   "key": "",
+   "t": 21.3667,
+   "expected_frame": 641,
+   "detected_frame": 641,
+   "offset_frames": 0,
+   "strength": 62.73,
+   "pass": true
+  },
+  {
+   "id": "cut_S8a2",
+   "what": "cut to S8a2",
+   "key": "",
+   "t": 21.8667,
+   "expected_frame": 656,
+   "detected_frame": 656,
+   "offset_frames": 0,
+   "strength": 61.17,
+   "pass": true
+  },
+  {
+   "id": "cut_S8b_x",
+   "what": "cut to S8b_x",
+   "key": "",
+   "t": 24.0667,
+   "expected_frame": 722,
+   "detected_frame": 722,
+   "offset_frames": 0,
+   "strength": 57.08,
+   "pass": true
+  },
+  {
+   "id": "cut_S8w",
+   "what": "cut to S8w",
+   "key": "",
+   "t": 24.7333,
+   "expected_frame": 742,
+   "detected_frame": 742,
+   "offset_frames": 0,
+   "strength": 56.85,
+   "pass": true
+  },
+  {
+   "id": "cut_S8b_x2",
+   "what": "cut to S8b_x2",
+   "key": "",
+   "t": 25.1667,
+   "expected_frame": 755,
+   "detected_frame": 755,
+   "offset_frames": 0,
+   "strength": 51.88,
+   "pass": true
+  },
+  {
+   "id": "cut_N1",
+   "what": "insert N1 (take N1)",
+   "key": "",
+   "t": 3.8333,
+   "expected_frame": 115,
+   "detected_frame": 115,
+   "offset_frames": 0,
+   "strength": 47.51,
+   "pass": true
+  },
+  {
+   "id": "cut_I1",
+   "what": "insert I1 (take S9a)",
+   "key": "",
+   "t": 4.3333,
+   "expected_frame": 130,
+   "detected_frame": 130,
+   "offset_frames": 0,
+   "strength": 34.09,
+   "pass": true
+  },
+  {
+   "id": "cut_I3",
+   "what": "insert I3 (take S9a)",
+   "key": "",
+   "t": 8.6,
+   "expected_frame": 258,
+   "detected_frame": 258,
+   "offset_frames": 0,
+   "strength": 27.12,
+   "pass": true
+  },
+  {
+   "id": "cut_I3_back",
+   "what": "back from insert I3",
+   "key": "",
+   "t": 9.0333,
+   "expected_frame": 271,
+   "detected_frame": 271,
+   "offset_frames": 0,
+   "strength": 31.36,
+   "pass": true
+  },
+  {
+   "id": "cut_I4",
+   "what": "insert I4 (take S3)",
+   "key": "",
+   "t": 15.0333,
+   "expected_frame": 451,
+   "detected_frame": 451,
+   "offset_frames": 0,
+   "strength": 46.4,
+   "pass": true
+  },
+  {
+   "id": "cut_I4_back",
+   "what": "back from insert I4",
+   "key": "",
+   "t": 15.5333,
+   "expected_frame": 466,
+   "detected_frame": 466,
+   "offset_frames": 0,
+   "strength": 44.04,
+   "pass": true
+  },
+  {
+   "id": "cut_N4",
+   "what": "insert N4 (take N4)",
+   "key": "",
+   "t": 16.9,
+   "expected_frame": 507,
+   "detected_frame": 507,
+   "offset_frames": 0,
+   "strength": 43.65,
+   "pass": true
+  },
+  {
+   "id": "cut_N4_back",
+   "what": "back from insert N4",
+   "key": "",
+   "t": 17.6667,
+   "expected_frame": 530,
+   "detected_frame": 530,
+   "offset_frames": 0,
+   "strength": 53.92,
+   "pass": true
+  },
+  {
+   "id": "cut_N3",
+   "what": "insert N3 (take N3)",
+   "key": "",
+   "t": 25.5,
+   "expected_frame": 765,
+   "detected_frame": 765,
+   "offset_frames": 0,
+   "strength": 67.43,
+   "pass": true
+  },
+  {
+   "id": "cut_I7",
+   "what": "insert I7 (still P8c)",
+   "key": "",
+   "t": 26.2333,
+   "expected_frame": 787,
+   "detected_frame": 787,
+   "offset_frames": 0,
+   "strength": 50.3,
+   "pass": true
+  },
+  {
+   "id": "cut_I7_back",
+   "what": "back from insert I7",
+   "key": "",
+   "t": 26.7,
+   "expected_frame": 801,
+   "detected_frame": 801,
+   "offset_frames": 0,
+   "strength": 51.84,
+   "pass": true
+  },
+  {
+   "id": "chorus_impact",
+   "what": "impact on the chorus entry hit (picture one frame early)",
+   "key": "",
+   "t": 19.0667,
+   "expected_frame": 572,
+   "detected_frame": 571,
+   "offset_frames": -1,
+   "strength": 23.88,
+   "pass": true
+  },
+  {
+   "id": "s1_timecode",
+   "what": "03:47 lands on beat 1",
+   "key": "",
+   "t": 0.5,
+   "expected_frame": 15,
+   "detected_frame": 15,
+   "offset_frames": 0,
+   "strength": 48.41,
+   "pass": true
+  },
+  {
+   "id": "s2_title",
+   "what": "title slams in with the cut",
+   "key": "",
+   "t": 2.8667,
+   "expected_frame": 86,
+   "detected_frame": 86,
+   "offset_frames": 0,
+   "strength": 48.56,
+   "pass": true
+  },
+  {
+   "id": "s2_date",
+   "what": "incident date OSD on 'September'",
+   "key": "",
+   "t": 3.8333,
+   "expected_frame": 115,
+   "detected_frame": 115,
+   "offset_frames": 0,
+   "strength": 34.16,
+   "pass": true
+  },
+  {
+   "id": "s3_model",
+   "what": "研究模型 on 'training'",
+   "key": "",
+   "t": 5.0667,
+   "expected_frame": 152,
+   "detected_frame": 152,
+   "offset_frames": 0,
+   "strength": 37.98,
+   "pass": true
+  },
+  {
+   "id": "s3_resolver",
+   "what": "DNS 解析器 on 'resolver'",
+   "key": "",
+   "t": 6.1,
+   "expected_frame": 183,
+   "detected_frame": 184,
+   "offset_frames": 1,
+   "strength": 5.54,
+   "pass": true
+  },
+  {
+   "id": "s3d_error",
+   "what": "resolver node turns red on 'misconfigured'",
+   "key": "",
+   "t": 7.1667,
+   "expected_frame": 215,
+   "detected_frame": 214,
+   "offset_frames": -1,
+   "strength": 16.16,
+   "pass": true
+  },
+  {
+   "id": "s4_reach",
+   "what": "the probe breaches the glass on 'reached'",
+   "key": "",
+   "t": 9.8333,
+   "expected_frame": 295,
+   "detected_frame": 295,
+   "offset_frames": 0,
+   "strength": 2.49,
+   "pass": true
+  },
+  {
+   "id": "s5d_count",
+   "what": "the eleven-day count starts on 'Eleven'",
+   "key": "",
+   "t": 12.1667,
+   "expected_frame": 365,
+   "detected_frame": 365,
+   "offset_frames": 0,
+   "strength": 31.71,
+   "pass": true
+  },
+  {
+   "id": "s5_window",
+   "what": "far window lights on 'around'",
+   "key": "",
+   "t": 11.5333,
+   "expected_frame": 346,
+   "detected_frame": 347,
+   "offset_frames": 1,
+   "strength": 4.35,
+   "pass": true
+  },
+  {
+   "id": "s6_pause",
+   "what": "最强模型训练 暂停 11 天",
+   "key": "",
+   "t": 13.4,
+   "expected_frame": 402,
+   "detected_frame": 402,
+   "offset_frames": 0,
+   "strength": 70.19,
+   "pass": true
+  },
+  {
+   "id": "s7_offline",
+   "what": "离线 with the cut",
+   "key": "",
+   "t": 14.8,
+   "expected_frame": 444,
+   "detected_frame": 444,
+   "offset_frames": 0,
+   "strength": 74.68,
+   "pass": true
+  },
+  {
+   "id": "s9a_shut",
+   "what": "door shut, 已修复 tag",
+   "key": "",
+   "t": 28.2,
+   "expected_frame": 846,
+   "detected_frame": 847,
+   "offset_frames": 1,
+   "strength": 71.07,
+   "pass": true
+  },
+  {
+   "id": "s9b_redteam",
+   "what": "另一项红队测试",
+   "key": "",
+   "t": 28.3333,
+   "expected_frame": 850,
+   "detected_frame": 851,
+   "offset_frames": 1,
+   "strength": 40.02,
+   "pass": true
+  },
+  {
+   "id": "s9b_card",
+   "what": "03:48 card",
+   "key": "",
+   "t": 30.1,
+   "expected_frame": 903,
+   "detected_frame": 903,
+   "offset_frames": 0,
+   "strength": 21.71,
+   "pass": true
+  },
+  {
+   "id": "k_still",
+   "what": "STILL on 'still'",
+   "key": "",
+   "t": 14.0667,
+   "expected_frame": 422,
+   "detected_frame": 422,
+   "offset_frames": 0,
+   "strength": 48.2,
+   "pass": true
+  },
+  {
+   "id": "k_offline",
+   "what": "OFFLINE on 'offline'",
+   "key": "",
+   "t": 15.6667,
+   "expected_frame": 470,
+   "detected_frame": 470,
+   "offset_frames": 0,
+   "strength": 79.64,
+   "pass": true
+  },
+  {
+   "id": "s9a_invert",
+   "what": "white-ground inversion on the beat of 'The door'",
+   "key": "",
+   "t": 27.1667,
+   "expected_frame": 815,
+   "detected_frame": 815,
+   "offset_frames": 0,
+   "strength": 162.72,
+   "pass": true
+  },
+  {
+   "id": "s9a_invert_end",
+   "what": "back to the dark ground 1.5 beats later",
+   "key": "",
+   "t": 27.9,
+   "expected_frame": 837,
+   "detected_frame": 837,
+   "offset_frames": 0,
+   "strength": 165.16,
+   "pass": true
+  },
+  {
+   "id": "k_closed",
+   "what": "CLOSED on 'closed' (inverted ground)",
+   "key": "",
+   "t": 27.5333,
+   "expected_frame": 826,
+   "detected_frame": 826,
+   "offset_frames": 0,
+   "strength": 78.38,
+   "pass": true
+  }
+ ],
+ "flash": {
+  "transitions": [
+   [
+    86,
+    -1
+   ],
+   [
+    292,
+    1
+   ],
+   [
+    344,
+    -1
+   ],
+   [
+    363,
+    -1
+   ],
+   [
+    530,
+    -1
+   ],
+   [
+    566,
+    1
+   ],
+   [
+    641,
+    1
+   ],
+   [
+    656,
+    1
+   ],
+   [
+    677,
+    -1
+   ],
+   [
+    722,
+    -1
+   ],
+   [
+    742,
+    1
+   ],
+   [
+    755,
+    -1
+   ],
+   [
+    765,
+    -1
+   ],
+   [
+    787,
+    1
+   ],
+   [
+    801,
+    -1
+   ],
+   [
+    815,
+    1
+   ],
+   [
+    837,
+    -1
+   ]
+  ],
+  "flashes": [
+   292,
+   566,
+   677,
+   742,
+   787,
+   815
+  ],
+  "max_flashes_per_s": 2,
+  "pass": true,
+  "single_frame_pops": []
+ },
+ "strobe_cells": [],
+ "outlier_frames": [],
+ "motion_per_bar": [
+  {
+   "bar": 1,
+   "t0": 0.035,
+   "motion": 2.226
+  },
+  {
+   "bar": 2,
+   "t0": 1.916,
+   "motion": 4.191
+  },
+  {
+   "bar": 3,
+   "t0": 3.82,
+   "motion": 3.322
+  },
+  {
+   "bar": 4,
+   "t0": 5.724,
+   "motion": 2.815
+  },
+  {
+   "bar": 5,
+   "t0": 7.628,
+   "motion": 3.013
+  },
+  {
+   "bar": 6,
+   "t0": 9.532,
+   "motion": 3.074
+  },
+  {
+   "bar": 7,
+   "t0": 11.436,
+   "motion": 3.659
+  },
+  {
+   "bar": 8,
+   "t0": 13.351,
+   "motion": 3.482
+  },
+  {
+   "bar": 9,
+   "t0": 15.255,
+   "motion": 4.16
+  },
+  {
+   "bar": 10,
+   "t0": 17.16,
+   "motion": 4.884
+  },
+  {
+   "bar": 11,
+   "t0": 19.064,
+   "motion": 3.4
+  },
+  {
+   "bar": 12,
+   "t0": 20.979,
+   "motion": 5.431
+  },
+  {
+   "bar": 13,
+   "t0": 22.872,
+   "motion": 8.327
+  },
+  {
+   "bar": 14,
+   "t0": 24.776,
+   "motion": 7.266
+  },
+  {
+   "bar": 15,
+   "t0": 26.68,
+   "motion": 7.924
+  },
+  {
+   "bar": 16,
+   "t0": 28.584,
+   "motion": 2.808
+  }
+ ],
+ "verdicts": {
+  "spec": true,
+  "sync": true,
+  "flash": true,
+  "frames_match_comp": true,
+  "pops": true,
+  "strobe": true,
+  "outliers": true
+ }
+}

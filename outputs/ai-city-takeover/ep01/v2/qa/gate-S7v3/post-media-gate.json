@@ -1,0 +1,46 @@
+{
+ "schema": "iris-v2-post-media-gate/1",
+ "unit": "S7v3",
+ "shot_id": "ep01v2-s7",
+ "attempt_id": "iris-s7v3-source-001",
+ "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+ "artifact_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21",
+ "intent": "v3: in the cache room her eyes follow a sliding pane to frame-left, a faint knowing coldness, then back to the lens (K7 start frame, P7 expression reference)",
+ "source_audio_policy": "MUTE (final film uses the approved song v2)",
+ "evidence": {
+  "mcp_video_probe": "1920x1080, 6.08 s, 145 frames, h264, aac stereo; dreamina AIGC metadata",
+  "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S7v3/mcp-frame-*.jpg, mcp-sheet.jpg",
+  "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 0.0 s, issues []",
+  "performance": "qa/gate-S7v3/face-follow.jpg, quarter-second-sheet.jpg",
+  "camera": "visual: her scale and place in frame hold across the 24 quarter-second frames (no push, no pan); qa/region_drift.py on her coat 700,880,1260,1080 moves up to ~15 px at low response (0.35-0.46) as she turns, which is body motion; the sliding panes rule out a background measurement"
+ },
+ "required_findings": [
+  {
+   "requirement_id": "identity",
+   "verdict": "PASS",
+   "reason": "same IRIS face, black hook on the left ear, thin red line on the left collar, charcoal high collar, slicked-back hair"
+  },
+  {
+   "requirement_id": "follow-and-return",
+   "verdict": "PASS",
+   "reason": "looks into the lens 0-1.0 s; a large pane slides to frame-left and her eyes and head follow it from about 1.15 s (turned by 1.4 s); a faint knowing half-smile while she watches; turns back from about 4.6 s and is on the lens by 5.0-5.2 s; lips closed, no speech (Whisper 0.0 s)"
+  },
+  {
+   "requirement_id": "locked-camera-no-readable-panes",
+   "verdict": "PASS",
+   "reason": "framing held (see camera evidence); panes carry light texture only, nothing readable"
+  },
+  {
+   "requirement_id": "no-new-graphics",
+   "verdict": "PASS",
+   "reason": "platform AI mark kept top-left; no added text or interface"
+  }
+ ],
+ "edit_note": "in-point 1.4: window clip 1.4-5.47; she is just turned to the panes at the cut (14.8 s), watches through 'offline world', starts back at clip 4.6 = master 18.0 s ('cached') and is on the lens by about 18.4 s",
+ "verdict": "PASS",
+ "all_required_observed_pass": true,
+ "not_evaluated": [
+  "human 1.0x viewing in the assembled film"
+ ],
+ "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

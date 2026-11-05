@@ -1,0 +1,26 @@
+{
+  "scope": "typed authoring draft only",
+  "typed_scene_shot_character_qa_registry": true,
+  "source_hashes_match_user_approved_package": true,
+  "registered_source_count": 3,
+  "provider_selected_source_count": 2,
+  "natural_lips_no_continuous_speech_or_device_operation": true,
+  "monitor_back_preserved": true,
+  "source_nominal_window_seconds": 6,
+  "source_audio_final_mute": true,
+  "exact_native_order": "NOT_EVALUATED until canonical authoring and resolved_request.image_bindings",
+  "expected_order_to_verify": [
+    "iris-c-interior",
+    "iris-cf-details"
+  ],
+  "runtime_preview_approval_payload_valid": true,
+  "runtime_preview_approval_adopted": false,
+  "previous_shot_gate": "canonical A01-v2 Gate must PASS before materialize apply or new submit",
+  "parent_source_project": "../a01-first-frame-repair/project",
+  "parent_attempt": "iris-ep01-a01-two-reference-repair-002",
+  "ai_label_allowed": true,
+  "no_extra_required_pixel_breathing_or_blink_measurement": true,
+  "canonical_project_mutations": 0,
+  "provider_calls": 0,
+  "actual_quality": "NOT_EVALUATED"
+}

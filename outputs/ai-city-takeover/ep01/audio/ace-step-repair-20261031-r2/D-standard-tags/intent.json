@@ -1,0 +1,43 @@
+{
+  "schema": "local-song-repair-unit/1",
+  "series_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/series-intent.json",
+  "series_intent_sha256": "3a68073421b0389db994a322c7fccdf8d4ff1d071fd33567c7848196619c8b8e",
+  "label": "D",
+  "cumulative_attempt_ordinal": 4,
+  "runtime_root": "/home/reggie/.local/share/ai-video/ace-step/runtime-ca1e85fe",
+  "code_sha": "ca1e85fe9430179831e6bc6be790c332190a3866",
+  "weights_revision": "19671f406d603126926c1b7e2adc169acbcade22",
+  "weights_manifest_path": "/home/reggie/.local/share/ai-video/ace-step/weights-manifest.json",
+  "inputs_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/D-standard-tags/inputs.json",
+  "inputs_sha256": "c875eb4868a74ff714024ce678a31f7023605b7e98f6a7da5104fafd804dbf19",
+  "predecessor_results": [
+    {
+      "result_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/C-direct-dit/result.json",
+      "result_sha256": "6a27519848801377b6b879b39c49b31e3891738b51fc04fd0d49925a93231898",
+      "success": true,
+      "artifact_sha256": "7142d8cf2f6af2b5a67380bf36e115002e3cb85517dc0fe8487fb6b8fe7ddac4"
+    }
+  ],
+  "selected_dit": "acestep-v15-turbo",
+  "use_lm": false,
+  "source_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "source_intent_sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+  "original_lyrics_sha256": "179b2bc93c75f4767837f0e09df6eb47ebaadc94a7f2134706fd835b7dbb57fe",
+  "lyrics_adaptation": "Only standard section labels and short phrase line breaks; all spoken words, punctuation and order exactly match original",
+  "planned_param_diff_from_B": {
+    "thinking": {
+      "before": true,
+      "after": false
+    },
+    "lyric_section_labels_and_wrapping": "normalized; performance directions moved to caption without deleting meaning"
+  },
+  "automatic_retries": 0,
+  "output_count": 1,
+  "production_state_writes": 0,
+  "created_at_utc": "2026-10-31T04:56:17.735900+00:00",
+  "runner_sha256": "928429f0e71fdd445c90b50613db2b051455e091e88f40b9461c9bbb0b9e8af7",
+  "planned_param_diff_from_C": {
+    "lyrics": "standard labels and short phrase wrapping",
+    "caption": "append original section performance directions removed from labels"
+  }
+}

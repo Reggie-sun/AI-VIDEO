@@ -1,0 +1,61 @@
+artifact_id: iris-v2-s9a-project
+artifacts:
+  brief:
+    artifact_id: iris-v2-s9a-brief
+    content_hash: 09aff77f3080e2bd1010e81f1cdc50b015366697de477c8e06b6754ffa6a2e97
+    path: creative/iris-v2-s9a-brief/09aff77f3080e2bd1010e81f1cdc50b015366697de477c8e06b6754ffa6a2e97.yaml
+    revision: 1
+  characters: []
+  scenes:
+  - artifact_id: iris-v2-s9a-scene
+    content_hash: 778ab60d8a1bb68d0b6818fee8ff5b495b009e929216bea8213c4f0ccb15ec48
+    path: creative/iris-v2-s9a-scene/778ab60d8a1bb68d0b6818fee8ff5b495b009e929216bea8213c4f0ccb15ec48.yaml
+    revision: 1
+  shots:
+  - artifact_id: iris-v2-s9a-shot
+    content_hash: 4defeb8c2298168cb036704da817c2525c2962e3ad3c9978d58660fa3f6821f1
+    path: creative/iris-v2-s9a-shot/4defeb8c2298168cb036704da817c2525c2962e3ad3c9978d58660fa3f6821f1.yaml
+    revision: 1
+  story:
+    artifact_id: iris-v2-s9a-story
+    content_hash: 5c325440938892b67ec109f4d73161772c1300077446ee551bef693389919a4b
+    path: creative/iris-v2-s9a-story/5c325440938892b67ec109f4d73161772c1300077446ee551bef693389919a4b.yaml
+    revision: 1
+  storyboard:
+    artifact_id: iris-v2-s9a-storyboard
+    content_hash: 0345933553a6339a9835e532a8578639c488a674fd143d3c520b3501b4fb54ed
+    path: creative/iris-v2-s9a-storyboard/0345933553a6339a9835e532a8578639c488a674fd143d3c520b3501b4fb54ed.yaml
+    revision: 1
+asset_root: assets/files
+content_hash: d160aab4aaaececdb774077d5c15bafad5ce1f61473df1e5cfcc1cf00ac28039
+creation_receipt_id: iris-v2-s9a-authoring
+default_language: zh
+delivery_profile:
+  codec_profile: h264
+  fps: 30
+  height: 1080
+  width: 1920
+project_id: iris-v2-s9a-source
+renderer_policy:
+  allowed:
+  - hyperframes
+  default_preference: hyperframes
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 4b80e9faf55ce864802a67ac872efa9a62ed3568073df56c153afa1a9ca4f8f8
+  kind: user_input
+  reference: evidence/authoring-input/4b80e9faf55ce864802a67ac872efa9a62ed3568073df56c153afa1a9ca4f8f8.json
+- content_hash: 7cdd3a65989ac64e2b1de4921d9ecb80d84fdacedef6552f251270e13d2caaeb
+  kind: user_input
+  reference: evidence/authoring-input/7cdd3a65989ac64e2b1de4921d9ecb80d84fdacedef6552f251270e13d2caaeb.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 53d1b791e5c37796a532d12e9a9c5e85a7d26fe2107114522e9e2a070e0557ed
+  kind: user_input
+  reference: evidence/authoring-input/53d1b791e5c37796a532d12e9a9c5e85a7d26fe2107114522e9e2a070e0557ed.json
+- content_hash: 352d0de44736cd78a9a6292243c73ce2eb92e98f0d07d22f9178925a4305a3c5
+  kind: user_input
+  reference: evidence/authoring-input/352d0de44736cd78a9a6292243c73ce2eb92e98f0d07d22f9178925a4305a3c5.json
+title: IRIS EP01 v2 S9a source

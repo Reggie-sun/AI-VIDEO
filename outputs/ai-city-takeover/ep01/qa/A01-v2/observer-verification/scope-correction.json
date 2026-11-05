@@ -1,0 +1,26 @@
+{
+  "unchanged_media_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+  "unchanged_qa_policy_hash": "657747bc189c9de527c836585be7b34990683c3a2d2a9844269c30aff25737d9",
+  "changed": "interpretation of the existing selected QA only, not criteria or source bytes",
+  "initial_report_archive": "observations-initial-overstrict-scope.json",
+  "initial_archive_sha256": "11d178f4523d9be024645766fe06209d1f3175df4ee43bf07006bf0b36dabef1",
+  "corrections": [
+    {
+      "requirement_id": "camera-space",
+      "from": "FAIL",
+      "to": "PASS",
+      "reason": "Initial assessment added an unsupported pixel-exact size gate to a multimodal semantic framing observable. Actual frontal head-chest framing, screen relation, axis and micro move are preserved."
+    },
+    {
+      "requirement_id": "quiet-observer",
+      "from": "NOT_EVALUATED",
+      "to": "PASS",
+      "reason": "Initial assessment promoted natural micro-motion wording and an unsealed wind/physiological inference into separate mandatory measurable events. Current observable requires natural resting lips/quiet micro state and prohibits speech articulation, turn and hand raise; those are observed."
+    }
+  ],
+  "no_media_edit": true,
+  "no_qa_policy_edit": true,
+  "no_canonical_state_write": true,
+  "new_provider_calls": 0,
+  "no_claim_of_human_acceptance": true
+}

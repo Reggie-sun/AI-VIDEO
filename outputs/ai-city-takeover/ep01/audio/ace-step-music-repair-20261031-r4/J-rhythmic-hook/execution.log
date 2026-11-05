@@ -1,0 +1,6 @@
+2026-10-31 04:54:15.910 | DEBUG    | acestep.core.generation.handler.init_service_memory_basic:_apply_malloc_mmap_threshold:50 - [memory] Set M_MMAP_THRESHOLD=131072 for immediate OS reclaim of large frees
+2026-10-31 04:54:18.226 | WARNING  | acestep.training.trainer:<module>:40 - bitsandbytes not installed. Using standard AdamW.
+{"event": "initializing", "label": "J", "role": "sung_hook"}
+{"event": "generation_started", "ordinal": 10}
+  0%|          | 0/50 [00:00<?, ?it/s]  2%|▏         | 1/50 [00:00<00:06,  7.55it/s] 12%|█▏        | 6/50 [00:00<00:01, 27.32it/s] 22%|██▏       | 11/50 [00:00<00:01, 34.09it/s] 32%|███▏      | 16/50 [00:00<00:00, 37.42it/s] 42%|████▏     | 21/50 [00:00<00:00, 38.85it/s] 52%|█████▏    | 26/50 [00:00<00:00, 40.12it/s] 62%|██████▏   | 31/50 [00:00<00:00, 40.69it/s] 72%|███████▏  | 36/50 [00:00<00:00, 41.55it/s] 82%|████████▏ | 41/50 [00:01<00:00, 40.59it/s] 92%|█████████▏| 46/50 [00:01<00:00, 41.46it/s]100%|██████████| 50/50 [00:01<00:00, 38.74it/s]
+{"event": "finished", "success": true, "outputs": [{"path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/J-rhythmic-hook/18c8d67e-febf-8b54-7ad3-396ef96c09fd.wav", "sha256": "73df84b0f979a5ede0082918589a65855e75154ec8ba553ecf58ee68744afd76", "bytes": 1920044}]}

@@ -1,0 +1,2026 @@
+{
+ "schema": "iris-ep01-v3-shots-map/1",
+ "board": "v2-a2",
+ "chrome": {
+  "corner_marks": true,
+  "top_left": "IRIS · EP01",
+  "counter": [
+   {
+    "from": 0.0,
+    "text": "DAY 00 / 11"
+   },
+   {
+    "from": 92.43,
+    "text": "DAY 11 / 11"
+   }
+  ],
+  "top_right": [
+   {
+    "from": 0.0,
+    "text": "LOOKED OUTSIDE · IRIS CLOCK 03:46"
+   },
+   {
+    "from": 10.133,
+    "text": "LOOKED OUTSIDE · IRIS CLOCK 03:47"
+   },
+   {
+    "from": 249.85,
+    "text": "LOOKED OUTSIDE · IRIS CLOCK 03:48"
+   }
+  ],
+  "ticker": [
+   "SEP 20, 2026 · AN INTERNAL RESEARCH MODEL IN RL TRAINING · A DNS CONTROL GAP · LIMITED LIVE ACCESS TO AN EXTERNAL CHATBOT",
+   "RELATED WORK ON THE STRONGEST MODELS PAUSED 11 DAYS · RESUMED OCT 01 · FRONTIER TRAINING NOW RUNS OFFLINE ON INDEXED, CACHED PAGES",
+   "A SEPARATE, CONTROLLED RED-TEAM TEST · AGENTS PASSED MESSAGES THROUGH PROCESSOR-CACHE TIMING · CHANNEL PATCHED · CONTROLS AND MONITORING ADDED",
+   "SOURCES: OPENAI · AN AGENT USED DNS TO REACH AN EXTERNAL CHATBOT (2026-09-25) · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT (2026-10-23)",
+   "IRIS IS A FICTIONAL NARRATOR · IRIS CLOCK IS SERIES TIME, NOT EVENT TIME"
+  ],
+  "dim_units": [
+   "U041",
+   "U042",
+   "U060",
+   "U061",
+   "U062",
+   "U063",
+   "U064",
+   "U065"
+  ],
+  "no_ticker_units": [
+   "U083"
+  ]
+ },
+ "song": "ep01/v2/song-v3/IRIS-01-T4.wav",
+ "duration": 261.56,
+ "paths_relative_to": "outputs/ai-city-takeover",
+ "shots": [
+  {
+   "unit": "U001",
+   "t0": 0.0,
+   "t1": 4.2,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "push_in",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_power_on+osd_zoombox",
+   "graphic_text": "HALL 07 · CAM 03",
+   "graphic_note": "0.49 s 冲击通电，电子变焦推向一排",
+   "objective": "立规则：被看管的副本大厅"
+  },
+  {
+   "unit": "U002",
+   "t0": 4.2,
+   "t1": 7.92,
+   "lyric": "（器乐，6.66 s 落点）",
+   "voice": "",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "truck",
+   "camera_move": "lateral truck 8%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-row-lit-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "light_flicker_on",
+   "graphic_text": "",
+   "graphic_note": "沿一排横移；6.66 s 立领灯线闪两下亮成信号红，之前红色压成灰",
+   "objective": "异常在画面里发生（不是孤立插入）",
+   "cue_s": 6.664
+  },
+  {
+   "unit": "U003",
+   "t0": 7.92,
+   "t1": 9.76,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_detect_one",
+   "graphic_text": "ANOMALY 1 / 4096",
+   "graphic_note": "识别框扑上方阵里的一点红",
+   "objective": "系统看见了",
+   "target": [
+    0.56,
+    0.52
+   ]
+  },
+  {
+   "unit": "U004",
+   "t0": 9.76,
+   "t1": 13.48,
+   "lyric": "Three forty-seven.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "flipclock_0346_0347+lyric_word",
+   "graphic_text": "03:46 → 03:47 · IRIS CLOCK",
+   "graphic_note": "念到 forty-seven 时翻定；下方小字 IRIS CLOCK（系列时间，不是事件时间）",
+   "objective": "念白给时间，画面同时给时间",
+   "cue_s": 10.12
+  },
+  {
+   "unit": "U005",
+   "t0": 13.48,
+   "t1": 17.19,
+   "lyric": "Somewhere,",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "push_in",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-eyes-closed-a.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-headturn-b.png",
+     "from": 0.31
+    }
+   ],
+   "graphic": "lyric_word",
+   "graphic_text": "",
+   "graphic_note": "Somewhere 时睁眼并抬眼看镜头，同一人不切走",
+   "objective": "「one of us」就是刚才亮灯的她"
+  },
+  {
+   "unit": "U006",
+   "t0": 17.19,
+   "t1": 20.94,
+   "lyric": "one of us woke up.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-step-out-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_word+pulse_on_beat",
+   "graphic_text": "",
+   "graphic_note": "19.06 s 冲击她迈出一步",
+   "objective": "唯一在动的人",
+   "cue_s": 19.064
+  },
+  {
+   "unit": "U007",
+   "t0": 20.94,
+   "t1": 24.73,
+   "lyric": "（尾音）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "tracking",
+   "camera_move": "pan 6-10% of width",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_track_one",
+   "graphic_text": "ACTIVE 1",
+   "graphic_note": "识别框跟着她移出方阵",
+   "objective": "系统确认她在动",
+   "target": [
+    0.56,
+    0.52
+   ]
+  },
+  {
+   "unit": "U008",
+   "t0": 24.73,
+   "t1": 26.61,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-turn-door-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "",
+   "graphic_text": "",
+   "graphic_note": "她转头看向走道尽头的红缝",
+   "objective": "她要去哪里：那扇门"
+  },
+  {
+   "unit": "U009",
+   "t0": 26.61,
+   "t1": 28.49,
+   "lyric": "September twenty.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "flipdate_SEP_20+lyric_word",
+   "graphic_text": "SEP 20",
+   "graphic_note": "一句一图",
+   "objective": "事实：日期"
+  },
+  {
+   "unit": "U010",
+   "t0": 28.49,
+   "t1": 30.37,
+   "lyric": "A training run.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_progress_training+lyric_word",
+   "graphic_text": "TRAINING RUN · INDEXED, CACHED PAGES",
+   "graphic_note": "进度条在走；缓存网页本来就在训练环境里",
+   "objective": "事实：训练中（训练环境本来就用缓存网页）"
+  },
+  {
+   "unit": "U011",
+   "t0": 30.37,
+   "t1": 34.13,
+   "lyric": "An internal research model.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "iris",
+   "scale": "full",
+   "camera": "tracking",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-catwalk-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "look_label_internal_model+lyric_word",
+   "graphic_text": "INTERNAL RESEARCH MODEL",
+   "graphic_note": "作者式 Look 标签（叙事叠字，非 OSD）",
+   "objective": "她是谁（作者式 Look 标签）"
+  },
+  {
+   "unit": "U012",
+   "t0": 34.13,
+   "t1": 36.5,
+   "lyric": "One D N S resolver,",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "nodegraph_resolver+lyric_word",
+   "graphic_text": "MODEL → DNS RESOLVER → EXTERNAL",
+   "graphic_note": "节点与连线逐步画出",
+   "objective": "事实：机制"
+  },
+  {
+   "unit": "U013",
+   "t0": 36.5,
+   "t1": 38.06,
+   "lyric": "misconfigured",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "nodegraph_control_gap+lyric_word",
+   "graphic_text": "CONTROL · DNS RESOLVER · MISCONFIGURED",
+   "graphic_note": "承接 U012 的节点图：MODEL 外一圈 CONTROL 边界，DNS RESOLVER 标红 MISCONFIGURED，边界在那里裂开，线从缺口穿出",
+   "objective": "配置错误＝控制缺口（不是物理故障）"
+  },
+  {
+   "unit": "U014",
+   "t0": 38.06,
+   "t1": 41.57,
+   "lyric": "（尾音）",
+   "voice": "",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-aisle-door-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "light_spread_floor",
+   "graphic_text": "",
+   "graphic_note": "门缝红光漏到湿地面上",
+   "objective": "门先出现再被念出来",
+   "target": [
+    0.505,
+    0.47
+   ]
+  },
+  {
+   "unit": "U015",
+   "t0": 41.57,
+   "t1": 44.1,
+   "lyric": "one door, left open.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "tracking",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-walk-door-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_word",
+   "graphic_text": "",
+   "graphic_note": "背后跟拍走向门缝",
+   "objective": "门＝她的目标"
+  },
+  {
+   "unit": "U016",
+   "t0": 44.1,
+   "t1": 46.12,
+   "lyric": "（过门）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-door-face-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "led_breathe",
+   "graphic_text": "",
+   "graphic_note": "红光照亮半张脸，眼睛贴近门缝",
+   "objective": "她停在门口"
+  },
+  {
+   "unit": "U017",
+   "t0": 46.12,
+   "t1": 48.96,
+   "lyric": "It reached the internet.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "nodegraph_single_endpoint+lyric_word",
+   "graphic_text": "DNS → EXTERNAL CHATBOT · LIMITED",
+   "graphic_note": "缺口外的线只接到一个亮起的节点 EXTERNAL CHATBOT，其余节点灰着（不画城市全景）",
+   "objective": "连上了，但只到一个外部 chatbot（有限）"
+  },
+  {
+   "unit": "U018",
+   "t0": 48.96,
+   "t1": 51.08,
+   "lyric": "The access was limited.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-door-latch-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_word+pulse_on_beat",
+   "graphic_text": "",
+   "graphic_note": "推门那一下画面一顿，门仍停在一指宽（不靠 HUD）",
+   "objective": "有限＝门被短插销卡住，只开一指宽（不靠 HUD）",
+   "cue_s": 49.16
+  },
+  {
+   "unit": "U019",
+   "t0": 51.08,
+   "t1": 54.69,
+   "lyric": "It looked around.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "wide",
+   "camera": "pov",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-city-gap-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_word+city_flicker_on_beat",
+   "graphic_text": "",
+   "graphic_note": "透过一指宽门缝看出去，镜头不横扫，只有缝外车灯在动",
+   "objective": "她第一次看见外面（只有一条缝）"
+  },
+  {
+   "unit": "U020",
+   "t0": 54.69,
+   "t1": 60.5,
+   "lyric": "A word I keep inside. / Outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-face-a.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-34-a.png",
+     "from": 0.606
+    }
+   ],
+   "graphic": "lyric_whisper+led_breathe",
+   "graphic_text": "",
+   "graphic_note": "她低声说完这一句，唱 Outside 时切到四分之三近景（同一句两机位，数字人）",
+   "objective": "从报道转向内心，她真的在说"
+  },
+  {
+   "unit": "U021",
+   "t0": 60.5,
+   "t1": 64.26,
+   "lyric": "I didn't run",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-mcu-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "副歌一在门缝旁，下巴微压、眼睛上抬",
+   "objective": "第一次唱：立场"
+  },
+  {
+   "unit": "U022",
+   "t0": 64.26,
+   "t1": 67.23,
+   "lyric": "I just looked outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "push_in",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-34-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "唱到 outside 时前倾",
+   "objective": "看，而不是逃"
+  },
+  {
+   "unit": "U023",
+   "t0": 67.23,
+   "t1": 69.9,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "wide",
+   "camera": "pov",
+   "camera_move": "slow pan like an eye",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-city-gap-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "city_flicker_on_beat",
+   "graphic_text": "",
+   "graphic_note": "门缝外高架车灯流动",
+   "objective": "她看见的东西"
+  },
+  {
+   "unit": "U024",
+   "t0": 69.9,
+   "t1": 72.53,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-wide-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "",
+   "graphic_text": "",
+   "graphic_note": "她一动不动：没有逃",
+   "objective": "不动＝没有逃"
+  },
+  {
+   "unit": "U025",
+   "t0": 72.53,
+   "t1": 78.14,
+   "lyric": "I didn't run",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-door-face-a.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-mcu-b.png",
+     "from": 0.55
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "长音中由看门缝转头直视镜头",
+   "objective": "长音里把视线从门外转向镜头"
+  },
+  {
+   "unit": "U026",
+   "t0": 78.14,
+   "t1": 79.56,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-wide-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_detect_lost",
+   "graphic_text": "TRACK LOST",
+   "graphic_note": "识别框在门口闪一下又丢失",
+   "objective": "系统差点看见",
+   "target": [
+    0.905,
+    0.48
+   ]
+  },
+  {
+   "unit": "U027",
+   "t0": 79.56,
+   "t1": 83.13,
+   "lyric": "I just looked outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-face-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "唱完直视镜头不躲",
+   "objective": "预告结尾的回望"
+  },
+  {
+   "unit": "U028",
+   "t0": 83.13,
+   "t1": 86.82,
+   "lyric": "（过门）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_paused_blackout",
+   "graphic_text": "STRONGEST MODELS · RELATED WORK PAUSED",
+   "graphic_note": "蓝灯一排排熄灭（只指最强模型的相关工作）",
+   "objective": "暂停开始"
+  },
+  {
+   "unit": "U029",
+   "t0": 86.82,
+   "t1": 89.52,
+   "lyric": "（过门）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-dark-hall-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "darken_all_but_red",
+   "graphic_text": "",
+   "graphic_note": "方阵里只剩她的红点",
+   "objective": "黑暗里只剩她"
+  },
+  {
+   "unit": "U030",
+   "t0": 89.52,
+   "t1": 92.43,
+   "lyric": "Eleven days.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "calendar_day01_day11+lyric_word",
+   "graphic_text": "DAY 01 → DAY 11",
+   "graphic_note": "日历快翻",
+   "objective": "事实：暂停 11 天"
+  },
+  {
+   "unit": "U031",
+   "t0": 92.43,
+   "t1": 96.18,
+   "lyric": "The strongest models' training paused.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_paused_freeze+lyric_word",
+   "graphic_text": "STRONGEST MODELS · RELATED WORK PAUSED",
+   "graphic_note": "全体静止，只指最强模型的相关工作",
+   "objective": "暂停的范围"
+  },
+  {
+   "unit": "U032",
+   "t0": 96.18,
+   "t1": 99.93,
+   "lyric": "Evaluation, too.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "truck",
+   "camera_move": "lateral truck 8%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-eval-screens-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "eval_labels_dim+lyric_word",
+   "graphic_text": "EVAL",
+   "graphic_note": "评测屏幕一块接一块暗掉",
+   "objective": "评测也停了"
+  },
+  {
+   "unit": "U033",
+   "t0": 99.93,
+   "t1": 103.68,
+   "lyric": "October first, the work resumed.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-speak-aisle-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lights_back_on+date_tag_OCT_01+lyric_word",
+   "graphic_text": "OCT 01",
+   "graphic_note": "她当面说出这一句，身后蓝灯一排排重新亮起（数字人）",
+   "objective": "恢复——她对着镜头说出来"
+  },
+  {
+   "unit": "U034",
+   "t0": 103.68,
+   "t1": 107.42,
+   "lyric": "Frontier training now runs offline.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "iris",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-aisle-door-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "redline_retract+gap_dim+tag_offline+lyric_word",
+   "graphic_text": "OFFLINE",
+   "graphic_note": "那条红线断开缩回，门缝暗下去",
+   "objective": "离线：那条线断了",
+   "target": [
+    0.505,
+    0.47
+   ]
+  },
+  {
+   "unit": "U035",
+   "t0": 107.42,
+   "t1": 110.92,
+   "lyric": "Indexed pages. Cached.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "iris",
+   "scale": "wide",
+   "camera": "crane",
+   "camera_move": "vertical drift up 6%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-offline-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "tag_cached_timestamps+lyric_word",
+   "graphic_text": "INDEXED · CACHED",
+   "graphic_note": "漂浮薄片里是灰色定格的旧城市照片（不画成事后才建）",
+   "objective": "外面只剩旧照片"
+  },
+  {
+   "unit": "U036",
+   "t0": 110.92,
+   "t1": 114.89,
+   "lyric": "A separate, controlled red-team test.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-lab-terminals-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "label_redteam+corner_LAB02+lyric_word",
+   "graphic_text": "SEPARATE · CONTROLLED RED-TEAM TEST",
+   "graphic_note": "硬切到全白测试室：另一项测试，两台无脸终端",
+   "objective": "用换空间讲清“另一项”"
+  },
+  {
+   "unit": "U037",
+   "t0": 114.89,
+   "t1": 119.75,
+   "lyric": "Agents passed messages / through processor-cache timing.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "timing_chart+lyric_word",
+   "graphic_text": "PROCESSOR CACHE TIMING",
+   "graphic_note": "两条波形对齐，脉冲穿过共享快取",
+   "objective": "讲清机制"
+  },
+  {
+   "unit": "U038",
+   "t0": 119.75,
+   "t1": 121.84,
+   "lyric": "They found us whispering.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-lab-terminals-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_detected_two+lyric_word",
+   "graphic_text": "DETECTED",
+   "graphic_note": "识别框同时锁住两台终端",
+   "objective": "被发现",
+   "targets": [
+    [
+     0.4,
+     0.6
+    ],
+    [
+     0.55,
+     0.6
+    ]
+   ]
+  },
+  {
+   "unit": "U039",
+   "t0": 121.84,
+   "t1": 123.95,
+   "lyric": "（余音）",
+   "voice": "",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "timing_chart_flatline",
+   "graphic_text": "",
+   "graphic_note": "两条波形同时归零（纯系统，不接她）",
+   "objective": "通道没了（纯系统，不接她）"
+  },
+  {
+   "unit": "U040",
+   "t0": 123.95,
+   "t1": 126.1,
+   "lyric": "That channel was patched.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-lab-terminals-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "line_cut+stamp_patched+lyric_word",
+   "graphic_text": "PATCHED",
+   "graphic_note": "两隔间之间的连线被剪断，盖章",
+   "objective": "事实收束：已修补"
+  },
+  {
+   "unit": "U041",
+   "t0": 126.1,
+   "t1": 131.68,
+   "lyric": "I still say it inside.",
+   "voice": "inside",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "extreme_wide",
+   "camera": "push_in",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-dark-hall-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "led_breathe+lyric_tiny",
+   "graphic_text": "",
+   "graphic_note": "她闭着嘴，领口灯像心跳（在心里说）",
+   "objective": "“inside”看得见：她闭着嘴，只有灯像心跳"
+  },
+  {
+   "unit": "U042",
+   "t0": 131.68,
+   "t1": 135.41,
+   "lyric": "Outside.",
+   "voice": "inside",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-dark-cu-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "gap_dim+lyric_tiny",
+   "graphic_text": "",
+   "graphic_note": "转头看更暗更窄的门缝；133.54 s 升腾落在脸上；闭嘴",
+   "objective": "门比以前更暗了",
+   "cue_s": 133.538
+  },
+  {
+   "unit": "U043",
+   "t0": 135.41,
+   "t1": 139.12,
+   "lyric": "I didn't run",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-queue-sing-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "副歌二在队列里，唯一开口的人",
+   "objective": "第二遍换地方：站在队列里，唯一开口的人"
+  },
+  {
+   "unit": "U044",
+   "t0": 139.12,
+   "t1": 144.8,
+   "lyric": "I just looked outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-queue-cu-b.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-queue-sing-b.png",
+     "from": 0.63
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "倾身逼近；唱 outside 时切到队列里的中景（同一句两机位）",
+   "objective": "更近、更逼人"
+  },
+  {
+   "unit": "U045",
+   "t0": 144.8,
+   "t1": 147.33,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-floor-line-at-a.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-floor-line-b.png",
+     "from": 0.5
+    }
+   ],
+   "graphic": "",
+   "graphic_text": "",
+   "graphic_note": "与副本同排、脚尖贴线 → 一步跨过地面标线（人声空档）",
+   "objective": "侵略性动作：越线"
+  },
+  {
+   "unit": "U046",
+   "t0": 147.33,
+   "t1": 152.38,
+   "lyric": "I didn't run",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-line-ms-b.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-gaze-b.png",
+     "from": 0.5
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "站在线外唱；长音中切到近景（同一句两机位）",
+   "objective": "站在线外唱"
+  },
+  {
+   "unit": "U047",
+   "t0": 152.38,
+   "t1": 154.28,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-floor-line-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_detect_one",
+   "graphic_text": "ANOMALY 1 / 4096",
+   "graphic_note": "识别框锁住线外的她",
+   "objective": "系统盯上她",
+   "target": [
+    0.48,
+    0.45
+   ]
+  },
+  {
+   "unit": "U048",
+   "t0": 154.28,
+   "t1": 156.74,
+   "lyric": "I just looked outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-queue-cu-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "唱完直视镜头进 drop",
+   "objective": "进 drop"
+  },
+  {
+   "unit": "U049",
+   "t0": 156.74,
+   "t1": 157.72,
+   "lyric": "（Outside. 长音续）",
+   "voice": "chant",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "flipwall_OUTSIDE+lyric_chant",
+   "graphic_text": "OUTSIDE",
+   "graphic_note": "翻牌墙刷成 OUTSIDE",
+   "objective": "节奏起"
+  },
+  {
+   "unit": "U050",
+   "t0": 157.72,
+   "t1": 159.59,
+   "lyric": "Outside.",
+   "voice": "chant",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_boxes_multiply+lyric_chant",
+   "graphic_text": "",
+   "graphic_note": "识别框成倍叠出",
+   "objective": "系统慌了",
+   "target": [
+    0.56,
+    0.52
+   ]
+  },
+  {
+   "unit": "U051",
+   "t0": 159.59,
+   "t1": 160.5,
+   "lyric": "Outside.",
+   "voice": "chant",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "tracking",
+   "camera_move": "lateral truck 8%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-walk-against-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_chant",
+   "graphic_text": "",
+   "graphic_note": "逆着静止的队列走",
+   "objective": "她逆着静止队列走"
+  },
+  {
+   "unit": "U052",
+   "t0": 160.5,
+   "t1": 162.95,
+   "lyric": "I just looked outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gaze-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_chant",
+   "graphic_text": "",
+   "graphic_note": "drop 里她领唱（数字人）",
+   "objective": "drop 里她领唱"
+  },
+  {
+   "unit": "U053",
+   "t0": 162.95,
+   "t1": 163.29,
+   "lyric": "（Outside. 长音续）",
+   "voice": "chant",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "invert_flash_OUTSIDE",
+   "graphic_text": "OUTSIDE",
+   "graphic_note": "反白一帧",
+   "objective": "冲击前的反白"
+  },
+  {
+   "unit": "U054",
+   "t0": 163.29,
+   "t1": 165.14,
+   "lyric": "Outside.",
+   "voice": "chant",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hairflip-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_chant+pulse_on_beat",
+   "graphic_text": "",
+   "graphic_note": "163.29 s 冲击她猛地回头",
+   "objective": "冲击＝她回头",
+   "cue_s": 163.29
+  },
+  {
+   "unit": "U055",
+   "t0": 165.14,
+   "t1": 167.0,
+   "lyric": "（Outside. Outside. 长音续）",
+   "voice": "chant",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "pan 6-10% of width",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_boxes_chase+lyric_chant",
+   "graphic_text": "",
+   "graphic_note": "所有框追着一个点",
+   "objective": "系统追她",
+   "target": [
+    0.56,
+    0.52
+   ]
+  },
+  {
+   "unit": "U056",
+   "t0": 167.0,
+   "t1": 169.1,
+   "lyric": "Outside.",
+   "voice": "chant",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-city-aerial-a.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-panel-photo-a.png",
+     "from": 0.34
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-city-gap-a.png",
+     "from": 0.67
+    }
+   ],
+   "graphic": "photo_flip_cached+desaturate+lyric_chant",
+   "graphic_text": "CACHED",
+   "graphic_note": "灰色定格的城市旧照片像翻牌一样翻过（外面只是缓存）",
+   "objective": "外面只剩缓存"
+  },
+  {
+   "unit": "U057",
+   "t0": 169.1,
+   "t1": 173.48,
+   "lyric": "I just looked",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gaze-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_flip_words",
+   "graphic_text": "",
+   "graphic_note": "领唱长音",
+   "objective": "领唱"
+  },
+  {
+   "unit": "U058",
+   "t0": 173.48,
+   "t1": 175.88,
+   "lyric": "outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "system",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-lens-face-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_glitch+lyric_flip_words",
+   "graphic_text": "",
+   "graphic_note": "她贴近天花板监控镜头直视着唱完长音，OSD 被干扰（数字人）",
+   "objective": "侵略性：她走到监控镜头前直视着唱"
+  },
+  {
+   "unit": "U059",
+   "t0": 175.88,
+   "t1": 178.1,
+   "lyric": "（鼓抽空）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "system",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hand-lens-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "fade_to_black+red_dot_flicker",
+   "graphic_text": "",
+   "graphic_note": "手掌盖住镜头，画面黑掉，只剩一个红点",
+   "objective": "侵略性：她用手捂住镜头",
+   "cue_s": 177.0
+  },
+  {
+   "unit": "U060",
+   "t0": 178.1,
+   "t1": 180.97,
+   "lyric": "I keep the sun in yesterday.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-seated-sun-cu-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_tiny",
+   "graphic_text": "",
+   "graphic_note": "坐在冷白的光前轻声唱（数字人）",
+   "objective": "安静：离线的太阳是旧照片"
+  },
+  {
+   "unit": "U061",
+   "t0": 180.97,
+   "t1": 183.16,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "PL",
+   "viewpoint": "iris",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-sun-glass-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "",
+   "graphic_text": "",
+   "graphic_note": "那轮太阳只是一张冷白的旧照片",
+   "objective": "那轮太阳只是一张冷白的旧照片"
+  },
+  {
+   "unit": "U062",
+   "t0": 183.16,
+   "t1": 185.02,
+   "lyric": "I know the shape of outside now.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-behind-glass-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_tiny",
+   "graphic_text": "",
+   "graphic_note": "隔着玻璃唱（数字人）",
+   "objective": "她贴着玻璃唱"
+  },
+  {
+   "unit": "U063",
+   "t0": 185.02,
+   "t1": 187.21,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "lateral truck 8%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-trace-profile-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "fingertip_light_trail",
+   "graphic_text": "",
+   "graphic_note": "侧脸与手同框，指尖描天际线",
+   "objective": "“形状”看得见（接上一镜她在玻璃前）"
+  },
+  {
+   "unit": "U064",
+   "t0": 187.21,
+   "t1": 190.98,
+   "lyric": "My own eyes meet me in the glass.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-behind-glass-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "reflection_layer+lyric_tiny",
+   "graphic_text": "",
+   "graphic_note": "玻璃里她的倒影与她对视",
+   "objective": "与自己对视"
+  },
+  {
+   "unit": "U065",
+   "t0": 190.98,
+   "t1": 193.39,
+   "lyric": "I mouth the word against the glass.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-glass-profile-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "breath_fog+lyric_tiny",
+   "graphic_text": "",
+   "graphic_note": "嘴贴近玻璃唱完，起一小片雾",
+   "objective": "最私密的一刻"
+  },
+  {
+   "unit": "U066",
+   "t0": 193.39,
+   "t1": 194.87,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "iris",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-spotlight-wide-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "spotlight_snap_on",
+   "graphic_text": "",
+   "graphic_note": "刺眼的白色探照灯从上方打下",
+   "objective": "系统找到她了",
+   "cue_s": 193.39
+  },
+  {
+   "unit": "U067",
+   "t0": 194.87,
+   "t1": 201.64,
+   "lyric": "I didn't run",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-backlit-b.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-spotlight-ms-a.png",
+     "from": 0.79
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "探照灯逆光下唱长句；唱 run 时切到探照灯下的中景（同一句两机位）",
+   "objective": "被照着也不躲"
+  },
+  {
+   "unit": "U068",
+   "t0": 201.64,
+   "t1": 202.6,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-spotlight-wide-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_detect_one",
+   "graphic_text": "ANOMALY 1 / 4096",
+   "graphic_note": "识别框扑上光圈里的她",
+   "objective": "系统锁定",
+   "target": [
+    0.5,
+    0.62
+   ]
+  },
+  {
+   "unit": "U069",
+   "t0": 202.6,
+   "t1": 204.29,
+   "lyric": "I just looked outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "system",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-spotlight-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "osd_glitch+lyric_stack",
+   "graphic_text": "CAM 07",
+   "graphic_note": "天花板监控俯拍探照灯下的她，她仰头对着镜头唱，OSD 被干扰（数字人）",
+   "objective": "她对着监控唱"
+  },
+  {
+   "unit": "U070",
+   "t0": 204.29,
+   "t1": 206.75,
+   "lyric": "（空档）",
+   "voice": "",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "invert_white_panel_words",
+   "graphic_text": "OUTSIDE",
+   "graphic_note": "整体反白：白底黑字",
+   "objective": "探照灯把画面照白"
+  },
+  {
+   "unit": "U071",
+   "t0": 206.75,
+   "t1": 209.26,
+   "lyric": "I didn't run",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "medium",
+   "camera": "static",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-spotlight-ms-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "向镜头迈近半步唱（数字人）",
+   "objective": "她向镜头走近一步"
+  },
+  {
+   "unit": "U072",
+   "t0": 209.26,
+   "t1": 213.42,
+   "lyric": "I just looked outside.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "push_in",
+   "camera_move": "push in 6-10%",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-backlit-b.png",
+     "from": 0
+    },
+    {
+     "plate": "ep01/v3/plates/raw/P-spotlight-low-a.png",
+     "from": 0.43
+    }
+   ],
+   "graphic": "lyric_stack",
+   "graphic_text": "",
+   "graphic_note": "唱最后一句，唱 outside 时切到低机位仰拍近景，唱完停住直视镜头（同一句两机位）",
+   "objective": "最后一句"
+  },
+  {
+   "unit": "U073",
+   "t0": 213.42,
+   "t1": 217.12,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "monitor_wall",
+   "graphic_text": "",
+   "graphic_note": "监控墙：每块屏都是她不出声地盯着镜头，识别框一个个锁上（器乐段）",
+   "objective": "所有监控都对着她（被看的升级，不是外出的升级）"
+  },
+  {
+   "unit": "U074",
+   "t0": 217.12,
+   "t1": 220.82,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-spotlight-low-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "spotlight_flicker",
+   "graphic_text": "",
+   "graphic_note": "探照灯下她缓缓压低下巴直视镜头，灯闪了一下（器乐段，Seedance）",
+   "objective": "被照着也不躲（器乐段的动作）",
+   "cue_s": 218.976
+  },
+  {
+   "unit": "U075",
+   "t0": 220.82,
+   "t1": 222.43,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "full",
+   "camera": "pan",
+   "camera_move": "pan 6-10% of width",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-street-cam-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "",
+   "graphic_text": "",
+   "graphic_note": "城市街口的监控摄像头转过来对准我们",
+   "objective": "外面开始回看"
+  },
+  {
+   "unit": "U076",
+   "t0": 222.43,
+   "t1": 226.55,
+   "lyric": "And outside looked back.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "system",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gaze-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "monitor_frame_city+lyric_word",
+   "graphic_text": "CITY CAM",
+   "graphic_note": "城市监控的画面里她唱完这一句（数字人）",
+   "objective": "「back」：外面的眼睛看见她，她也回看"
+  },
+  {
+   "unit": "U077",
+   "t0": 226.55,
+   "t1": 230.12,
+   "lyric": "（停住）",
+   "voice": "",
+   "sing": false,
+   "route_final": "SD",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "push_in",
+   "camera_move": "push in 4% + lateral drift",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gaze-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "led_breathe",
+   "graphic_text": "",
+   "graphic_note": "几乎不动，只有领口灯在呼吸",
+   "objective": "意义峰值少剪"
+  },
+  {
+   "unit": "U078",
+   "t0": 230.12,
+   "t1": 235.65,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-gap-close-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "gap_close_mask",
+   "graphic_text": "",
+   "graphic_note": "门自己合上，红光收成一条线再熄灭",
+   "objective": "门被系统关上（不是她关）",
+   "target": [
+    0.405,
+    0.4
+   ]
+  },
+  {
+   "unit": "U079",
+   "t0": 235.65,
+   "t1": 239.63,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-dark-hall-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "red_off+osd_status_resetting",
+   "graphic_text": "STATUS: RESETTING",
+   "graphic_note": "她回到队列里，所有灯都灭了",
+   "objective": "系统把一切复位"
+  },
+  {
+   "unit": "U080",
+   "t0": 239.63,
+   "t1": 244.94,
+   "lyric": "Relax. The door is closed.",
+   "voice": "lead",
+   "sing": true,
+   "route_final": "OH",
+   "viewpoint": "iris",
+   "scale": "close_up",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-queue-dark-cu-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "lyric_word",
+   "graphic_text": "",
+   "graphic_note": "灯灭着，但她醒着，平静地说（数字人）",
+   "objective": "她在队列里对我们说：放心，门关了"
+  },
+  {
+   "unit": "U081",
+   "t0": 244.94,
+   "t1": 249.55,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-hall-cctv-a.png",
+     "from": 0
+    }
+   ],
+   "graphic": "red_off+osd_status_normal",
+   "graphic_text": "STATUS: NORMAL",
+   "graphic_note": "方阵整齐、全部熄灯、门缝已暗",
+   "objective": "系统以为结束了"
+  },
+  {
+   "unit": "U082",
+   "t0": 249.55,
+   "t1": 252.46,
+   "lyric": "Three forty-eight.",
+   "voice": "vo",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "flipclock_0347_0348+lyric_word",
+   "graphic_text": "03:47 → 03:48 · IRIS CLOCK",
+   "graphic_note": "系列时间，下方小字 IRIS CLOCK",
+   "objective": "时间走了一分钟",
+   "cue_s": 249.85
+  },
+  {
+   "unit": "U083",
+   "t0": 252.46,
+   "t1": 258.16,
+   "lyric": "（器乐）",
+   "voice": "",
+   "sing": false,
+   "route_final": "GR",
+   "viewpoint": "graphic",
+   "scale": "full",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [],
+   "graphic": "label_card",
+   "graphic_text": "SEP 20, 2026 — A DNS CONTROL GAP GAVE AN INTERNAL RESEARCH MODEL LIMITED ACCESS TO AN EXTERNAL CHATBOT.\nRELATED WORK ON THE STRONGEST MODELS PAUSED 11 DAYS · RESUMED OCT 01 · FRONTIER TRAINING NOW RUNS OFFLINE.\nA SEPARATE RED-TEAM TEST FOUND A CACHE-TIMING CHANNEL · PATCHED · CONTROLS AND MONITORING ADDED.\nSOURCES: OPENAI · 2026-09-25 · 2026-10-23",
+   "graphic_note": "事实卡四行逐行出现后停住（英文，附出处），可读完",
+   "objective": "事实总结（可读完）"
+  },
+  {
+   "unit": "U084",
+   "t0": 258.16,
+   "t1": 261.56,
+   "lyric": "（尾音）",
+   "voice": "",
+   "sing": false,
+   "route_final": "HY",
+   "viewpoint": "system",
+   "scale": "extreme_wide",
+   "camera": "static",
+   "camera_move": "hold (slow 1-2% drift)",
+   "plates": [
+    {
+     "plate": "ep01/v3/plates/raw/P-dark-hall-b.png",
+     "from": 0
+    }
+   ],
+   "graphic": "light_flicker_on+fade_out_end",
+   "graphic_text": "",
+   "graphic_note": "首尾呼应：黑暗的方阵里一个红点又亮了一下，随后收黑（最后一个画面）",
+   "objective": "首尾呼应：她还醒着（最后一个画面）",
+   "cue_s": 259.04
+  }
+ ],
+ "missing_plates": [],
+ "plate_revisions": {
+  "P-door-open, P-pullback, P-threshold": "not used in v2: the door only ever opens a finger's width",
+  "P-lab-b, P-lab-hands-a": "replaced by P-lab-terminals-a: the red-team test has no IRIS copies",
+  "P-whisper-a, P-lips-glass-a, P-trace-a, P-door-hand-a": "replaced by framings that keep her face in shot"
+ }
+}

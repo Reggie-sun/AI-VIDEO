@@ -1,0 +1,615 @@
+diff --git a/docs/agent-primary-contract-matrix.md b/docs/agent-primary-contract-matrix.md
+index c1f0ccf2152833d90e8312f5181a7881ea808150..fc5879190ea501d0a3f0476e21874dc4a66905f3 100644
+--- a/docs/agent-primary-contract-matrix.md
++++ b/docs/agent-primary-contract-matrix.md
+@@ -321,6 +321,7 @@ receipt中的V1 map必须为identity，layer不得携带retime map，voice_sourc
+ `_composition_visual`按exact admission限制音轨，resolver产生`development_audio_preview`，
+ HyperFrames消费同一时间线混音；所有非Production scope与captured bytes仍由原activation fence拒绝。
+ 此扩展不改变旧`/2,/3`行为，不资格化失败素材，不推进原Shot barrier或Final Acceptance。
++`development-qualification-preview/2` 在原正常速度 `replacement_audio_preview` 上显式封存 `captioned_music`：唯一 global MUSIC/BGM 音轨、exact 音讯 SHA 与样本裁切，以及每条字幕的 asset ID、bytes SHA、script/transcript hashes。外部歌曲保留真实 IMPORTED/GENERATED 来源，record 与 audio metadata 的 kind、tool、input fingerprint 必须一致，不冒充原片 DIALOGUE。reader 仅对匹配该已验证 receipt 的歌曲字幕接纳无 voice script 的 MUSIC，其他 BGM/SFX 与旧 speech script 检查保持；所有参与捕获须同一歌曲和字幕 binding。resolver 要求实际选用这些 `/2` 视觉、字幕精确绑定封存音轨，并保持歌曲完整覆盖成片样本窗口；沿原 P4 CaptionTrack 核验字词、trim、style，由唯一 ResolvedTimeline 产生 `development_audio_preview`，不建立新时钟或绕过 activation fence。此契约仅证明明确选定的歌曲和字幕身份，不证明听写、对嘴、真人观感或 Production 验收。
+ `video_cleanup_contracts.py` / `video_cleanup_pixels.py` 独占显式逐帧clean-plate recipe、仿射采样、羽化与foreground保护；
+ `video_cleanup_media.py`只用注入的本地工具准备同帧数/PTS的lossless RGB派生源，重解码验证像素并比较原声PCM/时间。
+ 它不拥有剪辑顺序、trim/speed或最终renderer；无自动tracking/生成填补。
+diff --git a/src/ai_video/production/_composition_visual.py b/src/ai_video/production/_composition_visual.py
+index bfe2eafb4ed2a8083e88ffcb0b7fa58908e34481..7e858cfb94731bcf46460ff757a691e26e626222 100644
+--- a/src/ai_video/production/_composition_visual.py
++++ b/src/ai_video/production/_composition_visual.py
+@@ -54,6 +54,7 @@ def resolve_preview_layer_ids(
+ ) -> set[str]:
+     preview_layer_ids: set[str] = set()
+     preview_scopes: set[str] = set()
++    preview_receipts = []
+     roles_by_shot = {
+         shot_id: {role.role: role for role in shots_by_id[shot_id].required_asset_roles}
+         for shot_id in spec.shot_ids
+@@ -74,7 +75,19 @@ def resolve_preview_layer_ids(
+         if allows_repair_preview_layer(project, layer, shot):
+             preview_layer_ids.add(layer.layer_id)
+             asset = next(a for a in project.registry.assets if a.asset_id == layer.asset_id)
+-            preview_scopes.add(verify_repair_input(asset, project.root).preview_use.scope)
++            receipt = verify_repair_input(asset, project.root)
++            preview_receipts.append(receipt)
++            preview_scopes.add(receipt.preview_use.scope)
++    if not preview_layer_ids and spec.caption_tracks:
++        from ai_video.production.qualification_preview_input import allows_captioned_music_caption
++
++        assets = {asset.asset_id: asset for asset in project.registry.assets}
++        for binding in spec.caption_tracks:
++            caption = assets.get(binding.caption_asset_id)
++            metadata = caption.caption_metadata if caption is not None else None
++            source = assets.get(metadata.source_audio_asset_id) if metadata is not None else None
++            if source is not None and allows_captioned_music_caption(project, caption, source):
++                raise invalid("Captioned music captions require their actual qualification preview visuals.")
+     if preview_layer_ids:
+         if spec.schema_version not in {"2.3", "2.4"}:
+             raise invalid("Development repair previews require CompositionSpec 2.3 or 2.4.")
+@@ -92,7 +105,10 @@ def resolve_preview_layer_ids(
+                     } for t in spec.audio_tracks)
+                     or spec.voice_sources):
+                 raise invalid("Replacement audio preview requires supported P4 audio tracks and no voice sources.")
+-            if dialogue_tracks:
++            music = _captioned_music_binding(preview_receipts, invalid=invalid)
++            if music is not None:
++                _validate_captioned_music_layout(project, spec, music, invalid=invalid)
++            elif dialogue_tracks:
+                 if not _captured_dialogue_layout_valid(
+                     spec, dialogue_tracks,
+                     silent_image_shots=_speech_free_visual_shots(project, spec, shots_by_id),
+@@ -107,6 +123,59 @@ def resolve_preview_layer_ids(
+     return preview_layer_ids
+ 
+ 
++def _captioned_music_binding(receipts, *, invalid):
++    version = "development-qualification-preview/2"
++    opted_in = [r for r in receipts if getattr(r, "contract_version", None) == version]
++    if not opted_in:
++        return None
++    music = opted_in[0].captioned_music
++    if len(opted_in) != len(receipts) or any(r.captioned_music != music for r in opted_in):
++        raise invalid("Captioned music preview requires the same explicit song binding on every captured clip.")
++    return music
++
++
++def _validate_captioned_music_layout(project, spec, music, *, invalid):
++    if (spec.audio_tracks != (music.track,) or not spec.caption_tracks or spec.voice_sources
++            or {binding.caption_asset_id for binding in spec.caption_tracks}
++            != {caption.caption_asset_id for caption in music.captions}
++            or any(binding.source_audio_track_id != music.track.track_id or binding.shot_id is not None
++                   for binding in spec.caption_tracks)
++            or any(layer.source_time_map is not None or layer.source_audio_policy not in {"MUTE", "REPLACE"}
++                   or not layer.source_audio_reason or not layer.source_audio_reason.strip()
++                   for layer in spec.layers if layer.layer_id not in spec.graphic_layer_ids)):
++        raise invalid("Captioned music preview requires only its exact song, global captions and explicitly muted source visuals.")
++    try:
++        music.validate_asset(next((a for a in project.registry.assets if a.asset_id == music.track.asset_id), None))
++        music.validate_captions(project.registry.assets)
++    except ValueError as exc:
++        raise invalid("Captioned music preview source is invalid.", str(exc)) from exc
++
++
++def _validate_captioned_music_timeline(project, spec, timeline, shots_by_id, *, invalid):
++    from ai_video.production.repair_input_admission import allows_repair_preview_layer, verify_repair_input
++
++    assets = {asset.asset_id: asset for asset in project.registry.assets}
++    receipts = [verify_repair_input(assets[layer.asset_id], project.root)
++                for layer in spec.layers if layer.shot_id in shots_by_id
++                and allows_repair_preview_layer(project, layer, shots_by_id[layer.shot_id])]
++    music = _captioned_music_binding(receipts, invalid=invalid)
++    if music is None:
++        return
++    _validate_captioned_music_layout(project, spec, music, invalid=invalid)
++    if len(timeline.audio_spans) != 1:
++        raise invalid("Captioned music preview must resolve exactly one song span.")
++    span = timeline.audio_spans[0]
++    if (span.track_id != music.track.track_id or span.asset_id != music.track.asset_id
++            or span.asset_sha256 != music.audio_asset_sha256 or span.audio_kind is not AudioKind.BGM
++            or span.start_sample != 0 or span.duration_samples != timeline.total_samples
++            or span.source_start_sample != music.track.trim_start_sample
++            or span.source_duration_samples != music.track.trim_duration_samples
++            or span.duration_samples != span.source_duration_samples
++            or span.gain_millidb != 0 or span.fade_in_samples != 0 or span.fade_out_samples != 0
++            or span.ducking is not None):
++        raise invalid("Captioned music preview must preserve its exact song samples across the complete film.")
++
++
+ def validate_replacement_preview_narration(
+     project: LoadedProductionProject,
+     spec: CompositionSpec,
+@@ -115,6 +184,7 @@ def validate_replacement_preview_narration(
+     *,
+     invalid: Callable[..., AiVideoError],
+ ) -> None:
++    _validate_captioned_music_timeline(project, spec, timeline, shots_by_id, invalid=invalid)
+     dialogue_tracks = tuple(
+         track for track in spec.audio_tracks
+         if track.audio_kind is AudioKind.DIALOGUE
+diff --git a/src/ai_video/production/qualification_preview_input.py b/src/ai_video/production/qualification_preview_input.py
+index e620b815619bd6e5cbe2002becea8cebd52e4fc1..4dce172073d779216207cad3894303d232220fbe 100644
+--- a/src/ai_video/production/qualification_preview_input.py
++++ b/src/ai_video/production/qualification_preview_input.py
+@@ -9,9 +9,13 @@ import hashlib
+ from pathlib import Path
+ from typing import Literal
+ 
++from pydantic import Field, model_validator
++
++from ai_video.production.artifact_contracts import StrictModel
++from ai_video.production.composition_contracts import AudioTrackSpec
+ from ai_video.production.hashing import canonical_sha256
+ from ai_video.production.models import (
+-    AssetRecord, AssetRegistrySnapshot, AssetSourceKind, AssetType, ProductionManifest,
++    AssetRecord, AssetRegistrySnapshot, AssetSourceKind, AssetType, AudioKind, ProductionManifest,
+ )
+ from ai_video.production.paths import _read_regular_file_nofollow, canonical_video_asset_path
+ from ai_video.production.repair_input_admission import (
+@@ -25,6 +29,100 @@ class QualificationPreviewInputReceipt(RepairPreviewInputAdmissionReceipt):
+     contract_version: Literal["development-qualification-preview/1"] = "development-qualification-preview/1"
+ 
+ 
++class CaptionedMusicCaption(StrictModel):
++    caption_asset_id: str = Field(min_length=1)
++    caption_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
++    script_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
++    transcript_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
++
++
++class CaptionedMusicPreview(StrictModel):
++    """One exact song and sample window, never captured dialogue."""
++
++    track: AudioTrackSpec
++    audio_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
++    captions: tuple[CaptionedMusicCaption, ...] = Field(min_length=1)
++
++    @model_validator(mode="after")
++    def _normal_speed_global_song(self):
++        track = self.track
++        if (track.audio_kind is not AudioKind.BGM or track.shot_id is not None
++                or track.start_sample != 0 or track.trim_duration_samples is None
++                or track.gain_millidb != 0 or track.fade_in_samples != 0
++                or track.fade_out_samples != 0 or track.ducking is not None):
++            raise ValueError("Captioned music preview requires one explicit unmodified global BGM window")
++        if len({caption.caption_asset_id for caption in self.captions}) != len(self.captions):
++            raise ValueError("Captioned music preview caption IDs must be unique")
++        return self
++
++    def validate_asset(self, asset):
++        metadata = asset.audio_metadata if asset is not None else None
++        if (asset is None or asset.asset_id != self.track.asset_id
++                or asset.asset_type is not AssetType.MUSIC
++                or asset.source_kind not in {AssetSourceKind.IMPORTED, AssetSourceKind.GENERATED}
++                or asset.sha256 != self.audio_asset_sha256 or metadata is None
++                or metadata.audio_kind is not AudioKind.BGM
++                or metadata.source.kind is not asset.source_kind
++                or metadata.source.provider_or_tool != asset.tool
++                or metadata.source.input_fingerprint != asset.input_fingerprint
++                or self.track.trim_start_sample + self.track.trim_duration_samples
++                > metadata.duration_samples):
++            raise ValueError("Captioned music preview differs from its exact song provenance and samples")
++
++    def validate_caption(self, asset):
++        expected = next((c for c in self.captions if c.caption_asset_id == asset.asset_id), None)
++        metadata = asset.caption_metadata
++        if (expected is None or asset.asset_type is not AssetType.CAPTION or metadata is None
++                or asset.sha256 != expected.caption_asset_sha256
++                or metadata.source_audio_asset_id != self.track.asset_id
++                or metadata.source_audio_sha256 != self.audio_asset_sha256
++                or metadata.script_hash != expected.script_hash
++                or metadata.transcript_hash != expected.transcript_hash):
++            raise ValueError("Captioned music preview differs from its exact sealed caption identity")
++
++    def validate_captions(self, assets):
++        by_id = {asset.asset_id: asset for asset in assets}
++        for caption in self.captions:
++            asset = by_id.get(caption.caption_asset_id)
++            if asset is None:
++                raise ValueError("Captioned music preview is missing its sealed caption asset")
++            self.validate_caption(asset)
++
++
++class CaptionedMusicQualificationPreviewInputReceipt(QualificationPreviewInputReceipt):
++    contract_version: Literal["development-qualification-preview/2"] = "development-qualification-preview/2"
++    captioned_music: CaptionedMusicPreview
++
++
++def allows_captioned_music_caption(project, caption, source):
++    """A narrowly sealed development source exception, never general music captions."""
++    from ai_video.production.repair_input_admission import is_repair_input_record, verify_repair_input
++
++    if source.asset_type is not AssetType.MUSIC or source.audio_metadata is None:
++        return False
++    receipts = []
++    for asset in project.registry.assets:
++        if not is_repair_input_record(asset, project.root):
++            continue
++        receipt = verify_repair_input(asset, project.root)
++        if (receipt.contract_version != "development-qualification-preview/2"
++                or receipt.target_project_id != project.project.project_id
++                or receipt.target_project_hash != project.project.content_hash):
++            continue
++        receipts.append(receipt)
++    if not receipts:
++        return False
++    music = receipts[0].captioned_music
++    if any(receipt.captioned_music != music for receipt in receipts):
++        return False
++    try:
++        music.validate_asset(source)
++        music.validate_caption(caption)
++    except ValueError:
++        return False
++    return True
++
++
+ def _source_state(manifest, attempt_id):
+     attempt = next((a for a in manifest.attempts if a.attempt_id == attempt_id), None)
+     state = attempt.video_generation_state if attempt else None
+@@ -109,7 +207,8 @@ def validate_qualification_capture(receipt):
+ 
+ 
+ def _prepare_qualification_preview_input(*, target_root, project, registry, source_root,
+-        source_attempt_id, source_sha256, asset_id, usage_license, preview_use, preview_probe):
++        source_attempt_id, source_sha256, asset_id, usage_license, preview_use, preview_probe,
++        captioned_music=None):
+     """Read-only preparation for canonical bootstrap_initial_state; no side effects."""
+     from ai_video.production.project import load_production_project
+     from ai_video.production.registry import registry_semantic_sha256
+@@ -142,8 +241,17 @@ def _prepare_qualification_preview_input(*, target_root, project, registry, sour
+         source_attempt_id=source_attempt_id, source_manifest_json=raw.decode(),
+         source_manifest_sha256=hashlib.sha256(raw).hexdigest(), documents=docs,
+         preview_use=RepairPreviewUse.model_validate(preview_use), preview_probe=preview_probe)
+-    provisional = QualificationPreviewInputReceipt.model_construct(**values, content_hash="0" * 64)
+-    receipt = QualificationPreviewInputReceipt.model_validate({**provisional.model_dump(mode="python"),
++    receipt_type = QualificationPreviewInputReceipt
++    if captioned_music is not None:
++        if isinstance(captioned_music, CaptionedMusicPreview):
++            captioned_music = captioned_music.model_dump(mode="python")
++        music = CaptionedMusicPreview.model_validate(captioned_music)
++        music.validate_asset(next((a for a in registry.assets if a.asset_id == music.track.asset_id), None))
++        music.validate_captions(registry.assets)
++        values['captioned_music'] = music
++        receipt_type = CaptionedMusicQualificationPreviewInputReceipt
++    provisional = receipt_type.model_construct(**values, content_hash="0" * 64)
++    receipt = receipt_type.model_validate({**provisional.model_dump(mode="python"),
+         "content_hash": canonical_sha256(provisional.model_dump(mode="json"))})
+     measured = receipt.preview_probe.measured
+     asset = AssetRecord(asset_id=asset_id, asset_type=AssetType.VIDEO,
+diff --git a/src/ai_video/production/repair_input_admission.py b/src/ai_video/production/repair_input_admission.py
+index 331bb98cf8f7e217a26ec4adc74ba9fc80d7bfa9..aa3936ea567ba3b169fb26d901dbb2fa143387d8 100644
+--- a/src/ai_video/production/repair_input_admission.py
++++ b/src/ai_video/production/repair_input_admission.py
+@@ -97,7 +97,7 @@ class RepairInputAdmissionReceipt(StrictModel):
+ 
+     @model_validator(mode="after")
+     def _source_chain(self):
+-        if self.contract_version == "development-qualification-preview/1":
++        if self.contract_version in {"development-qualification-preview/1", "development-qualification-preview/2"}:
+             from ai_video.production.qualification_preview_input import validate_qualification_capture
+             validate_qualification_capture(self)
+             return self
+@@ -282,6 +282,8 @@ class RepairReplacementPreviewInputAdmissionReceipt(RepairPreviewInputAdmissionR
+ 
+ 
+ def _preview_input_tool(receipt):
++    if receipt.contract_version == "development-qualification-preview/2":
++        return ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="8")
+     if receipt.contract_version == "development-qualification-preview/1":
+         return ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="7")
+     if receipt.contract_version == "development-repair-input/6":
+@@ -444,6 +446,9 @@ def verify_repair_input(record, root):
+     if version == "development-qualification-preview/1":
+         from ai_video.production.qualification_preview_input import QualificationPreviewInputReceipt
+         receipt_type = QualificationPreviewInputReceipt
++    elif version == "development-qualification-preview/2":
++        from ai_video.production.qualification_preview_input import CaptionedMusicQualificationPreviewInputReceipt
++        receipt_type = CaptionedMusicQualificationPreviewInputReceipt
+     if receipt_type is None:
+         raise ValueError("Development repair input version is unsupported")
+     receipt = receipt_type.model_validate_json(payload)
+diff --git a/src/ai_video/production/validation.py b/src/ai_video/production/validation.py
+index 51ce7c1e0840e4b64523b5c39e33170f3bd2a182..3ebf9a9bc634f69bb7b4455ed7e441857f9916e9 100644
+--- a/src/ai_video/production/validation.py
++++ b/src/ai_video/production/validation.py
+@@ -310,7 +310,10 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
+         if source.sha256 != metadata.source_audio_sha256:
+             raise _invalid(f"Caption asset {asset.asset_id} source audio hash is invalid.")
+         if source_metadata.script_hash != metadata.script_hash:
+-            raise _invalid(f"Caption asset {asset.asset_id} script hash is invalid.")
++            from ai_video.production.qualification_preview_input import allows_captioned_music_caption
++
++            if not allows_captioned_music_caption(bundle, asset, source):
++                raise _invalid(f"Caption asset {asset.asset_id} script hash is invalid.")
+         if (
+             asset.input_artifact_ids != (source.asset_id,)
+             or asset.input_fingerprint != source.sha256
+diff --git a/tests/test_caption_development_preview.py b/tests/test_caption_development_preview.py
+index 97882921ed6c15b355626e86d19b092c681d5c68..0bc8cf86377a958f19621ee16a7cc6cfef215ff9 100644
+--- a/tests/test_caption_development_preview.py
++++ b/tests/test_caption_development_preview.py
+@@ -466,3 +466,41 @@ def test_captured_dialogue_preview_can_add_silent_image_title_and_score(monkeypa
+     else:
+         with pytest.raises(ValueError):
+             check()
++
++
++@pytest.mark.parametrize('changes', [
++    {'audio_kind': 'dialogue', 'shot_id': 'shot-s01'},
++    {'audio_kind': 'narration', 'shot_id': 'shot-s01'},
++    {'start_sample': 1}, {'shot_id': 'shot-s01'}, {'trim_duration_samples': None},
++    {'gain_millidb': -1}, {'fade_in_samples': 1}, {'fade_out_samples': 1},
++    {'ducking': {'sidechain_track_ids': ('other',), 'attenuation_millidb': -1000,
++                 'attack_samples': 0, 'release_samples': 0}},
++])
++def test_captioned_music_binding_requires_explicit_unmodified_global_song(changes):
++    from ai_video.production.qualification_preview_input import CaptionedMusicPreview
++    track = dict(track_id='song', asset_id='song-asset', audio_kind='bgm',
++                 start_sample=0, trim_duration_samples=96_000)
++    track.update(changes)
++    with pytest.raises(ValueError):
++        CaptionedMusicPreview.model_validate({'track': track, 'audio_asset_sha256': 'a'*64,
++            'captions': ({'caption_asset_id': 'lyrics', 'caption_asset_sha256': 'b'*64,
++                          'script_hash': 'c'*64, 'transcript_hash': 'd'*64},)})
++
++
++@pytest.mark.parametrize('failure', ['mixed_version', 'different_song'])
++def test_captioned_music_clips_require_the_same_opt_in(failure):
++    from ai_video.production._composition_visual import _captioned_music_binding
++    from ai_video.production.qualification_preview_input import CaptionedMusicPreview
++    music = CaptionedMusicPreview.model_validate({'track': {
++        'track_id': 'song', 'asset_id': 'song-asset', 'audio_kind': 'bgm',
++        'start_sample': 0, 'trim_duration_samples': 96_000}, 'audio_asset_sha256': 'a'*64,
++        'captions': ({'caption_asset_id': 'lyrics', 'caption_asset_sha256': 'b'*64,
++                      'script_hash': 'c'*64, 'transcript_hash': 'd'*64},)})
++    first = SimpleNamespace(contract_version='development-qualification-preview/2', captioned_music=music)
++    second = SimpleNamespace(contract_version='development-qualification-preview/2', captioned_music=music)
++    if failure == 'mixed_version':
++        second.contract_version = 'development-qualification-preview/1'
++    else:
++        second.captioned_music = music.model_copy(update={'audio_asset_sha256': 'b'*64})
++    with pytest.raises(ValueError, match='same explicit song binding'):
++        _captioned_music_binding([first, second], invalid=lambda message, *_: ValueError(message))
+diff --git a/tests/test_qualification_preview_input.py b/tests/test_qualification_preview_input.py
+index a3903ecf277a8c9cbcab0ce43ad01bbe0b519084..377f1e0a8bcf7442698f0792c1a2f3f86f3c6344 100644
+--- a/tests/test_qualification_preview_input.py
++++ b/tests/test_qualification_preview_input.py
+@@ -56,6 +56,8 @@ def test_exact_paid_trial_capture_strict_reopens_and_cannot_promote(tmp_path):
+     asset=next(a for a in loaded.registry.assets if a.asset_id=='trial-preview')
+     receipt=verify_repair_input(asset,target)
+     assert receipt.contract_version=='development-qualification-preview/1'
++    assert 'captioned_music' not in receipt.model_dump()
++    assert asset.tool.version == '7'
+     assert receipt.qualification=='NOT_EVALUATED'
+     assert loaded.manifest.attempts==()
+     assert loaded.manifest.active_paid_provider_budget is None
+@@ -101,3 +103,232 @@ def test_production_fetch_cannot_be_relabelled_as_qualification_preview(tmp_path
+             usage_license='fixture only',preview_use=use,preview_probe=probe)
+     assert 'exact paid source chain' in error.value.technical_detail
+     assert {p.relative_to(target):p.read_bytes() for p in target.rglob('*') if p.is_file()}==before
++
++
++def _captioned_music_preview(tmp_path, *, opt_in=True, duration_samples=96_000,
++        generated=False, bilingual=False, pending=False, conflict=False, ordinary_target=False):
++    """Use real fixture WAV/canonical captions through public bootstrap and reopen."""
++    import hashlib
++    import yaml
++    from ai_video.production.captions import CaptionImportRequest, caption_timing_fingerprint
++    from ai_video.production.composition_contracts import AudioTrackSpec, CaptionTrackBinding, CompositionLayerSpec, CompositionSpec
++    from ai_video.production.models import AssetRoleRequirement, AssetSourceKind, AssetType, CaptionTrack, DurationPolicy, Shot, VisualStrategy
++    from ai_video.production.project import load_production_project
++    from ai_video.production.registry import registry_semantic_sha256
++    from ai_video.production.state_commit import PreparedArtifact, prepare_audio_registry_commit
++    from production_project_factory import make_p4_composition_fixture
++
++    writer, arguments, artifacts = _qualification_bundle(tmp_path)
++    root = arguments['target_root']
++    reference = arguments['project'].artifacts.shots[0]
++    shot_payload = next(a.payload for a in artifacts if a.relative_path == reference.path)
++    changes = {'duration_policy': DurationPolicy(mode='fixed', seconds=2)}
++    if not ordinary_target:
++        changes.update({
++        'visual_strategy': VisualStrategy.GENERATED_VIDEO,
++        'generated_video_rationale': 'Offline qualification preview fixture',
++        'required_asset_roles': (AssetRoleRequirement(role='final_visual', asset_ids=(),
++            allowed_asset_types=(AssetType.VIDEO,)),)})
++    shot = seal_artifact(Shot.model_validate(yaml.safe_load(shot_payload)).model_copy(update=changes))
++    payload = yaml.safe_dump(shot.model_dump(mode='json'), sort_keys=False).encode()
++    def artifact(path, data):
++        return PreparedArtifact(path, data, hashlib.sha256(data).hexdigest())
++    artifacts = tuple(artifact(reference.path, payload) if a.relative_path == reference.path else a
++                      for a in artifacts)
++    arguments['project'] = seal_artifact(arguments['project'].model_copy(update={
++        'artifacts': arguments['project'].artifacts.model_copy(update={'shots': tuple(
++            r.model_copy(update={'content_hash': shot.content_hash}) if r == reference else r
++            for r in arguments['project'].artifacts.shots)})}))
++    arguments['preview_use'].update(transform={'video_fit': 'cover'})
++    sound_root = tmp_path / 'sound'
++    sound_root.mkdir()
++    sound, sound_spec = make_p4_composition_fixture(sound_root)
++    music = next(a for a in sound.registry.assets if a.asset_id == 'bgm-theme')
++    if generated:
++        music = music.model_copy(update={'source_kind': AssetSourceKind.GENERATED,
++            'audio_metadata': music.audio_metadata.model_copy(update={
++                'source': music.audio_metadata.source.model_copy(update={'kind': AssetSourceKind.GENERATED})})})
++    caption = next(a for a in sound.registry.assets if a.asset_type is AssetType.CAPTION)
++    track = CaptionTrack.model_validate_json((sound_root / caption.artifact_path).read_bytes())
++    track = track.model_copy(update={'source_audio_asset_id': music.asset_id,
++                                    'source_audio_sha256': music.sha256})
++    track = seal_artifact(track.model_copy(update={'timing_fingerprint': caption_timing_fingerprint(track)}))
++    style = sound_spec.caption_tracks[0].style_reference
++    style_bytes = (sound_root / style.path).read_bytes()
++    imported = CaptionImportRequest.create(caption_track=track, style_reference=style, style_bytes=style_bytes)
++    metadata = caption.caption_metadata.model_copy(update={
++        'source_audio_asset_id': music.asset_id, 'source_audio_sha256': music.sha256,
++        'timing_fingerprint': track.timing_fingerprint})
++    caption = caption.model_copy(update={'sha256': hashlib.sha256(imported.track_bytes).hexdigest(),
++        'size_bytes': len(imported.track_bytes), 'input_artifact_ids': (music.asset_id,),
++        'input_fingerprint': music.sha256, 'caption_metadata': metadata})
++    caption_inputs = [(caption, imported.track_bytes)]
++    if bilingual:
++        translated = track.model_copy(update={'artifact_id': 'caption-artifact-zh',
++            'caption_track_id': 'caption-track-zh', 'language': 'zh-CN',
++            'script_hash': hashlib.sha256('中文译句脚本'.encode()).hexdigest(),
++            'transcript_hash': hashlib.sha256('你好世界'.encode()).hexdigest(),
++            'segments': tuple(segment.model_copy(update={'text': text})
++                for segment, text in zip(track.segments, ('你好', '世界')))})
++        translated = seal_artifact(translated.model_copy(update={
++            'timing_fingerprint': caption_timing_fingerprint(translated)}))
++        imported_zh = CaptionImportRequest.create(caption_track=translated,
++            style_reference=style, style_bytes=style_bytes)
++        translated_asset = caption.model_copy(update={'asset_id': 'caption-asset-zh',
++            'artifact_path': caption.artifact_path.with_name('caption-track-zh.json'),
++            'sha256': hashlib.sha256(imported_zh.track_bytes).hexdigest(),
++            'size_bytes': len(imported_zh.track_bytes),
++            'caption_metadata': metadata.model_copy(update={
++                'caption_track_id': translated.caption_track_id, 'language': translated.language,
++                'script_hash': translated.script_hash, 'transcript_hash': translated.transcript_hash,
++                'timing_fingerprint': translated.timing_fingerprint})})
++        caption_inputs.append((translated_asset, imported_zh.track_bytes))
++    caption_assets = tuple(asset for asset, _ in caption_inputs)
++    base_registry = arguments['registry']
++    registry = base_registry.model_copy(update={
++        'schema_version': '2.1', 'assets': (*base_registry.assets, music, *caption_assets)})
++    digest = registry_semantic_sha256(registry)
++    arguments['registry'] = registry.model_copy(update={'revision_id': digest, 'content_hash': digest})
++    music_track = AudioTrackSpec(track_id='song', asset_id=music.asset_id, audio_kind='bgm',
++        start_sample=0, trim_start_sample=0, trim_duration_samples=duration_samples)
++    if opt_in:
++        arguments['captioned_music'] = {'track': music_track, 'audio_asset_sha256': music.sha256,
++            'captions': tuple({'caption_asset_id': asset.asset_id, 'caption_asset_sha256': asset.sha256,
++                'script_hash': asset.caption_metadata.script_hash,
++                'transcript_hash': asset.caption_metadata.transcript_hash} for asset in caption_assets)}
++    spec = seal_artifact(CompositionSpec(artifact_id='song-preview', revision=1, content_hash='0'*64,
++        creation_receipt_id='song-preview', source_provenance=arguments['project'].source_provenance,
++        schema_version='2.3', composition_id='song-preview', shot_ids=(shot.shot_id,),
++        delivery_profile=arguments['project'].delivery_profile,
++        layers=(CompositionLayerSpec(layer_id='visual', shot_id=shot.shot_id,
++            asset_role='final_visual', asset_id=arguments['asset_id'], trim_start_frame=0,
++            trim_duration_frames=48, transform={'video_fit': 'cover'}, source_audio_policy='REPLACE',
++            source_audio_reason='Use only the explicitly bound external fixture song.'),),
++        audio_tracks=(music_track,), caption_tracks=tuple(CaptionTrackBinding(
++            binding_id=asset.asset_id, caption_asset_id=asset.asset_id,
++            source_audio_track_id=music_track.track_id, style_reference=style)
++            for asset in caption_assets)))
++    before = {p.relative_to(arguments['source_root']): p.read_bytes()
++              for p in arguments['source_root'].rglob('*') if p.is_file()}
++    registry, captured = prepare_qualification_preview_input(**arguments)
++    captured_record = next(a for a in registry.assets if a.asset_id == arguments['asset_id'])
++    capture_records = [captured_record]
++    if conflict:
++        other = {**arguments, 'asset_id': 'other-preview', 'captioned_music': {
++            **arguments['captioned_music'], 'track': music_track.model_copy(update={'track_id': 'other-song'})}}
++        other_registry, other_artifacts = prepare_qualification_preview_input(**other)
++        capture_records.append(next(a for a in other_registry.assets if a.asset_id == other['asset_id']))
++        captured += tuple(a for a in other_artifacts
++                          if a.relative_path not in {old.relative_path for old in captured})
++    registry = base_registry.model_copy(update={
++        'schema_version': '2.2', 'assets': (*base_registry.assets, *capture_records)})
++    digest = registry_semantic_sha256(registry)
++    registry = registry.model_copy(update={'revision_id': digest, 'content_hash': digest})
++    writer.bootstrap_initial_state(attempt_id='song-preview-bootstrap', project=arguments['project'],
++        registry=registry, artifacts=(*artifacts, *captured))
++    loaded = load_production_project(root / 'project.yaml')
++    assert music.asset_id not in loaded.asset_paths
++    assert caption.asset_id not in loaded.asset_paths
++    assert loaded.manifest.attempts == ()
++    from ai_video.production.composition import resolve_composition
++    with pytest.raises(AiVideoError):
++        resolve_composition(loaded, spec, '0.7.103')
++    if pending:
++        return loaded, spec, arguments, before
++    registry = loaded.registry.model_copy(update={'assets': (*loaded.registry.assets, music, *caption_assets)})
++    digest = registry_semantic_sha256(registry)
++    registry = registry.model_copy(update={'revision_id': digest, 'content_hash': digest})
++    pointer = loaded.manifest.active_project
++    writer.commit(prepare_audio_registry_commit(manifest=loaded.manifest, project=loaded.project,
++        base_registry=loaded.registry, registry=registry, attempt_id='song-caption-import',
++        artifacts=(artifact(music.artifact_path, (sound_root / music.artifact_path).read_bytes()),
++            *(artifact(asset.artifact_path, data) for asset, data in caption_inputs), artifact(style.path, style_bytes)),
++        active_project_artifact=artifact(pointer.path, (root / pointer.path).read_bytes())))
++    loaded = load_production_project(root / 'project.yaml')
++    return loaded, spec, arguments, before
++
++
++@pytest.mark.parametrize('generated', [False, True])
++def test_captioned_music_qualification_preview_public_resolution_stays_unaccepted(tmp_path, generated):
++    from ai_video.production.composition import resolve_composition
++    from ai_video.production.repair_input_admission import require_production_render_sources, verify_repair_input
++    loaded, spec, arguments, before = _captioned_music_preview(tmp_path,
++        generated=generated, bilingual=generated)
++    timeline = resolve_composition(loaded, spec, '0.7.103')
++    asset = next(a for a in loaded.registry.assets if a.asset_id == arguments['asset_id'])
++    receipt = verify_repair_input(asset, loaded.root)
++    assert receipt.contract_version == 'development-qualification-preview/2'
++    assert receipt.qualification == 'NOT_EVALUATED'
++    assert timeline.usage_scope == 'development_audio_preview'
++    assert timeline.total_samples == 96_000
++    assert timeline.audio_spans[0].track_id == 'song'
++    assert {cue.text for cue in timeline.caption_cues} == (
++        {'Hello', 'world', '你好', '世界'} if generated else {'Hello', 'world'})
++    assert {attempt.operation for attempt in loaded.manifest.attempts} == {'audio_import'}
++    assert {p.relative_to(arguments['source_root']): p.read_bytes()
++            for p in arguments['source_root'].rglob('*') if p.is_file()} == before
++    with pytest.raises(ValueError, match='cannot be activated'):
++        require_production_render_sources(loaded.root, loaded.manifest.active_registry, timeline)
++
++
++def test_song_captions_without_explicit_qualification_binding_are_rejected(tmp_path):
++    with pytest.raises(AiVideoError, match='script hash is invalid'):
++        _captioned_music_preview(tmp_path, opt_in=False)
++
++
++def test_conflicting_captioned_music_captures_do_not_authorize_reader(tmp_path):
++    with pytest.raises(AiVideoError, match='script hash is invalid'):
++        _captioned_music_preview(tmp_path, conflict=True)
++
++
++def test_unconsumed_captioned_music_capture_is_reopenable_but_not_resolvable(tmp_path):
++    from ai_video.production.composition import resolve_composition
++    loaded, spec, _, _ = _captioned_music_preview(tmp_path, pending=True)
++    with pytest.raises(AiVideoError):
++        resolve_composition(loaded, spec, '0.7.103')
++
++
++def test_unused_capture_cannot_launder_song_captions_into_production(tmp_path):
++    from ai_video.production.composition import resolve_composition
++    from ai_video.production.composition_contracts import CompositionLayerSpec
++    loaded, spec, _, _ = _captioned_music_preview(tmp_path, ordinary_target=True)
++    role = loaded.shots[0].required_asset_roles[0]
++    assert role.asset_ids
++    ordinary = CompositionLayerSpec(layer_id='ordinary-visual', shot_id=loaded.shots[0].shot_id,
++        asset_role=role.role, asset_id=role.asset_ids[0])
++    spec = seal_artifact(spec.model_copy(update={'layers': (ordinary,)}))
++    with pytest.raises(AiVideoError, match='actual qualification preview visuals'):
++        resolve_composition(loaded, spec, '0.7.103')
++
++
++@pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
++    'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
++def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
++    from ai_video.production.composition import resolve_composition
++    loaded, spec, _, _ = _captioned_music_preview(tmp_path,
++        duration_samples=95_999 if failure == 'short_song' else 96_000)
++    if failure == 'changed_song_sha':
++        source = next(a for a in loaded.registry.assets if a.asset_id == spec.audio_tracks[0].asset_id)
++        registry = loaded.registry.model_copy(update={'assets': tuple(
++            a.model_copy(update={'sha256': 'b'*64}) if a == source else a
++            for a in loaded.registry.assets)})
++        loaded = loaded.model_copy(update={'registry': registry})
++    elif failure == 'extra_track':
++        spec = seal_artifact(spec.model_copy(update={'audio_tracks': (
++            *spec.audio_tracks, spec.audio_tracks[0].model_copy(update={'track_id': 'extra-song'}))}))
++    elif failure in {'wrong_caption_track', 'shot_caption'}:
++        update = {'source_audio_track_id': 'other-song'} if failure == 'wrong_caption_track' else {
++            'shot_id': spec.shot_ids[0]}
++        spec = seal_artifact(spec.model_copy(update={'caption_tracks': (
++            spec.caption_tracks[0].model_copy(update=update),)}))
++    elif failure == 'keep_native_audio':
++        spec = seal_artifact(spec.model_copy(update={'layers': (
++            spec.layers[0].model_copy(update={'source_audio_policy': 'KEEP'}),)}))
++    elif failure == 'retimed_visual':
++        from ai_video.production.video_retime import VideoTimeMap
++        time_map = VideoTimeMap.model_validate({'audio_policy': 'mute', 'points': [
++            {'source_frame': 0, 'output_frame': 0}, {'source_frame': 48, 'output_frame': 40}]})
++        spec = seal_artifact(spec.model_copy(update={'layers': (
++            spec.layers[0].model_copy(update={'source_time_map': time_map}),)}))
++    with pytest.raises(AiVideoError):
++        resolve_composition(loaded, spec, '0.7.103')

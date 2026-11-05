@@ -1,0 +1,26 @@
+{
+  "operation": "add_one_empty_video_node",
+  "via": "canvas left toolbar 视频 button",
+  "prior_node_ids": [
+    "node_nxqx68czn9",
+    "node_c33q9smf0f",
+    "node_vdk8wx4zs5",
+    "node_1vxq33rs4d",
+    "node_x7nx0de1et",
+    "node_2dp6s93h3e",
+    "node_84f31ceyn1",
+    "node_5jvcjw9pzq",
+    "node_g5dbxsad5y",
+    "node_g2c2vwv3d1",
+    "node_p8zbz56w2a",
+    "node_pt1yxwtw3y",
+    "node_wdy7ej2s5d",
+    "node_d0a24kjfsf",
+    "node_4bgjmfnzjj",
+    "node_0hhpmypamh",
+    "node_41076c7tr7",
+    "node_dd7zc9e0h4"
+  ],
+  "created_at": "2026-11-02T11:18:38.364Z",
+  "generation_POSTs": 0
+}

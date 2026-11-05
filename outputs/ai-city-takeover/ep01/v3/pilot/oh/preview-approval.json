@@ -1,0 +1,152 @@
+{
+ "schema": "iris-v3-preview-approval/1",
+ "unit_group": "pilot-digital-human",
+ "question": "动画分镜 a2：http://127.0.0.1:8768/review/animatic-a2.html\n试拍参考包：http://127.0.0.1:8768/pilot/preview.html\n（a1 对照：http://127.0.0.1:8768/review/animatic-a1.html）\n\n这是检查点 B：请以正常速度带声音看完 a2，再看试拍参考包（5 条数字人唱段 + 2 条 Seedance 首帧镜头）。你认可后我把它封存为 preview_approval，改掉上面三处小问题，做提交前连续性报告，再进入阶段 7 付费试拍（预留上限 1155 积分，不是报价）。怎么处理？\n\n---\n\n试拍参考包：http://127.0.0.1:8768/pilot/preview.html\n\n数字人动作描述要求只写正向动作。U020 里有「头几乎不动」，U027 里有「唱完最后一个字后嘴慢慢合上，停住不动」；上次同类否定说法（SC4「几乎不笑」）被场记判为不可提交。改成正向说法可以吗？U020 改为「头部保持平稳」；U027 改为「唱完最后一个字后嘴慢慢合上，静静停住」。其余文字不变。",
+ "user_quote": "认可，进入试拍 ／ 同意这两处改写",
+ "approved_at": "2026-11-05T01:30:10+00:00",
+ "approved_at_basis": "time the main session recorded both answers, minutes after the user gave them in this session",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview.html",
+  "sha256": "61ae3176fd06a3a4f8543cdd02784fb0808f159ecbd4236954476ed0457e597c"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs-r2.json",
+  "sha256": "37e27128eff57c90b8861194914b3d3964e6cf27b4cb136caef110d4f84ae720"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-face-shut-b.png",
+   "sha256": "1eb6555ae7c7f378eb79cf2b021c6258096c470cb711fa3a0772a0518a436169",
+   "role": "U020 still; U027 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U020.wav",
+   "sha256": "2ad08570d6f15567ec292f2135918fdc621b725ab2f1f74286607d000e583552",
+   "role": "U020 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-shut-b.png",
+   "sha256": "ffe0c323ef57309e72002e93811472d54490865b81b35f4a5afe96e809ef5bdf",
+   "role": "U021 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+   "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+   "role": "U021 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-34-shut-b.png",
+   "sha256": "df5cc9f24b0ae079517e63440f5ee06df61fdcaf3e8a8868c8e9e6e322f11733",
+   "role": "U022 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U022.wav",
+   "sha256": "cf6e1128cd21da9af38eda200b06a6a4232814ea86aab4420fe22b0d3806b385",
+   "role": "U022 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-turn-shut-b.png",
+   "sha256": "652bc76d732d5af9b4c4e91cf8dbcf169821e3d5b5589980da069ce7b321b721",
+   "role": "U025 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U025.wav",
+   "sha256": "47d8219c76ecc0834e9808b40f57235afc41de33837c130cd841b9957c856314",
+   "role": "U025 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U027.wav",
+   "sha256": "ea5e90b1918aa1d6c2c8c19895e4acbd120abc41cd196cd6674c9bd64092ae41",
+   "role": "U027 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview.html",
+   "sha256": "61ae3176fd06a3a4f8543cdd02784fb0808f159ecbd4236954476ed0457e597c",
+   "role": "package page reviewed at checkpoint B"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs.json",
+   "sha256": "41ea7116768910f8bdb84fefca47f6060d732067561f1e0a2b6702a0dd5ad2a0",
+   "role": "package inputs approved at checkpoint B"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs-r2.json",
+   "sha256": "37e27128eff57c90b8861194914b3d3964e6cf27b4cb136caef110d4f84ae720",
+   "role": "package revision r2: the two action-text rewrites the user approved"
+  }
+ ],
+ "takes": {
+  "U020": {
+   "image": {
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-face-shut-b.png",
+    "sha256": "1eb6555ae7c7f378eb79cf2b021c6258096c470cb711fa3a0772a0518a436169"
+   },
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U020.wav",
+    "sha256": "2ad08570d6f15567ec292f2135918fdc621b725ab2f1f74286607d000e583552",
+    "seconds": 6.41
+   },
+   "action_prompt": "镜头固定近景。她冷静而克制地对着镜头低声耳语，嘴随歌词轻轻张合，眼神从下往上看着镜头，头部保持平稳；唱最后那个长音时下巴慢慢抬起，眉头放松。",
+   "action_prompt_sha256": "c32bf41d66132408515212fee32dde28170c8b8ce5b63152803ef2373c2e5896"
+  },
+  "U021": {
+   "image": {
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-shut-b.png",
+    "sha256": "ffe0c323ef57309e72002e93811472d54490865b81b35f4a5afe96e809ef5bdf"
+   },
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+    "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+    "seconds": 4.36
+   },
+   "action_prompt": "镜头固定中景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，肩膀放松，重心落在后脚，句尾轻轻吸一口气，眉头放松，眼睛向上直视镜头，双手自然垂在身侧。",
+   "action_prompt_sha256": "14ca007fc710903a913b0e583fd2259e00813bd160d483b7a77e9ceb487cde3e"
+  },
+  "U022": {
+   "image": {
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-34-shut-b.png",
+    "sha256": "df5cc9f24b0ae079517e63440f5ee06df61fdcaf3e8a8868c8e9e6e322f11733"
+   },
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U022.wav",
+    "sha256": "cf6e1128cd21da9af38eda200b06a6a4232814ea86aab4420fe22b0d3806b385",
+    "seconds": 3.57
+   },
+   "action_prompt": "镜头固定近景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，唱到最后的长音时身体向镜头前倾，眼睛微微眯起，眉头放松，眼神始终看着镜头。",
+   "action_prompt_sha256": "d123f513d5a5e1c2c8213ad66694abce1063f97c329a4c546a85cb72d799534f"
+  },
+  "U025": {
+   "image": {
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-turn-shut-b.png",
+    "sha256": "652bc76d732d5af9b4c4e91cf8dbcf169821e3d5b5589980da069ce7b321b721"
+   },
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U025.wav",
+    "sha256": "47d8219c76ecc0834e9808b40f57235afc41de33837c130cd841b9957c856314",
+    "seconds": 6.21
+   },
+   "action_prompt": "镜头固定中景。开始时她侧头看着画面右侧的门缝；唱第一个长音时慢慢把头转回来，直视镜头；两个长音之间换一口气，再唱第二个长音，长音时嘴张开并保持，眉头放松。",
+   "action_prompt_sha256": "a151cbcc92a012550e71e4da29284e309a5f4f241e8f0e7720b37ab2c07ba3d4"
+  },
+  "U027": {
+   "image": {
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-face-shut-b.png",
+    "sha256": "1eb6555ae7c7f378eb79cf2b021c6258096c470cb711fa3a0772a0518a436169"
+   },
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U027.wav",
+    "sha256": "ea5e90b1918aa1d6c2c8c19895e4acbd120abc41cd196cd6674c9bd64092ae41",
+    "seconds": 4.17
+   },
+   "action_prompt": "镜头固定近景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，唱完最后一个字后嘴慢慢合上，静静停住，眉头放松，眼神始终直视镜头。",
+   "action_prompt_sha256": "ead2790c282390dff983ac41e96e5993c5c87f94ff8e46acb3292ef538fbcbef"
+  }
+ },
+ "mode": "即梦 数字人 · 大师模式 · output size follows the still (16:9 still → 1920×1088 last time)",
+ "budget": {
+  "generations": 5,
+  "retries": 0,
+  "operator_ceiling_per_take_CRD": 165,
+  "cumulative_CRD": 825
+ }
+}

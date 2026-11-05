@@ -1,0 +1,60 @@
+{
+ "schema": "iris-v3-preview-approval/1",
+ "unit_group": "pilot-digital-human-r3b",
+ "question": "http://127.0.0.1:8768/pilot/r3/u021-text-r2.html\n\n提交前场记拦下了描述：“面无表情”的“无”触犯只用正向说法的规则；开头静音时嘴张着没交代；“带点好奇”没写进去。页面上是两条线的新旧描述对照。用新写法吗？ ／ 上一条的立领红线唱到一半熄灭了。这次如果又熄灭，怎么判？",
+ "user_quote": "同意新写法 ／ 后期补画，不算 FAIL (Recommended)",
+ "approved_at": "2026-11-05T08:13:13+00:00",
+ "approved_at_basis": "time the main session recorded the answers, minutes after the user gave them",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v3/pilot/r3/u021-text-r2.html",
+  "sha256": "ad7201be8e49ab30a4e2c962b86d5a0df98a5185a4e611e2465121522bc2aa62"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs-r3b.json",
+  "sha256": "70c5fd8873133194a9972af63c07877aaa6fc39fff2a1428830cfc2e86cdebd3"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-sing.png",
+   "sha256": "4cb7b152e8e9ed40320e8dcdf73ce51e12c338bbb1d118a9ad2e6a1cc21bde2f",
+   "role": "U021 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+   "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+   "role": "U021 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/r3/u021-text-r2.html",
+   "sha256": "ad7201be8e49ab30a4e2c962b86d5a0df98a5185a4e611e2465121522bc2aa62",
+   "role": "preview page"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs-r3b.json",
+   "sha256": "70c5fd8873133194a9972af63c07877aaa6fc39fff2a1428830cfc2e86cdebd3",
+   "role": "preview inputs r3b"
+  }
+ ],
+ "mode": "即梦 数字人 · 大师模式 · output size follows the still",
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_take_CRD": 165,
+  "cumulative_CRD": 165
+ },
+ "takes": {
+  "U021": {
+   "image": {
+    "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-sing.png",
+    "sha256": "4cb7b152e8e9ed40320e8dcdf73ce51e12c338bbb1d118a9ad2e6a1cc21bde2f"
+   },
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+    "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+    "seconds": 4.36
+   },
+   "action_prompt": "镜头固定中近景。开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，投入地轻声唱，嘴随歌词自然张合，神情平静淡然，带着一点好奇，眉头舒展；唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头，肩膀放松，身体稳稳站定。",
+   "action_prompt_sha256": "13d5f01e35a6495c7440eb5dabfb71560df1766c9627818caecf0b473e7a99c3"
+  }
+ }
+}

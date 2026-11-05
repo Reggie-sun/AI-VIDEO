@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v2-n4-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "e1848d0175ca01b52c6bb27f8c41b8bcaa8f1b6c0da5bf6a3b9707a0685a1591",
+  "creation_receipt_id": "iris-v2-N4-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a962449099864b88bceb082c1297eb959b93c5706a27a3f2ee1565fd4892cbc0.json",
+      "content_hash": "a962449099864b88bceb082c1297eb959b93c5706a27a3f2ee1565fd4892cbc0"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e07551fa8b808ff385f87cfad5ad777dac0238755521b0cf9d522baab5b26786.json",
+      "content_hash": "e07551fa8b808ff385f87cfad5ad777dac0238755521b0cf9d522baab5b26786"
+    }
+  ],
+  "shot_id": "ep01v2-n4",
+  "scene_id": "cache-room",
+  "storyboard_beat_id": "action-n4",
+  "intent": "镜头缓慢横移跟随。她在悬浮的发光薄片之间慢慢走，抬手用指尖碰到一块薄片，薄片泛起一圈柔光后微微漂开，她收回手继续向前走，神情平静，嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）",
+    "她在薄片之间慢慢走，抬手用指尖碰到一块薄片，薄片泛起柔光后漂开，她收回手继续走，神情平静，嘴唇自然闭合",
+    "镜头缓慢横移跟随她",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v2-n4-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

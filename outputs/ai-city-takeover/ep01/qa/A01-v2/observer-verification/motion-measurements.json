@@ -1,0 +1,699 @@
+{
+  "method": "local 24x24 grayscale NCC over +/-16px at 960x540 normal-speed capture; bg similarity least squares, no learned detector",
+  "limitations": [
+    "Integer-pixel match quantization; local perspective and image synthesis may violate a global similarity model.",
+    "Residuals establish independent local motion, not a physiological cause.",
+    "NCC scale fit is background image change; it cannot distinguish an actual dolly from a digital zoom."
+  ],
+  "rows": [
+    {
+      "file": "playback-00-0.000.jpg",
+      "time": 0.0,
+      "tracks": {
+        "bg-city": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9999997615814209
+        },
+        "bg-lamp": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 1.0000005960464478
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 1.0000001192092896
+        },
+        "bg-window": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 1.0000016689300537
+        },
+        "body-left-shoulder": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9999998807907104,
+          "residual_dx": -2.066168834237954e-13,
+          "residual_dy": -1.6649223939410432e-13
+        },
+        "body-collar": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 1.0,
+          "residual_dx": -2.6168394544520317e-13,
+          "residual_dy": -1.3496190549474987e-13
+        },
+        "body-redline": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 1.0,
+          "residual_dx": -3.265209700833123e-13,
+          "residual_dy": -1.2208331840909806e-13
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0000000000000004,
+        "translate_x": -2.1050452057340132e-15,
+        "translate_y": 6.620123848081769e-15,
+        "fit_rmse_px": 1.9895196601282805e-13
+      }
+    },
+    {
+      "file": "playback-01-0.500.jpg",
+      "time": 0.5,
+      "tracks": {
+        "bg-city": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9976946115493774
+        },
+        "bg-lamp": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9982385039329529
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9945514798164368
+        },
+        "bg-window": {
+          "dx": 1,
+          "dy": 0,
+          "ncc": 0.8516268730163574
+        },
+        "body-left-shoulder": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9984008073806763,
+          "residual_dx": -0.25965266578854634,
+          "residual_dy": -0.19401858234872627
+        },
+        "body-collar": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9884432554244995,
+          "residual_dx": -0.41924340682494005,
+          "residual_dy": -0.10264001288433955
+        },
+        "body-redline": {
+          "dx": -1,
+          "dy": 1,
+          "ncc": 0.9745528697967529,
+          "residual_dx": -1.6071486341742423,
+          "residual_dy": 0.9346836281644945
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0012870221051322,
+        "translate_x": -0.3452477236235911,
+        "translate_y": -0.26930937549886835,
+        "fit_rmse_px": 0.14194514208931416
+      }
+    },
+    {
+      "file": "playback-02-1.000.jpg",
+      "time": 1.0,
+      "tracks": {
+        "bg-city": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9966774582862854
+        },
+        "bg-lamp": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9959736466407776
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9820647835731506
+        },
+        "bg-window": {
+          "dx": 1,
+          "dy": -1,
+          "ncc": 0.8772256970405579
+        },
+        "body-left-shoulder": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9959269762039185,
+          "residual_dx": -0.2615357268195393,
+          "residual_dy": 0.0181318909307151
+        },
+        "body-collar": {
+          "dx": -1,
+          "dy": 1,
+          "ncc": 0.9790109992027283,
+          "residual_dx": -1.4522597435663462,
+          "residual_dy": 1.1273367714873546
+        },
+        "body-redline": {
+          "dx": 1,
+          "dy": 0,
+          "ncc": 0.9699552059173584,
+          "residual_dx": 0.32317810768338107,
+          "residual_dy": 0.1719415818555594
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0015380969092484,
+        "translate_x": -0.46136982052722897,
+        "translate_y": -0.5718467782601546,
+        "fit_rmse_px": 0.28702036401373904
+      }
+    },
+    {
+      "file": "playback-03-1.500.jpg",
+      "time": 1.5,
+      "tracks": {
+        "bg-city": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9963831305503845
+        },
+        "bg-lamp": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9920650124549866
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9765809178352356
+        },
+        "bg-window": {
+          "dx": 2,
+          "dy": -1,
+          "ncc": 0.8572509288787842
+        },
+        "body-left-shoulder": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9890581965446472,
+          "residual_dx": -0.5239892480909265,
+          "residual_dy": -0.4821838866240711
+        },
+        "body-collar": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.99034583568573,
+          "residual_dx": -0.9206114831912344,
+          "residual_dy": -0.2550856713650238
+        },
+        "body-redline": {
+          "dx": 1,
+          "dy": 0,
+          "ncc": 0.9896737933158875,
+          "residual_dx": -0.387602179357726,
+          "residual_dy": -0.16232724541414534
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0031985664120993,
+        "translate_x": -0.9793369655957245,
+        "translate_y": -0.6693000217316616,
+        "fit_rmse_px": 0.41279988939006423
+      }
+    },
+    {
+      "file": "playback-04-2.000.jpg",
+      "time": 2.0,
+      "tracks": {
+        "bg-city": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9942636489868164
+        },
+        "bg-lamp": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9904308319091797
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9797918796539307
+        },
+        "bg-window": {
+          "dx": 2,
+          "dy": -1,
+          "ncc": 0.893208384513855
+        },
+        "body-left-shoulder": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9792348146438599,
+          "residual_dx": -0.5245325402090382,
+          "residual_dy": 0.25689594180118136
+        },
+        "body-collar": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9819560647010803,
+          "residual_dx": -0.9301372049960701,
+          "residual_dy": -0.510862677554631
+        },
+        "body-redline": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9710648059844971,
+          "residual_dx": -1.4077039877291884,
+          "residual_dy": -0.41600352208024444
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0032710053611857,
+        "translate_x": -1.0128399795482603,
+        "translate_y": -0.43445787182804835,
+        "fit_rmse_px": 0.4932847195435844
+      }
+    },
+    {
+      "file": "playback-05-2.500.jpg",
+      "time": 2.5,
+      "tracks": {
+        "bg-city": {
+          "dx": 1,
+          "dy": 0,
+          "ncc": 0.9935272932052612
+        },
+        "bg-lamp": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.993047297000885
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9888098835945129
+        },
+        "bg-window": {
+          "dx": 3,
+          "dy": -1,
+          "ncc": 0.8875270485877991
+        },
+        "body-left-shoulder": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9860383868217468,
+          "residual_dx": -0.033710484729226886,
+          "residual_dy": 0.07241925694508355
+        },
+        "body-collar": {
+          "dx": 0,
+          "dy": 0,
+          "ncc": 0.9915779829025269,
+          "residual_dx": -1.5910571655836396,
+          "residual_dy": -0.608454820952793
+        },
+        "body-redline": {
+          "dx": 1,
+          "dy": 0,
+          "ncc": 0.9647500514984131,
+          "residual_dx": -1.2472879349767387,
+          "residual_dy": -0.47810761333361584
+        }
+      },
+      "background_similarity": {
+        "scale": 1.004494731297213,
+        "translate_x": -1.078813224960886,
+        "translate_y": -0.6905225239417657,
+        "fit_rmse_px": 0.4427955326499829
+      }
+    },
+    {
+      "file": "playback-06-3.000.jpg",
+      "time": 3.0,
+      "tracks": {
+        "bg-city": {
+          "dx": 1,
+          "dy": 0,
+          "ncc": 0.9938134551048279
+        },
+        "bg-lamp": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9918273687362671
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9817287921905518
+        },
+        "bg-window": {
+          "dx": 3,
+          "dy": -1,
+          "ncc": 0.8095576763153076
+        },
+        "body-left-shoulder": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.990809977054596,
+          "residual_dx": -0.033710484729226886,
+          "residual_dy": 0.07241925694508355
+        },
+        "body-collar": {
+          "dx": -1,
+          "dy": 1,
+          "ncc": 0.977904736995697,
+          "residual_dx": -2.5910571655836394,
+          "residual_dy": 0.391545179047207
+        },
+        "body-redline": {
+          "dx": 4,
+          "dy": -1,
+          "ncc": 0.962058961391449,
+          "residual_dx": 1.7527120650232613,
+          "residual_dy": -1.478107613333616
+        }
+      },
+      "background_similarity": {
+        "scale": 1.004494731297213,
+        "translate_x": -1.078813224960886,
+        "translate_y": -0.6905225239417657,
+        "fit_rmse_px": 0.4427955326499829
+      }
+    },
+    {
+      "file": "playback-07-3.500.jpg",
+      "time": 3.5,
+      "tracks": {
+        "bg-city": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9944681525230408
+        },
+        "bg-lamp": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9930045008659363
+        },
+        "bg-bridge": {
+          "dx": 0,
+          "dy": 1,
+          "ncc": 0.9825180172920227
+        },
+        "bg-window": {
+          "dx": 4,
+          "dy": -2,
+          "ncc": 0.8472504615783691
+        },
+        "body-left-shoulder": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9884148836135864,
+          "residual_dx": -0.5413060250218398,
+          "residual_dy": -0.08025110293585502
+        },
+        "body-collar": {
+          "dx": -3,
+          "dy": 2,
+          "ncc": 0.974936306476593,
+          "residual_dx": -5.224232305380294,
+          "residual_dy": 1.3107792672693888
+        },
+        "body-redline": {
+          "dx": -1,
+          "dy": 2,
+          "ncc": 0.9650863409042358,
+          "residual_dx": -4.028322925802344,
+          "residual_dy": 1.4704958973532207
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0055074700028908,
+        "translate_x": -1.0472048763368162,
+        "translate_y": -0.9024380981048177,
+        "fit_rmse_px": 0.788015751892142
+      }
+    },
+    {
+      "file": "playback-08-4.000.jpg",
+      "time": 4.0,
+      "tracks": {
+        "bg-city": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9932457804679871
+        },
+        "bg-lamp": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9920557737350464
+        },
+        "bg-bridge": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9868971109390259
+        },
+        "bg-window": {
+          "dx": 4,
+          "dy": -2,
+          "ncc": 0.7973662614822388
+        },
+        "body-left-shoulder": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9782020449638367,
+          "residual_dx": -1.9984014443252818e-14,
+          "residual_dy": -1.021405182655144e-14
+        },
+        "body-collar": {
+          "dx": -6,
+          "dy": 6,
+          "ncc": 0.9505583047866821,
+          "residual_dx": -7.0000000000000195,
+          "residual_dy": 4.999999999999989
+        },
+        "body-redline": {
+          "dx": -1,
+          "dy": 1,
+          "ncc": 0.9846265912055969,
+          "residual_dx": -2.00000000000002,
+          "residual_dy": -1.021405182655144e-14
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0,
+        "translate_x": 1.00000000000002,
+        "translate_y": 1.0000000000000102,
+        "fit_rmse_px": 1.160311428702309e-14
+      }
+    },
+    {
+      "file": "playback-09-4.500.jpg",
+      "time": 4.5,
+      "tracks": {
+        "bg-city": {
+          "dx": 1,
+          "dy": 1,
+          "ncc": 0.9886804819107056
+        },
+        "bg-lamp": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.9896711707115173
+        },
+        "bg-bridge": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.9932389259338379
+        },
+        "bg-window": {
+          "dx": 5,
+          "dy": -2,
+          "ncc": 0.7919491529464722
+        },
+        "body-left-shoulder": {
+          "dx": 2,
+          "dy": 1,
+          "ncc": 0.9684911966323853,
+          "residual_dx": 0.7591826806132429,
+          "residual_dy": -0.8487847644529363
+        },
+        "body-collar": {
+          "dx": -7,
+          "dy": 3,
+          "ncc": 0.9433663487434387,
+          "residual_dx": -8.427450741911604,
+          "residual_dy": 1.2580779210250002
+        },
+        "body-redline": {
+          "dx": -3,
+          "dy": 1,
+          "ncc": 0.9827448129653931,
+          "residual_dx": -4.647196545852149,
+          "residual_dy": -0.6982739398361244
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0015051082461681,
+        "translate_x": 0.5334164436877413,
+        "translate_y": 1.3069457958324135,
+        "fit_rmse_px": 0.29372916955816003
+      }
+    },
+    {
+      "file": "playback-10-5.000.jpg",
+      "time": 5.0,
+      "tracks": {
+        "bg-city": {
+          "dx": 2,
+          "dy": 1,
+          "ncc": 0.9874247312545776
+        },
+        "bg-lamp": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.995196521282196
+        },
+        "bg-bridge": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.9961537718772888
+        },
+        "bg-window": {
+          "dx": 6,
+          "dy": -3,
+          "ncc": 0.7991711497306824
+        },
+        "body-left-shoulder": {
+          "dx": 2,
+          "dy": 1,
+          "ncc": 0.9527090191841125,
+          "residual_dx": 0.10962458444840006,
+          "residual_dy": -1.0879297413442766
+        },
+        "body-collar": {
+          "dx": -9,
+          "dy": 5,
+          "ncc": 0.9386559128761292,
+          "residual_dx": -11.322083029270834,
+          "residual_dy": 3.1592576826401237
+        },
+        "body-redline": {
+          "dx": -3,
+          "dy": -1,
+          "ncc": 0.9731253385543823,
+          "residual_dx": -5.830383929295094,
+          "residual_dy": -2.7397784399577976
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0034815130138648,
+        "translate_x": 0.2540642990351488,
+        "translate_y": 0.834585056352952,
+        "fit_rmse_px": 0.29890546252345973
+      }
+    },
+    {
+      "file": "playback-11-5.500.jpg",
+      "time": 5.5,
+      "tracks": {
+        "bg-city": {
+          "dx": 2,
+          "dy": 1,
+          "ncc": 0.9874944090843201
+        },
+        "bg-lamp": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.9964759349822998
+        },
+        "bg-bridge": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.995432436466217
+        },
+        "bg-window": {
+          "dx": 6,
+          "dy": -3,
+          "ncc": 0.7641484141349792
+        },
+        "body-left-shoulder": {
+          "dx": 2,
+          "dy": 1,
+          "ncc": 0.9344154000282288,
+          "residual_dx": 0.10962458444840006,
+          "residual_dy": -1.0879297413442766
+        },
+        "body-collar": {
+          "dx": -9,
+          "dy": 0,
+          "ncc": 0.9286445379257202,
+          "residual_dx": -11.322083029270834,
+          "residual_dy": -1.8407423173598763
+        },
+        "body-redline": {
+          "dx": -3,
+          "dy": -1,
+          "ncc": 0.9705450534820557,
+          "residual_dx": -5.830383929295094,
+          "residual_dy": -2.7397784399577976
+        }
+      },
+      "background_similarity": {
+        "scale": 1.0034815130138648,
+        "translate_x": 0.2540642990351488,
+        "translate_y": 0.834585056352952,
+        "fit_rmse_px": 0.29890546252345973
+      }
+    },
+    {
+      "file": "playback-12-6.000.jpg",
+      "time": 6.0,
+      "tracks": {
+        "bg-city": {
+          "dx": 2,
+          "dy": 2,
+          "ncc": 0.9879125356674194
+        },
+        "bg-lamp": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.9905176162719727
+        },
+        "bg-bridge": {
+          "dx": 1,
+          "dy": 2,
+          "ncc": 0.9900559186935425
+        },
+        "bg-window": {
+          "dx": 7,
+          "dy": -3,
+          "ncc": 0.7532669305801392
+        },
+        "body-left-shoulder": {
+          "dx": 2,
+          "dy": 2,
+          "ncc": 0.956556499004364,
+          "residual_dx": 0.35044190383538654,
+          "residual_dy": -0.2391449768911853
+        },
+        "body-collar": {
+          "dx": -8,
+          "dy": 6,
+          "ncc": 0.9399823546409607,
+          "residual_dx": -9.894632287358919,
+          "residual_dy": 3.9011797616152313
+        },
+        "body-redline": {
+          "dx": -1,
+          "dy": 0,
+          "ncc": 0.9842918515205383,
+          "residual_dx": -3.183187383442535,
+          "residual_dy": -2.041504500121585
+        }
+      },
+      "background_similarity": {
+        "scale": 1.001976404767696,
+        "translate_x": 0.7206478553474911,
+        "translate_y": 1.5276392605206235,
+        "fit_rmse_px": 0.26132165584012307
+      }
+    }
+  ]
+}

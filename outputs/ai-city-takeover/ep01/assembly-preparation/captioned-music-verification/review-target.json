@@ -1,0 +1,15 @@
+{
+  "base_commit": "43c330bc9509d4e14ff91411d9cdf1b190f61810",
+  "index_tree": "d8f257613d350a0235fbc09bbca64f7852605962",
+  "patch_sha256": "2424bf26024dc1b697facf06b519ad1c196652a830751d912fa2f0dd7ff2b580",
+  "files": {
+    "src/ai_video/production/qualification_preview_input.py": "32aeb20d65e05d8710120129a232637fb9b032756784f2f6331e549b2907f1e5",
+    "src/ai_video/production/repair_input_admission.py": "4613340dd98e05f766f8eead172972dbee65034a97bdda4e122d87243f235dda",
+    "src/ai_video/production/_composition_visual.py": "049b6b16c1e3f0169b8b65c56f19e4941575215518db60fb2f8873f042019ede",
+    "src/ai_video/production/validation.py": "dc00f97280e827d089c59419fb5b94d2cdf537c26f1804dd2c94e0e9f033e3b4",
+    "tests/test_qualification_preview_input.py": "edd2615b6fdad8616c69aa2e57852729dc733868b53d4a8a84652a0dd227efb8",
+    "tests/test_caption_development_preview.py": "1a0a5d7a097e6b10a51fa86dfc636ff21438922bb53437ae88898f6375fd4f34",
+    "docs/agent-primary-contract-matrix.md": "2c5c15616e52c8f420020a30ffea58ac3d31a4def0458eea3eab107e06853cb6"
+  },
+  "scope": "owned change projection; original unrelated index preserved"
+}

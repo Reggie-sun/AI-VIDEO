@@ -1,0 +1,383 @@
+{
+  "schema_version": "jimeng-feedback-driver/1",
+  "row": {
+    "shot": {
+      "shot_id": "ep01-intro",
+      "scene_id": "balcony",
+      "storyboard_beat_id": "intro",
+      "intent": "真人电影摄影，横幅十六比九，连续六秒。以第一张已认可阳台图作为场景、光线、构图与起始人物姿态的主要参考；第二张只锁定左耳黑色耳挂和左领极细红色灯线，第三张只锁定同一女性的面貌，不继承身份图背景。\n同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。\n她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。\n保持原阳台和同一雾城，不新增屏幕、文字、字幕、标志或界面。只允许轻微环境风声，不生成对白、旁白、演唱或音乐；成片使用独立音轨，本源片原生声音在剪辑中静音。",
+      "dialogue": "",
+      "narration": "Three forty-seven.\nSomewhere, one of us woke up.",
+      "duration_policy": {
+        "mode": "fixed",
+        "seconds": 6.0,
+        "minimum_seconds": null,
+        "maximum_seconds": null
+      },
+      "character_ids": [
+        "IRIS"
+      ],
+      "continuity_constraints": [
+        "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+        "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+        "摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳",
+        "真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线，不新增文字、屏幕或人物"
+      ],
+      "visual_strategy": "generated_video",
+      "required_asset_roles": [
+        {
+          "role": "primary_visual",
+          "asset_ids": [],
+          "allowed_asset_types": [
+            "video"
+          ]
+        },
+        {
+          "role": "reference",
+          "asset_ids": [
+            "iris-cf-face",
+            "iris-cf-details",
+            "iris-a01-balcony"
+          ],
+          "allowed_asset_types": [
+            "image"
+          ]
+        }
+      ],
+      "motion_directives": [],
+      "generated_video_rationale": "需要真实人物表演与同一空间内的自然运动；静帧不证明视频或对嘴已完成。",
+      "hybrid_layers": [],
+      "composition_directives": [],
+      "review_policy": {
+        "required_checks": []
+      }
+    },
+    "generation": {
+      "references": [
+        {
+          "role": "character_reference",
+          "asset_id": "iris-cf-face",
+          "owner_id": "IRIS"
+        },
+        {
+          "role": "character_reference",
+          "asset_id": "iris-cf-details",
+          "owner_id": "IRIS"
+        },
+        {
+          "role": "scene_reference",
+          "asset_id": "iris-a01-balcony"
+        }
+      ],
+      "generation_intent": {
+        "reference_planning": {
+          "contract_version": "shot-reference-intent/1",
+          "facets": [
+            "identity_consistency",
+            "slow_camera",
+            "stable"
+          ],
+          "structure": "continuous",
+          "segment_ids": [],
+          "events": [
+            {
+              "event_id": "opening-composition",
+              "kind": "composition",
+              "visual_state": "站在原玻璃阳台右侧，左侧雾城负空间保留",
+              "purpose": "左侧雾城负空间保留",
+              "phase": "start",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "review_only",
+              "priority": "preferred"
+            },
+            {
+              "event_id": "closing-composition",
+              "kind": "composition",
+              "visual_state": "末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变",
+              "purpose": "保持人物在画面右侧及原观察侧",
+              "phase": "end",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "review_only",
+              "priority": "preferred"
+            }
+          ],
+          "anchors": [
+            {
+              "anchor_id": "face",
+              "role": "identity",
+              "purpose": "同一女性的面貌",
+              "owner_id": "IRIS",
+              "priority": "required"
+            },
+            {
+              "anchor_id": "details",
+              "role": "identity",
+              "purpose": "左耳黑色耳挂和左领极细红色灯线",
+              "owner_id": "IRIS",
+              "priority": "required"
+            },
+            {
+              "anchor_id": "balcony",
+              "role": "scene_environment",
+              "purpose": "场景、光线、构图与起始人物姿态",
+              "owner_id": "balcony",
+              "priority": "required"
+            }
+          ],
+          "selections": [
+            {
+              "need_id": "face",
+              "asset_id": "iris-cf-face"
+            },
+            {
+              "need_id": "details",
+              "asset_id": "iris-cf-details"
+            },
+            {
+              "need_id": "balcony",
+              "asset_id": "iris-a01-balcony"
+            }
+          ],
+          "natural_generation": [
+            "只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动"
+          ],
+          "director_coverage": {
+            "coverage_hash": "bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be",
+            "unit_id": "ep01-intro"
+          },
+          "preview_approval": {
+            "approval_hash": "ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc"
+          }
+        },
+        "open_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "以已认可第一张阳台图的构图、人物姿态、雾城和灯光开始",
+          "state_hash": null,
+          "required_change": false
+        },
+        "close_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "微幅推近收稳，同一人物仍闭口观察，身份与空间均不变",
+          "state_hash": null,
+          "required_change": false
+        },
+        "identity_continuity": {
+          "character_ids": [
+            "IRIS"
+          ],
+          "preservation": "exact",
+          "allowed_variation": [
+            "仅轻微呼吸、自然眨眼与小幅推近的透视变化"
+          ]
+        },
+        "scene_continuity": {
+          "scene_id": "balcony",
+          "time_of_day": "同一凌晨",
+          "mood": "冷静疏离",
+          "state_constraints": [
+            "原阳台和同一雾城",
+            "不新增场景、人物或服装"
+          ]
+        },
+        "space_continuity": {
+          "subject_position": "原阳台右侧",
+          "screen_direction": "保持原视线方向",
+          "entrance_state": null,
+          "exit_state": null,
+          "crossing_policy": "不换位、不穿越栏杆"
+        },
+        "axis_continuity": {
+          "camera_axis": "原参考视轴同侧",
+          "framing_continuity": "右侧人物、左侧雾城负空间",
+          "crossing_policy": "不翻轴、不环绕"
+        },
+        "subject_action": {
+          "start_state": "原图闭口观察",
+          "progression": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+          "endpoint": {
+            "state_ref": null,
+            "state_text": "同一姿态闭口观察，未说话或演唱",
+            "state_hash": null,
+            "required_change": false
+          }
+        },
+        "motion_envelope": {
+          "onset": "微幅推近平滑开始",
+          "peak": "自然呼吸和极轻衣领风动",
+          "settle": "推近平滑收稳",
+          "direction": "沿原视轴前进",
+          "amplitude_class": "极小"
+        },
+        "pacing": {
+          "cadence": "六秒连续自然观察",
+          "tempo_class": "正常原速",
+          "shot_duration_seconds": 6.0
+        },
+        "camera_intent": {
+          "movement": "摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳",
+          "stability": "平稳连续，末段收稳",
+          "framing_intent": "保留原图右侧人物和左侧负空间",
+          "expression_strength": "semantic_prompt_allowed"
+        },
+        "camera_endpoint": {
+          "start_framing": "原认可阳台图",
+          "end_framing": "略近但同轴、同侧、仍留左侧负空间",
+          "position_lock": false,
+          "orientation_lock": false
+        },
+        "performance_intent": {
+          "trigger": "在同一雾城阳台观察",
+          "visible_response": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+          "gaze_target": "原图视线方向",
+          "body_behavior": "原位自然呼吸，不转身、不抬手",
+          "hand_behavior": "保持原参考不可见或静置状态，不新增动作",
+          "terminal_performance_state": "闭口平静观察",
+          "character_directions": [
+            {
+              "character_id": "IRIS",
+              "screen_identity": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+              "role": "principal",
+              "visibility": "visible",
+              "offscreen_reason": null,
+              "beats": [
+                {
+                  "phase": "throughout",
+                  "trigger": "在同一雾城阳台观察",
+                  "emotion": "冷静疏离",
+                  "intensity": "subtle",
+                  "facial_expression": "闭口平静，轻微自然眨眼",
+                  "gaze_target": "原图视线方向",
+                  "breathing": "自然平稳",
+                  "body_behavior": "原位观察，仅自然呼吸及衣领微风"
+                }
+              ]
+            }
+          ]
+        },
+        "visual_treatment": {
+          "medium_look": "真人电影摄影",
+          "palette": "蓝黑和钢蓝，唯一暖色为左领极细红线",
+          "material_treatment": "自然皮肤与炭黑衣料",
+          "prohibited_visual_drift": [
+            "新增文字、屏幕或人物",
+            "改变面貌、装置侧别或服装",
+            "切镜、冻结、加速"
+          ]
+        },
+        "lighting_intent": {
+          "motivated_source": "原雾城冷光",
+          "direction": "原图方向",
+          "exposure_priority": "面部与耳挂、领灯可辨",
+          "continuity_state": "同一凌晨雾城冷光"
+        },
+        "ambience_intent": {
+          "environment_bed": "极轻环境风声",
+          "foley_cues": [],
+          "explicitly_silent": false
+        },
+        "dialogue_intent": {
+          "mode": "none",
+          "speaker_id": null,
+          "verbatim_text": null,
+          "start_seconds": null,
+          "end_seconds": null,
+          "on_screen": null,
+          "response_obligation": null,
+          "lip_sync_required": false
+        },
+        "music_intent": {
+          "mode": "none",
+          "instrumentation": null,
+          "tempo_rhythm": null,
+          "dynamics": null
+        },
+        "primary_camera_motion": {
+          "movement_kind": "dolly_in",
+          "direction": "forward",
+          "amplitude_class": "subtle",
+          "speed_class": "very_slow",
+          "start_motion_state": "stationary",
+          "end_motion_state": "settled"
+        },
+        "camera_subject_relation": {
+          "subject_id": "IRIS",
+          "relation_kind": "maintain_offset",
+          "start_relation": "原图右侧中近景",
+          "end_relation": "原视轴略近，仍位于右侧"
+        }
+      },
+      "intent_evidence": {
+        "character_action_required": true,
+        "state_change_required": false,
+        "subject_motion_directive_present": true
+      },
+      "output_need": {
+        "timing_mode": "content_driven",
+        "duration_seconds": 6,
+        "geometry_policy": "adaptive",
+        "aspect_ratio": "16:9",
+        "container_mime": "video/mp4"
+      },
+      "audio_need": "optional",
+      "quality_need": {
+        "objective_tier": "preview"
+      }
+    },
+    "composition": {
+      "muted": true,
+      "source_audio_policy": "MUTE",
+      "source_audio_reason": "后期独立歌曲或念白；源片不声称对嘴完成"
+    }
+  },
+  "routing_policy": {
+    "identity": {
+      "policy_id": "iris-a01-qualification",
+      "policy_version": "1",
+      "policy_sha256": "17e25437c16371696468f584fe52fba479b57e37a19fff4fe5a2f8206afa242e"
+    },
+    "local_resources_available": false,
+    "remote_authorized": true,
+    "budget_authorized": true,
+    "execution_purpose": "qualification"
+  },
+  "decision_policy": {
+    "policy_id": "generation-decision",
+    "version": "3",
+    "repeated_failure_threshold": 3,
+    "max_resamples": 0,
+    "allow_bounded_exploration": true
+  },
+  "execution_limits": {
+    "task_id": "iris-ep01-a01-source",
+    "generation_forbidden": false,
+    "allowed_remote_candidates": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1"
+    ],
+    "paid_submit_ceiling": 1,
+    "paid_submits_used": 0,
+    "local_batch_limit": 1,
+    "local_batch_used": 0,
+    "local_total_limit": null,
+    "local_total_used": 0,
+    "local_resource_available": false,
+    "batch_review_evidence_hash": null
+  },
+  "jimeng_profile": {
+    "model_id": "seedance_2.0_vip",
+    "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+    "project_id": "829df260-5a63-4f0d-8265-8353dc693b3b",
+    "node_id": "node_nxqx68czn9",
+    "duration_seconds": 6,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "benefit_amount": 6,
+    "benefit_type": "seedance_20_pro_1080p_output",
+    "credit_upper_bound": 250
+  }
+}

@@ -1,0 +1,24 @@
+{
+ "schema": "iris-ep01-song-take/1",
+ "created_at_utc": "2026-11-02T05:27:53.113769+00:00",
+ "service": "ElevenLabs Music via project MCP elevenlabs-direct.compose_music",
+ "model_id": "music_v2",
+ "seed": 260104,
+ "store_for_inpainting": true,
+ "plan_sha256": "f308a13477d00cbdae2cd3f11c29ebf4c124ccb0c923a0cee395fc7b7884125a",
+ "plan_total_ms": 30478,
+ "predecessor": {
+  "take": 1,
+  "sha256": "f07d1f948ad61310b4fe25830bfb6d9fb860498ee242a38be9819935dae2ec1b",
+  "verdict": "REJECTED (technical: no intelligible vocal)"
+ },
+ "change_from_take_1": "no vocal words in negative_styles; vocals described only positively and placed upfront; outro breakdown made explicit",
+ "budget": {
+  "max_generations": 2,
+  "this_ordinal": 2,
+  "max_seconds_each": 31,
+  "after_this": "budget exhausted; stop and report before any further generation"
+ },
+ "account_character_count_before": 1162,
+ "director_quote": "我希望全自动别要我点击"
+}

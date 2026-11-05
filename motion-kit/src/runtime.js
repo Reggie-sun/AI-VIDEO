@@ -1,6 +1,9 @@
 // Frame runtime for HyperFrames. One render per `hf-seek`: every frame is a pure function of
 // comp time t. Scenes return GL parameters and draw into four software 2D canvases:
 //   overlay (crisp readable type), feed (in-image signal: OSD/detectors), emit (light), ui (screen).
+// A plate is a still image (cfg.images) or an image sequence (cfg.sequences: generated video conformed to
+// the comp fps, one numbered JPG per frame). For a sequence the scene also returns plateFrame; that exact
+// frame is decoded and uploaded before the scene pass, so the render stays a pure function of t.
 import { Clock } from './clock.js';
 import { createGL, draw, program, target, texture, updateTexture, use } from './gl.js';
 import { BRIGHT, DOWN, FINAL, SCENE, UP } from './shaders.js';
@@ -19,8 +22,8 @@ async function loadJSON(url) {
 
 const DEFAULT_GRADE = {
   uExposure: 1.0, uBloomGain: 0.55, uHalation: 0.35, uLift: [0.043, 0.059, 0.078], uLiftAmt: 0.06,
-  uHalftone: 0.10, uCell: 4.0, uGrain: 0.035, uGrainOverlay: 0.45, uVignette: 0.32, uCA: 0.25,
-  uMisreg: 0, uFlash: 0, uFade: 0, uSat: 0.86, uRedKeep: 1.12, uWeave: [0, 0], uFeedGain: 0.92,
+  uHalftone: 0.10, uCell: 4.0, uGrain: 0.032, uGrainOverlay: 0.45, uVignette: 0.32, uCA: 0.9,
+  uMisreg: 0, uFlash: 0, uFade: 0, uSat: 0.86, uRedKeep: 1.12, uWeave: [0, 0], uFeedGain: 0.92, uInvert: 0,
 };
 
 export async function boot(cfg) {
@@ -38,6 +41,32 @@ export async function boot(cfg) {
     tex[k] = texture(gl, img, { mipmap: spec.mipmap !== false });
     size[k] = [img.width, img.height];
   }
+  // cfg.bitmaps: images the scenes draw on the 2D layers themselves (picture-in-picture insets), as ImageBitmaps in
+  // ctx.bitmaps; loaded before the first frame like the plates, so a frame stays a pure function of t
+  const bitmaps = {};
+  for (const [k, spec] of Object.entries(cfg.bitmaps || {})) bitmaps[k] = await loadImage(spec.url);
+  const seqUrl = (spec, i) => `${spec.dir}/${String(i).padStart(4, '0')}.jpg`;
+  const shown = {};
+  for (const [k, spec] of Object.entries(cfg.sequences || {})) {
+    const img = await loadImage(seqUrl(spec, 0));
+    tex[k] = texture(gl, img, { mipmap: true });
+    size[k] = [img.width, img.height];
+    shown[k] = 0;
+    img.close();
+  }
+  async function showSequenceFrame(k, frame) {
+    const spec = cfg.sequences[k];
+    const i = Math.max(0, Math.min(spec.count - 1, Math.round(frame)));
+    if (shown[k] === i) return;
+    const img = await loadImage(seqUrl(spec, i));
+    gl.bindTexture(gl.TEXTURE_2D, tex[k]);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    img.close();
+    shown[k] = i;
+  }
   const layers = {
     overlay: canvas2d(W, H), feed: canvas2d(W, H), emit: canvas2d(W, H),
     ui: canvas2d(cfg.uiSize?.[0] || 1268, cfg.uiSize?.[1] || 400),
@@ -54,15 +83,16 @@ export async function boot(cfg) {
   for (let i = 0; i < 5; i++) { chain.push(target(gl, Math.max(w, 8), Math.max(h, 8), { float: info.floatRT })); w >>= 1; h >>= 1; }
   const ups = chain.map(c => target(gl, c.w, c.h, { float: info.floatRT }));
   const clock = new Clock(beats, hits, { offset: music.song_offset ?? 0, windowBar0: music.window_bar0 ?? 0, fps: cfg.fps });
-  const ctx = { W, H, fps: cfg.fps, clock, data, size, layers, info };
+  const ctx = { W, H, fps: cfg.fps, clock, data, size, layers, info, bitmaps };
   window.__mk = { info, scenes: Object.keys(cfg.scenes), music, ready: true };
 
-  function renderFrame(t) {
+  async function renderFrame(t) {
     const frame = Math.round(t * cfg.fps);
     for (const l of Object.values(layers)) reset(l.ctx);
     const shot = cfg.pickShot(t, clock, data);
     const scene = cfg.scenes[shot.id];
     const p = scene(t, { ...ctx, frame, shot, t0: shot.t0, t1: shot.t1 });
+    if (cfg.sequences?.[p.plate]) await showSequenceFrame(p.plate, p.plateFrame ?? 0);
     for (const [k, l] of Object.entries(layers)) updateTexture(gl, ltex[k], l.c);
 
     // scene pass
@@ -79,6 +109,7 @@ export async function boot(cfg) {
       uSpillColor: p.screen?.spillColor || [0.6, 0.75, 0.95], uSpill: p.screen?.spill ?? 0,
       uScreenCenter: p.screen?.center || [0, 0], uScreenRadius: p.screen?.radius || 1,
       uMaskOn: p.mask ? 1 : 0, uSweep: p.sweep || [1, 0, -9999, 1], uSweepGain: p.sweepGain || 0, uFlowVP: p.flowVP || [0, 0, 1],
+      uRoadOn: p.road ? 1 : 0, uRoad: p.road || [0, 0, 0, 1],
       uTrailOn: 0, uBeatPos: 0, uLambda: 1, uPulseGain: 0, uFlashGain: 0, uTrailColor: [1, 0.1, 0.05],
     }, { uPlate: tex[plate], uUI: ltex.ui, uMask: p.mask ? tex[p.mask] : tex[plate], uEmit: ltex.emit, uFlow: tex[plate] });
     draw(gl, rt.scene);
@@ -115,10 +146,17 @@ export function install(cfg) {
     document.title = 'MK-ERROR';
     throw err;
   });
+  // Renders run strictly one after another. A frame that waits for a sequence image must not resume after a
+  // later seek has drawn, or it would put its plate under the later frame's type (seen as a one-frame flash).
+  let queue = ready;
+  const render = t => {
+    const run = queue.then(r => r.renderFrame(t));
+    queue = run.then(() => ready, () => ready);
+    return run;
+  };
   window.addEventListener('hf-seek', e => {
-    const t = e.detail.time;
-    e.detail.waitUntil(ready.then(r => r.renderFrame(t)));
+    e.detail.waitUntil(render(e.detail.time));
   });
-  window.__mkRender = t => ready.then(r => r.renderFrame(t));
+  window.__mkRender = render;
   return ready;
 }

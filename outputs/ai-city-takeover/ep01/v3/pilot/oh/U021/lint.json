@@ -1,0 +1,49 @@
+{
+ "unit": "U021",
+ "checks": {
+  "unit_in_approved_preview": true,
+  "user_approval_quoted": true,
+  "take_has_own_image_and_audio": true,
+  "approved_inputs_unchanged": true,
+  "take_inputs_in_preview": true,
+  "audio_seconds_match_file": true,
+  "action_text_is_approved_text": true,
+  "action_text_pure_chinese": true,
+  "mode_is_master": true,
+  "continuity_report_ready": true,
+  "never_submitted": true,
+  "ledger_has_room": true
+ },
+ "pass": true,
+ "at": "2026-11-05T01:49:37.159421+00:00",
+ "approval_sha256": "22d60dc1e9f6659cb5d494694141aa66b1aa2a48ce5e6d8b0473d65643dad073",
+ "continuity_report_sha256": "2b25eac6d2403c69b5fac52cd2c5b2f5cb0908695a689817685154a3b62e938d",
+ "inputs": {
+  "image": {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-shut-b.png",
+   "sha256": "ffe0c323ef57309e72002e93811472d54490865b81b35f4a5afe96e809ef5bdf"
+  },
+  "audio": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+   "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+   "seconds": 4.36
+  }
+ },
+ "page_audio_accepted": {
+  "seconds": 4.36,
+  "floor": "00:04",
+  "ceil": "00:05"
+ },
+ "action_text": "镜头固定中景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，肩膀放松，重心落在后脚，句尾轻轻吸一口气，眉头放松，眼睛向上直视镜头，双手自然垂在身侧。",
+ "ledger": {
+  "takes": 0,
+  "credits": 0,
+  "closed": false
+ },
+ "caps": {
+  "submits": 5,
+  "credits": 825,
+  "per_take": 165,
+  "submits_per_take": 1
+ }
+}

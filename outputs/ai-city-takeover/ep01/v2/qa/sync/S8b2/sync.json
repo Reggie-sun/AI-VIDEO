@@ -1,0 +1,225 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "outputs/ai-city-takeover/ep01/v2/gen/S8b2/project/state/video-generation/fetch/files/098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148.mp4",
+ "take_sha256": "098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148",
+ "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8b-vocal-ref-22.20-26.20.wav",
+ "window_sha256": "8b391077d80ef5b967afb5163ee2896a839f7efd0fe137064ddb7ccc61a4b16b",
+ "song_t0": 22.2,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": -0.1328,
+ "ncc": 0.3347,
+ "copy": true,
+ "threshold": {
+  "null90": 0.6306,
+  "matched_med": 0.7263,
+  "thr": 0.6689,
+  "strong_frames": 61
+ },
+ "frames": {
+  "total": 407,
+  "active": 342,
+  "matched": 140,
+  "matched_of_active": 0.409
+ },
+ "divergence": {
+  "frame": 229,
+  "rule": "stretch",
+  "last_match": 228,
+  "clip_s": 2.29,
+  "song_s": 24.623
+ },
+ "synced_until": {
+  "clip_s": 2.238,
+  "song_s": 24.571
+ },
+ "spans": [
+  {
+   "clip_s": [
+    0.64,
+    2.28
+   ],
+   "song_s": [
+    22.973,
+    24.613
+   ]
+  }
+ ],
+ "envelope": {
+  "lag_s": 0.002,
+  "ncc": 0.572,
+  "windows": [
+   {
+    "clip_t0": 0.0,
+    "clip_t1": 1.5,
+    "lag_s": 0.022,
+    "ncc": 0.514
+   },
+   {
+    "clip_t0": 0.25,
+    "clip_t1": 1.75,
+    "lag_s": -0.5,
+    "ncc": 0.737
+   },
+   {
+    "clip_t0": 0.5,
+    "clip_t1": 2.0,
+    "lag_s": -0.5,
+    "ncc": 0.834
+   },
+   {
+    "clip_t0": 0.75,
+    "clip_t1": 2.25,
+    "lag_s": -0.345,
+    "ncc": 0.706
+   },
+   {
+    "clip_t0": 1.0,
+    "clip_t1": 2.5,
+    "lag_s": -0.321,
+    "ncc": 0.745
+   },
+   {
+    "clip_t0": 1.25,
+    "clip_t1": 2.75,
+    "lag_s": -0.115,
+    "ncc": 0.748
+   },
+   {
+    "clip_t0": 1.5,
+    "clip_t1": 3.0,
+    "lag_s": -0.167,
+    "ncc": 0.681
+   },
+   {
+    "clip_t0": 1.75,
+    "clip_t1": 3.25,
+    "lag_s": -0.094,
+    "ncc": 0.474
+   },
+   {
+    "clip_t0": 2.0,
+    "clip_t1": 3.5,
+    "lag_s": -0.098,
+    "ncc": 0.092
+   },
+   {
+    "clip_t0": 2.25,
+    "clip_t1": 3.75,
+    "lag_s": 0.307,
+    "ncc": 0.233
+   },
+   {
+    "clip_t0": 2.5,
+    "clip_t1": 4.0,
+    "lag_s": 0.311,
+    "ncc": 0.609
+   }
+  ],
+  "max_dev_s": 0.502,
+  "steady": false,
+  "segments": [
+   {
+    "clip_s": [
+     0.625,
+     0.875
+    ],
+    "lag_s": 0.022,
+    "windows": 1,
+    "min_ncc": 0.514
+   },
+   {
+    "clip_s": [
+     0.875,
+     1.375
+    ],
+    "lag_s": -0.5,
+    "windows": 2,
+    "min_ncc": 0.737
+   },
+   {
+    "clip_s": [
+     1.375,
+     1.875
+    ],
+    "lag_s": -0.333,
+    "windows": 2,
+    "min_ncc": 0.706
+   },
+   {
+    "clip_s": [
+     1.875,
+     2.125
+    ],
+    "lag_s": -0.115,
+    "windows": 1,
+    "min_ncc": 0.748
+   },
+   {
+    "clip_s": [
+     2.125,
+     2.375
+    ],
+    "lag_s": -0.167,
+    "windows": 1,
+    "min_ncc": 0.681
+   },
+   {
+    "clip_s": [
+     2.375,
+     2.875
+    ],
+    "lag_s": -0.096,
+    "windows": 2,
+    "min_ncc": 0.092
+   },
+   {
+    "clip_s": [
+     2.875,
+     3.375
+    ],
+    "lag_s": 0.309,
+    "windows": 2,
+    "min_ncc": 0.233
+   }
+  ]
+ },
+ "placement": {
+  "lag_s": -0.1328,
+  "method": "tool 15 waveform lag (copy)",
+  "song_t_of_clip0": 22.3328,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "S8b2",
+ "film_window_song_s": [
+  22.5667,
+  25.9
+ ],
+ "prior": {
+  "lag_s": 0.0,
+  "why": "c1 cut, in-point 0.3667 (sealed mapping)"
+ },
+ "reviews": [
+  {
+   "kind": "placement",
+   "lag_s": -0.1328,
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/sync/S8b2/review-S8b2-098b41979918-placement-lag-0.133.mp4",
+   "sha256": "140984650cc9dd6f0e39ac36d9a0fc0a2284841d3b81855fc4e75be49ffac3b0"
+  },
+  {
+   "kind": "prior",
+   "lag_s": 0.0,
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/sync/S8b2/review-S8b2-098b41979918-prior-lag+0.000.mp4",
+   "sha256": "afbfc8e8a728ce84f68c1e7a5e3b6a15710747adca51227775c0a544f8780f0e"
+  }
+ ]
+}

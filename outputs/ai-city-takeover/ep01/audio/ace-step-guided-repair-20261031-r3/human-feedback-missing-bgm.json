@@ -1,0 +1,12 @@
+{
+  "schema": "local-media-human-feedback/1",
+  "recorded_at_utc": "2026-10-31T08:49:55.355496+00:00",
+  "user_quote": "这个版本为什么bgm都没有，只有词语",
+  "candidate": "G",
+  "source_sha256": "b469c215138b3b517dad78c84de0614fdf97821d853059f7c7106f8e99f4df13",
+  "music_requirement": "FAIL",
+  "overall_song_acceptance": "REJECTED",
+  "reason": "User listened and reports missing BGM, words only",
+  "ASR_evidence": "Preserved as word-fidelity evidence only; does not establish music or singing",
+  "next_repair": "Independent instrumental and actual sung hook sources; preserve all original words and 30s; no final film timeline mutation"
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "local-spoken-rhythm-guide/1",
+  "series_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/series-intent.json",
+  "series_intent_sha256": "f14a4b9feef75f46fb0626ab3355685311dcddb170731008baf4a3eb4ce0af73",
+  "guide_ordinal": 1,
+  "synthesis_speed": 1.0,
+  "plain_text_sha256": "e68c0e7b56319d0688e590e5b6a69fdd099ba84926541111583a179f03788296",
+  "weights_root": "/home/reggie/.local/share/ai-video/ace-step/kokoro-guide/weights",
+  "weights_manifest_path": "/home/reggie/.local/share/ai-video/ace-step/kokoro-guide/weights-manifest.json",
+  "weights_manifest_sha256": "76f9c14edc0680acdf9f2ecc2787de057d116b25d7cc8b5088913683b7b84dc0",
+  "runner_sha256": "eb37dd5008388ac7b123ae91c15efcb7fdc18c3def794e9da8c796ff558cdd5b",
+  "source_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "created_at_utc": "2026-10-31T05:14:21.728902+00:00",
+  "voice": "af_heart local official American English female reference",
+  "formal_voice_acceptance": "NOT_EVALUATED"
+}

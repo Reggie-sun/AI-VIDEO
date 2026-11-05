@@ -1,0 +1,59 @@
+{
+ "unit": "ST6",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/ST6/project/state/video-generation/fetch/files/79f17f350fca44302571a2950d4ee4e6774418616800e46f3d32b675298ca7f3.mp4",
+ "sha256": "79f17f350fca44302571a2950d4ee4e6774418616800e46f3d32b675298ca7f3",
+ "verdict": "FAIL",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum与给定值一致"
+  },
+  {
+   "id": "no_hard_cut",
+   "result": "PASS",
+   "evidence": "帧差中位数0.18，最大0.99(f1)"
+  },
+  {
+   "id": "camera_locked",
+   "result": "PASS",
+   "evidence": "累计位移0,0；缩放1.005"
+  },
+  {
+   "id": "action_push_door_red_narrows",
+   "result": "FAIL",
+   "evidence": "门和手都没有可见移动；0-1.33s门缝红色像素4609→15152，反而变亮；1.0s有亮点闪光；1.49-2.49s红光从上往下熄灭（红色像素的最高行0→784），没有‘越来越窄’"
+  },
+  {
+   "id": "end_state_red_off_eyes_down",
+   "result": "PASS",
+   "evidence": "2.49s起门缝红色像素为0；她垂眼看着门缝"
+  },
+  {
+   "id": "no_mouth_movement",
+   "result": "PASS",
+   "evidence": "侧脸低头，嘴唇全程闭合"
+  },
+  {
+   "id": "identity_canon_earpiece_redline",
+   "result": "PASS",
+   "evidence": "露出的左耳有耳挂；领口红线是沿上沿的分段线，与首帧相同(R8)，未成圈也未扩大"
+  },
+  {
+   "id": "no_model_text",
+   "result": "PASS",
+   "evidence": "未见文字"
+  },
+  {
+   "id": "watermark_corners",
+   "result": "PASS",
+   "evidence": "四角无水印"
+  }
+ ],
+ "usable_span": [
+  2.5,
+  5.0
+ ],
+ "notes": "可用段是关门后的静止状态",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

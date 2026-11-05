@@ -1,0 +1,519 @@
+{
+  "shot_id": "S0005",
+  "start_frame": 183,
+  "end_frame": 187,
+  "start_time": 7.625,
+  "end_time": 7.8333,
+  "duration_frames": 5,
+  "duration_s": 0.2083,
+  "start_tc": "00:00:07:15",
+  "end_tc": "00:00:07:19",
+  "boundary_in_id": "B0-004",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 183,
+      "path": "keyframes/S0005_f00183.jpg",
+      "role": "first",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 184,
+      "path": "keyframes/S0005_f00184.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 185,
+      "path": "keyframes/S0005_f00185.jpg",
+      "role": "middle",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 186,
+      "path": "keyframes/S0005_f00186.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 187,
+      "path": "keyframes/S0005_f00187.jpg",
+      "role": "last",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 185,
+      "path": "work/full_batch/00185.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    }
+  ],
+  "scene_type": "detail_insert",
+  "narrative_role": "以摄影层与独立信息层推进序章、服装展示和机器观众主题",
+  "subject": "腰部特写",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "腰部特写，黑色反光百褶裙、宽黑腰带与矩形金属扣位于中心；白色纸质条码吊牌垂直悬挂在左中，右手搭在腰侧。两枚小白色检测标签分别标识腰部和服装吊牌。",
+  "composition": {
+    "shot_size": "近景",
+    "subject_position": "见subject_bbox；视觉估计",
+    "subject_bbox": {
+      "x": 0.2,
+      "y": 0.09,
+      "w": 0.65,
+      "h": 0.91,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "腰部插镜近水平；汽车大远景略俯；其他平视，实际焦距未知",
+    "layers": {
+      "foreground": "独立文字/检测框，及近处主体",
+      "midground": "人物、汽车或无摄影层的统计图",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "首/中/末与filmstrip已检查；光流观测 {'pan_x_frac_per_s': -0.0001, 'pan_y_frac_per_s': -0.0001, 'zoom_per_s': 0.0128, 'median_flow_frac_per_s': 0.0033, 'pairs_measured': 4}",
+    "measured_motion": {
+      "pan_x_frac_per_s": -0.0001,
+      "pan_y_frac_per_s": -0.0001,
+      "zoom_per_s": 0.0128,
+      "median_flow_frac_per_s": 0.0033,
+      "pairs_measured": 4
+    }
+  },
+  "lighting": {
+    "key_direction": "视觉估计：冷蓝环境照明；红色点光或侧光见描述",
+    "quality": "低照度深阴影、反光表面与高亮屏幕；图形层自发光",
+    "effects": [
+      "可见彩色网点/细颗粒"
+    ],
+    "temporal_change": "见逐镜描述，精确亮度变化使用shot_stats luma"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#111814",
+        "fraction": 0.471,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#212D32",
+        "fraction": 0.148,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#4B4B51",
+        "fraction": 0.113,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#6F6B77",
+        "fraction": 0.109,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#B2C3E1",
+        "fraction": 0.087,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#8D8DA0",
+        "fraction": 0.072,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "亮度首中末 [62.8, 63.1, 62.8]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 00 / 11",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "18 MONTHS TO ESCAPE（S0001开头在底部大板内滚动）",
+    "G-FLAP-BOARD": "S0001随机字符锁定；S0002保持；S0003收缩退出；后续小控件",
+    "G-TICKER": "底边横向滚动，未逐字完整登记"
+  },
+  "elements": [
+    {
+      "element_id": "S0005-E01",
+      "shot_id": "S0005",
+      "type": "background_media",
+      "description": "腰部特写，黑色反光百褶裙、宽黑腰带与矩形金属扣位于中心；白色纸质条码吊牌垂直悬挂在左中，右手搭在腰侧。两枚小白色检测标签分别标识腰部和服装吊牌。",
+      "start_frame": 183,
+      "end_frame": 187,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "见描述与关键帧，未量化曲线",
+        "easing": "unknown",
+        "entrance": "时间范围为观察包络，待逐帧确认",
+        "exit": "cut或随镜头退出；未逐帧确认"
+      },
+      "keyframes": [
+        {
+          "frame": 183,
+          "observed_state": "腰部特写，黑色反光百褶裙、宽黑腰带与矩形金属扣位于中心；白色纸质条码吊牌垂直悬挂在左中，右手搭在腰侧。两枚小白色检测标签分别标识腰部和服装吊牌。"
+        },
+        {
+          "frame": 187,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        183,
+        184,
+        185,
+        186,
+        187
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "细节与入退场需进一步逐帧测量。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0005-E02",
+      "shot_id": "S0005",
+      "type": "prop",
+      "description": "左中白色吊牌，三段横向条码",
+      "start_frame": 183,
+      "end_frame": 187,
+      "bounding_box": {
+        "x": 0.33,
+        "y": 0.4,
+        "w": 0.24,
+        "h": 0.57,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "见描述与关键帧，未量化曲线",
+        "easing": "unknown",
+        "entrance": "时间范围为观察包络，待逐帧确认",
+        "exit": "cut或随镜头退出；未逐帧确认"
+      },
+      "keyframes": [
+        {
+          "frame": 183,
+          "observed_state": "左中白色吊牌，三段横向条码"
+        },
+        {
+          "frame": 187,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        183,
+        184,
+        185,
+        186,
+        187
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "细节与入退场需进一步逐帧测量。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0005-E03",
+      "shot_id": "S0005",
+      "type": "prop",
+      "description": "黑色腰带及金属扣，位置见归一化边框",
+      "start_frame": 183,
+      "end_frame": 187,
+      "bounding_box": {
+        "x": 0.2,
+        "y": 0.18,
+        "w": 0.5,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "见描述与关键帧，未量化曲线",
+        "easing": "unknown",
+        "entrance": "时间范围为观察包络，待逐帧确认",
+        "exit": "cut或随镜头退出；未逐帧确认"
+      },
+      "keyframes": [
+        {
+          "frame": 183,
+          "observed_state": "黑色腰带及金属扣"
+        },
+        {
+          "frame": 187,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        183,
+        184,
+        185,
+        186,
+        187
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "细节与入退场需进一步逐帧测量。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0005-E04",
+      "shot_id": "S0005",
+      "type": "hud_marker",
+      "description": "小型服装识别白标签与细线框",
+      "start_frame": 183,
+      "end_frame": 187,
+      "bounding_box": {
+        "x": 0.23,
+        "y": 0.16,
+        "w": 0.32,
+        "h": 0.36,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "见描述与关键帧，未量化曲线",
+        "easing": "unknown",
+        "entrance": "时间范围为观察包络，待逐帧确认",
+        "exit": "cut或随镜头退出；未逐帧确认"
+      },
+      "keyframes": [
+        {
+          "frame": 183,
+          "observed_state": "小型服装识别白标签与细线框"
+        },
+        {
+          "frame": 187,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        183,
+        184,
+        185,
+        186,
+        187
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "细节与入退场需进一步逐帧测量。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "HARNESS · OPEN / TAG · LOOK 00",
+        "transcription_status": "READ_AT_FULL_RESOLUTION",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 14,
+          "line_height_px": 18,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "element_id": "S0005-E05",
+      "shot_id": "S0005",
+      "type": "hud_gauge",
+      "description": "左上INSERT · CROP 1 / 4进度标记：四段细横条中当前段橙色",
+      "start_frame": 183,
+      "end_frame": 187,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.13425925925925927,
+        "w": 0.09635416666666667,
+        "h": 0.037037037037037035,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "pixel_read_from_full_resolution",
+      "z_index": 15,
+      "appearance": {
+        "color_hex": "#D97757",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "当前条橙色，文字白色，其余进度条灰"
+      },
+      "motion": {
+        "path": "见描述与关键帧，未量化曲线",
+        "easing": "unknown",
+        "entrance": "时间范围为观察包络，待逐帧确认",
+        "exit": "cut或随镜头退出；未逐帧确认"
+      },
+      "keyframes": [
+        {
+          "frame": 183,
+          "active_segment": 1
+        },
+        {
+          "frame": 187,
+          "active_segment": 1
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        183,
+        187
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "字体文件和设计token精确值未知；此处12px视觉测量估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "INSERT · CROP 1 / 4",
+        "typography": {
+          "font_status": "candidate_only",
+          "visual_family": "monospaced uppercase",
+          "cap_height_px": 12,
+          "tracking": "wide",
+          "alignment": "left",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B0-004",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-005",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0018",
+      "relation": "beat_candidate (unknown) at frame 187; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 187
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "bbox是原图坐标读取或视觉近似，不应误认为作者源参数。",
+    "原始字体、生成素材文件、网点shader隐藏参数无法从成片确认。",
+    "纸质吊牌上生成模型烘焙的微小字不可辨；不伪造转写。",
+    "本镜无独立音频语义裁决，音画关系待全片音频合并。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0005.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      185
+    ],
+    "finding": "首中末+1920原帧+整镜每一帧再次核对，已补INSERT进度标签；此短镜所有可辨独立叠层已登记",
+    "remaining": "字体原文件、隐藏算法参数未知；背景生成素材局部小字不可可靠读，保留unknown",
+    "dense_ranges_viewed": [
+      [
+        183,
+        187,
+        1
+      ]
+    ]
+  }
+}

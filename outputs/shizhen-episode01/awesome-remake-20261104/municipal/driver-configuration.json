@@ -1,0 +1,333 @@
+{
+  "schema_version": "jimeng-feedback-driver/1",
+  "row": {
+    "shot": {
+      "shot_id": "municipal",
+      "scene_id": "municipal-rain-gate",
+      "storyboard_beat_id": "municipal",
+      "intent": "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。",
+      "dialogue": "",
+      "duration_policy": {
+        "mode": "fixed",
+        "seconds": 6
+      },
+      "character_ids": [
+        "municipal-worker"
+      ],
+      "continuity_constraints": [
+        "只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。",
+        "工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。",
+        "一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。",
+        "原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。"
+      ],
+      "visual_strategy": "generated_video",
+      "required_asset_roles": [
+        {
+          "role": "primary_visual",
+          "asset_ids": [],
+          "allowed_asset_types": [
+            "video"
+          ]
+        }
+      ],
+      "generated_video_rationale": "新制作市政断电后设备仍运作的连续证据"
+    },
+    "generation": {
+      "references": [
+        {
+          "role": "character_reference",
+          "asset_id": "municipal-board-v2",
+          "owner_id": "municipal-worker"
+        }
+      ],
+      "intent_evidence": {
+        "character_action_required": true,
+        "state_change_required": true,
+        "subject_motion_directive_present": true
+      },
+      "generation_intent": {
+        "reference_planning": {
+          "contract_version": "shot-reference-intent/1",
+          "facets": [
+            "continuous_physics",
+            "identity_consistency",
+            "slow_camera"
+          ],
+          "structure": "continuous",
+          "segment_ids": [],
+          "events": [
+            {
+              "event_id": "start-composition",
+              "kind": "composition",
+              "visual_state": "低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。",
+              "purpose": "看清工人、电闸和钢缆起始关系",
+              "phase": "start",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "model_guidance",
+              "priority": "required"
+            },
+            {
+              "event_id": "end-composition",
+              "kind": "composition",
+              "visual_state": "电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。",
+              "purpose": "看清断电后仍运作的受力证据",
+              "phase": "end",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "model_guidance",
+              "priority": "required"
+            }
+          ],
+          "anchors": [
+            {
+              "anchor_id": "worker-identity",
+              "role": "identity",
+              "purpose": "只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。",
+              "owner_id": "municipal-worker",
+              "priority": "required"
+            }
+          ],
+          "selections": [
+            {
+              "need_id": "worker-identity",
+              "asset_id": "municipal-board-v2"
+            },
+            {
+              "need_id": "start-composition",
+              "asset_id": "municipal-board-v2"
+            },
+            {
+              "need_id": "end-composition",
+              "asset_id": "municipal-board-v2"
+            }
+          ],
+          "natural_generation": [],
+          "director_coverage": {
+            "coverage_hash": "db5561bdaab553e6db10cf3cbe547a6185e9615acf07c1abe9971c9d29b18456",
+            "unit_id": "municipal"
+          },
+          "preview_approval": {
+            "approval_hash": "84383dadffb71dd3de31469ba2a6f3a4d0cf229806b49e1ef0c67c614093ec09"
+          }
+        },
+        "open_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。",
+          "state_hash": null,
+          "required_change": false
+        },
+        "close_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。",
+          "state_hash": null,
+          "required_change": true
+        },
+        "identity_continuity": {
+          "character_ids": [
+            "municipal-worker"
+          ],
+          "preservation": "exact",
+          "allowed_variation": []
+        },
+        "scene_continuity": {
+          "scene_id": "municipal-rain-gate",
+          "time_of_day": "雨夜",
+          "mood": "市政设备断电后仍运行",
+          "state_constraints": [
+            "钢缆连接绞盘与铁门",
+            "电闸断开后绞盘仍转"
+          ]
+        },
+        "space_continuity": {
+          "subject_position": "电闸在左，绞盘居中，钢缆连接右侧铁门",
+          "screen_direction": "向右揭示机械关系",
+          "entrance_state": null,
+          "exit_state": null,
+          "crossing_policy": "不越轴"
+        },
+        "axis_continuity": {
+          "camera_axis": "设备正面同一侧",
+          "framing_continuity": "工人与电闸到绞盘钢缆铁门",
+          "crossing_policy": "不越轴"
+        },
+        "subject_action": {
+          "start_state": "低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。",
+          "progression": "工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。",
+          "endpoint": {
+            "state_ref": null,
+            "state_text": "电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。",
+            "state_hash": null,
+            "required_change": true
+          }
+        },
+        "motion_envelope": {
+          "onset": "伸手断电",
+          "peak": "断电后绞盘仍转",
+          "settle": "工人回看绷紧钢缆",
+          "direction": "手向下断电、头向右回看",
+          "amplitude_class": "正常实时动作"
+        },
+        "pacing": {
+          "cadence": "操作、揭示、停留确认",
+          "tempo_class": "正常原速",
+          "shot_duration_seconds": 6.0
+        },
+        "camera_intent": {
+          "movement": "小幅向右摇",
+          "stability": "稳定",
+          "framing_intent": "一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。",
+          "expression_strength": "semantic_prompt_allowed"
+        },
+        "camera_endpoint": {
+          "start_framing": "低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。",
+          "end_framing": "电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。",
+          "position_lock": true,
+          "orientation_lock": false
+        },
+        "performance_intent": {
+          "trigger": "断电后机械仍转",
+          "visible_response": "回看绞盘",
+          "gaze_target": "绞盘",
+          "body_behavior": "站稳后回头",
+          "hand_behavior": "拉下电闸后松手",
+          "terminal_performance_state": "站定看绞盘",
+          "character_directions": [
+            {
+              "character_id": "municipal-worker",
+              "screen_identity": "只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。",
+              "role": "principal",
+              "visibility": "visible",
+              "offscreen_reason": null,
+              "beats": [
+                {
+                  "phase": "throughout",
+                  "trigger": "断电后机械仍转",
+                  "emotion": "克制困惑",
+                  "intensity": "subtle",
+                  "facial_expression": "轻微皱眉",
+                  "gaze_target": "绞盘",
+                  "breathing": "正常",
+                  "body_behavior": "操作后回看"
+                }
+              ]
+            }
+          ]
+        },
+        "visual_treatment": {
+          "medium_look": "正常速度真人摄影",
+          "palette": "冷灰与实用灯",
+          "material_treatment": "潮湿金属和真实衣物",
+          "prohibited_visual_drift": [
+            "慢动作、闪屏、鬼影",
+            "字幕、格线、编号"
+          ]
+        },
+        "lighting_intent": {
+          "motivated_source": "现场实用灯",
+          "direction": "侧上方",
+          "exposure_priority": "电闸断开与钢缆关系可读",
+          "continuity_state": "现场灯不闪烁"
+        },
+        "ambience_intent": {
+          "environment_bed": "持续雨声",
+          "foley_cues": [
+            "绞盘电机声",
+            "钢缆受力声"
+          ],
+          "explicitly_silent": false
+        },
+        "dialogue_intent": {
+          "mode": "none",
+          "speaker_id": null,
+          "verbatim_text": null,
+          "start_seconds": null,
+          "end_seconds": null,
+          "on_screen": null,
+          "response_obligation": null,
+          "lip_sync_required": false
+        },
+        "music_intent": {
+          "mode": "none",
+          "instrumentation": null,
+          "tempo_rhythm": null,
+          "dynamics": null
+        },
+        "primary_camera_motion": {
+          "movement_kind": "pan_right",
+          "direction": "right",
+          "amplitude_class": "subtle",
+          "speed_class": "slow",
+          "start_motion_state": "stationary",
+          "end_motion_state": "settled"
+        },
+        "camera_subject_relation": {
+          "subject_id": "municipal-worker",
+          "relation_kind": "reveal",
+          "start_relation": "工人和断电开关",
+          "end_relation": "工人回看仍运作机械"
+        }
+      },
+      "output_need": {
+        "timing_mode": "content_driven",
+        "duration_seconds": 6,
+        "geometry_policy": "adaptive",
+        "aspect_ratio": "16:9",
+        "fps": null,
+        "container_mime": "video/mp4"
+      },
+      "audio_need": "required",
+      "quality_need": {
+        "objective_tier": "preview"
+      }
+    },
+    "composition": {
+      "muted": false,
+      "source_audio_policy": "KEEP"
+    }
+  },
+  "routing_policy": {
+    "identity": {
+      "policy_id": "awesome-municipal-qualification",
+      "policy_version": "1",
+      "policy_sha256": "e4427f3e94162825d232cf80af49f06d4d3e59b34142c6ffe0b4755fbdaedf8e"
+    },
+    "local_resources_available": false,
+    "remote_authorized": true,
+    "budget_authorized": true,
+    "execution_purpose": "qualification"
+  },
+  "decision_policy": {
+    "max_resamples": 0,
+    "allow_bounded_exploration": true
+  },
+  "execution_limits": {
+    "task_id": "awesome-municipal-preview",
+    "generation_forbidden": false,
+    "allowed_remote_candidates": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1"
+    ],
+    "paid_submit_ceiling": 1,
+    "paid_submits_used": 0,
+    "local_batch_limit": 1,
+    "local_batch_used": 0,
+    "local_total_used": 0,
+    "local_resource_available": false
+  },
+  "jimeng_profile": {
+    "model_id": "seedance_2.0_vip",
+    "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+    "project_id": "e09b617d-5af1-40ee-9136-d36a7422d40c",
+    "node_id": "node_z42z9181vs",
+    "duration_seconds": 6,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "benefit_amount": 6,
+    "benefit_type": "seedance_20_pro_1080p_output",
+    "credit_upper_bound": 1500
+  }
+}

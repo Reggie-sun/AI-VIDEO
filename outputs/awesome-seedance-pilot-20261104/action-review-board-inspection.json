@@ -1,0 +1,11 @@
+{
+  "path": "outputs/awesome-seedance-pilot-20261104/action-review-board.png",
+  "sha256": "307c9d6c9bd44c5da8495615a0bb6b2f645b529114f3773257d619d4f0694919",
+  "size": [
+    2172,
+    724
+  ],
+  "role": "review_only",
+  "status": "NOT_APPROVED",
+  "inspection": "Middle panel shows right index contact; right panel shows released hand and tightened brow. Board uses tighter framing; left panel finger is near/touching button, not exact opening. Use opening-reference.png as sole proposed actual model input. Board conveys middle/end intention only, not exact keyframe or proven motion."
+}

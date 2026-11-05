@@ -1,0 +1,77 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song-full/vo/outro/tts_Relax_20261103_220848.mp3",
+ "audio_sha256": "d46dc759b27471b1e6badbf4505997ab6f8a3a41a744a6ba339a734d8b5a09ae",
+ "start": 0.0,
+ "end": 4.24,
+ "text": "Relax. The door is closed. Three forty-eight.",
+ "words": [
+  {
+   "text": " Relax",
+   "start": 0.0,
+   "end": 0.52,
+   "probability": 0.9161108136177063
+  },
+  {
+   "text": ".",
+   "start": 0.52,
+   "end": 0.64,
+   "probability": 0.6344741582870483
+  },
+  {
+   "text": " The",
+   "start": 0.64,
+   "end": 1.22,
+   "probability": 0.9989908337593079
+  },
+  {
+   "text": " door",
+   "start": 1.22,
+   "end": 1.48,
+   "probability": 0.9991959929466248
+  },
+  {
+   "text": " is",
+   "start": 1.48,
+   "end": 1.62,
+   "probability": 0.9986340403556824
+  },
+  {
+   "text": " closed",
+   "start": 1.62,
+   "end": 1.9,
+   "probability": 0.9998522996902466
+  },
+  {
+   "text": ".",
+   "start": 1.9,
+   "end": 2.26,
+   "probability": 0.9925328493118286
+  },
+  {
+   "text": " Three",
+   "start": 2.26,
+   "end": 3.1,
+   "probability": 0.03410617634654045
+  },
+  {
+   "text": " forty",
+   "start": 3.1,
+   "end": 3.44,
+   "probability": 0.58537757396698
+  },
+  {
+   "text": "-eight",
+   "start": 3.44,
+   "end": 3.76,
+   "probability": 0.8605257868766785
+  },
+  {
+   "text": ".",
+   "start": 3.76,
+   "end": 3.9,
+   "probability": 0.9881334900856018
+  }
+ ]
+}

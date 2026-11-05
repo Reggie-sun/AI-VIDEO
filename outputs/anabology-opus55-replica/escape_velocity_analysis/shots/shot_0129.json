@@ -1,0 +1,2181 @@
+{
+  "shot_id": "S0129",
+  "start_frame": 5751,
+  "end_frame": 5879,
+  "start_time": 239.625,
+  "end_time": 245.0,
+  "duration_frames": 129,
+  "duration_s": 5.375,
+  "start_tc": "00:03:59:15",
+  "end_tc": "00:04:04:23",
+  "boundary_in_id": "B3-034",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5751,
+      "path": "keyframes/S0129_f05751.jpg",
+      "role": "first",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5783,
+      "path": "keyframes/S0129_f05783.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5815,
+      "path": "keyframes/S0129_f05815.jpg",
+      "role": "middle",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5847,
+      "path": "keyframes/S0129_f05847.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5879,
+      "path": "keyframes/S0129_f05879.jpg",
+      "role": "last",
+      "note": "Actually opened individually in detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Frontal singer interrupted by expanding full-screen terminal on white background",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "7 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Frontal singer interrupted by expanding full-screen terminal on white background. Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879. Geometry and typography in this draft require full-resolution detail verification.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Frontal singer interrupted by expanding full-screen terminal on white background",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Frontal singer interrupted by expanding full-screen terminal on white background",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0129.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0015,
+      "pan_y_frac_per_s": 0.0009,
+      "zoom_per_s": 0.0001,
+      "median_flow_frac_per_s": 0.0063,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E9EBEC",
+        "fraction": 0.676,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#0F0F0C",
+        "fraction": 0.095,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#D5D0CD",
+        "fraction": 0.085,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#504541",
+        "fraction": 0.05,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#B0A5A1",
+        "fraction": 0.049,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#817673",
+        "fraction": 0.045,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[186.9, 223.9, 188.9]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 04 /11",
+      "evidence_frame": 5815,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5815
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5815,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:59:15",
+      "end_value": "00:04:04:23"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5815
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0129-E01",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Frontal singer interrupted by expanding full-screen terminal on white background",
+      "start_frame": 5751,
+      "end_frame": 5879,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5751–5753; inherited state when at shot start.",
+        "exit": "Last visibility f5877–5879; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5751,
+          "state": "visible"
+        },
+        {
+          "frame": 5879,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5815,
+        5879
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5751,
+          5753
+        ],
+        "exit_bounds": [
+          5877,
+          5879
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E02",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_lyric",
+      "description": "It’s So Over region? / We’re So Back region.",
+      "start_frame": 5751,
+      "end_frame": 5794,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.16,
+        "w": 0.9,
+        "h": 0.1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5751–5753; inherited state when at shot start.",
+        "exit": "Last visibility f5792–5794; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5751,
+          "text": "It’s So Over region?"
+        },
+        {
+          "frame": 5757,
+          "text": "We’re"
+        },
+        {
+          "frame": 5763,
+          "text": "We’re So"
+        },
+        {
+          "frame": 5772,
+          "text": "We’re So Back; left heading struck through"
+        },
+        {
+          "frame": 5787,
+          "text": "We’re So Back region."
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5815,
+        5879
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "It’s So Over region? / We’re So Back region.",
+        "case": "as displayed; slash separates sequential states",
+        "typography": {
+          "description": "Sans headline or mono label; exact font and size unresolved",
+          "method": "visual_estimate",
+          "font_status": "candidate only"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5751,
+          5753
+        ],
+        "exit_bounds": [
+          5792,
+          5794
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E03",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "Cream terminal border/window frame with rapid expansion; body lines and chart split into independent elements",
+      "start_frame": 5793,
+      "end_frame": 5825,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.04,
+        "w": 0.72,
+        "h": 0.89,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5793–5795; inherited state when at shot start.",
+        "exit": "Last visibility f5823–5825; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5793,
+          "state": "terminal begins opening from small card"
+        },
+        {
+          "frame": 5794,
+          "state": "nearly fills frame"
+        },
+        {
+          "frame": 5795,
+          "state": "full cream view > /l"
+        },
+        {
+          "frame": 5799,
+          "text": "> /loop"
+        },
+        {
+          "frame": 5815,
+          "text": "Looping… iteration0008 of∞; Happiness.measure();0.666 ▲+0.007 per loop; You’re absolutely right!; Mood+0.007. Running it again."
+        },
+        {
+          "frame": 5825,
+          "state": "last full-size view"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5793,
+        5815,
+        5825
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "is_group_container": true,
+      "visibility_evidence": {
+        "entry_bounds": [
+          5793,
+          5795
+        ],
+        "exit_bounds": [
+          5823,
+          5825
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E04",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "/loop make me happier.",
+      "start_frame": 5826,
+      "end_frame": 5879,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.11,
+        "w": 0.52,
+        "h": 0.16,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5826–5828; inherited state when at shot start.",
+        "exit": "Last visibility f5877–5879; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5826,
+          "text": "> /loop make"
+        },
+        {
+          "frame": 5832,
+          "text": "> /loop make me"
+        },
+        {
+          "frame": 5835,
+          "text": "> /loop make me happier"
+        },
+        {
+          "frame": 5879,
+          "iteration": 31,
+          "happiness": 0.827
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5815,
+        5879
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "/loop make me happier.",
+        "case": "as displayed; slash separates sequential states",
+        "typography": {
+          "description": "Sans headline or mono label; exact font and size unresolved",
+          "method": "visual_estimate",
+          "font_status": "candidate only"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5826,
+          5828
+        ],
+        "exit_bounds": [
+          5877,
+          5879
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E05",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "SLOPACOLYPSE?",
+      "start_frame": 5846,
+      "end_frame": 5879,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.44,
+        "w": 0.58,
+        "h": 0.14,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5846–5848; inherited state when at shot start.",
+        "exit": "Last visibility f5877–5879; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5846,
+          "state": "white lettering on black one-frame inversion"
+        },
+        {
+          "frame": 5847,
+          "state": "black letters without backing"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5815,
+        5879
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "SLOPACOLYPSE?",
+        "case": "as displayed; slash separates sequential states",
+        "typography": {
+          "description": "Sans headline or mono label; exact font and size unresolved",
+          "method": "visual_estimate",
+          "font_status": "candidate only"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5846,
+          5848
+        ],
+        "exit_bounds": [
+          5877,
+          5879
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E06",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "image_inset",
+      "description": "Repeated small gray halftone thumbnails",
+      "start_frame": 5846,
+      "end_frame": 5879,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.63,
+        "w": 0.85,
+        "h": 0.2,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Gray blurred extra-finger hand images. First labels SLOP0.97 / IMG0417.PNG ·6FINGERS and SLOP0.91 / IMG0448.PNG ·GLOSSY; repeated changing rows use same two image families."
+      },
+      "motion": {
+        "path": "Mirrored thumbnail columns build downward in staggered entries every ~3frames from5846; looped stacks move down and expire behind caption by5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5846–5848; inherited state when at shot start.",
+        "exit": "Last visibility f5877–5879; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5846,
+          "state": "visible"
+        },
+        {
+          "frame": 5879,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5815,
+        5879
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "instance_timing_observations": [
+        {
+          "frame": 5846,
+          "visible_count": 2
+        },
+        {
+          "frame": 5850,
+          "visible_count": 4
+        },
+        {
+          "frame": 5856,
+          "visible_count": 6
+        },
+        {
+          "frame": 5862,
+          "visible_count": 8
+        },
+        {
+          "frame": 5874,
+          "state": "bottom cards clipped/expired"
+        }
+      ],
+      "visibility_evidence": {
+        "entry_bounds": [
+          5846,
+          5848
+        ],
+        "exit_bounds": [
+          5877,
+          5879
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E07",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "sticker",
+      "description": "Visible sticker bearing NOT",
+      "start_frame": 5874,
+      "end_frame": 5879,
+      "bounding_box": {
+        "x": 0.8,
+        "y": 0.32,
+        "w": 0.1,
+        "h": 0.12,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5874–5876; inherited state when at shot start.",
+        "exit": "Last visibility f5877–5879; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5874,
+          "state": "visible"
+        },
+        {
+          "frame": 5879,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5815,
+        5879
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5874,
+          5876
+        ],
+        "exit_bounds": [
+          5877,
+          5879
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E08",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Separate LOOP LOG /loop listing iterations and mood at right of expanded terminal",
+      "start_frame": 5795,
+      "end_frame": 5825,
+      "bounding_box": {
+        "x": 0.69,
+        "y": 0.28,
+        "w": 0.26,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5795–5797; inherited state when at shot start.",
+        "exit": "Last visibility f5823–5825; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5799,
+          "state": "iteration0002"
+        },
+        {
+          "frame": 5815,
+          "state": "iteration0008; top mood0.666"
+        },
+        {
+          "frame": 5825,
+          "state": "iteration0011; top mood0.687"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5815,
+        5879
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOOP LOG /loop",
+        "typography": {
+          "description": "Tiny mono tabular log",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5795,
+          5797
+        ],
+        "exit_bounds": [
+          5823,
+          5825
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E09",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "hud_marker",
+      "description": "Horizontal tournament final line: IT’S SO OVER ·72 left, WE’RE SO BACK ·88 right",
+      "start_frame": 5751,
+      "end_frame": 5793,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.55,
+        "w": 0.9,
+        "h": 0.025,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5751–5753; inherited state when at shot start.",
+        "exit": "Last visibility f5791–5793; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5751,
+          "state": "visible"
+        },
+        {
+          "frame": 5793,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5751,
+          5753
+        ],
+        "exit_bounds": [
+          5791,
+          5793
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E10",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "tag_card",
+      "description": "CHAMPION · FINAL88–72 / WE’RE SO BACK",
+      "start_frame": 5772,
+      "end_frame": 5793,
+      "bounding_box": {
+        "x": 0.41,
+        "y": 0.51,
+        "w": 0.18,
+        "h": 0.09,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5772–5774; inherited state when at shot start.",
+        "exit": "Last visibility f5791–5793; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5772,
+          "state": "visible"
+        },
+        {
+          "frame": 5793,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5772,
+          5774
+        ],
+        "exit_bounds": [
+          5791,
+          5793
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E11",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "FACE · CLEAN · NOT SLOP ·0.99",
+      "start_frame": 5826,
+      "end_frame": 5879,
+      "bounding_box": {
+        "x": 0.45,
+        "y": 0.08,
+        "w": 0.13,
+        "h": 0.025,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5826–5828; inherited state when at shot start.",
+        "exit": "Last visibility f5877–5879; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5826,
+          "state": "visible"
+        },
+        {
+          "frame": 5879,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "FACE · CLEAN · NOT SLOP ·0.99",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5826,
+          5828
+        ],
+        "exit_bounds": [
+          5877,
+          5879
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E12",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_caption",
+      "description": "/loop make me happier. Slopacolypse? Not",
+      "start_frame": 5826,
+      "end_frame": 5879,
+      "bounding_box": {
+        "x": 0.035,
+        "y": 0.85,
+        "w": 0.46,
+        "h": 0.095,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5826–5828; inherited state when at shot start.",
+        "exit": "Last visibility f5877–5879; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5826,
+          "state": "visible"
+        },
+        {
+          "frame": 5879,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5751,
+        5879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "/loop make me happier. Slopacolypse? Not",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5826,
+          5828
+        ],
+        "exit_bounds": [
+          5877,
+          5879
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E13",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Terminal large prompt > /loop with black selection/cursor block",
+      "start_frame": 5795,
+      "end_frame": 5825,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.11,
+        "w": 0.4,
+        "h": 0.16,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5795–5797; inherited state when at shot start.",
+        "exit": "Last visibility f5823–5825; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5795,
+          "text": "> /l"
+        },
+        {
+          "frame": 5797,
+          "text": "> /lo"
+        },
+        {
+          "frame": 5798,
+          "text": "> /loo"
+        },
+        {
+          "frame": 5799,
+          "text": "> /loop"
+        },
+        {
+          "frame": 5805,
+          "state": "selection clears; cursor persists"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5795,
+        5825
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "> /loop",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5795,
+          5797
+        ],
+        "exit_bounds": [
+          5823,
+          5825
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E14",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Rotating asterisk and Looping iteration line below command",
+      "start_frame": 5798,
+      "end_frame": 5825,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.35,
+        "w": 0.57,
+        "h": 0.045,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5798–5800; inherited state when at shot start.",
+        "exit": "Last visibility f5823–5825; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5799,
+          "value": 2
+        },
+        {
+          "frame": 5803,
+          "value": 3
+        },
+        {
+          "frame": 5805,
+          "value": 4
+        },
+        {
+          "frame": 5807,
+          "value": 5
+        },
+        {
+          "frame": 5811,
+          "value": 6
+        },
+        {
+          "frame": 5813,
+          "value": 7
+        },
+        {
+          "frame": 5815,
+          "value": 8
+        },
+        {
+          "frame": 5819,
+          "value": 9
+        },
+        {
+          "frame": 5821,
+          "value": 10
+        },
+        {
+          "frame": 5823,
+          "value": 11
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5798,
+        5825
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Looping… iteration0011 of∞ (esc to interrupt)",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5798,
+          5800
+        ],
+        "exit_bounds": [
+          5823,
+          5825
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E15",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Happiness.measure call and incrementing numeric result",
+      "start_frame": 5806,
+      "end_frame": 5825,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.42,
+        "w": 0.41,
+        "h": 0.1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5806–5808; inherited state when at shot start.",
+        "exit": "Last visibility f5823–5825; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5807,
+          "value": 0.645
+        },
+        {
+          "frame": 5811,
+          "value": 0.652
+        },
+        {
+          "frame": 5813,
+          "value": 0.659
+        },
+        {
+          "frame": 5815,
+          "value": 0.666
+        },
+        {
+          "frame": 5819,
+          "value": 0.673
+        },
+        {
+          "frame": 5821,
+          "value": 0.68
+        },
+        {
+          "frame": 5823,
+          "value": 0.687
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5806,
+        5825
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Happiness.measure()\n└ 0.687 ▲ +0.007 per loop",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5806,
+          5808
+        ],
+        "exit_bounds": [
+          5823,
+          5825
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E16",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Bold assistant praise followed by small repeat-status line",
+      "start_frame": 5814,
+      "end_frame": 5825,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.54,
+        "w": 0.57,
+        "h": 0.14,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5814–5816; inherited state when at shot start.",
+        "exit": "Last visibility f5823–5825; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5814,
+          "opacity": 1
+        },
+        {
+          "frame": 5825,
+          "opacity": 1
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5814,
+        5825
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "You’re absolutely right!\nMood +0.007. Running it again.",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5814,
+          5816
+        ],
+        "exit_bounds": [
+          5823,
+          5825
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0129-E17",
+      "shot_id": "S0129",
+      "asset_id": null,
+      "type": "hud_chart",
+      "description": "Tiny rising happiness bar plot at lower left of expanded terminal",
+      "start_frame": 5798,
+      "end_frame": 5825,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.73,
+        "w": 0.26,
+        "h": 0.11,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5798–5800; inherited state when at shot start.",
+        "exit": "Last visibility f5823–5825; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5799,
+          "state": "early low bars"
+        },
+        {
+          "frame": 5815,
+          "state": "8 bars rising right"
+        },
+        {
+          "frame": 5825,
+          "state": "11 bars rising right"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5798,
+        5825
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5798,
+          5800
+        ],
+        "exit_bounds": [
+          5823,
+          5825
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0129-A01",
+      "target_element_ids": [
+        "S0129-E02",
+        "S0129-E03",
+        "S0129-E04",
+        "S0129-E05",
+        "S0129-E06",
+        "S0129-E07"
+      ],
+      "description": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+      "start_frame": 5751,
+      "end_frame": 5879,
+      "easing": "unfitted",
+      "audio_sync": "not listened in this pass"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0244",
+        "D0245"
+      ],
+      "frame_range": [
+        5794,
+        5826
+      ],
+      "type": "hud_swap",
+      "description": "A small terminal window grows from the HUD to full-screen (5793 woman still visible above window, 5794 near full, 5795-5825 full-frame cream '/loop' terminal card) and closes at 5826 back onto the same frontal woman shot; treated as a full-screen HUD window, not a new shot.",
+      "confidence": 0.5,
+      "chunk": 3,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    },
+    {
+      "dist_ids": [
+        "D0246"
+      ],
+      "frame_range": [
+        5845,
+        5846
+      ],
+      "type": "text_swap",
+      "description": "'SLOPACOLYPSE?' caption appears with halftone thumbnails; same woman.",
+      "confidence": 0.85,
+      "chunk": 3,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-034",
+      "span": [
+        5751,
+        5751
+      ],
+      "description": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-035",
+      "span": [
+        5879,
+        5879
+      ],
+      "description": "Terminal fills frame5795-5825, shrinks5826; SLOPACOLYPSE5846; NOT5879",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0371",
+      "relation": "vocal_word_candidate (unknown) at frame 5741–5751; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5751
+    },
+    {
+      "audio_event_id": "AH02432",
+      "relation": "band_onset_candidate (unknown) at frame 5751; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5751
+    },
+    {
+      "audio_event_id": "AB0531",
+      "relation": "beat_candidate (unknown) at frame 5751; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5751
+    },
+    {
+      "audio_event_id": "AH02433",
+      "relation": "band_onset_candidate (unknown) at frame 5751; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5751
+    },
+    {
+      "audio_event_id": "AH02434",
+      "relation": "band_onset_candidate (unknown) at frame 5751; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5751
+    },
+    {
+      "audio_event_id": "AH02435",
+      "relation": "band_onset_candidate (unknown) at frame 5751; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5751
+    },
+    {
+      "audio_event_id": "AW0372",
+      "relation": "vocal_word_candidate (unknown) at frame 5751–5754; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5751
+    },
+    {
+      "audio_event_id": "AH02436",
+      "relation": "band_onset_candidate (unknown) at frame 5752; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5752
+    },
+    {
+      "audio_event_id": "AW0373",
+      "relation": "vocal_word_candidate (unknown) at frame 5754–5755; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5754
+    },
+    {
+      "audio_event_id": "AW0374",
+      "relation": "vocal_word_candidate (unknown) at frame 5755–5756; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5755
+    },
+    {
+      "audio_event_id": "AW0375",
+      "relation": "vocal_word_candidate (unknown) at frame 5756–5759; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5756
+    },
+    {
+      "audio_event_id": "AH02437",
+      "relation": "band_onset_candidate (unknown) at frame 5757; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5757
+    },
+    {
+      "audio_event_id": "AH02438",
+      "relation": "band_onset_candidate (unknown) at frame 5757; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5757
+    },
+    {
+      "audio_event_id": "AH02439",
+      "relation": "band_onset_candidate (unknown) at frame 5757; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5757
+    },
+    {
+      "audio_event_id": "AW0376",
+      "relation": "vocal_word_candidate (unknown) at frame 5759–5802; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5759
+    },
+    {
+      "audio_event_id": "AH02440",
+      "relation": "band_onset_candidate (unknown) at frame 5762; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5762
+    },
+    {
+      "audio_event_id": "AB0532",
+      "relation": "beat_candidate (unknown) at frame 5762; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5762
+    },
+    {
+      "audio_event_id": "AH02441",
+      "relation": "band_onset_candidate (unknown) at frame 5762; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5762
+    },
+    {
+      "audio_event_id": "AH02442",
+      "relation": "band_onset_candidate (unknown) at frame 5762; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5762
+    },
+    {
+      "audio_event_id": "AH02443",
+      "relation": "band_onset_candidate (unknown) at frame 5762; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5762
+    },
+    {
+      "audio_event_id": "AH02444",
+      "relation": "band_onset_candidate (unknown) at frame 5767; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5767
+    },
+    {
+      "audio_event_id": "AH02445",
+      "relation": "band_onset_candidate (unknown) at frame 5767; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5767
+    },
+    {
+      "audio_event_id": "AH02446",
+      "relation": "band_onset_candidate (unknown) at frame 5768; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5768
+    },
+    {
+      "audio_event_id": "AH02447",
+      "relation": "band_onset_candidate (unknown) at frame 5772; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5772
+    },
+    {
+      "audio_event_id": "AH02448",
+      "relation": "band_onset_candidate (unknown) at frame 5772; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5772
+    },
+    {
+      "audio_event_id": "AH02449",
+      "relation": "band_onset_candidate (unknown) at frame 5772; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5772
+    },
+    {
+      "audio_event_id": "AB0533",
+      "relation": "beat_candidate (unknown) at frame 5772; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5772
+    },
+    {
+      "audio_event_id": "AH02450",
+      "relation": "band_onset_candidate (unknown) at frame 5772; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5772
+    },
+    {
+      "audio_event_id": "AH02451",
+      "relation": "band_onset_candidate (unknown) at frame 5773; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5773
+    },
+    {
+      "audio_event_id": "AH02452",
+      "relation": "band_onset_candidate (unknown) at frame 5778; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5778
+    },
+    {
+      "audio_event_id": "AH02453",
+      "relation": "band_onset_candidate (unknown) at frame 5778; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5778
+    },
+    {
+      "audio_event_id": "AH02454",
+      "relation": "band_onset_candidate (unknown) at frame 5778; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5778
+    },
+    {
+      "audio_event_id": "AH02455",
+      "relation": "band_onset_candidate (unknown) at frame 5783; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5783
+    },
+    {
+      "audio_event_id": "AH02456",
+      "relation": "band_onset_candidate (unknown) at frame 5783; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5783
+    },
+    {
+      "audio_event_id": "AH02457",
+      "relation": "band_onset_candidate (unknown) at frame 5783; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5783
+    },
+    {
+      "audio_event_id": "AB0534",
+      "relation": "beat_candidate (unknown) at frame 5783; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5783
+    },
+    {
+      "audio_event_id": "AH02458",
+      "relation": "band_onset_candidate (unknown) at frame 5783; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5783
+    },
+    {
+      "audio_event_id": "AH02459",
+      "relation": "band_onset_candidate (unknown) at frame 5784; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5784
+    },
+    {
+      "audio_event_id": "AB0535",
+      "relation": "beat_candidate (unknown) at frame 5794; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5794
+    },
+    {
+      "audio_event_id": "AH02460",
+      "relation": "band_onset_candidate (unknown) at frame 5794; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5794
+    },
+    {
+      "audio_event_id": "AH02461",
+      "relation": "band_onset_candidate (unknown) at frame 5794; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5794
+    },
+    {
+      "audio_event_id": "AH02462",
+      "relation": "band_onset_candidate (unknown) at frame 5794; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5794
+    },
+    {
+      "audio_event_id": "AH02463",
+      "relation": "band_onset_candidate (unknown) at frame 5795; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5795
+    },
+    {
+      "audio_event_id": "AH02464",
+      "relation": "band_onset_candidate (unknown) at frame 5799; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5799
+    },
+    {
+      "audio_event_id": "AH02465",
+      "relation": "band_onset_candidate (unknown) at frame 5799; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5799
+    },
+    {
+      "audio_event_id": "AH02466",
+      "relation": "band_onset_candidate (unknown) at frame 5799; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5799
+    },
+    {
+      "audio_event_id": "AW0377",
+      "relation": "vocal_word_candidate (unknown) at frame 5804–5822; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5804
+    },
+    {
+      "audio_event_id": "AH02467",
+      "relation": "band_onset_candidate (unknown) at frame 5805; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5805
+    },
+    {
+      "audio_event_id": "AB0536",
+      "relation": "beat_candidate (unknown) at frame 5805; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5805
+    },
+    {
+      "audio_event_id": "AH02468",
+      "relation": "band_onset_candidate (unknown) at frame 5805; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5805
+    },
+    {
+      "audio_event_id": "AH02469",
+      "relation": "band_onset_candidate (unknown) at frame 5805; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5805
+    },
+    {
+      "audio_event_id": "AH02470",
+      "relation": "band_onset_candidate (unknown) at frame 5805; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5805
+    },
+    {
+      "audio_event_id": "AH02471",
+      "relation": "band_onset_candidate (unknown) at frame 5805; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5805
+    },
+    {
+      "audio_event_id": "AH02472",
+      "relation": "band_onset_candidate (unknown) at frame 5810; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5810
+    },
+    {
+      "audio_event_id": "AH02473",
+      "relation": "band_onset_candidate (unknown) at frame 5810; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5810
+    },
+    {
+      "audio_event_id": "AH02474",
+      "relation": "band_onset_candidate (unknown) at frame 5810; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5810
+    },
+    {
+      "audio_event_id": "AH02475",
+      "relation": "band_onset_candidate (unknown) at frame 5815; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5815
+    },
+    {
+      "audio_event_id": "AB0537",
+      "relation": "beat_candidate (unknown) at frame 5815; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5815
+    },
+    {
+      "audio_event_id": "AH02476",
+      "relation": "band_onset_candidate (unknown) at frame 5815; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5815
+    },
+    {
+      "audio_event_id": "AH02477",
+      "relation": "band_onset_candidate (unknown) at frame 5815; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5815
+    },
+    {
+      "audio_event_id": "AH02478",
+      "relation": "band_onset_candidate (unknown) at frame 5816; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5816
+    },
+    {
+      "audio_event_id": "AH02479",
+      "relation": "band_onset_candidate (unknown) at frame 5816; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5816
+    },
+    {
+      "audio_event_id": "AH02480",
+      "relation": "band_onset_candidate (unknown) at frame 5821; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5821
+    },
+    {
+      "audio_event_id": "AH02481",
+      "relation": "band_onset_candidate (unknown) at frame 5821; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5821
+    },
+    {
+      "audio_event_id": "AH02482",
+      "relation": "band_onset_candidate (unknown) at frame 5821; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5821
+    },
+    {
+      "audio_event_id": "AW0378",
+      "relation": "vocal_word_candidate (unknown) at frame 5826–5830; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5826
+    },
+    {
+      "audio_event_id": "AB0538",
+      "relation": "beat_candidate (unknown) at frame 5826; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5826
+    },
+    {
+      "audio_event_id": "AH02483",
+      "relation": "band_onset_candidate (unknown) at frame 5826; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5826
+    },
+    {
+      "audio_event_id": "AH02484",
+      "relation": "band_onset_candidate (unknown) at frame 5826; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5826
+    },
+    {
+      "audio_event_id": "AH02485",
+      "relation": "band_onset_candidate (unknown) at frame 5826; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5826
+    },
+    {
+      "audio_event_id": "AH02486",
+      "relation": "band_onset_candidate (unknown) at frame 5826; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5826
+    },
+    {
+      "audio_event_id": "AH02487",
+      "relation": "band_onset_candidate (unknown) at frame 5827; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5827
+    },
+    {
+      "audio_event_id": "AW0379",
+      "relation": "vocal_word_candidate (unknown) at frame 5830–5832; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5830
+    },
+    {
+      "audio_event_id": "AH02488",
+      "relation": "band_onset_candidate (unknown) at frame 5831; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5831
+    },
+    {
+      "audio_event_id": "AH02489",
+      "relation": "band_onset_candidate (unknown) at frame 5832; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5832
+    },
+    {
+      "audio_event_id": "AW0380",
+      "relation": "vocal_word_candidate (unknown) at frame 5834–5843; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5834
+    },
+    {
+      "audio_event_id": "AH02490",
+      "relation": "band_onset_candidate (unknown) at frame 5837; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5837
+    },
+    {
+      "audio_event_id": "AH02491",
+      "relation": "band_onset_candidate (unknown) at frame 5837; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5837
+    },
+    {
+      "audio_event_id": "AH02492",
+      "relation": "band_onset_candidate (unknown) at frame 5837; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5837
+    },
+    {
+      "audio_event_id": "AB0539",
+      "relation": "beat_candidate (unknown) at frame 5837; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5837
+    },
+    {
+      "audio_event_id": "AH02493",
+      "relation": "band_onset_candidate (unknown) at frame 5837; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5837
+    },
+    {
+      "audio_event_id": "AH02494",
+      "relation": "band_onset_candidate (unknown) at frame 5838; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5838
+    },
+    {
+      "audio_event_id": "AH02495",
+      "relation": "band_onset_candidate (unknown) at frame 5842; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5842
+    },
+    {
+      "audio_event_id": "AH02496",
+      "relation": "band_onset_candidate (unknown) at frame 5843; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5843
+    },
+    {
+      "audio_event_id": "AH02497",
+      "relation": "band_onset_candidate (unknown) at frame 5843; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5843
+    },
+    {
+      "audio_event_id": "AW0381",
+      "relation": "vocal_word_candidate (unknown) at frame 5845–5874; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5845
+    },
+    {
+      "audio_event_id": "AH02498",
+      "relation": "band_onset_candidate (unknown) at frame 5848; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5848
+    },
+    {
+      "audio_event_id": "AH02499",
+      "relation": "band_onset_candidate (unknown) at frame 5848; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5848
+    },
+    {
+      "audio_event_id": "AB0540",
+      "relation": "beat_candidate (unknown) at frame 5848; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5848
+    },
+    {
+      "audio_event_id": "AH02500",
+      "relation": "band_onset_candidate (unknown) at frame 5848; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5848
+    },
+    {
+      "audio_event_id": "AH02501",
+      "relation": "band_onset_candidate (unknown) at frame 5848; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5848
+    },
+    {
+      "audio_event_id": "AH02502",
+      "relation": "band_onset_candidate (unknown) at frame 5853; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5853
+    },
+    {
+      "audio_event_id": "AH02503",
+      "relation": "band_onset_candidate (unknown) at frame 5853; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5853
+    },
+    {
+      "audio_event_id": "AH02504",
+      "relation": "band_onset_candidate (unknown) at frame 5853; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5853
+    },
+    {
+      "audio_event_id": "AH02505",
+      "relation": "band_onset_candidate (unknown) at frame 5858; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5858
+    },
+    {
+      "audio_event_id": "AH02506",
+      "relation": "band_onset_candidate (unknown) at frame 5858; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5858
+    },
+    {
+      "audio_event_id": "AH02507",
+      "relation": "band_onset_candidate (unknown) at frame 5859; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5859
+    },
+    {
+      "audio_event_id": "AB0541",
+      "relation": "beat_candidate (unknown) at frame 5859; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5859
+    },
+    {
+      "audio_event_id": "AH02508",
+      "relation": "band_onset_candidate (unknown) at frame 5859; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5859
+    },
+    {
+      "audio_event_id": "AH02509",
+      "relation": "band_onset_candidate (unknown) at frame 5859; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5859
+    },
+    {
+      "audio_event_id": "AH02510",
+      "relation": "band_onset_candidate (unknown) at frame 5864; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5864
+    },
+    {
+      "audio_event_id": "AH02511",
+      "relation": "band_onset_candidate (unknown) at frame 5864; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5864
+    },
+    {
+      "audio_event_id": "AH02512",
+      "relation": "band_onset_candidate (unknown) at frame 5864; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5864
+    },
+    {
+      "audio_event_id": "AH02513",
+      "relation": "band_onset_candidate (unknown) at frame 5869; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5869
+    },
+    {
+      "audio_event_id": "AH02514",
+      "relation": "band_onset_candidate (unknown) at frame 5869; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5869
+    },
+    {
+      "audio_event_id": "AH02515",
+      "relation": "band_onset_candidate (unknown) at frame 5869; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5869
+    },
+    {
+      "audio_event_id": "AB0542",
+      "relation": "beat_candidate (unknown) at frame 5869; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5869
+    },
+    {
+      "audio_event_id": "AH02516",
+      "relation": "band_onset_candidate (unknown) at frame 5870; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5870
+    },
+    {
+      "audio_event_id": "AW0382",
+      "relation": "vocal_word_candidate (unknown) at frame 5874–5879; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5874
+    },
+    {
+      "audio_event_id": "AH02517",
+      "relation": "band_onset_candidate (unknown) at frame 5875; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5875
+    },
+    {
+      "audio_event_id": "AH02518",
+      "relation": "band_onset_candidate (unknown) at frame 5875; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5875
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0129.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original font, shader, lens, exact easing and authored layer decomposition remain unknown.",
+    "Spatial bounds and type sizes are visual estimates from source pixels."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0129.jpg",
+      "keyframes/S0129_f05751.jpg",
+      "keyframes/S0129_f05783.jpg",
+      "keyframes/S0129_f05815.jpg",
+      "keyframes/S0129_f05847.jpg",
+      "keyframes/S0129_f05879.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "filmstrip_opened": true,
+    "frames_actually_opened": [
+      5751,
+      5783,
+      5815,
+      5847,
+      5879
+    ],
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "dense_sheets": [
+      "work/full_codex_103_153/terminal129.jpg",
+      "work/full_codex_103_153/loopbody129.jpg",
+      "work/full_codex_103_153/regions129.jpg",
+      "work/full_codex_103_153/slop129.jpg",
+      "work/full_codex_103_153/not129.jpg",
+      "work/full_codex_103_153/slopall129.jpg",
+      "work/full_codex_103_153/notenter129.jpg"
+    ],
+    "detail_crops": [
+      "work/full_codex_103_153/detail5815_full_batch.png"
+    ],
+    "fullres_frames_actually_opened": [
+      5815,
+      5879
+    ],
+    "method": "All five individual keyframes, full-resolution detail, dense 1–4-frame event review, then second visual inventory and visibility review.",
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d",
+  "unit_ids": [
+    "S7"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5b-a.png",
+      "sha256": "5c92c9d658681077e9d00232aeaddd9be1fb1d4033bbe9212710d26486ba3c62",
+      "role": "S5 start frame"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P5-a.png",
+      "sha256": "b460c26cb8bf377004e02719bd6ef9261055aa068839476d5f254aebfb885610",
+      "role": "S5 performance: noticing the far light"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K7-a.png",
+      "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+      "role": "S7 start frame"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P7-a.png",
+      "sha256": "f5bc00f36d1a636cd9e789b375135570c8d939b15582cb12d84358bd3284d0df",
+      "role": "S7 performance: eyes follow a pane"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/reference-package/A02-v1.png",
+      "sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039",
+      "role": "S8a start frame"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P8a-a.png",
+      "sha256": "8b1464f598644d3b5d0c18bb5ca001541c25f93a00f751f1ca6d1a6e876463a1",
+      "role": "S8a performance: alive singing"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K8b-a.png",
+      "sha256": "e6c6e7714ef4b18009a91bb17663c9a4ff871d67268291719007f2d3fea86af6",
+      "role": "S8b start frame"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P8b-a.png",
+      "sha256": "bd807f0764b95987e583c2d01d9911ed04fa3af6332ba036e590519a8434e75d",
+      "role": "S8b performance: last line, opening up"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P8c-a.png",
+      "sha256": "d1c7d07d0291c66db15eb97ad52e150ef67401b1d83e029ad5b522de5f3ece8e",
+      "role": "S8b end state: mouth closed, looking at the city"
+    },
+    {
+      "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+      "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+      "role": "IRIS identity sheet"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8a-vocal-ref-18.40-23.40.wav",
+      "sha256": "c70ec5a59777795a6ac608e17803be6b94ee24842d68801718cf6226c3241dfe",
+      "role": "S8a lip-sync reference (0.20 s lead-in), played in the preview"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8br-vocal-ref-22.00-27.00.wav",
+      "sha256": "9ba9442d9d7c516f41251e410c8c8540cd0bd339d4923b08f0405e1a5326318a",
+      "role": "S8b lip-sync reference (0.20 s lead-in), played in the preview"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v2/review/v3-preview.html",
+      "sha256": "5d78c313a87ace54142e8c2f3f9a35517fa1143f89d9046a8dbbb0cea6c58f8f",
+      "role": "the preview page the user approved"
+    }
+  ],
+  "user_quote": "認可，S1 用原生首尾幀 (Recommended)"
+}

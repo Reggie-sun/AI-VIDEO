@@ -1,0 +1,15 @@
+{
+  "three_exact_registered_sources": true,
+  "source_windows_seconds": true,
+  "no_song_or_lipsync": true,
+  "mute_at_composition": true,
+  "chinese_prompt": true,
+  "no_fake_canvas_capture": true,
+  "runtime_preview_approval_present": true,
+  "live_profile_present": true,
+  "paid_submits": 0,
+  "canonical_reload_verified": true,
+  "manifest_revision": 20,
+  "live_profile_source": "../live-binding/profile.json",
+  "evidence_scope": "authoring and offline prepare only; no provider call"
+}

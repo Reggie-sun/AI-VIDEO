@@ -1,0 +1,178 @@
+{
+ "unit": "U021",
+ "observed_at": "2026-11-05T08:18:31.129Z",
+ "tab": "https://jimeng.jianying.com/ai-tool/home#omnihuman-U021",
+ "generation_POSTs": 0,
+ "inputs": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-sing.png",
+   "sha256": "4cb7b152e8e9ed40320e8dcdf73ce51e12c338bbb1d118a9ad2e6a1cc21bde2f"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+   "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e"
+  }
+ ],
+ "mode_label": "大师模式",
+ "model_title": "选择模型：大师模式 by OmniHuman 1.5",
+ "price": 24,
+ "balance_text": "6.2万 超级会员",
+ "balance_precise": 61852,
+ "generate_enabled": true,
+ "rows": {
+  "speech_text": null,
+  "speech_audio": "00:04",
+  "action": "镜头固定中近景。开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，投入地轻声唱，嘴随歌词自然张合，神情平静淡然，带着一点好奇，眉头舒展；唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头，肩膀放松，身体稳稳站定。"
+ },
+ "resolution": null,
+ "vivid": false,
+ "image_uploaded": true,
+ "audio_uploaded": true,
+ "action_text": "镜头固定中近景。开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，投入地轻声唱，嘴随歌词自然张合，神情平静淡然，带着一点好奇，眉头舒展；唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头，肩膀放松，身体稳稳站定。",
+ "panel": {
+  "found": true,
+  "text": "音频原声\n\n角色说\n00:00\n/\n00:04\n\n\n\n动作描述\n镜头固定中近景。开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，投入地轻声唱，嘴随歌词自然张合，神情平静淡然，带着一点好奇，眉头舒展；唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头，肩膀放松，身体稳稳站定。\n\n数字人\n大师模式\n上传音频\n24",
+  "mode": "大师模式",
+  "imgs": [
+   {
+    "src": "blob:https://jimeng.jianying.com/b38bf54a-a96f-4b06-b35f-8b507fa1a264",
+    "w": 48,
+    "h": 64
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/b38bf54a-a96f-4b06-b35f-8b507fa1a264",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/b38bf54a-a96f-4b06-b35f-8b507fa1a264",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/b38bf54a-a96f-4b06-b35f-8b507fa1a264",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/b38bf54a-a96f-4b06-b35f-8b507fa1a264",
+    "w": 16,
+    "h": 16
+   }
+  ],
+  "editors": [
+   {
+    "tag": "DIV",
+    "value": "角色说\n00:00\n/\n00:04\n\n\n\n动作描述\n镜头固定中近景。开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，投入地轻声唱，嘴随歌词自然张合，神情平静淡然，带着一点好奇，眉头舒展；唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头，肩膀放松，身体稳稳站定。",
+    "placeholder": null
+   },
+   {
+    "tag": "DIV",
+    "value": "",
+    "placeholder": null
+   }
+  ],
+  "buttons": [
+   {
+    "text": "移除 · 参考内容",
+    "x": 55,
+    "y": 12,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "移除 · 参考内容",
+    "x": 133,
+    "y": 17,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "",
+    "x": 244,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 352,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-gIRG2a"
+   },
+   {
+    "text": "",
+    "x": 244,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 352,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-gIRG2a"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 117,
+    "w": 32,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU submit-button"
+   },
+   {
+    "text": "上传音频",
+    "x": 215,
+    "y": 117,
+    "w": 84,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-default lv-btn-shape-square button-EkZazO button-E9b8NU toolbar-button-J5Ou4K"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 117,
+    "w": 32,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU submit-button"
+   }
+  ],
+  "numbers": [
+   {
+    "n": 24,
+    "x": 1128,
+    "y": 127
+   }
+  ],
+  "price": 24,
+  "size": [
+   1200,
+   166
+  ],
+  "rows": {
+   "speech_text": null,
+   "speech_audio": "00:04",
+   "action": "镜头固定中近景。开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，投入地轻声唱，嘴随歌词自然张合，神情平静淡然，带着一点好奇，眉头舒展；唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头，肩膀放松，身体稳稳站定。"
+  },
+  "resolution": null,
+  "vivid": false
+ }
+}

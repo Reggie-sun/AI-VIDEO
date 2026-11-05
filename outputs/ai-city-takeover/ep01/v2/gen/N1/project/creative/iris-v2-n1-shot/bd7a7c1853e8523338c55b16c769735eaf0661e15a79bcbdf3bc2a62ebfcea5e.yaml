@@ -1,0 +1,51 @@
+artifact_id: iris-v2-n1-shot
+character_ids:
+- IRIS
+composition_directives: []
+content_hash: bd7a7c1853e8523338c55b16c769735eaf0661e15a79bcbdf3bc2a62ebfcea5e
+continuity_constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）
+- 她背对镜头沿走道中央向红光门缝不紧不慢地走去，步伐平稳，始终看不到她的脸
+- 摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧的走道构图
+- 画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡
+creation_receipt_id: iris-v2-N1-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: 镜头固定。她背对镜头，沿数据中心走道中央向尽头的红光门缝不紧不慢地走去，步伐平稳，大衣下摆随步子轻轻摆动，两侧机柜的指示灯闪烁，地面上的倒影跟着她移动。始终看不到她的脸。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-c-v2-n1-first-frame
+  role: first_frame
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: aisle
+schema_version: '2.0'
+shot_id: ep01v2-n1
+source_provenance:
+- content_hash: 2ee93e4950349896c79f63ef1e44ad48768e4cdd2b0bda67f1e460c691eea747
+  kind: user_input
+  reference: evidence/authoring-input/2ee93e4950349896c79f63ef1e44ad48768e4cdd2b0bda67f1e460c691eea747.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: d5293e2a5b021a63b39b50e82ccaecbab096535e31ab8c051b7b4a644058670f
+  kind: user_input
+  reference: evidence/authoring-input/d5293e2a5b021a63b39b50e82ccaecbab096535e31ab8c051b7b4a644058670f.json
+storyboard_beat_id: action-n1
+visual_strategy: generated_video

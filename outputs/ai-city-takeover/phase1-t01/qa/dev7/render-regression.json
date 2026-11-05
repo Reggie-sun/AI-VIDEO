@@ -1,0 +1,23 @@
+{
+  "method": "decode exact MP4 to framemd5; compare every video/audio frame",
+  "current_sha256": "5e4601b0824b2cb82a42c9041178b0d3f06827f1d66de4e14755bf83b47a3697",
+  "single_worker_sha256": "5e4601b0824b2cb82a42c9041178b0d3f06827f1d66de4e14755bf83b47a3697",
+  "video_frames": 300,
+  "same_worker_frames": 300,
+  "worker_lengths_equal": true,
+  "unchanged_S1_S2_frames": 0,
+  "baseline_audio_frames": 469,
+  "current_audio_frames": 469,
+  "audio_bit_identical": true,
+  "normal_speed_perception": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED",
+  "S1_S2_lossy_comparison": {
+    "method": "decode first180 frames at480x270 RGB; compare dev6b and dev7",
+    "mean_absolute_difference_levels": 0.6900168752857796,
+    "p99_absolute_difference_levels": 4.0,
+    "max_absolute_difference_levels": 222,
+    "per_frame_mean_max": 1.1053420781893004,
+    "same_decoded_pixels": false,
+    "interpretation": "Lossy encodings differ; metric alone cannot sign no-regression. Visual checks and input/source comparison required."
+  }
+}

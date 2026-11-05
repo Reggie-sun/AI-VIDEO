@@ -1,0 +1,58 @@
+{
+ "chunks": [
+  {
+   "song_id": "ztXMEJCivkZMuNZlyzdB",
+   "range": {
+    "start_ms": 45715,
+    "end_ms": 51429
+   }
+  },
+  {
+   "text": "[Instrumental]",
+   "duration_ms": 7619,
+   "positive_styles": [
+    "126 BPM",
+    "4/4",
+    "dark electroclash",
+    "minimal techno",
+    "deep sub bass",
+    "cold analog synth arpeggio",
+    "sparse nocturnal mix",
+    "instrumental only",
+    "leaves space for a spoken voice on top",
+    "tight dry kick on every beat",
+    "crisp closed hi-hats",
+    "the instrumental chorus groove hands over to the second verse groove after one bar",
+    "precise and mechanical",
+    "filtered sub bass pulse"
+   ],
+   "negative_styles": [
+    "vocals",
+    "lyrics",
+    "singing",
+    "spoken voice",
+    "humming",
+    "choir",
+    "vocal chops",
+    "rap",
+    "trance supersaw",
+    "festival EDM drop",
+    "guitar",
+    "piano ballad",
+    "trailer braams",
+    "female vocals",
+    "sung hook",
+    "repeated chorus vocal",
+    "vocal sample"
+   ],
+   "context_adherence": "high"
+  },
+  {
+   "song_id": "ztXMEJCivkZMuNZlyzdB",
+   "range": {
+    "start_ms": 59048,
+    "end_ms": 66667
+   }
+  }
+ ]
+}

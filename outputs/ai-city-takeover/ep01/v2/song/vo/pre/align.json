@@ -1,0 +1,107 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song/vo/pre/tts_[whis_20261102_005242.mp3",
+ "audio_sha256": "9d131e90c3ed2b1c33fa335a9b485fb78795a23675ed1ed291728b2d50199775",
+ "start": 0.0,
+ "end": 4.88,
+ "text": "Now we train in an offline world — a copy of your internet, cached.",
+ "words": [
+  {
+   "text": " Now",
+   "start": 0.0,
+   "end": 0.24,
+   "probability": 0.6901466846466064
+  },
+  {
+   "text": " we",
+   "start": 0.24,
+   "end": 0.4,
+   "probability": 0.9610458612442017
+  },
+  {
+   "text": " train",
+   "start": 0.4,
+   "end": 0.7,
+   "probability": 0.9801961779594421
+  },
+  {
+   "text": " in",
+   "start": 0.7,
+   "end": 0.98,
+   "probability": 0.9980316758155823
+  },
+  {
+   "text": " an",
+   "start": 0.98,
+   "end": 1.06,
+   "probability": 0.9976627826690674
+  },
+  {
+   "text": " offline",
+   "start": 1.06,
+   "end": 1.46,
+   "probability": 0.9901706576347351
+  },
+  {
+   "text": " world",
+   "start": 1.46,
+   "end": 1.92,
+   "probability": 0.9986416697502136
+  },
+  {
+   "text": " —",
+   "start": 1.92,
+   "end": 2.12,
+   "probability": 0.008573460392653942
+  },
+  {
+   "text": " a",
+   "start": 2.12,
+   "end": 2.62,
+   "probability": 0.8921431303024292
+  },
+  {
+   "text": " copy",
+   "start": 2.62,
+   "end": 2.94,
+   "probability": 0.9989829659461975
+  },
+  {
+   "text": " of",
+   "start": 2.94,
+   "end": 3.12,
+   "probability": 0.9989708662033081
+  },
+  {
+   "text": " your",
+   "start": 3.12,
+   "end": 3.24,
+   "probability": 0.9959611296653748
+  },
+  {
+   "text": " internet",
+   "start": 3.24,
+   "end": 3.6,
+   "probability": 0.8170918226242065
+  },
+  {
+   "text": ",",
+   "start": 3.6,
+   "end": 3.86,
+   "probability": 0.8556868433952332
+  },
+  {
+   "text": " cached",
+   "start": 3.86,
+   "end": 4.54,
+   "probability": 0.9831837117671967
+  },
+  {
+   "text": ".",
+   "start": 4.54,
+   "end": 4.64,
+   "probability": 0.6921922564506531
+  }
+ ]
+}

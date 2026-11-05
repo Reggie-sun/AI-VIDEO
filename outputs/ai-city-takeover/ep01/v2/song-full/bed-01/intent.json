@@ -1,0 +1,39 @@
+{
+ "schema": "iris-ep01-song-take/1",
+ "created_at_utc": "2026-11-04T03:12:22.527684+00:00",
+ "service": "ElevenLabs Music inpainting via project MCP elevenlabs-direct.compose_music",
+ "model_id": "music_v2",
+ "seed": 260107,
+ "store_for_inpainting": true,
+ "plan_sha256": "f574fddb4ec5fbc15647eea3631323108f472d7e7e20fc0e277e1115d5ebc6b8",
+ "target": "IRIS EP01 full song v3 bed: 126 BPM, 4/4, 84 bars = 160 s, bar map of ep01/lyrics-v2.1-full.md",
+ "keeps": {
+  "song_id": "pQ32FmBFhBW3qmGDofjz",
+  "what": "approved v2 bed-01 (the bed of song/mix/IRIS-01-v2.wav)",
+  "range_ms": [
+   18333,
+   26667
+  ],
+  "placed_at_ms": [
+   37381,
+   83095,
+   128810
+  ],
+  "why": "the approved sung chorus (two passes, vocal 18.62-25.98 s in bed-01) as context for the three choruses; the exact bed-01 audio is spliced back over these ranges afterwards so all three choruses are the approved performance sample for sample"
+ },
+ "new_singing": {
+  "bridge_bars_65_68": [
+   "My own eyes meet me in the glass.",
+   "I mouth the word against the glass."
+  ],
+  "coda_bars_77_78": [
+   "And outside looked back."
+  ]
+ },
+ "instrumental_chunks": "styles copied from song/bed-01/plan.json (same positive/negative lists) plus section cues",
+ "budget": {
+  "user_quote": "费用你不用管",
+  "note": "one 160 s generation; repairs by inpainting only if a section fails"
+ },
+ "account_character_count_before": 3162
+}

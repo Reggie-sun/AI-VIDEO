@@ -1,0 +1,95 @@
+{
+ "schema": "iris-v2-burned-label/1",
+ "authority": "development_only (Agent observation by eye)",
+ "render": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c15.mp4",
+ "render_sha256": "b246939af02f1141157415c0df6d8309e437061395155c23b091187390a7f10a",
+ "method": "top-left 320x150 crops of the c15 render at the start (+2 frames), middle and end (-2 frames) of each of the 35 segments (qa/film-c15/burned-label-topleft.jpg) and a 2x crop of the S6 picture-in-picture at 13.8 s (qa/film-c15/burned-label-pipS5.jpg)",
+ "policy": "user 2026-11-03: the visible 「AI生成」 removed; the comp draws no AI mark any more; labels burned into older Jimeng sources are NOT cropped, blurred, painted or zoomed out (they stay where they are)",
+ "visible": [
+  {
+   "shot": "S1",
+   "t0": 0.0,
+   "t1": 2.8667,
+   "note": "整個 S1：即夢舊鏡頭，左上完整的「AI生成」",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S1v3/project/state/video-generation/fetch/files/4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5.mp4",
+   "source_sha256": "4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5"
+  },
+  {
+   "shot": "I1",
+   "t0": 4.3333,
+   "t1": 4.8,
+   "note": "插入鏡 I1（S9a 鏡頭，原尺寸取景）：左上完整的「AI生成」",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+   "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728"
+  },
+  {
+   "shot": "S3",
+   "t0": 4.8,
+   "t1": 7.1,
+   "note": "整個 S3：左上完整的「AI生成」",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+   "source_sha256": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7"
+  },
+  {
+   "shot": "S4c",
+   "t0": 9.7333,
+   "t1": 11.4667,
+   "note": "S4c 的 A01-v2 畫格（ep01/shots/A01-v2.mp4 第 1.0 s，c10 起放大 1.8 倍取景）：只露出左上角標識框的下緣，字被畫框切掉",
+   "source": "outputs/ai-city-takeover/ep01/shots/A01-v2.mp4",
+   "source_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c"
+  },
+  {
+   "shot": "S6",
+   "t0": 13.4333,
+   "t1": 14.0,
+   "note": "S6 右上的子畫面 pipS5（第一支 S5 鏡頭縮成 384×216）：子畫面左上角有約 30×14 px 的縮小「AI生成」（13.367 s 切入後 2 幀淡入）",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S5/project/state/video-generation/fetch/files/ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16.mp4",
+   "source_sha256": "ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16"
+  },
+  {
+   "shot": "S7",
+   "t0": 14.8,
+   "t1": 15.0333,
+   "note": "S7（S7v3）：左上完整的「AI生成」",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+   "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21"
+  },
+  {
+   "shot": "S7",
+   "t0": 15.5333,
+   "t1": 16.9,
+   "note": "S7（ST4 插入之後）：同上",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+   "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21"
+  },
+  {
+   "shot": "S7",
+   "t0": 17.6667,
+   "t1": 18.8667,
+   "note": "S7（N4 插入之後到副歌）：同上",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+   "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21"
+  },
+  {
+   "shot": "S9a",
+   "t0": 25.9,
+   "t1": 26.2333,
+   "note": "S9a：左上完整的「AI生成」",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+   "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728"
+  },
+  {
+   "shot": "S9a",
+   "t0": 26.7,
+   "t1": 27.9,
+   "note": "S9a（I7 之後到 ST6；27.167–27.9 s 白底反轉時標識也一起反轉）：同上",
+   "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+   "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728"
+  }
+ ],
+ "not_visible": {
+  "N1、N2（S8b）、N3、N4、ST1、ST2（含 S8p）、ST3、ST4、ST6、OH-B（S8a、S8a2）": "來源畫面本身沒有燒進去的標識（逐鏡 Gate：四角乾淨）",
+  "S2、S3d、S4、S5、S5d、S8b_x、S8w、S8b_x2、I7、S9b、S9b2 與 pipK4／pipK9e 子畫面": "認可的靜圖，沒有標識",
+  "I3（S9a，c12 起 1.5 倍取景）、S9h（S7v3，c10 起 1.28 倍取景）": "標識在這兩個取景的畫框外；取景自 c12／c10 沿用，c15 沒有為了藏標識改動"
+ }
+}

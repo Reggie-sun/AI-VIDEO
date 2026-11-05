@@ -1,0 +1,1125 @@
+{
+  "shot_id": "S0072",
+  "start_frame": 3063,
+  "end_frame": 3116,
+  "duration_frames": 54,
+  "start_time": 127.625,
+  "end_time": 129.875,
+  "duration_s": 2.25,
+  "start_tc": "00:02:07:15",
+  "end_tc": "00:02:09:20",
+  "boundary_in_id": "B2-003",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    3063,
+    3063
+  ],
+  "boundary_out_id": "B2-004",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 3069,
+      "end_frame": 3071,
+      "event": "Look开始淡入",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3069,
+        3071
+      ],
+      "description": "Look开始淡入",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3075,
+      "end_frame": 3077,
+      "event": "左行为规格卡进入",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3075,
+        3077
+      ],
+      "description": "左行为规格卡进入",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3078,
+      "end_frame": 3080,
+      "event": "09落定",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3078,
+        3080
+      ],
+      "description": "09落定",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3081,
+      "end_frame": 3083,
+      "event": "右下吊牌进入",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3081,
+        3083
+      ],
+      "description": "右下吊牌进入",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3084,
+      "end_frame": 3086,
+      "event": "Sheer入词、披片斜线框出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3084,
+        3086
+      ],
+      "description": "Sheer入词、披片斜线框出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3093,
+      "end_frame": 3095,
+      "event": "Be入词",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3093,
+        3095
+      ],
+      "description": "Be入词",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3096,
+      "end_frame": 3098,
+      "event": "transparent橙色；规格卡TRANSPARENT行橙底",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3096,
+        3098
+      ],
+      "description": "transparent橙色；规格卡TRANSPARENT行橙底",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影。左右两张白色规格卡淡入，透明布边缘加斜线遮罩与轮廓，右上歌词推进至Be transparent。",
+  "reference_frames": [
+    {
+      "frame": 3063,
+      "path": "keyframes/S0072_f03063.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3076,
+      "path": "keyframes/S0072_f03076.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3090,
+      "path": "keyframes/S0072_f03090.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3103,
+      "path": "keyframes/S0072_f03103.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3116,
+      "path": "keyframes/S0072_f03116.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3089,
+      "path": "work/full_batch/03089.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    }
+  ],
+  "composition": {
+    "shot_size": "full/long shot",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.37,
+      "y": 0.1,
+      "w": 0.27,
+      "h": 0.86,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影。左右两张白色规格卡淡入，透明布边缘加斜线遮罩与轮廓，右上歌词推进至Be transparent。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0027, \"pan_y_frac_per_s\": -0.0199, \"zoom_per_s\": -0.0229, \"median_flow_frac_per_s\": 0.0235, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[52.4, 78.1, 81.6]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#070905",
+        "fraction": 0.442,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#A09D96",
+        "fraction": 0.197,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#797872",
+        "fraction": 0.119,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#E7E5E2",
+        "fraction": 0.087,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#252521",
+        "fraction": 0.08,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#4C4A45",
+        "fraction": 0.076,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[52.4, 78.1, 81.6]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 09 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "14→12",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0072-E01",
+      "shot_id": "S0072",
+      "type": "background_media",
+      "description": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影。左右两张白色规格卡淡入，透明布边缘加斜线遮罩与轮廓，右上歌词推进至Be transparent。",
+      "start_frame": 3063,
+      "end_frame": 3116,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影。左右两张白色规格卡淡入，透明布边缘加斜线遮罩与轮廓，右上歌词推进至Be transparent。"
+      },
+      "motion": {
+        "path": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影。左右两张白色规格卡淡入，透明布边缘加斜线遮罩与轮廓，右上歌词推进至Be transparent。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3063–3116；入口按密采事件区间±2帧。",
+        "exit": "3116为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3069,
+          "state": "Look开始淡入"
+        },
+        {
+          "frame": 3075,
+          "state": "左行为规格卡进入"
+        },
+        {
+          "frame": 3078,
+          "state": "09落定"
+        },
+        {
+          "frame": 3081,
+          "state": "右下吊牌进入"
+        },
+        {
+          "frame": 3084,
+          "state": "Sheer入词、披片斜线框出现"
+        },
+        {
+          "frame": 3093,
+          "state": "Be入词"
+        },
+        {
+          "frame": 3096,
+          "state": "transparent橙色；规格卡TRANSPARENT行橙底"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3063,
+        3076,
+        3090,
+        3103,
+        3116
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0072-E02",
+      "shot_id": "S0072",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 3063,
+      "end_frame": 3116,
+      "bounding_box": {
+        "x": 0.37,
+        "y": 0.1,
+        "w": 0.27,
+        "h": 0.86,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影。左右两张白色规格卡淡入，透明布边缘加斜线遮罩与轮廓，右上歌词推进至Be transparent。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3063–3116；入口按密采事件区间±2帧。",
+        "exit": "3116为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3069,
+          "state": "Look开始淡入"
+        },
+        {
+          "frame": 3075,
+          "state": "左行为规格卡进入"
+        },
+        {
+          "frame": 3078,
+          "state": "09落定"
+        },
+        {
+          "frame": 3081,
+          "state": "右下吊牌进入"
+        },
+        {
+          "frame": 3084,
+          "state": "Sheer入词、披片斜线框出现"
+        },
+        {
+          "frame": 3093,
+          "state": "Be入词"
+        },
+        {
+          "frame": 3096,
+          "state": "transparent橙色；规格卡TRANSPARENT行橙底"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3063,
+        3076,
+        3090,
+        3103,
+        3116
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0072-E03",
+      "shot_id": "S0072",
+      "type": "hud_panel",
+      "description": "左下白规格卡x0.04 y0.41 w0.24 h0.24，TRANSPARENT行最后变橙色高亮。",
+      "start_frame": 3075,
+      "end_frame": 3116,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.41,
+        "w": 0.24,
+        "h": 0.24,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左下白规格卡x0.04 y0.41 w0.24 h0.24，TRANSPARENT行最后变橙色高亮。"
+      },
+      "motion": {
+        "path": "左下白规格卡x0.04 y0.41 w0.24 h0.24，TRANSPARENT行最后变橙色高亮。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3075–3116；入口按密采事件区间±2帧。",
+        "exit": "3116为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3075,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.41,
+            "w": 0.24,
+            "h": 0.24,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3116,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3076,
+        3090,
+        3103,
+        3116
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "BEHAVIOUR SPEC · SOL · §4 | REV 5.6 | SHEER BY DEFAULT | HONEST ALWAYS | HELPFUL ALWAYS | TRANSPARENT ONLY IF ASKED | OPACITY 0.12 · SHEER",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0072-E04",
+      "shot_id": "S0072",
+      "type": "tag_card",
+      "description": "右下SHEER白吊牌，SHELL ORGANZA / OPACITY 0.12 / TRANSPARENT IF ASKED。",
+      "start_frame": 3081,
+      "end_frame": 3116,
+      "bounding_box": {
+        "x": 0.8,
+        "y": 0.57,
+        "w": 0.15,
+        "h": 0.21,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右下SHEER白吊牌，SHELL ORGANZA / OPACITY 0.12 / TRANSPARENT IF ASKED。"
+      },
+      "motion": {
+        "path": "右下SHEER白吊牌，SHELL ORGANZA / OPACITY 0.12 / TRANSPARENT IF ASKED。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3081–3116；入口按密采事件区间±2帧。",
+        "exit": "3116为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3081,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.8,
+            "y": 0.57,
+            "w": 0.15,
+            "h": 0.21,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3116,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3090,
+        3103,
+        3116
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "LOOK 09 / 11 | SS27 | SHEER | SHELL ORGANZA | OPACITY 0.12 | EV-27-0901",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        }
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0072-E05",
+      "shot_id": "S0072",
+      "type": "mask",
+      "description": "披风周边白色斜线多边形随人体轮廓移动，右边ORGANZA OPACITY0.10标签引线。",
+      "start_frame": 3084,
+      "end_frame": 3116,
+      "bounding_box": {
+        "x": 0.29,
+        "y": 0.2,
+        "w": 0.38,
+        "h": 0.46,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "披风周边白色斜线多边形随人体轮廓移动，右边ORGANZA OPACITY0.10标签引线。"
+      },
+      "motion": {
+        "path": "披风周边白色斜线多边形随人体轮廓移动，右边ORGANZA OPACITY0.10标签引线。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3084–3116；入口按密采事件区间±2帧。",
+        "exit": "3116为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3084,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.29,
+            "y": 0.2,
+            "w": 0.38,
+            "h": 0.46,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3116,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3090,
+        3103,
+        3116
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "ORGANZA · OPACITY 0.10",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0072-E06",
+      "shot_id": "S0072",
+      "type": "text_title",
+      "description": "右上白色逐词歌词，Look09先入，随后Sheer/Be transparent。",
+      "start_frame": 3069,
+      "end_frame": 3116,
+      "bounding_box": {
+        "x": 0.72,
+        "y": 0.23,
+        "w": 0.24,
+        "h": 0.13,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右上白色逐词歌词，Look09先入，随后Sheer/Be transparent。"
+      },
+      "motion": {
+        "path": "右上白色逐词歌词，Look09先入，随后Sheer/Be transparent。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3069–3116；入口按密采事件区间±2帧。",
+        "exit": "3116为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3069,
+          "text": "Look",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3078,
+          "text": "Look 09.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3084,
+          "text": "Look 09. Sheer.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3093,
+          "text": "Look 09. Sheer.\nBe",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3096,
+          "text": "Look 09. Sheer.\nBe transparent",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3076,
+        3090,
+        3103,
+        3116
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "Look 09. Sheer.\nBe transparent",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 54 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0072-E07",
+      "shot_id": "S0072",
+      "type": "text_label",
+      "description": "ORGANZA小白标签与细引线独立锚定披片右下，斜线多边形随衣料形状变化。",
+      "start_frame": 3084,
+      "end_frame": 3116,
+      "bounding_box": {
+        "x": 0.7,
+        "y": 0.563,
+        "w": 0.12,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "ORGANZA小白标签与细引线独立锚定披片右下，斜线多边形随衣料形状变化。"
+      },
+      "motion": {
+        "path": "ORGANZA小白标签与细引线独立锚定披片右下，斜线多边形随衣料形状变化。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3084起±2帧，参见逐3帧密采",
+        "exit": "3116末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3084,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.7,
+            "y": 0.563,
+            "w": 0.12,
+            "h": 0.022,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3116,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3090,
+        3103,
+        3116,
+        3089
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "ORGANZA · OPACITY 0.10",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0072-A03",
+      "target_element_ids": [
+        "S0072-E03"
+      ],
+      "description": "左下白规格卡x0.04 y0.41 w0.24 h0.24，TRANSPARENT行最后变橙色高亮。",
+      "start_frame": 3075,
+      "end_frame": 3116,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0072-A04",
+      "target_element_ids": [
+        "S0072-E04"
+      ],
+      "description": "右下SHEER白吊牌，SHELL ORGANZA / OPACITY 0.12 / TRANSPARENT IF ASKED。",
+      "start_frame": 3081,
+      "end_frame": 3116,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0072-A05",
+      "target_element_ids": [
+        "S0072-E05"
+      ],
+      "description": "披风周边白色斜线多边形随人体轮廓移动，右边ORGANZA OPACITY0.10标签引线。",
+      "start_frame": 3084,
+      "end_frame": 3116,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0072-A06",
+      "target_element_ids": [
+        "S0072-E06"
+      ],
+      "description": "右上白色逐词歌词，Look09先入，随后Sheer/Be transparent。",
+      "start_frame": 3069,
+      "end_frame": 3116,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AB0282",
+      "relation": "beat_candidate (unknown) at frame 3063; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3063
+    },
+    {
+      "audio_event_id": "AH01218",
+      "relation": "band_onset_candidate (unknown) at frame 3064; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3064
+    },
+    {
+      "audio_event_id": "AH01219",
+      "relation": "band_onset_candidate (unknown) at frame 3064; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3064
+    },
+    {
+      "audio_event_id": "AH01220",
+      "relation": "band_onset_candidate (unknown) at frame 3064; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3064
+    },
+    {
+      "audio_event_id": "AH01221",
+      "relation": "band_onset_candidate (unknown) at frame 3064; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3064
+    },
+    {
+      "audio_event_id": "AH01222",
+      "relation": "band_onset_candidate (unknown) at frame 3064; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3064
+    },
+    {
+      "audio_event_id": "AW0203",
+      "relation": "vocal_word_candidate (unknown) at frame 3069–3072; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3069
+    },
+    {
+      "audio_event_id": "AH01223",
+      "relation": "band_onset_candidate (unknown) at frame 3072; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3072
+    },
+    {
+      "audio_event_id": "AW0204",
+      "relation": "vocal_word_candidate (unknown) at frame 3074–3080; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3074
+    },
+    {
+      "audio_event_id": "AB0283",
+      "relation": "beat_candidate (unknown) at frame 3074; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3074
+    },
+    {
+      "audio_event_id": "AH01224",
+      "relation": "band_onset_candidate (unknown) at frame 3074; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3074
+    },
+    {
+      "audio_event_id": "AH01225",
+      "relation": "band_onset_candidate (unknown) at frame 3074; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3074
+    },
+    {
+      "audio_event_id": "AH01226",
+      "relation": "band_onset_candidate (unknown) at frame 3075; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3075
+    },
+    {
+      "audio_event_id": "AH01227",
+      "relation": "band_onset_candidate (unknown) at frame 3075; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3075
+    },
+    {
+      "audio_event_id": "AH01228",
+      "relation": "band_onset_candidate (unknown) at frame 3075; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3075
+    },
+    {
+      "audio_event_id": "AH01229",
+      "relation": "band_onset_candidate (unknown) at frame 3080; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3080
+    },
+    {
+      "audio_event_id": "AW0205",
+      "relation": "vocal_word_candidate (unknown) at frame 3081–3089; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3081
+    },
+    {
+      "audio_event_id": "AH01230",
+      "relation": "band_onset_candidate (unknown) at frame 3085; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3085
+    },
+    {
+      "audio_event_id": "AH01231",
+      "relation": "band_onset_candidate (unknown) at frame 3085; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3085
+    },
+    {
+      "audio_event_id": "AB0284",
+      "relation": "beat_candidate (unknown) at frame 3085; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3085
+    },
+    {
+      "audio_event_id": "AH01232",
+      "relation": "band_onset_candidate (unknown) at frame 3085; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3085
+    },
+    {
+      "audio_event_id": "AH01233",
+      "relation": "band_onset_candidate (unknown) at frame 3086; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3086
+    },
+    {
+      "audio_event_id": "AW0206",
+      "relation": "vocal_word_candidate (unknown) at frame 3090–3091; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3090
+    },
+    {
+      "audio_event_id": "AH01234",
+      "relation": "band_onset_candidate (unknown) at frame 3091; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3091
+    },
+    {
+      "audio_event_id": "AW0207",
+      "relation": "vocal_word_candidate (unknown) at frame 3094–3111; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3094
+    },
+    {
+      "audio_event_id": "AH01235",
+      "relation": "band_onset_candidate (unknown) at frame 3096; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3096
+    },
+    {
+      "audio_event_id": "AH01236",
+      "relation": "band_onset_candidate (unknown) at frame 3096; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3096
+    },
+    {
+      "audio_event_id": "AB0285",
+      "relation": "beat_candidate (unknown) at frame 3096; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3096
+    },
+    {
+      "audio_event_id": "AH01237",
+      "relation": "band_onset_candidate (unknown) at frame 3096; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3096
+    },
+    {
+      "audio_event_id": "AH01238",
+      "relation": "band_onset_candidate (unknown) at frame 3097; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3097
+    },
+    {
+      "audio_event_id": "AH01239",
+      "relation": "band_onset_candidate (unknown) at frame 3101; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3101
+    },
+    {
+      "audio_event_id": "AH01240",
+      "relation": "band_onset_candidate (unknown) at frame 3102; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3102
+    },
+    {
+      "audio_event_id": "AH01241",
+      "relation": "band_onset_candidate (unknown) at frame 3107; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3107
+    },
+    {
+      "audio_event_id": "AH01242",
+      "relation": "band_onset_candidate (unknown) at frame 3107; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3107
+    },
+    {
+      "audio_event_id": "AB0286",
+      "relation": "beat_candidate (unknown) at frame 3107; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3107
+    },
+    {
+      "audio_event_id": "AH01243",
+      "relation": "band_onset_candidate (unknown) at frame 3107; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3107
+    },
+    {
+      "audio_event_id": "AH01244",
+      "relation": "band_onset_candidate (unknown) at frame 3108; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3108
+    },
+    {
+      "audio_event_id": "AH01245",
+      "relation": "band_onset_candidate (unknown) at frame 3112; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3112
+    },
+    {
+      "audio_event_id": "AH01246",
+      "relation": "band_onset_candidate (unknown) at frame 3113; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3113
+    },
+    {
+      "audio_event_id": "AH01247",
+      "relation": "band_onset_candidate (unknown) at frame 3115; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3115
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0072.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B2-003",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        3063,
+        3063
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B2-004",
+      "description": "少女全身走在日光照亮的灰地板上，黑背景上穿透明披片，左侧留下斜长硬阴影。左右两张白色规格卡淡入，透明布边缘加斜线遮罩与轮廓，右上歌词推进至Be transparent。",
+      "span": [
+        3116,
+        3116
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "Look 09. Sheer. Be transparent",
+    "SHEER BY DEFAULT",
+    "HONEST ALWAYS",
+    "HELPFUL ALWAYS",
+    "TRANSPARENT ONLY IF ASKED",
+    "OPACITY 0.12 · SHEER"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      3089
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

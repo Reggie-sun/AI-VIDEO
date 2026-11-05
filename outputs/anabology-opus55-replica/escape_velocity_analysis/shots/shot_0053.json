@@ -1,0 +1,826 @@
+{
+  "shot_id": "S0053",
+  "start_frame": 1943,
+  "end_frame": 2018,
+  "duration_frames": 76,
+  "start_time": 80.9583,
+  "end_time": 84.125,
+  "duration_s": 3.1667,
+  "start_tc": "00:01:20:23",
+  "end_tc": "00:01:24:02",
+  "boundary_in_id": "B1-016",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    1943,
+    1943
+  ],
+  "boundary_out_id": "B1-017",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        1993,
+        1994
+      ],
+      "description": "UNDERCLASS尚未可读；2帧采样误差≤1帧，不是音频词对齐证据。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        1995,
+        1996
+      ],
+      "description": "UNDERCLASS白色大字出现；2帧采样误差≤1帧，不是音频词对齐证据。"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "将阶级逃逸歌词具体化为可攀升的阶层仪表。",
+  "subject": "少女穿白色泡袖上衣黑色背带短裙和长靴，在两侧金色窗格的长廊中央向镜头走近",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "少女穿白色泡袖上衣黑色背带短裙和长靴，在两侧金色窗格的长廊中央向镜头走近。右侧黑色阶层面板出现，左上 UNDERCLASS 晚于底部逐词歌词进入。",
+  "reference_frames": [
+    {
+      "frame": 1943,
+      "path": "keyframes/S0053_f01943.jpg",
+      "role": "first",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 1962,
+      "path": "keyframes/S0053_f01962.jpg",
+      "role": "key_change",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 1981,
+      "path": "keyframes/S0053_f01981.jpg",
+      "role": "middle",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 2000,
+      "path": "keyframes/S0053_f02000.jpg",
+      "role": "key_change",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 2018,
+      "path": "keyframes/S0053_f02018.jpg",
+      "role": "last",
+      "note": "已查看filmstrip与first/middle/last对应帧；辅助四分位帧列为抽帧参考"
+    },
+    {
+      "frame": 1980,
+      "path": "work/full_batch/01980.jpg",
+      "role": "detail",
+      "note": "本轮1920x1080原始帧已实际查看，文字/仪表几何核查。"
+    }
+  ],
+  "composition": {
+    "shot_size": "full body",
+    "subject_position": "central",
+    "subject_bbox": {
+      "x": 0.38,
+      "y": 0.08,
+      "w": 0.25,
+      "h": 0.92,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": 0.23,
+    "camera_angle": "低机位仰视",
+    "layers": {
+      "foreground": "图形、文字和追踪角标",
+      "midground": "少女与服装或靴子细节",
+      "background": "金色廊道"
+    },
+    "empty_field_for_type": "右侧黑暗留白，S0053左上也用于标题"
+  },
+  "camera": {
+    "movement": "人物走近且机位后退",
+    "direction": "无明显稳定横移",
+    "speed_profile": "视觉估计；数值flow含人物局部运动，不直接解释为相机运动",
+    "dof_focus": "面部清晰、背景柔化；无可确认的焦距",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0, \"pan_y_frac_per_s\": 0.0147, \"zoom_per_s\": -0.0245, \"median_flow_frac_per_s\": 0.0198, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "暖色侧上方",
+    "quality": "皮肤暖高光与冷暗背景分离",
+    "effects": [
+      "global halftone"
+    ],
+    "temporal_change": "随表演和缩放变化；未确认独立灯光动画"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#1B1510",
+        "fraction": 0.306,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#453021",
+        "fraction": 0.298,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#6E4932",
+        "fraction": 0.17,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#A06E4E",
+        "fraction": 0.093,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#C79E7C",
+        "fraction": 0.075,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#D8C9B5",
+        "fraction": 0.057,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[75.1, 63.1, 69.0]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 06 / 11",
+    "G-MONTHS-COUNTER": "18 MONTHS TO ESCAPE",
+    "G-TICKER": "可见底部滚动条；完整逐帧字符未转录",
+    "G-HALFTONE": "visible",
+    "G-CV-BRACKET": "MODEL 01 · LOOK 06 · WALK",
+    "G-FLAP-BOARD": "not visible"
+  },
+  "elements": [
+    {
+      "element_id": "S0053-E01",
+      "shot_id": "S0053",
+      "type": "background_media",
+      "description": "少女穿白色泡袖上衣黑色背带短裙和长靴，在两侧金色窗格的长廊中央向镜头走近。右侧黑色阶层面板出现，左上 UNDERCLASS 晚于底部逐词歌词进入。",
+      "start_frame": 1943,
+      "end_frame": 2018,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "人物与场景作为原片已合成底片；不假称存在独立人物遮罩。"
+      },
+      "motion": {
+        "path": "人物走近且机位后退",
+        "easing": "unknown",
+        "entrance": "first_visible≈1943, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2018; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 1943
+        },
+        {
+          "frame": 1981
+        },
+        {
+          "frame": 2018
+        }
+      ],
+      "effects": [
+        "halftone inherited"
+      ],
+      "reference_frames": [
+        1943,
+        1962,
+        1981,
+        2000,
+        2018
+      ],
+      "confidence": 0.75,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 1943,
+        "last_visible_frame_estimate": 2018,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    },
+    {
+      "element_id": "S0053-E02",
+      "shot_id": "S0053",
+      "type": "hud_panel",
+      "description": "黑色矩形细白边；分层 ESCAPED / OWNERS / LABOUR / UNDERCLASS / PERMANENT UNDERCLASS；橙色 YOU 点沿竖轴上移。",
+      "start_frame": 1949,
+      "end_frame": 2018,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.28,
+        "w": 0.2,
+        "h": 0.48,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#D97757",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "黑色矩形细白边；分层 ESCAPED / OWNERS / LABOUR / UNDERCLASS / PERMANENT UNDERCLASS；橙色 YOU 点沿竖轴上移。"
+      },
+      "motion": {
+        "path": "黑色矩形细白边；分层 ESCAPED / OWNERS / LABOUR / UNDERCLASS / PERMANENT UNDERCLASS；橙色 YOU 点沿竖轴上移。",
+        "easing": "snap/step for text; curve unknown",
+        "entrance": "first_visible≈1949, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2018; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 1950,
+          "state": "first observed"
+        },
+        {
+          "frame": 2018,
+          "state": "last observed"
+        }
+      ],
+      "effects": [
+        "print pass inherited"
+      ],
+      "reference_frames": [
+        1962,
+        1981,
+        2000,
+        2018
+      ],
+      "confidence": 0.7,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "text": {
+        "content": "CLASS MOBILITY · SF · 2026",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "IBM Plex Mono 500"
+          ],
+          "candidate_only": true,
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none independently identifiable",
+          "size_note": "黑色矩形细白边；分层 ESCAPED / OWNERS / LABOUR / UNDERCLASS / PERMANENT UNDERCLASS；橙色 YOU 点沿竖轴上移。"
+        }
+      },
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 1949,
+        "last_visible_frame_estimate": 2018,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    },
+    {
+      "element_id": "S0053-E03",
+      "shot_id": "S0053",
+      "type": "text_title",
+      "description": "白色凝缩大写，约130px高，短促入场后固定左上。",
+      "start_frame": 1994,
+      "end_frame": 2018,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.2,
+        "w": 0.4,
+        "h": 0.13,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "白色凝缩大写，约130px高，短促入场后固定左上。"
+      },
+      "motion": {
+        "path": "白色凝缩大写，约130px高，短促入场后固定左上。",
+        "easing": "snap/step for text; curve unknown",
+        "entrance": "first_visible≈1994, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2018; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 1995,
+          "state": "first observed"
+        },
+        {
+          "frame": 2018,
+          "state": "last observed"
+        }
+      ],
+      "effects": [
+        "print pass inherited"
+      ],
+      "reference_frames": [
+        2000,
+        2018
+      ],
+      "confidence": 0.7,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "text": {
+        "content": "UNDERCLASS",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900"
+          ],
+          "candidate_only": true,
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none independently identifiable",
+          "size_note": "白色凝缩大写，约130px高，短促入场后固定左上。"
+        }
+      },
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 1994,
+        "last_visible_frame_estimate": 2018,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    },
+    {
+      "element_id": "S0053-E04",
+      "shot_id": "S0053",
+      "type": "text_lyric",
+      "description": "底部小号白字逐词显露，当前词橙色；最后underclass带橙底。",
+      "start_frame": 1961,
+      "end_frame": 2018,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.89,
+        "w": 0.43,
+        "h": 0.045,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "底部小号白字逐词显露，当前词橙色；最后underclass带橙底。"
+      },
+      "motion": {
+        "path": "底部小号白字逐词显露，当前词橙色；最后underclass带橙底。",
+        "easing": "snap/step for text; curve unknown",
+        "entrance": "first_visible≈1961, ±2 frames unless inherited from previous shot",
+        "exit": "last_visible≈2018; boundary-cut or described internal removal"
+      },
+      "keyframes": [
+        {
+          "frame": 1963,
+          "state": "first observed"
+        },
+        {
+          "frame": 2018,
+          "state": "last observed"
+        }
+      ],
+      "effects": [
+        "print pass inherited"
+      ],
+      "reference_frames": [
+        1981,
+        2000,
+        2018
+      ],
+      "confidence": 0.7,
+      "uncertainties": [
+        "字体候选/原始mask、alpha、随机seed与原始缓动曲线无法从成片确定。",
+        "bbox为视觉估计；可见事件时间采样误差不超过2帧。"
+      ],
+      "text": {
+        "content": "18 months to escape the underclass",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "Heros 700"
+          ],
+          "candidate_only": true,
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none independently identifiable",
+          "size_note": "底部小号白字逐词显露，当前词橙色；最后underclass带橙底。"
+        }
+      },
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "first_visible_frame_estimate": 1961,
+        "last_visible_frame_estimate": 2018,
+        "uncertainty_frames": 2,
+        "note": "可见性1–3帧采样测得；不是音频对齐"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0053-A02",
+      "target_element_ids": [
+        "S0053-E02"
+      ],
+      "description": "黑色矩形细白边；分层 ESCAPED / OWNERS / LABOUR / UNDERCLASS / PERMANENT UNDERCLASS；橙色 YOU 点沿竖轴上移。",
+      "start_frame": 1949,
+      "end_frame": 2018,
+      "easing": "observed stepped state; continuous curve unknown",
+      "audio_sync": "未听音，本记录不确认音频同步。"
+    },
+    {
+      "anim_id": "S0053-A03",
+      "target_element_ids": [
+        "S0053-E03"
+      ],
+      "description": "白色凝缩大写，约130px高，短促入场后固定左上。",
+      "start_frame": 1994,
+      "end_frame": 2018,
+      "easing": "observed stepped state; continuous curve unknown",
+      "audio_sync": "未听音，本记录不确认音频同步。"
+    },
+    {
+      "anim_id": "S0053-A04",
+      "target_element_ids": [
+        "S0053-E04"
+      ],
+      "description": "底部小号白字逐词显露，当前词橙色；最后underclass带橙底。",
+      "start_frame": 1961,
+      "end_frame": 2018,
+      "easing": "observed stepped state; continuous curve unknown",
+      "audio_sync": "未听音，本记录不确认音频同步。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AW0132",
+      "relation": "vocal_word_candidate (unknown) at frame 1927–1962; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1943
+    },
+    {
+      "audio_event_id": "AH00649",
+      "relation": "band_onset_candidate (unknown) at frame 1943; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1943
+    },
+    {
+      "audio_event_id": "AH00650",
+      "relation": "band_onset_candidate (unknown) at frame 1943; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1943
+    },
+    {
+      "audio_event_id": "AB0179",
+      "relation": "beat_candidate (unknown) at frame 1944; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 1944
+    },
+    {
+      "audio_event_id": "AH00651",
+      "relation": "band_onset_candidate (unknown) at frame 1944; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1944
+    },
+    {
+      "audio_event_id": "AH00652",
+      "relation": "band_onset_candidate (unknown) at frame 1954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1954
+    },
+    {
+      "audio_event_id": "AH00653",
+      "relation": "band_onset_candidate (unknown) at frame 1954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1954
+    },
+    {
+      "audio_event_id": "AH00654",
+      "relation": "band_onset_candidate (unknown) at frame 1954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1954
+    },
+    {
+      "audio_event_id": "AB0180",
+      "relation": "beat_candidate (unknown) at frame 1954; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1954
+    },
+    {
+      "audio_event_id": "AH00655",
+      "relation": "band_onset_candidate (unknown) at frame 1954; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1954
+    },
+    {
+      "audio_event_id": "AH00656",
+      "relation": "band_onset_candidate (unknown) at frame 1955; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1955
+    },
+    {
+      "audio_event_id": "AW0133",
+      "relation": "vocal_word_candidate (unknown) at frame 1965–1973; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1965
+    },
+    {
+      "audio_event_id": "AH00657",
+      "relation": "band_onset_candidate (unknown) at frame 1965; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1965
+    },
+    {
+      "audio_event_id": "AH00658",
+      "relation": "band_onset_candidate (unknown) at frame 1965; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1965
+    },
+    {
+      "audio_event_id": "AH00659",
+      "relation": "band_onset_candidate (unknown) at frame 1965; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1965
+    },
+    {
+      "audio_event_id": "AB0181",
+      "relation": "beat_candidate (unknown) at frame 1965; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1965
+    },
+    {
+      "audio_event_id": "AH00660",
+      "relation": "band_onset_candidate (unknown) at frame 1965; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1965
+    },
+    {
+      "audio_event_id": "AH00661",
+      "relation": "band_onset_candidate (unknown) at frame 1966; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1966
+    },
+    {
+      "audio_event_id": "AW0134",
+      "relation": "vocal_word_candidate (unknown) at frame 1975–1979; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1975
+    },
+    {
+      "audio_event_id": "AH00662",
+      "relation": "band_onset_candidate (unknown) at frame 1976; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1976
+    },
+    {
+      "audio_event_id": "AH00663",
+      "relation": "band_onset_candidate (unknown) at frame 1976; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1976
+    },
+    {
+      "audio_event_id": "AH00664",
+      "relation": "band_onset_candidate (unknown) at frame 1976; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1976
+    },
+    {
+      "audio_event_id": "AB0182",
+      "relation": "beat_candidate (unknown) at frame 1976; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1976
+    },
+    {
+      "audio_event_id": "AH00665",
+      "relation": "band_onset_candidate (unknown) at frame 1976; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1976
+    },
+    {
+      "audio_event_id": "AH00666",
+      "relation": "band_onset_candidate (unknown) at frame 1977; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1977
+    },
+    {
+      "audio_event_id": "AW0135",
+      "relation": "vocal_word_candidate (unknown) at frame 1979–1995; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1979
+    },
+    {
+      "audio_event_id": "AH00667",
+      "relation": "band_onset_candidate (unknown) at frame 1987; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1987
+    },
+    {
+      "audio_event_id": "AH00668",
+      "relation": "band_onset_candidate (unknown) at frame 1987; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1987
+    },
+    {
+      "audio_event_id": "AH00669",
+      "relation": "band_onset_candidate (unknown) at frame 1987; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1987
+    },
+    {
+      "audio_event_id": "AB0183",
+      "relation": "beat_candidate (unknown) at frame 1987; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1987
+    },
+    {
+      "audio_event_id": "AH00670",
+      "relation": "band_onset_candidate (unknown) at frame 1987; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1987
+    },
+    {
+      "audio_event_id": "AH00671",
+      "relation": "band_onset_candidate (unknown) at frame 1988; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1988
+    },
+    {
+      "audio_event_id": "AH00672",
+      "relation": "band_onset_candidate (unknown) at frame 1992; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1992
+    },
+    {
+      "audio_event_id": "AH00673",
+      "relation": "band_onset_candidate (unknown) at frame 1993; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1993
+    },
+    {
+      "audio_event_id": "AH00674",
+      "relation": "band_onset_candidate (unknown) at frame 1998; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1998
+    },
+    {
+      "audio_event_id": "AH00675",
+      "relation": "band_onset_candidate (unknown) at frame 1998; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1998
+    },
+    {
+      "audio_event_id": "AB0184",
+      "relation": "beat_candidate (unknown) at frame 1998; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1998
+    },
+    {
+      "audio_event_id": "AH00676",
+      "relation": "band_onset_candidate (unknown) at frame 1998; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1998
+    },
+    {
+      "audio_event_id": "AH00677",
+      "relation": "band_onset_candidate (unknown) at frame 1999; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1999
+    },
+    {
+      "audio_event_id": "AW0136",
+      "relation": "vocal_word_candidate (unknown) at frame 1999–2000; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1999
+    },
+    {
+      "audio_event_id": "AW0137",
+      "relation": "vocal_word_candidate (unknown) at frame 2000–2018; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2000
+    },
+    {
+      "audio_event_id": "AX0123",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 2003–2013; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 2003
+    },
+    {
+      "audio_event_id": "AB0185",
+      "relation": "beat_candidate (unknown) at frame 2009; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2009
+    },
+    {
+      "audio_event_id": "AH00678",
+      "relation": "band_onset_candidate (unknown) at frame 2009; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2009
+    },
+    {
+      "audio_event_id": "AH00679",
+      "relation": "band_onset_candidate (unknown) at frame 2009; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2009
+    },
+    {
+      "audio_event_id": "AH00680",
+      "relation": "band_onset_candidate (unknown) at frame 2009; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2009
+    },
+    {
+      "audio_event_id": "AH00681",
+      "relation": "band_onset_candidate (unknown) at frame 2009; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2009
+    },
+    {
+      "audio_event_id": "AH00682",
+      "relation": "band_onset_candidate (unknown) at frame 2010; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2010
+    },
+    {
+      "audio_event_id": "AH00683",
+      "relation": "band_onset_candidate (unknown) at frame 2015; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2015
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.72,
+  "uncertainties": [
+    "可见性关键时间由1–3帧采样给出，误差±2帧；不宣称每个像素的原始工程参数已恢复。",
+    "原字体、shader内部参数、alpha曲线、随机翻字seed无公开逐镜证据。",
+    "音频听证NOT_EVALUATED；音频link由主会话另合。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0053.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B1-016",
+      "description": "相邻样本呈硬切；未推断隐藏后期工程",
+      "span": [
+        1943,
+        1943
+      ],
+      "recommended_technique": "frame-exact edit"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B1-017",
+      "description": "相邻样本呈硬切；未推断隐藏后期工程",
+      "span": [
+        2018,
+        2018
+      ],
+      "recommended_technique": "frame-exact edit"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      1980
+    ],
+    "dense_sampling_stride_frames": 2,
+    "dense_sampling_regions": "文字/仪表区域裁切；本次临时观察联系表 /tmp/evdetail，canonical帧仍在work/f960及full_batch",
+    "second_pass_notes": "重新对照fullres中帧与dense区域，修正首批粗采样时间估计。",
+    "observations": [
+      {
+        "frame": 1993,
+        "description": "UNDERCLASS尚未可读",
+        "timing_uncertainty_frames": 1
+      },
+      {
+        "frame": 1995,
+        "description": "UNDERCLASS白色大字出现",
+        "timing_uncertainty_frames": 1
+      }
+    ],
+    "second_pass_status": "COMPLETED_FOR_VISIBLE_LAYERS_WITH_1_TO_3_FRAME_SAMPLING",
+    "limitations": "显示内容与可见事件已复核；原始工程隐藏参数unknown；audio listening NOT_EVALUATED。"
+  }
+}

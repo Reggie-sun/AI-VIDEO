@@ -1,0 +1,14 @@
+{
+  "schema": "iris-v2-user-gate-decision/1",
+  "unit": "S8b",
+  "chosen": "S8bv3b",
+  "gates": {
+    "S8bv3b": "qa/gate-S8bv3b/post-media-gate.json (FAIL)"
+  },
+  "question": "S8bv3b（副歌第二遍）表演明顯放開，但停頓、「outside」和唱完閉嘴都沒對上，逐鏡檢查不合格。要怎麼處理？",
+  "user_answer": "用 S8bv3b (Recommended)",
+  "scope": "S8bv3b with the sealed in-point 0.5667 (clip 0 = master 22.00), film window master 22.567-25.90 s = clip 0.567-3.90 s",
+  "review_clip": "renders/review/S8bv3b-film-window.mp4",
+  "recorded_at": "2026-11-02T11:36:32.248044+00:00",
+  "authority": "user decision on a FAIL verdict; the sealed gate verdict is unchanged"
+}

@@ -1,0 +1,8 @@
+{
+ "unit": "SC2",
+ "price": 30,
+ "balance_before": 63266,
+ "permit_sha256": "d4d7031eb56d9adc8f8a80fe4d8cffaf327efcdbe7ee89f0f910560dc401edf7",
+ "observed_sha256": "0f42175750d8e727d4a3ab76d1c9a29e89d4f78704362cdec8727caf415bdb49",
+ "clicked_at": "2026-11-04T03:36:04.133Z"
+}

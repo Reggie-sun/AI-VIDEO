@@ -66,7 +66,9 @@ uniform vec3 uSpillColor; uniform float uSpill; uniform vec2 uScreenCenter; unif
 // interior mask (S2): r = interior (1) vs exterior through glass (0); sampled in plate uv
 uniform float uMaskOn; uniform sampler2D uMask;
 uniform vec4 uSweep; uniform float uSweepGain; // dir.x, dir.y, position, width
-uniform vec3 uFlowVP; // exterior forward flow: vp.x, vp.y (plate px), scale
+uniform vec3 uFlowVP; // exterior forward flow: vp.x, vp.y (plate px), scale (legacy radial zoom)
+uniform vec4 uRoad;    // ground-plane forward travel: vp.x, horizon y (plate px), speed (1/px per s), cycle (s)
+uniform float uRoadOn;
 // soft dark car bodies (output px): cx, cy, halfW, halfH ; opacity
 #define MAXB 12
 uniform int uBN; uniform vec4 uBP[MAXB]; uniform float uBA[MAXB];
@@ -82,6 +84,31 @@ vec2 outToPlate(vec2 px){
   d = mat2(c, s, -s, c) * d;
   return uView.xy + d / (uFit * uView.z);
 }
+// Sample the plate as if the camera travelled d forward over a ground (below the horizon) and a
+// mirrored ceiling plane (lamps, fog above it): depth ∝ 1/(y - yh); travelling d samples farther points.
+vec2 roadFlow(vec2 pp, float d){
+  float dy = pp.y - uRoad.y;
+  float s = sign(dy);
+  if (s < 0.0) d *= 0.5;                                  // lamps and fog above the horizon travel less
+  float a = max(abs(dy), 1.5);
+  float a2 = 1.0 / (1.0 / a + d);
+  return vec2(uRoad.x + (pp.x - uRoad.x) * (a2 / a), uRoad.y + s * a2);
+}
+vec3 exteriorTravel(vec2 pp){
+  vec3 acc = vec3(0.0);
+  for (int ph = 0; ph < 2; ph++) {
+    float f = fract(uTime / uRoad.w + 0.5 * float(ph));
+    float w = 1.0 - abs(2.0 * f - 1.0);                  // two phases always sum to 1
+    float d = f * uRoad.z * uRoad.w;
+    vec3 c = vec3(0.0);
+    for (int k = 0; k < 4; k++) {                         // shutter blur along the flow
+      float dk = d - float(k) * uRoad.z * 0.005;
+      c += toLin(sampleCR(uPlate, roadFlow(pp, max(dk, 0.0)) / uPlateSize, uPlateSize).rgb);
+    }
+    acc += w * c * 0.25;
+  }
+  return acc;
+}
 float segDist(vec2 p, vec2 a, vec2 b){ vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-4), 0.0, 1.0); return length(pa - ba * h); }
 
 void main(){
@@ -95,7 +122,9 @@ void main(){
     pp = mix(ppx, pp, interior);
   }
   vec2 uv = pp / uPlateSize;
-  vec3 col = toLin(sampleCR(uPlate, uv, uPlateSize).rgb) * uPlateGain * uPlateTint;
+  vec3 col = toLin(sampleCR(uPlate, uv, uPlateSize).rgb);
+  if (uRoadOn > 0.5 && interior < 0.999) col = mix(exteriorTravel(outToPlate(px)), col, interior);
+  col *= uPlateGain * uPlateTint;
   vec3 blurred = toLin(textureLod(uPlate, uv, 5.0).rgb);
   vec3 blurredWide = toLin(textureLod(uPlate, uv, 7.0).rgb);
 
@@ -230,6 +259,7 @@ uniform vec3 uLift; uniform float uLiftAmt;
 uniform float uHalftone; uniform float uCell; uniform float uGrain; uniform float uGrainOverlay;
 uniform float uVignette; uniform float uCA; uniform float uMisreg; uniform float uFlash; uniform float uFade;
 uniform float uSat; uniform float uRedKeep; uniform vec2 uWeave;
+uniform float uInvert;
 
 vec3 aces(vec3 x){ return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
 float screenDot(vec2 p, float ang, float cell, float v){
@@ -260,13 +290,13 @@ void main(){
   vec2 px = pxCoord();
   vec2 uvb = vUv + uWeave / uRes;                          // gate weave, sub-pixel
   vec2 cd = vUv - 0.5;
-  float r2 = dot(cd, cd) * 4.0;
-  float ca = uCA * r2 * r2;
+  float r2 = dot(cd, cd) * 2.0;                             // 0 centre .. 1 corner
+  vec2 caOff = normalize(cd + 1e-6) * uCA * r2 / uRes;      // uCA px at the corners
   vec2 mis = vec2(uMisreg / uRes.x, 0.0);
   vec3 d;
-  d.r = gradeAt(uvb + cd * ca / 100.0 + mis).r;
+  d.r = gradeAt(uvb + caOff + mis).r;
   d.g = gradeAt(uvb).g;
-  d.b = gradeAt(uvb - cd * ca / 100.0 - mis).b;
+  d.b = gradeAt(uvb - caOff - mis).b;
   // additive colour halftone: light dots on dark, so a night scene keeps its colour
   vec3 ht = vec3(screenDot(px, 0.2618, uCell, d.r), screenDot(px, 1.309, uCell, d.g), screenDot(px, 0.7854, uCell, d.b));
   d = mix(d, ht * max(d * 1.35, vec3(0.0)) + d * 0.35, uHalftone);
@@ -280,10 +310,13 @@ void main(){
   ov.rgb = vec3(oR, ov.g, oB);
   d = d * (1.0 - ov.a) + ov.rgb;
   d += uFlash;
+  // luminance inversion (EV's white-ground turn): light becomes dark and back, hue kept; 0 = off
+  d = mix(d, clamp(d + vec3(1.0 - 2.0 * luma(d)), 0.0, 1.0), uInvert);
   // film grain: clumped, strongest in the mid tones, lighter on graphics
   float g = (vnoise(px / 1.35 + uFrame * vec2(37.1, 17.3)) - 0.5) * 1.6 + (hash12(px + uFrame * 7.7) - 0.5) * 0.7;
   float lm = luma(d);
   float amp = uGrain * (0.45 + 0.9 * (1.0 - abs(lm * 2.0 - 1.0))) * mix(1.0, uGrainOverlay, ov.a);
+  amp *= 0.45 + 0.55 * smoothstep(0.02, 0.20, lm);         // deep darks get less grain (survives platform transcodes)
   d += g * amp;
   d *= 1.0 - uFade;
   d += (hash12(px + uFrame * 3.1) - 0.5) / 255.0;           // dither before 8-bit quantisation

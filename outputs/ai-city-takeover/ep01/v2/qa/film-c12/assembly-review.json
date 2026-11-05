@@ -1,0 +1,294 @@
+{
+ "schema": "iris-v2-assembly-review/1",
+ "authority": "development_only (Agent observation)",
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c12.mp4",
+ "video_sha256": "ead978bb3891f452b808a7b7c7ebe4a89d75bcaaa880d5ec71145377b9b6e7ab",
+ "delivery_copy": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c12.mp4",
+  "sha256": "f1a7fba69b71c57a6306e28f18a6d335dd333cb97c1d70b94b208ea12eca3801",
+  "note": "x264 crf 17 aac 320k re-encode with faststart of the render above"
+ },
+ "side_by_side": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c11-vs-c12.mp4",
+   "sha256": "509af8c797f9a3fb2ff5a792e07a9c2c74890ed5b4117d6cefec0363485c11a9",
+   "note": "hstack 960x540 each, left c11 delivery, right c12 delivery, audio from c12"
+  }
+ ],
+ "chorus_excerpt": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c12-chorus-17.5-26.5.mp4",
+  "sha256": "bf97477f6321a701f25825205923f9cb572e9db67f55098de4b56eb67389a688"
+ },
+ "review_page": "outputs/ai-city-takeover/ep01/v2/review/film-c12.html",
+ "canonical_gate": {
+  "command": "scripts.agent_harness verify-assembly",
+  "status": "NOT_RUN",
+  "reason": "the motion-kit HyperFrames comp has no canonical ResolvedTimeline or render report (spec 2026-10-30 §3.7 Phase 1.5 not done); unverified review film"
+ },
+ "decision": "user 2026-11-03 on c11: 「還不夠，繼續加」; direction 「兩條都做 (Recommended)」 - c12 is the free reuse half (logs/decisions.md)",
+ "chorus_edit": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/chorus.json",
+  "sha256": "75041cf53f5a05277b0f094cf2ba0af78a9b216d2baa2d0931ada15a846294ac",
+  "note": "unchanged from c10/c11 (copy: comp/chorus-c11.json)"
+ },
+ "inserts": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/inserts.json",
+  "sha256": "3d6a5327abc2bea172e508fa354c948e76e04d666e80d5c5a1169195c5d44956",
+  "items": [
+   {
+    "id": "I1",
+    "t0": 4.1,
+    "t1": 4.8,
+    "source": "gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "sha": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "inout": "3.400–4.100 s（S9a，60fps 取最近幀成 30fps，正常速度）",
+    "why": "'twenty.': where it happened - the server room by the glass, the city outside (S9a after the door has shut: no red, no person)"
+   },
+   {
+    "id": "I2",
+    "t0": 5.266666666666667,
+    "t1": 5.733333333333333,
+    "source": "keyframes/raw/K9b-a.png",
+    "sha": "b9baefbb3a4aa7e8efd2072b5c30aa2a6cf9ff63bdeef29d93337a521f514ec0",
+    "inout": "靜圖，鏡頭 [836, 470, 1.1] → [800, 470, 1.18]",
+    "why": "'run.': the training run - the chip, pushing in"
+   },
+   {
+    "id": "I3",
+    "t0": 8.6,
+    "t1": 9.033333333333333,
+    "source": "gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "sha": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "inout": "0.000–0.433 s（S9a，60fps 取最近幀成 30fps，正常速度）",
+    "why": "'one door,': the door itself, still open and lit red (S9a's first frames, before it starts to shut), framed on the gap"
+   },
+   {
+    "id": "I4",
+    "t0": 15.033333333333333,
+    "t1": 15.533333333333333,
+    "source": "gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+    "sha": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7",
+    "inout": "0.500–1.000 s（S3，60fps 取最近幀成 30fps，正常速度）",
+    "why": "'train': the training aisle (S3's early push, which c11 does not use)"
+   },
+   {
+    "id": "I5",
+    "t0": 16.9,
+    "t1": 17.433333333333334,
+    "source": "gen/S7/project/state/video-generation/fetch/files/1921cdec15b928919c99454ccafb0411916d21bfcc2780688904471d103ee9b7.mp4",
+    "sha": "1921cdec15b928919c99454ccafb0411916d21bfcc2780688904471d103ee9b7",
+    "inout": "2.200–2.733 s（S7，60fps 取最近幀成 30fps，正常速度）",
+    "why": "'a copy': the cached panes of the first S7 take sliding past, framed on the panes only (her face and mouth stay out of frame)"
+   },
+   {
+    "id": "I6",
+    "t0": 23.333333333333332,
+    "t1": 23.866666666666667,
+    "source": "gen/S5r/project/state/video-generation/fetch/files/3f2224254e9453161301f7796dbf1a022d2dbfdaf15080d19ebe1a3f13f559dc.mp4",
+    "sha": "3f2224254e9453161301f7796dbf1a022d2dbfdaf15080d19ebe1a3f13f559dc",
+    "inout": "1.000–1.533 s（S5r，60fps 取最近幀成 30fps，正常速度）",
+    "why": "chorus 'run' (second pass): she stands at the glass, a closer profile than the K5 still around it (at 1.25 it read as a jump cut), mouth closed - she did not run"
+   },
+   {
+    "id": "I7",
+    "t0": 26.233333333333334,
+    "t1": 26.7,
+    "source": "keyframes/raw/P8c-a.png",
+    "sha": "d1c7d07d0291c66db15eb97ad52e150ef67401b1d83e029ad5b522de5f3ece8e",
+    "inout": "靜圖，鏡頭 [880, 380, 1.12] → [900, 372, 1.18]",
+    "why": "after 'Relax.': her, calm at the glass, mouth closed (P8c, approved, not used before)"
+   }
+  ],
+  "pips": {
+   "pipS5": {
+    "dir": "pip/pipS5",
+    "count": 44,
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S5/project/state/video-generation/fetch/files/ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16.mp4",
+    "source_sha256": "ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16",
+    "in_seconds": 1.0,
+    "why": "S6: while the rest stood still, IRIS at the glass (the first S5 take, profile, mouth closed)"
+   }
+  },
+  "pip_stills": {
+   "pipK4": {
+    "source": "keyframes/raw/K4-a.png",
+    "sha256": "c778ec44cf58dac57d684a83591fee20d5e1e2c9525955ce632f5a119b8cb19a"
+   },
+   "pipK9e": {
+    "source": "keyframes/raw/K9e-a.png",
+    "sha256": "d66b2fe2af4da9768da66da4148773c699b686ddec58c4f48d45bf5198bc95eb"
+   }
+  },
+  "chorus_share": "1.47 s／7.03 s＝21%（S8e 0.50 s＋S8w 0.43 s＋I6 0.53 s），上限約三分之一"
+ },
+ "qa": {
+  "tool": "motion-kit/tools/qa.py",
+  "report": "qa/film-c12/report.md",
+  "verdicts": {
+   "spec": true,
+   "sync": true,
+   "flash": true,
+   "frames_match_comp": true,
+   "pops": true,
+   "strobe": true,
+   "outliers": true
+  },
+  "result": "all verdicts true: cuts 33/33 on frame (the 20 c11 cuts on their c11 frames + 13 insert in/out cuts; cut_I6_back detected -1 frame, within tolerance), cues 20/20 within 1 frame, flash max 2/s (c11: 1/s; limit 3), strobe 0, pops 0, outliers 0. On the way: (1) the c11 one-frame print burst on the cut into I5's bright panes read as a single-frame pop (frame 507): inserts now cut plain; (2) I6 at 1.25x matched the K5 still around it (a jump cut on the sheet): reframed to a 1.6x profile; (3) I5 showed half her face and mouth at the right edge: reframed on the panes; (4) I7's bracket label met the AI mark: bracket from eyes to chin"
+ },
+ "pace": {
+  "table": "qa/film-c12/pace-vs-c1.json",
+  "summary": "bars with an insert or prop rise (bar 3 2.83->5.64, bar 9 2.08->4.46, bar 10 2.93->4.38, bar 14 3.93->6.32); bars 1, 2, 7, 11, 12, 15 as c11"
+ },
+ "loudness": "integrated -14.2 LUFS, true peak -1.0 dBFS (ebur128 on the delivery; song unchanged, same as c11)",
+ "junctions": [
+  {
+   "cut": "S1->S2 2.867 s",
+   "observation": "the eye of S1 opens in the cold pane light; cut on 'woke' to its owner (P7), title slam",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S2->S3 4.800 s",
+   "observation": "the incident date over S2 carries into the aisle (OpenAI · 内部研究模型训练 2026-09-20)",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S3->S3d 7.100 s",
+   "observation": "c10: on 'misconfigured' the aisle dims and the route becomes a diagram: 研究模型 → DNS 解析器 (turns red, 配置错误) → 互联网 (the closed link opens red); the aisle's red gap stays visible underneath",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S3d->S4 8.133 s",
+   "observation": "the diagram's red link to the door: the red rack, its gap glowing on 'left open', the pulse running to the glass by the cut",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S4->S4c 9.733 s",
+   "observation": "c10: through the glass on 'It reached the internet': a breach point lights where the probe crosses, arcs touch lit buildings (有限联网), all withdraws by the line's end; the city is the skyline part of the A01v2 frame (no balcony, no person)",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S4c->S5 11.467 s",
+   "observation": "the city she reached -> she at that window (K5b), the far window lights on 'around'",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S5->S5d 12.100 s",
+   "observation": "c10: on 'Eleven' the count: mass type 1→11 天 over the idle racks",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S5d->S6 13.367 s",
+   "observation": "the count lands -> 最强模型训练 暂停 11 天 with D+11 held",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S6->S7 14.800 s",
+   "observation": "unchanged (S7v3, user: 「这里倒是可以」)",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S7->S8a 18.867 s",
+   "observation": "S7v3 ends on the lens -> the 数字人 take cut in closer in the same pane space; stacked sung line on the left; detector IRIS · 仍在沙盒内; c11: hairline strips cross the last 9 frames of S7; the chorus's first frame is clean (no bars), the entry hit 2 frames later untouched",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8a->S8e 21.367 s",
+   "observation": "c10: 'looked' -> her eye (K1b), the eye that opened in S1; the stacked line keeps running",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8e->S8a2 21.867 s",
+   "observation": "c10: 'outside' -> back on her singing, the take and the camera where they would have been (one camera span S8a→S8b)",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8a2->S8b 22.567 s",
+   "observation": "pass 2 'I didn't run' finds her at S5's window (K5), detector again",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8b->S8b_x 24.067 s",
+   "observation": "'I just': closer on K5b, the drift starts (one camera span S8b_x→S9a)",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8b_x->S8w 24.733 s",
+   "observation": "c10: 'looked' -> the far window she looked at in S5, lighting red, the glow scaled to the 2x zoom",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8w->S8b_x2 25.167 s",
+   "observation": "c10: 'outside' -> back on her, the drift continuing",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S8b_x2->S9a 25.900 s",
+   "observation": "her looking out -> the door closes ('Relax. The door is closed'); c11: strips cross the end of the chorus, then 9 bars retract off S9a in 3 frames; 27.17-27.9 s the frame turns white-ground with CLOSED in dark type, back before the door shuts",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S9a->S9b 28.300 s",
+   "observation": "the door's 已修复 -> the chip: another red-team finding",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S9b->S9h 29.133 s",
+   "observation": "c10: 'through the' -> her last look (S7v3's slight smile on the lens, framed closer)",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "S9h->S9b2 29.733 s",
+   "observation": "c10: 'cache' -> back on the chip, its camera, bits and title continuing (one stretch from cut_S9b), the 03:48 card",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "insert I1 4.100-4.800 s",
+   "observation": "「twenty.」（九月二十日）: 機房靠窗的寬鏡，窗外城市（S9a 門已關後的段落，沒有人、沒有紅光）；右上延續事件日期 2026-09-20; source gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4 (9616a8a21cdf…) 3.400–4.100 s（S9a，60fps 取最近幀成 30fps，正常速度）",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg, no singing mouth or frown in the window); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "insert I2 5.267-5.733 s",
+   "observation": "「run.」（一次训练）: 晶片（K9b 靜圖，鏡頭推近），識別框「研究模型」＋標籤 RUN · TRAINING; source keyframes/raw/K9b-a.png (b9baefbb3a4a…) 靜圖，鏡頭 [836, 470, 1.1] → [800, 470, 1.18]",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg, no singing mouth or frown in the window); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "insert I3 8.600-9.033 s",
+   "observation": "「one door,」（一扇门）: 紅色門縫特寫（S9a 開頭、門還開著），識別框「一扇门／没关」; source gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4 (9616a8a21cdf…) 0.000–0.433 s（S9a，60fps 取最近幀成 30fps，正常速度）",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg, no singing mouth or frown in the window); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "insert I4 15.033-15.533 s",
+   "observation": "「train」（我们在离线世界里训练）: 機房走道（S3 前半段推軌，c11 沒用到），右上 MODE · OFFLINE; source gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4 (4d017c1be081…) 0.500–1.000 s（S3，60fps 取最近幀成 30fps，正常速度）",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg, no singing mouth or frown in the window); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "insert I5 16.900-17.433 s",
+   "observation": "「a copy」（一份缓存）: 第一版 S7 的半透明面板滑過（只框面板，臉和嘴在畫外），蓋一個「已缓存」章; source gen/S7/project/state/video-generation/fetch/files/1921cdec15b928919c99454ccafb0411916d21bfcc2780688904471d103ee9b7.mp4 (1921cdec15b9…) 2.200–2.733 s（S7，60fps 取最近幀成 30fps，正常速度）",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg, no singing mouth or frown in the window); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "insert I6 23.333-23.867 s",
+   "observation": "副歌第二遍「run」（我没有逃）: 她在窗前的側臉近景（S5r，嘴閉著），識別框＋VIEW · OUTSIDE；隨副歌 zoom 與印刷感; source gen/S5r/project/state/video-generation/fetch/files/3f2224254e9453161301f7796dbf1a022d2dbfdaf15080d19ebe1a3f13f559dc.mp4 (3f2224254e94…) 1.000–1.533 s（S5r，60fps 取最近幀成 30fps，正常速度）",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg, no singing mouth or frown in the window); normal-speed viewing is the user's"
+  },
+  {
+   "cut": "insert I7 26.233-26.700 s",
+   "observation": "「Relax.」之後的拍子（放心）: 她在陽台的平靜側臉（P8c 靜圖，嘴閉著，第一次用），識別框＋MODE · SANDBOX; source keyframes/raw/P8c-a.png (d1c7d07d0291…) 靜圖，鏡頭 [880, 380, 1.12] → [900, 372, 1.18]",
+   "visual": "pass (Agent frames: qa/film-c12/cuts.jpg, no singing mouth or frown in the window); normal-speed viewing is the user's"
+  }
+ ],
+ "known_deviations": [
+  "倉庫的拼接 Gate（verify-assembly）還接不上 motion-kit 合成，所以接點<b>沒經過 Harness 驗證</b>，這是一部審看片。",
+  "舊鏡頭取片：我逐格看過入出點範圍，只挑沒有唱歌嘴型、沒有皺眉的片段；I6、I7 的側臉嘴是閉著的，但仍是她的臉，你覺得不行可以拿掉（每個插入鏡在 <code>comp/inserts.json</code> 一行，刪掉重建即可，不影響 c11 的剪點）。",
+  "I1 和 I3 都取自 S9a：I1 用的是門已經關上之後的寬鏡（窗外城市），放在故事前段的「September twenty」；I3 用門還開著的開頭。畫面上 I1 看不到門，但嚴格說是同一個機房的「之後」。",
+  "插入鏡讓第 3 小節（3.8–5.7 s）在 1.9 秒內有 4 個剪點（S2→I1→S3→I2→S3），是全片最密的一段；如果太碎，可以只留 I1 或 I2。",
+  "閃爍每秒最多 2 次（c11 是 1 次，上限 3）。",
+  "小視窗與示意圖的字是 15–16 px，手機上大概只看得出有一個視窗，讀不清字。",
+  "S5 第一版的小視窗是 480×270 的縮圖，放大看會比較糊。",
+  "聲音我沒辦法聽；歌沒改（−14.2 LUFS／−1.0 dBFS 與 c11 相同）。好不好看、會不會太滿，以你看、聽為準。"
+ ],
+ "c11_reproducible": "comp/src/main-c11.js + comp/chorus-c11.json; build.py --inserts none --main comp/src/main-c11.js --chorus comp/chorus-c11.json rewrites data/events.json to d879367bb7b7907b404eaf5ed44ce1da35a5b22063e16d73ee96775b53836807 (= c11); then seq.py, tracks.py, build.py with the same flags",
+ "tests": "node --test motion-kit/tests/*.test.mjs: 42/42",
+ "recorded_at": "2026-11-03T07:26:22-05:00",
+ "cost": "0 (local reuse of fetched takes and approved stills; no paid or remote call)"
+}

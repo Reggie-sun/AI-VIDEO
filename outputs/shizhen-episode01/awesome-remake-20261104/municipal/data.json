@@ -1,0 +1,173 @@
+{
+  "objective": "失帧全新开头：市政断电后绞盘仍转，钢缆拉住铁门",
+  "images": [
+    {
+      "asset_id": "municipal-board-v2",
+      "node_id": "municipal-board-v2-node",
+      "resource_id": "municipal-board-v2-local",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/awesome-remake-20261104/refs/storyboard-v2.png",
+      "usage_license": "Task-owned fictional storyboard generated for Shizhen remake",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/awesome-remake-20261104/municipal/reference-source.json",
+        "record_sha256": "06aa23f89e6e352c7bb9950c1c51b21bbfae903d94b76aefde195ffbd721771c",
+        "tool": {
+          "name": "image_gen.imagegen",
+          "version": "runtime-tool-version-not-exposed"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "municipal-worker",
+      "name": "市政工人",
+      "identity": "只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。",
+      "appearance_bible": "黄色安全帽、深蓝反光工作服、浅色手套",
+      "reference_asset_ids": [
+        "municipal-board-v2"
+      ]
+    }
+  ],
+  "scene": {
+    "scene_id": "municipal-rain-gate",
+    "location": "雨夜市政铁门旁",
+    "mood": "机械反常运行"
+  },
+  "scene_images": [],
+  "observations": {
+    "identity": "只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。",
+    "action": "工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。",
+    "camera": "一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。",
+    "performance": "工人只操作和回看，不开口、不惊恐表演",
+    "space": "绞盘、连续钢缆和铁门相连，受力方向不变",
+    "sound": "原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。",
+    "art": "雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.1",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+    ],
+    "action": [
+      "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+    ],
+    "camera": [
+      "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+    ],
+    "performance": [
+      "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+    ],
+    "space": [
+      "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+    ],
+    "sound": [
+      "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+    ],
+    "art": [
+      "{{image:0}}仅为软参考，不是首帧。只使用第一、二格工人、电闸、绞盘、钢缆和铁门，不复制其他格人物、地点、格线、编号或分格排版。\n只借参考图第一、二格同一工人的黄色安全帽、深蓝工作服反光条和浅色手套，保留该工人身份。\n低机位近处钢缆收紧，左侧电闸与戴黄色安全帽的工人可见，绞盘连接右侧铁门。\n工人伸手将电闸明确拉到断开位置并松手；镜头仍能确认断开状态，绞盘继续收缆，钢缆始终连接铁门，门被拉到限位后停止但钢缆仍绷紧。工人回头看绞盘，保持克制，不惊叫、不开口。\n一个连续六秒镜头，低机位从电闸和近处收紧钢缆小幅向右摇，连接工人操作与仍运转绞盘，最后稳定在绞盘、钢缆、铁门受力关系；不切镜、不越轴、不变焦。\n电闸已断开，工人回看；绞盘仍转、钢缆仍收紧，连接的铁门抵住限位。\n看清工人、电闸和钢缆起始关系\n看清断电后仍运作的受力证据\n原生同期雨声、绞盘电机声与钢缆受力声，断电后机械声继续，无对白、无配乐、无字幕。\n雨夜真实摄影，冷灰雨幕与现场实用灯，潮湿金属和真实衣物；无慢动作、闪屏、黑屏、鬼影、格线、编号或文字。"
+    ]
+  },
+  "intent_sha256": "b16f206a7e3714dd3793121cd95673a374e7cd1974f19bb728550ed72ce6b3aa",
+  "coverage": {
+    "coverage_hash": "db5561bdaab553e6db10cf3cbe547a6185e9615acf07c1abe9971c9d29b18456",
+    "unit_id": "municipal"
+  }
+}

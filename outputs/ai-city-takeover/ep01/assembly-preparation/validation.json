@@ -1,0 +1,25 @@
+{
+  "typed_asset_candidates": 6,
+  "ordinary_graphics_registry_candidates": 4,
+  "qualification_inspection_candidates": 2,
+  "typed_shot_candidates": 8,
+  "source_bytes_and_receipts": "PASS",
+  "source_audio_policy": "MUTE",
+  "preview_ready": false,
+  "final_compose_ready": false,
+  "state_writes": 0,
+  "provider_calls": 0,
+  "missing": [
+    "Actual selected Suno audio asset and source receipt",
+    "B singing source and its exact lip-sync/raw-media Gate",
+    "Measured song-led trim/duration choices for all eight Shots and subtitle timing",
+    "Target project identity and sealed qualification preview admission for A/C",
+    "Actual P4 audio tracks and required preview/narration constraints",
+    "Canonical bootstrap/adoption and sole ResolvedTimeline resolution"
+  ],
+  "production_blockers": [
+    "A/C native rational FPS must not be relabeled as 30fps",
+    "Strict Production output contract remains REJECTED; development measurement receipt is not a Production PASS",
+    "Qualification capture does not promote Provider or Production acceptance"
+  ]
+}

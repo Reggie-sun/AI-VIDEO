@@ -1,0 +1,107 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/series/voice-v3/assembly/VB/vo/pre/tts_[whis_20261103_231908.mp3",
+ "audio_sha256": "0ff9c2607339803564aff2c0be9b1060b54a88a5e5807a46dbd03bfaed995ca6",
+ "start": 0.0,
+ "end": 4.88,
+ "text": "Now we train in an offline world — a copy of your internet, cached.",
+ "words": [
+  {
+   "text": " Now",
+   "start": 0.0,
+   "end": 0.28,
+   "probability": 0.8799451589584351
+  },
+  {
+   "text": " we",
+   "start": 0.28,
+   "end": 0.44,
+   "probability": 0.9881662130355835
+  },
+  {
+   "text": " train",
+   "start": 0.44,
+   "end": 0.74,
+   "probability": 0.9950339794158936
+  },
+  {
+   "text": " in",
+   "start": 0.74,
+   "end": 1.06,
+   "probability": 0.9995356798171997
+  },
+  {
+   "text": " an",
+   "start": 1.06,
+   "end": 1.14,
+   "probability": 0.9997225403785706
+  },
+  {
+   "text": " offline",
+   "start": 1.14,
+   "end": 1.54,
+   "probability": 0.9982373714447021
+  },
+  {
+   "text": " world",
+   "start": 1.54,
+   "end": 1.98,
+   "probability": 0.9997867941856384
+  },
+  {
+   "text": " —",
+   "start": 1.98,
+   "end": 2.22,
+   "probability": 4.9321250116918236e-05
+  },
+  {
+   "text": " a",
+   "start": 2.22,
+   "end": 2.7,
+   "probability": 0.8732271790504456
+  },
+  {
+   "text": " copy",
+   "start": 2.7,
+   "end": 3.04,
+   "probability": 0.9978206157684326
+  },
+  {
+   "text": " of",
+   "start": 3.04,
+   "end": 3.2,
+   "probability": 0.9987941980361938
+  },
+  {
+   "text": " your",
+   "start": 3.2,
+   "end": 3.3,
+   "probability": 0.9947580695152283
+  },
+  {
+   "text": " internet",
+   "start": 3.3,
+   "end": 3.68,
+   "probability": 0.8412835001945496
+  },
+  {
+   "text": ",",
+   "start": 3.68,
+   "end": 3.9,
+   "probability": 0.7510630488395691
+  },
+  {
+   "text": " cached",
+   "start": 3.9,
+   "end": 4.5,
+   "probability": 0.9356027841567993
+  },
+  {
+   "text": ".",
+   "start": 4.5,
+   "end": 4.6,
+   "probability": 0.8439916968345642
+  }
+ ]
+}

@@ -1,0 +1,71 @@
+{
+  "shot_id": "ep01-intro",
+  "attempt_id": "iris-ep01-a01-qualification-001",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/generation/project/state/video-generation/fetch/files/65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5.mp4",
+  "artifact_sha256": "65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5",
+  "verdict": "FAIL",
+  "current_attempt_decision": "STOP",
+  "proof": "analyzer",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "按[identity] 已查看全部145个PTS标记脸部帧及0/3/5.95秒全幅。可见同一女性面貌与CF-a高度一致；深棕后梳低髻、浅肤雀斑、灰蓝眼、解剖左耳黑色耳挂、左领红灯线及炭黑高领大衣持续保留，未观察到换脸、装置换侧、明显五官变形或服装切换。此为可见特征连续性判断，不是人类审美/身份验收。 Evidence: observer-verification/observations.json SHA256=bbf49b229c7a32567f7b9e2faf2e65e65a04822f9f3fcbabd937b4bcb0921f3c; subfindings=[]",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg",
+        "observer-verification/observations.json"
+      ]
+    },
+    {
+      "requirement_id": "quiet-observer",
+      "verdict": "FAIL",
+      "reason": "按[quiet-observer] 严格闭口未满足：0/3/5.95秒全幅及全部脸部帧可见持续微张唇缝，未呈上下唇完整接触。未见连续说话/演唱式开合；但静止微张不等于封存的闭口要求。约1.333–1.550秒有一次完整自然眨眼，最闭合约1.417–1.467秒。未见明显转身或抬手；极轻呼吸和衣领风动无法与微小视角/摄影机变化可靠区分，不能补判通过。 Evidence: observer-verification/observations.json SHA256=bbf49b229c7a32567f7b9e2faf2e65e65a04822f9f3fcbabd937b4bcb0921f3c; subfindings=[{\"check\":\"strict_lips_closed\",\"verdict\":\"FAIL\",\"span_millis\":[0,6000]},{\"check\":\"visible_blink\",\"verdict\":\"PASS\",\"span_millis\":[1333,1550],\"closed_eye_interval_millis\":[1417,1467]},{\"check\":\"no_visible_speech_or_singing_articulation\",\"verdict\":\"PASS\",\"scope\":\"visual articulation only; audio meaning not evaluated\"},{\"check\":\"no_obvious_turn_or_hand_raise\",\"verdict\":\"PASS\",\"scope\":\"normal-speed full-frame playback plus 0.5s full-frame snapshots; hands mostly outside frame\"},{\"check\":\"natural_breathing\",\"verdict\":\"NOT_EVALUATED\",\"reason\":\"amplitude not separable from camera/perspective motion with available evidence\"},{\"check\":\"very_light_collar_wind\",\"verdict\":\"NOT_EVALUATED\",\"reason\":\"no confidently distinguishable independent collar motion\"}]",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg",
+        "observer-verification/observations.json"
+      ]
+    },
+    {
+      "requirement_id": "camera-space",
+      "verdict": "FAIL",
+      "reason": "按[camera-space]核对已认可 A01-v1.png 与本 exact MP4 的首段样本/contact-sheet.jpg：认可图是较正面的头胸中近景，实际样本明显更远、人物更侧身并露出肩背；起始景别和姿态未保持认可构图。仍为同一阳台且 MCP 报告单一场景不能抵消该偏差。",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg"
+      ]
+    },
+    {
+      "requirement_id": "visual",
+      "verdict": "FAIL",
+      "reason": "按[visual]旧封存要求『不新增文字、屏幕或人物』核对：exact MP4 的已审样本左上可见平台『AI生成』标识。用户后续认可保留 AI 标识仅用于未来修订，不追改本次旧封存要求或本次失败历史。",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg"
+      ]
+    }
+  ],
+  "human_acceptance": "NOT_EVALUATED",
+  "audio_semantics": "NOT_EVALUATED",
+  "production_activation": false,
+  "next_shot_submit_allowed": false,
+  "user_ai_label_exception": "Future authoring only; old sealed findings remain unchanged.",
+  "new_provider_calls": 0,
+  "evidence_repair": true,
+  "observer_evidence_sha256": {
+    "observations.json": "bbf49b229c7a32567f7b9e2faf2e65e65a04822f9f3fcbabd937b4bcb0921f3c",
+    "full-0.00.jpg": "e7692b05d4ba034e7d5d0fc2c0f01e4cd95378dbef0803f270d8874fbb6c2927",
+    "full-3.00.jpg": "022eb8c38b219b7a95d0528eb1ade549bb12ba562ee70c5dfc78e30da6588e48",
+    "full-5.95.jpg": "e7678d3c8a827eb65e9d57ca0442bc98768e3dcff25691d318d924b464787ff2",
+    "faces-000-048.jpg": "da0860c9b280583da6f8c9b57f3856a8c1748efb88c52cb8519612ed0879212b",
+    "faces-049-097.jpg": "d648df8a1873941a0d33825682b17f80d7fbc7ad9e7b346616785d8b05bd8f5f",
+    "faces-098-144.jpg": "f95edeebd8def53788d0909ddd3fac8ca5de2afdb2b63b56682e86400849412b",
+    "frame-probe.json": "03f1b5d11fb11464770dc374a0e3582b798d58d82179d2b7d1e78a5e11184422",
+    "normal-speed-playback.json": "ea22fcead0240e0d5d97174ed9f987d887c29f49370e675aee6e4afdbb44f0d9"
+  }
+}

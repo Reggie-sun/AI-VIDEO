@@ -1,0 +1,232 @@
+{
+ "schema": "iris-v2-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-03",
+ "scope": "IRIS EP01 v2 新人物遠景動作鏡頭 N1–N4（Seedance 2.0 VIP / 即夢，首幀生視頻，5 s，1080p，16:9），付費提交前的連續性報告；以 c11 為準（c12 平行製作，未納入）；只讀，未提交、未上傳、未讀 .env",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/action/preview-approval.json",
+   "sha256": "e517c3deec6e94bff57b36716d2a20dd498e4902bd6896095d7e02e908792eb3",
+   "user_quote": "4 支都生成 (Recommended)"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/action/preview.html",
+   "sha256": "560a7652393a691ad4d7e47e5a593a71b34777aa06d049628bbcf1b7db47005e",
+   "note": "與 approval 記錄相同"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/action/preview-inputs.json",
+   "sha256": "4e89c677deba003c58514c1358d9d97267652445c766683b9df612100b7d7643",
+   "note": "與 approval 記錄相同"
+  },
+  "prompt_book": {
+   "path": "outputs/ai-city-takeover/ep01/v2/keyframes/prompts-v5-action.md",
+   "sha256": "8e5e19af2e6ae7672b6454e4fc5d7258ba4ff4043fc354870017d2c9933c080f"
+  },
+  "specs": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/unit.py",
+   "sha256": "0f7559921f9f34b33ccf0a5d0c3f3a9e6e5c40fe48a39f055564ab372d782c9f",
+   "identity_text": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持"
+  },
+  "lint": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/lint.py",
+   "sha256": "5b8efe6ae23f2a1dafcb578a4a23d170446e256eabfeb0c53604e4d84e813a70"
+  },
+  "first_frames": {
+   "N1": "f5afc9637788287044e6ea96af4d7cef93fc82224106e9ffa3f25b732e82888c",
+   "N2": "9f2b74e7c8f09d679b2f6e7ce720e7ddfb9522021bf71cb6756188afa015f3f2",
+   "N3": "4f3e63927ee96332bdff70e86ab41f6e2c11ea37d8a96c59e6a911f1e83b5659",
+   "N4": "5c4f178988557051276003c1e1a071a24741ee447b10577e33bcb2bd3e726a1f"
+  },
+  "accepted_states": {
+   "K3": "f2232ea22e5bb69c390f833129d764bce1305c05be9945e81b4a6b6686a49452",
+   "K5": "19bd38c1e375d5fe04fa84a527bfac64f4f3f649d3d2707d4ff3b2a6597728e9",
+   "K5b": "5c92c9d658681077e9d00232aeaddd9be1fb1d4033bbe9212710d26486ba3c62",
+   "K7": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+   "K9e": "d66b2fe2af4da9768da66da4148773c699b686ddec58c4f48d45bf5198bc95eb",
+   "identity_sheet": {
+    "path": "outputs/ai-city-takeover/series/identity-cf/identity-cf-v2-sheet.jpg",
+    "sha256": "c615d9d3ffcc71b48c8b46dc9836e5a3aed39a6101b05336f40abdcb339d3340"
+   }
+  },
+  "film": {
+   "path": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c11.mp4",
+   "sha256": "c4600f8aace0d88070722c484e7b23a640cd3c0ca9e44e31d08966a71034db2e",
+   "duration_s": 30.522,
+   "frames_checked_s": [
+    4.7,
+    5.0,
+    6.9,
+    11.3,
+    11.8,
+    14.9,
+    16.5,
+    18.7,
+    22.4,
+    22.8,
+    24.2,
+    25.8
+   ]
+  },
+  "cut_list": {
+   "path": "outputs/ai-city-takeover/ep01/v2/comp/data/events.json",
+   "sha256": "1e3a3e4f8622bd072963e6323fddc5972f74196691a9e78c4afe23b8af0d2b03"
+  },
+  "assembly_review": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/film-c11/assembly-review.json",
+   "sha256": "b82e8678ae8a645bacbc07c92ff78e39f0b8bce7757f19c9ccd0f7efe47f3caf"
+  },
+  "lint_outputs": {
+   "N1": "e00cff0b62329f25f9153f03f4697dd0f6c9762b84d93e871f0e483738e56627",
+   "N2": "aedce57c56a28d974c32ee1d2e950e3dec6e0bd1fbd2e133b5493f8aff48a1ea",
+   "N3": "035f5b34e2edf88560edb90cb923cd02988c3313f90d8cd35ece8f933209ace4",
+   "N4": "6f02f092f53350dbe1a75d9f5e952e9d8c71c5507b0d3b8b06fec252f901e16f"
+  }
+ },
+ "shared_findings": {
+  "prompt_fit": "四支的 compiled-native-prompt.zh.txt 去檔尾換行後，與 preview-approval.json prompts[Nx].text 逐字相同；resolved_request.prompt_text 也相同。純中文、沒有對白或唱歌字句；N1 和 N3 寫了「始终看不到她的脸」，N2 和 N4 寫了「嘴唇自然闭合」。image_bindings 只有一張 first_frame，sha 與 approval 的 preview_artifacts 相同；media_bindings 為空（沒有音訊參考）。",
+  "request": "effective_output：5 s、1080p、16:9、mp4，與 approval.generation 和 profile.json 相符；profile credit_upper_bound=165，等於 operator ceiling。native_audio=true，而 driver-config 的 source_audio_policy=MUTE，即成片使用時靜音。approval 的 audio:null 依 preview-inputs.about 理解為「沒有音訊參考」。附帶觀察：profile.benefit_type=seedance_20_pro_1080p_output 但 model_id=seedance_2.0_vip，這不屬連續性範圍，交主會話核對。",
+  "identity_canon": "IRIS 設定是左耳黑色耳挂、左領極細紅燈線。CF-ID3（右側朝鏡頭）右耳沒有耳挂；K7、K5b、CF-ID4 的耳挂和紅線都在左側。",
+  "lint": "`uv run python V2/gen/lint.py N1..N4` 四支都輸出 failed=[\"continuity_report_ready\"]，其餘 10 項（exact_image_order、audio_binding、every_input_in_user_preview、prompt_language_policy、prompt_is_user_approved_text、directed_behaviour_in_text、no_platform_label_removal、bound_output、operator_ceiling_matches_preview、cumulative_budget_left）全部為 true；lint 只寫了 gen/Nx/pre-submit-lint.json。",
+  "placement_context": "c11 的時間：S3 4.8–7.1 s（其中 5.27–5.73 是插入鏡頭 I2）；S5 11.47–12.1 s；S7 14.8–18.87 s（插入 I4、I5）；S8b（K5 靜圖）22.57–24.07 s（插入 I6）；S9a 從 25.9 s 起，關門時換成 K9e。"
+ },
+ "risks": [
+  {
+   "id": "R1",
+   "units": [
+    "N1",
+    "N3"
+   ],
+   "risk": "背影的領口紅線：首幀裡紅線跨過整個後領到右肩，設定是「左領」。沒有已認可的背面畫面可以對照，所以不判 FAIL；生成後的逐鏡審查要檢查紅線有沒有漂成整圈發光或跑到右前領。"
+  },
+  {
+   "id": "R2",
+   "units": [
+    "N1",
+    "N3"
+   ],
+   "risk": "背影鏡頭的身份漂移：身份只靠首幀撐（identity_waivers），沒有附身份圖；她回頭或側臉時可能換臉。prompt 寫了「始终看不到她的脸」，N3 的「头微微侧向一边」可能露出側臉。"
+  },
+  {
+   "id": "R3",
+   "units": [
+    "N2"
+   ],
+   "risk": "手部結構：首幀左手五指正常，但指尖收攏和霧氣散開的過程中可能多指、黏指或手變形；推近之後手部佔畫面更大，問題更明顯。"
+  },
+  {
+   "id": "R4",
+   "units": [
+    "N1",
+    "N4"
+   ],
+   "risk": "走路步態：N1 鏡頭固定、人越走越遠，可能出現滑步或腳穿地；N4 側面全身走路加橫移跟拍，可能出現滑步或腳步與鏡頭速度不同步。"
+  },
+  {
+   "id": "R5",
+   "units": [
+    "N1",
+    "N2",
+    "N3",
+    "N4"
+   ],
+   "risk": "鏡頭運動不照設定：N1 要求完全固定，但 prompt 只寫「镜头固定」，前例 gate-S5 出現過固定或緩推最後一秒失控；N2 推近、N3 後拉可能速度不勻，或在 5 s 內看不出來；N4 只寫「横移跟随」沒寫方向，設定是 truck_right。"
+  },
+  {
+   "id": "R6",
+   "units": [
+    "N1",
+    "N2",
+    "N3",
+    "N4"
+   ],
+   "risk": "「画面中不得出现任何文字、字母、数字、标志或水印」是在約束畫面內容，不是要求去除浮水印；lint 的 no_platform_label_removal 為 true。即夢會自行加上 AI 生成標識，這不算違規；審查時要把平台標識和模型自己畫出來的字分開判斷，也不能遮擋或移除平台標識（unit.py NO_TEXT）。"
+  },
+  {
+   "id": "R7",
+   "units": [
+    "N1",
+    "N2",
+    "N3",
+    "N4"
+   ],
+   "risk": "5 s 片長對短落點：S3 約 2.3 s（中間還有插入鏡頭）、S8b 1.5 s、S5 0.63 s、S7 插入約 0.5 s；剪短後推近、後拉或觸碰動作可能看不出來，要決定取哪一段。"
+  },
+  {
+   "id": "R8",
+   "units": [
+    "N2",
+    "N4"
+   ],
+   "risk": "不動嘴：N4 側臉露出嘴唇，N2 有一點側臉；另外 native_audio=true，模型可能自己生成人聲並帶動嘴型。使用者要求遠景動作不要動嘴，逐鏡審查必須檢查。"
+  },
+  {
+   "id": "R9",
+   "units": [
+    "N2"
+   ],
+   "risk": "合成程式裡 S8b 的 her() 臉框用 K5_FACE 這組靜圖座標（main.js:401）；換成 N2 影片後要重新追蹤，不然偵測框會框到空處。"
+  },
+  {
+   "id": "R10",
+   "units": [
+    "N1"
+   ],
+   "risk": "S3 的 DNS 偵測框追蹤的是走道盡頭的紅色門縫（tracks.S3_gap）；N1 她走向門縫時可能擋住它，如果在 N1 上疊 S3d 圖解，框會失準。"
+  }
+ ],
+ "units": {
+  "N1": {
+   "verdict": "ready",
+   "continuity": "PASS：N1-a 是 K3 的編修版，走道、兩側機櫃藍燈、盡頭紅光門縫、天花燈帶和構圖都與 K3 相同；炭黑高領大衣、後梳低髻與身份設定一致；背影看不到耳朵，所以耳挂不可見，符合預期；光線是冷藍加門縫紅光，與 K3 和 c11 S3（5.0 s 那一幀）一致。領口紅線跨過整個後領，見 R1。",
+   "handoff": "PASS（附條件）：開頭就是 K3 構圖加上她走在走道中央，結尾是她走得更遠、仍背對鏡頭，是乾淨的出點。條件：不要直接接 S3 的空走道（同一構圖，硬切時她會突然出現或消失）；建議放在 I1 之後、S3 之前或取代 S3 前段，並先在剪接決定裡寫明是省略剪接還是取代。",
+   "axis_action_camera": "PASS：她沿走道中央直線遠離鏡頭，沒有左右方向問題；與 K3 消失點相同；鏡頭固定（LOCKED，prompt 寫「镜头固定」）；動作只有一段：走向門縫。首幀已在跨步中，與設定 action_start「站在」差一點，但不影響理解。風險見 R4、R5、R10。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 36ddbc5a…；compiled 檔 f5088098…，差在檔尾換行）；寫了「始终看不到她的脸」，沒有對白或唱歌；設定 open_event、close_event 的字句都在 prompt 裡。",
+   "lint": "PASS（只差本報告）：lint.py N1 只有 continuity_report_ready 未過；request_hash e1b088bc…"
+  },
+  "N2": {
+   "verdict": "ready",
+   "continuity": "PASS：N2-a 是 K5b 的編修版，同一扇雨夜落地窗、同樣的城市天際線和高架橋、窗框位置相同；左耳黑色耳挂、左領紅燈線（往後頸延伸）、濕的後梳低髻、炭黑大衣，都與 K5b 和 c11 24.2 s（S8b_x）一致；貼在玻璃上的是近側的左手，五指正常。註：prompt 本寫「抬起右手」，但已認可的首幀是左手；影片 prompt 沒指定哪隻手，所以沒有衝突。",
+   "handoff": "PASS：取代 S8b 的 K5 靜圖（22.57–24.07 s）。入點從 S8a2（玻璃面板空間，正面唱歌）在「I didn't run」硬切到窗前，換場的理由和 c11 現在一樣；出點接 S8b_x（K5b 更近的側臉、面向畫左），N2 結尾她抬頭望向城市、臉朝窗外（畫左），方向一致。S8b 中段的插入鏡頭 I6 和 S8b 臉框要重排，見 R9。",
+   "axis_action_camera": "PASS：她和窗在 c11 S5、S8b、S8b_x 裡都在畫左，臉朝畫左，N2 一樣，沒有跳軸；鏡頭緩慢推近到手（dolly_in），推向畫左的手和玻璃，看得懂；動作順序：手停住 → 指尖收攏 → 霧氣散開 → 頭低下再抬起望向城市，順序清楚。風險見 R3、R5、R8。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 6fbc62d9…）；寫了「嘴唇自然闭合」「脸始终朝着窗外」，沒有唱歌字句；設定的字句都在 prompt 裡。",
+   "lint": "PASS（只差本報告）：lint.py N2 只有 continuity_report_ready 未過；request_hash f9944417…"
+  },
+  "N3": {
+   "verdict": "ready",
+   "continuity": "PASS：N3-a 是 K9e 的編修版，左側機櫃、右側落地窗、霧夜城市、地面線槽和反光都與 K9e 相同；炭黑長大衣、後梳低髻、全身背影；冷光剪影，與 K9e 一致。領口紅線跨過整個後領，見 R1。注意這是 K9e 的機房窗，是霧夜、沒有雨，不是 K5b 的雨夜窗。",
+   "handoff": "PASS（只限結尾那個落點）：放在 S9a「Relax. The door is closed」之前，而 S9a 關門時換成的正是 K9e 同一個房間（main.js:666/687/710），她站在窗前接到空房間的關門畫面，可以當成省略。條件：不要放進 S5「It looked around」（11.47–12.1 s，只有 0.63 s，而且前後的 S4c、S5 都是雨夜窗，天氣和窗子都對不上）。",
+   "axis_action_camera": "PASS：背對鏡頭，窗在畫右，她面向畫內窗外，沒有和其他鏡頭的視線方向衝突；鏡頭極慢後拉（dolly_out）；動作是靜立、過一會兒頭微側，順序清楚。風險見 R2、R5、R7。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 18510654…）；寫了「始终看不到她的脸」，沒有對白或唱歌；設定的字句都在 prompt 裡。",
+   "lint": "PASS（只差本報告）：lint.py N3 只有 continuity_report_ready 未過；request_hash 0525e5e5…"
+  },
+  "N4": {
+   "verdict": "ready",
+   "continuity": "PASS: N4f-a (8efafcfc…) is an exact horizontal mirror of N4-a (pixel diff 0). She faces screen left with the near side being her left; the earpiece is on her left ear and the red line on the near (left) collar, matching canon, K7 and c12 S7 at 14.9-18.7 s. Space (floating panels, black background, cold floor light spots), coat, bun and lighting match K7/S7. Mirror side effects: no visible hair parting; the coat is an open lapel in side view with no visible buttoning; the raised hand becomes the far-side right hand, which the prompt does not specify; the panels are abstract with no text. None reads wrong.",
+   "handoff": "PASS: insert inside c12 S7 (14.8-18.867 s), same class as I4 (15.033-15.533) and I5 (16.900-17.433); same space and light; clear reason for the cut from close-up to wide; clean out-point as she withdraws her hand and walks on.",
+   "axis_action_camera": "PASS: in S7 her face and gaze lean to screen left; in N4f she walks and reaches to screen left, consistent, no axis jump. Spec is truck_left/left with envelope_direction 向左 and open text 向画面左侧走, matching the first frame. Action order walk-reach-touch-glow-drift-withdraw-walk is readable.",
+   "prompt_fit": "PASS: compiled-native-prompt.zh.txt matches approval prompts.N4.text and the superseded version verbatim; prepare-result compilation, resolved and execution image_bindings each have exactly one first_frame 8efafcfc… with empty media_bindings and no reference to the old 5c4f1789. The flip is user-approved (amendment quote 用翻轉版送出 (Recommended), takes.html shows N4f, preview_artifacts include N4f). The prompt says only 横移跟随 with no direction (see risks).",
+   "lint": "PASS except this report: lint.py N4 exit 2, failed=[continuity_report_ready] only; the other 10 checks (exact_image_order, audio_binding, every_input_in_user_preview, prompt_language_policy, prompt_is_user_approved_text, directed_behaviour_in_text, no_platform_label_removal, bound_output, operator_ceiling_matches_preview, cumulative_budget_left) are true; request_hash c64f8134…; spent_submits 3 of 4, ceiling 660. Re-run lint after continuity-report.json is updated.",
+   "risks": [
+    "R5: the prompt does not state the truck direction (spec truck_left); the per-shot gate must confirm the camera follows to the left, not reversed or static.",
+    "R4: side-view full-body walk with a truck may slide or fall out of sync with the camera.",
+    "R8: lips visible in profile and native_audio=true; check that the mouth does not move.",
+    "Identity during the shot: if she turns, the right ear must have no earpiece and the red line must not spread around the collar or move to the right collar.",
+    "Provenance: gen/N4/preview-approval.json user_quote is still 4 支都生成; the flip approval quote is only in the trial amendments; main session to confirm the chain is sufficient.",
+    "gen/N4/evidence/authoring-input holds orphaned evidence from the 07:23/07:25 builds, not referenced by the current request; keep it, do not delete.",
+    "Compositing: S7 carries subtitles and face-box overlays that need re-layout when N4 is inserted."
+   ],
+   "rechecked_at": "2026-11-03T12:49:50.345235+00:00",
+   "first_frame": "keyframes/raw/N4f-a.png"
+  },
+  "N4_superseded_unflipped": {
+   "verdict": "not_ready",
+   "continuity": "FAIL：N4-a 中她面向畫右，鏡頭看到的是她右側；裁切放大（N4-a 約 x880–1180、y200–400）看到耳挂在右耳，近側（右）領口有紅燈線。這與身份設定「左耳黑色耳挂、左领极细红灯线」相反，也和 CF-ID3（右側朝鏡頭時右耳空、紅線只在遠側露一點）、K7（耳挂和紅線都在她左側）、c11 S7 實際畫面（14.9、16.5、18.7 s）不一致。空間（漂浮發光薄片、黑底、冷白地面光斑）、大衣、髮髻則與 K7 和 S7 一致。",
+   "handoff": "PASS：插入 S7 的玻璃面板空間（14.8–18.87 s，與 I4、I5 同類插入），同一空間、同樣光線，從近景切遠景的理由清楚；她收回手繼續走的結尾是乾淨的出點。",
+   "axis_action_camera": "PASS：她向畫右走，鏡頭向右橫移跟拍（設定 truck_right），動作是走、抬起遠側的左手、指尖碰到薄片、薄片發光漂開、收回手、繼續走，看得懂；S7 是正面近景，沒有方向衝突。prompt 沒寫橫移方向，見 R5。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 24ad6494…）；寫了「嘴唇自然闭合」「神情平静」，沒有唱歌字句；設定的字句都在 prompt 裡。側臉露出嘴唇，見 R8。",
+   "lint": "PASS（只差本報告）：lint.py N4 只有 continuity_report_ready 未過；request_hash 6b74489b…"
+  }
+ },
+ "notes": "1) N4 FAIL 的原因在已認可的首幀本身；使用者認可預覽不代替連續性核對。修法建議交主會話或參考負責角色：重做 N4-a，讓耳挂和紅線在被遮住的左側，或水平翻轉後改成向左橫移；兩者都要使用者重新認可預覽（新的 preview_approval），並重新準備 gen/N4；修好前不要產出 N4 的 permit 或提交。2) N1、N2、N3 的 ready 只表示提交前的連續性檢查通過；每支 MP4 落地後仍要用 video-analysis 做逐鏡審查（R1–R10），拼接後仍要做 verify-assembly，才算接點驗證過。3) native_audio=true 與預覽描述的「沒有音訊」：如果本意是成片本身不帶音訊，主會話要在提交前確認；本報告依「沒有音訊參考」判讀。4) 本報告只讀檔案，沒有修改；lint 寫了 gen/N1..N4/pre-submit-lint.json，屬允許範圍；看圖用的裁切和抽幀在 /tmp/cs_crops、/tmp/cs_c11。"
+}

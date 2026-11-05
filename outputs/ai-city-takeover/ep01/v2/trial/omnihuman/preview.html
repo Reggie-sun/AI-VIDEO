@@ -1,0 +1,25 @@
+<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><title>副歌近景「真的在唱」試驗預覽（OmniHuman）</title>
+<style>body{background:#0a0c10;color:#dfe3ea;font:15px/1.7 system-ui,"Noto Sans CJK TC",sans-serif;margin:0;padding:28px 40px 60px;max-width:1300px}
+h1{font-size:22px} h2{font-size:18px;margin-top:28px} .box{background:#11141b;border:1px solid #1f2430;border-radius:6px;padding:10px 18px}
+img{width:100%;max-width:1100px;border:1px solid #1f2430} code{color:#9fd3a8} .dim{color:#8b93a3;font-size:13px} td,th{border-bottom:1px solid #1f2430;padding:6px 10px;text-align:left;vertical-align:top}</style>
+<h1>副歌近景「真的在唱」：即夢數字人（OmniHuman 1.5）最小試驗預覽</h1>
+<div class="dim">你的方向：「我们只需要让人物真的表现在唱歌就好」。這頁是送出前的預覽；你認可之前什麼都不會送出。</div>
+<h2>1. 唱歌的人（不做任何修改）</h2>
+<img src="../../keyframes/raw/K7-a.png" alt="K7"><div class="dim"><code>keyframes/raw/K7-a.png</code> · 1672×941 · SHA 881537a1b4d4…（和 c5/c6 副歌近景同一張）</div>
+<h2>2. 她要唱的歌聲（純人聲，上傳原檔，不用 TTS）</h2>
+<audio controls src="../lipsync-ev/window-17.97-22.97.wav"></audio>
+<div class="dim">歌曲 17.97–22.97 s，5.0 秒：「I didn't run / I just looked outside」· SHA 851ce8a54b3b…</div>
+<h2>3. 兩次生成（大師模式、1080P、單一主體）</h2>
+<table><tr><th>Take</th><th>動作描述</th><th>為什麼</th></tr>
+<tr><td>A</td><td>不寫</td><td>對照組，看模型自己怎麼唱</td></tr>
+<tr><td>B</td><td>镜头固定特写。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，乐句之间轻轻换气，肩膀随呼吸微微起伏，头随乐句轻轻点动，眉头舒展，眼神始终看着镜头。</td><td>純中文、只寫正向動作；「冷靜但活著」是你在 v3 選的演唱方向</td></tr></table>
+<h2>4. 費用與規則</h2>
+<div class="box"><ul><li>2 次、不重做；官方沒公開數字人每秒價格，用 Seedance 2.0 VIP 1080p 的約 33 積分/秒估上限：約 <b>330 積分</b>（目前餘額約 64,791）。</li>
+<li>送出前記下網頁顯示的價格和餘額，送出後再記一次；結果不明就停，不重送。</li>
+<li>放進片子：歌聲從片內 0 秒開始，對齊歌曲 17.97 s；副歌近景取片內 0.90–4.60 s（片子 18.87–22.57 s）。</li></ul></div>
+<h2>5. 算成功／放棄</h2>
+<div class="box"><b>成功</b>：兩個樂句都看得出在唱（嘴有開合）；「I just」前看得到換氣；不皺眉、不凍臉、不過度表演；臉和 K7 一致、背景穩定。先跑逐鏡檢查，再由你配歌看。<br>
+<b>放棄</b>：K7 被數字人入口擋下就停（不修圖繞過）；A、B 都皺眉、表情弱、凍臉，或嘴型誇張、牙齒崩、臉變了，就放棄這條路，不追加第 3 次。</div>
+<h2>6. 誰來操作</h2>
+<div class="box">我們的即夢自動化程式目前只會開 Seedance 節點。數字人要嘛你在即夢網頁上手動做（最快：上傳這張圖和這段音頻、選大師模式、B 再貼上動作描述，下載兩支 MP4 放進 <code>trial/omnihuman/</code>），要嘛我先寫新的自動化程式（較慢，但價格、餘額、一次性許可都由程式記錄）。</div>
+<div class="dim">調研全文：<code>trial/omnihuman/research-2026-11-02.md</code> · 輸入清單：<code>trial/omnihuman/preview-inputs.json</code></div></html>

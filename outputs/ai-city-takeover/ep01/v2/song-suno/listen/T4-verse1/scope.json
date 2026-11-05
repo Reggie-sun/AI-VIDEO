@@ -1,0 +1,24 @@
+{
+  "schema": "iris-listening-scope/1",
+  "authorization_reference": "user-20261104-t4-voice-to-character",
+  "user_quote": "脸还要微调,感觉太善良,乖乖女,和音色也不像,衣服更不像了",
+  "source": {
+    "path": "outputs/ai-city-takeover/ep01/v2/song-v3/stems/htdemucs_ft/IRIS-01-T4/vocals.wav",
+    "sha256": "10d8d5cf58013db7633aab60d85814dbc5ccf5e339ebb50d809a1b9cde0f85eb"
+  },
+  "window": {
+    "path": "outputs/ai-city-takeover/ep01/v2/song-suno/listen/windows/T4-verse1-27-28.wav",
+    "sha256": "7ba400e2c109a49ac0c8aaa33aa94d7c186aa3578b166085362f518386b1dbbb",
+    "start_s": 27.0,
+    "duration_s": 28.0,
+    "derivation": "ffmpeg -ss 27.0 -t 28.0 -ac 1 -ar 24000 pcm_s16le from the source WAV"
+  },
+  "purpose": "Blind observation of the selected song T4 voice and delivery, to match the lead character look to the voice (user: face and clothes do not match the voice)",
+  "submit_limit": 1,
+  "operator_upper_bound_USD": 0.05,
+  "upper_bound_is_price_or_settlement": false,
+  "key_route": "Existing injected dotenv-first exact supplier; no values exposed",
+  "UNKNOWN": "STOP and inspect existing outcome, no replay or remint",
+  "actual_cost": "Pending settlement",
+  "host_direct_audio_hearing": "UNAVAILABLE; Gemini model observations will be attributed"
+}

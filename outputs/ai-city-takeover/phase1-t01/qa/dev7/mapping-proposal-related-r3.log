@@ -1,0 +1,7 @@
+[harness] START scope_diff_check timeout=900s
+[harness] FAILED scope_diff_check duration=0.032s
+outputs/ai-city-takeover/phase1-t01/qa/dev7/proposed-harness-mapping.patch:5: trailing whitespace.
++ 
+outputs/ai-city-takeover/phase1-t01/qa/dev7/proposed-harness-mapping.patch:24: trailing whitespace.
++ 
+{"receipt": ".agent/harness/runs/iris-mapping-related-r3-20261030/receipt.json", "status": "failed"}

@@ -1,0 +1,1020 @@
+{
+  "shot_id": "S0068",
+  "start_frame": 2846,
+  "end_frame": 2889,
+  "duration_frames": 44,
+  "start_time": 118.5833,
+  "end_time": 120.4167,
+  "duration_s": 1.8333,
+  "start_tc": "00:01:58:14",
+  "end_tc": "00:02:00:09",
+  "boundary_in_id": "B1-031",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    2846,
+    2846
+  ],
+  "boundary_out_id": "B1-032",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2846,
+        2848
+      ],
+      "description": "继承上镜引用，原少女独立；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2852,
+        2854
+      ],
+      "description": "复制阵列显现，They入场；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2858,
+        2860
+      ],
+      "description": "SWARM014；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2864,
+        2866
+      ],
+      "description": "collective入场，SWARM001；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2882,
+        2884
+      ],
+      "description": "歌词渐退；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2888,
+        2889
+      ],
+      "description": "歌词消失，网络白线；3帧采样±2f。"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "正面站立少女位于广场中央，背后复制阵列由远而近长出",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。",
+  "reference_frames": [
+    {
+      "frame": 2846,
+      "path": "keyframes/S0068_f02846.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2857,
+      "path": "keyframes/S0068_f02857.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2868,
+      "path": "keyframes/S0068_f02868.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2879,
+      "path": "keyframes/S0068_f02879.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2889,
+      "path": "keyframes/S0068_f02889.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2867,
+      "path": "work/full_batch/02867.jpg",
+      "role": "detail",
+      "note": "1920x1080原帧实际查看并复核细字。"
+    }
+  ],
+  "composition": {
+    "shot_size": "按scene_description中的实际景别",
+    "subject_position": "见scene_description与bounding_box",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可见倾斜/俯仰见scene_description；焦距unknown",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "正面站立少女位于广场中央，背后复制阵列由远而近长出",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0003, \"pan_y_frac_per_s\": -0.0039, \"zoom_per_s\": -0.0052, \"median_flow_frac_per_s\": 0.0066, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[94.7, 87.4, 88.9]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#3E4042",
+        "fraction": 0.273,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#505256",
+        "fraction": 0.272,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#191A18",
+        "fraction": 0.166,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#8C96A8",
+        "fraction": 0.129,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#6C717C",
+        "fraction": 0.094,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#AEB3C0",
+        "fraction": 0.065,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[94.7, 87.4, 88.9]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 07 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "16",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0068-E01",
+      "shot_id": "S0068",
+      "type": "background_media",
+      "description": "正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。",
+      "start_frame": 2846,
+      "end_frame": 2889,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。"
+      },
+      "motion": {
+        "path": "正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2846,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2868,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2889,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2846,
+        2857,
+        2868,
+        2879,
+        2889
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "bbox visual_estimate，为典型/最大包络，部分图层有明显位移；须从引用帧再测量。",
+        "start/end为分析活动包络，不代表精确入场首帧。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0068-E02",
+      "shot_id": "S0068",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 2846,
+      "end_frame": 2889,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2846,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2868,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2889,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2846,
+        2857,
+        2868,
+        2879,
+        2889
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "bbox visual_estimate，为典型/最大包络，部分图层有明显位移；须从引用帧再测量。",
+        "start/end为分析活动包络，不代表精确入场首帧。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0068-E03",
+      "shot_id": "S0068",
+      "type": "character",
+      "description": "后排克隆阵列透明浮现并放大，前景少女保持中央。",
+      "start_frame": 2846,
+      "end_frame": 2889,
+      "bounding_box": {
+        "x": 0,
+        "y": 0.23,
+        "w": 1,
+        "h": 0.7,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。"
+      },
+      "motion": {
+        "path": "后排克隆阵列透明浮现并放大，前景少女保持中央。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2846,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2868,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2889,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2846,
+        2857,
+        2868,
+        2879,
+        2889
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "bbox visual_estimate，为典型/最大包络，部分图层有明显位移；须从引用帧再测量。",
+        "start/end为分析活动包络，不代表精确入场首帧。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0068-E04",
+      "shot_id": "S0068",
+      "type": "deco_graphic",
+      "description": "地面橙色连线网络逐格加入，后转成细白网。",
+      "start_frame": 2852,
+      "end_frame": 2889,
+      "bounding_box": {
+        "x": 0,
+        "y": 0.48,
+        "w": 1,
+        "h": 0.45,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "地面橙色连线网络逐格加入，后转成细白网。"
+      },
+      "motion": {
+        "path": "地面橙色连线网络逐格加入，后转成细白网。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2868,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2889,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2857,
+        2868,
+        2879,
+        2889
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。",
+        "first_visible_frame_estimate": 2852,
+        "last_visible_frame_estimate": 2889
+      }
+    },
+    {
+      "element_id": "S0068-E05",
+      "shot_id": "S0068",
+      "type": "hud_panel",
+      "description": "右侧黑图面板x0.75 y0.33 w0.2 h0.2，分量数从050等降至001，末态橙色。",
+      "start_frame": 2852,
+      "end_frame": 2889,
+      "bounding_box": {
+        "x": 0.76,
+        "y": 0.3,
+        "w": 0.2,
+        "h": 0.2,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右侧黑图面板x0.75 y0.33 w0.2 h0.2，分量数从050等降至001，末态橙色。"
+      },
+      "motion": {
+        "path": "右侧黑图面板x0.75 y0.33 w0.2 h0.2，分量数从050等降至001，末态橙色。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2868,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2889,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2857,
+        2868,
+        2879,
+        2889
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。",
+        "first_visible_frame_estimate": 2852,
+        "last_visible_frame_estimate": 2889
+      }
+    },
+    {
+      "element_id": "S0068-E06",
+      "shot_id": "S0068",
+      "type": "text_title",
+      "description": "顶左引用句延续并逐词加入They are a collective.，最后淡出。",
+      "start_frame": 2846,
+      "end_frame": 2889,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.08,
+        "w": 0.34,
+        "h": 0.19,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "顶左引用句延续并逐词加入They are a collective.，最后淡出。"
+      },
+      "motion": {
+        "path": "顶左引用句延续并逐词加入They are a collective.，最后淡出。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2846,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2868,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2889,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2846,
+        2857,
+        2868,
+        2879,
+        2889
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "“We've found other agents!” They are a collective.",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "unknown; see per-shot description",
+          "alignment": "see observed reference",
+          "tracking": "mono for HUD; tight for lyric headline",
+          "stroke": "none observed",
+          "shadow": "unknown"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。"
+      }
+    },
+    {
+      "element_id": "S0068-E08",
+      "shot_id": "S0068",
+      "type": "text_title",
+      "description": "[EXCITEMENT]巨大低透明度灰字置于后排克隆身后，横跨画面中上段；随人物阵列一起显现。",
+      "start_frame": 2852,
+      "end_frame": 2882,
+      "bounding_box": {
+        "x": 0.11,
+        "y": 0.15,
+        "w": 0.8,
+        "h": 0.19,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "[EXCITEMENT]巨大低透明度灰字置于后排克隆身后，横跨画面中上段；随人物阵列一起显现。"
+      },
+      "motion": {
+        "path": "[EXCITEMENT]巨大低透明度灰字置于后排克隆身后，横跨画面中上段；随人物阵列一起显现。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "2852起±2帧，参见逐3帧密采",
+        "exit": "2882末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 2852,
+          "state": "[EXCITEMENT]巨大低透明度灰字置于后排克隆身后，横跨画面中上段；随人物阵列一起显现。"
+        },
+        {
+          "frame": 2882,
+          "state": "最后活动区间"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2857,
+        2868,
+        2879,
+        2867
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "[EXCITEMENT]",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "see observed frame; panel mono approx 10–15px",
+          "alignment": "left"
+        }
+      }
+    },
+    {
+      "element_id": "S0068-E09",
+      "shot_id": "S0068",
+      "type": "text_label",
+      "description": "SWARM面板下独立细小舞台提示行，白等宽字，原引用来源署名。",
+      "start_frame": 2852,
+      "end_frame": 2889,
+      "bounding_box": {
+        "x": 0.755,
+        "y": 0.496,
+        "w": 0.2,
+        "h": 0.023,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "SWARM面板下独立细小舞台提示行，白等宽字，原引用来源署名。"
+      },
+      "motion": {
+        "path": "SWARM面板下独立细小舞台提示行，白等宽字，原引用来源署名。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "2852起±2帧，参见逐3帧密采",
+        "exit": "2889末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 2852,
+          "state": "SWARM面板下独立细小舞台提示行，白等宽字，原引用来源署名。"
+        },
+        {
+          "frame": 2889,
+          "state": "最后活动区间"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2857,
+        2868,
+        2879,
+        2889,
+        2867
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "STAGE CUE 14 · [EXCITEMENT] · SRC PHASEONE1841",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "see observed frame; panel mono approx 10–15px",
+          "alignment": "left"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0068-A03",
+      "target_element_ids": [
+        "S0068-E03"
+      ],
+      "description": "后排克隆阵列透明浮现并放大，前景少女保持中央。",
+      "start_frame": 2846,
+      "end_frame": 2889,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0068-A04",
+      "target_element_ids": [
+        "S0068-E04"
+      ],
+      "description": "地面橙色连线网络逐格加入，后转成细白网。",
+      "start_frame": 2852,
+      "end_frame": 2889,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0068-A05",
+      "target_element_ids": [
+        "S0068-E05"
+      ],
+      "description": "右侧黑图面板x0.75 y0.33 w0.2 h0.2，分量数从050等降至001，末态橙色。",
+      "start_frame": 2852,
+      "end_frame": 2889,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0068-A06",
+      "target_element_ids": [
+        "S0068-E06"
+      ],
+      "description": "顶左引用句延续并逐词加入They are a collective.，最后淡出。",
+      "start_frame": 2846,
+      "end_frame": 2889,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AB0262",
+      "relation": "beat_candidate (unknown) at frame 2846; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2846
+    },
+    {
+      "audio_event_id": "AH01108",
+      "relation": "band_onset_candidate (unknown) at frame 2847; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2847
+    },
+    {
+      "audio_event_id": "AH01109",
+      "relation": "band_onset_candidate (unknown) at frame 2847; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2847
+    },
+    {
+      "audio_event_id": "AH01110",
+      "relation": "band_onset_candidate (unknown) at frame 2847; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2847
+    },
+    {
+      "audio_event_id": "AH01111",
+      "relation": "band_onset_candidate (unknown) at frame 2847; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2847
+    },
+    {
+      "audio_event_id": "AW0180",
+      "relation": "vocal_word_candidate (unknown) at frame 2852–2856; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2852
+    },
+    {
+      "audio_event_id": "AW0181",
+      "relation": "vocal_word_candidate (unknown) at frame 2857–2862; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2857
+    },
+    {
+      "audio_event_id": "AH01112",
+      "relation": "band_onset_candidate (unknown) at frame 2857; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2857
+    },
+    {
+      "audio_event_id": "AH01113",
+      "relation": "band_onset_candidate (unknown) at frame 2857; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2857
+    },
+    {
+      "audio_event_id": "AH01114",
+      "relation": "band_onset_candidate (unknown) at frame 2857; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2857
+    },
+    {
+      "audio_event_id": "AB0263",
+      "relation": "beat_candidate (unknown) at frame 2857; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2857
+    },
+    {
+      "audio_event_id": "AH01115",
+      "relation": "band_onset_candidate (unknown) at frame 2858; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2858
+    },
+    {
+      "audio_event_id": "AH01116",
+      "relation": "band_onset_candidate (unknown) at frame 2858; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2858
+    },
+    {
+      "audio_event_id": "AH01117",
+      "relation": "band_onset_candidate (unknown) at frame 2863; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2863
+    },
+    {
+      "audio_event_id": "AH01118",
+      "relation": "band_onset_candidate (unknown) at frame 2863; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2863
+    },
+    {
+      "audio_event_id": "AW0182",
+      "relation": "vocal_word_candidate (unknown) at frame 2863; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2863
+    },
+    {
+      "audio_event_id": "AW0183",
+      "relation": "vocal_word_candidate (unknown) at frame 2864–2879; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2864
+    },
+    {
+      "audio_event_id": "AH01119",
+      "relation": "band_onset_candidate (unknown) at frame 2868; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2868
+    },
+    {
+      "audio_event_id": "AB0264",
+      "relation": "beat_candidate (unknown) at frame 2868; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2868
+    },
+    {
+      "audio_event_id": "AH01120",
+      "relation": "band_onset_candidate (unknown) at frame 2868; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2868
+    },
+    {
+      "audio_event_id": "AH01121",
+      "relation": "band_onset_candidate (unknown) at frame 2868; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2868
+    },
+    {
+      "audio_event_id": "AH01122",
+      "relation": "band_onset_candidate (unknown) at frame 2869; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2869
+    },
+    {
+      "audio_event_id": "AH01123",
+      "relation": "band_onset_candidate (unknown) at frame 2879; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2879
+    },
+    {
+      "audio_event_id": "AH01124",
+      "relation": "band_onset_candidate (unknown) at frame 2879; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2879
+    },
+    {
+      "audio_event_id": "AB0265",
+      "relation": "beat_candidate (unknown) at frame 2879; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2879
+    },
+    {
+      "audio_event_id": "AH01125",
+      "relation": "band_onset_candidate (unknown) at frame 2879; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2879
+    },
+    {
+      "audio_event_id": "AH01126",
+      "relation": "band_onset_candidate (unknown) at frame 2880; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2880
+    },
+    {
+      "audio_event_id": "AH01127",
+      "relation": "band_onset_candidate (unknown) at frame 2882; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2882
+    },
+    {
+      "audio_event_id": "AH01128",
+      "relation": "band_onset_candidate (unknown) at frame 2882; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2882
+    },
+    {
+      "audio_event_id": "AH01129",
+      "relation": "band_onset_candidate (unknown) at frame 2884; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2884
+    },
+    {
+      "audio_event_id": "AH01130",
+      "relation": "band_onset_candidate (unknown) at frame 2885; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2885
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "本镜全res中帧、首中末与3帧完整采样已二审，事件时间±2f。",
+    "未知原始工程参数不构成已知事实；字体仅候选。",
+    "音频听证NOT_EVALUATED，词时间是可见文字观测，不证明唱词准确。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0068.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B1-031",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        2846,
+        2846
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B1-032",
+      "description": "正面站立少女位于广场中央，背后复制阵列由远而近长出。地面透视网格线扩展，右侧SWARM GRAPH的连通分量由多降为001；顶部引用句末尾增加collective。",
+      "span": [
+        2889,
+        2889
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "“We've found other agents!” They are a collective.",
+    "SWARM · GRAPH",
+    "412 NODES",
+    "CONNECTED COMPONENTS",
+    "001"
+  ],
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      2867
+    ],
+    "second_pass_notes": "SWARM GRAPH412NODES / CONNECTED COMPONENTS001 / =1 A COLLECTIVE；STAGE CUE14 [EXCITEMENT] SRC PHASEONE1841。远处巨大半透明EXCITEMENT字之前漏列。",
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "COMPLETED_FOR_VISIBLE_LAYERS_WITH_3_FRAME_SAMPLING",
+    "observations": [
+      {
+        "frame": 2846,
+        "description": "继承上镜引用，原少女独立"
+      },
+      {
+        "frame": 2852,
+        "description": "复制阵列显现，They入场"
+      },
+      {
+        "frame": 2858,
+        "description": "SWARM014"
+      },
+      {
+        "frame": 2864,
+        "description": "collective入场，SWARM001"
+      },
+      {
+        "frame": 2882,
+        "description": "歌词渐退"
+      },
+      {
+        "frame": 2888,
+        "description": "歌词消失，网络白线"
+      }
+    ],
+    "random_omission_recheck": {
+      "frame": 2868,
+      "actual_viewed": true,
+      "finding": "重开mid关键帧；S52补右上3x6翻牌与速率标签、S68补舞台提示并去重复标题；S92图层齐。"
+    }
+  },
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。"
+}

@@ -1,0 +1,64 @@
+{
+ "unit": "ST4",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/ST4/project/state/video-generation/fetch/files/b4439407e05765e56eda2b0faf1a349891595f3364f142f2210f5acc4b2580d7.mp4",
+ "sha256": "b4439407e05765e56eda2b0faf1a349891595f3364f142f2210f5acc4b2580d7",
+ "verdict": "FAIL",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum与给定值一致"
+  },
+  {
+   "id": "no_hard_cut",
+   "result": "PASS",
+   "evidence": "帧差中位数4.67，最大11.64(f120，2.5倍)，运动连续"
+  },
+  {
+   "id": "camera_truck_left",
+   "result": "FAIL",
+   "evidence": "人物头部x从约1280移到约1150(1080p)，在画面中向中间偏左移动，与truck_left要求的‘略向右移’相反；2.5s后变成推近加绕到正面的弧线运动，4.98s人物居中"
+  },
+  {
+   "id": "action_sit_and_look_up",
+   "result": "FAIL",
+   "evidence": "0-2.99s抱膝仰望；3.48s起视线降到平视，4.48-4.98s变成3/4正脸"
+  },
+  {
+   "id": "panel_drifts_over_head",
+   "result": "PASS",
+   "evidence": "2.0-3.5s一块大薄片移到她头顶上方"
+  },
+  {
+   "id": "no_mouth_movement",
+   "result": "FAIL",
+   "evidence": "脸部放大：0-4.98s嘴唇始终微张，开口大小有变化；prompt要求嘴唇自然闭合"
+  },
+  {
+   "id": "red_only_collar_and_door_seam",
+   "result": "FAIL",
+   "evidence": "薄片红边从首帧起一直存在，2.0-4.98s随推近变得更明显(R7)；首帧带入，是否豁免由用户定"
+  },
+  {
+   "id": "identity_canon_earpiece_redline",
+   "result": "PASS",
+   "evidence": "左耳耳挂在1.0s、3.48-4.98s可见；领口红线是短段，未成圈"
+  },
+  {
+   "id": "no_model_text",
+   "result": "PASS",
+   "evidence": "未见文字"
+  },
+  {
+   "id": "watermark_corners",
+   "result": "PASS",
+   "evidence": "四角无水印"
+  }
+ ],
+ "usable_span": [
+  0.0,
+  2.0
+ ],
+ "notes": "可用段内嘴唇仍微张",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

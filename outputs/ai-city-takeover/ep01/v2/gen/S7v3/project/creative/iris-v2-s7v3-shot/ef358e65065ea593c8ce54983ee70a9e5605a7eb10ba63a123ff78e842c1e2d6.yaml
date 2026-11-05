@@ -1,0 +1,65 @@
+artifact_id: iris-v2-s7v3-shot
+character_ids:
+- IRIS
+composition_directives: []
+content_hash: ef358e65065ea593c8ce54983ee70a9e5605a7eb10ba63a123ff78e842c1e2d6
+continuity_constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 开头直视镜头；眼睛跟着滑过的薄片转向画面左侧，嘴角一丝了然的冷淡，再回到镜头；嘴唇闭合，不说话、不唱歌
+- 摄影机完全固定，全程不推近、不移动、不摇镜，保持第一张图的景别与人物位置；薄片上没有可读内容
+- 保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。
+creation_receipt_id: iris-v2-S7v3-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: '真人电影摄影，横幅十六比九，连续六秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性站在几乎全黑的房间里，几块半透明的发光薄片悬浮在她身前和身侧；第二张图只示范她在这一镜要达到的神情与投入程度，不是起始画面，也不改变构图；第三张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第三张图的背景。
+
+  开头她平静地直视镜头；随后一块半透明薄片从她面前向画面左侧缓缓滑过，冷白光斑扫过她的脸，她的眼睛跟着那块薄片转向画面左侧，头随之极轻微地转动，嘴角有一丝难以察觉的、了然的冷淡；薄片滑走后，她的目光慢慢回到镜头，眼神比开头更沉静。嘴唇自然闭合，不说话、不唱歌。薄片上没有任何可读内容。
+
+  摄影机完全固定在三脚架上，全程不推近、不拉远、不移动、不摇镜，保持第一张图的景别与人物位置。蓝黑与钢蓝冷色，红色只在一块薄片的边缘和她左领口的细灯线。
+
+  保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。只有极轻的环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨。'
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-c-v3-s7-1-cache-room
+  - iris-c-v3-s7-2-performance
+  - iris-cf-details
+  role: reference
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: cache-room
+schema_version: '2.0'
+shot_id: ep01v2-s7
+source_provenance:
+- content_hash: 27c0b1f4226944ad5354d84e54230a68380eff54c9de7d3484c1d0083007799d
+  kind: user_input
+  reference: evidence/authoring-input/27c0b1f4226944ad5354d84e54230a68380eff54c9de7d3484c1d0083007799d.json
+- content_hash: 1fa0609beeb57e71206d697b6bdbf0d989d4e19fbd4f5df39d842ddb3b7d4fb0
+  kind: user_input
+  reference: evidence/authoring-input/1fa0609beeb57e71206d697b6bdbf0d989d4e19fbd4f5df39d842ddb3b7d4fb0.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 46b256fea8124675d213d0e8f4cee416fb039a52375943cf0864ce4e4f62f625
+  kind: user_input
+  reference: evidence/authoring-input/46b256fea8124675d213d0e8f4cee416fb039a52375943cf0864ce4e4f62f625.json
+storyboard_beat_id: offline
+visual_strategy: generated_video

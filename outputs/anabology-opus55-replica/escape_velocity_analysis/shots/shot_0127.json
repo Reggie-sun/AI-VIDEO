@@ -1,0 +1,1181 @@
+{
+  "shot_id": "S0127",
+  "start_frame": 5663,
+  "end_frame": 5707,
+  "start_time": 235.9583,
+  "end_time": 237.8333,
+  "duration_frames": 45,
+  "duration_s": 1.875,
+  "start_tc": "00:03:55:23",
+  "end_tc": "00:03:57:19",
+  "boundary_in_id": "B3-032",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5663,
+      "path": "keyframes/S0127_f05663.jpg",
+      "role": "first",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5674,
+      "path": "keyframes/S0127_f05674.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5685,
+      "path": "keyframes/S0127_f05685.jpg",
+      "role": "middle",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5696,
+      "path": "keyframes/S0127_f05696.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5707,
+      "path": "keyframes/S0127_f05707.jpg",
+      "role": "last",
+      "note": "Actually opened individually in detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Chain-link fence in empty industrial white field",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Chain-link fence in empty industrial white field. Horizontal black chain-link fence centered, left paper notice and faint block diagrams behind; no performer. STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Chain-link fence in empty industrial white field",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Chain-link fence in empty industrial white field",
+      "background": "Horizontal black chain-link fence centered, left paper notice and faint block diagrams behind; no performer."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0127.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0102,
+      "pan_y_frac_per_s": -0.0051,
+      "zoom_per_s": 0.0143,
+      "median_flow_frac_per_s": 0.0374,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Horizontal black chain-link fence centered, left paper notice and faint block diagrams behind; no performer.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#DDDDE0",
+        "fraction": 0.368,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#ECECED",
+        "fraction": 0.313,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#C0C1C3",
+        "fraction": 0.102,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#0D0C10",
+        "fraction": 0.096,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#83838A",
+        "fraction": 0.067,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#4C4B54",
+        "fraction": 0.054,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [61.5, 204.9, 204.0]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 02 /11",
+      "evidence_frame": 5685,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5685
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5685,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:55:23",
+      "end_value": "00:03:57:19"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5685
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0127-E01",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Horizontal black chain-link fence centered, left paper notice and faint block diagrams behind; no performer.",
+      "start_frame": 5663,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5663–5665; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5663,
+          "state": "visible"
+        },
+        {
+          "frame": 5707,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5685,
+        5707
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5663,
+          5665
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E02",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "STARGATE: / FORCE / MAJEURE. / IT’S",
+      "start_frame": 5664,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.12,
+        "w": 0.62,
+        "h": 0.15,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5664–5666; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5664,
+          "text": "STARGATE:",
+          "entrance": "one-frame inversion then normal"
+        },
+        {
+          "frame": 5685,
+          "text": "FORCE",
+          "entrance": "one-frame inversion then normal"
+        },
+        {
+          "frame": 5692,
+          "text": "MAJEURE.",
+          "entrance": "one-frame inversion then normal"
+        },
+        {
+          "frame": 5703,
+          "text": "IT’S",
+          "entrance": "one-frame inversion then normal"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5664,
+        5707
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "STARGATE: / FORCE / MAJEURE. / IT’S",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5664,
+          5666
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E03",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "tag_card",
+      "description": "NOTICE OF FORCE MAJEURE",
+      "start_frame": 5664,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.27,
+        "y": 0.48,
+        "w": 0.17,
+        "h": 0.21,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5664–5666; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5664,
+          "state": "visible"
+        },
+        {
+          "frame": 5707,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5685,
+        5707
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "NOTICE OF FORCE MAJEURE\nPROJECT JUPITER ·2.45GW\nSITE: NEW MEXICO\nISSUED SEP24",
+        "typography": {
+          "description": "Condensed bold multiline notice heading approximately24px; mono microtype beneath; black on cream paper",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5664,
+          5666
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E04",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "2.45 GW · 0 BUILT",
+      "start_frame": 5675,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.5,
+        "y": 0.41,
+        "w": 0.24,
+        "h": 0.08,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5675–5677; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5675,
+          "state": "visible"
+        },
+        {
+          "frame": 5707,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5685,
+        5707
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "2.45 GW · 0 BUILT",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5675,
+          5677
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E05",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "deco_graphic",
+      "description": "Thin rectangular block diagrams behind fence",
+      "start_frame": 5667,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.2,
+        "y": 0.48,
+        "w": 0.77,
+        "h": 0.2,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5667–5669; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5667,
+          "progress": 0.05
+        },
+        {
+          "frame": 5675,
+          "progress": 0.45
+        },
+        {
+          "frame": 5683,
+          "progress": 1
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5685,
+        5707
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5667,
+          5669
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E06",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "STARGATE · PROJECT JUPITER / PLANNED2.45GW / BUILT0% / NOTICE FORCE MAJEURE / CAUSE PIPELINE SLIP",
+      "start_frame": 5664,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.77,
+        "y": 0.21,
+        "w": 0.19,
+        "h": 0.09,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5664–5666; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5664,
+          "state": "visible"
+        },
+        {
+          "frame": 5707,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5707
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "STARGATE · PROJECT JUPITER / PLANNED2.45GW / BUILT0% / NOTICE FORCE MAJEURE / CAUSE PIPELINE SLIP",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5664,
+          5666
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E07",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "GAP → FEB1,2027 / GAS PIPELINE STOPS SHORT",
+      "start_frame": 5679,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.37,
+        "y": 0.8,
+        "w": 0.32,
+        "h": 0.1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5679–5681; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5679,
+          "text": "GAP → FEB1,2027"
+        },
+        {
+          "frame": 5683,
+          "text": "GAS PIPELINE STOPS SHORT"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5707
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "GAP → FEB1,2027 / GAS PIPELINE STOPS SHORT",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5679,
+          5681
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E08",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "text_caption",
+      "description": "Sora’s gone dark. Stargate: force majeure.",
+      "start_frame": 5663,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.035,
+        "y": 0.85,
+        "w": 0.42,
+        "h": 0.095,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5663–5665; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5663,
+          "state": "visible"
+        },
+        {
+          "frame": 5707,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5707
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Sora’s gone dark. Stargate: force majeure.",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5663,
+          5665
+        ],
+        "exit_bounds": [
+          5705,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E09",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "mask",
+      "description": "Incoming dithered black sweep retains prior DARK lettering until fence clears",
+      "start_frame": 5663,
+      "end_frame": 5666,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 0.55,
+        "h": 0.8,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5663–5665; inherited state when at shot start.",
+        "exit": "Last visibility f5664–5666; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5663,
+          "state": "dark residual at left"
+        },
+        {
+          "frame": 5666,
+          "state": "fence clean"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5663,
+        5666
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5663,
+          5665
+        ],
+        "exit_bounds": [
+          5664,
+          5666
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0127-E10",
+      "shot_id": "S0127",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Small HALL B label anchored above planned wireframe block",
+      "start_frame": 5682,
+      "end_frame": 5707,
+      "bounding_box": {
+        "x": 0.575,
+        "y": 0.532,
+        "w": 0.12,
+        "h": 0.025,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5675–5677; inherited state when at shot start.",
+        "exit": "Last visibility f5705–5707; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5682,
+          "state": "small label enters above block"
+        },
+        {
+          "frame": 5685,
+          "text": "HALL B · PLANNED · 0%"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5685
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "HALL B · PLANNED · 0%",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5681,
+          5683
+        ],
+        "exit_bounds": [
+          5707,
+          5707
+        ],
+        "confidence": 0.74,
+        "method": "hallentry127 every2f crop; fullres hall127.png read"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0127-A01",
+      "target_element_ids": [
+        "S0127-E02",
+        "S0127-E03",
+        "S0127-E04",
+        "S0127-E05"
+      ],
+      "description": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+      "start_frame": 5663,
+      "end_frame": 5707,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0239",
+        "D0240",
+        "D0241"
+      ],
+      "frame_range": [
+        5684,
+        5703
+      ],
+      "type": "text_swap",
+      "description": "STARGATE -> FORCE -> MAJEURE -> IT'S captions over fence shot.",
+      "confidence": 0.85,
+      "chunk": 3,
+      "verification": "Consistent at filmstrip resolution; candidate span from Phase A, not independently frame-exact verified"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "other",
+      "boundary_id": "B3-032",
+      "span": [
+        5660,
+        5665
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-033",
+      "span": [
+        5707,
+        5707
+      ],
+      "description": "STARGATE f5665, FORCE f5686, MAJEURE f5692, IT’S f5703; background exposure lifts from transition",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0365",
+      "relation": "vocal_word_candidate (unknown) at frame 5662–5678; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5663
+    },
+    {
+      "audio_event_id": "AH02389",
+      "relation": "band_onset_candidate (unknown) at frame 5665; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5665
+    },
+    {
+      "audio_event_id": "AH02390",
+      "relation": "band_onset_candidate (unknown) at frame 5665; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5665
+    },
+    {
+      "audio_event_id": "AB0523",
+      "relation": "beat_candidate (unknown) at frame 5665; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5665
+    },
+    {
+      "audio_event_id": "AH02391",
+      "relation": "band_onset_candidate (unknown) at frame 5665; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5665
+    },
+    {
+      "audio_event_id": "AH02392",
+      "relation": "band_onset_candidate (unknown) at frame 5665; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5665
+    },
+    {
+      "audio_event_id": "AH02393",
+      "relation": "band_onset_candidate (unknown) at frame 5666; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5666
+    },
+    {
+      "audio_event_id": "AH02394",
+      "relation": "band_onset_candidate (unknown) at frame 5670; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5670
+    },
+    {
+      "audio_event_id": "AH02395",
+      "relation": "band_onset_candidate (unknown) at frame 5676; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5676
+    },
+    {
+      "audio_event_id": "AH02396",
+      "relation": "band_onset_candidate (unknown) at frame 5676; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5676
+    },
+    {
+      "audio_event_id": "AH02397",
+      "relation": "band_onset_candidate (unknown) at frame 5676; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5676
+    },
+    {
+      "audio_event_id": "AH02398",
+      "relation": "band_onset_candidate (unknown) at frame 5676; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5676
+    },
+    {
+      "audio_event_id": "AB0524",
+      "relation": "beat_candidate (unknown) at frame 5676; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5676
+    },
+    {
+      "audio_event_id": "AW0366",
+      "relation": "vocal_word_candidate (unknown) at frame 5685–5692; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5685
+    },
+    {
+      "audio_event_id": "AB0525",
+      "relation": "beat_candidate (unknown) at frame 5686; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5686
+    },
+    {
+      "audio_event_id": "AH02399",
+      "relation": "band_onset_candidate (unknown) at frame 5686; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5686
+    },
+    {
+      "audio_event_id": "AH02400",
+      "relation": "band_onset_candidate (unknown) at frame 5686; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5686
+    },
+    {
+      "audio_event_id": "AH02401",
+      "relation": "band_onset_candidate (unknown) at frame 5687; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5687
+    },
+    {
+      "audio_event_id": "AH02402",
+      "relation": "band_onset_candidate (unknown) at frame 5687; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5687
+    },
+    {
+      "audio_event_id": "AW0367",
+      "relation": "vocal_word_candidate (unknown) at frame 5692–5703; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5692
+    },
+    {
+      "audio_event_id": "AH02403",
+      "relation": "band_onset_candidate (unknown) at frame 5697; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5697
+    },
+    {
+      "audio_event_id": "AH02404",
+      "relation": "band_onset_candidate (unknown) at frame 5697; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5697
+    },
+    {
+      "audio_event_id": "AH02405",
+      "relation": "band_onset_candidate (unknown) at frame 5697; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5697
+    },
+    {
+      "audio_event_id": "AH02406",
+      "relation": "band_onset_candidate (unknown) at frame 5697; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5697
+    },
+    {
+      "audio_event_id": "AB0526",
+      "relation": "beat_candidate (unknown) at frame 5697; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5697
+    },
+    {
+      "audio_event_id": "AW0368",
+      "relation": "vocal_word_candidate (unknown) at frame 5704–5716; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5704
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0127.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original font, shader, lens, exact easing and authored layer decomposition remain unknown.",
+    "Spatial bounds and type sizes are visual estimates from source pixels."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0127.jpg",
+      "keyframes/S0127_f05663.jpg",
+      "keyframes/S0127_f05674.jpg",
+      "keyframes/S0127_f05685.jpg",
+      "keyframes/S0127_f05696.jpg",
+      "keyframes/S0127_f05707.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "filmstrip_opened": true,
+    "frames_actually_opened": [
+      5663,
+      5674,
+      5685,
+      5696,
+      5707
+    ],
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "dense_sheets": [
+      "work/full_codex_103_153/force127.jpg",
+      "work/full_codex_103_153/notice127.jpg",
+      "work/full_codex_103_153/top127.jpg",
+      "work/full_codex_103_153/hallentry127.jpg"
+    ],
+    "detail_crops": [
+      "work/full_codex_103_153/detail5685_full_batch.png",
+      "work/full_codex_103_153/hall127.png"
+    ],
+    "fullres_frames_actually_opened": [
+      5685
+    ],
+    "method": "All five individual keyframes, full-resolution detail, dense 1–4-frame event review, then second visual inventory and visibility review.",
+    "final_random_spot_check": {
+      "seed": 41,
+      "frame": 5685,
+      "result": "Reopened after all owned shots finished; independent-element inventory checked; S0127 HALL B label added."
+    },
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

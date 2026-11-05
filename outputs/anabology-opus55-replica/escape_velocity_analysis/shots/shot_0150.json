@@ -1,0 +1,966 @@
+{
+  "shot_id": "S0150",
+  "start_frame": 6924,
+  "end_frame": 6965,
+  "start_time": 288.5,
+  "end_time": 290.25,
+  "duration_frames": 42,
+  "duration_s": 1.75,
+  "start_tc": "00:04:48:12",
+  "end_tc": "00:04:50:05",
+  "boundary_in_id": "B4-020",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 6924,
+      "path": "keyframes/S0150_f06924.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6934,
+      "path": "keyframes/S0150_f06934.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6945,
+      "path": "keyframes/S0150_f06945.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6955,
+      "path": "keyframes/S0150_f06955.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6965,
+      "path": "keyframes/S0150_f06965.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6944,
+      "path": "work/full_batch/06944.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 reference"
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Tilted portrait with tag at mouth, San Francisco map drawing and chest barcode label",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Tilted portrait with tag at mouth, San Francisco map drawing and chest barcode label. Map6928-6935; Made/in/San/Francisco type; star6941. 独立图层、时序与屏幕坐标已根据实际参考帧复核；隐藏原参数保留unknown。",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Tilted portrait with tag at mouth, San Francisco map drawing and chest barcode label",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Tilted portrait with tag at mouth, San Francisco map drawing and chest barcode label",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "Map6928-6935; Made/in/San/Francisco type; star6941",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0150.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0007,
+      "pan_y_frac_per_s": 0.0027,
+      "zoom_per_s": -0.0013,
+      "median_flow_frac_per_s": 0.0047,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E8E7E3",
+        "fraction": 0.375,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#CDC8C7",
+        "fraction": 0.202,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#0A0906",
+        "fraction": 0.131,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#AF8E81",
+        "fraction": 0.127,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#8B5B44",
+        "fraction": 0.089,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#513523",
+        "fraction": 0.077,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[164.0, 160.6, 160.8]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "Small upper-left chrome present in filmstrip; exact look digits require full-resolution review"
+    },
+    "G-TITLE-TAG": {
+      "state": "Upper-right small collection chrome visible except final black"
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Zero-month / final no-underclass state after countdown; exact per-frame widget content unresolved"
+    },
+    "G-TICKER": {
+      "state": "Bottom ticker visible; microtext not transcribed from thumbnail"
+    },
+    "G-TIMECODE": {
+      "state": "Bottom-right timecode; exact per-frame expected time from supplied timeline"
+    },
+    "G-HALFTONE": {
+      "state": "Colored print dots visible; finale coarse-dot modulation especially S0151-S0152"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0150-E01",
+      "shot_id": "S0150",
+      "type": "background_media",
+      "description": "Tilted portrait with tag at mouth, San Francisco map drawing and chest barcode label. Map6928-6935; Made/in/San/Francisco type; star6941.",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Tilted portrait with tag at mouth, San Francisco map drawing and chest barcode label. Map6928-6935; Made/in/San/Francisco type; star6941."
+      },
+      "motion": {
+        "path": "Tilted portrait with tag at mouth, San Francisco map drawing and chest barcode label. Map6928-6935; Made/in/San/Francisco type; star6941.",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0150-E02",
+      "shot_id": "S0150",
+      "type": "character",
+      "description": "Same tilted close portrait but new hand pose lifts tag beside mouth, black hair and orange strand crisp under coarse dots",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.328125,
+        "y": 0.0,
+        "w": 0.671875,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Same tilted close portrait but new hand pose lifts tag beside mouth, black hair and orange strand crisp under coarse dots"
+      },
+      "motion": {
+        "path": "Same tilted close portrait but new hand pose lifts tag beside mouth, black hair and orange strand crisp under coarse dots",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0150-E03",
+      "shot_id": "S0150",
+      "type": "prop",
+      "description": "White rectangular tag with small L-like mark and dot, held horizontally to lens",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.5,
+        "y": 0.5,
+        "w": 0.15104166666666666,
+        "h": 0.17592592592592593,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 6,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "White rectangular tag with small L-like mark and dot, held horizontally to lens"
+      },
+      "motion": {
+        "path": "White rectangular tag with small L-like mark and dot, held horizontally to lens",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0150-E04",
+      "shot_id": "S0150",
+      "type": "hud_panel",
+      "description": "FIG13 San Francisco map paper inherited blank grid from prior shot",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.1111111111111111,
+        "w": 0.2604166666666667,
+        "h": 0.5,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "FIG13 San Francisco map paper inherited blank grid from prior shot"
+      },
+      "motion": {
+        "path": "FIG13 San Francisco map paper inherited blank grid from prior shot",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "FIG. 13 · ORIGIN OF THE COLLECTION / SF",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0150-E05",
+      "shot_id": "S0150",
+      "type": "hud_chart",
+      "description": "City outline draws, then landmark circles, leader labels and orange MADEHERE star",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.059895833333333336,
+        "y": 0.1712962962962963,
+        "w": 0.22395833333333334,
+        "h": 0.4027777777777778,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 31,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "City outline draws, then landmark circles, leader labels and orange MADEHERE star"
+      },
+      "motion": {
+        "path": "City outline draws, then landmark circles, leader labels and orange MADEHERE star",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6926,
+          "state": "outline begins"
+        },
+        {
+          "frame": 6932,
+          "state": "outline complete; locations start"
+        },
+        {
+          "frame": 6940,
+          "state": "orange star and MADEHERE"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6926,
+        6932,
+        6940,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "GOLDEN GATE / 20 STRANDED · PRESIDIO / 00 · THE BILLBOARD · MASONIC AVE / LOOK 04 · SHOES OFF · NORTH BEACH / LOOK 05 · FIREWORK · MISSION / US-101 · BILLBOARDS / MADE HERE ✱",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0150-E06",
+      "shot_id": "S0150",
+      "type": "text_lyric",
+      "description": "Left headline builds Made/in/San thenFrancisco on second line; incoming word orange then black",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.6759259259259259,
+        "w": 0.2604166666666667,
+        "h": 0.1037037037037037,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Left headline builds Made/in/San thenFrancisco on second line; incoming word orange then black"
+      },
+      "motion": {
+        "path": "Left headline builds Made/in/San thenFrancisco on second line; incoming word orange then black",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6924,
+          "text": "Made"
+        },
+        {
+          "frame": 6930,
+          "text": "Made in"
+        },
+        {
+          "frame": 6934,
+          "text": "Made in San"
+        },
+        {
+          "frame": 6940,
+          "text": "Made in San Francisco."
+        },
+        {
+          "frame": 6954,
+          "state": "all words black"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6930,
+        6934,
+        6940,
+        6954,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "Made in San / Francisco.",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 62,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0150-E07",
+      "shot_id": "S0150",
+      "type": "text_label",
+      "description": "Map latitude ticks and typed city-coordinate/footer line",
+      "start_frame": 6944,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.7916666666666666,
+        "w": 0.2604166666666667,
+        "h": 0.041666666666666664,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Map latitude ticks and typed city-coordinate/footer line"
+      },
+      "motion": {
+        "path": "Map latitude ticks and typed city-coordinate/footer line",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6944; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6944,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6944,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "L64 · CARE LABEL / 37.7749° N · 122.4194° W",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0150-E08",
+      "shot_id": "S0150",
+      "type": "tag_card",
+      "description": "Chest ESCAPE VELOCITY tag-back full care/composition table stays from preceding shot",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.7260416666666667,
+        "y": 0.6481481481481481,
+        "w": 0.16145833333333334,
+        "h": 0.24537037037037038,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Chest ESCAPE VELOCITY tag-back full care/composition table stays from preceding shot"
+      },
+      "motion": {
+        "path": "Chest ESCAPE VELOCITY tag-back full care/composition table stays from preceding shot",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "LOOK 00 · TAG BACK / ESCAPE VELOCITY / SHELL 100% OPTIMISM / LINING 100% DOOM / WASH COLD · 30 / IRON DO NOT / NERF DO NOT / MADE IN SAN FRANCISCO / EV-27-0000",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0150-E09",
+      "shot_id": "S0150",
+      "type": "hud_bracket",
+      "description": "Head/tag face-to-lens corner brackets",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "bounding_box": {
+        "x": 0.5260416666666666,
+        "y": 0.24074074074074073,
+        "w": 0.2864583333333333,
+        "h": 0.4074074074074074,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Head/tag face-to-lens corner brackets"
+      },
+      "motion": {
+        "path": "Head/tag face-to-lens corner brackets",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6924; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6965"
+      },
+      "keyframes": [
+        {
+          "frame": 6924,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6965,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6924,
+        6965
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "FACE · TO LENS 0.97",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0150-A05",
+      "target_element_ids": [
+        "S0150-E05"
+      ],
+      "description": "City outline draws, then landmark circles, leader labels and orange MADEHERE star",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0150-A06",
+      "target_element_ids": [
+        "S0150-E06"
+      ],
+      "description": "Left headline builds Made/in/San thenFrancisco on second line; incoming word orange then black",
+      "start_frame": 6924,
+      "end_frame": 6965,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0303"
+      ],
+      "frame_range": [
+        6933,
+        6934
+      ],
+      "type": "text_swap",
+      "description": "'Made in San' / 'Francisco.' caption fade; same shot.",
+      "confidence": 0.7,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B4-020",
+      "span": [
+        6924,
+        6924
+      ],
+      "description": "Map6928-6935; Made/in/San/Francisco type; star6941",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B4-021",
+      "span": [
+        6965,
+        6965
+      ],
+      "description": "Map6928-6935; Made/in/San/Francisco type; star6941",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0444",
+      "relation": "vocal_word_candidate (unknown) at frame 6924–6930; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6924
+    },
+    {
+      "audio_event_id": "AB0640",
+      "relation": "beat_candidate (unknown) at frame 6924; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6924
+    },
+    {
+      "audio_event_id": "AH02871",
+      "relation": "band_onset_candidate (unknown) at frame 6925; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6925
+    },
+    {
+      "audio_event_id": "AW0445",
+      "relation": "vocal_word_candidate (unknown) at frame 6930–6931; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6930
+    },
+    {
+      "audio_event_id": "AW0446",
+      "relation": "vocal_word_candidate (unknown) at frame 6934–6938; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6934
+    },
+    {
+      "audio_event_id": "AW0447",
+      "relation": "vocal_word_candidate (unknown) at frame 6935–6948; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6935
+    },
+    {
+      "audio_event_id": "AB0641",
+      "relation": "beat_candidate (unknown) at frame 6935; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6935
+    },
+    {
+      "audio_event_id": "AH02872",
+      "relation": "band_onset_candidate (unknown) at frame 6939; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6939
+    },
+    {
+      "audio_event_id": "AB0642",
+      "relation": "beat_candidate (unknown) at frame 6945; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6945
+    },
+    {
+      "audio_event_id": "AB0643",
+      "relation": "beat_candidate (unknown) at frame 6956; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6956
+    },
+    {
+      "audio_event_id": "AH02873",
+      "relation": "band_onset_candidate (unknown) at frame 6956; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6956
+    },
+    {
+      "audio_event_id": "AH02874",
+      "relation": "band_onset_candidate (unknown) at frame 6956; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6956
+    },
+    {
+      "audio_event_id": "AH02875",
+      "relation": "band_onset_candidate (unknown) at frame 6956; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6956
+    },
+    {
+      "audio_event_id": "AH02876",
+      "relation": "band_onset_candidate (unknown) at frame 6956; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6956
+    },
+    {
+      "audio_event_id": "AH02877",
+      "relation": "band_onset_candidate (unknown) at frame 6956; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6956
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0150.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Unknown font files, physical plate/overlay decomposition, original curve, alpha and random flip seed",
+    "Measured visual boxes +/-0.02 normalized; event start bounds +/-3f; precise audio alignment still requires listening",
+    "Author eight-point star statement does not override observed nine-point ending; uncounted clips remain unknown"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0150.jpg",
+      "keyframes/S0150_f06924.jpg",
+      "keyframes/S0150_f06934.jpg",
+      "keyframes/S0150_f06945.jpg",
+      "keyframes/S0150_f06955.jpg",
+      "keyframes/S0150_f06965.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "reviewer": "root",
+    "method": "whole filmstrip, native1920 midpoint and independent1–4f regional/whole-shot second pass",
+    "timing_precision_frames": 3,
+    "reference_sheet": "work/root_review/tail_micro_S0150.jpg",
+    "pending": []
+  },
+  "observed_text_inventory": [
+    "FIG. 13 · ORIGIN OF THE COLLECTION / SF",
+    "GOLDEN GATE / 20 STRANDED · PRESIDIO / 00 · THE BILLBOARD · MASONIC AVE / LOOK 04 · SHOES OFF · NORTH BEACH / LOOK 05 · FIREWORK · MISSION / US-101 · BILLBOARDS / MADE HERE ✱",
+    "Made in San / Francisco.",
+    "L64 · CARE LABEL / 37.7749° N · 122.4194° W",
+    "LOOK 00 · TAG BACK / ESCAPE VELOCITY / SHELL 100% OPTIMISM / LINING 100% DOOM / WASH COLD · 30 / IRON DO NOT / NERF DO NOT / MADE IN SAN FRANCISCO / EV-27-0000",
+    "FACE · TO LENS 0.97"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+ "unit": "SC3",
+ "one_use": true,
+ "issued_at": "2026-11-04T03:37:09.648007+00:00",
+ "expires_at": "2026-11-04T03:57:09.648011+00:00",
+ "fill_observed_sha256": "399c5fc092ca2add514db168cccfee9b723a741339ecc698c11bc80e0954c0bf",
+ "price": 30,
+ "approval_sha256": "002cd8e9f849196683ed6384f68cc9572c7066a29bdeb124f8e49e401b8af564",
+ "user_quote": "先做出来我看"
+}

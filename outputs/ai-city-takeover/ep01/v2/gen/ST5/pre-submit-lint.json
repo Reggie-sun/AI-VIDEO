@@ -1,0 +1,33 @@
+{
+ "unit": "ST5",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": false
+ },
+ "pass": false,
+ "request_hash": "f9aade1bf061d7a8cdf2568867e9d30407ceadcd6be440786529787558bf31f5",
+ "compiled_prompt_sha256": "b72f389e85d6fe066a67fc1c3a933fb955fffe6b266a6b216f618b2aeedfe4a6",
+ "continuity_report": {
+  "path": null,
+  "sha256": null,
+  "unit": {}
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   6,
+   990
+  ]
+ },
+ "new_calls": 0
+}

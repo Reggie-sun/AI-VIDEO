@@ -1,0 +1,42 @@
+{
+  "schema_version": "iris-source-operation/1",
+  "scope_kind": "next_shot",
+  "task": "IRIS EP01 C interior observation",
+  "user_quote": "三张都认可，继续镜头制作",
+  "ai_label_quote": "保留 AI 标识，只禁止新增剧情字幕和图形",
+  "attempt_id": "iris-ep01-c-source-003",
+  "project_path": "../generation-c-draft/project",
+  "configuration_path": "../generation-c-draft/driver-config.json",
+  "policy_id": "iris-ep01-c-source-003",
+  "reservation_id": "iris-ep01-c-reservation-003",
+  "max_submit_count": 1,
+  "automatic_retries": 0,
+  "operator_currency": "CRD",
+  "operator_ceiling": 250,
+  "cumulative_attempt_ceiling": 3,
+  "cumulative_operator_credit_ceiling": 750,
+  "issued_at": "2026-10-30T23:37:49.055390+00:00",
+  "expires_at": "2026-10-31T01:37:49.055390+00:00",
+  "stop_on_unknown": true,
+  "prior_sources": [
+    {
+      "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/generation/project",
+      "attempt_id": "iris-ep01-a01-qualification-001",
+      "artifact_sha256": "65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5",
+      "gate_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/qa/A01/post-media-gate.json",
+      "gate_sha256": "9493d3ea00a9c7c0869a7416789f92212d01dc5de1b45559deec83a11a0ad220",
+      "gate_verdict": "FAIL",
+      "observed_cost_credits": 198
+    },
+    {
+      "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/a01-first-frame-repair/project",
+      "attempt_id": "iris-ep01-a01-two-reference-repair-002",
+      "artifact_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+      "gate_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/qa/A01-v2/post-media-gate.json",
+      "gate_sha256": "69a428fad163a3473c189a839919caadf5b830eb0fd15e91fc33a7ec124c14b6",
+      "gate_verdict": "PASS",
+      "observed_cost_credits": 198
+    }
+  ],
+  "predecessor_accepted_end_state": "A01-v2: same woman, low bun, left ear device and left collar line stable, quiet frontal observation. C cuts to the separately approved interior Scene; no claim of a continuous camera move across Scenes."
+}

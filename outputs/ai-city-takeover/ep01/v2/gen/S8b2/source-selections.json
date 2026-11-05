@@ -1,0 +1,47 @@
+[
+  {
+    "asset_id": "iris-c-v2-s8b-balcony",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K8b-a.png",
+    "sha256": "e6c6e7714ef4b18009a91bb17663c9a4ff871d67268291719007f2d3fea86af6",
+    "size_bytes": 1990291,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K8b: start frame, balcony three-quarter view",
+    "need_id": "balcony",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-cf-details",
+    "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+    "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+    "size_bytes": 1843560,
+    "width": 1672,
+    "height": 941,
+    "role": "approved front IRIS identity: face, left-ear device and fine red left-collar line",
+    "need_id": "identity",
+    "anchor_role": "identity",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v2-s8b-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8b-vocal-ref-22.20-26.20.wav",
+    "sha256": "8b391077d80ef5b967afb5163ee2896a839f7efd0fe137064ddb7ccc61a4b16b",
+    "size_bytes": 352844,
+    "kind": "audio",
+    "duration_millis": 4000,
+    "sample_rate_hz": 44100,
+    "role": "isolated chorus vocal the mouth follows",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v2/song/bed-01/music__20261102_004125.mp3",
+      "sha256": "f45c385ef6ec3c5ef817cce72ba6c9d6e5f6fbb21849e80ed8b794d137f08973",
+      "master_window_seconds": [
+        22.2,
+        26.2
+      ],
+      "tool": "ElevenLabs Voice Isolator, then ffmpeg trim, pad and gain",
+      "basis": "board.md S8b, s8a-lipsync-amendment.md S8b section (sealed before payment), user choice for S8a"
+    },
+    "selected_for_provider": true
+  }
+]

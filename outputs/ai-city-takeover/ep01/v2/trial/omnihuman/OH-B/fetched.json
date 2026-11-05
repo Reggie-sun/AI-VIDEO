@@ -1,0 +1,19 @@
+{
+ "unit": "OH-B",
+ "file": "trial/omnihuman/OH-B/fetch/3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302.mp4",
+ "sha256": "3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302",
+ "bytes": 8466088,
+ "suggested_name": "jimeng-2026-11-03-6517-镜头固定特写。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，乐句之间轻轻换气，肩....mp4",
+ "page_video": {
+  "w": 1920,
+  "h": 1088,
+  "dur": 5.133333,
+  "box": [
+   566,
+   152,
+   504,
+   283.5
+  ]
+ },
+ "fetched_at": "2026-11-03T05:59:09.074Z"
+}

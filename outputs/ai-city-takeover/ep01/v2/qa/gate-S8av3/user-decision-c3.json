@@ -1,0 +1,14 @@
+{
+ "schema": "iris-v2-user-gate-decision/1",
+ "unit": "S8av3",
+ "artifact_sha256": "20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f",
+ "gate": "qa/gate-S8av3/post-media-gate.json (FAIL, sealed)",
+ "film": "c3",
+ "question": "first chorus pass (S8a, 18.867-22.567 s): 依同步檢查量到的延遲放置，A 整遍不切走／B 換行處切到不唱的復用畫面",
+ "review": "review/c3-chorus.html",
+ "sync_evidence": "qa/sync/S8av3/sync.json",
+ "user_answer": "B：切到睜開的眼 (Recommended)",
+ "scope": "c3 plays S8av3 only for line 11 'I didn't run —', 18.867-20.667 s, at its measured lag -0.1075 s (in-point 0.3592); the measured in-sync span 18.84-20.78 s covers it. From 20.667 s the pass cuts to S1v3 (clip 4.0 s), lyrics on screen.",
+ "recorded_at": "2026-11-02T23:19:22.150503+00:00",
+ "authority": "user decision on a FAIL verdict for the c3 cut; the sealed gate verdict is unchanged, and the earlier user-decision.json (c1/c2) is kept as it was"
+}

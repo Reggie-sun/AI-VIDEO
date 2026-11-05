@@ -466,3 +466,41 @@ def test_captured_dialogue_preview_can_add_silent_image_title_and_score(monkeypa
     else:
         with pytest.raises(ValueError):
             check()
+
+
+@pytest.mark.parametrize('changes', [
+    {'audio_kind': 'dialogue', 'shot_id': 'shot-s01'},
+    {'audio_kind': 'narration', 'shot_id': 'shot-s01'},
+    {'start_sample': 1}, {'shot_id': 'shot-s01'}, {'trim_duration_samples': None},
+    {'gain_millidb': -1}, {'fade_in_samples': 1}, {'fade_out_samples': 1},
+    {'ducking': {'sidechain_track_ids': ('other',), 'attenuation_millidb': -1000,
+                 'attack_samples': 0, 'release_samples': 0}},
+])
+def test_captioned_music_binding_requires_explicit_unmodified_global_song(changes):
+    from ai_video.production.qualification_preview_input import CaptionedMusicPreview
+    track = dict(track_id='song', asset_id='song-asset', audio_kind='bgm',
+                 start_sample=0, trim_duration_samples=96_000)
+    track.update(changes)
+    with pytest.raises(ValueError):
+        CaptionedMusicPreview.model_validate({'track': track, 'audio_asset_sha256': 'a'*64,
+            'captions': ({'caption_asset_id': 'lyrics', 'caption_asset_sha256': 'b'*64,
+                          'script_hash': 'c'*64, 'transcript_hash': 'd'*64},)})
+
+
+@pytest.mark.parametrize('failure', ['mixed_version', 'different_song'])
+def test_captioned_music_clips_require_the_same_opt_in(failure):
+    from ai_video.production._composition_visual import _captioned_music_binding
+    from ai_video.production.qualification_preview_input import CaptionedMusicPreview
+    music = CaptionedMusicPreview.model_validate({'track': {
+        'track_id': 'song', 'asset_id': 'song-asset', 'audio_kind': 'bgm',
+        'start_sample': 0, 'trim_duration_samples': 96_000}, 'audio_asset_sha256': 'a'*64,
+        'captions': ({'caption_asset_id': 'lyrics', 'caption_asset_sha256': 'b'*64,
+                      'script_hash': 'c'*64, 'transcript_hash': 'd'*64},)})
+    first = SimpleNamespace(contract_version='development-qualification-preview/2', captioned_music=music)
+    second = SimpleNamespace(contract_version='development-qualification-preview/2', captioned_music=music)
+    if failure == 'mixed_version':
+        second.contract_version = 'development-qualification-preview/1'
+    else:
+        second.captioned_music = music.model_copy(update={'audio_asset_sha256': 'b'*64})
+    with pytest.raises(ValueError, match='same explicit song binding'):
+        _captioned_music_binding([first, second], invalid=lambda message, *_: ValueError(message))

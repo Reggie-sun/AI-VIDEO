@@ -1,0 +1,41 @@
+{
+ "ceilings": {
+  "submits": 4,
+  "credits": 660,
+  "per_take": 165
+ },
+ "takes": [
+  {
+   "unit": "SC1",
+   "outcome": "submitted",
+   "price_observed": 30,
+   "balance_before": 63296,
+   "balance_after": 63266,
+   "booked_at": "2026-11-04T03:35:01.849919+00:00"
+  },
+  {
+   "unit": "SC2",
+   "outcome": "submitted",
+   "price_observed": 30,
+   "balance_before": 63266,
+   "balance_after": 63236,
+   "booked_at": "2026-11-04T03:36:17.115074+00:00"
+  },
+  {
+   "unit": "SC3",
+   "outcome": "submitted",
+   "price_observed": 30,
+   "balance_before": 63236,
+   "balance_after": 63206,
+   "booked_at": "2026-11-04T03:37:25.771400+00:00"
+  },
+  {
+   "unit": "SC4",
+   "outcome": "submitted",
+   "price_observed": 30,
+   "balance_before": 63206,
+   "balance_after": 63176,
+   "booked_at": "2026-11-04T03:42:44.072190+00:00"
+  }
+ ]
+}

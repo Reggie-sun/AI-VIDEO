@@ -1,0 +1,21 @@
+{
+  "model_config_keys": [
+    "generationResourceType",
+    "benefitKey",
+    "resolutionBenefitKeys"
+  ],
+  "benefit_strings": [
+    {
+      "path": "modelConfig.seedance_2.0_vip.benefitKey.benefitType",
+      "value": "seedance_20_pro_720p_output"
+    },
+    {
+      "path": "modelConfig.seedance_2.0_vip.resolutionBenefitKeys.1080p.benefitType",
+      "value": "seedance_20_pro_1080p_output"
+    },
+    {
+      "path": "modelConfig.seedance_2.0_vip.resolutionBenefitKeys.4k.benefitType",
+      "value": "seedance_20_pro_4k_output"
+    }
+  ]
+}

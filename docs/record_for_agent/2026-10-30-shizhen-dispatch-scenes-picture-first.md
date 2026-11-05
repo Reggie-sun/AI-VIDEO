@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-10-30
 
+## Supersession Notice — 2026-10-30
+
+下表 PASS 保留为当时 Agent 的历史技术判断，不构成用户观看认可或继续生成的依据；D3 未明确抬眼、D4 缺呼救声等已记录偏差不能写成“PASS 但有偏差”。下文清空 identity 的做法也不再是可沿用的参考策略。后续用户要求先修规则与程序，当前工程修复及仍未关闭的门禁缺口见 [Preview Approval And Identity Waiver Gate](2026-10-30-preview-approval-and-identity-waiver-gate.md)；本次没有重新评估或接受这些媒体。
+
 ## Request And Direction
 
 用户否定两版独立 TTS（“語氣不對”“不像幀的人”），要求“先把画面做出来”“语言也做下直接用seedance出”。导演覆盖升为 v5（`outputs/shizhen-episode01/opening-dispatch-20261029/director-coverage.v5.json`，分镜 `DISPATCH-SHOTBOARD.v5.md`）：独立 Concept Check 判 v4（一次生成五地点六镜）带条件可做但风险高，改为记录台一条约 26 秒的对白母带（Seedance 2.5）提供全部对白与 D1/D5 画面，D2/D3/D4/D6 现场分开生成、不说话，剪辑时铺在母带对讲声下；D3 推近、D4 上摇回应“运镜太平缓”；字幕不由模型生成。

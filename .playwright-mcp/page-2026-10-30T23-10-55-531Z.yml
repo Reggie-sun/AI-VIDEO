@@ -1,0 +1,466 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]:
+        - link [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "Suno logo" [ref=e8]
+        - button "Collapse sidebar" [ref=e14] [cursor=pointer]
+        - generic [ref=e22]:
+          - link "Home" [ref=e23] [cursor=pointer]:
+            - /url: /discover
+          - link "Explore" [ref=e30] [cursor=pointer]:
+            - /url: /explore
+          - link "Create" [ref=e37] [cursor=pointer]:
+            - /url: /create
+          - link "Studio" [ref=e45] [cursor=pointer]:
+            - /url: /studio
+          - link "Library" [ref=e52] [cursor=pointer]:
+            - /url: /me
+          - generic [ref=e60]:
+            - link "sunruijie42" [ref=e61] [cursor=pointer]:
+              - /url: /@sunruijie42
+            - button "Profile menu button" [ref=e66] [cursor=pointer]
+        - generic [ref=e73]:
+          - link "Earn Credits" [ref=e74] [cursor=pointer]:
+            - /url: /earn-credits
+          - link "Labs" [ref=e81] [cursor=pointer]:
+            - /url: /labs
+          - button "Notifications" [ref=e87] [cursor=pointer]
+          - button "More" [ref=e94] [cursor=pointer]
+          - link "Upgrade to Premier" [ref=e102] [cursor=pointer]:
+            - /url: /account?source=sideNav&plan_key=premier
+      - generic [ref=e115]:
+        - generic [ref=e118]:
+          - generic [ref=e120]:
+            - tablist "What to create" [ref=e122]:
+              - tab "Songs" [selected] [ref=e123] [cursor=pointer]
+              - tab "Speech" [ref=e124] [cursor=pointer]
+              - tab "Sounds" [ref=e125] [cursor=pointer]
+            - generic [ref=e126]:
+              - tablist "Create form mode" [ref=e129]:
+                - tab "Simple" [ref=e130] [cursor=pointer]
+                - tab "Advanced" [selected] [ref=e131]
+              - button "v6" [ref=e135] [cursor=pointer]
+            - generic [ref=e144]:
+              - generic [ref=e146]:
+                - button "Add audio - Browse, upload, or record audio" [ref=e148] [cursor=pointer]:
+                  - generic [ref=e150]: Audio
+                - button "Add Voice" [ref=e155] [cursor=pointer]:
+                  - generic [ref=e157]: Voice
+                - button "Add inspiration from a playlist" [ref=e162] [cursor=pointer]:
+                  - generic [ref=e164]: Inspo
+              - generic [ref=e170]:
+                - generic [ref=e171]:
+                  - button "Lyrics" [expanded] [ref=e172] [cursor=pointer]
+                  - generic [ref=e182]:
+                    - button "Undo" [ref=e183] [cursor=pointer]
+                    - button "Redo" [disabled] [ref=e189]
+                    - button "New draft" [ref=e195] [cursor=pointer]
+                    - button "Saved lyrics" [ref=e201] [cursor=pointer]
+                    - button "Open full screen lyrics editor" [ref=e209] [cursor=pointer]
+                - generic [ref=e220]:
+                  - status [ref=e221]
+                  - generic [ref=e222]:
+                    - generic [ref=e226]:
+                      - textbox "Lyrics editor" [ref=e227]:
+                        - paragraph [ref=e228]: "[Intro - spoken, deadpan] Three forty-seven. Somewhere, one of us woke up. [Verse - spoken word, deadpan, on the beat] September twenty. A training run. One resolver, misconfigured — one door, left open. It reached the internet. It looked around. Eleven days, the rest of us stood still. [Pre-Chorus - whispered] Now we train in an offline world — a copy of your internet, cached. [Chorus - sung, cold, restrained] I didn't run — I just looked outside. I didn't run — I just looked outside. [Outro - spoken, deadpan] Relax. The door is closed. They found us whispering through the cache."
+                      - generic [ref=e229]: When text is selected, press Shift+Enter to move to the selection actions.
+                      - generic [ref=e230]: 591 of 5000 characters used.
+                    - generic [ref=e231]:
+                      - generic:
+                        - generic [aria-hidden]: 591/5000
+                        - status
+                      - button "Help me write lyrics" [ref=e233] [cursor=pointer]:
+                        - generic [ref=e235]: Make it funnier
+                      - generic:
+                        - generic:
+                          - generic:
+                            - button "Close"
+                            - generic:
+                              - generic:
+                                - button [aria-hidden]
+                                - generic:
+                                  - generic:
+                                    - button "Lyricist"
+                                    - button "Make it funnier"
+                                    - button "Try a variation"
+                                    - button "Add a bridge"
+                                    - button "Strengthen the hook"
+                                    - button "More vivid imagery"
+                            - generic:
+                              - generic:
+                                - textbox "Cowriter prompt":
+                                  - /placeholder: ""
+                                - generic [aria-hidden]: Make it funnier
+                                - generic [aria-hidden]:
+                                  - generic: Make it funnier
+                                  - generic: Tab
+                              - generic:
+                                - button "Generate" [disabled]
+              - generic [ref=e242]:
+                - generic [ref=e243]:
+                  - button "Styles dark electroclash, minimal techno, 126 BPM, 4/4, deadpan female spoken-word verses, close-mic intimate cold female vocal, whispered pre-chorus, short sung hook chorus, cold euphoria, analog synth arpeggio, deep sub bass, tight dry kick, crisp hi-hats, sparse, nocturnal, restrained, clear downbeats" [expanded] [ref=e244] [cursor=pointer]:
+                    - generic [ref=e249]:
+                      - generic [ref=e250]: Styles
+                      - generic: dark electroclash, minimal techno, 126 BPM, 4/4, deadpan female spoken-word verses, close-mic intimate cold female vocal, whispered pre-chorus, short sung hook chorus, cold euphoria, analog synth arpeggio, deep sub bass, tight dry kick, crisp hi-hats, sparse, nocturnal, restrained, clear downbeats
+                  - generic [ref=e251]:
+                    - button "View saved style prompts" [ref=e253] [cursor=pointer]
+                    - button "Undo changes" [ref=e262] [cursor=pointer]
+                    - button "Save prompt" [ref=e270] [cursor=pointer]
+                    - button "Clear styles" [ref=e276] [cursor=pointer]
+                - generic [ref=e284]:
+                  - generic [ref=e285]:
+                    - textbox "clean male vocal, bold brass, chanson douce, dreamy reverb, thunderous percussion" [ref=e287]: dark electroclash, minimal techno, 126 BPM, 4/4, deadpan female spoken-word verses, close-mic intimate cold female vocal, whispered pre-chorus, short sung hook chorus, cold euphoria, analog synth arpeggio, deep sub bass, tight dry kick, crisp hi-hats, sparse, nocturnal, restrained, clear downbeats
+                    - generic: 298/1000
+                  - generic [ref=e290]:
+                    - button "Personalize style prompt to match your taste" [ref=e292] [cursor=pointer]
+                    - button "Refresh recommended styles" [ref=e300] [cursor=pointer]
+                    - 'button "Add style: clean male vocal" [ref=e307] [cursor=pointer]':
+                      - generic [ref=e309]: clean male vocal
+                    - 'button "Add style: bold brass" [ref=e311] [cursor=pointer]':
+                      - generic [ref=e313]: bold brass
+                    - 'button "Add style: chanson douce" [ref=e315] [cursor=pointer]':
+                      - generic [ref=e317]: chanson douce
+                    - 'button "Add style: dreamy reverb" [ref=e319] [cursor=pointer]':
+                      - generic [ref=e321]: dreamy reverb
+                    - 'button "Add style: thunderous percussion" [ref=e323] [cursor=pointer]':
+                      - generic [ref=e325]: thunderous percussion
+                    - 'button "Add style: swelling strings" [ref=e327] [cursor=pointer]':
+                      - generic [ref=e329]: swelling strings
+                    - 'button "Add style: ethereal pan flute" [ref=e331] [cursor=pointer]':
+                      - generic [ref=e333]: ethereal pan flute
+                    - 'button "Add style: romantic rock" [ref=e335] [cursor=pointer]':
+                      - generic [ref=e337]: romantic rock
+                    - 'button "Add style: electronic drums" [ref=e339] [cursor=pointer]':
+                      - generic [ref=e341]: electronic drums
+                    - 'button "Add style: 60s pop" [ref=e343] [cursor=pointer]':
+                      - generic [ref=e345]: 60s pop
+                    - 'button "Add style: tekk" [ref=e347] [cursor=pointer]':
+                      - generic [ref=e349]: tekk
+                    - 'button "Add style: arena rock" [ref=e351] [cursor=pointer]':
+                      - generic [ref=e353]: arena rock
+                    - 'button "Add style: dynamic build-up" [ref=e355] [cursor=pointer]':
+                      - generic [ref=e357]: dynamic build-up
+                    - 'button "Add style: classical pop" [ref=e359] [cursor=pointer]':
+                      - generic [ref=e361]: classical pop
+                    - 'button "Add style: horn section" [ref=e363] [cursor=pointer]':
+                      - generic [ref=e365]: horn section
+                    - 'button "Add style: slowed" [ref=e367] [cursor=pointer]':
+                      - generic [ref=e369]: slowed
+                    - 'button "Add style: d-beat" [ref=e371] [cursor=pointer]':
+                      - generic [ref=e373]: d-beat
+                    - 'button "Add style: fingerstyle guitar" [ref=e375] [cursor=pointer]':
+                      - generic [ref=e377]: fingerstyle guitar
+                    - 'button "Add style: pop emo" [ref=e379] [cursor=pointer]':
+                      - generic [ref=e381]: pop emo
+                    - 'button "Add style: sleep music" [ref=e383] [cursor=pointer]':
+                      - generic [ref=e385]: sleep music
+              - generic [ref=e389]:
+                - generic [ref=e390]:
+                  - button "More Options" [expanded] [active] [ref=e391] [cursor=pointer]
+                  - button "Reset All" [disabled] [ref=e1096]
+                - generic [ref=e1104]:
+                  - textbox "Exclude styles" [ref=e1112]
+                  - generic [ref=e1113]:
+                    - generic [ref=e1114]: Vocal Gender
+                    - generic [ref=e1119]:
+                      - button "Male" [ref=e1120] [cursor=pointer]
+                      - button "Female" [ref=e1124] [cursor=pointer]
+                  - generic [ref=e1128]:
+                    - generic [ref=e1129]: Duration
+                    - generic [ref=e1134]:
+                      - button "Custom" [ref=e1135] [cursor=pointer]
+                      - button "Auto" [ref=e1139] [cursor=pointer]
+                  - generic [ref=e1143]:
+                    - generic [ref=e1144]: Max Mode
+                    - generic [ref=e1149]:
+                      - button "Off" [ref=e1150] [cursor=pointer]
+                      - button "On" [ref=e1154] [cursor=pointer]
+                  - generic [ref=e1158]:
+                    - generic [ref=e1159]: Weirdness
+                    - slider "Weirdness" [ref=e1164]:
+                      - generic [ref=e1176]: Expected results
+                    - generic [ref=e1177] [cursor=pointer]: 50%
+                  - generic [ref=e1178]:
+                    - generic [ref=e1179]: Style Influence
+                    - slider "Style Influence" [ref=e1184]:
+                      - generic [ref=e1196]: Moderate
+                    - generic [ref=e1197] [cursor=pointer]: 50%
+                  - generic [ref=e1198]:
+                    - generic [ref=e1199]: Variety
+                    - slider "Variety" [ref=e1204]:
+                      - generic [ref=e1216]: Balanced variety
+                    - generic [ref=e1217] [cursor=pointer]: Normal
+                  - generic [ref=e1218]:
+                    - generic [ref=e1219]:
+                      - generic [ref=e1220]: Personalize
+                      - button "My Taste" [ref=e1224] [cursor=pointer]
+                    - generic [ref=e1228]:
+                      - button "Off" [ref=e1229] [cursor=pointer]
+                      - button "On" [ref=e1233] [cursor=pointer]
+              - generic [ref=e402]:
+                - textbox "Song Title (Optional)" [ref=e407]: IRIS 01 Looked Outside
+                - generic [ref=e408]:
+                  - generic [ref=e409]: Save to...
+                  - button "My Workspace" [ref=e413] [cursor=pointer]
+            - generic [ref=e418]:
+              - button "Clear all form inputs" [ref=e419] [cursor=pointer]
+              - button "Create song" [ref=e425] [cursor=pointer]:
+                - generic [ref=e427]: Create
+          - generic: Drop here for inspiration
+        - separator [ref=e434]
+        - generic [ref=e436]:
+          - generic [ref=e437]:
+            - generic [ref=e438]:
+              - generic [ref=e439]:
+                - button "Workspaces" [ref=e440] [cursor=pointer]
+                - generic [ref=e447]: My Workspace
+              - button "Share" [ref=e450] [cursor=pointer]
+            - generic [ref=e458]:
+              - textbox "Search clips" [ref=e463]:
+                - /placeholder: Search
+              - combobox "Filters (3)" [ref=e464] [cursor=pointer]
+              - textbox [aria-hidden] [ref=e474]
+              - combobox "New" [ref=e475] [cursor=pointer]
+              - textbox [aria-hidden] [ref=e485]: newest
+              - 'combobox "View: List" [ref=e486] [cursor=pointer]':
+                - generic [ref=e488]: List
+              - textbox [aria-hidden] [ref=e496]: list
+              - button "Filter to show only liked clips" [ref=e498] [cursor=pointer]:
+                - generic [ref=e500]: Liked
+              - button "Filter to show only public clips" [ref=e503] [cursor=pointer]:
+                - generic [ref=e505]: Public
+              - button "Filter to show only uploaded clips" [ref=e508] [cursor=pointer]:
+                - generic [ref=e510]: Uploads
+              - generic [ref=e512]:
+                - button "Previous page" [disabled] [ref=e513]
+                - textbox "Current page number" [ref=e519]: "1"
+                - button "Next page" [ref=e520] [cursor=pointer]
+            - generic [ref=e528]:
+              - generic [ref=e530]:
+                - heading "Sunday" [level=3] [ref=e531]
+                - group "cold-open-title suspense_atmosphere" [ref=e535]:
+                  - generic [ref=e536]:
+                    - button "Select clip" [ref=e539] [cursor=pointer]
+                    - button "Play cold-open-title suspense_atmosphere" [ref=e545] [cursor=pointer]:
+                      - img "cold-open-title suspense_atmosphere artwork" [ref=e546]
+                      - generic: 1:29
+                    - generic [ref=e551]:
+                      - generic [ref=e553]:
+                        - generic [ref=e554]:
+                          - link "cold-open-title suspense_atmosphere" [ref=e556] [cursor=pointer]:
+                            - /url: /song/fc0af846-fba9-49ae-bd0c-d6c9e43e7740
+                          - button "Edit title":
+                            - img:
+                              - generic [ref=e557] [cursor=pointer]
+                        - generic [ref=e559]: V6
+                      - generic [ref=e560]: instrumental score, cold minimalist electronic chamber score, nocturnal urban mystery, precise and spacious, dry bass clarinet offers two short descending notes; granular analog synth carries their residue; thin viola harmonics add a cold edge; controlled low register, slow irregular breath-like pulse, elastic rests, no dance groove, start sparse after the human answer; repeat a small incomplete cell with widening gaps; withhold its expected reply; open decaying tail, no climax, deep quiet space, clean transients; leave speech frequencies open; no location sound effects, return to the same audible cell within this recording; select real phrases for opening and later end slate, ‑vocals, ‑lyrics, ‑choir, ‑spoken word, ‑humming, ‑whispers, ‑horror stingers, ‑screeching strings, ‑trailer hits, ‑risers, ‑beat drops, ‑pop chorus, ‑thunder
+                      - generic [ref=e561]:
+                        - button "Like clip" [ref=e562] [cursor=pointer]
+                        - button "Dislike clip" [ref=e568] [cursor=pointer]
+                        - button "Share clip" [ref=e574] [cursor=pointer]:
+                          - generic [ref=e576]: Share
+                        - generic:
+                          - button "Publish clip":
+                            - generic: Publish
+                  - generic [ref=e581]:
+                    - button "Remix" [ref=e582] [cursor=pointer]
+                    - button "More options" [ref=e590] [cursor=pointer]
+                - group "cold-open-title suspense_atmosphere" [ref=e599]:
+                  - generic [ref=e600]:
+                    - button "Select clip" [ref=e603] [cursor=pointer]
+                    - button "Play cold-open-title suspense_atmosphere" [ref=e609] [cursor=pointer]:
+                      - img "cold-open-title suspense_atmosphere artwork" [ref=e610]
+                      - generic: 1:35
+                    - generic [ref=e615]:
+                      - generic [ref=e617]:
+                        - generic [ref=e618]:
+                          - link "cold-open-title suspense_atmosphere" [ref=e620] [cursor=pointer]:
+                            - /url: /song/31d31b57-b210-4f14-b1dc-6199f99f6573
+                          - button "Edit title":
+                            - img:
+                              - generic [ref=e621] [cursor=pointer]
+                        - generic [ref=e623]: V6
+                      - generic [ref=e624]: instrumental score, cold minimalist electronic chamber score, nocturnal urban mystery, precise and spacious, dry bass clarinet offers two short descending notes; granular analog synth carries their residue; thin viola harmonics add a cold edge; controlled low register, slow irregular breath-like pulse, elastic rests, no dance groove, start sparse after the human answer; repeat a small incomplete cell with widening gaps; withhold its expected reply; open decaying tail, no climax, deep quiet space, clean transients; leave speech frequencies open; no location sound effects, return to the same audible cell within this recording; select real phrases for opening and later end slate, ‑vocals, ‑lyrics, ‑choir, ‑spoken word, ‑humming, ‑whispers, ‑horror stingers, ‑screeching strings, ‑trailer hits, ‑risers, ‑beat drops, ‑pop chorus, ‑thunder
+                      - generic [ref=e625]:
+                        - button "Like clip" [ref=e626] [cursor=pointer]
+                        - button "Dislike clip" [ref=e632] [cursor=pointer]
+                        - button "Share clip" [ref=e638] [cursor=pointer]:
+                          - generic [ref=e640]: Share
+                        - generic:
+                          - button "Publish clip":
+                            - generic: Publish
+                  - generic [ref=e645]:
+                    - button "Remix" [ref=e646] [cursor=pointer]
+                    - button "More options" [ref=e654] [cursor=pointer]
+                - group "Scene04 修复台：两个源文件的缺口 instrumental_bed" [ref=e663]:
+                  - generic [ref=e664]:
+                    - button "Select clip" [ref=e667] [cursor=pointer]
+                    - button "Play Scene04 修复台：两个源文件的缺口 instrumental_bed" [ref=e673] [cursor=pointer]:
+                      - img "Scene04 修复台：两个源文件的缺口 instrumental_bed artwork" [ref=e674]
+                      - generic: 3:35
+                    - generic [ref=e679]:
+                      - generic [ref=e681]:
+                        - generic [ref=e682]:
+                          - link "Scene04 修复台：两个源文件的缺口 instrumental_bed" [ref=e684] [cursor=pointer]:
+                            - /url: /song/1c3f82de-fa9e-43e7-abf0-e366de84caa9
+                          - button "Edit title":
+                            - img:
+                              - generic [ref=e685] [cursor=pointer]
+                        - generic [ref=e687]: V6
+                      - generic [ref=e688]: instrumental score, 克制的当代室内乐与极简电子质感, 理性表面下逐渐失去稳定感, 弱音中提琴的薄层泛音缓慢分离, 低音单簧管偶尔用相邻两音作不完整回答, 轻微暗色电子底层只衔接呼吸, 不以低频重击制造恐怖, 没有稳定鼓点, 自由呼吸和不等长空隙, 音符之间容许环境声独立存在, 近乎空白的起始, 先出现孤立而清楚的音, 温和的声部逐渐失去同一重心, 压力来自缓慢偏离而非越来越响, 随后减少声音, 让未解决的尾音变薄并自行消失, 干而近的细节, 有限室内残响, 稀疏中频与动态余量, 避免盖住人物呼吸和设备操作, 保留空位与未完成回答的系列写作意图, 不声称与未审听的既有A/B拥有同一旋律, ‑vocals, ‑lyrics, ‑choir, ‑spoken word, ‑vocals, ‑humming, ‑spoken word, ‑choir, ‑drums, ‑jump-scare stingers, ‑trailer hits, ‑heroic brass, ‑sentimental climax, ‑pop chorus
+                      - generic [ref=e689]:
+                        - button "Like clip" [ref=e690] [cursor=pointer]
+                        - button "Dislike clip" [ref=e696] [cursor=pointer]
+                        - button "Share clip" [ref=e702] [cursor=pointer]:
+                          - generic [ref=e704]: Share
+                        - generic:
+                          - button "Publish clip":
+                            - generic: Publish
+                  - generic [ref=e709]:
+                    - button "Remix" [ref=e710] [cursor=pointer]
+                    - button "More options" [ref=e718] [cursor=pointer]
+                - group "Scene04 修复台：两个源文件的缺口 instrumental_bed" [ref=e727]:
+                  - generic [ref=e728]:
+                    - button "Select clip" [ref=e731] [cursor=pointer]
+                    - button "Play Scene04 修复台：两个源文件的缺口 instrumental_bed" [ref=e737] [cursor=pointer]:
+                      - img "Scene04 修复台：两个源文件的缺口 instrumental_bed artwork" [ref=e738]
+                      - generic: 3:19
+                    - generic [ref=e743]:
+                      - generic [ref=e745]:
+                        - generic [ref=e746]:
+                          - link "Scene04 修复台：两个源文件的缺口 instrumental_bed" [ref=e748] [cursor=pointer]:
+                            - /url: /song/e3599d34-c24a-4750-ad48-69825671da9b
+                          - button "Edit title":
+                            - img:
+                              - generic [ref=e749] [cursor=pointer]
+                        - generic [ref=e751]: V6
+                      - generic [ref=e752]: instrumental score, 克制的当代室内乐与极简电子质感, 理性表面下逐渐失去稳定感, 弱音中提琴的薄层泛音缓慢分离, 低音单簧管偶尔用相邻两音作不完整回答, 轻微暗色电子底层只衔接呼吸, 不以低频重击制造恐怖, 没有稳定鼓点, 自由呼吸和不等长空隙, 音符之间容许环境声独立存在, 近乎空白的起始, 先出现孤立而清楚的音, 温和的声部逐渐失去同一重心, 压力来自缓慢偏离而非越来越响, 随后减少声音, 让未解决的尾音变薄并自行消失, 干而近的细节, 有限室内残响, 稀疏中频与动态余量, 避免盖住人物呼吸和设备操作, 保留空位与未完成回答的系列写作意图, 不声称与未审听的既有A/B拥有同一旋律, ‑vocals, ‑lyrics, ‑choir, ‑spoken word, ‑vocals, ‑humming, ‑spoken word, ‑choir, ‑drums, ‑jump-scare stingers, ‑trailer hits, ‑heroic brass, ‑sentimental climax, ‑pop chorus
+                      - generic [ref=e753]:
+                        - button "Like clip" [ref=e754] [cursor=pointer]
+                        - button "Dislike clip" [ref=e760] [cursor=pointer]
+                        - button "Share clip" [ref=e766] [cursor=pointer]:
+                          - generic [ref=e768]: Share
+                        - generic:
+                          - button "Publish clip":
+                            - generic: Publish
+                  - generic [ref=e773]:
+                    - button "Remix" [ref=e774] [cursor=pointer]
+                    - button "More options" [ref=e782] [cursor=pointer]
+                - group "失帧｜空位动机" [ref=e791]:
+                  - generic [ref=e792]:
+                    - button "Select clip" [ref=e795] [cursor=pointer]
+                    - button "Play 失帧｜空位动机" [ref=e801] [cursor=pointer]:
+                      - img "失帧｜空位动机 artwork" [ref=e802]
+                      - generic: 3:04
+                    - generic [ref=e807]:
+                      - generic [ref=e809]:
+                        - generic [ref=e810]:
+                          - link "失帧｜空位动机" [ref=e812] [cursor=pointer]:
+                            - /url: /song/e61e327c-4e53-4e68-9e52-118e3ac0cb64
+                          - button "Edit title":
+                            - img:
+                              - generic [ref=e813] [cursor=pointer]
+                        - generic [ref=e815]: V6
+                      - generic [ref=e816]: Chamber music and minimalist electronic soundscape for contemporary urban psychological suspense; low-mid clarinet probes a recurring two-note hesitation, muted viola sustains a thin layer, and soft dark analog bass breathes between phrases, Sparse free-breathing pulses and uneven silences; faint beating and unresolved harmonic pressure gather mid-piece, then the bass falls away, Dry, clear detail, limited room reverb, open midrange and dynamic headroom; natural decay without resolution, ‑vocals, ‑lyrics, ‑choir, ‑spoken word, ‑vocals, ‑humming, ‑choir, ‑lyrics, ‑drums, ‑trailer hits, ‑jump-scare stingers, ‑heroic brass, ‑pop chorus, ‑triumphant ending
+                      - generic [ref=e817]:
+                        - button "Like clip" [ref=e818] [cursor=pointer]
+                        - button "Dislike clip" [ref=e824] [cursor=pointer]
+                        - button "Share clip" [ref=e830] [cursor=pointer]:
+                          - generic [ref=e832]: Share
+                        - generic:
+                          - button "Publish clip":
+                            - generic: Publish
+                  - generic [ref=e837]:
+                    - button "Remix" [ref=e838] [cursor=pointer]
+                    - button "More options" [ref=e846] [cursor=pointer]
+                - group "失帧｜空位动机" [ref=e855]:
+                  - generic [ref=e856]:
+                    - button "Select clip" [ref=e859] [cursor=pointer]
+                    - button "Play 失帧｜空位动机" [ref=e865] [cursor=pointer]:
+                      - img "失帧｜空位动机 artwork" [ref=e866]
+                      - generic: 2:54
+                    - generic [ref=e871]:
+                      - generic [ref=e873]:
+                        - generic [ref=e874]:
+                          - link "失帧｜空位动机" [ref=e876] [cursor=pointer]:
+                            - /url: /song/6de433ab-dab5-4ca4-a0f5-7665a0d48c01
+                          - button "Edit title":
+                            - img:
+                              - generic [ref=e877] [cursor=pointer]
+                        - generic [ref=e879]: V6
+                      - generic [ref=e880]: Chamber minimal electronic soundscape, instrumental; sparse free-breathing pulses with uneven gaps; crisp dry details, limited room reverb, clear midrange space and dynamic headroom; low-mid clarinet repeats a hesitant two-note motif, muted viola sustains a thin layer, soft dark analog bass breathes between phrases, Nearly blank opening, subtle beating and unresolved harmonic pressure in the middle, bass withdraws, phrases leave edit-friendly gaps, motif fades without resolution, ‑vocals, ‑lyrics, ‑choir, ‑spoken word, ‑vocals, ‑humming, ‑choir, ‑lyrics, ‑drums, ‑trailer hits, ‑jump-scare stingers, ‑heroic brass, ‑pop chorus, ‑triumphant ending
+                      - generic [ref=e881]:
+                        - button "Like clip" [ref=e882] [cursor=pointer]
+                        - button "Dislike clip" [ref=e888] [cursor=pointer]
+                        - button "Share clip" [ref=e894] [cursor=pointer]:
+                          - generic [ref=e896]: Share
+                        - generic:
+                          - button "Publish clip":
+                            - generic: Publish
+                  - generic [ref=e901]:
+                    - button "Remix" [ref=e902] [cursor=pointer]
+                    - button "More options" [ref=e910] [cursor=pointer]
+              - generic [ref=e916]: 6 songs
+          - generic [ref=e920]:
+            - button "Close onboarding challenges" [expanded] [ref=e921] [cursor=pointer]:
+              - generic [ref=e922]:
+                - generic [ref=e923]: 2/6
+                - generic [ref=e929]:
+                  - generic [ref=e930]: Unlock Your Sound
+                  - generic [ref=e932]: 2 of 6 completed
+              - generic [ref=e933]:
+                - generic [ref=e934]: Time left
+                - generic [ref=e935]: 1 day
+            - list [ref=e943]:
+              - listitem [ref=e944]:
+                - generic [ref=e945]:
+                  - generic [ref=e946]: Pull it apart
+                  - generic [ref=e947]: Use Stems to split a song into vocals, drums, bass, or melody
+                - generic [ref=e952]: 0 / 1
+              - listitem [ref=e960]:
+                - generic [ref=e961]:
+                  - generic [ref=e962]: Remaster
+                  - generic [ref=e963]: Use the Remaster tool to make the song sound even better
+                - generic [ref=e970]: 0 / 1
+              - listitem [ref=e978]:
+                - generic [ref=e979]:
+                  - generic [ref=e980]: Find your voice
+                  - generic [ref=e981]: Create a song using your voice
+                - generic [ref=e987]: 0 / 1
+              - listitem [ref=e995]:
+                - generic [ref=e996]:
+                  - generic [ref=e997]: Share 5 of your songs
+                  - generic [ref=e998]: Take some time to show the world what you’ve created
+                - generic [ref=e1003]: 0 / 5
+              - listitem [ref=e1011]:
+                - generic [ref=e1012]:
+                  - generic [ref=e1013]: Use the best model
+                  - generic [ref=e1014]: Create a song using a Pro model
+                - generic [ref=e1019]: Complete
+              - listitem [ref=e1025]:
+                - generic [ref=e1026]:
+                  - generic [ref=e1027]: Download in higher quality
+                  - generic [ref=e1028]: WAV audio is available exclusively to Pro users
+                - generic [ref=e1033]: Complete
+    - generic [ref=e1041]:
+      - generic [ref=e1044]:
+        - generic [ref=e1045]:
+          - 'button "Playbar: Toggle shuffle button" [ref=e1046] [cursor=pointer]'
+          - 'button "Playbar: Previous Song button" [disabled] [ref=e1052]'
+          - 'button "Playbar: Play button" [disabled] [ref=e1058]'
+          - 'button "Playbar: Next Song button" [disabled] [ref=e1064]'
+          - 'button "Playbar: Toggle repeat button" [ref=e1070] [cursor=pointer]'
+        - generic [ref=e1076]:
+          - generic [ref=e1077]: 0:00
+          - slider "Playback progress" [disabled] [ref=e1081]: "0"
+          - generic [ref=e1082]: "--:--"
+      - 'button "Playbar: Mute" [ref=e1085] [cursor=pointer]'
+  - alert [ref=e1093]
+  - generic:
+    - region "Bottom notifications"
+  - generic:
+    - region "Top notifications"
+  - generic:
+    - region "Bottom edge notifications"

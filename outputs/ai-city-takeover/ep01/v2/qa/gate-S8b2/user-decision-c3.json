@@ -1,0 +1,14 @@
+{
+ "schema": "iris-v2-user-gate-decision/1",
+ "unit": "S8b2",
+ "artifact_sha256": "098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148",
+ "gate": "qa/gate-S8b2/post-media-gate.json (FAIL, sealed)",
+ "film": "c3",
+ "question": "second chorus pass (S8b, 22.567-25.900 s): 依同步檢查量到的延遲放置，A 整遍不切走／B 換行處切到不唱的復用畫面",
+ "review": "review/c3-chorus.html",
+ "sync_evidence": "qa/sync/S8b2/sync.json",
+ "user_answer": "B：切到窗前 (Recommended)",
+ "scope": "c3 plays S8b2 only for line 13 'I didn't run —', 22.567-24.067 s, at its measured lag -0.1328 s (in-point 0.2339); the measured in-sync span 22.97-24.57 s covers it except the held 'I' before 22.97 s. From 24.067 s the pass cuts to S5v3 (clip 3.0 s), lyrics on screen.",
+ "recorded_at": "2026-11-02T23:19:22.150503+00:00",
+ "authority": "user decision on a FAIL verdict for the c3 cut; the sealed gate verdict is unchanged, and the earlier user-decision.json (c1/c2) is kept as it was"
+}

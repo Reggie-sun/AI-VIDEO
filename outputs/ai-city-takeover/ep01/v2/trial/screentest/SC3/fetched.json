@@ -1,0 +1,19 @@
+{
+ "unit": "SC3",
+ "file": "trial/screentest/SC3/fetch/74f74a9005fdd930549791dd874684d8504f70ccdf9d32abbcf88ff575722457.mp4",
+ "sha256": "74f74a9005fdd930549791dd874684d8504f70ccdf9d32abbcf88ff575722457",
+ "bytes": 21817730,
+ "suggested_name": "jimeng-2026-11-03-6827-镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体....mp4",
+ "page_video": {
+  "w": 720,
+  "h": 960,
+  "dur": 5.16,
+  "box": [
+   566,
+   152,
+   504,
+   283.5
+  ]
+ },
+ "fetched_at": "2026-11-04T03:40:47.145Z"
+}

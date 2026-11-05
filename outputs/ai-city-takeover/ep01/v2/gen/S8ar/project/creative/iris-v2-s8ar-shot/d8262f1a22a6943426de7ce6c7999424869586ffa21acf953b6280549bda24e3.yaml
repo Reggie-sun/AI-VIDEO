@@ -1,0 +1,64 @@
+artifact_id: iris-v2-s8ar-shot
+character_ids:
+- IRIS
+composition_directives: []
+content_hash: d8262f1a22a6943426de7ce6c7999424869586ffa21acf953b6280549bda24e3
+continuity_constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 嘴型与参考音频逐音节同步：开口时机在正负两帧内，实测停顿处嘴型收小，音频前后嘴唇闭合，无声处没有多余嘴动，牙齿与下巴不变形
+- 摄影机完全固定，全程不推近、不移动、不摇镜，保持第一张图的景别与人物位置
+- 保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。
+creation_receipt_id: iris-v2-S8ar-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: '真人电影摄影，横幅十六比九，连续五秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性站在雨夜高层建筑的玻璃阳台上，正面近景看着镜头；第二张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第二张图的背景。
+
+  音频是她自己演唱的一句歌，从第一帧就开始唱。她对着镜头轻声演唱，嘴型与音频的每一个音节严格同步：有声音时张口唱，声音停顿时嘴型随之收小；音频结束后双唇完全合拢，不再动。她神情冷静克制，眼神平稳地看着镜头，只有唱歌的嘴型、呼吸和自然眨眼；头部几乎不动，不点头、不摆头、不抬手。
+
+  摄影机完全固定在三脚架上，全程不推近、不拉远、不移动、不摇镜，保持第一张图的景别与人物位置。细雨在玻璃栏杆上缓慢滑落，背后城市灯光虚化。蓝黑与钢蓝冷色，红色只在她左领口的细灯线。牙齿和下巴自然稳定，不变形。
+
+  保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。声音只跟随参考音频里的演唱，不新增其他人声、旁白、乐器或音乐；成片使用独立音轨。'
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-c-v2-s8a-balcony
+  - iris-cf-details
+  role: reference
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: balcony
+schema_version: '2.0'
+shot_id: ep01v2-s8a
+source_provenance:
+- content_hash: 686412c6d7dad23aa793ebf00bb773f6489407c1431dca10e010b0ff8153c375
+  kind: user_input
+  reference: evidence/authoring-input/686412c6d7dad23aa793ebf00bb773f6489407c1431dca10e010b0ff8153c375.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 7422bd29fdb96ce2fbe220fff5c6986473a1e32d77d5f6852e3aaf61eef09aa9
+  kind: user_input
+  reference: evidence/authoring-input/7422bd29fdb96ce2fbe220fff5c6986473a1e32d77d5f6852e3aaf61eef09aa9.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 1343541a5c788280c4b167a25558cb41314fc103354827726a31e67f43ee4310
+  kind: user_input
+  reference: evidence/authoring-input/1343541a5c788280c4b167a25558cb41314fc103354827726a31e67f43ee4310.json
+storyboard_beat_id: chorus-1
+visual_strategy: generated_video

@@ -1,0 +1,31 @@
+{
+ "about": "Sung still for S8a (user on c5: 「我觉得这是还是要动嘴,这样你可以就做图,然后拼起来变成动态图」). motion-kit/tools/region_plates.py pastes each variant's mouth (m) or eyes (e) into K7 through the feathered shapes below (K7 plate px; paths relative to ep01/v2) and writes plates/K7m<shape>.png and plates/K7e<eye>.png; motion-kit/src/mouth.js steps through them on the measured sung words (timing/words.json): each word is a list of [shape, fraction of the word], shapes lead the sound by lead_frames, a pause of rest_gap_s closes the mouth. Shapes: X rest (K7, lips closed), B lips just apart on a consonant, C half open, D open vowel, F rounded. Eyes: one blink (H half, C closed) in the breath after 'run'.",
+ "base": "K7",
+ "base_path": "keyframes/raw/K7-a.png",
+ "regions": {
+  "m": {
+   "polygons": [[[812, 428], [870, 426], [960, 424], [1010, 434], [1048, 456], [1068, 490], [1070, 525], [1030, 585], [960, 622], [880, 622], [835, 598], [806, 540], [800, 470]]],
+   "feather_px": 10,
+   "align_box": [790, 200, 1130, 650],
+   "variants": {"B": "keyframes/raw/M7B-a.png", "C": "keyframes/raw/M7C-a.png", "D": "keyframes/raw/M7D-a.png", "F": "keyframes/raw/M7F-a.png"}
+  },
+  "e": {
+   "ellipses": [[838, 312, 48, 33, 0], [992, 302, 51, 33, 0]],
+   "feather_px": 6,
+   "align_box": [790, 200, 1130, 650],
+   "variants": {"H": "keyframes/raw/E7H-a.png", "C": "keyframes/raw/E7C-a.png"}
+  }
+ },
+ "words": {
+  "i": [["D", 0], ["C", 0.55]],
+  "didn't": [["B", 0], ["C", 0.25], ["B", 0.6]],
+  "run": [["F", 0], ["D", 0.12], ["B", 0.9]],
+  "just": [["F", 0], ["D", 0.22], ["B", 0.75]],
+  "looked": [["C", 0], ["F", 0.25], ["B", 0.8]],
+  "outside": [["D", 0], ["F", 0.22], ["B", 0.36], ["D", 0.48], ["C", 0.75], ["B", 0.9]]
+ },
+ "lead_frames": 2,
+ "min_hold_frames": 2,
+ "rest_gap_s": 0.12,
+ "blinks": [20.5]
+}

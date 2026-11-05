@@ -1,0 +1,899 @@
+{
+  "shot_id": "S0088",
+  "start_frame": 4005,
+  "end_frame": 4015,
+  "duration_frames": 11,
+  "start_time": 166.875,
+  "end_time": 167.3333,
+  "duration_s": 0.4583,
+  "start_tc": "00:02:46:21",
+  "end_tc": "00:02:47:07",
+  "boundary_in_id": "B2-019",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    4005,
+    4005
+  ],
+  "boundary_out_id": "B2-020",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 4005,
+      "end_frame": 4007,
+      "event": "GAS橙底；脚踩插镜",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4005,
+        4007
+      ],
+      "description": "GAS橙底；脚踩插镜",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4008,
+      "end_frame": 4010,
+      "event": "透明底GAS，油门100%",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4008,
+        4010
+      ],
+      "description": "透明底GAS，油门100%",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4011,
+      "end_frame": 4013,
+      "event": "IMPACT卡SEISMIC4.1G",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4011,
+        4013
+      ],
+      "description": "IMPACT卡SEISMIC4.1G",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4014,
+      "end_frame": 4015,
+      "event": "THROTTLE →100%落定",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4014,
+        4015
+      ],
+      "description": "THROTTLE →100%落定",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明。右下BRAKE/GAS卡延续，油门从82升到100%，鞋旁小型IMPACT数据卡逐字出现。",
+  "reference_frames": [
+    {
+      "frame": 4005,
+      "path": "keyframes/S0088_f04005.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4007,
+      "path": "keyframes/S0088_f04007.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4010,
+      "path": "keyframes/S0088_f04010.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4013,
+      "path": "keyframes/S0088_f04013.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4015,
+      "path": "keyframes/S0088_f04015.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    }
+  ],
+  "composition": {
+    "shot_size": "extreme close-up",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.3,
+      "y": 0,
+      "w": 0.4,
+      "h": 0.88,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明。右下BRAKE/GAS卡延续，油门从82升到100%，鞋旁小型IMPACT数据卡逐字出现。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0029, \"pan_y_frac_per_s\": 0.0189, \"zoom_per_s\": -0.0064, \"median_flow_frac_per_s\": 0.0228, \"pairs_measured\": 10}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[93.6, 108.9, 111.8]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#868F95",
+        "fraction": 0.305,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#1A1A16",
+        "fraction": 0.243,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#6E7578",
+        "fraction": 0.24,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#DEDCD8",
+        "fraction": 0.103,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#4F4D4A",
+        "fraction": 0.087,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#C4775F",
+        "fraction": 0.021,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[93.6, 108.9, 111.8]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0088-E01",
+      "shot_id": "S0088",
+      "type": "background_media",
+      "description": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明。右下BRAKE/GAS卡延续，油门从82升到100%，鞋旁小型IMPACT数据卡逐字出现。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明。右下BRAKE/GAS卡延续，油门从82升到100%，鞋旁小型IMPACT数据卡逐字出现。"
+      },
+      "motion": {
+        "path": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明。右下BRAKE/GAS卡延续，油门从82升到100%，鞋旁小型IMPACT数据卡逐字出现。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4005–4015；入口按密采事件区间±2帧。",
+        "exit": "4015为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4005,
+          "state": "GAS橙底；脚踩插镜"
+        },
+        {
+          "frame": 4008,
+          "state": "透明底GAS，油门100%"
+        },
+        {
+          "frame": 4011,
+          "state": "IMPACT卡SEISMIC4.1G"
+        },
+        {
+          "frame": 4014,
+          "state": "THROTTLE →100%落定"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4005,
+        4007,
+        4010,
+        4013,
+        4015
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0088-E02",
+      "shot_id": "S0088",
+      "type": "prop",
+      "description": "黑高靴和裙边近景，脚底接近公路，横线运动模糊较强。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "bounding_box": {
+        "x": 0.32,
+        "y": 0,
+        "w": 0.52,
+        "h": 0.9,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "黑高靴和裙边近景，脚底接近公路，横线运动模糊较强。"
+      },
+      "motion": {
+        "path": "黑高靴和裙边近景，脚底接近公路，横线运动模糊较强。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4005–4015；入口按密采事件区间±2帧。",
+        "exit": "4015为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4005,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.32,
+            "y": 0,
+            "w": 0.52,
+            "h": 0.9,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4015,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4005,
+        4007,
+        4010,
+        4013,
+        4015
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0088-E03",
+      "shot_id": "S0088",
+      "type": "hud_chart",
+      "description": "右下白双竖条，BRAKE0%，GAS末态100%橙色满柱。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.56,
+        "w": 0.2,
+        "h": 0.3,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右下白双竖条，BRAKE0%，GAS末态100%橙色满柱。"
+      },
+      "motion": {
+        "path": "右下白双竖条，BRAKE0%，GAS末态100%橙色满柱。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4005–4015；入口按密采事件区间±2帧。",
+        "exit": "4015为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4005,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.75,
+            "y": 0.56,
+            "w": 0.2,
+            "h": 0.3,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4015,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4005,
+        4007,
+        4010,
+        4013,
+        4015
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "PEDALS · DRIVE-BY-WIRE | THEM / US | BRAKE 0% | GAS 100% | THEY SAY OVERRULED | WE SAY",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0088-E04",
+      "shot_id": "S0088",
+      "type": "hud_panel",
+      "description": "鞋底旁小白框IMPACT ON THE BEAT，逐行SEISMIC4.1G和THROTTLE。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "bounding_box": {
+        "x": 0.54,
+        "y": 0.73,
+        "w": 0.16,
+        "h": 0.12,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "鞋底旁小白框IMPACT ON THE BEAT，逐行SEISMIC4.1G和THROTTLE。"
+      },
+      "motion": {
+        "path": "鞋底旁小白框IMPACT ON THE BEAT，逐行SEISMIC4.1G和THROTTLE。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4005–4015；入口按密采事件区间±2帧。",
+        "exit": "4015为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4005,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.54,
+            "y": 0.73,
+            "w": 0.16,
+            "h": 0.12,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4015,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4005,
+        4007,
+        4010,
+        4013,
+        4015
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "IMPACT · 02:46:20 · ON THE BEAT √ | SEISMIC 4.1 G | THROTTLE → 100%",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0088-E05",
+      "shot_id": "S0088",
+      "type": "text_title",
+      "description": "4005 GAS橙底，4006后黑字透明底。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "bounding_box": {
+        "x": 0.02,
+        "y": 0.2,
+        "w": 0.3,
+        "h": 0.36,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "4005 GAS橙底，4006后黑字透明底。"
+      },
+      "motion": {
+        "path": "4005 GAS橙底，4006后黑字透明底。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4005–4015；入口按密采事件区间±2帧。",
+        "exit": "4015为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4005,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.02,
+            "y": 0.2,
+            "w": 0.3,
+            "h": 0.36,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4015,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4005,
+        4007,
+        4010,
+        4013,
+        4015
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "GAS",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 300 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0088-E06",
+      "shot_id": "S0088",
+      "type": "text_lyric",
+      "description": "底部歌词补gas橙色后落白。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.89,
+        "w": 0.56,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "底部歌词补gas橙色后落白。"
+      },
+      "motion": {
+        "path": "底部歌词补gas橙色后落白。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4005–4015；入口按密采事件区间±2帧。",
+        "exit": "4015为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4005,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.89,
+            "w": 0.56,
+            "h": 0.05,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4015,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4005,
+        4007,
+        4010,
+        4013,
+        4015
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "They say hit the brakes, we say hit the gas",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0088-E07",
+      "shot_id": "S0088",
+      "type": "hud_panel",
+      "description": "左上攀升速度卡跨镜延续，7.5→7.2/7.1MO，倍率约2.4→2.5。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "bounding_box": {
+        "x": 0.032,
+        "y": 0.091,
+        "w": 0.19,
+        "h": 0.102,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "左上攀升速度卡跨镜延续，7.5→7.2/7.1MO，倍率约2.4→2.5。"
+      },
+      "motion": {
+        "path": "左上攀升速度卡跨镜延续，7.5→7.2/7.1MO，倍率约2.4→2.5。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "4005起±2帧，参见逐3帧密采",
+        "exit": "4015末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 4005,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.032,
+            "y": 0.091,
+            "w": 0.19,
+            "h": 0.102,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4015,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4005,
+        4007,
+        4010,
+        4013,
+        4015
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "REQUIRED CLIMB RATE | 1 CLASS / 07.2 MO ×2.5 | CHORUS 1 · 18 MO | NOW · 6 MO",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "see observed frame; panel mono approx 10–15px",
+          "alignment": "left"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0088-A03",
+      "target_element_ids": [
+        "S0088-E03"
+      ],
+      "description": "右下白双竖条，BRAKE0%，GAS末态100%橙色满柱。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0088-A04",
+      "target_element_ids": [
+        "S0088-E04"
+      ],
+      "description": "鞋底旁小白框IMPACT ON THE BEAT，逐行SEISMIC4.1G和THROTTLE。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0088-A05",
+      "target_element_ids": [
+        "S0088-E05"
+      ],
+      "description": "4005 GAS橙底，4006后黑字透明底。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0088-A06",
+      "target_element_ids": [
+        "S0088-E06"
+      ],
+      "description": "底部歌词补gas橙色后落白。",
+      "start_frame": 4005,
+      "end_frame": 4015,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AW0280",
+      "relation": "vocal_word_candidate (unknown) at frame 4005–4014; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4005
+    },
+    {
+      "audio_event_id": "AB0369",
+      "relation": "beat_candidate (unknown) at frame 4005; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4005
+    },
+    {
+      "audio_event_id": "AH01635",
+      "relation": "band_onset_candidate (unknown) at frame 4005; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4005
+    },
+    {
+      "audio_event_id": "AH01636",
+      "relation": "band_onset_candidate (unknown) at frame 4005; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4005
+    },
+    {
+      "audio_event_id": "AH01637",
+      "relation": "band_onset_candidate (unknown) at frame 4005; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4005
+    },
+    {
+      "audio_event_id": "AH01638",
+      "relation": "band_onset_candidate (unknown) at frame 4005; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4005
+    },
+    {
+      "audio_event_id": "AH01639",
+      "relation": "band_onset_candidate (unknown) at frame 4006; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4006
+    },
+    {
+      "audio_event_id": "AH01640",
+      "relation": "band_onset_candidate (unknown) at frame 4011; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4011
+    },
+    {
+      "audio_event_id": "AH01641",
+      "relation": "band_onset_candidate (unknown) at frame 4011; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4011
+    },
+    {
+      "audio_event_id": "AH01642",
+      "relation": "band_onset_candidate (unknown) at frame 4011; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4011
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0088.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B2-019",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        4005,
+        4005
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B2-020",
+      "description": "靴子踩在公路的低角度短插镜，左侧GAS巨大黑字带橙底闪入后透明。右下BRAKE/GAS卡延续，油门从82升到100%，鞋旁小型IMPACT数据卡逐字出现。",
+      "span": [
+        4015,
+        4015
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "GAS",
+    "They say hit the brakes, we say hit the gas",
+    "SEISMIC 4.1 G",
+    "THROTTLE → 100%"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      4010,
+      4015
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

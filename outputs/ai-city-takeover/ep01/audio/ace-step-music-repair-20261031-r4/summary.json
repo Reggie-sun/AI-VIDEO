@@ -1,0 +1,86 @@
+{
+  "schema": "local-song-music-repair-summary/1",
+  "created_at_utc": "2026-10-31T09:01:48.299326+00:00",
+  "authority": "Development source audition, not Production or human acceptance",
+  "trigger_quote": "这个版本为什么bgm都没有，只有词语",
+  "previous_G_verdict": "USER_REJECTED_MISSING_BGM",
+  "budget_history": [
+    2,
+    5,
+    7,
+    10
+  ],
+  "previous_used": 7,
+  "new_units": [
+    {
+      "unit": "H-instrumental",
+      "ordinal": 8,
+      "source_sha256": "dda4ce0ed63b1c5dd4736c835d22967cd1e0b82095b822c00b869d77f81e0304",
+      "generation_seconds": 6.318,
+      "outcome": "KNOWN",
+      "ASR_WER": null
+    },
+    {
+      "unit": "I-sung-hook",
+      "ordinal": 9,
+      "source_sha256": "0f202c1970655f2e6668921096b9ca0ecc15190b6a050a74e1e13aa175bcbf15",
+      "generation_seconds": 5.167,
+      "outcome": "KNOWN",
+      "ASR_WER": 0.5
+    },
+    {
+      "unit": "J-rhythmic-hook",
+      "ordinal": 10,
+      "source_sha256": "73df84b0f979a5ede0082918589a65855e75154ec8ba553ecf58ee68744afd76",
+      "generation_seconds": 5.181,
+      "outcome": "KNOWN",
+      "ASR_WER": 0.3125
+    }
+  ],
+  "cumulative_ACE_used": 10,
+  "cumulative_ACE_ceiling": 10,
+  "local_TTS_used": 1,
+  "local_TTS_ceiling": 2,
+  "automatic_retries": 0,
+  "consumed_unknowns": 0,
+  "new_downloads": 0,
+  "new_paid_calls": 0,
+  "paid_cost": 0,
+  "selected_source": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.wav",
+    "sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+    "bytes": 5760044
+  },
+  "source_preparation": "Original spoken words outside chorus, edited I/J intended sung phrase repeated2x, independent H instrumental bed retained across30s; no post-speedup",
+  "full_decode": "PASS",
+  "ASR_unprompted": {
+    "normalized_words": 75,
+    "reference_words": 75,
+    "WER": 0.013333333333333334,
+    "only_difference": "347 versus3.47 numeric formatting"
+  },
+  "music_stem_proof": "complete-source-preview/source-mix-evidence.json",
+  "human_hearing": "NOT_EVALUATED",
+  "music_quality": "NOT_EVALUATED",
+  "singing_naturalness": "NOT_EVALUATED",
+  "voice_seams": "NOT_EVALUATED",
+  "whispered_prechorus": "NOT_EVALUATED",
+  "final_film_composition_activation_and_acceptance": "NOT_PERFORMED",
+  "scope": "Song source authoring only; no source/test/Registry/Manifest/final-timeline edits",
+  "Suno_unknowns": "Preserved, no new Suno interaction",
+  "verification_level": "Exact media hashes/decode/reconstruction/unpromptedASR; not project Harness or full regression",
+  "learning_assessment": "no_candidate; same-work experimental family, current source not human accepted",
+  "publish_status": "LOCAL_ONLY pending real media acceptance before project validation/commit/push",
+  "mobile_delivery_status": "SERVICE_ACKNOWLEDGED",
+  "mobile_delivery_receipt": "complete-source-preview/mobile-delivery.json",
+  "independent_verification": "independent-verification.json",
+  "later_actual_audio_analysis": {
+    "receipt": "../iris-google-listening-20261031/summary.json",
+    "model": "gemini-3.8-flash",
+    "status": "OBSERVATION_AVAILABLE",
+    "music_and_sung_hook": "OBSERVED_BY_GEMINI",
+    "calls": 1,
+    "actual_cost": "PENDING_CONFIRMATION",
+    "human_acceptance": "NOT_EVALUATED"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "at_utc": "2026-10-31T01:09:53.595634+00:00",
+  "ui_state": "HUMAN_CHALLENGE_VISIBLE",
+  "challenge_provider": "Cloudflare",
+  "create_clicks": 1,
+  "automatic_retries": 0,
+  "song_generation": "NOT_CONFIRMED",
+  "prior_unknowns": "PRESERVED",
+  "window_visible_on_primary_display": true,
+  "challenge_solving": false,
+  "library": {
+    "status": "success",
+    "count": 6,
+    "has_more": false,
+    "new_clips": []
+  },
+  "credits": {
+    "status": "success",
+    "balance": 2470
+  },
+  "latest_library_readback": {
+    "at_utc": "2026-10-31T01:15:14.063438+00:00",
+    "status": "success",
+    "total_clips": 6,
+    "new_clips": []
+  }
+}

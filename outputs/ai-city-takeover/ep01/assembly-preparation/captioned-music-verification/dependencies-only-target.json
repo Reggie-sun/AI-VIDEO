@@ -1,0 +1,28 @@
+{
+  "scope": "Only pre-existing unowned dependency changes; no captioned-music task code",
+  "index_tree": "2b95b504a9991af74a1efc4c882934e9c929afe9",
+  "files": {
+    ".agent/harness/policy.yaml": "efe5ea0fa4700888017fbd5c41e111228c96647e6a900989924784ad24542a0a",
+    "docs/agent-primary-contract-matrix.md": "b806aba91fb6703ca1b708632a922b9ae864d93ee5b696c48fefb9dbd395c6ed",
+    "docs/shot-reference-planning.md": "fe50586ac30692ce98f6d7dab28d6142d78e1a4255573e865fa75d1c0353db6d",
+    "src/ai_video/production/preview_approval.py": "01734a3f7a310bb3d92b2dff136a2752a24c29e3e86e7595988b789c9af4bc38",
+    "src/ai_video/production/reference_authoring.py": "51b5bca85493858e5cd1b79f0d05f706c6a0b442f7964aab0003b7ab569e90dc",
+    "src/ai_video/production/reference_planning.py": "1bf2dde3386eb65f5ec0e56fa9b790a1ede692a9bd0ac4c48884ce2f035bfce5",
+    "src/ai_video/production/reference_planning_contracts.py": "086ce2491eb269df8e1d10ec9083f6450ef3b63b7cd3bdeaa6f5df839bdd5bb2",
+    "tests/production_generation_execution_factory.py": "f89ee35d41fc5084925b8485c51fb634c62f61b766c9ec23c3f3ea30abf2b66e",
+    "tests/reference_authoring_fixture.py": "573c4afe72595996a9e237083ba18a01b7095e4ba341537fb85a5230d5d176fc",
+    "tests/test_canvas_project_data.py": "6a29c86bd5a589c71ba86cec80064ec030770a81c0573f0c29aa7dd8b99b8adb",
+    "tests/test_generation_history_import_receipt.py": "9e3e647c7f425adc03d725e1b753e959b3b2533777f8837a3c9bded576327a6d",
+    "tests/test_generation_quality_rejection.py": "88396230b26aea7490877266b7f54b8d07dc49788643497b4e7b803275a287a7",
+    "tests/test_performance_direction.py": "741b10c7cd7d7301902290d4bb7d347c22fddde5bd47a9e2a0b7efa2362bdcec",
+    "tests/test_production_vidu_subjects.py": "14eba6d3e398817dd1f33527a482a3e750ad43a3a3242707267670234bc59549",
+    "tests/test_reference_authoring.py": "f4d2105172acac379d9163f349c57f893b5485a2fedf0c26393c3d58d572071d",
+    "tests/test_reference_planning.py": "98773ce15ec6fd905651372f0ab5c088a7ccf93cf87dea40cdb2cb5f0039c521",
+    "tests/test_reference_planning_integration.py": "1247654994f7f64dba5caf412bea9c1e066e395bc7db75faf21ab6d15ba7d80c",
+    "tests/test_seedance_durable_fidelity.py": "8c772c64153cdfd0e31d8c44350610da0755b9ad70c9a55989693f213258f567",
+    "tests/test_seedance_prompt_fidelity.py": "79e42d35bd16dcc32ea0294dd81fad4efe8cf49f6fbc772f99eadd7ae99809ee",
+    "tests/test_typed_causal_native_expression.py": "f6905ad4407257569fc6bbe6125232fe53e02057cfa5b56791cd38f4a80030dc",
+    "tests/test_voice_routing_identity.py": "72487188401d5b1725b25b2d853316431cb1097f5b08ae9e09548a6af4200c23",
+    "tests/test_voice_routing_integration.py": "00c2faf3e1379f110183ec0ceea59132f581ecc52a763bfe1998913b65167ce7"
+  }
+}

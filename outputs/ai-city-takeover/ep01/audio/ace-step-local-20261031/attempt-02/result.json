@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "error": null,
+  "status_message": "✅ LM chunk 1: phase1_time: 0.00s, phase2_time: 2.86s, total_time: 2.86s\nGeneration completed successfully!",
+  "attempt": 2,
+  "seed": 20261031,
+  "intent_sha256": "0faf282510d73e1355f48a7621a53928f95c878bdcfa5071b1a1841a8f4e2366",
+  "elapsed_seconds": 23.96,
+  "peak_gpu_allocated_bytes": 14632834560,
+  "peak_gpu_reserved_bytes": 14810087424,
+  "completed_at_utc": "2026-10-31T03:10:51.434936+00:00",
+  "source": "ACE-Step local generation",
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-02/5a45ffec-a1ce-3076-523a-2995110ca730.wav",
+      "sha256": "ab0000749101d9cc9d85526683b760ae1d2e20b5dad455ac2eb67c8c0d509b06",
+      "bytes": 5760044
+    }
+  ],
+  "human_listening": "NOT_EVALUATED",
+  "production_state_writes": 0
+}

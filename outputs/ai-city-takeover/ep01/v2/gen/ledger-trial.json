@@ -1,0 +1,12 @@
+{
+ "schema": "iris-v2-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "LSen1",
+   "attempt_id": "iris-lsen1-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-03T00:29:50.805499+00:00",
+   "outcome": "submitted"
+  }
+ ]
+}

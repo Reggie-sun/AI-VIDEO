@@ -1,0 +1,737 @@
+{
+  "shot_id": "S0017",
+  "start_frame": 499,
+  "end_frame": 542,
+  "start_time": 20.7917,
+  "end_time": 22.625,
+  "duration_frames": 44,
+  "duration_s": 1.8333,
+  "start_tc": "00:00:20:19",
+  "end_tc": "00:00:22:14",
+  "boundary_in_id": "B0-016",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 499,
+      "path": "keyframes/S0017_f00499.jpg",
+      "role": "first",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 510,
+      "path": "keyframes/S0017_f00510.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 521,
+      "path": "keyframes/S0017_f00521.jpg",
+      "role": "middle",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 532,
+      "path": "keyframes/S0017_f00532.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 542,
+      "path": "keyframes/S0017_f00542.jpg",
+      "role": "last",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 520,
+      "path": "work/full_batch/00520.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 542,
+      "path": "work/full_batch/00542.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "以摄影层与独立信息层推进序章、服装展示和机器观众主题",
+  "subject": "侧看跑道观众席：前景左边为黑色人形和发亮手持设备",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "侧看跑道观众席：前景左边为黑色人形和发亮手持设备，屋顶白蓝灯条斜伸向远处，右侧空场出现偏斜的白色服装标签大卡。卡片主标题 PHONES DOWN. TOKENS UP.；多枚检测框及斜向细线连接观众、屏幕和卡片。",
+  "composition": {
+    "shot_size": "远景/全身或信息图",
+    "subject_position": "见subject_bbox；视觉估计",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "腰部插镜近水平；汽车大远景略俯；其他平视，实际焦距未知",
+    "layers": {
+      "foreground": "独立文字/检测框，及近处主体",
+      "midground": "人物、汽车或无摄影层的统计图",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "首/中/末与filmstrip已检查；光流观测 {'pan_x_frac_per_s': -0.0049, 'pan_y_frac_per_s': -0.0077, 'zoom_per_s': 0.0268, 'median_flow_frac_per_s': 0.014, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": -0.0049,
+      "pan_y_frac_per_s": -0.0077,
+      "zoom_per_s": 0.0268,
+      "median_flow_frac_per_s": 0.014,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "视觉估计：冷蓝环境照明；红色点光或侧光见描述",
+    "quality": "低照度深阴影、反光表面与高亮屏幕；图形层自发光",
+    "effects": [
+      "可见彩色网点/细颗粒"
+    ],
+    "temporal_change": "见逐镜描述，精确亮度变化使用shot_stats luma"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#0B1611",
+        "fraction": 0.472,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#152D3D",
+        "fraction": 0.195,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#EAE8E3",
+        "fraction": 0.104,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#274F71",
+        "fraction": 0.1,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#5480AE",
+        "fraction": 0.069,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#98AAC2",
+        "fraction": 0.061,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "亮度首中末 [36.6, 60.3, 61.7]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 00 / 11",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "右上18 MONTHS / TO ESCAPE，底部微字THE PERMANENT UNDERCLASS及DEPARTURES · SS27 · COLLECTION01",
+    "G-FLAP-BOARD": "无底部大翻牌；18由右上小控件承载",
+    "G-TICKER": "底部持续向左滚动，条目见visual_system；逐镜窗口随时间变化",
+    "G-CORNER-MARKS": "四角浅灰十字",
+    "G-AUDIO-SPECTRUM": "右上白条，随时间起伏",
+    "G-LEFT-RULER": "左侧白刻度，y540橙指针",
+    "G-TIMECODE": {
+      "first": "00:00:20:19",
+      "last": "00:00:22:14"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0017-E01",
+      "shot_id": "S0017",
+      "type": "background_media",
+      "description": "侧看跑道观众席：前景左边为黑色人形和发亮手持设备，屋顶白蓝灯条斜伸向远处，右侧空场出现偏斜的白色服装标签大卡。卡片主标题 PHONES DOWN. TOKENS UP.；多枚检测框及斜向细线连接观众、屏幕和卡片。",
+      "start_frame": 499,
+      "end_frame": 542,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "摄影层人物/机位运动见首中末参考帧",
+        "easing": "unknown",
+        "entrance": "f499首个可见状态；变化见dense采样keyframes",
+        "exit": "f542仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 499,
+          "observed_state": "侧看跑道观众席：前景左边为黑色人形和发亮手持设备，屋顶白蓝灯条斜伸向远处，右侧空场出现偏斜的白色服装标签大卡。卡片主标题 PHONES DOWN. TOKENS UP.；多枚检测框及斜向细线连接观众、屏幕和卡片。"
+        },
+        {
+          "frame": 542,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        499,
+        510,
+        521,
+        532,
+        542
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0017-E02",
+      "shot_id": "S0017",
+      "type": "tag_card",
+      "description": "右中倾斜的白色条码服装卡",
+      "start_frame": 504,
+      "end_frame": 542,
+      "bounding_box": {
+        "x": 0.6385416666666667,
+        "y": 0.3138888888888889,
+        "w": 0.25677083333333334,
+        "h": 0.5148148148148148,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定图形定位见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f504首个可见状态；变化见dense采样keyframes",
+        "exit": "f542仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 503,
+          "observed_state": "无卡片",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 505,
+          "observed_state": "卡片半透明且低于终位",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 507,
+          "observed_state": "卡片近终位",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 509,
+          "observed_state": "卡片稳定，完整主字",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 519,
+          "observed_state": "卡片AGENTS行被引线选中",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 525,
+          "observed_state": "UNDERCLASS行橙色强调",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        510,
+        521,
+        532,
+        542
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "ESCAPE VELOCITY · SS27\nSHOW 01 · DATA HALL · YOU ARE INVITED\nPHONES DOWN. TOKENS UP.\nSEATING\nAGENTS ... FRONT ROW\nVCS ... BACK ROW\nUNDERCLASS ... STANDING\nDRESS CODE ... LOCKED IN\nEV-SS27-0001 · ADMIT ONE / SEAT A-01",
+        "transcription_status": "可读主字；小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "visual_family": "heading condensed sans; metadata monospace",
+          "font_candidates": [],
+          "cap_height_px": 48,
+          "tracking": "normal",
+          "alignment": "left",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 28,
+          "weight": "bold heading / medium fields",
+          "secondary_cap_height_px": 11
+        }
+      },
+      "full_resolution_text_observation": {
+        "frame": 520,
+        "content": "ESCAPE VELOCITY · SS27\nSHOW 01 · DATA HALL · YOU ARE INVITED\nPHONES DOWN. TOKENS UP.\nSEATING\nAGENTS ... FRONT ROW\nVCS ... BACK ROW\nUNDERCLASS ... STANDING\nDRESS CODE ... LOCKED IN\nEV-SS27-0001 · ADMIT ONE / SEAT A-01",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      }
+    },
+    {
+      "element_id": "S0017-E03",
+      "shot_id": "S0017",
+      "type": "hud_bracket",
+      "description": "左侧数枚观众与屏幕白色检测框",
+      "start_frame": 503,
+      "end_frame": 542,
+      "bounding_box": {
+        "x": 0.049479166666666664,
+        "y": 0.3287037037037037,
+        "w": 0.5796875,
+        "h": 0.6148148148148148,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定图形定位见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f503首个可见状态；变化见dense采样keyframes",
+        "exit": "f542仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 503,
+          "observed_state": "左侧数枚观众与屏幕白色检测框"
+        },
+        {
+          "frame": 542,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        510,
+        521,
+        532,
+        542
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "full_resolution_text_observation": {
+        "frame": 520,
+        "content": "AGENT 0.94 / AGENT 0.97 / AGENT 0.99 / AGENT 0.98 / VC 0.71 / UNDERCLASS 0.52",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "AGENT 0.94 / AGENT 0.97 / AGENT 0.99 / AGENT 0.98 / VC 0.71 / UNDERCLASS 0.52",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 11,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "monospaced sans"
+        }
+      }
+    },
+    {
+      "element_id": "S0017-E04",
+      "shot_id": "S0017",
+      "type": "deco_graphic",
+      "description": "摄影中检测对象的圆节点向邀请卡三席位行连线；主色灰白，UNDERCLASS被高亮时连线橙色。",
+      "start_frame": 508,
+      "end_frame": 542,
+      "bounding_box": {
+        "x": 0.17447916666666666,
+        "y": 0.37592592592592594,
+        "w": 0.4791666666666667,
+        "h": 0.5157407407407407,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定图形定位见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f508首个可见状态；变化见dense采样keyframes",
+        "exit": "f542仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 508,
+          "observed_state": "从检测框延伸至右侧卡片的对角线"
+        },
+        {
+          "frame": 542,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        510,
+        521,
+        532,
+        542
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0017-E05",
+      "shot_id": "S0017",
+      "type": "text_label",
+      "description": "左上三行前排席位分布说明",
+      "start_frame": 499,
+      "end_frame": 542,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.1638888888888889,
+        "w": 0.17708333333333334,
+        "h": 0.05185185185185185,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f499首次采样可见",
+        "exit": "f542仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 499,
+          "observed_state": "第一行起显"
+        },
+        {
+          "frame": 520,
+          "observed_state": "HUMANS SEA仍打字"
+        },
+        {
+          "frame": 542,
+          "observed_state": "三行完整，最后一行橙色"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        542
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "FRONT ROW · 100% AGENTS\nHUMANS SEATED · 0\nUNDERCLASS · STANDING ROOM",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "bold sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0022"
+      ],
+      "frame_range": [
+        504,
+        510
+      ],
+      "type": "hud_swap",
+      "description": "PHONES DOWN. TOKENS UP. card fades/slides in over same hall shot",
+      "confidence": 0.9,
+      "chunk": 0
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B0-016",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-017",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0047",
+      "relation": "beat_candidate (unknown) at frame 500; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 500
+    },
+    {
+      "audio_event_id": "AH00044",
+      "relation": "band_onset_candidate (unknown) at frame 500; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 500
+    },
+    {
+      "audio_event_id": "AH00045",
+      "relation": "band_onset_candidate (unknown) at frame 500; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 500
+    },
+    {
+      "audio_event_id": "AH00046",
+      "relation": "band_onset_candidate (unknown) at frame 500; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 500
+    },
+    {
+      "audio_event_id": "AH00047",
+      "relation": "band_onset_candidate (unknown) at frame 500; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 500
+    },
+    {
+      "audio_event_id": "AH00048",
+      "relation": "band_onset_candidate (unknown) at frame 501; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 501
+    },
+    {
+      "audio_event_id": "AH00049",
+      "relation": "band_onset_candidate (unknown) at frame 507; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 507
+    },
+    {
+      "audio_event_id": "AB0048",
+      "relation": "beat_candidate (unknown) at frame 510; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 510
+    },
+    {
+      "audio_event_id": "AH00050",
+      "relation": "band_onset_candidate (unknown) at frame 511; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 511
+    },
+    {
+      "audio_event_id": "AH00051",
+      "relation": "band_onset_candidate (unknown) at frame 511; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 511
+    },
+    {
+      "audio_event_id": "AH00052",
+      "relation": "band_onset_candidate (unknown) at frame 511; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 511
+    },
+    {
+      "audio_event_id": "AH00053",
+      "relation": "band_onset_candidate (unknown) at frame 511; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 511
+    },
+    {
+      "audio_event_id": "AH00054",
+      "relation": "band_onset_candidate (unknown) at frame 511; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 511
+    },
+    {
+      "audio_event_id": "AH00055",
+      "relation": "band_onset_candidate (unknown) at frame 518; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 518
+    },
+    {
+      "audio_event_id": "AH00056",
+      "relation": "band_onset_candidate (unknown) at frame 518; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 518
+    },
+    {
+      "audio_event_id": "AB0049",
+      "relation": "beat_candidate (unknown) at frame 522; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 522
+    },
+    {
+      "audio_event_id": "AH00057",
+      "relation": "band_onset_candidate (unknown) at frame 522; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 522
+    },
+    {
+      "audio_event_id": "AH00058",
+      "relation": "band_onset_candidate (unknown) at frame 522; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 522
+    },
+    {
+      "audio_event_id": "AH00059",
+      "relation": "band_onset_candidate (unknown) at frame 522; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 522
+    },
+    {
+      "audio_event_id": "AH00060",
+      "relation": "band_onset_candidate (unknown) at frame 522; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 522
+    },
+    {
+      "audio_event_id": "AH00061",
+      "relation": "band_onset_candidate (unknown) at frame 522; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 522
+    },
+    {
+      "audio_event_id": "AH00062",
+      "relation": "band_onset_candidate (unknown) at frame 529; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 529
+    },
+    {
+      "audio_event_id": "AH00063",
+      "relation": "band_onset_candidate (unknown) at frame 529; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 529
+    },
+    {
+      "audio_event_id": "AB0050",
+      "relation": "beat_candidate (unknown) at frame 533; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 533
+    },
+    {
+      "audio_event_id": "AH00064",
+      "relation": "band_onset_candidate (unknown) at frame 533; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 533
+    },
+    {
+      "audio_event_id": "AH00065",
+      "relation": "band_onset_candidate (unknown) at frame 533; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 533
+    },
+    {
+      "audio_event_id": "AH00066",
+      "relation": "band_onset_candidate (unknown) at frame 533; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 533
+    },
+    {
+      "audio_event_id": "AH00067",
+      "relation": "band_onset_candidate (unknown) at frame 533; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 533
+    },
+    {
+      "audio_event_id": "AH00068",
+      "relation": "band_onset_candidate (unknown) at frame 533; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 533
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "几何为fullres视觉像素估计±4–12px，非作者源坐标。",
+    "密集采样时点存在1–2帧区间；半翻字形与插值不猜测。",
+    "原字体identity、shader和摄影层抠像方式未知。",
+    "音频待主会话绑定。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0017.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      520,
+      542
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation；局部2帧间隔图已核对，逐词/逐行可见状态写入keyframes；精度2帧，不伪装逐帧",
+    "remaining": "原始shader/font/插值保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        499,
+        542,
+        2
+      ]
+    ],
+    "closure": "本轮fullres逐层检查并补遗漏独立层；已复核text.content和各bbox，密集时间精度见keyframes"
+  }
+}

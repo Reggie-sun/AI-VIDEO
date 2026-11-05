@@ -1,0 +1,117 @@
+{
+  "shot_id": "ep01-dns",
+  "attempt_id": "iris-ep01-c-source-003",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/generation-c-draft/project/state/video-generation/fetch/files/974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15.mp4",
+  "artifact_sha256": "974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15",
+  "verdict": "PASS",
+  "proof": "analyzer",
+  "all_required_observed_pass": true,
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "对照实际A03、ID7b及全部145个PTS脸部样本与正常速度全片：同一女性面貌、浅肤雀斑、灰蓝眼、深棕后梳低髻、解剖左耳黑色耳挂、左领细红线与炭黑高领大衣保持。未见换脸、装置换侧或服装/五官显著形变；与前序A01v2接受的身份、服装和凌晨冷光一致。这是已批准新Scene的切镜，未增设连续穿越要求。",
+      "evidence_refs": [
+        "face-sheet-000.jpg",
+        "face-sheet-049.jpg",
+        "face-sheet-098.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json"
+      ]
+    },
+    {
+      "requirement_id": "observer",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "保持A03的原身体朝向和看向左侧设备的视线。嘴唇自然静置，仅小幅自然微变化，没有连续说话/演唱式开合；145脸部帧、73个约12fps全幅样本及1x全片中未见抬手、伸手操作设备、敲键盘或转身。当前observable明确自然呼吸/眨眼属于可接受变化而非必须发生的独立事件，因此不另设可见呼吸幅度或眨眼计数门槛。",
+      "evidence_refs": [
+        "face-sheet-000.jpg",
+        "face-sheet-049.jpg",
+        "face-sheet-098.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json",
+        "full-sheet-000.jpg",
+        "full-sheet-025.jpg",
+        "full-sheet-050.jpg"
+      ]
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "正常速度和0至6秒密集全幅序列显示极小、连续的靠近变化；人物留在右侧，显示器背面留在左前景，观察侧、视轴侧及二者的空间关系不变，无翻轴、环绕、突然拉远或切镜。末段5.5至6秒平稳收束，无突然变焦/机位跳动。不把2D图像观察冒称物理3D轨迹测量，也未新增未封存的像素锁定要求。",
+      "evidence_refs": [
+        "full-sheet-000.jpg",
+        "full-sheet-025.jpg",
+        "full-sheet-050.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json",
+        "../mcp-review.json"
+      ]
+    },
+    {
+      "requirement_id": "monitor-back",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "73个密集全幅样本及正常速度全片内始终为显示器背壳、背部连接结构与支架，未转出正面显示面，背壳未被贴入新闻画面、文字或发光界面；未新增剧情字幕、片名或新闻图形。仅保留用户允许的平台AI生成标识，新闻解释继续由独立图形素材剪辑承接。",
+      "evidence_refs": [
+        "full-sheet-000.jpg",
+        "full-sheet-025.jpg",
+        "full-sheet-050.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json",
+        "../mcp-analysis.json",
+        "../mcp-review.json"
+      ]
+    }
+  ],
+  "observer_observations_sha256": "f2886bb0ec37cd4e74bf148e4c5252af7fb2eabf3d8dcd8e3d883dcf370c399d",
+  "observer_evidence_sha256": {
+    "observations.json": "f2886bb0ec37cd4e74bf148e4c5252af7fb2eabf3d8dcd8e3d883dcf370c399d",
+    "frame-probe.json": "5f89d506dd47a81450f12ee2e710d4e223e99317ae4b50048f58c08da8ed3a84",
+    "normal-speed-playback.json": "a4f484683fc3d205781f02867ee0632aac881d8834684e92ebde20c58319121e",
+    "playback.cjs": "6f73d93591b89a954da22951d0d0d5352fbeaf86408bbfaf3005e813070cef45",
+    "full-0.00.jpg": "71608297f82180c2f7165d2f20a4c1bd0229a543e2f5e538864acded15bc057f",
+    "full-3.00.jpg": "0bc635dd90dbb21ee1fde56d55e3067efba5142a7ee9149f3302b2b59bb02946",
+    "full-5.95.jpg": "eae2c22cc454bd08d0415967e943daa38fab382f05fcceb4c11edb79a2d706a7",
+    "full-sheet-000.jpg": "0aafc930342ac017424ce6dae82e9fc0d75a87d17f437d42c956864f8a783f33",
+    "full-sheet-025.jpg": "c44b6a767d0867561253f60b06f5275ba5a4821a90835544cf19a640f861aa84",
+    "full-sheet-050.jpg": "e8fd654ea56623999c2f1c63fac482153fde6efd0b6cef00ecb82409cb715223",
+    "face-sheet-000.jpg": "7382416216403dc25c5a55d13be917401d6e11a1aec9c00865ecb50ae4e64882",
+    "face-sheet-049.jpg": "da2ea391c3d5804384fc03b76779f7a0ef0484ad8ea021c2838effdbc21cae7a",
+    "face-sheet-098.jpg": "d107b9c4484827575646cd1d5cf2c40e4dcfa88413d221bf440b1b9e3c895d06",
+    "../mcp-analysis.json": "c7aef6de8713fb1c215a7e4b5f6db07c686dd84ecdef2f6064f096ed82a4caa2",
+    "../mcp-review.json": "7a344448a68d3d49bd3548a7fc812c14fb5b7b8dcbd910672cba493c308405a5"
+  },
+  "human_acceptance": "NOT_EVALUATED",
+  "audio_semantics_or_listening": "NOT_EVALUATED",
+  "production_activation": false,
+  "provider_qualification_promotion": false,
+  "next_shot_preparation_allowed": true,
+  "next_shot_submit_authorized": false,
+  "new_provider_calls": 0
+}

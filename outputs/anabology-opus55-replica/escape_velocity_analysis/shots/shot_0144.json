@@ -1,0 +1,1098 @@
+{
+  "shot_id": "S0144",
+  "start_frame": 6579,
+  "end_frame": 6653,
+  "start_time": 274.125,
+  "end_time": 277.25,
+  "duration_frames": 75,
+  "duration_s": 3.125,
+  "start_tc": "00:04:34:03",
+  "end_tc": "00:04:37:05",
+  "boundary_in_id": "B4-014",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 6579,
+      "path": "keyframes/S0144_f06579.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6597,
+      "path": "keyframes/S0144_f06597.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6616,
+      "path": "keyframes/S0144_f06616.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6635,
+      "path": "keyframes/S0144_f06635.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6653,
+      "path": "keyframes/S0144_f06653.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6616,
+      "path": "work/full_batch/06616.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 reference"
+    }
+  ],
+  "scene_type": "detail_insert",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "White barcode fabric tag tilted on black pleated cloth",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "4 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "White barcode fabric tag tilted on black pleated cloth. SHELL6588-6592; ring0,25,50,75,99,100;100%6634. 独立图层、时序与屏幕坐标已根据实际参考帧复核；隐藏原参数保留unknown。",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "White barcode fabric tag tilted on black pleated cloth",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "White barcode fabric tag tilted on black pleated cloth",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "SHELL6588-6592; ring0,25,50,75,99,100;100%6634",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0144.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0004,
+      "pan_y_frac_per_s": 0.0011,
+      "zoom_per_s": -0.0006,
+      "median_flow_frac_per_s": 0.0079,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#121111",
+        "fraction": 0.499,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#E2DFE0",
+        "fraction": 0.283,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#D0CCCC",
+        "fraction": 0.089,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#756B72",
+        "fraction": 0.05,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#433E43",
+        "fraction": 0.044,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#A19EA3",
+        "fraction": 0.035,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[134.4, 80.2, 80.0]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "Small upper-left chrome present in filmstrip; exact look digits require full-resolution review"
+    },
+    "G-TITLE-TAG": {
+      "state": "Upper-right small collection chrome visible except final black"
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Zero-month / final no-underclass state after countdown; exact per-frame widget content unresolved"
+    },
+    "G-TICKER": {
+      "state": "Bottom ticker visible; microtext not transcribed from thumbnail"
+    },
+    "G-TIMECODE": {
+      "state": "Bottom-right timecode; exact per-frame expected time from supplied timeline"
+    },
+    "G-HALFTONE": {
+      "state": "Colored print dots visible; finale coarse-dot modulation especially S0151-S0152"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0144-E01",
+      "shot_id": "S0144",
+      "type": "background_media",
+      "description": "White barcode fabric tag tilted on black pleated cloth. SHELL6588-6592; ring0,25,50,75,99,100;100%6634.",
+      "start_frame": 6579,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "White barcode fabric tag tilted on black pleated cloth. SHELL6588-6592; ring0,25,50,75,99,100;100%6634."
+      },
+      "motion": {
+        "path": "White barcode fabric tag tilted on black pleated cloth. SHELL6588-6592; ring0,25,50,75,99,100;100%6634.",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6579; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6579,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6579,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0144-E02",
+      "shot_id": "S0144",
+      "type": "prop",
+      "description": "White rectangular woven barcode tag hangs on cord, rotates about-15deg over black pleats",
+      "start_frame": 6579,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.171875,
+        "y": 0.06481481481481481,
+        "w": 0.6302083333333334,
+        "h": 0.8009259259259259,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "White rectangular woven barcode tag hangs on cord, rotates about-15deg over black pleats"
+      },
+      "motion": {
+        "path": "White rectangular woven barcode tag hangs on cord, rotates about-15deg over black pleats",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6579; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6579,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6579,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0144-E03",
+      "shot_id": "S0144",
+      "type": "prop",
+      "description": "Narrow dark barcode bands printed into right half of physical tag; no decoded data inferred",
+      "start_frame": 6579,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.4661458333333333,
+        "y": 0.22685185185185186,
+        "w": 0.23177083333333334,
+        "h": 0.36574074074074076,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 6,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Narrow dark barcode bands printed into right half of physical tag; no decoded data inferred"
+      },
+      "motion": {
+        "path": "Narrow dark barcode bands printed into right half of physical tag; no decoded data inferred",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6579; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6579,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6579,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0144-E04",
+      "shot_id": "S0144",
+      "type": "text_label",
+      "description": "Tag header and fine-print fibre test details rotate with cloth",
+      "start_frame": 6579,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.1953125,
+        "y": 0.2777777777777778,
+        "w": 0.234375,
+        "h": 0.46296296296296297,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Tag header and fine-print fibre test details rotate with cloth"
+      },
+      "motion": {
+        "path": "Tag header and fine-print fibre test details rotate with cloth",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6579; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6579,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6579,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "CARE LABEL 01 · EV-27-0000 / FIBRE CONTENT BY WEIGHT / TEST METHOD ISO 1833 · SS27 / SHELL 100% / LINING 100% / THIS SIDE OUT",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 14,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0144-E05",
+      "shot_id": "S0144",
+      "type": "text_lyric",
+      "description": "SHELL types in orange then turns black on tag;100% appears on following line late",
+      "start_frame": 6584,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.21354166666666666,
+        "y": 0.37037037037037035,
+        "w": 0.18229166666666666,
+        "h": 0.24537037037037038,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "SHELL types in orange then turns black on tag;100% appears on following line late"
+      },
+      "motion": {
+        "path": "SHELL types in orange then turns black on tag;100% appears on following line late",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6584; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6584,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6585,
+          "text": "SHE"
+        },
+        {
+          "frame": 6588,
+          "text": "SHELL:"
+        },
+        {
+          "frame": 6594,
+          "state": "black text"
+        },
+        {
+          "frame": 6633,
+          "text": "SHELL: 100%"
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6584,
+        6585,
+        6588,
+        6594,
+        6633,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "SHELL: / 100%",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 78,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0144-E06",
+      "shot_id": "S0144",
+      "type": "hud_gauge",
+      "description": "Right ring progress advances0→25→50→75→100, orange arc over grey track",
+      "start_frame": 6585,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.8333333333333334,
+        "y": 0.24074074074074073,
+        "w": 0.125,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Right ring progress advances0→25→50→75→100, orange arc over grey track"
+      },
+      "motion": {
+        "path": "Right ring progress advances0→25→50→75→100, orange arc over grey track",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6585; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6585,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6586,
+          "value": 0
+        },
+        {
+          "frame": 6603,
+          "value": 25
+        },
+        {
+          "frame": 6615,
+          "value": 50
+        },
+        {
+          "frame": 6624,
+          "value": 75
+        },
+        {
+          "frame": 6636,
+          "value": 100
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6585,
+        6586,
+        6603,
+        6615,
+        6624,
+        6636,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "SHELL · ANALYSIS / 0 / 25 / 50 / 75",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 60,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0144-E07",
+      "shot_id": "S0144",
+      "type": "text_label",
+      "description": "Weaving status below progress, then settled pending-weft text",
+      "start_frame": 6590,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.8166666666666667,
+        "y": 0.5166666666666667,
+        "w": 0.16145833333333334,
+        "h": 0.06018518518518518,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 31,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Weaving status below progress, then settled pending-weft text"
+      },
+      "motion": {
+        "path": "Weaving status below progress, then settled pending-weft text",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6590; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6590,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6616,
+          "text": "Weaving…"
+        },
+        {
+          "frame": 6636,
+          "text": "Woven. Result pending."
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6590,
+        6616,
+        6636,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "Weaving… / (1s · 2.3k tokens) / Woven. Result pending.",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 18,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0144-E08",
+      "shot_id": "S0144",
+      "type": "deco_graphic",
+      "description": "Fine probe leader to barcode and orange vertical registration rule across tag",
+      "start_frame": 6579,
+      "end_frame": 6653,
+      "bounding_box": {
+        "x": 0.4375,
+        "y": 0.1111111111111111,
+        "w": 0.2916666666666667,
+        "h": 0.5462962962962963,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Fine probe leader to barcode and orange vertical registration rule across tag"
+      },
+      "motion": {
+        "path": "Fine probe leader to barcode and orange vertical registration rule across tag",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6579; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6653"
+      },
+      "keyframes": [
+        {
+          "frame": 6579,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6653,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6579,
+        6653
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0144-E09",
+      "shot_id": "S0144",
+      "type": "transition_graphic",
+      "description": "Incoming tag overlays previous full-body frame through horizontal tear at first two frames",
+      "start_frame": 6579,
+      "end_frame": 6580,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.32407407407407407,
+        "w": 1.0,
+        "h": 0.4166666666666667,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Incoming tag overlays previous full-body frame through horizontal tear at first two frames"
+      },
+      "motion": {
+        "path": "Incoming tag overlays previous full-body frame through horizontal tear at first two frames",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6579; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6580"
+      },
+      "keyframes": [
+        {
+          "frame": 6579,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6580,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6579,
+        6580
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0144-A05",
+      "target_element_ids": [
+        "S0144-E05"
+      ],
+      "description": "SHELL types in orange then turns black on tag;100% appears on following line late",
+      "start_frame": 6584,
+      "end_frame": 6653,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0144-A06",
+      "target_element_ids": [
+        "S0144-E06"
+      ],
+      "description": "Right ring progress advances0→25→50→75→100, orange arc over grey track",
+      "start_frame": 6585,
+      "end_frame": 6653,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0144-A07",
+      "target_element_ids": [
+        "S0144-E07"
+      ],
+      "description": "Weaving status below progress, then settled pending-weft text",
+      "start_frame": 6590,
+      "end_frame": 6653,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    }
+  ],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "glitch_cut",
+      "boundary_id": "B4-014",
+      "span": [
+        6576,
+        6581
+      ],
+      "description": "SHELL6588-6592; ring0,25,50,75,99,100;100%6634",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B4-015",
+      "span": [
+        6653,
+        6653
+      ],
+      "description": "SHELL6588-6592; ring0,25,50,75,99,100;100%6634",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AH02829",
+      "relation": "band_onset_candidate (unknown) at frame 6579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6579
+    },
+    {
+      "audio_event_id": "AH02830",
+      "relation": "band_onset_candidate (unknown) at frame 6579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6579
+    },
+    {
+      "audio_event_id": "AB0608",
+      "relation": "beat_candidate (unknown) at frame 6579; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6579
+    },
+    {
+      "audio_event_id": "AH02831",
+      "relation": "band_onset_candidate (unknown) at frame 6579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6579
+    },
+    {
+      "audio_event_id": "AH02832",
+      "relation": "band_onset_candidate (unknown) at frame 6579; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6579
+    },
+    {
+      "audio_event_id": "AH02833",
+      "relation": "band_onset_candidate (unknown) at frame 6580; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6580
+    },
+    {
+      "audio_event_id": "AW0432",
+      "relation": "vocal_word_candidate (unknown) at frame 6584–6591; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6584
+    },
+    {
+      "audio_event_id": "AB0609",
+      "relation": "beat_candidate (unknown) at frame 6590; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6590
+    },
+    {
+      "audio_event_id": "AH02834",
+      "relation": "band_onset_candidate (unknown) at frame 6590; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6590
+    },
+    {
+      "audio_event_id": "AH02835",
+      "relation": "band_onset_candidate (unknown) at frame 6590; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6590
+    },
+    {
+      "audio_event_id": "AH02836",
+      "relation": "band_onset_candidate (unknown) at frame 6590; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6590
+    },
+    {
+      "audio_event_id": "AH02837",
+      "relation": "band_onset_candidate (unknown) at frame 6590; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6590
+    },
+    {
+      "audio_event_id": "AH02838",
+      "relation": "band_onset_candidate (unknown) at frame 6591; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6591
+    },
+    {
+      "audio_event_id": "AB0610",
+      "relation": "beat_candidate (unknown) at frame 6601; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6601
+    },
+    {
+      "audio_event_id": "AH02839",
+      "relation": "band_onset_candidate (unknown) at frame 6601; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6601
+    },
+    {
+      "audio_event_id": "AH02840",
+      "relation": "band_onset_candidate (unknown) at frame 6601; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6601
+    },
+    {
+      "audio_event_id": "AH02841",
+      "relation": "band_onset_candidate (unknown) at frame 6601; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6601
+    },
+    {
+      "audio_event_id": "AH02842",
+      "relation": "band_onset_candidate (unknown) at frame 6601; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6601
+    },
+    {
+      "audio_event_id": "AH02843",
+      "relation": "band_onset_candidate (unknown) at frame 6601; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6601
+    },
+    {
+      "audio_event_id": "AB0611",
+      "relation": "beat_candidate (unknown) at frame 6612; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6612
+    },
+    {
+      "audio_event_id": "AH02844",
+      "relation": "band_onset_candidate (unknown) at frame 6612; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6612
+    },
+    {
+      "audio_event_id": "AH02845",
+      "relation": "band_onset_candidate (unknown) at frame 6612; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6612
+    },
+    {
+      "audio_event_id": "AH02846",
+      "relation": "band_onset_candidate (unknown) at frame 6612; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6612
+    },
+    {
+      "audio_event_id": "AH02847",
+      "relation": "band_onset_candidate (unknown) at frame 6612; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6612
+    },
+    {
+      "audio_event_id": "AH02848",
+      "relation": "band_onset_candidate (unknown) at frame 6612; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6612
+    },
+    {
+      "audio_event_id": "AH02849",
+      "relation": "band_onset_candidate (unknown) at frame 6622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6622
+    },
+    {
+      "audio_event_id": "AH02850",
+      "relation": "band_onset_candidate (unknown) at frame 6622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6622
+    },
+    {
+      "audio_event_id": "AB0612",
+      "relation": "beat_candidate (unknown) at frame 6622; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6622
+    },
+    {
+      "audio_event_id": "AH02851",
+      "relation": "band_onset_candidate (unknown) at frame 6622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6622
+    },
+    {
+      "audio_event_id": "AH02852",
+      "relation": "band_onset_candidate (unknown) at frame 6622; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6622
+    },
+    {
+      "audio_event_id": "AH02853",
+      "relation": "band_onset_candidate (unknown) at frame 6623; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6623
+    },
+    {
+      "audio_event_id": "AB0613",
+      "relation": "beat_candidate (unknown) at frame 6633; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6633
+    },
+    {
+      "audio_event_id": "AH02854",
+      "relation": "band_onset_candidate (unknown) at frame 6633; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6633
+    },
+    {
+      "audio_event_id": "AH02855",
+      "relation": "band_onset_candidate (unknown) at frame 6633; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6633
+    },
+    {
+      "audio_event_id": "AH02856",
+      "relation": "band_onset_candidate (unknown) at frame 6633; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6633
+    },
+    {
+      "audio_event_id": "AH02857",
+      "relation": "band_onset_candidate (unknown) at frame 6633; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6633
+    },
+    {
+      "audio_event_id": "AH02858",
+      "relation": "band_onset_candidate (unknown) at frame 6634; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6634
+    },
+    {
+      "audio_event_id": "AH02859",
+      "relation": "band_onset_candidate (unknown) at frame 6644; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6644
+    },
+    {
+      "audio_event_id": "AH02860",
+      "relation": "band_onset_candidate (unknown) at frame 6644; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6644
+    },
+    {
+      "audio_event_id": "AH02861",
+      "relation": "band_onset_candidate (unknown) at frame 6644; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6644
+    },
+    {
+      "audio_event_id": "AB0614",
+      "relation": "beat_candidate (unknown) at frame 6644; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6644
+    },
+    {
+      "audio_event_id": "AH02862",
+      "relation": "band_onset_candidate (unknown) at frame 6644; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6644
+    },
+    {
+      "audio_event_id": "AH02863",
+      "relation": "band_onset_candidate (unknown) at frame 6645; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6645
+    },
+    {
+      "audio_event_id": "AH02864",
+      "relation": "band_onset_candidate (unknown) at frame 6652; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6652
+    },
+    {
+      "audio_event_id": "AH02865",
+      "relation": "band_onset_candidate (unknown) at frame 6652; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6652
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0144.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Unknown font files, physical plate/overlay decomposition, original curve, alpha and random flip seed",
+    "Measured visual boxes +/-0.02 normalized; event start bounds +/-3f; precise audio alignment still requires listening",
+    "Author eight-point star statement does not override observed nine-point ending; uncounted clips remain unknown"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0144.jpg",
+      "keyframes/S0144_f06579.jpg",
+      "keyframes/S0144_f06597.jpg",
+      "keyframes/S0144_f06616.jpg",
+      "keyframes/S0144_f06635.jpg",
+      "keyframes/S0144_f06653.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "reviewer": "root",
+    "method": "whole filmstrip, native1920 midpoint and independent1–4f regional/whole-shot second pass",
+    "timing_precision_frames": 3,
+    "reference_sheet": "work/root_review/tail_micro_S0144.jpg",
+    "pending": []
+  },
+  "observed_text_inventory": [
+    "CARE LABEL 01 · EV-27-0000 / FIBRE CONTENT BY WEIGHT / TEST METHOD ISO 1833 · SS27 / SHELL 100% / LINING 100% / THIS SIDE OUT",
+    "SHELL: / 100%",
+    "SHELL · ANALYSIS / 0 / 25 / 50 / 75",
+    "Weaving… / (1s · 2.3k tokens) / Woven. Result pending."
+  ]
+}

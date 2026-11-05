@@ -1,0 +1,76 @@
+{
+ "schema": "iris-v2-assembly-review/1",
+ "authority": "development_only (Agent observation)",
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c2.mp4",
+ "video_sha256": "b98c994ba03a6e3d1f41268903f0e1b3687de227cbf87944f61185e1be7a77e6",
+ "delivery_copy": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c2.mp4",
+  "sha256": "58b9e653cfa74a19c597c3855af441e5a63d2a970b4b38559a843dc1a7149568",
+  "note": "x264 crf 17 re-encode with faststart of the render above"
+ },
+ "canonical_gate": {
+  "command": "scripts.agent_harness verify-assembly",
+  "status": "NOT_RUN",
+  "reason": "same as c1: the motion-kit HyperFrames comp has no canonical ResolvedTimeline or HyperFrames render report (Phase 1.5 not done), so the joins are not verified by the Harness; this is an unverified review film"
+ },
+ "changes_from_c1": [
+  "S1 -> S1v3 (native first/last frame K1a->K1c): the eye opens on 'woke'; S1 0-3.367 s, S2 3.367-4.8 s (cut moved to beat 1.3 at the user's note '2s这里没有睁眼的过程')",
+  "S5 -> S5v3 in 1.0 (gate PASS): she notices the far window and locks on, brow starting about 0.2 s after it lights",
+  "S7 -> S7v3 in 1.4 (gate PASS): watching the panes, turns back to the lens on 'cached'",
+  "S8a -> S8av3 in 0.5333 (gate FAIL, user: '用 S8av3，晚 2 幀 (Recommended)')",
+  "S8b -> S8bv3b in 0.5667 (gate FAIL, user: '用 S8bv3b (Recommended)')",
+  "S7 'offline' break line moved from y 300 (across her eyes) to y 820; S7 cached stamps kept inside a safe area (2 stamps)",
+  "director-coverage.json S1/S2 durations synced to 3.367/1.433"
+ ],
+ "qa": {
+  "tool": "motion-kit/tools/qa.py",
+  "report": "qa/film-c2/report.md",
+  "result": "10/10 cuts at 0 frames, 12/12 graphic cues within 1 frame, no flash, strobe, pops or outlier frames"
+ },
+ "loudness": "integrated -14.2 LUFS, true peak -1.0 dBFS (ffmpeg ebur128 on the delivery copy)",
+ "cuts_frames": "qa/film-c2/cuts.jpg (frames -6, -1, 0, +6 around every cut)",
+ "junctions": [
+  {
+   "cut": "S1->S2 3.367 s",
+   "observation": "the eye has just opened in cold light, then IRIS awake on the balcony with the title slam: the waking now reads",
+   "visual": "pass"
+  },
+  {
+   "cut": "S4->S5 11.467 s",
+   "observation": "pulse at the rack door to her calm profile at the window; the far window lights at 11.53 s and she reacts about 0.2 s later",
+   "visual": "pass"
+  },
+  {
+   "cut": "S5->S6 13.367 s",
+   "observation": "her furrowed lock-on to the paused racks with 暂停 11 天",
+   "visual": "pass"
+  },
+  {
+   "cut": "S6->S7 14.8 s",
+   "observation": "she is just turned toward the sliding panes at the cut; the break line now runs below her face",
+   "visual": "pass"
+  },
+  {
+   "cut": "S7->S8a 18.867 s",
+   "observation": "she is back on the lens on 'cached', then sings straight to the lens",
+   "visual": "pass"
+  },
+  {
+   "cut": "S8a->S8b 22.567 s",
+   "observation": "frontal to three-quarter on the second-pass 'I', singing continues",
+   "visual": "pass"
+  },
+  {
+   "cut": "S8b->S9a 25.9 s",
+   "observation": "eyes half closed after the line to the rack door shutting on 'Relax'",
+   "visual": "pass"
+  }
+ ],
+ "audio": "master song only (all generated clip audio muted); lip-sync listening is the user's",
+ "known_deviations": [
+  "S8a: 'didn't' mouth about 3 frames early, 'I just' about 2 frames late (user-chosen slip)",
+  "S8b: the two pauses and 'outside' are not articulated; lips still slightly parted at the cut to S9a; her look to the city comes after the cut",
+  "S7: only 2 cached stamps (S7v3 panes sit mostly at the frame edges)",
+  "S2 still uses A01-v2 (unchanged)"
+ ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "iris-v2-user-gate-decision/1",
+  "unit": "S8b",
+  "chosen": "S8b2",
+  "gates": {
+    "S8b2": "qa/gate-S8b2/post-media-gate.json (FAIL)",
+    "S8br": "qa/gate-S8br/post-media-gate.json (FAIL)"
+  },
+  "question": "S8b 用哪一版放進成片？",
+  "user_answer": "用 S8b2 (Recommended)",
+  "scope": "S8b2 inside the film window master 22.567-25.90 s (clip 0.367-3.70 s)",
+  "recorded_at": "2026-11-02T08:59:38.719664+00:00",
+  "authority": "user decision on FAIL verdicts; the sealed gate verdicts are unchanged"
+}

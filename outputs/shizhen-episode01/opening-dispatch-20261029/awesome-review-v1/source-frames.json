@@ -1,0 +1,89 @@
+{
+  "purpose": "旧素材定位，非新生成；不是正式时间线或新preview_approval",
+  "receipt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/assembly-review-v1/receipt.json",
+  "receipt_sha256": "0ece4b7d89cdf46965485f59c51b3adb78fc3f8ab9be03b5e73c30ac03da7ed1",
+  "video_generation_calls": 0,
+  "image_generation_calls": 0,
+  "frames": [
+    {
+      "unit": "municipal",
+      "source_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+      "source_sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d",
+      "requested_source_seconds": 0,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "municipal.jpg",
+      "frame_sha256": "bc0d278672716cdbe43533e4057032ff5fb041efdc770d431f6cbeca8ca9a85a",
+      "frame_bytes": 540371
+    },
+    {
+      "unit": "D1",
+      "source_path": "runs/shizhen-opening-dispatch-20261104/M1-r11/state/video-generation/fetch/files/9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0.mp4",
+      "source_sha256": "9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0",
+      "requested_source_seconds": 3.4,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "D1.jpg",
+      "frame_sha256": "8fb63af7fedb681d56d4f3d5377663f1b2509498cffe33f3f0ef4e326cdc2e5f",
+      "frame_bytes": 71010
+    },
+    {
+      "unit": "D2",
+      "source_path": "runs/shizhen-opening-dispatch-20261030/D2r1/state/video-generation/fetch/files/5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a.mp4",
+      "source_sha256": "5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a",
+      "requested_source_seconds": 3.5,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "D2.jpg",
+      "frame_sha256": "601357b50bfefdf2a767df08e2a8cab7b2c6b6b83e6a757177cf57d0f354c3ab",
+      "frame_bytes": 283341
+    },
+    {
+      "unit": "D3",
+      "source_path": "runs/shizhen-opening-dispatch-20261030/D3/state/video-generation/fetch/files/b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f.mp4",
+      "source_sha256": "b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f",
+      "requested_source_seconds": 4,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "D3.jpg",
+      "frame_sha256": "553d563f5c2cf783dbb087d672fef86126d724d2cb115b50f7d7ae3fcc54440f",
+      "frame_bytes": 204940
+    },
+    {
+      "unit": "D4",
+      "source_path": "runs/shizhen-opening-dispatch-20261030/D4r1/state/video-generation/fetch/files/f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67.mp4",
+      "source_sha256": "f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67",
+      "requested_source_seconds": 5,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "D4.jpg",
+      "frame_sha256": "9fc93bd61e34da54501a20293ab9ea8ae66deb4ce3f564f2c23ba40be4acfb13",
+      "frame_bytes": 242318
+    },
+    {
+      "unit": "D5",
+      "source_path": "runs/shizhen-opening-dispatch-20261104/M1-r11/state/video-generation/fetch/files/9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0.mp4",
+      "source_sha256": "9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0",
+      "requested_source_seconds": 21.5,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "D5.jpg",
+      "frame_sha256": "4bb9cf37e99e4ff54dbc6ffb1c6c65e0152042a7d238997ed4a0e846688875a3",
+      "frame_bytes": 69127
+    },
+    {
+      "unit": "D6",
+      "source_path": "runs/shizhen-opening-dispatch-20261030/D6/state/video-generation/fetch/files/30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa.mp4",
+      "source_sha256": "30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa",
+      "requested_source_seconds": 2,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "D6.jpg",
+      "frame_sha256": "b2e49288b6bc8207009988bb588d757ffacde7d423816c7bfc704af37b52fbf3",
+      "frame_bytes": 369947
+    },
+    {
+      "unit": "B6",
+      "source_path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "source_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+      "requested_source_seconds": 0,
+      "extraction": "ffmpeg seek after input; first decoded frame at/after requested source time; no scale/crop/filter",
+      "frame_path": "B6.jpg",
+      "frame_sha256": "801cf40790d1f7c9f650c9c177f794778119394f5cd639564facf95146292046",
+      "frame_bytes": 349003
+    }
+  ]
+}

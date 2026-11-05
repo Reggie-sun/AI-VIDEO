@@ -1,0 +1,32 @@
+{
+  "unit": "S8ar",
+  "checks": {
+    "exact_images_A02_then_ID7b": true,
+    "exact_audio_reference": true,
+    "markers_image_image_audio": true,
+    "chinese_body_only": true,
+    "repair_variable_only": true,
+    "lip_sync_instruction": true,
+    "locked_camera": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "bound_output_5s": true,
+    "operator_ceiling_matches_preview": true,
+    "repair_budget": true,
+    "criteria_sealed_before_payment": true
+  },
+  "pass": true,
+  "request_hash": "0683dd8a598d69801f08b4bcd87f872c73a84f2351127cf76b527427f66befee",
+  "continuity": "same as S8a; clip t=0 is master 18.60 s, the film window 18.867-22.567 s is clip 0.267-3.967 s",
+  "handoff": "S7 -> S8a (this repair) -> S8b, which is not submitted before S8a passes",
+  "axis_action_camera": "as S8a: frontal close-up, locked camera, singing mouth, breath and blinks only",
+  "prompt_fit": "pure Chinese body 432 chars; only the start-and-end wording follows the new reference",
+  "budget": {
+    "v2_submits_before": 7,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 1750,
+    "v2_ceiling_CRD": 2500,
+    "observed_cost_5s_CRD": 165
+  },
+  "new_calls": 0
+}

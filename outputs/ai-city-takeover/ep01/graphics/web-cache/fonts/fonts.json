@@ -1,0 +1,56 @@
+{
+ "text_sha256": "33ea2d6667bf740f271775a01739bc9cf09524f9a63b6fe47b9129fc87b86590",
+ "chars": 266,
+ "faces": [
+  {
+   "family": "MK Sans SC",
+   "source_family": "Noto Sans CJK SC",
+   "weight": "Bold",
+   "file": "MK-Sans-SC.otf",
+   "bytes": 94948,
+   "sha256": "408bd45aeb7846ede72fb26340fb16f4f1bb483e84f327d94d60f945cd5fd04e",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Sans SC Regular",
+   "source_family": "Noto Sans CJK SC",
+   "weight": "Regular",
+   "file": "MK-Sans-SC-Regular.otf",
+   "bytes": 94136,
+   "sha256": "f43213b55dc8163d0b7b163656373fe7ba566563aec165dacc5b0045ac9f66ae",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Mono SC",
+   "source_family": "Noto Sans Mono CJK SC",
+   "weight": "Regular",
+   "file": "MK-Mono-SC.otf",
+   "bytes": 88180,
+   "sha256": "7cd35b1ed8816e73eeeb945a48429e40d1c982a068ef186732b717dfd755a978",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Mono SC Bold",
+   "source_family": "Noto Sans Mono CJK SC",
+   "weight": "Bold",
+   "file": "MK-Mono-SC-Bold.otf",
+   "bytes": 89008,
+   "sha256": "961758676e3961c381b6362a8a4ed09b3ae939a393fa3129ed0fec47ee20ab82",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Serif SC",
+   "source_family": "Noto Serif CJK SC",
+   "weight": "Bold",
+   "file": "MK-Serif-SC.otf",
+   "bytes": 133228,
+   "sha256": "567b66adc7536bef59038074b627b0d256db0b90d4a55c14e502a4e892fd8711",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  }
+ ]
+}

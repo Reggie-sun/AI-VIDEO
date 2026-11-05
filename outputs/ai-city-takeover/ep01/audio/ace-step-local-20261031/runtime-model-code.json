@@ -1,0 +1,19 @@
+{
+  "reason": "Official initialize_service synchronized model Python files to the pinned code revision before inference",
+  "code_sha": "ca1e85fe9430179831e6bc6be790c332190a3866",
+  "download_manifest_preserved": true,
+  "runtime_code_files": [
+    {
+      "file": "configuration_acestep_v15.py",
+      "source_sha256": "5f15aa79fe793bba3c00b6992dd193a269954950603d5031ecd7703b0fa69da1",
+      "runtime_checkpoint_sha256": "5f15aa79fe793bba3c00b6992dd193a269954950603d5031ecd7703b0fa69da1",
+      "matches_pinned_source": true
+    },
+    {
+      "file": "modeling_acestep_v15_turbo.py",
+      "source_sha256": "71b22e01b490bd9e149e4c0c5da2e1f512126f3ab3316e0ae97779af84d19512",
+      "runtime_checkpoint_sha256": "71b22e01b490bd9e149e4c0c5da2e1f512126f3ab3316e0ae97779af84d19512",
+      "matches_pinned_source": true
+    }
+  ]
+}

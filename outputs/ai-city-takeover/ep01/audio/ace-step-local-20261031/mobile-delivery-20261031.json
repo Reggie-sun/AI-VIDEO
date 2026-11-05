@@ -1,0 +1,84 @@
+{
+  "created_at_utc": "2026-10-31T03:38:59.910436+00:00",
+  "authorization": "User reports mobile cc-connect cannot access local links; deliver the requested audition files to the unique currently active project conversation",
+  "route": {
+    "project": "AI-VIDEO",
+    "platform": "feishu",
+    "session_key_sha256": "e9fc14342305eb409709e0efea0cda486bb017a2cdcfa402f640aa5fd377336b",
+    "matching_active_sessions": 1
+  },
+  "mechanism": "cc-connect send --audio plus --file to current conversation",
+  "automatic_retries": 0,
+  "items": [
+    {
+      "label": "A",
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-A.mp3",
+      "bytes": 698604,
+      "sha256": "070cc68ad612ec5c41d0f77f5731d88517047b8e7aef412f9d8e393ecb8b3fee",
+      "status": "FAILED_OR_PARTIAL_OUTCOME_UNCONFIRMED",
+      "started_at_utc": "2026-10-31T03:38:59.915961+00:00",
+      "exit_code": 1,
+      "cli_acknowledged_success": false,
+      "completed_at_utc": "2026-10-31T03:39:01.773404+00:00",
+      "error_output_retained": false
+    },
+    {
+      "label": "B",
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-B.mp3",
+      "bytes": 702972,
+      "sha256": "228a3a6b96cbbfc317524925d7593442256094e1476bd3cd11628e72c9e4faaa",
+      "status": "NOT_SENT"
+    }
+  ],
+  "phone_rendering": "NOT_EVALUATED",
+  "human_listening": "NOT_EVALUATED",
+  "third_party_or_public_link_sharing": false,
+  "separate_actions": [
+    {
+      "label": "B",
+      "kind": "native_audio_only",
+      "started_at_utc": "2026-10-31T03:40:53.498562+00:00",
+      "status": "ERROR",
+      "previous_B_attempts": 0,
+      "exit_code": 1,
+      "completed_at_utc": "2026-10-31T03:40:53.550846+00:00",
+      "sanitized_error": "Error: feishu: convert to opus: ffmpeg opus conversion failed: exit status 1 (stderr: ffmpeg version 9c33b2f Copyright (c) 2000-2021 the FFmpeg developers\n  built with gcc 9.3.0 (crosstool-NG 1.24.0.133_b0863d8_dirty)\n  configuration: --prefix=/home/reggie/miniconda3 --cc=/home/conda/feedstock_root/build_artifacts/ffmpeg_1627813612080/_build_env/bin/x86_64-conda-linux-gnu-cc --disable-doc --disable-openssl --enable-avresample --enable-gnutls --enable-gpl --enable-hardcoded-tables --enable-libfreetype --enable-libopenh264 --enable-libx264 --enable-pic --enable-pthreads --enable-shared --enable-static --enable-version3 --enable-zlib --enable-libmp3lame --pkg-config=/home/conda/feedstock_root/build_artifacts/ffmpeg_1627813612080/_build_env/bin/pkg-config\n  libavutil      56. 51.100 / 56. 51.100\n  libavcodec     58. 91.100 / 58. 91.100\n  libavformat    58. 45.100 / 58. 45.100\n  libavdevice    58. 10.100 / 58. 10.100\n  libavfilter     7. 85.100 /  7. 85.100\n  libavresample   4.  0.  0 /  4.  0.  0\n  libswscale      5.  7.100 /  5.  7.100\n  libswresample   3.  7.100 /  3.  7.100\n  libpostproc    55.  7.100 / 55.  7.100\n[mp3 @ 0x5e4b194fe0c0] invalid concatenated file detected - using bitrate for duration\nInput #0, mp3, from 'pipe:0':\n  Metadata:\n    title           : IRIS 01 Looked Outside - ACE-Step local candidate B\n    encoder         : Lavf58.45.100\n  Duration: N/A, start: 0.023021, bitrate: 167 kb/s\n    Stream #0:0: Audio: mp3, 48000 Hz, stereo, fltp, 167 kb/s\n    Metadata:\n      encoder         : Lavc58.91\nUnknown encoder 'libopus'\n)"
+    },
+    {
+      "label": "A",
+      "kind": "verified_opus_native_audio",
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-A-mobile.opus",
+      "sha256": "26ffab54274e7806c4b8eae892f79abe26a72714616e16670b34fcfc4a352df7",
+      "status": "SERVICE_ACKNOWLEDGED",
+      "started_at_utc": "2026-10-31T03:42:34.271698+00:00",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-31T03:42:36.274874+00:00"
+    },
+    {
+      "label": "B",
+      "kind": "verified_opus_native_audio",
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-B-mobile.opus",
+      "sha256": "e9fe98b02a2f05b0d5d479ccc6c583862256ee49831ab86b5c9ffcaa93f50318",
+      "status": "SERVICE_ACKNOWLEDGED",
+      "started_at_utc": "2026-10-31T03:42:36.280416+00:00",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-31T03:42:38.021210+00:00"
+    },
+    {
+      "label": "B",
+      "kind": "original_mp3_file_only",
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-B.mp3",
+      "sha256": "228a3a6b96cbbfc317524925d7593442256094e1476bd3cd11628e72c9e4faaa",
+      "status": "SERVICE_ACKNOWLEDGED",
+      "started_at_utc": "2026-10-31T03:43:10.664967+00:00",
+      "exit_code": 0,
+      "completed_at_utc": "2026-10-31T03:43:12.553788+00:00"
+    }
+  ],
+  "known_native_mp3_failure": "Feishu local conversion failed before upload: ffmpeg lacks libopus encoder",
+  "delivery_repair": "Send verified Opus derivatives via native audio field; preserve original combined-A status, do not replay that raw-file request",
+  "native_audio_service_acknowledged_labels": [
+    "A",
+    "B"
+  ]
+}

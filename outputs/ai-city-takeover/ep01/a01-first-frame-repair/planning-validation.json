@@ -1,0 +1,19 @@
+{
+  "planner_mode": "reference_to_video",
+  "selected_evidence": [
+    [
+      "iris-cf-details",
+      "identity"
+    ],
+    [
+      "iris-a01-first-frame-repair-balcony",
+      "scene"
+    ]
+  ],
+  "canonical_iris_character_unchanged": true,
+  "payload_cf_a_selected": false,
+  "registered_assets": 3,
+  "registration_is_not_egress": true,
+  "actual_native_bindings": "NOT_EVALUATED pending fresh live profile",
+  "provider_calls": 0
+}

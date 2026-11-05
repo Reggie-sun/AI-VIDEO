@@ -1,0 +1,1079 @@
+{
+  "shot_id": "S0119",
+  "start_frame": 5492,
+  "end_frame": 5524,
+  "start_time": 228.8333,
+  "end_time": 230.2083,
+  "duration_frames": 33,
+  "duration_s": 1.375,
+  "start_tc": "00:03:48:20",
+  "end_tc": "00:03:50:04",
+  "boundary_in_id": "B3-024",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5492,
+      "path": "keyframes/S0119_f05492.jpg",
+      "role": "first",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5500,
+      "path": "keyframes/S0119_f05500.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5508,
+      "path": "keyframes/S0119_f05508.jpg",
+      "role": "middle",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5516,
+      "path": "keyframes/S0119_f05516.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5524,
+      "path": "keyframes/S0119_f05524.jpg",
+      "role": "last",
+      "note": "Actually opened individually during detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Black boots on an immense white cooling-fan grid",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Black boots on an immense white cooling-fan grid. Starts macro on concentric fan grille then pulls back to boots centered among tiled circular ventilation units. A f5500, DATACENTER. f5502; circles spread over fan tiles.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Black boots on an immense white cooling-fan grid",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Black boots on an immense white cooling-fan grid",
+      "background": "Starts macro on concentric fan grille then pulls back to boots centered among tiled circular ventilation units."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0119.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0001,
+      "pan_y_frac_per_s": 0.032,
+      "zoom_per_s": -0.1445,
+      "median_flow_frac_per_s": 0.0801,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Starts macro on concentric fan grille then pulls back to boots centered among tiled circular ventilation units.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E7E9E9",
+        "fraction": 0.371,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#D1D7DD",
+        "fraction": 0.363,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#B9C1C9",
+        "fraction": 0.175,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#545352",
+        "fraction": 0.034,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#888B91",
+        "fraction": 0.031,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#101011",
+        "fraction": 0.026,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [208.3, 203.8, 201.9]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 02 /11",
+      "evidence_frame": 5508,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5508
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5508,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:48:20",
+      "end_value": "00:03:50:04"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5508
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0119-E01",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Starts macro on concentric fan grille then pulls back to boots centered among tiled circular ventilation units.",
+      "start_frame": 5492,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5492, 5495]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5521, 5524]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5492,
+          "state": "present"
+        },
+        {
+          "frame": 5524,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5492,
+        5524
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5492,
+          5495
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E02",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "character",
+      "description": "Black boots on an immense white cooling-fan grid",
+      "start_frame": 5492,
+      "end_frame": 5524,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5492, 5495]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5521, 5524]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5492,
+          "state": "present"
+        },
+        {
+          "frame": 5524,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5492,
+        5524
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5492,
+          5495
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E03",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "A / DATACENTER.",
+      "start_frame": 5500,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.75,
+        "w": 0.68,
+        "h": 0.15,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5500, 5503]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5521, 5524]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5500,
+          "text": "A",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5503,
+          "text": "DATACENTER.",
+          "inverted_backing_flash": true
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5500,
+        5524
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "A → DATACENTER.",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5500,
+          5503
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E04",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "hud_marker",
+      "description": "Thin concentric ellipse fan schematics multiply over original cooling fans; six front-row CV labels GENIUS000065/000067/000069/000083/000085/000087 with row-range labels000058–000076,000077–000095,000096–000114",
+      "start_frame": 5500,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.56,
+        "w": 0.95,
+        "h": 0.18,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5500, 5503]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5521, 5524]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5500,
+          "visible_rows": 1
+        },
+        {
+          "frame": 5508,
+          "visible_rows": 3
+        },
+        {
+          "frame": 5516,
+          "visible_rows": 5
+        },
+        {
+          "frame": 5524,
+          "visible_rows": 7
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5500,
+        5524
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5500,
+          5503
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E05",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "text_lyric",
+      "description": "Country of geniuses in a datacenter.",
+      "start_frame": 5492,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.6,
+        "y": 0.85,
+        "w": 0.34,
+        "h": 0.09,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5492, 5495]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5521, 5524]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5492,
+          "state": "present"
+        },
+        {
+          "frame": 5524,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5492,
+        5524
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Country of geniuses in a datacenter.",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5492,
+          5495
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E06",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "Lower-third solid cream panel behind DATACENTER and lyric",
+      "start_frame": 5496,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.02,
+        "y": 0.68,
+        "w": 0.96,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5496,
+          "state": "present"
+        },
+        {
+          "frame": 5524,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5496,
+        5524
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5496,
+          5499
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E07",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "PLAN · ROOF ·1FAN=1GENIUS · ALT11,200M",
+      "start_frame": 5496,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.06,
+        "y": 0.69,
+        "w": 0.4,
+        "h": 0.018,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5496,
+          "state": "present"
+        },
+        {
+          "frame": 5524,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5496,
+        5524
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "PLAN · ROOF ·1FAN=1GENIUS · ALT11,200M",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5496,
+          5499
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E08",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "counter",
+      "description": "GENIUS000001→935755 aggregate readout above lower panel",
+      "start_frame": 5496,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.84,
+        "y": 0.69,
+        "w": 0.12,
+        "h": 0.018,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5496,
+          "count": 1
+        },
+        {
+          "frame": 5508,
+          "count": 658772
+        },
+        {
+          "frame": 5516,
+          "count": 833942
+        },
+        {
+          "frame": 5524,
+          "count": 935755
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5496,
+        5524
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5496,
+          5499
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0119-E09",
+      "shot_id": "S0119",
+      "asset_id": null,
+      "type": "text_caption",
+      "description": "Country of geniuses in a datacenter.",
+      "start_frame": 5492,
+      "end_frame": 5524,
+      "bounding_box": {
+        "x": 0.7,
+        "y": 0.84,
+        "w": 0.25,
+        "h": 0.08,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5492,
+          "state": "present"
+        },
+        {
+          "frame": 5524,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5492,
+        5524
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Country of geniuses in a datacenter.",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5492,
+          5495
+        ],
+        "exit_bounds": [
+          5521,
+          5524
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0119-A01",
+      "target_element_ids": [
+        "S0119-E02",
+        "S0119-E03",
+        "S0119-E04",
+        "S0119-E05"
+      ],
+      "description": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+      "start_frame": 5492,
+      "end_frame": 5524,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0217",
+        "D0218"
+      ],
+      "frame_range": [
+        5499,
+        5503
+      ],
+      "type": "text_swap",
+      "description": "'A' then 'DATACENTER.' caption over fans shot.",
+      "confidence": 0.85,
+      "chunk": 3,
+      "verification": "Consistent at filmstrip resolution; candidate span from Phase A, not independently frame-exact verified"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-024",
+      "span": [
+        5489,
+        5492
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-025",
+      "span": [
+        5524,
+        5524
+      ],
+      "description": "A f5500, DATACENTER. f5502; circles spread over fan tiles",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0352",
+      "relation": "vocal_word_candidate (unknown) at frame 5489–5493; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5492
+    },
+    {
+      "audio_event_id": "AH02274",
+      "relation": "band_onset_candidate (unknown) at frame 5493; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AH02275",
+      "relation": "band_onset_candidate (unknown) at frame 5493; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AH02276",
+      "relation": "band_onset_candidate (unknown) at frame 5493; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AH02277",
+      "relation": "band_onset_candidate (unknown) at frame 5493; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AB0507",
+      "relation": "beat_candidate (unknown) at frame 5493; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AW0353",
+      "relation": "vocal_word_candidate (unknown) at frame 5493; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AH02278",
+      "relation": "band_onset_candidate (unknown) at frame 5493; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AW0354",
+      "relation": "vocal_word_candidate (unknown) at frame 5493–5523; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5493
+    },
+    {
+      "audio_event_id": "AH02279",
+      "relation": "band_onset_candidate (unknown) at frame 5498; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5498
+    },
+    {
+      "audio_event_id": "AH02280",
+      "relation": "band_onset_candidate (unknown) at frame 5498; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5498
+    },
+    {
+      "audio_event_id": "AH02281",
+      "relation": "band_onset_candidate (unknown) at frame 5498; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5498
+    },
+    {
+      "audio_event_id": "AH02282",
+      "relation": "band_onset_candidate (unknown) at frame 5503; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5503
+    },
+    {
+      "audio_event_id": "AH02283",
+      "relation": "band_onset_candidate (unknown) at frame 5503; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5503
+    },
+    {
+      "audio_event_id": "AH02284",
+      "relation": "band_onset_candidate (unknown) at frame 5503; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5503
+    },
+    {
+      "audio_event_id": "AB0508",
+      "relation": "beat_candidate (unknown) at frame 5503; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5503
+    },
+    {
+      "audio_event_id": "AH02285",
+      "relation": "band_onset_candidate (unknown) at frame 5504; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5504
+    },
+    {
+      "audio_event_id": "AH02286",
+      "relation": "band_onset_candidate (unknown) at frame 5504; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5504
+    },
+    {
+      "audio_event_id": "AH02287",
+      "relation": "band_onset_candidate (unknown) at frame 5509; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5509
+    },
+    {
+      "audio_event_id": "AH02288",
+      "relation": "band_onset_candidate (unknown) at frame 5509; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5509
+    },
+    {
+      "audio_event_id": "AH02289",
+      "relation": "band_onset_candidate (unknown) at frame 5509; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5509
+    },
+    {
+      "audio_event_id": "AB0509",
+      "relation": "beat_candidate (unknown) at frame 5514; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5514
+    },
+    {
+      "audio_event_id": "AH02290",
+      "relation": "band_onset_candidate (unknown) at frame 5514; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5514
+    },
+    {
+      "audio_event_id": "AH02291",
+      "relation": "band_onset_candidate (unknown) at frame 5514; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5514
+    },
+    {
+      "audio_event_id": "AH02292",
+      "relation": "band_onset_candidate (unknown) at frame 5514; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5514
+    },
+    {
+      "audio_event_id": "AH02293",
+      "relation": "band_onset_candidate (unknown) at frame 5514; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5514
+    },
+    {
+      "audio_event_id": "AH02294",
+      "relation": "band_onset_candidate (unknown) at frame 5515; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5515
+    },
+    {
+      "audio_event_id": "AH02295",
+      "relation": "band_onset_candidate (unknown) at frame 5519; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5519
+    },
+    {
+      "audio_event_id": "AH02296",
+      "relation": "band_onset_candidate (unknown) at frame 5519; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5519
+    },
+    {
+      "audio_event_id": "AH02297",
+      "relation": "band_onset_candidate (unknown) at frame 5520; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5520
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0119.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original shader, font and easing coefficients unknown.",
+    "Microtext repeats are recorded as a texture family with exact readable tokens, not original authored per-row source code."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0119.jpg",
+      "keyframes/S0119_f05492.jpg",
+      "keyframes/S0119_f05500.jpg",
+      "keyframes/S0119_f05508.jpg",
+      "keyframes/S0119_f05516.jpg",
+      "keyframes/S0119_f05524.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "frames_actually_opened": [
+      5492,
+      5500,
+      5508,
+      5516,
+      5524
+    ],
+    "filmstrip_opened": true,
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "All five 960px keyframes opened individually; selected source-detail crops and per-frame headline sheets inspected.",
+    "dense_sheets": [
+      "work/full_codex_103_153/datacenter119.jpg"
+    ],
+    "fullres_frames_actually_opened": [
+      5508
+    ],
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

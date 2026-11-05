@@ -1,0 +1,19 @@
+{
+ "unit": "U021",
+ "file": "outputs/ai-city-takeover/ep01/v3/pilot/oh-r3b/U021/fetch/e2996be8a48bc86d21f62c8ca71db4df4de4aac0ae593e415c31c31c76a4c433.mp4",
+ "sha256": "e2996be8a48bc86d21f62c8ca71db4df4de4aac0ae593e415c31c31c76a4c433",
+ "bytes": 7445029,
+ "suggested_name": "jimeng-2026-11-05-2267-镜头固定中近景。开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，投入地....mp4",
+ "page_video": {
+  "w": 1270,
+  "h": 720,
+  "dur": 4.365011,
+  "box": [
+   566,
+   152,
+   504,
+   283.5
+  ]
+ },
+ "fetched_at": "2026-11-05T08:33:21.455Z"
+}

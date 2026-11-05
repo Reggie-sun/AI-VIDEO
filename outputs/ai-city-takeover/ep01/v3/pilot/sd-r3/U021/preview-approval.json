@@ -1,0 +1,23 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "87679931317d23743265d7a208b2114836a5bc87c77dae81b4ce06e92ebb83ba",
+  "unit_ids": [
+    "U021"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-sing.png",
+      "sha256": "4cb7b152e8e9ed40320e8dcdf73ce51e12c338bbb1d118a9ad2e6a1cc21bde2f",
+      "role": "U021 reference image"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+      "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+      "role": "U021 vocal"
+    }
+  ],
+  "user_quote": "确认，开拍",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

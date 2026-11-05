@@ -1,0 +1,53 @@
+artifact_id: iris-v2-s5v3-brief
+audience: 中文短视频观众
+constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 开头平静望向窗外；随后注意到远处一点，视线锁定、眼睛微眯、眉心收紧、身体极轻微前倾；不转身、不说话、不抬手
+- 摄影机完全固定，全程不推近、不移动、不摇镜，保持第一张图的景别与人物位置；玻璃上没有倒影
+- 保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。
+content_hash: 6dbb03eb5f6724724562c5764a9e465d14f0b319fcef038c79c65b80fca9176b
+creation_receipt_id: iris-v2-s5v3-authoring
+format: 1920×1080 30fps horizontal source
+language: zh
+objective: 分镜 v2.1 S5 六秒源片
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 2852e3a23acda3b709e86a2600b3c5d42745ef427f1f3fc75af666a13cf2a43f
+  kind: user_input
+  reference: evidence/authoring-input/2852e3a23acda3b709e86a2600b3c5d42745ef427f1f3fc75af666a13cf2a43f.json
+- content_hash: 4c39cbc7d26c598830e0baa3315c38a1660ddaba292cc61af6b0bd0e3cc8c742
+  kind: user_input
+  reference: evidence/authoring-input/4c39cbc7d26c598830e0baa3315c38a1660ddaba292cc61af6b0bd0e3cc8c742.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 0f5ed459a07ee8e93cd5587905018502fd1ee470924566871ebedfa087f8ed44
+  kind: user_input
+  reference: evidence/authoring-input/0f5ed459a07ee8e93cd5587905018502fd1ee470924566871ebedfa087f8ed44.json
+- content_hash: f3926e15f96c958b3be0e814ac57fef8ebaba622539f494a7cdb9c7d56ba966e
+  kind: user_input
+  reference: evidence/authoring-input/f3926e15f96c958b3be0e814ac57fef8ebaba622539f494a7cdb9c7d56ba966e.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+title: IRIS EP01 v2 S5v3 source

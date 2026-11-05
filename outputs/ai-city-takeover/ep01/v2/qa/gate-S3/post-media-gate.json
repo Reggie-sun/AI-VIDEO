@@ -1,0 +1,44 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S3",
+  "shot_id": "ep01v2-s3",
+  "attempt_id": "iris-v2-s3-source-001",
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+  "artifact_sha256": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7",
+  "intent": "board v2.1 S3: aisle push toward the red door gap (A training run / misconfigured)",
+  "source_audio_policy": "MUTE (final film uses the approved song v2; raw audio not counted)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 6.08 s, 145 frames (VFR, r_frame_rate 60), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S3/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, issues []",
+    "frames_first_mid_last": "qa/gate-S3/first-mid-last.jpg"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "aisle-start",
+      "verdict": "PASS",
+      "reason": "frame 0 reproduces K3: empty aisle, symmetric racks, the narrow red gap at the far left end and its floor reflection"
+    },
+    {
+      "requirement_id": "push-to-door",
+      "verdict": "PASS",
+      "reason": "first/mid/last frames show a steady forward dolly on the aisle axis: the red door and far wall grow, vanishing point stays centred; one scene, no frozen frames"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; no subtitles, titles, text or interface added; rack glass shows no readable text"
+    }
+  ],
+  "observations": [
+    "red light also reflects on the right-hand rack glass, which the prompt asked for (opposite-glass reflections)",
+    "no person appears"
+  ],
+  "verdict": "PASS",
+  "all_required_observed_pass": true,
+  "not_evaluated": [
+    "human 1.0x viewing in the assembled film",
+    "final audio (MUTE here)"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

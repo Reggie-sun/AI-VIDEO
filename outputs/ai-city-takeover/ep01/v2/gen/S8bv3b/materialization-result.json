@@ -1,0 +1,13 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/S8bv3b/project",
+  "task_id": "iris-v2-s8bv3b-source-001",
+  "request_hash": "3689823e3480f87b36bcf1b60fc27d08f26336546f933bed31a23c729fc76b08",
+  "resolved_reference_order": [
+    "iris-c-v3-s8b-1-balcony",
+    "iris-c-v3-s8b-2-singing",
+    "iris-c-v3-s8b-3-after",
+    "iris-cf-details"
+  ],
+  "new_provider_calls": 0,
+  "new_attempt_started": false
+}

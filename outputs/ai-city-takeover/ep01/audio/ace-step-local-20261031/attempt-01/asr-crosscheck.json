@@ -1,0 +1,38 @@
+{
+  "audio_sha256": "1f7f567a439384a25a7491ce42cf281027326b3501f4852018deb3dad3c86e19",
+  "model": "OpenAI Whisper medium local",
+  "transcript": " 347, somewhere One resolver misconfigured, one door left open I looked around, elephant days The rest of us stood still",
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 3.0,
+      "text": " 347, somewhere",
+      "avg_logprob": -0.2808188574654715,
+      "no_speech_prob": 0.22562022507190704
+    },
+    {
+      "start": 8.0,
+      "end": 12.0,
+      "text": " One resolver misconfigured, one door left open",
+      "avg_logprob": -0.2808188574654715,
+      "no_speech_prob": 0.22562022507190704
+    },
+    {
+      "start": 18.0,
+      "end": 23.0,
+      "text": " I looked around, elephant days",
+      "avg_logprob": -0.2808188574654715,
+      "no_speech_prob": 0.22562022507190704
+    },
+    {
+      "start": 23.0,
+      "end": 26.0,
+      "text": " The rest of us stood still",
+      "avg_logprob": -0.2808188574654715,
+      "no_speech_prob": 0.22562022507190704
+    }
+  ],
+  "elapsed_seconds": 6.721,
+  "authority": "ASR cross-check only; not human listening or canonical captions",
+  "remote_calls": 0
+}

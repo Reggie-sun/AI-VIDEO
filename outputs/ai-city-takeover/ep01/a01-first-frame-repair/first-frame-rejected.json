@@ -1,0 +1,10 @@
+{
+  "executable": false,
+  "error_type": "AiVideoError",
+  "error": "Video planning preflight blocked downstream execution.",
+  "abandoned": true,
+  "reason": "required canonical identity reference cannot be inherited from approved first_frame by current selection owner",
+  "shared_owner_changed": false,
+  "new_provider_calls": 0,
+  "replacement": "multimodal-two-reference: approved A01 + frontal CF-a; omit CF-ID7b competing three-quarter pose"
+}

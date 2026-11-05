@@ -1,0 +1,262 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "outputs/ai-city-takeover/ep01/v2/gen/S8bv3b/project/state/video-generation/fetch/files/83576dce4c71fe88cdda4e2f93679e9a58f6cd564214dbc681f04bd69443a4b4.mp4",
+ "take_sha256": "83576dce4c71fe88cdda4e2f93679e9a58f6cd564214dbc681f04bd69443a4b4",
+ "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8br-vocal-ref-22.00-27.00.wav",
+ "window_sha256": "9ba9442d9d7c516f41251e410c8c8540cd0bd339d4923b08f0405e1a5326318a",
+ "song_t0": 22.0,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": -0.0471,
+ "ncc": 0.0342,
+ "copy": false,
+ "threshold": {
+  "null90": 0.4377,
+  "matched_med": 0.6839,
+  "thr": 0.5362,
+  "strong_frames": 19
+ },
+ "frames": {
+  "total": 507,
+  "active": 404,
+  "matched": 26,
+  "matched_of_active": 0.064
+ },
+ "divergence": {
+  "frame": 5,
+  "rule": "stretch",
+  "last_match": null,
+  "clip_s": 0.05,
+  "song_s": 22.097
+ },
+ "synced_until": null,
+ "spans": [],
+ "envelope": {
+  "lag_s": 0.699,
+  "ncc": 0.827,
+  "windows": [
+   {
+    "clip_t0": 0.0,
+    "clip_t1": 1.5,
+    "lag_s": 0.649,
+    "ncc": 0.952
+   },
+   {
+    "clip_t0": 0.25,
+    "clip_t1": 1.75,
+    "lag_s": 1.2,
+    "ncc": 0.857
+   },
+   {
+    "clip_t0": 0.5,
+    "clip_t1": 2.0,
+    "lag_s": 1.2,
+    "ncc": 0.886
+   },
+   {
+    "clip_t0": 0.75,
+    "clip_t1": 2.25,
+    "lag_s": 0.75,
+    "ncc": 0.761
+   },
+   {
+    "clip_t0": 1.0,
+    "clip_t1": 2.5,
+    "lag_s": 1.2,
+    "ncc": 0.524
+   },
+   {
+    "clip_t0": 1.25,
+    "clip_t1": 2.75,
+    "lag_s": 0.2,
+    "ncc": 0.26
+   },
+   {
+    "clip_t0": 1.5,
+    "clip_t1": 3.0,
+    "lag_s": 0.2,
+    "ncc": 0.716
+   },
+   {
+    "clip_t0": 1.75,
+    "clip_t1": 3.25,
+    "lag_s": 0.249,
+    "ncc": 0.851
+   },
+   {
+    "clip_t0": 2.0,
+    "clip_t1": 3.5,
+    "lag_s": 0.252,
+    "ncc": 0.867
+   },
+   {
+    "clip_t0": 2.25,
+    "clip_t1": 3.75,
+    "lag_s": 0.47,
+    "ncc": 0.691
+   },
+   {
+    "clip_t0": 2.5,
+    "clip_t1": 4.0,
+    "lag_s": 0.735,
+    "ncc": 0.686
+   },
+   {
+    "clip_t0": 2.75,
+    "clip_t1": 4.25,
+    "lag_s": 1.019,
+    "ncc": 0.816
+   },
+   {
+    "clip_t0": 3.0,
+    "clip_t1": 4.5,
+    "lag_s": 0.757,
+    "ncc": 0.716
+   },
+   {
+    "clip_t0": 3.25,
+    "clip_t1": 4.75,
+    "lag_s": 0.787,
+    "ncc": 0.797
+   },
+   {
+    "clip_t0": 3.5,
+    "clip_t1": 5.0,
+    "lag_s": 0.783,
+    "ncc": 0.847
+   }
+  ],
+  "max_dev_s": 0.501,
+  "steady": false,
+  "segments": [
+   {
+    "clip_s": [
+     0.625,
+     0.875
+    ],
+    "lag_s": 0.649,
+    "windows": 1,
+    "min_ncc": 0.952
+   },
+   {
+    "clip_s": [
+     0.875,
+     1.375
+    ],
+    "lag_s": 1.2,
+    "windows": 2,
+    "min_ncc": 0.857
+   },
+   {
+    "clip_s": [
+     1.375,
+     1.625
+    ],
+    "lag_s": 0.75,
+    "windows": 1,
+    "min_ncc": 0.761
+   },
+   {
+    "clip_s": [
+     1.625,
+     1.875
+    ],
+    "lag_s": 1.2,
+    "windows": 1,
+    "min_ncc": 0.524
+   },
+   {
+    "clip_s": [
+     1.875,
+     2.625
+    ],
+    "lag_s": 0.2,
+    "windows": 3,
+    "min_ncc": 0.26
+   },
+   {
+    "clip_s": [
+     2.625,
+     2.875
+    ],
+    "lag_s": 0.252,
+    "windows": 1,
+    "min_ncc": 0.867
+   },
+   {
+    "clip_s": [
+     2.875,
+     3.125
+    ],
+    "lag_s": 0.47,
+    "windows": 1,
+    "min_ncc": 0.691
+   },
+   {
+    "clip_s": [
+     3.125,
+     3.375
+    ],
+    "lag_s": 0.735,
+    "windows": 1,
+    "min_ncc": 0.686
+   },
+   {
+    "clip_s": [
+     3.375,
+     3.625
+    ],
+    "lag_s": 1.019,
+    "windows": 1,
+    "min_ncc": 0.816
+   },
+   {
+    "clip_s": [
+     3.625,
+     4.375
+    ],
+    "lag_s": 0.783,
+    "windows": 3,
+    "min_ncc": 0.716
+   }
+  ]
+ },
+ "placement": {
+  "lag_s": 0.699,
+  "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+  "song_t_of_clip0": 21.301,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "S8bv3b",
+ "film_window_song_s": [
+  22.5667,
+  25.9
+ ],
+ "prior": {
+  "lag_s": 0.0,
+  "why": "c2 cut, in-point 0.5667 (sealed mapping)"
+ },
+ "reviews": [
+  {
+   "kind": "placement",
+   "lag_s": 0.699,
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/sync/S8bv3b/review-S8bv3b-83576dce4c71-placement-lag+0.699.mp4",
+   "sha256": "ea2f2e82acba4af415f29cbb4b970fb8ffe2b5cfada86ee67cb800ccc7b57c47"
+  },
+  {
+   "kind": "prior",
+   "lag_s": 0.0,
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/sync/S8bv3b/review-S8bv3b-83576dce4c71-prior-lag+0.000.mp4",
+   "sha256": "78be0f9605b1e85eeeacc4a6ad4aeebeaa47268216a88fa05968a503c2285a83"
+  }
+ ]
+}

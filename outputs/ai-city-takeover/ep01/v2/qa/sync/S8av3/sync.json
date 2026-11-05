@@ -1,0 +1,214 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "outputs/ai-city-takeover/ep01/v2/gen/S8av3/project/state/video-generation/fetch/files/20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f.mp4",
+ "take_sha256": "20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f",
+ "window": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8a-vocal-ref-18.40-23.40.wav",
+ "window_sha256": "c70ec5a59777795a6ac608e17803be6b94ee24842d68801718cf6226c3241dfe",
+ "song_t0": 18.4,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": -0.1075,
+ "ncc": 0.4024,
+ "copy": true,
+ "threshold": {
+  "null90": 0.6332,
+  "matched_med": 0.9359,
+  "thr": 0.7543,
+  "strong_frames": 78
+ },
+ "frames": {
+  "total": 507,
+  "active": 373,
+  "matched": 219,
+  "matched_of_active": 0.587
+ },
+ "divergence": {
+  "frame": 327,
+  "rule": "stretch",
+  "last_match": 317,
+  "clip_s": 3.27,
+  "song_s": 21.777
+ },
+ "synced_until": {
+  "clip_s": 3.128,
+  "song_s": 21.636
+ },
+ "spans": [
+  {
+   "clip_s": [
+    0.33,
+    2.27
+   ],
+   "song_s": [
+    18.837,
+    20.777
+   ]
+  },
+  {
+   "clip_s": [
+    2.56,
+    4.11
+   ],
+   "song_s": [
+    21.067,
+    22.617
+   ]
+  }
+ ],
+ "envelope": {
+  "lag_s": -0.056,
+  "ncc": 0.886,
+  "windows": [
+   {
+    "clip_t0": 0.0,
+    "clip_t1": 1.5,
+    "lag_s": -0.139,
+    "ncc": 0.9
+   },
+   {
+    "clip_t0": 0.25,
+    "clip_t1": 1.75,
+    "lag_s": -0.143,
+    "ncc": 0.951
+   },
+   {
+    "clip_t0": 0.5,
+    "clip_t1": 2.0,
+    "lag_s": -0.138,
+    "ncc": 0.967
+   },
+   {
+    "clip_t0": 0.75,
+    "clip_t1": 2.25,
+    "lag_s": -0.124,
+    "ncc": 0.935
+   },
+   {
+    "clip_t0": 1.0,
+    "clip_t1": 2.5,
+    "lag_s": -0.089,
+    "ncc": 0.941
+   },
+   {
+    "clip_t0": 1.25,
+    "clip_t1": 2.75,
+    "lag_s": -0.078,
+    "ncc": 0.949
+   },
+   {
+    "clip_t0": 1.5,
+    "clip_t1": 3.0,
+    "lag_s": -0.071,
+    "ncc": 0.937
+   },
+   {
+    "clip_t0": 1.75,
+    "clip_t1": 3.25,
+    "lag_s": -0.068,
+    "ncc": 0.922
+   },
+   {
+    "clip_t0": 2.0,
+    "clip_t1": 3.5,
+    "lag_s": -0.065,
+    "ncc": 0.925
+   },
+   {
+    "clip_t0": 2.25,
+    "clip_t1": 3.75,
+    "lag_s": -0.058,
+    "ncc": 0.945
+   },
+   {
+    "clip_t0": 2.5,
+    "clip_t1": 4.0,
+    "lag_s": -0.046,
+    "ncc": 0.956
+   },
+   {
+    "clip_t0": 2.75,
+    "clip_t1": 4.25,
+    "lag_s": -0.043,
+    "ncc": 0.97
+   },
+   {
+    "clip_t0": 3.0,
+    "clip_t1": 4.5,
+    "lag_s": -0.033,
+    "ncc": 0.97
+   },
+   {
+    "clip_t0": 3.25,
+    "clip_t1": 4.75,
+    "lag_s": -0.029,
+    "ncc": 0.988
+   },
+   {
+    "clip_t0": 3.5,
+    "clip_t1": 5.0,
+    "lag_s": -0.027,
+    "ncc": 0.993
+   }
+  ],
+  "max_dev_s": 0.087,
+  "steady": false,
+  "segments": [
+   {
+    "clip_s": [
+     0.625,
+     1.875
+    ],
+    "lag_s": -0.138,
+    "windows": 5,
+    "min_ncc": 0.9
+   },
+   {
+    "clip_s": [
+     1.875,
+     4.375
+    ],
+    "lag_s": -0.052,
+    "windows": 10,
+    "min_ncc": 0.922
+   }
+  ]
+ },
+ "placement": {
+  "lag_s": -0.1075,
+  "method": "tool 15 waveform lag (copy)",
+  "song_t_of_clip0": 18.5075,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "S8av3",
+ "film_window_song_s": [
+  18.8667,
+  22.5667
+ ],
+ "prior": {
+  "lag_s": 0.0667,
+  "why": "c2 cut, in-point 0.5333 (user-chosen 2-frame slip)"
+ },
+ "reviews": [
+  {
+   "kind": "placement",
+   "lag_s": -0.1075,
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/sync/S8av3/review-S8av3-20e7642b073a-placement-lag-0.107.mp4",
+   "sha256": "80fd327eff7119f4b827fb61788dde14094f7be2f723864ff5e18c7547ceb971"
+  },
+  {
+   "kind": "prior",
+   "lag_s": 0.0667,
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/sync/S8av3/review-S8av3-20e7642b073a-prior-lag+0.067.mp4",
+   "sha256": "97118f7bb5dda2873813d70b0d40965cb7db213a4662b6a742136693ba67a177"
+  }
+ ]
+}

@@ -1,0 +1,58 @@
+artifact_id: iris-v2-s9a-shot
+character_ids: []
+composition_directives: []
+content_hash: 57b84ac2a741184411ddde1ce245fc406903321e49ee291545bf84744f67b99e
+continuity_constraints:
+- 机柜门平稳关上，门缝变窄直到消失，红光熄灭，之后画面静止
+- 同一机位：从K4起始画面到K9e结束画面，摄影机固定不动
+- 保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。
+creation_receipt_id: iris-v2-S9a-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: '真人电影摄影，横幅十六比九，连续六秒。第一张图是这个镜头的起始画面：机房里一扇半开的黑色机柜门，门缝透出强烈的红光，线缆沿地面通往右侧的落地窗；第二张图是这个镜头的结束画面：同一机位，那扇机柜门已经完全关上，红光熄灭，只剩冷蓝。
+
+  画面中没有人。开头红光门缝保持片刻，随后那扇机柜门平稳地转动关上，门缝逐渐变窄直到消失，红光随之熄灭，地面上的红色反光也消失。门关上后画面保持静止。
+
+  摄影机固定不动，窗外城市灯光不变。蓝黑与钢蓝冷色，红色只在门缝里，门关上后不再有红色。
+
+  保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。可以有一声轻微的机柜门关上声和极轻的机房环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨。'
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-c-v2-s9a-1-door-open
+  - iris-c-v2-s9a-2-door-closed
+  role: reference
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: rack-door
+schema_version: '2.0'
+shot_id: ep01v2-s9a
+source_provenance:
+- content_hash: 4b80e9faf55ce864802a67ac872efa9a62ed3568073df56c153afa1a9ca4f8f8
+  kind: user_input
+  reference: evidence/authoring-input/4b80e9faf55ce864802a67ac872efa9a62ed3568073df56c153afa1a9ca4f8f8.json
+- content_hash: 7cdd3a65989ac64e2b1de4921d9ecb80d84fdacedef6552f251270e13d2caaeb
+  kind: user_input
+  reference: evidence/authoring-input/7cdd3a65989ac64e2b1de4921d9ecb80d84fdacedef6552f251270e13d2caaeb.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 53d1b791e5c37796a532d12e9a9c5e85a7d26fe2107114522e9e2a070e0557ed
+  kind: user_input
+  reference: evidence/authoring-input/53d1b791e5c37796a532d12e9a9c5e85a7d26fe2107114522e9e2a070e0557ed.json
+storyboard_beat_id: closed
+visual_strategy: generated_video

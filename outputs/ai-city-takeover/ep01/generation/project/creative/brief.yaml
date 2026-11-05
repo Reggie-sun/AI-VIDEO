@@ -1,0 +1,28 @@
+artifact_id: iris-a01-brief
+audience: 中文短视频观众
+constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手
+- 摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳
+- 真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线，不新增文字、屏幕或人物
+content_hash: 8ac522e5cbae2ed3418170af2f51a441e27ad0465c61ad43261275744175c87b
+creation_receipt_id: iris-a01-authoring:brief
+format: 1920×1080 30fps horizontal source
+language: zh
+objective: 已认可阳台参考的六秒轻微自然运动源片；未完成歌曲、对嘴或整集
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: c6895e55abc8bacd6bf3b024579505a7d467827ebbf0e646e2bf6e23a1f4f3d3
+  kind: user_input
+  reference: evidence/authoring-input/c6895e55abc8bacd6bf3b024579505a7d467827ebbf0e646e2bf6e23a1f4f3d3.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+title: IRIS EP01 A01 source qualification

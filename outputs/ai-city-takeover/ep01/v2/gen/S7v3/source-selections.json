@@ -1,0 +1,38 @@
+[
+  {
+    "asset_id": "iris-c-v3-s7-1-cache-room",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K7-a.png",
+    "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+    "size_bytes": 1902209,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K7: start frame, dark room with floating panes",
+    "need_id": "cache-room",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v3-s7-2-performance",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P7-a.png",
+    "sha256": "f5bc00f36d1a636cd9e789b375135570c8d939b15582cb12d84358bd3284d0df",
+    "size_bytes": 1813624,
+    "width": 1672,
+    "height": 941,
+    "role": "approved P7: expression and commitment only",
+    "need_id": "performance",
+    "anchor_role": "action_pose",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-cf-details",
+    "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+    "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+    "size_bytes": 1843560,
+    "width": 1672,
+    "height": 941,
+    "role": "approved front IRIS identity: face, left-ear device and fine red left-collar line",
+    "need_id": "identity",
+    "anchor_role": "identity",
+    "selected_for_provider": true
+  }
+]

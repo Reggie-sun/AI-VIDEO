@@ -1,0 +1,54 @@
+artifact_id: iris-v3-u021-shot
+character_ids:
+- IRIS
+composition_directives: []
+content_hash: 59130acf6a3d21f013d2de7d98925a28c74a10f3119339ab88611126fee6e100
+continuity_constraints:
+- 同一IRIS（定稿v4）：银白色利落短发、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置、白色雕塑感短款立领外套与左侧立领的极细红灯线完整保持；正面时耳挂与立领红线在画面右侧
+- 同一IRIS（定稿v4）：银白色利落短发、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置、白色雕塑感短款立领外套与左侧立领的极细红灯线完整保持；正面时耳挂与立领红线在画面右侧（由认可的参考图承担）
+- 歌词期间嘴在唱、与参考人声逐字同步，无声处嘴唇闭合；对嘴准确度由片段自带音轨与参考人声的对齐量测和使用者审看判定
+- 摄影机完全固定，全程不推近、不移动、不摇镜，一镜到底
+- 画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡
+creation_receipt_id: iris-v3-U021-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: '{{image:0}}中的她对着镜头唱歌，口型与{{audio:1}}里的人声逐字精确同步。中近景，开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴，她闭着眼睛投入地唱，神情平静淡然，带着一点好奇，眉头舒展；唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头。镜头全程锁定，一镜到底。'
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-c-v3-u021-reference
+  role: reference
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: door-gap-red
+schema_version: '2.0'
+shot_id: ep01v3-u021
+source_provenance:
+- content_hash: b3f8e60622e39ad5e49cec585cbaf43c61cc93311837b671dac88067e64e192a
+  kind: user_input
+  reference: evidence/authoring-input/b3f8e60622e39ad5e49cec585cbaf43c61cc93311837b671dac88067e64e192a.json
+- content_hash: 90a19e89db7d0ff08e93956adffea07fe673f877dba3f2bcb97af8f0a18467b8
+  kind: user_input
+  reference: evidence/authoring-input/90a19e89db7d0ff08e93956adffea07fe673f877dba3f2bcb97af8f0a18467b8.json
+- content_hash: 87679931317d23743265d7a208b2114836a5bc87c77dae81b4ce06e92ebb83ba
+  kind: user_input
+  reference: evidence/authoring-input/87679931317d23743265d7a208b2114836a5bc87c77dae81b4ce06e92ebb83ba.json
+- content_hash: 9e848bc836e22466fb56ee45663262927746436046c1e4fc0f4483149abbf816
+  kind: user_input
+  reference: evidence/authoring-input/9e848bc836e22466fb56ee45663262927746436046c1e4fc0f4483149abbf816.json
+storyboard_beat_id: u021
+visual_strategy: generated_video

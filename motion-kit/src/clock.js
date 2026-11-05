@@ -73,8 +73,9 @@ export class Clock {
     const list = kind === 'impact' ? (this.hits.hits || []).map(h => h.t) : this.hits[kind];
     const e = this.last(list, t);
     if (e === null) return 0;
-    const dt = t - e;
-    return dt < 0 ? 0 : Math.exp(-dt / decay);
+    // last() excludes future events; offset subtraction can leave a tiny negative delta.
+    const dt = Math.max(0, t - e);
+    return Math.exp(-dt / decay);
   }
 
   // 24 fps envelope (0..1) linearly interpolated

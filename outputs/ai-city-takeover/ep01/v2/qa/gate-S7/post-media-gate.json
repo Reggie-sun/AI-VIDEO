@@ -1,0 +1,53 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S7",
+  "shot_id": "ep01v2-s7",
+  "attempt_id": "iris-v2-s7-source-001",
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S7/project/state/video-generation/fetch/files/1921cdec15b928919c99454ccafb0411916d21bfcc2780688904471d103ee9b7.mp4",
+  "artifact_sha256": "1921cdec15b928919c99454ccafb0411916d21bfcc2780688904471d103ee9b7",
+  "intent": "board v2.1 S7: offline cache room, IRIS frontal and calm while translucent panes slide past; static camera",
+  "source_audio_policy": "MUTE (final film uses the approved song v2; raw audio not counted)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 6.08 s, 145 frames (24 fps cadence on a 60 tbn grid), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S7/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 0.0 s, issues []",
+    "frames": "first-mid-last.jpg, quarter-second-sheet.jpg, face-first-mid-last.jpg",
+    "camera": {
+      "orb_ransac_scale": "within -0.41%..+0.10% with no trend (moving panes dominate many matches)",
+      "phase_correlation_face_and_coat": "whole figure sways laterally up to 15 px (0.8% of width) and returns to <=1 px by frame 144",
+      "limit": "the dark hazy background has no static texture, so sway of the standing figure cannot be separated from camera float; no push, zoom or pan is present"
+    }
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same face as ID7b/K7 (brows, freckles, eyes), black hook on her left ear, thin red line on the left collar, charcoal high-collar coat, hair back in the low bun"
+    },
+    {
+      "requirement_id": "observer",
+      "verdict": "PASS",
+      "reason": "calm, looks into the lens throughout; lips closed, no speech or singing (MCP speaking 0.0 s); translucent panes slide across in front of and behind her and cold light passes over her face and collar"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "no push, zoom or pan; framing class and placement match K7 (frontal close-up, head about 57% of frame height versus about 60% in K7, face centre at 56% of width in both); panes carry no readable content"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; no subtitles, titles, text or interface added; one pane has the red edge the prompt asked for"
+    }
+  ],
+  "observations": [
+    "the figure's small lateral sway (<=15 px) is visible only when frames are compared; judge at 1.0x in the assembled film"
+  ],
+  "verdict": "PASS",
+  "all_required_observed_pass": true,
+  "not_evaluated": [
+    "human 1.0x viewing in the assembled film",
+    "final audio (MUTE here)"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

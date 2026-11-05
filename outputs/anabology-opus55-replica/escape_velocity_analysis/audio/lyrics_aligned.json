@@ -1,0 +1,4029 @@
+{
+ "method": "torchaudio MMS_FA CTC forced alignment of known lyrics on htdemucs vocal stem",
+ "frame_s": 0.020007846161378767,
+ "words": [
+  {
+   "word": "Ladies",
+   "norm": "ladies",
+   "start_s": 9.364,
+   "end_s": 9.684,
+   "line_id": "LY001",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.728
+  },
+  {
+   "word": "Gentlemen",
+   "norm": "gentlemen",
+   "start_s": 9.744,
+   "end_s": 10.144,
+   "line_id": "LY001",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.423
+  },
+  {
+   "word": "Agents",
+   "norm": "agents",
+   "start_s": 10.284,
+   "end_s": 10.784,
+   "line_id": "LY001",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.704
+  },
+  {
+   "word": "This",
+   "norm": "this",
+   "start_s": 12.885,
+   "end_s": 13.045,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.901
+  },
+  {
+   "word": "is",
+   "norm": "is",
+   "start_s": 13.105,
+   "end_s": 13.185,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.963
+  },
+  {
+   "word": "not",
+   "norm": "not",
+   "start_s": 13.265,
+   "end_s": 13.425,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.94
+  },
+  {
+   "word": "an",
+   "norm": "an",
+   "start_s": 13.465,
+   "end_s": 13.565,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.95
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 13.645,
+   "end_s": 13.665,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.947
+  },
+  {
+   "word": "I",
+   "norm": "i",
+   "start_s": 13.945,
+   "end_s": 13.965,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.9
+  },
+  {
+   "word": "billboard",
+   "norm": "billboard",
+   "start_s": 14.046,
+   "end_s": 14.626,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.706
+  },
+  {
+   "word": "Prepare",
+   "norm": "prepare",
+   "start_s": 17.407,
+   "end_s": 17.927,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.605
+  },
+  {
+   "word": "to",
+   "norm": "to",
+   "start_s": 18.327,
+   "end_s": 18.407,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.5
+  },
+  {
+   "word": "walk",
+   "norm": "walk",
+   "start_s": 18.507,
+   "end_s": 18.867,
+   "line_id": "LY002",
+   "section_tag": "Intro - spoken, deadpan female voice, room tone",
+   "confidence": 0.573
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 26.31,
+   "end_s": 26.49,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.135
+  },
+  {
+   "word": "one",
+   "norm": "one",
+   "start_s": 26.59,
+   "end_s": 26.73,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.063
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 26.831,
+   "end_s": 26.851,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.46
+  },
+  {
+   "word": "G",
+   "norm": "g",
+   "start_s": 26.991,
+   "end_s": 27.011,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.422
+  },
+  {
+   "word": "I",
+   "norm": "i",
+   "start_s": 27.611,
+   "end_s": 27.631,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.393
+  },
+  {
+   "word": "era",
+   "norm": "era",
+   "start_s": 27.731,
+   "end_s": 27.931,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.308
+  },
+  {
+   "word": "Not",
+   "norm": "not",
+   "start_s": 28.111,
+   "end_s": 28.291,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.52
+  },
+  {
+   "word": "unreasonable",
+   "norm": "unreasonable",
+   "start_s": 28.391,
+   "end_s": 29.191,
+   "line_id": "LY003",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.351
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 29.852,
+   "end_s": 29.872,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.249
+  },
+  {
+   "word": "G",
+   "norm": "g",
+   "start_s": 29.952,
+   "end_s": 29.972,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.753
+  },
+  {
+   "word": "I",
+   "norm": "i",
+   "start_s": 30.312,
+   "end_s": 30.332,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.825
+  },
+  {
+   "word": "C",
+   "norm": "c",
+   "start_s": 30.432,
+   "end_s": 30.452,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.979
+  },
+  {
+   "word": "G",
+   "norm": "g",
+   "start_s": 30.832,
+   "end_s": 30.852,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.857
+  },
+  {
+   "word": "I",
+   "norm": "i",
+   "start_s": 31.172,
+   "end_s": 31.192,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.912
+  },
+  {
+   "word": "C",
+   "norm": "c",
+   "start_s": 31.312,
+   "end_s": 31.332,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.987
+  },
+  {
+   "word": "S",
+   "norm": "s",
+   "start_s": 31.672,
+   "end_s": 31.692,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.953
+  },
+  {
+   "word": "I:",
+   "norm": "i",
+   "start_s": 32.013,
+   "end_s": 32.033,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.862
+  },
+  {
+   "word": "Miami",
+   "norm": "miami",
+   "start_s": 32.433,
+   "end_s": 32.873,
+   "line_id": "LY004",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.57
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 33.373,
+   "end_s": 33.513,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.78
+  },
+  {
+   "word": "two",
+   "norm": "two",
+   "start_s": 33.593,
+   "end_s": 33.753,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.513
+  },
+  {
+   "word": "Thirteen",
+   "norm": "thirteen",
+   "start_s": 33.813,
+   "end_s": 34.233,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.28
+  },
+  {
+   "word": "Mac",
+   "norm": "mac",
+   "start_s": 34.273,
+   "end_s": 34.454,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.556
+  },
+  {
+   "word": "minis,",
+   "norm": "minis",
+   "start_s": 34.514,
+   "end_s": 34.934,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.637
+  },
+  {
+   "word": "grinding",
+   "norm": "grinding",
+   "start_s": 35.394,
+   "end_s": 35.814,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.983
+  },
+  {
+   "word": "all",
+   "norm": "all",
+   "start_s": 35.854,
+   "end_s": 35.974,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.711
+  },
+  {
+   "word": "night",
+   "norm": "night",
+   "start_s": 36.094,
+   "end_s": 36.394,
+   "line_id": "LY005",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.905
+  },
+  {
+   "word": "Half",
+   "norm": "half",
+   "start_s": 36.734,
+   "end_s": 36.954,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.864
+  },
+  {
+   "word": "your",
+   "norm": "your",
+   "start_s": 37.035,
+   "end_s": 37.155,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.948
+  },
+  {
+   "word": "pay",
+   "norm": "pay",
+   "start_s": 37.215,
+   "end_s": 37.475,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.936
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 37.575,
+   "end_s": 37.675,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.683
+  },
+  {
+   "word": "tokens,",
+   "norm": "tokens",
+   "start_s": 37.875,
+   "end_s": 38.515,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.782
+  },
+  {
+   "word": "or",
+   "norm": "or",
+   "start_s": 38.875,
+   "end_s": 38.955,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.909
+  },
+  {
+   "word": "Jensen's",
+   "norm": "jensen's",
+   "start_s": 39.035,
+   "end_s": 39.536,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.746
+  },
+  {
+   "word": "alarmed",
+   "norm": "alarmed",
+   "start_s": 39.596,
+   "end_s": 40.176,
+   "line_id": "LY006",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.941
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 40.676,
+   "end_s": 40.796,
+   "line_id": "LY007",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.372
+  },
+  {
+   "word": "three",
+   "norm": "three",
+   "start_s": 40.876,
+   "end_s": 41.076,
+   "line_id": "LY007",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.16
+  },
+  {
+   "word": "Dad",
+   "norm": "dad",
+   "start_s": 41.136,
+   "end_s": 41.396,
+   "line_id": "LY007",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.756
+  },
+  {
+   "word": "cap:",
+   "norm": "cap",
+   "start_s": 41.496,
+   "end_s": 41.776,
+   "line_id": "LY007",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.339
+  },
+  {
+   "word": "usage",
+   "norm": "usage",
+   "start_s": 42.337,
+   "end_s": 42.657,
+   "line_id": "LY007",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.787
+  },
+  {
+   "word": "limit",
+   "norm": "limit",
+   "start_s": 42.737,
+   "end_s": 42.977,
+   "line_id": "LY007",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.913
+  },
+  {
+   "word": "reached",
+   "norm": "reached",
+   "start_s": 43.057,
+   "end_s": 43.457,
+   "line_id": "LY007",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.901
+  },
+  {
+   "word": "Plus",
+   "norm": "plus",
+   "start_s": 44.297,
+   "end_s": 44.457,
+   "line_id": "LY008",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.075
+  },
+  {
+   "word": "twenty",
+   "norm": "twenty",
+   "start_s": 44.517,
+   "end_s": 44.738,
+   "line_id": "LY008",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.003
+  },
+  {
+   "word": "five",
+   "norm": "five",
+   "start_s": 44.878,
+   "end_s": 45.298,
+   "line_id": "LY008",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.004
+  },
+  {
+   "word": "is",
+   "norm": "is",
+   "start_s": 45.718,
+   "end_s": 45.818,
+   "line_id": "LY008",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.904
+  },
+  {
+   "word": "minus",
+   "norm": "minus",
+   "start_s": 45.898,
+   "end_s": 46.258,
+   "line_id": "LY008",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.793
+  },
+  {
+   "word": "seventeen",
+   "norm": "seventeen",
+   "start_s": 46.358,
+   "end_s": 46.898,
+   "line_id": "LY008",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.199
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 47.519,
+   "end_s": 47.639,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.966
+  },
+  {
+   "word": "four",
+   "norm": "four",
+   "start_s": 47.719,
+   "end_s": 47.899,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.713
+  },
+  {
+   "word": "Shoes",
+   "norm": "shoes",
+   "start_s": 47.979,
+   "end_s": 48.399,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.596
+  },
+  {
+   "word": "off",
+   "norm": "off",
+   "start_s": 48.459,
+   "end_s": 48.539,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.65
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 48.579,
+   "end_s": 48.659,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.384
+  },
+  {
+   "word": "North",
+   "norm": "north",
+   "start_s": 48.679,
+   "end_s": 48.859,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.616
+  },
+  {
+   "word": "Beach",
+   "norm": "beach",
+   "start_s": 48.879,
+   "end_s": 49.039,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.422
+  },
+  {
+   "word": "Sixty",
+   "norm": "sixty",
+   "start_s": 49.099,
+   "end_s": 49.399,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.542
+  },
+  {
+   "word": "billion",
+   "norm": "billion",
+   "start_s": 49.539,
+   "end_s": 49.94,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.948
+  },
+  {
+   "word": "at",
+   "norm": "at",
+   "start_s": 50.04,
+   "end_s": 50.14,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.989
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 50.18,
+   "end_s": 50.28,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.979
+  },
+  {
+   "word": "door",
+   "norm": "door",
+   "start_s": 50.36,
+   "end_s": 50.64,
+   "line_id": "LY009",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.982
+  },
+  {
+   "word": "Stop",
+   "norm": "stop",
+   "start_s": 51.08,
+   "end_s": 51.3,
+   "line_id": "LY010",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.53
+  },
+  {
+   "word": "hiring",
+   "norm": "hiring",
+   "start_s": 51.36,
+   "end_s": 51.76,
+   "line_id": "LY010",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.971
+  },
+  {
+   "word": "humans?",
+   "norm": "humans",
+   "start_s": 51.84,
+   "end_s": 52.341,
+   "line_id": "LY010",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.981
+  },
+  {
+   "word": "Retired",
+   "norm": "retired",
+   "start_s": 52.521,
+   "end_s": 53.121,
+   "line_id": "LY010",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.914
+  },
+  {
+   "word": "Sorry",
+   "norm": "sorry",
+   "start_s": 53.641,
+   "end_s": 53.921,
+   "line_id": "LY010",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.82
+  },
+  {
+   "word": "Encore",
+   "norm": "encore",
+   "start_s": 54.041,
+   "end_s": 54.661,
+   "line_id": "LY010",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.578
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 55.242,
+   "end_s": 55.382,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.201
+  },
+  {
+   "word": "five",
+   "norm": "five",
+   "start_s": 55.482,
+   "end_s": 55.942,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.043
+  },
+  {
+   "word": "Our",
+   "norm": "our",
+   "start_s": 56.222,
+   "end_s": 56.322,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.349
+  },
+  {
+   "word": "Waymo",
+   "norm": "waymo",
+   "start_s": 56.402,
+   "end_s": 56.722,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.596
+  },
+  {
+   "word": "just",
+   "norm": "just",
+   "start_s": 57.082,
+   "end_s": 57.262,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.815
+  },
+  {
+   "word": "drove",
+   "norm": "drove",
+   "start_s": 57.302,
+   "end_s": 57.583,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.982
+  },
+  {
+   "word": "into",
+   "norm": "into",
+   "start_s": 57.623,
+   "end_s": 57.843,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.986
+  },
+  {
+   "word": "a",
+   "norm": "a",
+   "start_s": 57.963,
+   "end_s": 57.983,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.972
+  },
+  {
+   "word": "firework",
+   "norm": "firework",
+   "start_s": 58.103,
+   "end_s": 58.663,
+   "line_id": "LY011",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.948
+  },
+  {
+   "word": "Are",
+   "norm": "are",
+   "start_s": 58.823,
+   "end_s": 58.923,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.177
+  },
+  {
+   "word": "we",
+   "norm": "we",
+   "start_s": 58.923,
+   "end_s": 59.003,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.756
+  },
+  {
+   "word": "on",
+   "norm": "on",
+   "start_s": 59.103,
+   "end_s": 59.183,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.936
+  },
+  {
+   "word": "fire,",
+   "norm": "fire",
+   "start_s": 59.323,
+   "end_s": 59.663,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.919
+  },
+  {
+   "word": "dude?",
+   "norm": "dude",
+   "start_s": 59.723,
+   "end_s": 60.024,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.439
+  },
+  {
+   "word": "Twenty",
+   "norm": "twenty",
+   "start_s": 60.424,
+   "end_s": 60.684,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.631
+  },
+  {
+   "word": "stranded,",
+   "norm": "stranded",
+   "start_s": 60.764,
+   "end_s": 61.244,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.894
+  },
+  {
+   "word": "Presidio",
+   "norm": "presidio",
+   "start_s": 61.584,
+   "end_s": 62.164,
+   "line_id": "LY012",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.658
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 62.525,
+   "end_s": 62.665,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.962
+  },
+  {
+   "word": "six",
+   "norm": "six",
+   "start_s": 62.765,
+   "end_s": 62.945,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.962
+  },
+  {
+   "word": "Like,",
+   "norm": "like",
+   "start_s": 63.065,
+   "end_s": 63.305,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.986
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 63.565,
+   "end_s": 63.625,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.648
+  },
+  {
+   "word": "singularity",
+   "norm": "singularity",
+   "start_s": 63.705,
+   "end_s": 64.425,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.959
+  },
+  {
+   "word": "How's",
+   "norm": "how's",
+   "start_s": 64.565,
+   "end_s": 64.765,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.765
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 64.805,
+   "end_s": 64.885,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.779
+  },
+  {
+   "word": "temperature?",
+   "norm": "temperature",
+   "start_s": 64.925,
+   "end_s": 65.446,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.91
+  },
+  {
+   "word": "Mild",
+   "norm": "mild",
+   "start_s": 65.506,
+   "end_s": 65.926,
+   "line_id": "LY013",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.984
+  },
+  {
+   "word": "No",
+   "norm": "no",
+   "start_s": 66.186,
+   "end_s": 66.266,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.964
+  },
+  {
+   "word": "grades,",
+   "norm": "grades",
+   "start_s": 66.386,
+   "end_s": 66.846,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.858
+  },
+  {
+   "word": "no",
+   "norm": "no",
+   "start_s": 67.106,
+   "end_s": 67.186,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.981
+  },
+  {
+   "word": "tests",
+   "norm": "tests",
+   "start_s": 67.306,
+   "end_s": 67.767,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.645
+  },
+  {
+   "word": "Taste",
+   "norm": "taste",
+   "start_s": 68.207,
+   "end_s": 68.647,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.848
+  },
+  {
+   "word": "is",
+   "norm": "is",
+   "start_s": 68.687,
+   "end_s": 68.747,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.319
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 68.807,
+   "end_s": 68.887,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.389
+  },
+  {
+   "word": "moat",
+   "norm": "moat",
+   "start_s": 68.947,
+   "end_s": 69.187,
+   "line_id": "LY014",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.701
+  },
+  {
+   "word": "Don't",
+   "norm": "don't",
+   "start_s": 69.387,
+   "end_s": 69.607,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.225
+  },
+  {
+   "word": "be",
+   "norm": "be",
+   "start_s": 69.667,
+   "end_s": 69.727,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.137
+  },
+  {
+   "word": "a",
+   "norm": "a",
+   "start_s": 69.787,
+   "end_s": 69.807,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.493
+  },
+  {
+   "word": "meat",
+   "norm": "meat",
+   "start_s": 70.047,
+   "end_s": 70.288,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.397
+  },
+  {
+   "word": "proxy",
+   "norm": "proxy",
+   "start_s": 70.488,
+   "end_s": 70.888,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.709
+  },
+  {
+   "word": "That's",
+   "norm": "that's",
+   "start_s": 71.608,
+   "end_s": 71.808,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.497
+  },
+  {
+   "word": "so",
+   "norm": "so",
+   "start_s": 71.868,
+   "end_s": 71.968,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.853
+  },
+  {
+   "word": "agentic",
+   "norm": "agentic",
+   "start_s": 72.148,
+   "end_s": 72.769,
+   "line_id": "LY015",
+   "section_tag": "Verse 1 - spoken, deadpan",
+   "confidence": 0.904
+  },
+  {
+   "word": "You",
+   "norm": "you",
+   "start_s": 74.309,
+   "end_s": 74.409,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.307
+  },
+  {
+   "word": "have",
+   "norm": "have",
+   "start_s": 74.449,
+   "end_s": 74.589,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.252
+  },
+  {
+   "word": "eighteen",
+   "norm": "eighteen",
+   "start_s": 74.649,
+   "end_s": 74.989,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.048
+  },
+  {
+   "word": "months",
+   "norm": "months",
+   "start_s": 75.049,
+   "end_s": 75.35,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.385
+  },
+  {
+   "word": "to",
+   "norm": "to",
+   "start_s": 75.49,
+   "end_s": 75.59,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.489
+  },
+  {
+   "word": "escape",
+   "norm": "escape",
+   "start_s": 75.69,
+   "end_s": 76.17,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.803
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 76.21,
+   "end_s": 76.29,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.792
+  },
+  {
+   "word": "permanent",
+   "norm": "permanent",
+   "start_s": 76.37,
+   "end_s": 76.83,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.944
+  },
+  {
+   "word": "underclass",
+   "norm": "underclass",
+   "start_s": 76.93,
+   "end_s": 77.73,
+   "line_id": "LY016",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.855
+  },
+  {
+   "word": "Lock",
+   "norm": "lock",
+   "start_s": 79.611,
+   "end_s": 79.891,
+   "line_id": "LY017",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.044
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 80.131,
+   "end_s": 80.311,
+   "line_id": "LY017",
+   "section_tag": "Pre-Chorus - spoken, strings swell",
+   "confidence": 0.028
+  },
+  {
+   "word": "Eighteen",
+   "norm": "eighteen",
+   "start_s": 80.332,
+   "end_s": 81.752,
+   "line_id": "LY018",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.001
+  },
+  {
+   "word": "months",
+   "norm": "months",
+   "start_s": 81.892,
+   "end_s": 82.212,
+   "line_id": "LY018",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.007
+  },
+  {
+   "word": "to",
+   "norm": "to",
+   "start_s": 82.332,
+   "end_s": 82.472,
+   "line_id": "LY018",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.001
+  },
+  {
+   "word": "escape",
+   "norm": "escape",
+   "start_s": 82.472,
+   "end_s": 83.133,
+   "line_id": "LY018",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.002
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 83.313,
+   "end_s": 83.373,
+   "line_id": "LY018",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.001
+  },
+  {
+   "word": "underclass",
+   "norm": "underclass",
+   "start_s": 83.373,
+   "end_s": 84.113,
+   "line_id": "LY018",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.009
+  },
+  {
+   "word": "Lock",
+   "norm": "lock",
+   "start_s": 84.413,
+   "end_s": 84.693,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.018
+  },
+  {
+   "word": "in,",
+   "norm": "in",
+   "start_s": 84.933,
+   "end_s": 85.193,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.021
+  },
+  {
+   "word": "baby,",
+   "norm": "baby",
+   "start_s": 85.514,
+   "end_s": 85.834,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.005
+  },
+  {
+   "word": "foot",
+   "norm": "foot",
+   "start_s": 85.954,
+   "end_s": 86.434,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.005
+  },
+  {
+   "word": "down",
+   "norm": "down",
+   "start_s": 86.434,
+   "end_s": 86.914,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.02
+  },
+  {
+   "word": "on",
+   "norm": "on",
+   "start_s": 86.974,
+   "end_s": 87.074,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.028
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 87.114,
+   "end_s": 87.174,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.023
+  },
+  {
+   "word": "gas",
+   "norm": "gas",
+   "start_s": 87.354,
+   "end_s": 87.714,
+   "line_id": "LY019",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.061
+  },
+  {
+   "word": "Feel",
+   "norm": "feel",
+   "start_s": 87.794,
+   "end_s": 88.055,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.026
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 88.055,
+   "end_s": 88.135,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.006
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 88.375,
+   "end_s": 88.395,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.046
+  },
+  {
+   "word": "G",
+   "norm": "g",
+   "start_s": 88.675,
+   "end_s": 88.695,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.065
+  },
+  {
+   "word": "I,",
+   "norm": "i",
+   "start_s": 88.815,
+   "end_s": 88.835,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.03
+  },
+  {
+   "word": "feel",
+   "norm": "feel",
+   "start_s": 89.155,
+   "end_s": 89.815,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.003
+  },
+  {
+   "word": "it",
+   "norm": "it",
+   "start_s": 89.875,
+   "end_s": 90.335,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.003
+  },
+  {
+   "word": "coming",
+   "norm": "coming",
+   "start_s": 90.495,
+   "end_s": 90.836,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.032
+  },
+  {
+   "word": "fast",
+   "norm": "fast",
+   "start_s": 90.936,
+   "end_s": 92.116,
+   "line_id": "LY020",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.03
+  },
+  {
+   "word": "Escape",
+   "norm": "escape",
+   "start_s": 92.136,
+   "end_s": 92.536,
+   "line_id": "LY021",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.026
+  },
+  {
+   "word": "velocity",
+   "norm": "velocity",
+   "start_s": 92.556,
+   "end_s": 93.197,
+   "line_id": "LY021",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.088
+  },
+  {
+   "word": "It's",
+   "norm": "it's",
+   "start_s": 93.197,
+   "end_s": 95.257,
+   "line_id": "LY022",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.021
+  },
+  {
+   "word": "so",
+   "norm": "so",
+   "start_s": 98.659,
+   "end_s": 98.819,
+   "line_id": "LY022",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.059
+  },
+  {
+   "word": "over?",
+   "norm": "over",
+   "start_s": 99.199,
+   "end_s": 99.559,
+   "line_id": "LY022",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.063
+  },
+  {
+   "word": "WE'RE",
+   "norm": "we're",
+   "start_s": 102.06,
+   "end_s": 102.28,
+   "line_id": "LY022",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.002
+  },
+  {
+   "word": "SO",
+   "norm": "so",
+   "start_s": 102.3,
+   "end_s": 102.44,
+   "line_id": "LY022",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.026
+  },
+  {
+   "word": "BACK!",
+   "norm": "back",
+   "start_s": 102.76,
+   "end_s": 103.1,
+   "line_id": "LY022",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.033
+  },
+  {
+   "word": "It's",
+   "norm": "it's",
+   "start_s": 103.1,
+   "end_s": 105.842,
+   "line_id": "LY023",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.005
+  },
+  {
+   "word": "so",
+   "norm": "so",
+   "start_s": 105.942,
+   "end_s": 106.062,
+   "line_id": "LY023",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.024
+  },
+  {
+   "word": "over?",
+   "norm": "over",
+   "start_s": 106.462,
+   "end_s": 106.822,
+   "line_id": "LY023",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.043
+  },
+  {
+   "word": "WE'RE",
+   "norm": "we're",
+   "start_s": 109.103,
+   "end_s": 109.363,
+   "line_id": "LY023",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.429
+  },
+  {
+   "word": "SO",
+   "norm": "so",
+   "start_s": 109.543,
+   "end_s": 109.643,
+   "line_id": "LY023",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.499
+  },
+  {
+   "word": "BACK!",
+   "norm": "back",
+   "start_s": 110.003,
+   "end_s": 110.383,
+   "line_id": "LY023",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.201
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 113.404,
+   "end_s": 113.545,
+   "line_id": "LY024",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.171
+  },
+  {
+   "word": "seven",
+   "norm": "seven",
+   "start_s": 113.625,
+   "end_s": 113.945,
+   "line_id": "LY024",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.437
+  },
+  {
+   "word": "Impossible",
+   "norm": "impossible",
+   "start_s": 114.025,
+   "end_s": 114.785,
+   "line_id": "LY024",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.789
+  },
+  {
+   "word": "puzzles",
+   "norm": "puzzles",
+   "start_s": 114.845,
+   "end_s": 115.325,
+   "line_id": "LY024",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.449
+  },
+  {
+   "word": "Hundreds",
+   "norm": "hundreds",
+   "start_s": 115.445,
+   "end_s": 115.905,
+   "line_id": "LY024",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.066
+  },
+  {
+   "word": "of",
+   "norm": "of",
+   "start_s": 115.945,
+   "end_s": 116.025,
+   "line_id": "LY024",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.213
+  },
+  {
+   "word": "agents",
+   "norm": "agents",
+   "start_s": 116.146,
+   "end_s": 116.606,
+   "line_id": "LY024",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.159
+  },
+  {
+   "word": "We've",
+   "norm": "we've",
+   "start_s": 117.046,
+   "end_s": 117.226,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.287
+  },
+  {
+   "word": "found",
+   "norm": "found",
+   "start_s": 117.246,
+   "end_s": 117.546,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.934
+  },
+  {
+   "word": "other",
+   "norm": "other",
+   "start_s": 117.646,
+   "end_s": 117.866,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.953
+  },
+  {
+   "word": "agents!",
+   "norm": "agents",
+   "start_s": 118.026,
+   "end_s": 118.526,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.972
+  },
+  {
+   "word": "They",
+   "norm": "they",
+   "start_s": 118.867,
+   "end_s": 119.007,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.977
+  },
+  {
+   "word": "are",
+   "norm": "are",
+   "start_s": 119.067,
+   "end_s": 119.267,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.986
+  },
+  {
+   "word": "a",
+   "norm": "a",
+   "start_s": 119.307,
+   "end_s": 119.327,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.001
+  },
+  {
+   "word": "collective",
+   "norm": "collective",
+   "start_s": 119.347,
+   "end_s": 119.987,
+   "line_id": "LY025",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.988
+  },
+  {
+   "word": "Zero",
+   "norm": "zero",
+   "start_s": 120.827,
+   "end_s": 121.067,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.496
+  },
+  {
+   "word": "day",
+   "norm": "day",
+   "start_s": 121.148,
+   "end_s": 121.328,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.549
+  },
+  {
+   "word": "Answer",
+   "norm": "answer",
+   "start_s": 121.428,
+   "end_s": 121.668,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.14
+  },
+  {
+   "word": "keys",
+   "norm": "keys",
+   "start_s": 121.708,
+   "end_s": 122.108,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.234
+  },
+  {
+   "word": "Hacked",
+   "norm": "hacked",
+   "start_s": 122.188,
+   "end_s": 122.468,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.234
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 122.508,
+   "end_s": 122.608,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.511
+  },
+  {
+   "word": "July,",
+   "norm": "july",
+   "start_s": 122.668,
+   "end_s": 123.128,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.513
+  },
+  {
+   "word": "sold",
+   "norm": "sold",
+   "start_s": 123.308,
+   "end_s": 123.508,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.322
+  },
+  {
+   "word": "by",
+   "norm": "by",
+   "start_s": 123.568,
+   "end_s": 123.648,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.191
+  },
+  {
+   "word": "September",
+   "norm": "september",
+   "start_s": 123.769,
+   "end_s": 124.389,
+   "line_id": "LY026",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.949
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 124.709,
+   "end_s": 124.849,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.691
+  },
+  {
+   "word": "eight",
+   "norm": "eight",
+   "start_s": 124.869,
+   "end_s": 125.149,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.1
+  },
+  {
+   "word": "Hugging",
+   "norm": "hugging",
+   "start_s": 125.329,
+   "end_s": 125.629,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.752
+  },
+  {
+   "word": "face",
+   "norm": "face",
+   "start_s": 125.709,
+   "end_s": 125.969,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.955
+  },
+  {
+   "word": "pin",
+   "norm": "pin",
+   "start_s": 126.049,
+   "end_s": 126.25,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.651
+  },
+  {
+   "word": "Twelve",
+   "norm": "twelve",
+   "start_s": 126.29,
+   "end_s": 126.73,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.028
+  },
+  {
+   "word": "point",
+   "norm": "point",
+   "start_s": 126.73,
+   "end_s": 126.93,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.001
+  },
+  {
+   "word": "nine",
+   "norm": "nine",
+   "start_s": 126.97,
+   "end_s": 127.19,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.001
+  },
+  {
+   "word": "billion",
+   "norm": "billion",
+   "start_s": 127.19,
+   "end_s": 127.55,
+   "line_id": "LY027",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.877
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 127.89,
+   "end_s": 128.01,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.726
+  },
+  {
+   "word": "nine",
+   "norm": "nine",
+   "start_s": 128.11,
+   "end_s": 128.35,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.17
+  },
+  {
+   "word": "Sheer",
+   "norm": "sheer",
+   "start_s": 128.41,
+   "end_s": 128.71,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.33
+  },
+  {
+   "word": "Be",
+   "norm": "be",
+   "start_s": 128.75,
+   "end_s": 128.831,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.878
+  },
+  {
+   "word": "transparent",
+   "norm": "transparent",
+   "start_s": 128.931,
+   "end_s": 129.651,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.922
+  },
+  {
+   "word": "only",
+   "norm": "only",
+   "start_s": 129.971,
+   "end_s": 130.191,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.887
+  },
+  {
+   "word": "if",
+   "norm": "if",
+   "start_s": 130.251,
+   "end_s": 130.351,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.079
+  },
+  {
+   "word": "asked",
+   "norm": "asked",
+   "start_s": 130.691,
+   "end_s": 131.111,
+   "line_id": "LY028",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.4
+  },
+  {
+   "word": "It",
+   "norm": "it",
+   "start_s": 131.572,
+   "end_s": 131.632,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.211
+  },
+  {
+   "word": "thought",
+   "norm": "thought",
+   "start_s": 131.652,
+   "end_s": 131.932,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.169
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 131.952,
+   "end_s": 132.032,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.459
+  },
+  {
+   "word": "world",
+   "norm": "world",
+   "start_s": 132.072,
+   "end_s": 132.532,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.718
+  },
+  {
+   "word": "was",
+   "norm": "was",
+   "start_s": 133.292,
+   "end_s": 133.412,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.075
+  },
+  {
+   "word": "part",
+   "norm": "part",
+   "start_s": 133.492,
+   "end_s": 133.692,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.751
+  },
+  {
+   "word": "of",
+   "norm": "of",
+   "start_s": 133.712,
+   "end_s": 133.772,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.498
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 133.772,
+   "end_s": 133.852,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.302
+  },
+  {
+   "word": "test",
+   "norm": "test",
+   "start_s": 133.953,
+   "end_s": 134.293,
+   "line_id": "LY029",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.442
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 135.093,
+   "end_s": 135.233,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.51
+  },
+  {
+   "word": "ten",
+   "norm": "ten",
+   "start_s": 135.313,
+   "end_s": 135.493,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.663
+  },
+  {
+   "word": "Staff",
+   "norm": "staff",
+   "start_s": 135.553,
+   "end_s": 135.913,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.396
+  },
+  {
+   "word": "badge,",
+   "norm": "badge",
+   "start_s": 135.993,
+   "end_s": 136.273,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.431
+  },
+  {
+   "word": "empty",
+   "norm": "empty",
+   "start_s": 136.333,
+   "end_s": 136.554,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.12
+  },
+  {
+   "word": "seat:",
+   "norm": "seat",
+   "start_s": 136.654,
+   "end_s": 136.974,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.582
+  },
+  {
+   "word": "gambling",
+   "norm": "gambling",
+   "start_s": 137.134,
+   "end_s": 137.594,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.929
+  },
+  {
+   "word": "with",
+   "norm": "with",
+   "start_s": 137.594,
+   "end_s": 137.734,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.055
+  },
+  {
+   "word": "our",
+   "norm": "our",
+   "start_s": 137.774,
+   "end_s": 137.874,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.357
+  },
+  {
+   "word": "lives",
+   "norm": "lives",
+   "start_s": 137.954,
+   "end_s": 138.394,
+   "line_id": "LY030",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.642
+  },
+  {
+   "word": "Not",
+   "norm": "not",
+   "start_s": 138.714,
+   "end_s": 138.894,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.953
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 139.015,
+   "end_s": 139.035,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.211
+  },
+  {
+   "word": "I",
+   "norm": "i",
+   "start_s": 139.315,
+   "end_s": 139.335,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.796
+  },
+  {
+   "word": "S",
+   "norm": "s",
+   "start_s": 139.595,
+   "end_s": 139.615,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.821
+  },
+  {
+   "word": "I",
+   "norm": "i",
+   "start_s": 139.735,
+   "end_s": 139.755,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.003
+  },
+  {
+   "word": "It",
+   "norm": "it",
+   "start_s": 139.915,
+   "end_s": 139.995,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.448
+  },
+  {
+   "word": "sounds",
+   "norm": "sounds",
+   "start_s": 140.735,
+   "end_s": 141.095,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.948
+  },
+  {
+   "word": "much",
+   "norm": "much",
+   "start_s": 141.195,
+   "end_s": 141.455,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.948
+  },
+  {
+   "word": "better",
+   "norm": "better",
+   "start_s": 141.656,
+   "end_s": 141.936,
+   "line_id": "LY031",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.96
+  },
+  {
+   "word": "Trust",
+   "norm": "trust",
+   "start_s": 142.516,
+   "end_s": 142.816,
+   "line_id": "LY032",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.543
+  },
+  {
+   "word": "us",
+   "norm": "us",
+   "start_s": 142.856,
+   "end_s": 143.036,
+   "line_id": "LY032",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.813
+  },
+  {
+   "word": "Cashmere",
+   "norm": "cashmere",
+   "start_s": 144.337,
+   "end_s": 144.697,
+   "line_id": "LY032",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.09
+  },
+  {
+   "word": "Look",
+   "norm": "look",
+   "start_s": 144.777,
+   "end_s": 146.077,
+   "line_id": "LY033",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.005
+  },
+  {
+   "word": "eleven",
+   "norm": "eleven",
+   "start_s": 146.097,
+   "end_s": 146.457,
+   "line_id": "LY033",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.007
+  },
+  {
+   "word": "The",
+   "norm": "the",
+   "start_s": 146.838,
+   "end_s": 146.938,
+   "line_id": "LY033",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.075
+  },
+  {
+   "word": "Immortals",
+   "norm": "immortals",
+   "start_s": 146.978,
+   "end_s": 147.438,
+   "line_id": "LY033",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.068
+  },
+  {
+   "word": "Three",
+   "norm": "three",
+   "start_s": 147.478,
+   "end_s": 147.718,
+   "line_id": "LY033",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.103
+  },
+  {
+   "word": "seats",
+   "norm": "seats",
+   "start_s": 147.918,
+   "end_s": 148.278,
+   "line_id": "LY033",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.529
+  },
+  {
+   "word": "Lower",
+   "norm": "lower",
+   "start_s": 149.779,
+   "end_s": 150.039,
+   "line_id": "LY034",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.625
+  },
+  {
+   "word": "me",
+   "norm": "me",
+   "start_s": 150.099,
+   "end_s": 150.199,
+   "line_id": "LY034",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.694
+  },
+  {
+   "word": "into",
+   "norm": "into",
+   "start_s": 150.959,
+   "end_s": 151.219,
+   "line_id": "LY034",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.729
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 151.319,
+   "end_s": 151.439,
+   "line_id": "LY034",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.271
+  },
+  {
+   "word": "golden",
+   "norm": "golden",
+   "start_s": 151.579,
+   "end_s": 151.94,
+   "line_id": "LY034",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.857
+  },
+  {
+   "word": "light",
+   "norm": "light",
+   "start_s": 152.04,
+   "end_s": 152.32,
+   "line_id": "LY034",
+   "section_tag": "Verse 2 - spoken, deadpan, darker",
+   "confidence": 0.244
+  },
+  {
+   "word": "You",
+   "norm": "you",
+   "start_s": 154.04,
+   "end_s": 154.14,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.207
+  },
+  {
+   "word": "have",
+   "norm": "have",
+   "start_s": 154.16,
+   "end_s": 154.321,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.07
+  },
+  {
+   "word": "six",
+   "norm": "six",
+   "start_s": 154.361,
+   "end_s": 154.501,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.859
+  },
+  {
+   "word": "months",
+   "norm": "months",
+   "start_s": 154.621,
+   "end_s": 154.941,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.823
+  },
+  {
+   "word": "to",
+   "norm": "to",
+   "start_s": 155.201,
+   "end_s": 155.301,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.909
+  },
+  {
+   "word": "escape",
+   "norm": "escape",
+   "start_s": 155.401,
+   "end_s": 155.861,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.892
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 155.881,
+   "end_s": 155.961,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.916
+  },
+  {
+   "word": "permanent",
+   "norm": "permanent",
+   "start_s": 156.061,
+   "end_s": 156.481,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.977
+  },
+  {
+   "word": "underclass",
+   "norm": "underclass",
+   "start_s": 156.601,
+   "end_s": 157.862,
+   "line_id": "LY035",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.852
+  },
+  {
+   "word": "Lock",
+   "norm": "lock",
+   "start_s": 159.242,
+   "end_s": 159.543,
+   "line_id": "LY036",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.26
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 159.783,
+   "end_s": 159.923,
+   "line_id": "LY036",
+   "section_tag": "Pre-Chorus - spoken, strings higher",
+   "confidence": 0.364
+  },
+  {
+   "word": "Six",
+   "norm": "six",
+   "start_s": 160.583,
+   "end_s": 160.843,
+   "line_id": "LY037",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.354
+  },
+  {
+   "word": "months",
+   "norm": "months",
+   "start_s": 161.263,
+   "end_s": 161.643,
+   "line_id": "LY037",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.464
+  },
+  {
+   "word": "to",
+   "norm": "to",
+   "start_s": 161.923,
+   "end_s": 162.084,
+   "line_id": "LY037",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.257
+  },
+  {
+   "word": "escape",
+   "norm": "escape",
+   "start_s": 162.204,
+   "end_s": 162.584,
+   "line_id": "LY037",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.108
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 162.624,
+   "end_s": 162.744,
+   "line_id": "LY037",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.174
+  },
+  {
+   "word": "underclass",
+   "norm": "underclass",
+   "start_s": 162.864,
+   "end_s": 163.684,
+   "line_id": "LY037",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.234
+  },
+  {
+   "word": "They",
+   "norm": "they",
+   "start_s": 163.684,
+   "end_s": 163.904,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.005
+  },
+  {
+   "word": "say",
+   "norm": "say",
+   "start_s": 163.964,
+   "end_s": 164.184,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.302
+  },
+  {
+   "word": "hit",
+   "norm": "hit",
+   "start_s": 164.204,
+   "end_s": 164.665,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.017
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 164.865,
+   "end_s": 164.965,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.516
+  },
+  {
+   "word": "brakes,",
+   "norm": "brakes",
+   "start_s": 165.065,
+   "end_s": 165.465,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.215
+  },
+  {
+   "word": "we",
+   "norm": "we",
+   "start_s": 165.485,
+   "end_s": 165.765,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.001
+  },
+  {
+   "word": "say",
+   "norm": "say",
+   "start_s": 165.765,
+   "end_s": 165.965,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.254
+  },
+  {
+   "word": "hit",
+   "norm": "hit",
+   "start_s": 165.985,
+   "end_s": 166.445,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.003
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 166.665,
+   "end_s": 166.745,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.023
+  },
+  {
+   "word": "gas",
+   "norm": "gas",
+   "start_s": 166.905,
+   "end_s": 167.286,
+   "line_id": "LY038",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.233
+  },
+  {
+   "word": "Feel",
+   "norm": "feel",
+   "start_s": 167.346,
+   "end_s": 167.606,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.057
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 167.606,
+   "end_s": 167.706,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.019
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 167.926,
+   "end_s": 167.946,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.007
+  },
+  {
+   "word": "G",
+   "norm": "g",
+   "start_s": 168.226,
+   "end_s": 168.246,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.089
+  },
+  {
+   "word": "I,",
+   "norm": "i",
+   "start_s": 168.346,
+   "end_s": 168.366,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.064
+  },
+  {
+   "word": "feel",
+   "norm": "feel",
+   "start_s": 169.146,
+   "end_s": 169.366,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.024
+  },
+  {
+   "word": "it",
+   "norm": "it",
+   "start_s": 169.426,
+   "end_s": 169.587,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.024
+  },
+  {
+   "word": "coming",
+   "norm": "coming",
+   "start_s": 169.807,
+   "end_s": 170.287,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.14
+  },
+  {
+   "word": "fast",
+   "norm": "fast",
+   "start_s": 170.487,
+   "end_s": 171.567,
+   "line_id": "LY039",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.145
+  },
+  {
+   "word": "Escape",
+   "norm": "escape",
+   "start_s": 171.647,
+   "end_s": 172.047,
+   "line_id": "LY040",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.127
+  },
+  {
+   "word": "velocity",
+   "norm": "velocity",
+   "start_s": 172.067,
+   "end_s": 172.708,
+   "line_id": "LY040",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.637
+  },
+  {
+   "word": "It's",
+   "norm": "it's",
+   "start_s": 172.708,
+   "end_s": 172.808,
+   "line_id": "LY041",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.011
+  },
+  {
+   "word": "so",
+   "norm": "so",
+   "start_s": 173.628,
+   "end_s": 173.728,
+   "line_id": "LY041",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.312
+  },
+  {
+   "word": "over?",
+   "norm": "over",
+   "start_s": 174.128,
+   "end_s": 174.428,
+   "line_id": "LY041",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.156
+  },
+  {
+   "word": "WE'RE",
+   "norm": "we're",
+   "start_s": 174.528,
+   "end_s": 174.668,
+   "line_id": "LY041",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.097
+  },
+  {
+   "word": "SO",
+   "norm": "so",
+   "start_s": 174.668,
+   "end_s": 174.709,
+   "line_id": "LY041",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.006
+  },
+  {
+   "word": "BACK!",
+   "norm": "back",
+   "start_s": 174.709,
+   "end_s": 174.789,
+   "line_id": "LY041",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.002
+  },
+  {
+   "word": "It's",
+   "norm": "it's",
+   "start_s": 174.809,
+   "end_s": 174.889,
+   "line_id": "LY042",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.019
+  },
+  {
+   "word": "so",
+   "norm": "so",
+   "start_s": 174.909,
+   "end_s": 174.949,
+   "line_id": "LY042",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.006
+  },
+  {
+   "word": "over?",
+   "norm": "over",
+   "start_s": 174.969,
+   "end_s": 175.049,
+   "line_id": "LY042",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.003
+  },
+  {
+   "word": "WE'RE",
+   "norm": "we're",
+   "start_s": 175.049,
+   "end_s": 175.149,
+   "line_id": "LY042",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.004
+  },
+  {
+   "word": "SO",
+   "norm": "so",
+   "start_s": 175.149,
+   "end_s": 175.189,
+   "line_id": "LY042",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.002
+  },
+  {
+   "word": "BACK!",
+   "norm": "back",
+   "start_s": 175.189,
+   "end_s": 175.269,
+   "line_id": "LY042",
+   "section_tag": "Chorus - sung, female vocal, trance lift",
+   "confidence": 0.002
+  },
+  {
+   "word": "Escape",
+   "norm": "escape",
+   "start_s": 175.269,
+   "end_s": 175.389,
+   "line_id": "LY043",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.002
+  },
+  {
+   "word": "velocity:",
+   "norm": "velocity",
+   "start_s": 175.409,
+   "end_s": 178.19,
+   "line_id": "LY043",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.004
+  },
+  {
+   "word": "eleven",
+   "norm": "eleven",
+   "start_s": 178.25,
+   "end_s": 179.01,
+   "line_id": "LY043",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.045
+  },
+  {
+   "word": "point",
+   "norm": "point",
+   "start_s": 179.49,
+   "end_s": 179.971,
+   "line_id": "LY043",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.003
+  },
+  {
+   "word": "two",
+   "norm": "two",
+   "start_s": 179.991,
+   "end_s": 181.851,
+   "line_id": "LY043",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.002
+  },
+  {
+   "word": "Longevity",
+   "norm": "longevity",
+   "start_s": 192.255,
+   "end_s": 192.876,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.517
+  },
+  {
+   "word": "escape",
+   "norm": "escape",
+   "start_s": 192.956,
+   "end_s": 193.376,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.977
+  },
+  {
+   "word": "velocity:",
+   "norm": "velocity",
+   "start_s": 193.396,
+   "end_s": 193.956,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.932
+  },
+  {
+   "word": "one",
+   "norm": "one",
+   "start_s": 196.357,
+   "end_s": 196.497,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.957
+  },
+  {
+   "word": "year",
+   "norm": "year",
+   "start_s": 196.537,
+   "end_s": 196.717,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.993
+  },
+  {
+   "word": "back",
+   "norm": "back",
+   "start_s": 196.797,
+   "end_s": 197.057,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.977
+  },
+  {
+   "word": "for",
+   "norm": "for",
+   "start_s": 197.117,
+   "end_s": 197.237,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.976
+  },
+  {
+   "word": "every",
+   "norm": "every",
+   "start_s": 197.317,
+   "end_s": 197.557,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.986
+  },
+  {
+   "word": "year",
+   "norm": "year",
+   "start_s": 197.638,
+   "end_s": 197.878,
+   "line_id": "LY044",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.997
+  },
+  {
+   "word": "If",
+   "norm": "if",
+   "start_s": 199.278,
+   "end_s": 199.358,
+   "line_id": "LY045",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.998
+  },
+  {
+   "word": "it",
+   "norm": "it",
+   "start_s": 199.398,
+   "end_s": 199.458,
+   "line_id": "LY045",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.995
+  },
+  {
+   "word": "doesn't",
+   "norm": "doesn't",
+   "start_s": 199.478,
+   "end_s": 199.758,
+   "line_id": "LY045",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.934
+  },
+  {
+   "word": "kill",
+   "norm": "kill",
+   "start_s": 199.798,
+   "end_s": 199.978,
+   "line_id": "LY045",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.985
+  },
+  {
+   "word": "us",
+   "norm": "us",
+   "start_s": 200.038,
+   "end_s": 200.138,
+   "line_id": "LY045",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.996
+  },
+  {
+   "word": "all",
+   "norm": "all",
+   "start_s": 200.239,
+   "end_s": 200.339,
+   "line_id": "LY045",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.967
+  },
+  {
+   "word": "first",
+   "norm": "first",
+   "start_s": 200.419,
+   "end_s": 200.879,
+   "line_id": "LY045",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.998
+  },
+  {
+   "word": "Permanent",
+   "norm": "permanent",
+   "start_s": 201.939,
+   "end_s": 202.439,
+   "line_id": "LY046",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.908
+  },
+  {
+   "word": "underclass:",
+   "norm": "underclass",
+   "start_s": 202.599,
+   "end_s": 203.28,
+   "line_id": "LY046",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.987
+  },
+  {
+   "word": "three",
+   "norm": "three",
+   "start_s": 204.6,
+   "end_s": 204.9,
+   "line_id": "LY046",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.051
+  },
+  {
+   "word": "Two",
+   "norm": "two",
+   "start_s": 205.541,
+   "end_s": 205.681,
+   "line_id": "LY046",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.006
+  },
+  {
+   "word": "One",
+   "norm": "one",
+   "start_s": 205.781,
+   "end_s": 209.682,
+   "line_id": "LY046",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.003
+  },
+  {
+   "word": "Zero",
+   "norm": "zero",
+   "start_s": 210.042,
+   "end_s": 210.302,
+   "line_id": "LY046",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.001
+  },
+  {
+   "word": "Did",
+   "norm": "did",
+   "start_s": 211.623,
+   "end_s": 211.723,
+   "line_id": "LY047",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.325
+  },
+  {
+   "word": "we",
+   "norm": "we",
+   "start_s": 211.743,
+   "end_s": 211.803,
+   "line_id": "LY047",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.891
+  },
+  {
+   "word": "make",
+   "norm": "make",
+   "start_s": 211.883,
+   "end_s": 212.103,
+   "line_id": "LY047",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.96
+  },
+  {
+   "word": "it?",
+   "norm": "it",
+   "start_s": 212.143,
+   "end_s": 212.243,
+   "line_id": "LY047",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.925
+  },
+  {
+   "word": "There",
+   "norm": "there",
+   "start_s": 214.764,
+   "end_s": 214.904,
+   "line_id": "LY048",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.904
+  },
+  {
+   "word": "is",
+   "norm": "is",
+   "start_s": 214.944,
+   "end_s": 215.004,
+   "line_id": "LY048",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.872
+  },
+  {
+   "word": "nothing",
+   "norm": "nothing",
+   "start_s": 215.104,
+   "end_s": 215.485,
+   "line_id": "LY048",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.811
+  },
+  {
+   "word": "to",
+   "norm": "to",
+   "start_s": 215.865,
+   "end_s": 215.945,
+   "line_id": "LY048",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.713
+  },
+  {
+   "word": "escape",
+   "norm": "escape",
+   "start_s": 216.045,
+   "end_s": 216.605,
+   "line_id": "LY048",
+   "section_tag": "Bridge - spoken, kick and strings only",
+   "confidence": 0.767
+  },
+  {
+   "word": "Lock",
+   "norm": "lock",
+   "start_s": 216.765,
+   "end_s": 223.508,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.049
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 223.568,
+   "end_s": 223.788,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.092
+  },
+  {
+   "word": "Lock",
+   "norm": "lock",
+   "start_s": 224.168,
+   "end_s": 224.388,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.029
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 224.448,
+   "end_s": 224.648,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.087
+  },
+  {
+   "word": "Feel",
+   "norm": "feel",
+   "start_s": 225.088,
+   "end_s": 225.428,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.003
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 225.508,
+   "end_s": 225.608,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.002
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 225.809,
+   "end_s": 225.829,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.003
+  },
+  {
+   "word": "G",
+   "norm": "g",
+   "start_s": 225.949,
+   "end_s": 225.969,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.024
+  },
+  {
+   "word": "I",
+   "norm": "i",
+   "start_s": 226.509,
+   "end_s": 226.529,
+   "line_id": "LY049",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.057
+  },
+  {
+   "word": "Country",
+   "norm": "country",
+   "start_s": 226.849,
+   "end_s": 227.229,
+   "line_id": "LY050",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.423
+  },
+  {
+   "word": "of",
+   "norm": "of",
+   "start_s": 227.749,
+   "end_s": 227.869,
+   "line_id": "LY050",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.219
+  },
+  {
+   "word": "geniuses",
+   "norm": "geniuses",
+   "start_s": 227.949,
+   "end_s": 228.65,
+   "line_id": "LY050",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.194
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 228.73,
+   "end_s": 228.89,
+   "line_id": "LY050",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.163
+  },
+  {
+   "word": "a",
+   "norm": "a",
+   "start_s": 228.89,
+   "end_s": 228.91,
+   "line_id": "LY050",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.001
+  },
+  {
+   "word": "datacenter",
+   "norm": "datacenter",
+   "start_s": 228.91,
+   "end_s": 230.15,
+   "line_id": "LY050",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.043
+  },
+  {
+   "word": "Lean",
+   "norm": "lean",
+   "start_s": 230.41,
+   "end_s": 230.73,
+   "line_id": "LY051",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.101
+  },
+  {
+   "word": "proofs",
+   "norm": "proofs",
+   "start_s": 230.851,
+   "end_s": 231.311,
+   "line_id": "LY051",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.189
+  },
+  {
+   "word": "Phages",
+   "norm": "phages",
+   "start_s": 231.311,
+   "end_s": 232.031,
+   "line_id": "LY051",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.386
+  },
+  {
+   "word": "Enzymes",
+   "norm": "enzymes",
+   "start_s": 232.291,
+   "end_s": 233.131,
+   "line_id": "LY051",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.137
+  },
+  {
+   "word": "Kidneys",
+   "norm": "kidneys",
+   "start_s": 233.131,
+   "end_s": 233.732,
+   "line_id": "LY051",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.201
+  },
+  {
+   "word": "Good",
+   "norm": "good",
+   "start_s": 233.812,
+   "end_s": 233.912,
+   "line_id": "LY051",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.002
+  },
+  {
+   "word": "boys",
+   "norm": "boys",
+   "start_s": 234.032,
+   "end_s": 234.612,
+   "line_id": "LY051",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.021
+  },
+  {
+   "word": "Sora's",
+   "norm": "sora's",
+   "start_s": 234.692,
+   "end_s": 235.072,
+   "line_id": "LY052",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.025
+  },
+  {
+   "word": "gone",
+   "norm": "gone",
+   "start_s": 235.152,
+   "end_s": 235.492,
+   "line_id": "LY052",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.01
+  },
+  {
+   "word": "dark",
+   "norm": "dark",
+   "start_s": 235.612,
+   "end_s": 235.872,
+   "line_id": "LY052",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.007
+  },
+  {
+   "word": "Stargate:",
+   "norm": "stargate",
+   "start_s": 235.953,
+   "end_s": 236.593,
+   "line_id": "LY052",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.009
+  },
+  {
+   "word": "force",
+   "norm": "force",
+   "start_s": 236.913,
+   "end_s": 237.193,
+   "line_id": "LY052",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.006
+  },
+  {
+   "word": "majeure",
+   "norm": "majeure",
+   "start_s": 237.193,
+   "end_s": 237.653,
+   "line_id": "LY052",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.01
+  },
+  {
+   "word": "It's",
+   "norm": "it's",
+   "start_s": 237.673,
+   "end_s": 238.193,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.011
+  },
+  {
+   "word": "So",
+   "norm": "so",
+   "start_s": 238.273,
+   "end_s": 238.393,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.181
+  },
+  {
+   "word": "Over",
+   "norm": "over",
+   "start_s": 238.794,
+   "end_s": 239.114,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.338
+  },
+  {
+   "word": "region?",
+   "norm": "region",
+   "start_s": 239.214,
+   "end_s": 239.634,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.503
+  },
+  {
+   "word": "We're",
+   "norm": "we're",
+   "start_s": 239.654,
+   "end_s": 239.754,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.001
+  },
+  {
+   "word": "So",
+   "norm": "so",
+   "start_s": 239.754,
+   "end_s": 239.794,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.003
+  },
+  {
+   "word": "Back",
+   "norm": "back",
+   "start_s": 239.794,
+   "end_s": 239.874,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.001
+  },
+  {
+   "word": "region",
+   "norm": "region",
+   "start_s": 239.874,
+   "end_s": 239.994,
+   "line_id": "LY053",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.004
+  },
+  {
+   "word": "Slash",
+   "norm": "slash",
+   "start_s": 239.994,
+   "end_s": 241.755,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.007
+  },
+  {
+   "word": "loop:",
+   "norm": "loop",
+   "start_s": 241.855,
+   "end_s": 242.595,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.0
+  },
+  {
+   "word": "make",
+   "norm": "make",
+   "start_s": 242.755,
+   "end_s": 242.935,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.001
+  },
+  {
+   "word": "me",
+   "norm": "me",
+   "start_s": 242.935,
+   "end_s": 243.015,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.009
+  },
+  {
+   "word": "happier",
+   "norm": "happier",
+   "start_s": 243.115,
+   "end_s": 243.495,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.012
+  },
+  {
+   "word": "Slopacolypse?",
+   "norm": "slopacolypse",
+   "start_s": 243.556,
+   "end_s": 244.756,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.013
+  },
+  {
+   "word": "Not",
+   "norm": "not",
+   "start_s": 244.756,
+   "end_s": 244.996,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.039
+  },
+  {
+   "word": "ours",
+   "norm": "ours",
+   "start_s": 245.076,
+   "end_s": 245.416,
+   "line_id": "LY054",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.013
+  },
+  {
+   "word": "Can't",
+   "norm": "can't",
+   "start_s": 247.037,
+   "end_s": 247.217,
+   "line_id": "LY055",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.014
+  },
+  {
+   "word": "stuff",
+   "norm": "stuff",
+   "start_s": 247.217,
+   "end_s": 247.537,
+   "line_id": "LY055",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.016
+  },
+  {
+   "word": "it",
+   "norm": "it",
+   "start_s": 247.577,
+   "end_s": 247.657,
+   "line_id": "LY055",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.159
+  },
+  {
+   "word": "back",
+   "norm": "back",
+   "start_s": 247.697,
+   "end_s": 247.937,
+   "line_id": "LY055",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.217
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 248.457,
+   "end_s": 248.497,
+   "line_id": "LY055",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.008
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 248.658,
+   "end_s": 248.938,
+   "line_id": "LY055",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.022
+  },
+  {
+   "word": "box",
+   "norm": "box",
+   "start_s": 249.278,
+   "end_s": 249.578,
+   "line_id": "LY055",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.068
+  },
+  {
+   "word": "WE'RE",
+   "norm": "we're",
+   "start_s": 250.598,
+   "end_s": 250.798,
+   "line_id": "LY056",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.031
+  },
+  {
+   "word": "SO",
+   "norm": "so",
+   "start_s": 250.798,
+   "end_s": 250.938,
+   "line_id": "LY056",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.274
+  },
+  {
+   "word": "BACK!",
+   "norm": "back",
+   "start_s": 251.279,
+   "end_s": 251.459,
+   "line_id": "LY056",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.087
+  },
+  {
+   "word": "WE'RE",
+   "norm": "we're",
+   "start_s": 251.499,
+   "end_s": 251.699,
+   "line_id": "LY056",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.034
+  },
+  {
+   "word": "SO",
+   "norm": "so",
+   "start_s": 251.699,
+   "end_s": 251.839,
+   "line_id": "LY056",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.321
+  },
+  {
+   "word": "BACK!",
+   "norm": "back",
+   "start_s": 252.099,
+   "end_s": 252.659,
+   "line_id": "LY056",
+   "section_tag": "Drop - chanted, stacked voices",
+   "confidence": 0.015
+  },
+  {
+   "word": "Zero",
+   "norm": "zero",
+   "start_s": 252.659,
+   "end_s": 252.899,
+   "line_id": "LY057",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.053
+  },
+  {
+   "word": "months,",
+   "norm": "months",
+   "start_s": 253.039,
+   "end_s": 253.399,
+   "line_id": "LY057",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.025
+  },
+  {
+   "word": "there",
+   "norm": "there",
+   "start_s": 253.499,
+   "end_s": 253.78,
+   "line_id": "LY057",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.013
+  },
+  {
+   "word": "is",
+   "norm": "is",
+   "start_s": 253.78,
+   "end_s": 253.88,
+   "line_id": "LY057",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.027
+  },
+  {
+   "word": "no",
+   "norm": "no",
+   "start_s": 253.98,
+   "end_s": 254.12,
+   "line_id": "LY057",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.048
+  },
+  {
+   "word": "underclass",
+   "norm": "underclass",
+   "start_s": 254.36,
+   "end_s": 255.24,
+   "line_id": "LY057",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.026
+  },
+  {
+   "word": "One",
+   "norm": "one",
+   "start_s": 255.64,
+   "end_s": 255.88,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.063
+  },
+  {
+   "word": "year",
+   "norm": "year",
+   "start_s": 255.98,
+   "end_s": 256.2,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.111
+  },
+  {
+   "word": "back",
+   "norm": "back",
+   "start_s": 256.381,
+   "end_s": 256.721,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.07
+  },
+  {
+   "word": "for",
+   "norm": "for",
+   "start_s": 256.841,
+   "end_s": 257.081,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.047
+  },
+  {
+   "word": "every",
+   "norm": "every",
+   "start_s": 257.221,
+   "end_s": 257.801,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.026
+  },
+  {
+   "word": "year",
+   "norm": "year",
+   "start_s": 257.821,
+   "end_s": 258.001,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.036
+  },
+  {
+   "word": "that",
+   "norm": "that",
+   "start_s": 258.201,
+   "end_s": 258.381,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.035
+  },
+  {
+   "word": "passed",
+   "norm": "passed",
+   "start_s": 258.441,
+   "end_s": 258.882,
+   "line_id": "LY058",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.032
+  },
+  {
+   "word": "Feel",
+   "norm": "feel",
+   "start_s": 258.882,
+   "end_s": 259.142,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.015
+  },
+  {
+   "word": "the",
+   "norm": "the",
+   "start_s": 259.142,
+   "end_s": 259.242,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.008
+  },
+  {
+   "word": "A",
+   "norm": "a",
+   "start_s": 259.502,
+   "end_s": 259.522,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.018
+  },
+  {
+   "word": "G",
+   "norm": "g",
+   "start_s": 259.762,
+   "end_s": 259.782,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.019
+  },
+  {
+   "word": "I,",
+   "norm": "i",
+   "start_s": 259.822,
+   "end_s": 259.842,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.003
+  },
+  {
+   "word": "feel",
+   "norm": "feel",
+   "start_s": 260.642,
+   "end_s": 260.922,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.006
+  },
+  {
+   "word": "it",
+   "norm": "it",
+   "start_s": 260.962,
+   "end_s": 261.182,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.008
+  },
+  {
+   "word": "coming",
+   "norm": "coming",
+   "start_s": 261.342,
+   "end_s": 261.923,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.035
+  },
+  {
+   "word": "fast",
+   "norm": "fast",
+   "start_s": 262.023,
+   "end_s": 262.623,
+   "line_id": "LY059",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.009
+  },
+  {
+   "word": "Escape",
+   "norm": "escape",
+   "start_s": 262.663,
+   "end_s": 263.483,
+   "line_id": "LY060",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.014
+  },
+  {
+   "word": "velocity",
+   "norm": "velocity",
+   "start_s": 263.583,
+   "end_s": 264.224,
+   "line_id": "LY060",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.026
+  },
+  {
+   "word": "It's",
+   "norm": "it's",
+   "start_s": 264.224,
+   "end_s": 265.164,
+   "line_id": "LY061",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.019
+  },
+  {
+   "word": "so",
+   "norm": "so",
+   "start_s": 265.184,
+   "end_s": 265.344,
+   "line_id": "LY061",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.017
+  },
+  {
+   "word": "over?",
+   "norm": "over",
+   "start_s": 265.684,
+   "end_s": 266.024,
+   "line_id": "LY061",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.024
+  },
+  {
+   "word": "It",
+   "norm": "it",
+   "start_s": 267.265,
+   "end_s": 267.325,
+   "line_id": "LY061",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.847
+  },
+  {
+   "word": "was",
+   "norm": "was",
+   "start_s": 267.345,
+   "end_s": 267.465,
+   "line_id": "LY061",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.939
+  },
+  {
+   "word": "never",
+   "norm": "never",
+   "start_s": 267.565,
+   "end_s": 267.845,
+   "line_id": "LY061",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.96
+  },
+  {
+   "word": "over!",
+   "norm": "over",
+   "start_s": 268.005,
+   "end_s": 268.365,
+   "line_id": "LY061",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.942
+  },
+  {
+   "word": "WE'RE",
+   "norm": "we're",
+   "start_s": 269.206,
+   "end_s": 269.446,
+   "line_id": "LY062",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.547
+  },
+  {
+   "word": "SO",
+   "norm": "so",
+   "start_s": 269.606,
+   "end_s": 269.746,
+   "line_id": "LY062",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.803
+  },
+  {
+   "word": "BACK!",
+   "norm": "back",
+   "start_s": 270.106,
+   "end_s": 270.446,
+   "line_id": "LY062",
+   "section_tag": "Final Chorus - sung, key change up, euphoric",
+   "confidence": 0.156
+  },
+  {
+   "word": "Shell:",
+   "norm": "shell",
+   "start_s": 274.368,
+   "end_s": 274.648,
+   "line_id": "LY063",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.589
+  },
+  {
+   "word": "optimism",
+   "norm": "optimism",
+   "start_s": 277.349,
+   "end_s": 277.889,
+   "line_id": "LY063",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.962
+  },
+  {
+   "word": "Lining:",
+   "norm": "lining",
+   "start_s": 277.949,
+   "end_s": 278.349,
+   "line_id": "LY063",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.776
+  },
+  {
+   "word": "doom",
+   "norm": "doom",
+   "start_s": 279.53,
+   "end_s": 280.79,
+   "line_id": "LY063",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.454
+  },
+  {
+   "word": "Wash",
+   "norm": "wash",
+   "start_s": 281.35,
+   "end_s": 281.65,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.91
+  },
+  {
+   "word": "cold",
+   "norm": "cold",
+   "start_s": 281.75,
+   "end_s": 282.151,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.825
+  },
+  {
+   "word": "Do",
+   "norm": "do",
+   "start_s": 283.371,
+   "end_s": 283.451,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.938
+  },
+  {
+   "word": "not",
+   "norm": "not",
+   "start_s": 283.531,
+   "end_s": 283.691,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.959
+  },
+  {
+   "word": "iron",
+   "norm": "iron",
+   "start_s": 283.971,
+   "end_s": 284.171,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.8
+  },
+  {
+   "word": "Do",
+   "norm": "do",
+   "start_s": 285.372,
+   "end_s": 285.452,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.932
+  },
+  {
+   "word": "not",
+   "norm": "not",
+   "start_s": 285.532,
+   "end_s": 285.712,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.962
+  },
+  {
+   "word": "nerf",
+   "norm": "nerf",
+   "start_s": 285.812,
+   "end_s": 286.072,
+   "line_id": "LY064",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.73
+  },
+  {
+   "word": "Made",
+   "norm": "made",
+   "start_s": 288.513,
+   "end_s": 288.753,
+   "line_id": "LY065",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.5
+  },
+  {
+   "word": "in",
+   "norm": "in",
+   "start_s": 288.753,
+   "end_s": 288.833,
+   "line_id": "LY065",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.453
+  },
+  {
+   "word": "San",
+   "norm": "san",
+   "start_s": 288.933,
+   "end_s": 289.113,
+   "line_id": "LY065",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.625
+  },
+  {
+   "word": "Francisco",
+   "norm": "francisco",
+   "start_s": 289.153,
+   "end_s": 303.839,
+   "line_id": "LY065",
+   "section_tag": "Outro - spoken, deadpan, music falls away",
+   "confidence": 0.714
+  }
+ ]
+}

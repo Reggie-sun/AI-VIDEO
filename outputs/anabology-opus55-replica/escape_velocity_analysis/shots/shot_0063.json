@@ -1,0 +1,802 @@
+{
+  "shot_id": "S0063",
+  "start_frame": 2596,
+  "end_frame": 2652,
+  "duration_frames": 57,
+  "start_time": 108.1667,
+  "end_time": 110.5417,
+  "duration_s": 2.375,
+  "start_tc": "00:01:48:04",
+  "end_tc": "00:01:50:12",
+  "boundary_in_id": "B1-026",
+  "boundary_in_type": "glitch_cut",
+  "boundary_in_span": [
+    2595,
+    2597
+  ],
+  "boundary_out_id": "B1-027",
+  "boundary_out_type": "glitch_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2596,
+        2598
+      ],
+      "description": "上下拼接滚动转场；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2599,
+        2601
+      ],
+      "description": "IT'S SO OVER?整行可见；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2617,
+        2619
+      ],
+      "description": "IT'S橙色重写开始；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2623,
+        2625
+      ],
+      "description": "WE'RE落定；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2632,
+        2634
+      ],
+      "description": "SO落定；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2644,
+        2646
+      ],
+      "description": "BACK!落定；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2647,
+        2649
+      ],
+      "description": "字卡脱离旋转，面部网格显现；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2650,
+        2652
+      ],
+      "description": "马赛克格消退露服务器；3帧采样±2f。"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "近景少女侧头，右脸受屏幕反光照亮",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "近景少女侧头，右脸受屏幕反光照亮。顶部翻牌行由IT'S SO OVER?改写成WE'RE SO BACK!，字符分段滚动，末段翻牌卡从板面脱落旋转坠下，同时人脸被网格马赛克擦开。",
+  "reference_frames": [
+    {
+      "frame": 2596,
+      "path": "keyframes/S0063_f02596.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2610,
+      "path": "keyframes/S0063_f02610.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2624,
+      "path": "keyframes/S0063_f02624.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2638,
+      "path": "keyframes/S0063_f02638.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2652,
+      "path": "keyframes/S0063_f02652.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2624,
+      "path": "work/full_batch/02624.jpg",
+      "role": "detail",
+      "note": "1920x1080原帧实际查看并复核细字。"
+    }
+  ],
+  "composition": {
+    "shot_size": "按scene_description中的实际景别",
+    "subject_position": "见scene_description与bounding_box",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可见倾斜/俯仰见scene_description；焦距unknown",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "近景少女侧头，右脸受屏幕反光照亮",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "近景少女侧头，右脸受屏幕反光照亮。顶部翻牌行由IT'S SO OVER?改写成WE'RE SO BACK!，字符分段滚动，末段翻牌卡从板面脱落旋转坠下，同时人脸被网格马赛克擦开。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0013, \"pan_y_frac_per_s\": 0.0012, \"zoom_per_s\": 0.0001, \"median_flow_frac_per_s\": 0.0103, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[67.0, 45.0, 38.6]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#0E100D",
+        "fraction": 0.524,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#2B2423",
+        "fraction": 0.152,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#814F4A",
+        "fraction": 0.111,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#523B3A",
+        "fraction": 0.099,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#A47272",
+        "fraction": 0.081,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#D6CBC9",
+        "fraction": 0.032,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[67.0, 45.0, 38.6]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 06 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "18",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0063-E01",
+      "shot_id": "S0063",
+      "type": "background_media",
+      "description": "近景少女侧头，右脸受屏幕反光照亮。顶部翻牌行由IT'S SO OVER?改写成WE'RE SO BACK!，字符分段滚动，末段翻牌卡从板面脱落旋转坠下，同时人脸被网格马赛克擦开。",
+      "start_frame": 2596,
+      "end_frame": 2652,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "近景少女侧头，右脸受屏幕反光照亮。顶部翻牌行由IT'S SO OVER?改写成WE'RE SO BACK!，字符分段滚动，末段翻牌卡从板面脱落旋转坠下，同时人脸被网格马赛克擦开。"
+      },
+      "motion": {
+        "path": "近景少女侧头，右脸受屏幕反光照亮。顶部翻牌行由IT'S SO OVER?改写成WE'RE SO BACK!，字符分段滚动，末段翻牌卡从板面脱落旋转坠下，同时人脸被网格马赛克擦开。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2596,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2624,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2652,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2596,
+        2610,
+        2624,
+        2638,
+        2652
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "bbox visual_estimate，为典型/最大包络，部分图层有明显位移；须从引用帧再测量。",
+        "start/end为分析活动包络，不代表精确入场首帧。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0063-E02",
+      "shot_id": "S0063",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 2596,
+      "end_frame": 2652,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。近景少女侧头，右脸受屏幕反光照亮。顶部翻牌行由IT'S SO OVER?改写成WE'RE SO BACK!，字符分段滚动，末段翻牌卡从板面脱落旋转坠下，同时人脸被网格马赛克擦开。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2596,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2624,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2652,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2596,
+        2610,
+        2624,
+        2638,
+        2652
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "bbox visual_estimate，为典型/最大包络，部分图层有明显位移；须从引用帧再测量。",
+        "start/end为分析活动包络，不代表精确入场首帧。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0063-E03",
+      "shot_id": "S0063",
+      "type": "split_flap",
+      "description": "顶部单行黑格x0.04 y0.08 w0.7 h0.15，2623 WE'RE落定，2645 BACK落定，2647起字卡扭转坠落。",
+      "start_frame": 2599,
+      "end_frame": 2652,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.08,
+        "w": 0.71,
+        "h": 0.15,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "顶部单行黑格x0.04 y0.08 w0.7 h0.15，2623 WE'RE落定，2645 BACK落定，2647起字卡扭转坠落。"
+      },
+      "motion": {
+        "path": "顶部单行黑格x0.04 y0.08 w0.7 h0.15，2623 WE'RE落定，2645 BACK落定，2647起字卡扭转坠落。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2624,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2652,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2610,
+        2624,
+        2638,
+        2652
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "IT'S SO OVER? → WE'RE SO BACK!",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "unknown; see per-shot description",
+          "alignment": "see observed reference",
+          "tracking": "mono for HUD; tight for lyric headline",
+          "stroke": "none observed",
+          "shadow": "unknown"
+        }
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。",
+        "first_visible_frame_estimate": 2599,
+        "last_visible_frame_estimate": 2652
+      }
+    },
+    {
+      "element_id": "S0063-E04",
+      "shot_id": "S0063",
+      "type": "hud_panel",
+      "description": "右下竞赛括号连线，两项REGION文字，白色细线，字约16px。",
+      "start_frame": 2596,
+      "end_frame": 2652,
+      "bounding_box": {
+        "x": 0.71,
+        "y": 0.61,
+        "w": 0.22,
+        "h": 0.14,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右下竞赛括号连线，两项REGION文字，白色细线，字约16px。"
+      },
+      "motion": {
+        "path": "右下竞赛括号连线，两项REGION文字，白色细线，字约16px。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2596,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2624,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2652,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2596,
+        2610,
+        2624,
+        2638,
+        2652
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。"
+      }
+    },
+    {
+      "element_id": "S0063-E05",
+      "shot_id": "S0063",
+      "type": "transition_graphic",
+      "description": "2647起面部矩形网格块逐个消失露出服务器通道。",
+      "start_frame": 2647,
+      "end_frame": 2652,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "unknown",
+        "details": "2647起面部矩形网格块逐个消失露出服务器通道。"
+      },
+      "motion": {
+        "path": "2647起面部矩形网格块逐个消失露出服务器通道。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2652,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2652
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。",
+        "first_visible_frame_estimate": 2647,
+        "last_visible_frame_estimate": 2652
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0063-A03",
+      "target_element_ids": [
+        "S0063-E03"
+      ],
+      "description": "顶部单行黑格x0.04 y0.08 w0.7 h0.15，2623 WE'RE落定，2645 BACK落定，2647起字卡扭转坠落。",
+      "start_frame": 2599,
+      "end_frame": 2652,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0063-A04",
+      "target_element_ids": [
+        "S0063-E04"
+      ],
+      "description": "右下竞赛括号连线，两项REGION文字，白色细线，字约16px。",
+      "start_frame": 2596,
+      "end_frame": 2652,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0063-A05",
+      "target_element_ids": [
+        "S0063-E05"
+      ],
+      "description": "2647起面部矩形网格块逐个消失露出服务器通道。",
+      "start_frame": 2647,
+      "end_frame": 2652,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AB0239",
+      "relation": "beat_candidate (unknown) at frame 2597; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 2597
+    },
+    {
+      "audio_event_id": "AX0160",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 2603–2620; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 2603
+    },
+    {
+      "audio_event_id": "AB0240",
+      "relation": "beat_candidate (unknown) at frame 2608; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 2608
+    },
+    {
+      "audio_event_id": "AW0166",
+      "relation": "vocal_word_candidate (unknown) at frame 2618–2624; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2618
+    },
+    {
+      "audio_event_id": "AH01001",
+      "relation": "band_onset_candidate (unknown) at frame 2618; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2618
+    },
+    {
+      "audio_event_id": "AB0241",
+      "relation": "beat_candidate (unknown) at frame 2619; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 2619
+    },
+    {
+      "audio_event_id": "AX0161",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 2620–2628; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 2620
+    },
+    {
+      "audio_event_id": "AX0162",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 2628–2641; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 2628
+    },
+    {
+      "audio_event_id": "AW0167",
+      "relation": "vocal_word_candidate (unknown) at frame 2629–2631; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2629
+    },
+    {
+      "audio_event_id": "AB0242",
+      "relation": "beat_candidate (unknown) at frame 2630; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 2630
+    },
+    {
+      "audio_event_id": "AW0168",
+      "relation": "vocal_word_candidate (unknown) at frame 2640–2649; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2640
+    },
+    {
+      "audio_event_id": "AB0243",
+      "relation": "beat_candidate (unknown) at frame 2640; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2640
+    },
+    {
+      "audio_event_id": "AH01002",
+      "relation": "band_onset_candidate (unknown) at frame 2640; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2640
+    },
+    {
+      "audio_event_id": "AH01003",
+      "relation": "band_onset_candidate (unknown) at frame 2640; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2640
+    },
+    {
+      "audio_event_id": "AH01004",
+      "relation": "band_onset_candidate (unknown) at frame 2640; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2640
+    },
+    {
+      "audio_event_id": "AH01005",
+      "relation": "band_onset_candidate (unknown) at frame 2641; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2641
+    },
+    {
+      "audio_event_id": "AH01006",
+      "relation": "band_onset_candidate (unknown) at frame 2648; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2648
+    },
+    {
+      "audio_event_id": "AH01007",
+      "relation": "band_onset_candidate (unknown) at frame 2648; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2648
+    },
+    {
+      "audio_event_id": "AH01008",
+      "relation": "band_onset_candidate (unknown) at frame 2651; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2651
+    },
+    {
+      "audio_event_id": "AH01009",
+      "relation": "band_onset_candidate (unknown) at frame 2651; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2651
+    },
+    {
+      "audio_event_id": "AB0244",
+      "relation": "beat_candidate (unknown) at frame 2651; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2651
+    },
+    {
+      "audio_event_id": "AH01010",
+      "relation": "band_onset_candidate (unknown) at frame 2651; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2651
+    },
+    {
+      "audio_event_id": "AH01011",
+      "relation": "band_onset_candidate (unknown) at frame 2651; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2651
+    },
+    {
+      "audio_event_id": "AH01012",
+      "relation": "band_onset_candidate (unknown) at frame 2652; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2652
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "本镜全res中帧、首中末与3帧完整采样已二审，事件时间±2f。",
+    "未知原始工程参数不构成已知事实；字体仅候选。",
+    "音频听证NOT_EVALUATED，词时间是可见文字观测，不证明唱词准确。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0063.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "glitch_cut",
+      "boundary_id": "B1-026",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        2595,
+        2597
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "glitch_cut",
+      "boundary_id": "B1-027",
+      "description": "近景少女侧头，右脸受屏幕反光照亮。顶部翻牌行由IT'S SO OVER?改写成WE'RE SO BACK!，字符分段滚动，末段翻牌卡从板面脱落旋转坠下，同时人脸被网格马赛克擦开。",
+      "span": [
+        2652,
+        2652
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "IT'S SO OVER?",
+    "WE'RE SO BACK!",
+    "THE BRACKET · FINAL · SF",
+    "IT'S SO OVER REGION",
+    "WE'RE SO BACK REGION"
+  ],
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      2624
+    ],
+    "second_pass_notes": "翻牌本帧是WE'RE SO OVER?，即第一部分已经改WE'RE而OVER尚未换BACK；末段grid wipe与掉落字卡是两种独立运动。",
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "COMPLETED_FOR_VISIBLE_LAYERS_WITH_3_FRAME_SAMPLING",
+    "observations": [
+      {
+        "frame": 2596,
+        "description": "上下拼接滚动转场"
+      },
+      {
+        "frame": 2599,
+        "description": "IT'S SO OVER?整行可见"
+      },
+      {
+        "frame": 2617,
+        "description": "IT'S橙色重写开始"
+      },
+      {
+        "frame": 2623,
+        "description": "WE'RE落定"
+      },
+      {
+        "frame": 2632,
+        "description": "SO落定"
+      },
+      {
+        "frame": 2644,
+        "description": "BACK!落定"
+      },
+      {
+        "frame": 2647,
+        "description": "字卡脱离旋转，面部网格显现"
+      },
+      {
+        "frame": 2650,
+        "description": "马赛克格消退露服务器"
+      }
+    ]
+  },
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。"
+}

@@ -1,0 +1,1103 @@
+{
+  "shot_id": "S0120",
+  "start_frame": 5525,
+  "end_frame": 5567,
+  "start_time": 230.2083,
+  "end_time": 232.0,
+  "duration_frames": 43,
+  "duration_s": 1.7917,
+  "start_tc": "00:03:50:05",
+  "end_tc": "00:03:51:23",
+  "boundary_in_id": "B3-025",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5525,
+      "path": "keyframes/S0120_f05525.jpg",
+      "role": "first",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5535,
+      "path": "keyframes/S0120_f05535.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5546,
+      "path": "keyframes/S0120_f05546.jpg",
+      "role": "middle",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5557,
+      "path": "keyframes/S0120_f05557.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5567,
+      "path": "keyframes/S0120_f05567.jpg",
+      "role": "last",
+      "note": "Actually opened individually during detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Frontal woman and flared black skirt",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "6 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Frontal woman and flared black skirt. Waist-to-knee frontal figure with hair flicking and skirt fanning, black harness on cropped white blouse against white field. LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Frontal woman and flared black skirt",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Frontal woman and flared black skirt",
+      "background": "Waist-to-knee frontal figure with hair flicking and skirt fanning, black harness on cropped white blouse against white field."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0120.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0006,
+      "pan_y_frac_per_s": -0.0029,
+      "zoom_per_s": -0.0011,
+      "median_flow_frac_per_s": 0.0043,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Waist-to-knee frontal figure with hair flicking and skirt fanning, black harness on cropped white blouse against white field.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E9ECED",
+        "fraction": 0.636,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#090A08",
+        "fraction": 0.162,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#CBCBCB",
+        "fraction": 0.069,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#3F3835",
+        "fraction": 0.047,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#736661",
+        "fraction": 0.043,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#9C9493",
+        "fraction": 0.043,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [187.3, 182.7, 180.6]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 09 /11",
+      "evidence_frame": 5546,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5546
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5546,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:50:05",
+      "end_value": "00:03:51:23"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5546
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0120-E01",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Waist-to-knee frontal figure with hair flicking and skirt fanning, black harness on cropped white blouse against white field.",
+      "start_frame": 5525,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5525, 5528]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5564, 5567]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5525,
+          "state": "present"
+        },
+        {
+          "frame": 5567,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5525,
+        5567
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5525,
+          5528
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E02",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "character",
+      "description": "Frontal woman and flared black skirt",
+      "start_frame": 5525,
+      "end_frame": 5567,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5525, 5528]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5564, 5567]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5525,
+          "state": "present"
+        },
+        {
+          "frame": 5567,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5525,
+        5567
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5525,
+          5528
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E03",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "LEAN / PROOFS. / PHAGES.",
+      "start_frame": 5530,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.13,
+        "w": 0.45,
+        "h": 0.15,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5530, 5533]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5564, 5567]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5530,
+          "text": "LEAN",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5540,
+          "text": "PROOFS.",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5551,
+          "text": "PHAGES.",
+          "inverted_backing_flash": true
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5530,
+        5567
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LEAN → PROOFS. → PHAGES.",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5530,
+          5533
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E04",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "LEAN PROOF code card",
+      "start_frame": 5530,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.26,
+        "w": 0.2,
+        "h": 0.26,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5530, 5533]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5564, 5567]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5530,
+          "box": "upper-right",
+          "text": "LEAN PROOF header"
+        },
+        {
+          "frame": 5537,
+          "text": "theorem open_problem_07"
+        },
+        {
+          "frame": 5546,
+          "text": "intro h typed"
+        },
+        {
+          "frame": 5551,
+          "box": "shifts down one card-height"
+        },
+        {
+          "frame": 5555,
+          "text": "nlinarith [spectral_gap h]; no goals"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5530,
+        5567
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5530,
+          5533
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E05",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "PHAGE diagram card stacks above proof card",
+      "start_frame": 5551,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.26,
+        "w": 0.2,
+        "h": 0.24,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5551, 5554]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5564, 5567]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5551,
+          "state": "newPHAGE card over proof"
+        },
+        {
+          "frame": 5555,
+          "state": "capsid cube and tail"
+        },
+        {
+          "frame": 5558,
+          "state": "legs andHEAD/TAIL descriptions"
+        },
+        {
+          "frame": 5564,
+          "state": "GENOME text complete"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5551,
+        5567
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5551,
+          5554
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E06",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "texture_overlay",
+      "description": "Left microtype rows repeat LEAN PROOFS, PHAGES, ENZYMES, KIDNEYS, GOOD BOYS; alternating low/high opacity bands",
+      "start_frame": 5525,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.36,
+        "w": 0.28,
+        "h": 0.4,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5525, 5528]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5564, 5567]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5525,
+          "state": "present"
+        },
+        {
+          "frame": 5567,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5525,
+        5567
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Faint text/code block at left",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5525,
+          5528
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E07",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "PHAGE card: HEAD ICOSAHEDRAL; TAIL CONTRACTILE; GENOME WRITTEN BY A LANGUAGE MODEL; DESIGNED BY GENOME LM; VIABLE16; ORIGIN AI-DESIGNED",
+      "start_frame": 5551,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.76,
+        "y": 0.28,
+        "w": 0.19,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5551,
+          "state": "present"
+        },
+        {
+          "frame": 5567,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5551,
+        5567
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "PHAGE card: HEAD ICOSAHEDRAL; TAIL CONTRACTILE; GENOME WRITTEN BY A LANGUAGE MODEL; DESIGNED BY GENOME LM; VIABLE16; ORIGIN AI-DESIGNED",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5551,
+          5554
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E08",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LEAN PROOF: theorem open_problem_07; : ¬ Bound(family c) := by; intro h; nlinarith [spectral_gap h]; no goals; PROBLEMS TEN, OPEN; CERTIFICATE LEAN4",
+      "start_frame": 5530,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.76,
+        "y": 0.58,
+        "w": 0.19,
+        "h": 0.28,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5530,
+          "state": "present"
+        },
+        {
+          "frame": 5567,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5530,
+        5567
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LEAN PROOF: theorem open_problem_07; : ¬ Bound(family c) := by; intro h; nlinarith [spectral_gap h]; no goals; PROBLEMS TEN, OPEN; CERTIFICATE LEAN4",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5530,
+          5533
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    },
+    {
+      "element_id": "S0120-E09",
+      "shot_id": "S0120",
+      "asset_id": null,
+      "type": "text_caption",
+      "description": "Lean proofs. Phages.",
+      "start_frame": 5525,
+      "end_frame": 5567,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.89,
+        "w": 0.3,
+        "h": 0.04,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5525,
+          "state": "present"
+        },
+        {
+          "frame": 5567,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5525,
+        5567
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing unknown; bounds and geometry are observational."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Lean proofs. Phages.",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5525,
+          5528
+        ],
+        "exit_bounds": [
+          5564,
+          5567
+        ],
+        "method": "Dense1–3frame panel/title sheets plus full-resolution detail and independent keyframes"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0120-A01",
+      "target_element_ids": [
+        "S0120-E02",
+        "S0120-E03",
+        "S0120-E04",
+        "S0120-E05",
+        "S0120-E06"
+      ],
+      "description": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+      "start_frame": 5525,
+      "end_frame": 5567,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0220",
+        "D0221",
+        "D0222"
+      ],
+      "frame_range": [
+        5529,
+        5552
+      ],
+      "type": "text_swap",
+      "description": "LEAN -> PROOFS -> PHAGES captions and panel updates over the frontal skirt shot.",
+      "confidence": 0.85,
+      "chunk": 3,
+      "verification": "Consistent at filmstrip resolution; candidate span from Phase A, not independently frame-exact verified"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-025",
+      "span": [
+        5525,
+        5525
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-026",
+      "span": [
+        5567,
+        5567
+      ],
+      "description": "LEAN f5530, PROOFS f5540, PHAGES f5551; cards stack on right as new nouns arrive",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0510",
+      "relation": "beat_candidate (unknown) at frame 5525; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5525
+    },
+    {
+      "audio_event_id": "AH02298",
+      "relation": "band_onset_candidate (unknown) at frame 5525; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5525
+    },
+    {
+      "audio_event_id": "AH02299",
+      "relation": "band_onset_candidate (unknown) at frame 5525; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5525
+    },
+    {
+      "audio_event_id": "AH02300",
+      "relation": "band_onset_candidate (unknown) at frame 5525; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5525
+    },
+    {
+      "audio_event_id": "AH02301",
+      "relation": "band_onset_candidate (unknown) at frame 5525; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5525
+    },
+    {
+      "audio_event_id": "AH02302",
+      "relation": "band_onset_candidate (unknown) at frame 5526; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5526
+    },
+    {
+      "audio_event_id": "AW0355",
+      "relation": "vocal_word_candidate (unknown) at frame 5529–5537; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5529
+    },
+    {
+      "audio_event_id": "AH02303",
+      "relation": "band_onset_candidate (unknown) at frame 5530; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5530
+    },
+    {
+      "audio_event_id": "AH02304",
+      "relation": "band_onset_candidate (unknown) at frame 5530; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5530
+    },
+    {
+      "audio_event_id": "AH02305",
+      "relation": "band_onset_candidate (unknown) at frame 5531; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5531
+    },
+    {
+      "audio_event_id": "AH02306",
+      "relation": "band_onset_candidate (unknown) at frame 5536; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5536
+    },
+    {
+      "audio_event_id": "AH02307",
+      "relation": "band_onset_candidate (unknown) at frame 5536; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5536
+    },
+    {
+      "audio_event_id": "AH02308",
+      "relation": "band_onset_candidate (unknown) at frame 5536; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5536
+    },
+    {
+      "audio_event_id": "AB0511",
+      "relation": "beat_candidate (unknown) at frame 5536; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 5536
+    },
+    {
+      "audio_event_id": "AW0356",
+      "relation": "vocal_word_candidate (unknown) at frame 5540–5551; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5540
+    },
+    {
+      "audio_event_id": "AH02309",
+      "relation": "band_onset_candidate (unknown) at frame 5541; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5541
+    },
+    {
+      "audio_event_id": "AH02310",
+      "relation": "band_onset_candidate (unknown) at frame 5541; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5541
+    },
+    {
+      "audio_event_id": "AH02311",
+      "relation": "band_onset_candidate (unknown) at frame 5542; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5542
+    },
+    {
+      "audio_event_id": "AH02312",
+      "relation": "band_onset_candidate (unknown) at frame 5546; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5546
+    },
+    {
+      "audio_event_id": "AH02313",
+      "relation": "band_onset_candidate (unknown) at frame 5546; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5546
+    },
+    {
+      "audio_event_id": "AB0512",
+      "relation": "beat_candidate (unknown) at frame 5546; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5546
+    },
+    {
+      "audio_event_id": "AH02314",
+      "relation": "band_onset_candidate (unknown) at frame 5547; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5547
+    },
+    {
+      "audio_event_id": "AH02315",
+      "relation": "band_onset_candidate (unknown) at frame 5547; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5547
+    },
+    {
+      "audio_event_id": "AW0357",
+      "relation": "vocal_word_candidate (unknown) at frame 5551–5568; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5551
+    },
+    {
+      "audio_event_id": "AH02316",
+      "relation": "band_onset_candidate (unknown) at frame 5552; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5552
+    },
+    {
+      "audio_event_id": "AH02317",
+      "relation": "band_onset_candidate (unknown) at frame 5557; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5557
+    },
+    {
+      "audio_event_id": "AB0513",
+      "relation": "beat_candidate (unknown) at frame 5557; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5557
+    },
+    {
+      "audio_event_id": "AH02318",
+      "relation": "band_onset_candidate (unknown) at frame 5557; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5557
+    },
+    {
+      "audio_event_id": "AH02319",
+      "relation": "band_onset_candidate (unknown) at frame 5557; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5557
+    },
+    {
+      "audio_event_id": "AH02320",
+      "relation": "band_onset_candidate (unknown) at frame 5558; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5558
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0120.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original shader, font and easing coefficients unknown.",
+    "Microtext repeats are recorded as a texture family with exact readable tokens, not original authored per-row source code."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0120.jpg",
+      "keyframes/S0120_f05525.jpg",
+      "keyframes/S0120_f05535.jpg",
+      "keyframes/S0120_f05546.jpg",
+      "keyframes/S0120_f05557.jpg",
+      "keyframes/S0120_f05567.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "frames_actually_opened": [
+      5525,
+      5535,
+      5546,
+      5557,
+      5567
+    ],
+    "filmstrip_opened": true,
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "All five 960px keyframes opened individually; selected source-detail crops and per-frame headline sheets inspected.",
+    "detail_crops": [
+      "work/full_codex_103_153/detail5567.png"
+    ],
+    "dense_sheets": [
+      "work/full_codex_103_153/proof120.jpg",
+      "work/full_codex_103_153/cards120.jpg"
+    ],
+    "fullres_frames_actually_opened": [
+      5546
+    ],
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

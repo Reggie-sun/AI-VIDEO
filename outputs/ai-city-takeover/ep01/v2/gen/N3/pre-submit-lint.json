@@ -1,0 +1,40 @@
+{
+ "unit": "N3",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "0525e5e574dac87387721202614c54b84b961f61f25ce3724add9957ddbbfe9c",
+ "compiled_prompt_sha256": "1851065488b4419bc018557b6bffb49394a6ada880c750d66b32e22f0316c763",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/action/continuity-report.json",
+  "sha256": "0af3fc1e681decd974c28b7faade05c92dcdcd8502d5117f0889856b8c8dbabf",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS：N3-a 是 K9e 的編修版，左側機櫃、右側落地窗、霧夜城市、地面線槽和反光都與 K9e 相同；炭黑長大衣、後梳低髻、全身背影；冷光剪影，與 K9e 一致。領口紅線跨過整個後領，見 R1。注意這是 K9e 的機房窗，是霧夜、沒有雨，不是 K5b 的雨夜窗。",
+   "handoff": "PASS（只限結尾那個落點）：放在 S9a「Relax. The door is closed」之前，而 S9a 關門時換成的正是 K9e 同一個房間（main.js:666/687/710），她站在窗前接到空房間的關門畫面，可以當成省略。條件：不要放進 S5「It looked around」（11.47–12.1 s，只有 0.63 s，而且前後的 S4c、S5 都是雨夜窗，天氣和窗子都對不上）。",
+   "axis_action_camera": "PASS：背對鏡頭，窗在畫右，她面向畫內窗外，沒有和其他鏡頭的視線方向衝突；鏡頭極慢後拉（dolly_out）；動作是靜立、過一會兒頭微側，順序清楚。風險見 R2、R5、R7。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 18510654…）；寫了「始终看不到她的脸」，沒有對白或唱歌；設定的字句都在 prompt 裡。",
+   "lint": "PASS（只差本報告）：lint.py N3 只有 continuity_report_ready 未過；request_hash 0525e5e5…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   4,
+   660
+  ]
+ },
+ "new_calls": 0
+}

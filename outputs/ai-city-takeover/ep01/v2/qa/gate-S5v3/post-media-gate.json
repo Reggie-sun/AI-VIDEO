@@ -1,0 +1,47 @@
+{
+ "schema": "iris-v2-post-media-gate/1",
+ "unit": "S5v3",
+ "shot_id": "ep01v2-s5",
+ "attempt_id": "iris-s5v3-source-001",
+ "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S5v3/project/state/video-generation/fetch/files/a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734.mp4",
+ "artifact_sha256": "a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734",
+ "intent": "v3: IRIS notices the far window and locks on (K5b start frame, P5 expression reference)",
+ "source_audio_policy": "MUTE (final film uses the approved song v2)",
+ "evidence": {
+  "mcp_video_probe": "1920x1080, 6.08 s, 145 frames, h264, aac stereo; dreamina AIGC metadata",
+  "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S5v3/mcp-frame-*.jpg, mcp-sheet.jpg",
+  "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 0.0 s, issues []",
+  "performance": "qa/gate-S5v3/face-reaction.jpg, quarter-second-sheet.jpg",
+  "camera": "qa/region_drift.py: window/city 0,0,500,600 dx <= 0.3 px, dy <= 0.3 px over 6 s (locked); the region at her head 1500,0,1920,400 moves about -25 px: her lean toward the glass",
+  "window_spot": "S5_WINDOW [450, 380] falls on a dark tower facade left of her eyeline (checked on the frame at 1.6 s)"
+ },
+ "required_findings": [
+  {
+   "requirement_id": "identity",
+   "verdict": "PASS",
+   "reason": "same IRIS profile, black hook on the left ear, thin red line on the left collar, charcoal high collar, low bun"
+  },
+  {
+   "requirement_id": "notice-and-lock",
+   "verdict": "PASS",
+   "reason": "calm profile 0-1.0 s; the brow starts to tighten about 1.2 s, eyes narrow and the brow furrows by 1.5-1.8 s, held to the end with lips slightly parted; a slight lean toward the window; no turn, no speech (Whisper 0.0 s), no hands"
+  },
+  {
+   "requirement_id": "locked-camera-no-reflection",
+   "verdict": "PASS",
+   "reason": "the city through the window does not move (<= 0.3 px); K5b framing; no reflection of her on the glass in the sampled frames"
+  },
+  {
+   "requirement_id": "no-new-graphics",
+   "verdict": "PASS",
+   "reason": "platform AI mark kept top-left; no added text or interface"
+  }
+ ],
+ "edit_note": "in-point 1.0: the window lights at 11.533 s ('around'), her brow starts at clip 1.25 = master 11.72 s and locks by about 12.3 s",
+ "verdict": "PASS",
+ "all_required_observed_pass": true,
+ "not_evaluated": [
+  "human 1.0x viewing in the assembled film"
+ ],
+ "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

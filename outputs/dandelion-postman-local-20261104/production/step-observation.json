@@ -1,0 +1,350 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/dandelion-postman-local-20261104/state/video-generation/fetch/files/41f44af39d83658e30f5e86ca2fc4802d3da23ab154205745af1af491f76bb60.mp4",
+  "total_frames_extracted": 49,
+  "interval_used": 0.25,
+  "frames": [
+    {
+      "timestamp_seconds": 0,
+      "timestamp_hms": "00:00:00.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17496
+    },
+    {
+      "timestamp_seconds": 0.25,
+      "timestamp_hms": "00:00:00.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17309
+    },
+    {
+      "timestamp_seconds": 0.5,
+      "timestamp_hms": "00:00:00.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17552
+    },
+    {
+      "timestamp_seconds": 0.75,
+      "timestamp_hms": "00:00:00.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17553
+    },
+    {
+      "timestamp_seconds": 1,
+      "timestamp_hms": "00:00:01.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17512
+    },
+    {
+      "timestamp_seconds": 1.25,
+      "timestamp_hms": "00:00:01.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17361
+    },
+    {
+      "timestamp_seconds": 1.5,
+      "timestamp_hms": "00:00:01.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17419
+    },
+    {
+      "timestamp_seconds": 1.75,
+      "timestamp_hms": "00:00:01.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17495
+    },
+    {
+      "timestamp_seconds": 2,
+      "timestamp_hms": "00:00:02.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17480
+    },
+    {
+      "timestamp_seconds": 2.25,
+      "timestamp_hms": "00:00:02.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17404
+    },
+    {
+      "timestamp_seconds": 2.5,
+      "timestamp_hms": "00:00:02.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17438
+    },
+    {
+      "timestamp_seconds": 2.75,
+      "timestamp_hms": "00:00:02.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17477
+    },
+    {
+      "timestamp_seconds": 3,
+      "timestamp_hms": "00:00:03.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17549
+    },
+    {
+      "timestamp_seconds": 3.25,
+      "timestamp_hms": "00:00:03.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17510
+    },
+    {
+      "timestamp_seconds": 3.5,
+      "timestamp_hms": "00:00:03.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17581
+    },
+    {
+      "timestamp_seconds": 3.75,
+      "timestamp_hms": "00:00:03.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17561
+    },
+    {
+      "timestamp_seconds": 4,
+      "timestamp_hms": "00:00:04.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17726
+    },
+    {
+      "timestamp_seconds": 4.25,
+      "timestamp_hms": "00:00:04.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17728
+    },
+    {
+      "timestamp_seconds": 4.5,
+      "timestamp_hms": "00:00:04.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17868
+    },
+    {
+      "timestamp_seconds": 4.75,
+      "timestamp_hms": "00:00:04.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17761
+    },
+    {
+      "timestamp_seconds": 5,
+      "timestamp_hms": "00:00:05.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17735
+    },
+    {
+      "timestamp_seconds": 5.25,
+      "timestamp_hms": "00:00:05.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17651
+    },
+    {
+      "timestamp_seconds": 5.5,
+      "timestamp_hms": "00:00:05.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17713
+    },
+    {
+      "timestamp_seconds": 5.75,
+      "timestamp_hms": "00:00:05.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17520
+    },
+    {
+      "timestamp_seconds": 6,
+      "timestamp_hms": "00:00:06.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17500
+    },
+    {
+      "timestamp_seconds": 6.25,
+      "timestamp_hms": "00:00:06.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17174
+    },
+    {
+      "timestamp_seconds": 6.5,
+      "timestamp_hms": "00:00:06.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 17075
+    },
+    {
+      "timestamp_seconds": 6.75,
+      "timestamp_hms": "00:00:06.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 16707
+    },
+    {
+      "timestamp_seconds": 7,
+      "timestamp_hms": "00:00:07.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 16373
+    },
+    {
+      "timestamp_seconds": 7.25,
+      "timestamp_hms": "00:00:07.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 15966
+    },
+    {
+      "timestamp_seconds": 7.5,
+      "timestamp_hms": "00:00:07.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 15556
+    },
+    {
+      "timestamp_seconds": 7.75,
+      "timestamp_hms": "00:00:07.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 15023
+    },
+    {
+      "timestamp_seconds": 8,
+      "timestamp_hms": "00:00:08.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 14701
+    },
+    {
+      "timestamp_seconds": 8.25,
+      "timestamp_hms": "00:00:08.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 14363
+    },
+    {
+      "timestamp_seconds": 8.5,
+      "timestamp_hms": "00:00:08.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 14069
+    },
+    {
+      "timestamp_seconds": 8.75,
+      "timestamp_hms": "00:00:08.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 13778
+    },
+    {
+      "timestamp_seconds": 9,
+      "timestamp_hms": "00:00:09.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 13518
+    },
+    {
+      "timestamp_seconds": 9.25,
+      "timestamp_hms": "00:00:09.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 13178
+    },
+    {
+      "timestamp_seconds": 9.5,
+      "timestamp_hms": "00:00:09.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 13008
+    },
+    {
+      "timestamp_seconds": 9.75,
+      "timestamp_hms": "00:00:09.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 12784
+    },
+    {
+      "timestamp_seconds": 10,
+      "timestamp_hms": "00:00:10.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 12462
+    },
+    {
+      "timestamp_seconds": 10.25,
+      "timestamp_hms": "00:00:10.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 12127
+    },
+    {
+      "timestamp_seconds": 10.5,
+      "timestamp_hms": "00:00:10.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 11776
+    },
+    {
+      "timestamp_seconds": 10.75,
+      "timestamp_hms": "00:00:10.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 11672
+    },
+    {
+      "timestamp_seconds": 11,
+      "timestamp_hms": "00:00:11.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 11465
+    },
+    {
+      "timestamp_seconds": 11.25,
+      "timestamp_hms": "00:00:11.250",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 11201
+    },
+    {
+      "timestamp_seconds": 11.5,
+      "timestamp_hms": "00:00:11.500",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 11054
+    },
+    {
+      "timestamp_seconds": 11.75,
+      "timestamp_hms": "00:00:11.750",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 10980
+    },
+    {
+      "timestamp_seconds": 12,
+      "timestamp_hms": "00:00:12.000",
+      "format": "jpeg",
+      "width": 480,
+      "size_bytes": 10933
+    }
+  ]
+}

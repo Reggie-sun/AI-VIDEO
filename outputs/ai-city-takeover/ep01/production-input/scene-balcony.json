@@ -1,0 +1,36 @@
+{
+  "artifact_id": "iris-balcony",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "2096ca1eb8592f153810430ebc64ccc7860df8f8795d84c5f9359263d6364dbf",
+  "creation_receipt_id": "director-draft:iris-ep01:20261030",
+  "source_provenance": [
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/ep01/lyrics-v1.md",
+      "content_hash": "0489e1606ed8a9337a3345dfc244ca9eb3c5cf857c33d74c6c0e6e3c8d8416a3"
+    },
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/series/BIBLE.md",
+      "content_hash": "73bafc509866ee32063feca204dd22e4ed49d4734a301461905d1dbf31d312b5"
+    },
+    {
+      "kind": "user_input",
+      "reference": "outputs/ai-city-takeover/ep01/production-input/reference-approval.txt",
+      "content_hash": "a2b86dc6a00a87de7721f3c5fb016a0b0fc0239d398403825c27dbfb9308e26e"
+    }
+  ],
+  "scene_id": "balcony",
+  "location": "雨后雾城高层玻璃阳台",
+  "time": "凌晨；03:47为虚构系列时钟",
+  "mood": "冷静、精密、疏离",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左领红光位置一致",
+    "蓝黑/钢蓝，红为唯一暖色"
+  ],
+  "visual_reference_asset_ids": []
+}

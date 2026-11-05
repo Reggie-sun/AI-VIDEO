@@ -1,0 +1,43 @@
+{
+  "schema": "local-song-repair-series/1",
+  "authority": "development_only",
+  "created_at_utc": "2026-10-31T04:53:18.969428+00:00",
+  "authorization_quote": "那继续修",
+  "constraints": {
+    "duration_seconds": 30,
+    "all_original_words_in_original_order": true,
+    "original_performance_and_music_direction": true,
+    "no_output_speedup": true
+  },
+  "predecessors": [
+    {
+      "result_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-01/result.json",
+      "result_sha256": "08c4ca8b8e5ae9f7a20f8b1368dc3d094988cdec84e9149cc9d187b074076f52",
+      "success": true,
+      "artifact_sha256": "1f7f567a439384a25a7491ce42cf281027326b3501f4852018deb3dad3c86e19"
+    },
+    {
+      "result_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-02/result.json",
+      "result_sha256": "d10831145a42fee50ccb4ab015c24cd601d1048620265796cb40d866d9d307b9",
+      "success": true,
+      "artifact_sha256": "ab0000749101d9cc9d85526683b760ae1d2e20b5dad455ac2eb67c8c0d509b06"
+    }
+  ],
+  "old_attempts_used": 2,
+  "old_ceiling": 2,
+  "new_additional_ceiling": 3,
+  "new_cumulative_ceiling": 5,
+  "automatic_retries": 0,
+  "paid_provider_call_limit": 0,
+  "source_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "source_intent_sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+  "original_lyrics_sha256": "179b2bc93c75f4767837f0e09df6eb47ebaadc94a7f2134706fd835b7dbb57fe",
+  "main_index_sha256_before": "19aac7a1a7e30c07d802baa33d8203e54202362b5e291b233465a164091f30e9",
+  "triage": {
+    "next_empirical_question": "Does direct DiT without optional LM codes improve exact original lyric coverage at30s?",
+    "cheapest_valid_experiment": "One existing-turbo generation with only thinking=False and no loaded LM; all original B params/lyrics retained",
+    "blocking_prerequisite": "Known predecessor outputs and unchanged exact source/model identities; verified above"
+  },
+  "prior_suno_unknowns": "PRESERVED; no Suno action",
+  "human_acceptance": "NOT_EVALUATED"
+}

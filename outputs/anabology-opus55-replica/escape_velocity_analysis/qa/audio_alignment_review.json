@@ -1,0 +1,2079 @@
+{
+ "schema": "ev-audio-alignment-review/v1",
+ "words": 447,
+ "matched_ASR_tokens": 313,
+ "flagged_words": [
+  {
+   "event_id": "AW0001",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0002",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0004",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0008",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0009",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0012",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0014",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0015",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0016",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0017",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0018",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0019",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0021",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0022",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0023",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0024",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0025",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0026",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0027",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0028",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0029",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0030",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0031",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0033",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0034",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0035",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0036",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0045",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0048",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0049",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0051",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0052",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0055",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0056",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0057",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0058",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0060",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0061",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0065",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0067",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0068",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0079",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0080",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0081",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0082",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0088",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0092",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0093",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0095",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0105",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0107",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0108",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0109",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0110",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0111",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0112",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0113",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0114",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0115",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0116",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0117",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0118",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0121",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0122",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0123",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0124",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0125",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0130",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0131",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0132",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0133",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0134",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0135",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0136",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0137",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0138",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0139",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0140",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0141",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0142",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0143",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0144",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0145",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0146",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0147",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0148",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0149",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0150",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0151",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0152",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0153",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0154",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0155",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0156",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0157",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0158",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0159",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0160",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0161",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0162",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0163",
+   "issues": [
+    "forced_alignment_word_longer_than_2.5s",
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0164",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0165",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0166",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0167",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0168",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0169",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0170",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0171",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0172",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0173",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0174",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0175",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0176",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0180",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0182",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0184",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0186",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0187",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0188",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0191",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0192",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0194",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0195",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0198",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0199",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0200",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0201",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0203",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0204",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0205",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0207",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0208",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0209",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0210",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0211",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0212",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0213",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0215",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0217",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0218",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0219",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0220",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0221",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0222",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0223",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0224",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0227",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0228",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0231",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0234",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0235",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0241",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0242",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0243",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0244",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0245",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0246",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0248",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0250",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0251",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0253",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0254",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0255",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0262",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0263",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0264",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0265",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0266",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0267",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0268",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0269",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0270",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0271",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0272",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0273",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0275",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0276",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0277",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0278",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0279",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0280",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0281",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0282",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0283",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0284",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0285",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0286",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0287",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0288",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0289",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0290",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0292",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0293",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0294",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0295",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0296",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0297",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0298",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0299",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0300",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0301",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0302",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0303",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0304",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0305",
+   "issues": [
+    "forced_alignment_word_longer_than_2.5s",
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0306",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0307",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0308",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0309",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0310",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0312",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0318",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0327",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0328",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0329",
+   "issues": [
+    "forced_alignment_word_longer_than_2.5s",
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0330",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0331",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0332",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0335",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0338",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0339",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0340",
+   "issues": [
+    "forced_alignment_word_longer_than_2.5s",
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0341",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0342",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0343",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0344",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0345",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0346",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0347",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0348",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0349",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0350",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0351",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0352",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0353",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0354",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0355",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0356",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0357",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0358",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0359",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0360",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0361",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0362",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0363",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0364",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0365",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0366",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0367",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0368",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0369",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0370",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0371",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0372",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0373",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0374",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0375",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0376",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0377",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0378",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0379",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0380",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0381",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0382",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0383",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0384",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0385",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0386",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0387",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0388",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0389",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0390",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0391",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0392",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0393",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0394",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0395",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0396",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0397",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0398",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0399",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0400",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0401",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0402",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0403",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0404",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0405",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0406",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0407",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0408",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0409",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0410",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0411",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0412",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0413",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0414",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0415",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0416",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0417",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0418",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0419",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0420",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0421",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0422",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0423",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0424",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0425",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0426",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0427",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0429",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0431",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0435",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0443",
+   "issues": [
+    "no_monotonic_exact_ASR_token_match"
+   ]
+  },
+  {
+   "event_id": "AW0444",
+   "issues": [
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  },
+  {
+   "event_id": "AW0445",
+   "issues": [
+    "low_CTC_score_not_a_calibrated_probability"
+   ]
+  },
+  {
+   "event_id": "AW0447",
+   "issues": [
+    "forced_alignment_word_longer_than_2.5s",
+    "ASR_alignment_disagreement_above_0.5s"
+   ]
+  }
+ ],
+ "listening_status": "NOT_EVALUATED"
+}

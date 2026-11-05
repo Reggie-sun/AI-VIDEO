@@ -1,0 +1,22 @@
+{
+ "schema": "ev-independent-review-target/v1",
+ "scope": "Read-only recheck of reported fixes; does not establish all-shot accuracy or audio listening",
+ "sha256": {
+  "scripts/14_audio_timeline.py": "e018a0cd7c81ceb76ca8614c3a4d76a68cac60b9759447efa137592e212a7dd9",
+  "scripts/15_validate_delivery.py": "964f31b7cbbb193d04455116fb57d65f92058e892953d6cabd8ee041fb026a5f",
+  "scripts/16_source_mapping.py": "a9fd5be02406c279019ce179ee630576821327ce41c21f8efaa2f8ccf6aa15e5",
+  "scripts/17_build_documents.py": "3dc4d4e18f09b78c731af5562e12143dc369235de1d6febfdc36641f181bea2a",
+  "scripts/18_synchronization.py": "936db3a3a0fc6bfd220674ef48c98d6ede0b80021d1c13e6db2d2e03eae9a5bc",
+  "scripts/19_extract_review_batch.py": "75f94ff492c449c4e7b61ed64550e18cca56db2d027009d5ea8f17eebfadbd49",
+  "scripts/20_refine_bridge.py": "7dffaef5b26230c5c6d9043c96beefcd53676de00a552de6d590580a7f392db9",
+  "scripts/21_refine_tail.py": "7ed1068840f540325ab1e5b705479c69e4dfad4e6221c68ef9418618d492cd03",
+  "scripts/test_delivery_validation.py": "690d7e1aa851c46c481a7fbd7d3f03519ae951dffd81d3300de6c797f5a889d9",
+  "scripts/validate_all.py": "93361f2d4930da7a7d543fff901f8aa884543eef8db588a8bc1a50529d7cb936",
+  "scripts/validate_shot.py": "eed899ff1871f1be3f159a0803192858ad7a13da3d5668ce3119bd8cec45ac0c",
+  "scripts/10_aggregate.py": "5588841b0e4c8330712d1a8c7369cbe6f2eb9daf661fe88993923308dc369e55",
+  "shots/shot_0097.json": "13ad9bf95d89a323705889331ca74af34bc40880dd37fe0444f6b86ffd7227ac",
+  "shots/shot_0100.json": "f68e1d320e46c298af6425c1d3bff673dcca2566b4129e075f9391a37fa675c6",
+  "shots/shot_0151.json": "60d56c273c50a41b94ce7e472f6434b2c4a3121b9778a43b2bc6e3168f1b6055",
+  "shots/shot_0152.json": "516e18717c99d2d3e700a430af5cbe8e1ac6e8853a703ccbbc5bc55e97b42bd7"
+ }
+}

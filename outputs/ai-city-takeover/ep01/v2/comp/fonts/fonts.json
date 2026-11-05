@@ -1,0 +1,96 @@
+{
+ "text_sha256": "4912bd0bc20bffb6a02c102216bea6441be27706d923be71a4be562c032a0110",
+ "chars": 403,
+ "faces": [
+  {
+   "family": "MK Sans SC",
+   "source_family": "Noto Sans CJK SC",
+   "weight": "Bold",
+   "file": "MK-Sans-SC.otf",
+   "bytes": 152492,
+   "sha256": "fa7838be2f8bcc95a4fa1fa044860c91be3df981fb8dee61fd0a8c66f2561f76",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Sans SC Regular",
+   "source_family": "Noto Sans CJK SC",
+   "weight": "Regular",
+   "file": "MK-Sans-SC-Regular.otf",
+   "bytes": 151880,
+   "sha256": "59ec8d92831cc08504baaf41ed131d976dbc0b503c98f60c52f4cf1fd0aff2c6",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Mono SC",
+   "source_family": "Noto Sans Mono CJK SC",
+   "weight": "Regular",
+   "file": "MK-Mono-SC.otf",
+   "bytes": 145540,
+   "sha256": "dd2bbf8cb688d3d28ff7487d10028b5bfc18438b3705df52d57c373b74af7ecb",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Mono SC Bold",
+   "source_family": "Noto Sans Mono CJK SC",
+   "weight": "Bold",
+   "file": "MK-Mono-SC-Bold.otf",
+   "bytes": 146168,
+   "sha256": "8d52599416a5bd52bf2218b4df4aa1f204080f7ae0098898f73db09535bc719e",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Serif SC",
+   "source_family": "Noto Serif CJK SC",
+   "weight": "Bold",
+   "file": "MK-Serif-SC.otf",
+   "bytes": 206896,
+   "sha256": "7e20b9b7652cda180ee1acb93482181e20c0dcacd083842b41609ea9d1d7f431",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Display",
+   "source_family": "NotoSansDisplay-Regular",
+   "weight": "Regular",
+   "file": "MK-Display.otf",
+   "bytes": 26264,
+   "sha256": "1735f831383e5121d9cca1ea98560a1e2609fc868bf35a90be62b9bc35ef1865",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Display Italic",
+   "source_family": "NotoSansDisplay-Italic",
+   "weight": "Regular",
+   "file": "MK-Display-Italic.otf",
+   "bytes": 27864,
+   "sha256": "07519159b8a37a05c1aee02f39c2cfa98fe68d269a3a6edca46b2a7bb6248c15",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Serif Display Italic",
+   "source_family": "NotoSerifDisplay-Italic",
+   "weight": "Regular",
+   "file": "MK-Serif-Display-Italic.otf",
+   "bytes": 35396,
+   "sha256": "efafbd28f8bc6bcf3b485937b86af6365439b8b5268691962897c57778fc61c4",
+   "license": "SIL Open Font License 1.1",
+   "missing": ""
+  },
+  {
+   "family": "MK Grotesk Bold",
+   "source_family": "NimbusSans-Bold",
+   "weight": "Bold",
+   "file": "MK-Grotesk-Bold.otf",
+   "bytes": 18216,
+   "sha256": "ead6660e0890a247bc38b878725d21121c00f204d3b902464a3333694132dbdb",
+   "license": "AGPL-3.0 with font exception (URW base35, (URW)++ 2013-2015; Debian fonts-urw-base35)",
+   "missing": ""
+  }
+ ]
+}

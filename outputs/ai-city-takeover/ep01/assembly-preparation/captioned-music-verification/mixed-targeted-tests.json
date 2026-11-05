@@ -1,0 +1,16 @@
+{
+  "scope": "Targeted tests in frozen MIXED dependency snapshot; not isolated owned final tree",
+  "index_tree": "75116eccba6e2f49a426585aaba574f372ff8a79",
+  "argv": [
+    "python",
+    "-m",
+    "pytest",
+    "-p",
+    "no:cacheprovider",
+    "tests/test_qualification_preview_input.py",
+    "tests/test_caption_development_preview.py",
+    "-q",
+    "--junitxml=/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/assembly-preparation/captioned-music-verification/mixed-targeted-tests.junit.xml"
+  ],
+  "exit_code": 0
+}

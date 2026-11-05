@@ -1,0 +1,381 @@
+{
+ "schema": "ev-visual-system/v1",
+ "status": "draft_v0 (lead measurements from 5 full-res frames + FFT/cross-correlation); Phase B shot records add per-shot state; final merge pass will extend",
+ "canvas": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 24,
+  "frames": 7353,
+  "color_note": "yuv420p H.264 High, no colour tags in stream (author says encoded BT.709 CRF16)"
+ },
+ "coordinate_convention": "bounding boxes are frame_norm_top_left (x,y,w,h in 0..1); pixel values below are at 1920x1080",
+ "z_order_convention": {
+  "0": "background media (plate / Seedance clip / pure colour)",
+  "5": "plate-derived layers (cut-outs, depth slices)",
+  "10-19": "scene props, CV brackets",
+  "20-29": "typography",
+  "30-39": "panels, charts, boards, tags",
+  "40-49": "persistent chrome",
+  "50": "halftone/grain print pass (applies over everything below it; chrome appears to sit above or be part of the pass, see notes)",
+  "60": "flash / transition overlays"
+ },
+ "accent": {
+  "hex": "#D97757",
+  "evidence_level": "confirmed",
+  "source": "source_docs/FINDINGS.md B1 (W-motion: 'clay orange #D97757 as the graphics accent')",
+  "rendered_note": "measured on-screen orange under halftone varies, e.g. words in f3300 median saturated pixel ~#D15C3C; use #D97757 as the design token"
+ },
+ "global_layers": [
+  {
+   "asset_id": "G-CORNER-MARKS",
+   "role": "four registration crosshair marks at the frame corners",
+   "geometry_px": {
+    "top_left_center": [
+     24,
+     24
+    ],
+    "top_right_center": [
+     1896,
+     24
+    ],
+    "bottom_left_center": [
+     30,
+     1050
+    ],
+    "bottom_right_center": [
+     1892,
+     1056
+    ]
+   },
+   "appearance": "thin 1px light crosses ~14px arm length; colour follows background contrast (light on dark, dark on light)",
+   "evidence": "f24, f1500, f3300, f5200, f7000 full-res frames",
+   "confidence": 0.7,
+   "uncertainties": [
+    "bottom marks only partially visible behind the ticker; exact arm length"
+   ]
+  },
+  {
+   "asset_id": "G-LOOK-COUNTER",
+   "role": "top-left 'LOOK NN / 11' counter; value changes with the look chapters",
+   "geometry_px": {
+    "anchor": [
+     72,
+     61
+    ],
+    "text_height_px": 11
+   },
+   "appearance": "uppercase mono, wide letter-spacing, ~12px, white (or dark on light looks); in the last look it sits in a white rounded pill with orange '· ALL'",
+   "observed_values": {
+    "f24": "LOOK 00 / 11",
+    "f1500": "LOOK 06 / 11",
+    "f3300": "LOOK 10 / 11",
+    "f5200": "LOOK 11 / 11",
+    "f7000": "LOOK 11 / 11 · ALL (white pill)"
+   },
+   "font_candidates": [
+    "IBM Plex Mono 500 (named in author site assets; candidate only)"
+   ],
+   "evidence": "full-res frames",
+   "confidence": 0.75,
+   "uncertainties": [
+    "frame at which each LOOK value flips"
+   ]
+  },
+  {
+   "asset_id": "G-TITLE-TAG",
+   "role": "top-right fixed text 'ESCAPE VELOCITY · SS27'",
+   "geometry_px": {
+    "right_aligned_x": 1824,
+    "baseline_y": 61
+   },
+   "appearance": "uppercase mono ~12px, same style as G-LOOK-COUNTER; in the last looks also gets a white pill background",
+   "evidence": "full-res frames",
+   "confidence": 0.8,
+   "uncertainties": []
+  },
+  {
+   "asset_id": "G-AUDIO-SPECTRUM",
+   "role": "tiny audio-reactive vertical-bar level meter under the title tag",
+   "geometry_px": {
+    "x_range": [
+     1645,
+     1822
+    ],
+    "y_range": [
+     92,
+     110
+    ],
+    "bars_approx": 64
+   },
+   "appearance": "thin vertical white bars, height driven by audio level (flat dotted line when quiet, e.g. f24 near 0)",
+   "evidence": "f24 (flat), f1500 / f3300 (active)",
+   "confidence": 0.7,
+   "uncertainties": [
+    "bar count, update rate, which band(s) drive it"
+   ]
+  },
+  {
+   "asset_id": "G-MONTHS-COUNTER",
+   "role": "top-right 'NN MONTHS TO ESCAPE' split-flap digit widget with sub-captions 'THE PERMANENT UNDERCLASS' and 'DEPARTURES · SS27 · COLLECTION 01'; counts the film's countdown (18 -> ... -> 0); later swapped to a two-row flap 'THERE IS NO UNDERCLASS'",
+   "geometry_px": {
+    "digits_box": [
+     1495,
+     130,
+     1560,
+     178
+    ],
+    "label_lines_x": 1570,
+    "label_y": [
+     135,
+     170
+    ],
+    "subcaption_y": [
+     187,
+     202
+    ],
+    "widget_bounds": [
+     1490,
+     125,
+     1720,
+     208
+    ]
+   },
+   "appearance": "two dark rounded flap tiles with orange (#D97757-family) digits, label 'MONTHS / TO ESCAPE' in wide-tracked mono white, hairline below, tiny captions",
+   "observed_values": {
+    "f24": "absent (the large bottom flap row shows '24 MONTHS TO ESCAPE THE PERMANENT UNDERCLASS' instead)",
+    "f1500": "18 MONTHS TO ESCAPE",
+    "f3300": "10 MONTHS TO ESCAPE",
+    "f5200": "replaced by flap rows 'THERE IS / NO UNDERCLASS' + 'BOARD · FINAL · H/T B. HALPERIN'",
+    "f7000": "absent; large 'BOARD 01 · THE WALL · RING-OUT' panel shows 'THERE IS NO UNDERCLASS', 'LOOKS 11/11', 'MONTHS 00'"
+   },
+   "evidence": "full-res frames",
+   "confidence": 0.7,
+   "uncertainties": [
+    "exact frames of each value change",
+    "whether value changes are keyed to the looks or to lyrics"
+   ]
+  },
+  {
+   "asset_id": "G-FLAP-BOARD",
+   "role": "large split-flap row(s): author device kind 'flap' (e.g. s001: rows [{text '18 MONTHS TO ESCAPE THE PERMANENT UNDERCLASS', at 0.0}], cw 36, gap 3, clatters from frame 1, settled by 1.5 s)",
+   "geometry_px": {
+    "full_width_lower_third_example_f24": {
+     "x": 72,
+     "y": 792,
+     "w": 1752,
+     "h": 90
+    },
+    "cell_pitch_px": "~38.9 (46 cells over 1752px at f24)"
+   },
+   "appearance": "dark charcoal flap cells (#17171B-ish) with a hairline split, bold condensed uppercase letters (white / orange for the numeral), 3px-ish gaps",
+   "font_candidates": [
+    "DINish Condensed 900 (author site asset; candidate only)",
+    "a DIN-like condensed grotesque"
+   ],
+   "evidence": "f24, f5200, f7000; author spec source_docs/wiki_formats.md s001 devices",
+   "confidence": 0.75,
+   "uncertainties": [
+    "flip animation timing per cell",
+    "font identity"
+   ]
+  },
+  {
+   "asset_id": "G-LEFT-RULER",
+   "role": "left-edge vertical ruler with tick marks, 3-digit labels and a red/orange marker at mid-height",
+   "geometry_px": {
+    "x_range": [
+     28,
+     90
+    ],
+    "y_range": [
+     200,
+     1040
+    ],
+    "marker_y": 540,
+    "label_step_px": "~88 per label",
+    "labels_seen": [
+     "000-005 at f24",
+     "031-039 at f1500",
+     "116-124 at f5200"
+    ]
+   },
+   "appearance": "short horizontal ticks, small mono numerals ~9px, low contrast; static within a few frames, labels advance over time (no horizontal shift measured over 20 consecutive frames)",
+   "evidence": "f24/f1500/f5200 + 20-frame cross-correlation (0 px/frame)",
+   "confidence": 0.6,
+   "uncertainties": [
+    "scroll law (per-second or per-beat)",
+    "colour on light looks"
+   ]
+  },
+  {
+   "asset_id": "G-TICKER",
+   "role": "bottom data ticker between two hairlines, continuously scrolling right-to-left",
+   "geometry_px": {
+    "hairlines_y": [
+     1035,
+     1065
+    ],
+    "text_baseline_y": 1050,
+    "text_height_px": 11
+   },
+   "motion": {
+    "speed_px_per_frame": 5.0,
+    "speed_px_per_s": 120,
+    "direction": "content moves left",
+    "measured": "cross-correlation of the strip over 19 consecutive frame pairs at frames 1000 and 3000 = exactly 5 px/frame; at frame 5000 = 4-5 px/frame (4.3 avg), so speed is not constant"
+   },
+   "appearance": "mono uppercase ~11px, entries separated by a '✱' glyph; accent glyph colour on some entries",
+   "observed_entries": [
+    "MAC MINIS 13",
+    "UNDERCLASS -18 MO",
+    "NVDA ▲ 5.3T",
+    "CURSOR → SPACEX $60B",
+    "WAYMO RECALL 3,900",
+    "CONTEXT 1,001,234 TOK",
+    "HUGGING FACE → NVIDIA $12.93B",
+    "IMO 2026 · 42 / 42",
+    "TOKENS BURNED 255,625,000 ▲",
+    "LEV 0.61 YR/YR",
+    "STOP HIRING HUMANS → RETIRED",
+    "SUNCATCHER T-6 DAYS",
+    "UNDERCLASS: NONE",
+    "FRONT ROW: AGENTS",
+    "SHOW 01 · SS27 · 11 / 11 LOOKS SHOWN",
+    "UNDERCLASS -0 MO"
+   ],
+   "dynamic_fields": [
+    "UNDERCLASS -NN MO follows the months countdown",
+    "CONTEXT n TOK increments (1,001,234 at f24 -> 1,169,675 at f3300 -> 1,359,916 at f7000)",
+    "TOKENS BURNED n increments (255,625,000 at f1500 -> 422,916,666 at f7000)"
+   ],
+   "evidence": "full-res frames + cross-correlation",
+   "confidence": 0.8,
+   "uncertainties": [
+    "full entry list and order",
+    "speed law"
+   ]
+  },
+  {
+   "asset_id": "G-TIMECODE",
+   "role": "bottom-right running film timecode",
+   "geometry_px": {
+    "right_aligned_x": 1824,
+    "baseline_y": 1004
+   },
+   "format": "MM:SS:FF at 24 fps of film time; verified f24 -> 00:01:00, f1500 -> 01:02:12, f3300 -> 02:17:12, f7000 -> 04:51:16",
+   "appearance": "mono ~12px, white, low contrast on light looks (appears greyed in f5200)",
+   "evidence": "four frames, all consistent with frame/24",
+   "confidence": 0.9,
+   "uncertainties": []
+  },
+  {
+   "asset_id": "G-HALFTONE",
+   "role": "global colour halftone 'print pass' over the whole frame (author: colour halftone + line screens, grain, dither transitions, misregistration)",
+   "measured": "See halftone_pitch.json for noisy FFT estimates; pitch/orientation cannot be treated as exact shader constants. Finale visibly demonstrates growing dots and its panel labels 7 PX→60 PX ·45° ·INK ON PAPER.",
+   "evidence_level": "measured (pitch/angle) / confirmed existence (author W-motion)",
+   "confidence": 0.65,
+   "uncertainties": [
+    "dot shape and size modulation by luminance (AM halftone) vs fixed grid",
+    "whether pitch change is intentional animation (likely, but only sampled every 2 s)",
+    "channel misregistration offset",
+    "Frame7140 printed45degree demo conflicts with prior automated axis0/90 summary; preserve both evidence types rather than asserting one exact global screen orientation"
+   ],
+   "prior_automated_estimate": "see halftone_pitch.json (FFT of full-res frames every 2 s). Square dot grid, axis-aligned (0/90 degrees). Pitch ~4.2 px for most of the film (e.g. f24, f5200), but visibly coarse ~7.3-8 px in the white finale looks (f7000) and some mid sections; the automated estimate is noisy where content has strong periodic structure.",
+   "observed_demo": {
+    "shot_id": "S0151",
+    "frame": 7140,
+    "reference": "work/root_review/native/f7140.jpg",
+    "text": "SCREEN · DOT PITCH / 10 PX / 7 PX → 60 PX · 45° · INK ON PAPER / STEP 05 / 12",
+    "evidence_level": "observed_on_screen_text",
+    "limitation": "Rendered explanatory label is not independent physical measurement; earlier 0/90 FFT axes may reflect aliasing/content structure"
+   }
+  },
+  {
+   "asset_id": "G-GRAIN",
+   "role": "fine film grain/noise over footage",
+   "evidence_level": "inferred",
+   "confidence": 0.5,
+   "uncertainties": [
+    "amount; separate pass or part of the plates (Midjourney prompts end with 'fine silver grain')"
+   ]
+  },
+  {
+   "asset_id": "G-CV-BRACKET",
+   "role": "computer-vision face/person bracket + label tag, tracked to her (author device kind cv.bracket, e.g. 'FACE · MODEL 01' conf 0.99; 'GUEST 01 · LOOK 06 0.98'; 'MODEL 01 · EXIT 0.96')",
+   "appearance": "four corner brackets (L-shaped hairlines, 1-2px) around a face/body box, white or ink; small label tag (white fill, dark mono text ~11px) above the box's top edge; confidence number at top right of box",
+   "evidence_level": "confirmed device (source_docs/wiki_formats.md), appearance measured",
+   "confidence": 0.8,
+   "uncertainties": [
+    "detector box smoothing",
+    "per-frame jitter"
+   ]
+  },
+  {
+   "asset_id": "G-STAR-CLIP",
+   "role": "Recurring clay-orange spark hair clip motif; author canon names eight points, rendered variants must be observed rather than assumed",
+   "evidence_level": "confirmed (author canon: 'an eight-pointed clay spark hair clip')",
+   "confidence": 0.78,
+   "uncertainties": [
+    "Per-shot point count outside explicit observed variants is not established",
+    "Final star is nine-point even though author canon says eight; no automatic identity correction"
+   ],
+   "author_design_statement": {
+    "points": 8,
+    "evidence_level": "confirmed_author_statement",
+    "source": "source_docs/FINDINGS.md / author character canon",
+    "limitation": "Not proof that every generated or composited final frame has eight visible points"
+   },
+   "observed_variants": [
+    {
+     "shot_id": "S0152",
+     "frame": 7285,
+     "reference": "work/full_batch/07285.jpg",
+     "points": 9,
+     "evidence_level": "observed",
+     "visible_label": "9-PT STAR · 9 × 40° · CLAY #D97757",
+     "diameter_label": "Ø 841 PX · MEASURED ON THE PLATE",
+     "angle_label": "∠ 38° · R7–R8 · MEASURED",
+     "note": "Visible9 tips and annotation differ from eight-point author canon. Annotation is observed on-screen text, not independent measurement certification."
+    }
+   ]
+  }
+ ],
+ "assets": [],
+ "typography_summary": {
+  "chrome_mono": {
+   "role": "all HUD/ticker/tags/timecode",
+   "description": "monospaced grotesque, uppercase, ~11-12px at 1080p, tracked out",
+   "candidates": [
+    "IBM Plex Mono 500"
+   ],
+   "evidence_level": "candidate"
+  },
+  "flap_condensed": {
+   "role": "split-flap cells and big condensed kinetic words",
+   "description": "tall condensed DIN-like sans, heavy weight, all caps",
+   "candidates": [
+    "DINish Condensed 900"
+   ],
+   "evidence_level": "candidate"
+  },
+  "lyric_headline": {
+   "role": "large sentence-case lyric coverlines (e.g. 'Look 10. Staff badge, empty seat: gambling', 'There is nothing to escape.')",
+   "description": "Helvetica-like bold grotesque, tight leading ~1.0-1.1, left aligned at x=72-80, accent words coloured #D97757, 70-90px cap-height class at 1080p",
+   "candidates": [
+    "Heros 700 / Nimbus Sans Bold (TeX Gyre Heros)"
+   ],
+   "evidence_level": "candidate"
+  }
+ },
+ "render_facts": {
+  "pipeline": "custom JS engine, headless Chromium, canvas 2D + WebGL print pass, every frame a pure function of time; 24 fps; 7354 frames reported by author (7353 decodable in the published file); CRF 16 H.264",
+  "evidence_level": "confirmed (author pages)",
+  "source": "source_docs/FINDINGS.md B10"
+ },
+ "open_items": [
+  "per-chapter chrome/colour mode changes (dark night looks vs white finale) to be filled from Phase B shot records",
+  "frame-exact flip times of LOOK counter and months counter",
+  "ticker speed law and full entry list",
+  "halftone pitch time series needs a robust estimator (see halftone_pitch.json caveats)"
+ ]
+}

@@ -1,0 +1,260 @@
+{
+ "about": "IRIS EP01 board v2 · stage 7 representative pilot. Nothing is submitted before the user approves this exact package; the approval is then sealed per lane.",
+ "segment": {
+  "units": "U020–U029",
+  "song": [
+   54.69,
+   89.52
+  ],
+  "crowd_test": "U045 (song 144.80–147.33)"
+ },
+ "code_units": [
+  "U024",
+  "U026",
+  "U028",
+  "U029"
+ ],
+ "digital_human": {
+  "mode": "即梦 数字人 · 大师模式 · output size follows the still (16:9 still → 1920×1088 last time)",
+  "takes": {
+   "U020": {
+    "image": {
+     "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-face-shut-b.png",
+     "sha256": "1eb6555ae7c7f378eb79cf2b021c6258096c470cb711fa3a0772a0518a436169"
+    },
+    "audio": {
+     "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U020.wav",
+     "sha256": "2ad08570d6f15567ec292f2135918fdc621b725ab2f1f74286607d000e583552",
+     "seconds": 6.41,
+     "song_window": [
+      54.39,
+      60.8
+     ]
+    },
+    "action_prompt": "镜头固定近景。她冷静而克制地对着镜头低声耳语，嘴随歌词轻轻张合，眼神从下往上看着镜头，头部保持平稳；唱最后那个长音时下巴慢慢抬起，眉头放松。",
+    "action_prompt_sha256": "c32bf41d66132408515212fee32dde28170c8b8ce5b63152803ef2373c2e5896",
+    "edit_window": 54.69,
+    "lyric": "A word I keep inside. / Outside.",
+    "accept": [
+     "正常速度和原曲合在一起看，她是在唱：每一句的嘴都在动、句中没有冻住的脸（口型大致同步即可，不要求逐字极准）",
+     "身份符合 canon v4：银白眉睫、冰灰眼；正面时耳挂与立领红线在画面右侧",
+     "没有凭空出现的手或物体、没有牙齿碎裂、没有身份漂移",
+     "背景与机位稳定（不漂、不晃）",
+     "表演克制、不做作：不皱眉、不夸张张嘴；动作按描述（呼吸、重心、视线）有变化",
+     "耳语明显比副歌轻，最后的长音时下巴抬起、嘴型保持"
+    ]
+   },
+   "U021": {
+    "image": {
+     "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-shut-b.png",
+     "sha256": "ffe0c323ef57309e72002e93811472d54490865b81b35f4a5afe96e809ef5bdf"
+    },
+    "audio": {
+     "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+     "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+     "seconds": 4.36,
+     "song_window": [
+      60.2,
+      64.56
+     ]
+    },
+    "action_prompt": "镜头固定中景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，肩膀放松，重心落在后脚，句尾轻轻吸一口气，眉头放松，眼睛向上直视镜头，双手自然垂在身侧。",
+    "action_prompt_sha256": "14ca007fc710903a913b0e583fd2259e00813bd160d483b7a77e9ceb487cde3e",
+    "edit_window": 60.5,
+    "lyric": "I didn't run",
+    "accept": [
+     "正常速度和原曲合在一起看，她是在唱：每一句的嘴都在动、句中没有冻住的脸（口型大致同步即可，不要求逐字极准）",
+     "身份符合 canon v4：银白眉睫、冰灰眼；正面时耳挂与立领红线在画面右侧",
+     "没有凭空出现的手或物体、没有牙齿碎裂、没有身份漂移",
+     "背景与机位稳定（不漂、不晃）",
+     "表演克制、不做作：不皱眉、不夸张张嘴；动作按描述（呼吸、重心、视线）有变化"
+    ]
+   },
+   "U022": {
+    "image": {
+     "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-34-shut-b.png",
+     "sha256": "df5cc9f24b0ae079517e63440f5ee06df61fdcaf3e8a8868c8e9e6e322f11733"
+    },
+    "audio": {
+     "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U022.wav",
+     "sha256": "cf6e1128cd21da9af38eda200b06a6a4232814ea86aab4420fe22b0d3806b385",
+     "seconds": 3.57,
+     "song_window": [
+      63.96,
+      67.53
+     ]
+    },
+    "action_prompt": "镜头固定近景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，唱到最后的长音时身体向镜头前倾，眼睛微微眯起，眉头放松，眼神始终看着镜头。",
+    "action_prompt_sha256": "d123f513d5a5e1c2c8213ad66694abce1063f97c329a4c546a85cb72d799534f",
+    "edit_window": 64.26,
+    "lyric": "I just looked outside.",
+    "accept": [
+     "正常速度和原曲合在一起看，她是在唱：每一句的嘴都在动、句中没有冻住的脸（口型大致同步即可，不要求逐字极准）",
+     "身份符合 canon v4：银白眉睫、冰灰眼；正面时耳挂与立领红线在画面右侧",
+     "没有凭空出现的手或物体、没有牙齿碎裂、没有身份漂移",
+     "背景与机位稳定（不漂、不晃）",
+     "表演克制、不做作：不皱眉、不夸张张嘴；动作按描述（呼吸、重心、视线）有变化"
+    ]
+   },
+   "U025": {
+    "image": {
+     "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-turn-shut-b.png",
+     "sha256": "652bc76d732d5af9b4c4e91cf8dbcf169821e3d5b5589980da069ce7b321b721"
+    },
+    "audio": {
+     "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U025.wav",
+     "sha256": "47d8219c76ecc0834e9808b40f57235afc41de33837c130cd841b9957c856314",
+     "seconds": 6.21,
+     "song_window": [
+      72.23,
+      78.44
+     ]
+    },
+    "action_prompt": "镜头固定中景。开始时她侧头看着画面右侧的门缝；唱第一个长音时慢慢把头转回来，直视镜头；两个长音之间换一口气，再唱第二个长音，长音时嘴张开并保持，眉头放松。",
+    "action_prompt_sha256": "a151cbcc92a012550e71e4da29284e309a5f4f241e8f0e7720b37ab2c07ba3d4",
+    "edit_window": 72.53,
+    "lyric": "I didn't run",
+    "accept": [
+     "正常速度和原曲合在一起看，她是在唱：每一句的嘴都在动、句中没有冻住的脸（口型大致同步即可，不要求逐字极准）",
+     "身份符合 canon v4：银白眉睫、冰灰眼；正面时耳挂与立领红线在画面右侧",
+     "没有凭空出现的手或物体、没有牙齿碎裂、没有身份漂移",
+     "背景与机位稳定（不漂、不晃）",
+     "表演克制、不做作：不皱眉、不夸张张嘴；动作按描述（呼吸、重心、视线）有变化",
+     "开始看着门缝，第一个长音中把头转回镜头",
+     "两个长音之间有一次换气，每个长音期间嘴保持张开"
+    ]
+   },
+   "U027": {
+    "image": {
+     "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-face-shut-b.png",
+     "sha256": "1eb6555ae7c7f378eb79cf2b021c6258096c470cb711fa3a0772a0518a436169"
+    },
+    "audio": {
+     "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U027.wav",
+     "sha256": "ea5e90b1918aa1d6c2c8c19895e4acbd120abc41cd196cd6674c9bd64092ae41",
+     "seconds": 4.17,
+     "song_window": [
+      79.26,
+      83.43
+     ]
+    },
+    "action_prompt": "镜头固定近景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，唱完最后一个字后嘴慢慢合上，静静停住，眉头放松，眼神始终直视镜头。",
+    "action_prompt_sha256": "ead2790c282390dff983ac41e96e5993c5c87f94ff8e46acb3292ef538fbcbef",
+    "edit_window": 79.56,
+    "lyric": "I just looked outside.",
+    "accept": [
+     "正常速度和原曲合在一起看，她是在唱：每一句的嘴都在动、句中没有冻住的脸（口型大致同步即可，不要求逐字极准）",
+     "身份符合 canon v4：银白眉睫、冰灰眼；正面时耳挂与立领红线在画面右侧",
+     "没有凭空出现的手或物体、没有牙齿碎裂、没有身份漂移",
+     "背景与机位稳定（不漂、不晃）",
+     "表演克制、不做作：不皱眉、不夸张张嘴；动作按描述（呼吸、重心、视线）有变化",
+     "唱完后嘴自然合上并停住"
+    ]
+   }
+  }
+ },
+ "seedance": {
+  "generation": {
+   "model": "Seedance 2.0 VIP",
+   "mode": "first_frame",
+   "seconds": 5,
+   "resolution": "1080p",
+   "ratio": "16:9",
+   "audio": null
+  },
+  "identity_waivers": [
+   "IRIS"
+  ],
+  "units": {
+   "U023": {
+    "first_frame": {
+     "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-city-gap-a.png",
+     "sha256": "61248d1238a7cef119676bd84244548cba615b83cf96866a00a3637dd4597426"
+    },
+    "prompt": "镜头固定。首帧是从一扇只开着一指宽的黑色门缝向外看出去的画面：门缝两侧是黑暗的门板边缘，缝里是凌晨三点雾中的城市。门不动，门缝始终只有一指宽。缝外的城市在动：高架桥上的车灯缓缓流过，远处高楼的窗灯安静地亮着，雾气慢慢飘过。城市的光是冷白和钢蓝色。画面里没有人。",
+    "prompt_sha256": "c9859e795b6e33949e61feb4a7db368c20b009a3cad2d915e71ad31a5228e55f",
+    "edit_window": [
+     67.23,
+     69.9
+    ],
+    "accept": [
+     "5 s 里至少有连续 2.67 s 可用：门缝宽度不变、门没有打开或变宽、车灯在流动",
+     "镜头固定",
+     "没有人、没有红色、没有任何文字或标识"
+    ]
+   },
+   "U045": {
+    "first_frame": {
+     "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-floor-line-at-a.png",
+     "sha256": "ec992510b052cb9ad686ff4d65592357bcdf0d02d10e77a05a54c686af537df3"
+    },
+    "prompt": "镜头固定。她从一排闭着眼睛、一动不动的副本中间，一步跨过地面上的白色标线，停在线外，冰灰色的眼睛直视镜头，神情平静而带着压迫感。她身边的副本始终闭着眼睛，一动不动，身上的灯都是熄灭的。冷蓝的光雾贴着湿润的地面缓缓流动。",
+    "prompt_sha256": "6d6ec1a90fc1a84c82f5422160a43431d3cdbd6b046e31da321e79bc249ada52",
+    "edit_window": [
+     144.8,
+     147.33
+    ],
+    "accept": [
+     "5 s 里有一段约 2.53 s：开始时她脚尖贴着标线，结束时她已站在线外并停下直视镜头",
+     "副本全程闭眼、静止、灯灭、银发同款，不变形、不移动",
+     "镜头固定",
+     "身份符合 canon v4，耳挂与立领红线在画面右侧",
+     "跨线不完整或任何副本动了，就算失败"
+    ],
+    "status": "postponed: the user chose 「改用多参考模式」 (redesign with an IRIS identity sheet, new preview, new approval)"
+   }
+  }
+ },
+ "order": "one at a time: submit → fetch → per-shot gate (shot-gate-reviewer, video-analysis MCP) → next; continuity report (continuity-supervisor) and lint before each submit",
+ "placement": {
+  "digital_human": "clip second 0 = song time of the audio window start (unit start − 0.3 s); after fetch, align the clip's own audio to the vocal stem by cross-correlation (motion-kit/tools/sync_check.py) and use only the aligned [unit start, unit end]; the page may round the audio length to mm:ss (floor or ceiling); a clip longer than its audio (5.00 s → 5.13 s last time) is trimmed by the alignment; judge it composited with the original song at normal speed",
+  "seedance": "generate 5 s, choose the usable window inside it per the unit's acceptance list (U023 2.67 s, U045 2.53 s); the film keeps the T4 master as its only audio"
+ },
+ "budget": {
+  "digital_human": {
+   "takes": 5,
+   "retries": 0,
+   "cap_per_take": 165,
+   "last_seen_price_5s": 30
+  },
+  "seedance": {
+   "takes": 2,
+   "retries": 0,
+   "cap_per_take": 165
+  },
+  "total_cap": 1155,
+  "cap_note": "1155 credits is the reserved ceiling for the seven takes, not a quote or a settled price",
+  "rule": "read the page price, duration and exact balance before and after each submit; any unknown outcome stops the pilot"
+ },
+ "stop": [
+  "the digital-human entry review refuses the new face: stop, no preprocessing to get past it",
+  "a take repeats a frozen face, broken teeth, extra hands or identity drift: stop that lane and report, no extra take",
+  "the page shows an audio length that is neither the floor nor the ceiling of the file length: stop"
+ ],
+ "revision": {
+  "id": "r2",
+  "of": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs.json",
+   "sha256": "41ea7116768910f8bdb84fefca47f6060d732067561f1e0a2b6702a0dd5ad2a0"
+  },
+  "changes": [
+   {
+    "unit": "U020",
+    "from": "头几乎不动",
+    "to": "头部保持平稳"
+   },
+   {
+    "unit": "U027",
+    "from": "唱完最后一个字后嘴慢慢合上，停住不动",
+    "to": "唱完最后一个字后嘴慢慢合上，静静停住"
+   }
+  ],
+  "question": "试拍参考包：http://127.0.0.1:8768/pilot/preview.html\n\n数字人动作描述要求只写正向动作。U020 里有「头几乎不动」，U027 里有「唱完最后一个字后嘴慢慢合上，停住不动」；上次同类否定说法（SC4「几乎不笑」）被场记判为不可提交。改成正向说法可以吗？U020 改为「头部保持平稳」；U027 改为「唱完最后一个字后嘴慢慢合上，静静停住」。其余文字不变。",
+  "user_quote": "同意这两处改写",
+  "u045": {
+   "question": "试拍参考包：http://127.0.0.1:8768/pilot/preview.html\n\nU045（群像里她跨过地上白线）用 Seedance 首帧模式，只能带一张首帧图，没法另附 IRIS 的身份设定图；参考包页面也没问过你这一点。项目规定这种情况要你明确同意才能提交。怎么处理？",
+   "user_quote": "改用多参考模式"
+  },
+  "recorded_at": "2026-11-05T01:30:10+00:00"
+ }
+}

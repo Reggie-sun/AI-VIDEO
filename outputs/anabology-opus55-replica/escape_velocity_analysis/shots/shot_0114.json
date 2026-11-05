@@ -1,0 +1,940 @@
+{
+  "shot_id": "S0114",
+  "start_frame": 5352,
+  "end_frame": 5373,
+  "start_time": 223.0,
+  "end_time": 223.9167,
+  "duration_frames": 22,
+  "duration_s": 0.9167,
+  "start_tc": "00:03:43:00",
+  "end_tc": "00:03:43:21",
+  "boundary_in_id": "B3-019",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5352,
+      "path": "keyframes/S0114_f05352.jpg",
+      "role": "first",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5357,
+      "path": "keyframes/S0114_f05357.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5363,
+      "path": "keyframes/S0114_f05363.jpg",
+      "role": "middle",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5368,
+      "path": "keyframes/S0114_f05368.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually during detail pass."
+    },
+    {
+      "frame": 5373,
+      "path": "keyframes/S0114_f05373.jpg",
+      "role": "last",
+      "note": "Actually opened individually during detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Frontal singing face with orange lipstick",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "5 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Frontal singing face with orange lipstick. Freckled pale face fills frame; short bob with orange streak, headset microphone at left cheek; bright white background. White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Frontal singing face with orange lipstick",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Frontal singing face with orange lipstick",
+      "background": "Freckled pale face fills frame; short bob with orange streak, headset microphone at left cheek; bright white background."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0114.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0025,
+      "pan_y_frac_per_s": -0.0056,
+      "zoom_per_s": -0.0089,
+      "median_flow_frac_per_s": 0.0122,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Freckled pale face fills frame; short bob with orange streak, headset microphone at left cheek; bright white background.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#E7E7E7",
+        "fraction": 0.309,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#0C0B09",
+        "fraction": 0.206,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#AF8A7E",
+        "fraction": 0.127,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#C2B9B4",
+        "fraction": 0.127,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#49362D",
+        "fraction": 0.118,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#915F4B",
+        "fraction": 0.113,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [204.1, 131.4, 131.5]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 07 /11",
+      "evidence_frame": 5362,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5362
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5362,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:43:00",
+      "end_value": "00:03:43:21"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5362
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0114-E01",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Freckled pale face fills frame; short bob with orange streak, headset microphone at left cheek; bright white background.",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5352, 5354]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5371, 5373]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5352,
+          "state": "present"
+        },
+        {
+          "frame": 5373,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5352,
+        5373
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5352,
+          5354
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    },
+    {
+      "element_id": "S0114-E02",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "character",
+      "description": "Frontal singing face with orange lipstick",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5352, 5354]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5371, 5373]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5352,
+          "state": "present"
+        },
+        {
+          "frame": 5373,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5352,
+        5373
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5352,
+          5354
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    },
+    {
+      "element_id": "S0114-E03",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "Visible text_title bearing LOCK IN.",
+      "start_frame": 5357,
+      "end_frame": 5373,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.38,
+        "w": 0.29,
+        "h": 0.3,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5357, 5359]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5371, 5373]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5357,
+          "text": "LOCK partial clipped strip",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5358,
+          "text": "LOCK",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5366,
+          "text": "LOCK IN.",
+          "inverted_backing_flash": true
+        },
+        {
+          "frame": 5367,
+          "text": "LOCK IN.",
+          "inverted_backing_flash": true
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5357,
+        5373
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOCK partial clipped strip → LOCK → LOCK IN. → LOCK IN.",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5357,
+          5359
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    },
+    {
+      "element_id": "S0114-E04",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "Toggle card OFF becomes ON",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "bounding_box": {
+        "x": 0.76,
+        "y": 0.21,
+        "w": 0.2,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5352, 5354]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5371, 5373]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5352,
+          "state": "OFF",
+          "distractions": 37,
+          "silenced": 0
+        },
+        {
+          "frame": 5365,
+          "state": "OFF→ON transition bound5364–5366"
+        },
+        {
+          "frame": 5366,
+          "state": "ON",
+          "distractions": 0,
+          "silenced": 1221
+        },
+        {
+          "frame": 5373,
+          "state": "ON",
+          "silenced": 1474
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5352,
+        5373
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5352,
+          5354
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    },
+    {
+      "element_id": "S0114-E05",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "hud_bracket",
+      "description": "Face tracking corner lines",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "bounding_box": {
+        "x": 0.34,
+        "y": 0.12,
+        "w": 0.36,
+        "h": 0.78,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5352, 5354]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5371, 5373]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5352,
+          "state": "present"
+        },
+        {
+          "frame": 5373,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5352,
+        5373
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5352,
+          5354
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    },
+    {
+      "element_id": "S0114-E06",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "FOCUS · SYSTEM SETTINGS / MODE LOCK IN / NOTIFICATIONS ALLOWED→SILENCED / SILENCED0→1474 / DISTRACTIONS37→0",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "bounding_box": {
+        "x": 0.77,
+        "y": 0.22,
+        "w": 0.19,
+        "h": 0.24,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5352,
+          "state": "present"
+        },
+        {
+          "frame": 5373,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5352,
+        5373
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "FOCUS · SYSTEM SETTINGS / MODE LOCK IN / NOTIFICATIONS ALLOWED→SILENCED / SILENCED0→1474 / DISTRACTIONS37→0",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5352,
+          5354
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    },
+    {
+      "element_id": "S0114-E07",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "TARGET LOCKED ·1.00; initial ACQUIRING0.43",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "bounding_box": {
+        "x": 0.34,
+        "y": 0.22,
+        "w": 0.18,
+        "h": 0.025,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5352,
+          "text": "ACQUIRING0.43"
+        },
+        {
+          "frame": 5357,
+          "text": "TARGET LOCKED1.00"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5352,
+        5373
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "TARGET LOCKED ·1.00; initial ACQUIRING0.43",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5352,
+          5354
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    },
+    {
+      "element_id": "S0114-E08",
+      "shot_id": "S0114",
+      "asset_id": null,
+      "type": "text_caption",
+      "description": "Visible label: Lock in.",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.89,
+        "w": 0.13,
+        "h": 0.04,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "See event/state sequence and filmstrip",
+        "easing": "unknown except observed step/typing behavior",
+        "entrance": "First/last visible envelope not yet refined",
+        "exit": "Envelope only"
+      },
+      "keyframes": [
+        {
+          "frame": 5352,
+          "state": "present"
+        },
+        {
+          "frame": 5373,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5352,
+        5373
+      ],
+      "confidence": 0.72,
+      "uncertainties": [
+        "Original font/shader/easing parameters unknown; bbox visual estimate."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Lock in.",
+        "typography": {
+          "description": "Small monospace labels; caption uses sans",
+          "method": "visual_estimate",
+          "font_status": "unknown"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5352,
+          5354
+        ],
+        "exit_bounds": [
+          5371,
+          5373
+        ],
+        "method": "Dense state sheet+individual first/middle/last; boundaries2frames for fade/subpixel ambiguity"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0114-A01",
+      "target_element_ids": [
+        "S0114-E02",
+        "S0114-E03",
+        "S0114-E04",
+        "S0114-E05"
+      ],
+      "description": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+      "start_frame": 5352,
+      "end_frame": 5373,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "fade_white",
+      "boundary_id": "B3-019",
+      "span": [
+        5350,
+        5354
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-020",
+      "span": [
+        5373,
+        5373
+      ],
+      "description": "White entry fade f5352-5354; LOCK f5358 then IN. f5366; toggle changes around f5367",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0340",
+      "relation": "vocal_word_candidate (unknown) at frame 5202–5364; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5352
+    },
+    {
+      "audio_event_id": "AH02184",
+      "relation": "band_onset_candidate (unknown) at frame 5353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5353
+    },
+    {
+      "audio_event_id": "AH02185",
+      "relation": "band_onset_candidate (unknown) at frame 5353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5353
+    },
+    {
+      "audio_event_id": "AB0494",
+      "relation": "beat_candidate (unknown) at frame 5353; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5353
+    },
+    {
+      "audio_event_id": "AH02186",
+      "relation": "band_onset_candidate (unknown) at frame 5353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5353
+    },
+    {
+      "audio_event_id": "AH02187",
+      "relation": "band_onset_candidate (unknown) at frame 5353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5353
+    },
+    {
+      "audio_event_id": "AH02188",
+      "relation": "band_onset_candidate (unknown) at frame 5353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5353
+    },
+    {
+      "audio_event_id": "AH02189",
+      "relation": "band_onset_candidate (unknown) at frame 5363; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5363
+    },
+    {
+      "audio_event_id": "AH02190",
+      "relation": "band_onset_candidate (unknown) at frame 5363; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5363
+    },
+    {
+      "audio_event_id": "AB0495",
+      "relation": "beat_candidate (unknown) at frame 5364; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5364
+    },
+    {
+      "audio_event_id": "AH02191",
+      "relation": "band_onset_candidate (unknown) at frame 5364; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5364
+    },
+    {
+      "audio_event_id": "AH02192",
+      "relation": "band_onset_candidate (unknown) at frame 5364; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5364
+    },
+    {
+      "audio_event_id": "AH02193",
+      "relation": "band_onset_candidate (unknown) at frame 5364; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5364
+    },
+    {
+      "audio_event_id": "AW0341",
+      "relation": "vocal_word_candidate (unknown) at frame 5365–5370; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5365
+    },
+    {
+      "audio_event_id": "AH02194",
+      "relation": "band_onset_candidate (unknown) at frame 5369; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5369
+    },
+    {
+      "audio_event_id": "AH02195",
+      "relation": "band_onset_candidate (unknown) at frame 5369; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5369
+    },
+    {
+      "audio_event_id": "AH02196",
+      "relation": "band_onset_candidate (unknown) at frame 5369; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5369
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0114.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original shader, font and continuous curve coefficients unknown.",
+    "Motion estimates are observational; original photographic metadata cannot be recovered."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0114.jpg",
+      "keyframes/S0114_f05352.jpg",
+      "keyframes/S0114_f05357.jpg",
+      "keyframes/S0114_f05363.jpg",
+      "keyframes/S0114_f05368.jpg",
+      "keyframes/S0114_f05373.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "frames_actually_opened": [
+      5352,
+      5357,
+      5363,
+      5368,
+      5373
+    ],
+    "filmstrip_opened": true,
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "All five 960px keyframes opened individually; selected source-detail crops and per-frame headline sheets inspected.",
+    "detail_crops": [
+      "work/full_codex_103_153/detail5368.png"
+    ],
+    "dense_sheets": [
+      "work/full_codex_103_153/lock114.jpg"
+    ],
+    "fullres_frames_actually_opened": [
+      5373
+    ],
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

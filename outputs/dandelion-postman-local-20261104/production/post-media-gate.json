@@ -1,0 +1,35 @@
+{
+  "attempt_id": "dandelion-postman-local-001",
+  "source_sha256": "41f44af39d83658e30f5e86ca2fc4802d3da23ab154205745af1af491f76bb60",
+  "verdict": "NOT_EVALUATED",
+  "workflow_action": "STOP_NO_RESAMPLE",
+  "human_acceptance": "NOT_EVALUATED",
+  "findings": [
+    {
+      "requirement": "one robot, persistent right-hip bag, no identity swap",
+      "verdict": "PASS",
+      "evidence": "video-analysis.json sampled0–12s"
+    },
+    {
+      "requirement": "exactly two steps, then stable feet",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "step-observation.json; feet settle around2s, intermediate closing foot movement makes strict two-step interpretation uncertain; no exact count PASS"
+    },
+    {
+      "requirement": "seed detaches, gaze rises, one seed lands and holds",
+      "verdict": "PASS",
+      "evidence": "video-analysis.json4–12s; seed on head around11–12s"
+    },
+    {
+      "requirement": "continuous slow camera push and no grid",
+      "verdict": "PASS",
+      "evidence": "one detected scene and visible gradual push"
+    },
+    {
+      "requirement": "breeze foliage, two metallic footfalls, no dialogue/music",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/postman/audio-understanding.json observes wind, rustling, distant ambient noise, no speech segments; metallic footfalls and absence of music not established"
+    }
+  ],
+  "comparison_limits": "one output each, prior outcome known, uncontrolled seed, prompt has multiple expression changes; no causal or system-superiority claim"
+}

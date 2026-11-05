@@ -1,0 +1,21 @@
+{
+  "sha256": "1509083877457f82b02f8ef471353ade303c21b997c913f0d6640c812c76c177",
+  "size": [
+    1448,
+    1086
+  ],
+  "status": "NEW_STORYBOARD_CANDIDATE_NOT_APPROVED",
+  "fixed": [
+    "03 keyboard action",
+    "04/05 distinct male resident, two-flight spatial layout"
+  ],
+  "limits": [
+    "05 shows returned endpoint, movement from upper flight requires video verification",
+    "07 exact floor count still requires per-shot spatial reference check",
+    "static image cannot prove winch motion, contact or complete truck occlusion",
+    "review board not sealed model input; no video generated"
+  ],
+  "generation_calls_this_remake": 2,
+  "video_calls": 0,
+  "cost": "not_reported_by_image_tool"
+}

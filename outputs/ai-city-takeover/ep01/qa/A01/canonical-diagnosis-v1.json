@@ -1,0 +1,16 @@
+{
+  "failure_classes": [
+    "EVIDENCE_GAP",
+    "QUALITY_FAILURE"
+  ],
+  "failed_requirements": [
+    "camera-space",
+    "visual"
+  ],
+  "preserved_requirements": [],
+  "evidence_hashes": [
+    "c1e52bd5c6cbf2fd68225fdb034a7096ae037a0ab1ff757add6eabd5fd0c1c0e"
+  ],
+  "next_owner": "evidence_owner",
+  "all_required_observed_pass": false
+}

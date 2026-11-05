@@ -1,0 +1,321 @@
+{
+  "schema_version": "jimeng-feedback-driver/1",
+  "row": {
+    "shot": {
+      "shot_id": "ep01v2-st6",
+      "scene_id": "rack-door",
+      "storyboard_beat_id": "action-st6",
+      "intent": "镜头固定。她用手把机柜门慢慢推上，门缝里的红光越来越窄，直到完全熄灭，她垂着眼看着那道门缝。嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+      "dialogue": "",
+      "narration": "",
+      "duration_policy": {
+        "mode": "fixed",
+        "seconds": 6.0,
+        "minimum_seconds": null,
+        "maximum_seconds": null
+      },
+      "character_ids": [
+        "IRIS"
+      ],
+      "continuity_constraints": [
+        "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+        "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）",
+        "她用手把机柜门慢慢推上，门缝里的红光越来越窄直到完全熄灭，她垂着眼看着那道门缝，嘴唇自然闭合",
+        "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+        "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+      ],
+      "visual_strategy": "generated_video",
+      "required_asset_roles": [
+        {
+          "role": "primary_visual",
+          "asset_ids": [],
+          "allowed_asset_types": [
+            "video"
+          ]
+        },
+        {
+          "role": "first_frame",
+          "asset_ids": [
+            "iris-c-v2-st6-first-frame"
+          ],
+          "allowed_asset_types": [
+            "image"
+          ]
+        }
+      ],
+      "motion_directives": [],
+      "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+      "hybrid_layers": [],
+      "composition_directives": [],
+      "review_policy": {
+        "required_checks": []
+      }
+    },
+    "generation": {
+      "references": [
+        {
+          "role": "approved_keyframe",
+          "asset_id": "iris-c-v2-st6-first-frame"
+        }
+      ],
+      "generation_intent": {
+        "reference_planning": {
+          "contract_version": "shot-reference-intent/1",
+          "facets": [
+            "stable"
+          ],
+          "structure": "continuous",
+          "segment_ids": [],
+          "events": [],
+          "anchors": [],
+          "selections": [],
+          "natural_generation": [
+            "门缝里的红光越来越窄"
+          ],
+          "director_coverage": {
+            "coverage_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d",
+            "unit_id": "S9a"
+          },
+          "preview_approval": {
+            "approval_hash": "adc608edc621f8ecbb25ff93153d331291bb1de806132b2267dd08192c4c4bd8"
+          },
+          "identity_waivers": [
+            {
+              "character_id": "IRIS",
+              "reason": "首帧生视频：身份由使用者在预览中认可的首帧承担；认可的参考包只有首帧，不附身份图"
+            }
+          ]
+        },
+        "open_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "ST6首帧：她站在机柜门旁，手掌按在门上，门缝漏出红光，右侧落地窗外是城市",
+          "state_hash": null,
+          "required_change": false
+        },
+        "close_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "门已推上，红光完全熄灭，她垂眼看着门缝",
+          "state_hash": null,
+          "required_change": false
+        },
+        "identity_continuity": {
+          "character_ids": [],
+          "preservation": "unspecified",
+          "allowed_variation": []
+        },
+        "scene_continuity": {
+          "scene_id": "rack-door",
+          "time_of_day": "同一凌晨",
+          "mood": "冷静、收束",
+          "state_constraints": [
+            "ST6首帧：她站在机柜门旁，手掌按在门上，门缝漏出红光，右侧落地窗外是城市",
+            "不新增人物、设备、文字或界面"
+          ]
+        },
+        "space_continuity": {
+          "subject_position": "她站在机柜门旁原位",
+          "screen_direction": "保持参考图方向",
+          "entrance_state": null,
+          "exit_state": null,
+          "crossing_policy": "不换位、不翻轴"
+        },
+        "axis_continuity": {
+          "camera_axis": "参考图原机位视轴",
+          "framing_continuity": "ST6首帧：左侧机柜门与她的侧身，右侧落地窗",
+          "crossing_policy": "不翻轴、不环绕"
+        },
+        "subject_action": {
+          "start_state": "手按在半开的机柜门上",
+          "progression": "用手把机柜门慢慢推上，门缝里的红光越来越窄",
+          "endpoint": {
+            "state_ref": null,
+            "state_text": "红光完全熄灭，她垂着眼看着那道门缝，嘴唇自然闭合",
+            "state_hash": null,
+            "required_change": false
+          }
+        },
+        "motion_envelope": {
+          "onset": "平滑开始",
+          "peak": "红光越来越窄直到熄灭",
+          "settle": "摄影机始终静止",
+          "direction": "摄影机不移动",
+          "amplitude_class": "很小"
+        },
+        "pacing": {
+          "cadence": "五秒连续原速",
+          "tempo_class": "正常原速",
+          "shot_duration_seconds": 5.0
+        },
+        "camera_intent": {
+          "movement": "摄影机完全固定，全程不推近、不移动、不摇镜",
+          "stability": "完全静止的固定机位",
+          "framing_intent": "ST6首帧：左侧机柜门与她的侧身，右侧落地窗",
+          "expression_strength": "semantic_prompt_allowed"
+        },
+        "camera_endpoint": {
+          "start_framing": "ST6首帧原始构图",
+          "end_framing": "与起始相同的机位",
+          "position_lock": false,
+          "orientation_lock": false
+        },
+        "performance_intent": {
+          "trigger": "门缝漏出红光",
+          "visible_response": "用手把机柜门慢慢推上，垂着眼看着门缝",
+          "gaze_target": "那道门缝",
+          "body_behavior": "侧身站着推门",
+          "hand_behavior": "手掌把机柜门慢慢推上",
+          "terminal_performance_state": "垂着眼看着门缝",
+          "character_directions": [
+            {
+              "character_id": "IRIS",
+              "screen_identity": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+              "role": "principal",
+              "visibility": "visible",
+              "offscreen_reason": null,
+              "beats": [
+                {
+                  "phase": "throughout",
+                  "trigger": "门缝漏出红光",
+                  "emotion": "平静",
+                  "intensity": "subtle",
+                  "facial_expression": "嘴唇自然闭合",
+                  "gaze_target": "那道门缝",
+                  "breathing": "自然平稳",
+                  "body_behavior": "侧身站着推门"
+                }
+              ]
+            }
+          ]
+        },
+        "visual_treatment": {
+          "medium_look": "真人电影摄影",
+          "palette": "蓝黑钢蓝，红色只在指定位置",
+          "material_treatment": "自然材质与真实光影",
+          "prohibited_visual_drift": [
+            "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+            "改变参考图的场景与光线"
+          ]
+        },
+        "lighting_intent": {
+          "motivated_source": "门缝的红光渐窄至熄灭，窗外城市冷光",
+          "direction": "参考图方向",
+          "exposure_priority": "保留暗部细节",
+          "continuity_state": "同一凌晨冷光"
+        },
+        "ambience_intent": {
+          "environment_bed": "极轻机房环境声（成片使用独立音轨）",
+          "foley_cues": [],
+          "explicitly_silent": false
+        },
+        "dialogue_intent": {
+          "mode": "none",
+          "speaker_id": null,
+          "verbatim_text": null,
+          "start_seconds": null,
+          "end_seconds": null,
+          "on_screen": null,
+          "response_obligation": null,
+          "lip_sync_required": false
+        },
+        "music_intent": {
+          "mode": "none",
+          "instrumentation": null,
+          "tempo_rhythm": null,
+          "dynamics": null
+        },
+        "primary_camera_motion": {
+          "movement_kind": "locked",
+          "direction": "none",
+          "amplitude_class": "subtle",
+          "speed_class": "very_slow",
+          "start_motion_state": "stationary",
+          "end_motion_state": "settled"
+        },
+        "camera_subject_relation": {
+          "subject_id": "IRIS",
+          "relation_kind": "fixed_frame",
+          "start_relation": "她站在半开的红光机柜门旁",
+          "end_relation": "门已关上、红光熄灭，机位不变"
+        }
+      },
+      "intent_evidence": {
+        "character_action_required": true,
+        "state_change_required": false,
+        "subject_motion_directive_present": true
+      },
+      "output_need": {
+        "timing_mode": "content_driven",
+        "duration_seconds": 5,
+        "geometry_policy": "adaptive",
+        "aspect_ratio": "16:9",
+        "container_mime": "video/mp4"
+      },
+      "audio_need": "optional",
+      "quality_need": {
+        "objective_tier": "preview"
+      },
+      "conditioning_compatibility": {
+        "lane": "i2va",
+        "first_anchor_id": "iris-c-v2-st6-first-frame",
+        "available_duration_seconds": 5.0
+      }
+    },
+    "composition": {
+      "muted": true,
+      "source_audio_policy": "MUTE",
+      "source_audio_reason": "成片使用已认可歌曲 v2 独立音轨"
+    },
+    "boundary": {
+      "independent": true,
+      "reason": "按分镜 v2.1 由最终剪辑切接；不要求复制前镜终态"
+    }
+  },
+  "routing_policy": {
+    "identity": {
+      "policy_id": "iris-v2-st6-qualification",
+      "policy_version": "1",
+      "policy_sha256": "ede8a5e3c3548f352618f36132fb7a69d1ae489cd617f99548ec858e397876b8"
+    },
+    "local_resources_available": false,
+    "remote_authorized": true,
+    "budget_authorized": true,
+    "execution_purpose": "qualification"
+  },
+  "decision_policy": {
+    "policy_id": "generation-decision",
+    "version": "3",
+    "repeated_failure_threshold": 3,
+    "max_resamples": 0,
+    "allow_bounded_exploration": true
+  },
+  "execution_limits": {
+    "task_id": "iris-v2-st6-source-001",
+    "generation_forbidden": false,
+    "allowed_remote_candidates": [
+      "jimeng/jimeng-seedance-2.0-vip-first-frame-v1"
+    ],
+    "paid_submit_ceiling": 1,
+    "paid_submits_used": 0,
+    "local_batch_limit": 1,
+    "local_batch_used": 0,
+    "local_total_limit": null,
+    "local_total_used": 0,
+    "local_resource_available": false,
+    "batch_review_evidence_hash": null
+  },
+  "jimeng_profile": {
+    "model_id": "seedance_2.0_vip",
+    "input_mode": "first_frame",
+    "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+    "project_id": "829df260-5a63-4f0d-8265-8353dc693b3b",
+    "node_id": "node_ek2qc56530",
+    "duration_seconds": 5,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "benefit_amount": 5,
+    "benefit_type": "seedance_20_pro_1080p_output",
+    "credit_upper_bound": 165
+  }
+}

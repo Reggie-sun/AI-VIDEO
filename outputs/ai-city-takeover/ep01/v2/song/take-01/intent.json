@@ -1,0 +1,22 @@
+{
+ "schema": "iris-ep01-song-take/1",
+ "created_at_utc": "2026-11-02T05:24:45.292711+00:00",
+ "service": "ElevenLabs Music via project MCP elevenlabs-direct.compose_music",
+ "model_id": "music_v2",
+ "seed": 260103,
+ "store_for_inpainting": true,
+ "plan_sha256": "ee7d29907e81322501e912ba89b2c0a39f089ac84d1389a035c9fdd7a749192c",
+ "plan_total_ms": 30478,
+ "bars": 16,
+ "bpm_target": 126,
+ "lyrics_source": "outputs/ai-city-takeover/ep01/lyrics-v1.md (approved 2026-10-30, unchanged)",
+ "budget": {
+  "max_generations": 2,
+  "this_ordinal": 1,
+  "max_seconds_each": 31
+ },
+ "account_character_count_before": 1162,
+ "account_character_limit": 40000,
+ "director_quote": "我希望全自动别要我点击",
+ "note": "outro chunk omits the every-beat kick style so it does not contradict \"beat drops out\""
+}

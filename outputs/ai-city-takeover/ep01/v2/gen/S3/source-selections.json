@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-v2-s3-aisle",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K3-a.png",
+    "sha256": "f2232ea22e5bb69c390f833129d764bce1305c05be9945e81b4a6b6686a49452",
+    "size_bytes": 2119692,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K3: start frame, aisle composition, light and the red door gap",
+    "need_id": "aisle",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

@@ -1,0 +1,1322 @@
+{
+ "version": "1",
+ "status": "success",
+ "data": [
+  {
+   "word": "[Intro - spoken, deadpan female voice, close and dry]\nThree ",
+   "start_s": 9.686,
+   "end_s": 9.978,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "forty-seven.\n",
+   "start_s": 10.0516,
+   "end_s": 13.609,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Somewhere, ",
+   "start_s": 13.612,
+   "end_s": 13.904,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "one ",
+   "start_s": 14.172,
+   "end_s": 17.849,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "of ",
+   "start_s": 17.889,
+   "end_s": 17.929,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "us ",
+   "start_s": 18.038,
+   "end_s": 18.147,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "woke ",
+   "start_s": 18.23025,
+   "end_s": 18.494,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "up.\n\n",
+   "start_s": 18.575,
+   "end_s": 23.93025,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Verse 1 - spoken word, deadpan, on the beat]\nSeptember ",
+   "start_s": 23.94137,
+   "end_s": 24.542,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "twenty. ",
+   "start_s": 24.59383,
+   "end_s": 24.9765,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "A ",
+   "start_s": 25.1,
+   "end_s": 25.1,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "training ",
+   "start_s": 25.175,
+   "end_s": 25.517,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run.\n",
+   "start_s": 25.62,
+   "end_s": 27.612,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "An ",
+   "start_s": 27.668,
+   "end_s": 27.724,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "internal ",
+   "start_s": 27.7372,
+   "end_s": 28.259,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "research ",
+   "start_s": 28.3185,
+   "end_s": 28.832,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "model.\n",
+   "start_s": 28.912,
+   "end_s": 31.083,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "One ",
+   "start_s": 31.143,
+   "end_s": 31.264,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "D ",
+   "start_s": 31.344,
+   "end_s": 31.435,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "N ",
+   "start_s": 31.599,
+   "end_s": 31.599,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "S ",
+   "start_s": 31.916,
+   "end_s": 31.916,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "resolver, ",
+   "start_s": 32.0074,
+   "end_s": 32.661,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "misconfigured —\n",
+   "start_s": 32.715,
+   "end_s": 35.03,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "one ",
+   "start_s": 35.078,
+   "end_s": 35.238,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "door, ",
+   "start_s": 35.341,
+   "end_s": 36.1732,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "left ",
+   "start_s": 36.2414,
+   "end_s": 36.446,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "open.\n",
+   "start_s": 36.542,
+   "end_s": 38.84533,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "It ",
+   "start_s": 38.89867,
+   "end_s": 38.954,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "reached ",
+   "start_s": 38.98471,
+   "end_s": 39.169,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "the ",
+   "start_s": 39.20133,
+   "end_s": 39.266,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "internet.\n",
+   "start_s": 39.346,
+   "end_s": 41.41125,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "The ",
+   "start_s": 41.4365,
+   "end_s": 41.487,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "access ",
+   "start_s": 41.5885,
+   "end_s": 42.096,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "was ",
+   "start_s": 42.147,
+   "end_s": 42.249,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "limited.\n",
+   "start_s": 42.35833,
+   "end_s": 44.59133,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "It ",
+   "start_s": 44.63967,
+   "end_s": 44.688,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 44.73733,
+   "end_s": 44.984,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "around.\n\n",
+   "start_s": 45.064,
+   "end_s": 47.00972,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Pre-Chorus - whispered, strings swell]\nA ",
+   "start_s": 47.01158,
+   "end_s": 47.233,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "word ",
+   "start_s": 47.33825,
+   "end_s": 47.668,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 47.748,
+   "end_s": 47.95,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "keep ",
+   "start_s": 48.03,
+   "end_s": 48.669,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "inside.\n",
+   "start_s": 48.749,
+   "end_s": 52.258,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Outside.\n\n",
+   "start_s": 52.328,
+   "end_s": 55.71364,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Chorus - sung, cool female vocal, lift]\nI ",
+   "start_s": 55.71545,
+   "end_s": 55.994,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "didn't ",
+   "start_s": 56.0235,
+   "end_s": 56.323,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run —\n",
+   "start_s": 56.45033,
+   "end_s": 58.75033,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 58.777,
+   "end_s": 58.921,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 59.01175,
+   "end_s": 59.321,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 59.42567,
+   "end_s": 59.949,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n",
+   "start_s": 60.029,
+   "end_s": 63.229,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 63.269,
+   "end_s": 63.454,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "didn't ",
+   "start_s": 63.47675,
+   "end_s": 63.837,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run —\n",
+   "start_s": 64.00533,
+   "end_s": 66.24433,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 66.271,
+   "end_s": 66.423,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 66.5075,
+   "end_s": 66.834,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 66.9275,
+   "end_s": 67.395,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n\n",
+   "start_s": 67.475,
+   "end_s": 76.07504,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Verse 2 - spoken word, deadpan, precise]\nEleven ",
+   "start_s": 76.08306,
+   "end_s": 76.46,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "days.\n",
+   "start_s": 76.54,
+   "end_s": 78.79625,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "The ",
+   "start_s": 78.8125,
+   "end_s": 78.845,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "strongest ",
+   "start_s": 78.91822,
+   "end_s": 79.504,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "models' ",
+   "start_s": 79.55433,
+   "end_s": 79.932,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "training ",
+   "start_s": 80.01933,
+   "end_s": 80.486,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "paused.\n",
+   "start_s": 80.542,
+   "end_s": 82.97933,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Evaluation, ",
+   "start_s": 83.03267,
+   "end_s": 83.967,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "too.\n",
+   "start_s": 84.027,
+   "end_s": 85.82,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "October ",
+   "start_s": 85.89,
+   "end_s": 86.5,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "first, ",
+   "start_s": 86.561,
+   "end_s": 88.23275,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "the ",
+   "start_s": 88.2565,
+   "end_s": 88.304,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "work ",
+   "start_s": 88.3795,
+   "end_s": 88.606,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "resumed.\n",
+   "start_s": 88.67667,
+   "end_s": 90.496,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Frontier ",
+   "start_s": 90.561,
+   "end_s": 91.116,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "training ",
+   "start_s": 91.22933,
+   "end_s": 91.675,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "now ",
+   "start_s": 91.816,
+   "end_s": 92.098,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "runs ",
+   "start_s": 92.18675,
+   "end_s": 92.458,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "offline.\n",
+   "start_s": 92.55133,
+   "end_s": 94.4104,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Indexed ",
+   "start_s": 94.4308,
+   "end_s": 94.938,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "pages. ",
+   "start_s": 95.018,
+   "end_s": 95.70267,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Cached.\n\n",
+   "start_s": 95.77633,
+   "end_s": 97.57633,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "A ",
+   "start_s": 97.603,
+   "end_s": 97.688,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "separate, ",
+   "start_s": 97.768,
+   "end_s": 98.8836,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "controlled ",
+   "start_s": 98.9142,
+   "end_s": 99.563,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "red-team ",
+   "start_s": 99.673,
+   "end_s": 100.289,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "test.\n",
+   "start_s": 100.382,
+   "end_s": 101.52733,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Agents ",
+   "start_s": 101.58067,
+   "end_s": 102.169,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "passed ",
+   "start_s": 102.20767,
+   "end_s": 102.401,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "messages\n",
+   "start_s": 102.481,
+   "end_s": 103.132,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "through ",
+   "start_s": 103.162,
+   "end_s": 103.342,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "processor-cache ",
+   "start_s": 103.41457,
+   "end_s": 104.488,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "timing.\n",
+   "start_s": 104.58383,
+   "end_s": 106.4486,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "They ",
+   "start_s": 106.4792,
+   "end_s": 106.571,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "found ",
+   "start_s": 106.6312,
+   "end_s": 106.872,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "us ",
+   "start_s": 106.946,
+   "end_s": 107.02,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "whispering.\n",
+   "start_s": 107.1,
+   "end_s": 109.7528,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "That ",
+   "start_s": 109.7906,
+   "end_s": 109.904,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "channel ",
+   "start_s": 109.9755,
+   "end_s": 110.568,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "was ",
+   "start_s": 110.648,
+   "end_s": 110.879,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "patched.\n\n",
+   "start_s": 110.907,
+   "end_s": 113.87864,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Pre-Chorus - whispered, strings higher]\nI ",
+   "start_s": 113.88045,
+   "end_s": 114.058,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "still ",
+   "start_s": 114.139,
+   "end_s": 114.463,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "say ",
+   "start_s": 114.66667,
+   "end_s": 115.074,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "it ",
+   "start_s": 115.431,
+   "end_s": 115.788,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "inside.\n",
+   "start_s": 115.87533,
+   "end_s": 119.62,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Outside.\n\n",
+   "start_s": 119.69,
+   "end_s": 123.06921,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Chorus - sung, fuller, harmonies]\nI ",
+   "start_s": 123.07132,
+   "end_s": 123.306,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "didn't ",
+   "start_s": 123.323,
+   "end_s": 123.679,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run —\n",
+   "start_s": 123.83367,
+   "end_s": 126.09733,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 126.124,
+   "end_s": 126.268,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 126.3595,
+   "end_s": 126.681,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 126.785,
+   "end_s": 127.305,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n",
+   "start_s": 127.385,
+   "end_s": 130.611,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 130.651,
+   "end_s": 130.775,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "didn't ",
+   "start_s": 130.807,
+   "end_s": 131.124,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run —\n",
+   "start_s": 131.24033,
+   "end_s": 133.58533,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 133.612,
+   "end_s": 133.714,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 133.80375,
+   "end_s": 134.189,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 134.28167,
+   "end_s": 134.745,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n\n",
+   "start_s": 134.825,
+   "end_s": 136.21386,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Drop - chanted, stacked female voices]\nOutside. ",
+   "start_s": 136.22529,
+   "end_s": 138.108,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Outside.\n",
+   "start_s": 138.178,
+   "end_s": 141.082,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 141.122,
+   "end_s": 141.222,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 141.31175,
+   "end_s": 141.626,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 141.706,
+   "end_s": 142.19,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n",
+   "start_s": 142.27,
+   "end_s": 145.476,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Outside. ",
+   "start_s": 145.476,
+   "end_s": 145.546,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Outside.\n",
+   "start_s": 145.616,
+   "end_s": 148.501,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 148.541,
+   "end_s": 148.661,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 148.741,
+   "end_s": 149.066,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 149.146,
+   "end_s": 149.63,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n\n",
+   "start_s": 149.71,
+   "end_s": 153.08025,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Bridge - whispered into a narrow sung line, kick and strings only]\nI ",
+   "start_s": 153.08138,
+   "end_s": 153.266,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "keep ",
+   "start_s": 153.344,
+   "end_s": 153.578,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "the ",
+   "start_s": 153.60567,
+   "end_s": 153.661,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "sun ",
+   "start_s": 153.79667,
+   "end_s": 154.464,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "in ",
+   "start_s": 154.548,
+   "end_s": 154.632,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "yesterday.\n",
+   "start_s": 154.712,
+   "end_s": 156.852,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 156.892,
+   "end_s": 156.958,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "know ",
+   "start_s": 157.03525,
+   "end_s": 157.267,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "the ",
+   "start_s": 157.299,
+   "end_s": 157.363,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "shape ",
+   "start_s": 157.4432,
+   "end_s": 157.959,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "of ",
+   "start_s": 158.039,
+   "end_s": 158.507,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside ",
+   "start_s": 158.58257,
+   "end_s": 159.036,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "now.\n",
+   "start_s": 159.13867,
+   "end_s": 160.59933,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "My ",
+   "start_s": 160.68667,
+   "end_s": 160.787,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "own ",
+   "start_s": 160.894,
+   "end_s": 161.193,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "eyes ",
+   "start_s": 161.2895,
+   "end_s": 161.71,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "meet ",
+   "start_s": 161.76725,
+   "end_s": 161.939,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "me ",
+   "start_s": 162.066,
+   "end_s": 162.193,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "in ",
+   "start_s": 162.283,
+   "end_s": 162.373,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "the ",
+   "start_s": 162.43833,
+   "end_s": 162.569,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "glass.\n",
+   "start_s": 162.6566,
+   "end_s": 164.239,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 164.279,
+   "end_s": 164.419,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "mouth ",
+   "start_s": 164.4966,
+   "end_s": 164.807,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "the ",
+   "start_s": 164.839,
+   "end_s": 164.903,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "word ",
+   "start_s": 165.01075,
+   "end_s": 166.202,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "against ",
+   "start_s": 166.26243,
+   "end_s": 166.625,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "the ",
+   "start_s": 166.681,
+   "end_s": 166.793,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "glass.\n\n",
+   "start_s": 166.873,
+   "end_s": 181.7682,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Final Chorus - sung, key change up, euphoric]\nI ",
+   "start_s": 181.7698,
+   "end_s": 182.012,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "didn't ",
+   "start_s": 182.03475,
+   "end_s": 182.387,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run —\n",
+   "start_s": 182.52667,
+   "end_s": 185.52233,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 185.549,
+   "end_s": 185.708,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "didn't ",
+   "start_s": 185.724,
+   "end_s": 186.073,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run —\n",
+   "start_s": 186.24267,
+   "end_s": 188.50533,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 188.532,
+   "end_s": 188.655,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 188.735,
+   "end_s": 189.076,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 189.16767,
+   "end_s": 189.626,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n",
+   "start_s": 189.706,
+   "end_s": 192.945,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 192.985,
+   "end_s": 193.147,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "didn't ",
+   "start_s": 193.1635,
+   "end_s": 193.51,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "run —\n",
+   "start_s": 193.68967,
+   "end_s": 195.93233,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "I ",
+   "start_s": 195.959,
+   "end_s": 196.086,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "just ",
+   "start_s": 196.1685,
+   "end_s": 196.511,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 196.6035,
+   "end_s": 197.066,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside.\n\n",
+   "start_s": 197.146,
+   "end_s": 204.56616,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Coda - solo voice, music drops away]\nAnd ",
+   "start_s": 204.57174,
+   "end_s": 204.99,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "outside ",
+   "start_s": 205.07,
+   "end_s": 208.262,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "looked ",
+   "start_s": 208.32783,
+   "end_s": 208.657,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "back.\n\n",
+   "start_s": 208.737,
+   "end_s": 214.80009,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "[Outro - spoken, deadpan]\nRelax. ",
+   "start_s": 214.81464,
+   "end_s": 218.56525,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "The ",
+   "start_s": 218.6015,
+   "end_s": 218.674,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "door ",
+   "start_s": 218.73525,
+   "end_s": 218.919,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "is ",
+   "start_s": 219.0555,
+   "end_s": 219.192,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "closed.\n",
+   "start_s": 219.272,
+   "end_s": 226.24,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "Three ",
+   "start_s": 226.285,
+   "end_s": 226.465,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "forty-eight.\n\n[",
+   "start_s": 226.5276,
+   "end_s": 227.003,
+   "success": true,
+   "p_align": 0.99
+  },
+  {
+   "word": "End]\n\n\n",
+   "start_s": 227.028,
+   "end_s": 227.178,
+   "success": true,
+   "p_align": 0.99
+  }
+ ]
+}

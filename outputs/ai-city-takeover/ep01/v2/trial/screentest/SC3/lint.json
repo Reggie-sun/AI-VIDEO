@@ -1,0 +1,74 @@
+{
+ "unit": "SC3",
+ "checks": {
+  "unit_in_approved_preview": true,
+  "user_approval_quoted": true,
+  "approved_inputs_unchanged": true,
+  "action_text_is_approved_text": true,
+  "action_text_pure_chinese": true,
+  "mode_is_master": true,
+  "continuity_report_ready": true,
+  "never_submitted": true,
+  "ledger_has_room": true
+ },
+ "pass": true,
+ "at": "2026-11-04T03:37:09.647597+00:00",
+ "approval_sha256": "002cd8e9f849196683ed6384f68cc9572c7066a29bdeb124f8e49e401b8af564",
+ "continuity_report_sha256": "5b3b08c4afb9996efb0314cd73959d4bd887001fdaf8244b35e262f8bdedf9d4",
+ "inputs": [
+  {
+   "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+   "role": "uploaded vocal"
+  },
+  {
+   "path": "trial/screentest/C1-closeup.png",
+   "sha256": "a507233de7d8adcdd6f41d77d7d897ad18f5003cfa12a0345ee253d81b123583",
+   "role": "SC1 singer image (叛逆)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C1-sheet-a.png",
+    "sha256": "6a3404b482c69b9e0d4f2ce158aa8b2b4aa3dde24a01310b6c6dbd4ee466938f",
+    "crop_x0": 940,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  },
+  {
+   "path": "trial/screentest/C2b-closeup.png",
+   "sha256": "412096ef0a2e5a28d8d454fdc297dd84f0a3a7cac3aabb4913fd667e210b2588",
+   "role": "SC2 singer image (偶像)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C2b-sheet-a.png",
+    "sha256": "43ed087d49cec710cd6baddb61d4327a9e11c9a473c2ae0491ef5cb83e61c838",
+    "crop_x0": 960,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  },
+  {
+   "path": "trial/screentest/C3-closeup.png",
+   "sha256": "907ff1b0d575cfbe192c6b3a273c266f188a4b28baf2492f0e10c2feeebc1947",
+   "role": "SC3 singer image (黑客少女)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C3-sheet-a.png",
+    "sha256": "6fdd8ae530702d5528305d8afde33701ff8121c8ab5489e01ec2fabf6cb11cd3",
+    "crop_x0": 980,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  },
+  {
+   "path": "trial/screentest/C4-closeup.png",
+   "sha256": "f7aa938e7fd96973e391533a4027a4b297143ac526c64934afc7bf7e8a236023",
+   "role": "SC4 singer image (女王)",
+   "derived_from": {
+    "path": "outputs/ai-city-takeover/series/casting-v2/raw/C4-sheet-a.png",
+    "sha256": "e907a8bc4f73e371b92fe8df28e8f40b0a9a859a78fe474dbaf89edf1738b31c",
+    "crop_x0": 975,
+    "note": "right head-and-shoulders panel of the casting sheet the user saw"
+   }
+  }
+ ],
+ "action_text": "镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体随节拍轻轻摇摆，乐句之间轻轻换气，像在分享一个秘密。",
+ "ledger": {
+  "takes": 2,
+  "credits": 60
+ }
+}

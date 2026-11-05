@@ -1,0 +1,1619 @@
+{
+  "shot_id": "S0078",
+  "start_frame": 3356,
+  "end_frame": 3484,
+  "duration_frames": 129,
+  "start_time": 139.8333,
+  "end_time": 145.2083,
+  "duration_s": 5.375,
+  "start_tc": "00:02:19:20",
+  "end_tc": "00:02:25:04",
+  "boundary_in_id": "B2-009",
+  "boundary_in_type": "shape_wipe",
+  "boundary_in_span": [
+    3354,
+    3358
+  ],
+  "boundary_out_id": "B2-010",
+  "boundary_out_type": "shape_wipe",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 3356,
+      "end_frame": 3358,
+      "event": "碎片转场及终端显现；Not AI. SI.歌词",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3356,
+        3358
+      ],
+      "description": "碎片转场及终端显现；Not AI. SI.歌词",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3374,
+      "end_frame": 3376,
+      "event": "It",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3374,
+        3376
+      ],
+      "description": "It",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3380,
+      "end_frame": 3382,
+      "event": "sounds",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3380,
+        3382
+      ],
+      "description": "sounds",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3392,
+      "end_frame": 3394,
+      "event": "much",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3392,
+        3394
+      ],
+      "description": "much",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3401,
+      "end_frame": 3403,
+      "event": "better.",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3401,
+        3403
+      ],
+      "description": "better.",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3410,
+      "end_frame": 3412,
+      "event": "终端与前句消失",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3410,
+        3412
+      ],
+      "description": "终端与前句消失",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3413,
+      "end_frame": 3415,
+      "event": "信任对话框淡入",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3413,
+        3415
+      ],
+      "description": "信任对话框淡入",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3422,
+      "end_frame": 3424,
+      "event": "Trust；胸牌TRUST US",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3422,
+        3424
+      ],
+      "description": "Trust；胸牌TRUST US",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3431,
+      "end_frame": 3433,
+      "event": "us.",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3431,
+        3433
+      ],
+      "description": "us.",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3437,
+      "end_frame": 3439,
+      "event": "Trust us勾选",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3437,
+        3439
+      ],
+      "description": "Trust us勾选",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3440,
+      "end_frame": 3442,
+      "event": "AGREE橙",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3440,
+        3442
+      ],
+      "description": "AGREE橙",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3443,
+      "end_frame": 3445,
+      "event": "双手抬帽",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3443,
+        3445
+      ],
+      "description": "双手抬帽",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3464,
+      "end_frame": 3466,
+      "event": "CASHMERE橙底标题，信任框退出",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3464,
+        3466
+      ],
+      "description": "CASHMERE橙底标题，信任框退出",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3467,
+      "end_frame": 3469,
+      "event": "白CASHMERE与洗护卡",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3467,
+        3469
+      ],
+      "description": "白CASHMERE与洗护卡",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3482,
+      "end_frame": 3484,
+      "event": "圆窗入场",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3482,
+        3484
+      ],
+      "description": "圆窗入场",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3484,
+      "end_frame": 3484,
+      "event": "圆窗扩大露椅子",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3484,
+        3484
+      ],
+      "description": "圆窗扩大露椅子",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头。左侧命令行窗口被信任条款卡替换，再变羊绒洗护吊牌，底部CASHMERE大字与圆形放大窗接下一镜。",
+  "reference_frames": [
+    {
+      "frame": 3356,
+      "path": "keyframes/S0078_f03356.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3388,
+      "path": "keyframes/S0078_f03388.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3420,
+      "path": "keyframes/S0078_f03420.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3452,
+      "path": "keyframes/S0078_f03452.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3484,
+      "path": "keyframes/S0078_f03484.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3476,
+      "path": "work/full_batch/03476.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    }
+  ],
+  "composition": {
+    "shot_size": "medium close-up",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.39,
+      "y": 0.06,
+      "w": 0.5,
+      "h": 0.9,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头。左侧命令行窗口被信任条款卡替换，再变羊绒洗护吊牌，底部CASHMERE大字与圆形放大窗接下一镜。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0007, \"pan_y_frac_per_s\": -0.0015, \"zoom_per_s\": 0.003, \"median_flow_frac_per_s\": 0.0092, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[70.3, 67.9, 84.7]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#1A1A11",
+        "fraction": 0.318,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#3A3625",
+        "fraction": 0.275,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#7D787D",
+        "fraction": 0.13,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#5D534D",
+        "fraction": 0.127,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#989BAA",
+        "fraction": 0.093,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#DEE2E1",
+        "fraction": 0.057,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[70.3, 67.9, 84.7]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 10 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "10",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0078-E01",
+      "shot_id": "S0078",
+      "type": "background_media",
+      "description": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头。左侧命令行窗口被信任条款卡替换，再变羊绒洗护吊牌，底部CASHMERE大字与圆形放大窗接下一镜。",
+      "start_frame": 3356,
+      "end_frame": 3484,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头。左侧命令行窗口被信任条款卡替换，再变羊绒洗护吊牌，底部CASHMERE大字与圆形放大窗接下一镜。"
+      },
+      "motion": {
+        "path": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头。左侧命令行窗口被信任条款卡替换，再变羊绒洗护吊牌，底部CASHMERE大字与圆形放大窗接下一镜。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3356–3484；入口按密采事件区间±2帧。",
+        "exit": "3484为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3356,
+          "state": "碎片转场及终端显现；Not AI. SI.歌词"
+        },
+        {
+          "frame": 3374,
+          "state": "It"
+        },
+        {
+          "frame": 3380,
+          "state": "sounds"
+        },
+        {
+          "frame": 3392,
+          "state": "much"
+        },
+        {
+          "frame": 3401,
+          "state": "better."
+        },
+        {
+          "frame": 3410,
+          "state": "终端与前句消失"
+        },
+        {
+          "frame": 3413,
+          "state": "信任对话框淡入"
+        },
+        {
+          "frame": 3422,
+          "state": "Trust；胸牌TRUST US"
+        },
+        {
+          "frame": 3431,
+          "state": "us."
+        },
+        {
+          "frame": 3437,
+          "state": "Trust us勾选"
+        },
+        {
+          "frame": 3440,
+          "state": "AGREE橙"
+        },
+        {
+          "frame": 3443,
+          "state": "双手抬帽"
+        },
+        {
+          "frame": 3464,
+          "state": "CASHMERE橙底标题，信任框退出"
+        },
+        {
+          "frame": 3467,
+          "state": "白CASHMERE与洗护卡"
+        },
+        {
+          "frame": 3482,
+          "state": "圆窗入场"
+        },
+        {
+          "frame": 3484,
+          "state": "圆窗扩大露椅子"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3356,
+        3388,
+        3420,
+        3452,
+        3484
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0078-E02",
+      "shot_id": "S0078",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 3356,
+      "end_frame": 3484,
+      "bounding_box": {
+        "x": 0.39,
+        "y": 0.06,
+        "w": 0.5,
+        "h": 0.9,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头。左侧命令行窗口被信任条款卡替换，再变羊绒洗护吊牌，底部CASHMERE大字与圆形放大窗接下一镜。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3356–3484；入口按密采事件区间±2帧。",
+        "exit": "3484为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3356,
+          "state": "碎片转场及终端显现；Not AI. SI.歌词"
+        },
+        {
+          "frame": 3374,
+          "state": "It"
+        },
+        {
+          "frame": 3380,
+          "state": "sounds"
+        },
+        {
+          "frame": 3392,
+          "state": "much"
+        },
+        {
+          "frame": 3401,
+          "state": "better."
+        },
+        {
+          "frame": 3410,
+          "state": "终端与前句消失"
+        },
+        {
+          "frame": 3413,
+          "state": "信任对话框淡入"
+        },
+        {
+          "frame": 3422,
+          "state": "Trust；胸牌TRUST US"
+        },
+        {
+          "frame": 3431,
+          "state": "us."
+        },
+        {
+          "frame": 3437,
+          "state": "Trust us勾选"
+        },
+        {
+          "frame": 3440,
+          "state": "AGREE橙"
+        },
+        {
+          "frame": 3443,
+          "state": "双手抬帽"
+        },
+        {
+          "frame": 3464,
+          "state": "CASHMERE橙底标题，信任框退出"
+        },
+        {
+          "frame": 3467,
+          "state": "白CASHMERE与洗护卡"
+        },
+        {
+          "frame": 3482,
+          "state": "圆窗入场"
+        },
+        {
+          "frame": 3484,
+          "state": "圆窗扩大露椅子"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3356,
+        3388,
+        3420,
+        3452,
+        3484
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0078-E03",
+      "shot_id": "S0078",
+      "type": "hud_panel",
+      "description": "左下Claude Code终端，model opus ctx1M，行内AI被SI替换；3412前后消失。",
+      "start_frame": 3356,
+      "end_frame": 3409,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.48,
+        "w": 0.33,
+        "h": 0.39,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左下Claude Code终端，model opus ctx1M，行内AI被SI替换；3412前后消失。"
+      },
+      "motion": {
+        "path": "左下Claude Code终端，model opus ctx1M，行内AI被SI替换；3412前后消失。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3356–3409；入口按密采事件区间±2帧。",
+        "exit": "3409为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3356,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.48,
+            "w": 0.33,
+            "h": 0.39,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3409,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3356,
+        3388
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "Claude Code | ~/unga/speech | model: opus | ctx: 1M | > rename AI → SI everywhere | Rebranding… (2s · ↓ 3.0k tokens · esc to interrupt) | Edit(glossary.md) | − Artificial Intelligence | + Super Intelligence | It sounds much better. | A/B blind: SI",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0078-E04",
+      "shot_id": "S0078",
+      "type": "hud_panel",
+      "description": "3417起左中白色Before you continue对话框，两复选框，Verify灰不可用，Trust us后被勾选。",
+      "start_frame": 3413,
+      "end_frame": 3464,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.39,
+        "w": 0.27,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "3417起左中白色Before you continue对话框，两复选框，Verify灰不可用，Trust us后被勾选。"
+      },
+      "motion": {
+        "path": "3417起左中白色Before you continue对话框，两复选框，Verify灰不可用，Trust us后被勾选。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3413–3464；入口按密采事件区间±2帧。",
+        "exit": "3464为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3413,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.39,
+            "w": 0.27,
+            "h": 0.25,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3464,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3420,
+        3452
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "TERMS OF TRUST · V1 · 09.15 | Before you continue | Verify UNAVAILABLE | Trust us | AGREE",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0078-E05",
+      "shot_id": "S0078",
+      "type": "prop",
+      "description": "胸前STAFF徽章末段叠TRUST US橙字；帽子从双手边抬到头上。",
+      "start_frame": 3422,
+      "end_frame": 3484,
+      "bounding_box": {
+        "x": 0.52,
+        "y": 0.48,
+        "w": 0.13,
+        "h": 0.19,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "胸前STAFF徽章末段叠TRUST US橙字；帽子从双手边抬到头上。"
+      },
+      "motion": {
+        "path": "胸前STAFF徽章末段叠TRUST US橙字；帽子从双手边抬到头上。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3422–3484；入口按密采事件区间±2帧。",
+        "exit": "3484为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3422,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.52,
+            "y": 0.48,
+            "w": 0.13,
+            "h": 0.19,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3484,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3452,
+        3484
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "STAFF | TRUST US",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0078-E06",
+      "shot_id": "S0078",
+      "type": "tag_card",
+      "description": "3467起左侧CASHMERE白卡；COMPOSITION 100% CASHMERE / VERIFIABLE 0% / BADGE TRUST US。",
+      "start_frame": 3467,
+      "end_frame": 3484,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.38,
+        "w": 0.17,
+        "h": 0.22,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "3467起左边CASHMERE白标签，100% CASHMERE / VERIFIED ON / BADGE TRUST US / HAND-WASH FAITH。"
+      },
+      "motion": {
+        "path": "3467起左边CASHMERE白标签，100% CASHMERE / VERIFIED ON / BADGE TRUST US / HAND-WASH FAITH。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3467–3484；入口按密采事件区间±2帧。",
+        "exit": "3484为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3467,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.38,
+            "w": 0.17,
+            "h": 0.22,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3484,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3484
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "LOOK 10 / 11 · CARE | TRUST | CASHMERE | COMPOSITION 100% CASHMERE | VERIFIABLE 0% | BADGE TRUST US | EV-27-1002",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        }
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0078-E07",
+      "shot_id": "S0078",
+      "type": "text_title",
+      "description": "底部CASHMERE.从3467附近入场，白凝缩大字。",
+      "start_frame": 3464,
+      "end_frame": 3484,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.74,
+        "w": 0.36,
+        "h": 0.16,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "底部CASHMERE.从3467附近入场，白凝缩大字。"
+      },
+      "motion": {
+        "path": "底部CASHMERE.从3467附近入场，白凝缩大字。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3464–3484；入口按密采事件区间±2帧。",
+        "exit": "3484为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3464,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.74,
+            "w": 0.36,
+            "h": 0.16,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3484,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3484
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "CASHMERE.",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 62 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0078-E08",
+      "shot_id": "S0078",
+      "type": "mask",
+      "description": "3484前上方大白圆边开口扩大，显示后镜座椅空间。",
+      "start_frame": 3482,
+      "end_frame": 3484,
+      "bounding_box": {
+        "x": 0.15,
+        "y": 0,
+        "w": 0.64,
+        "h": 0.8,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "3484前上方大白圆边开口扩大，显示后镜座椅空间。"
+      },
+      "motion": {
+        "path": "3484前上方大白圆边开口扩大，显示后镜座椅空间。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3482–3484；入口按密采事件区间±2帧。",
+        "exit": "3484为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3482,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.15,
+            "y": 0,
+            "w": 0.64,
+            "h": 0.8,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3484,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3484
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0078-E09",
+      "shot_id": "S0078",
+      "type": "text_lyric",
+      "description": "左上逐词Not AI. SI. It sounds much better.，3410退出；3422重新以Trust us.短句进入，3464退出。",
+      "start_frame": 3356,
+      "end_frame": 3464,
+      "bounding_box": {
+        "x": 0.037,
+        "y": 0.16,
+        "w": 0.28,
+        "h": 0.11,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "左上逐词Not AI. SI. It sounds much better.，3410退出；3422重新以Trust us.短句进入，3464退出。"
+      },
+      "motion": {
+        "path": "左上逐词Not AI. SI. It sounds much better.，3410退出；3422重新以Trust us.短句进入，3464退出。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3356起±2帧，参见逐3帧密采",
+        "exit": "3464末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3356,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.037,
+            "y": 0.16,
+            "w": 0.28,
+            "h": 0.11,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3464,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3356,
+        3388,
+        3420,
+        3452
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "Not AI. SI. It sounds\nmuch better. → Trust us.",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    },
+    {
+      "element_id": "S0078-E10",
+      "shot_id": "S0078",
+      "type": "deco_graphic",
+      "description": "TRUST US胸牌右下伸出白色细引线；胸牌贴在背带上随人物运动。",
+      "start_frame": 3422,
+      "end_frame": 3484,
+      "bounding_box": {
+        "x": 0.604,
+        "y": 0.62,
+        "w": 0.095,
+        "h": 0.09,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "TRUST US胸牌右下伸出白色细引线；胸牌贴在背带上随人物运动。"
+      },
+      "motion": {
+        "path": "TRUST US胸牌右下伸出白色细引线；胸牌贴在背带上随人物运动。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3422起±2帧，参见逐3帧密采",
+        "exit": "3484末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3422,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.604,
+            "y": 0.62,
+            "w": 0.095,
+            "h": 0.09,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3484,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3452,
+        3484,
+        3476
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0078-A03",
+      "target_element_ids": [
+        "S0078-E03"
+      ],
+      "description": "左下Claude Code终端，model opus ctx1M，行内AI被SI替换；3412前后消失。",
+      "start_frame": 3356,
+      "end_frame": 3409,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0078-A04",
+      "target_element_ids": [
+        "S0078-E04"
+      ],
+      "description": "3417起左中白色Before you continue对话框，两复选框，Verify灰不可用，Trust us后被勾选。",
+      "start_frame": 3413,
+      "end_frame": 3464,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0078-A05",
+      "target_element_ids": [
+        "S0078-E05"
+      ],
+      "description": "胸前STAFF徽章末段叠TRUST US橙字；帽子从双手边抬到头上。",
+      "start_frame": 3422,
+      "end_frame": 3484,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0078-A06",
+      "target_element_ids": [
+        "S0078-E06"
+      ],
+      "description": "3467起左边CASHMERE白标签，100% CASHMERE / VERIFIED ON / BADGE TRUST US / HAND-WASH FAITH。",
+      "start_frame": 3467,
+      "end_frame": 3484,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0078-A07",
+      "target_element_ids": [
+        "S0078-E07"
+      ],
+      "description": "底部CASHMERE.从3467附近入场，白凝缩大字。",
+      "start_frame": 3464,
+      "end_frame": 3484,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0078-A08",
+      "target_element_ids": [
+        "S0078-E08"
+      ],
+      "description": "3484前上方大白圆边开口扩大，显示后镜座椅空间。",
+      "start_frame": 3482,
+      "end_frame": 3484,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AH01390",
+      "relation": "band_onset_candidate (unknown) at frame 3356; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3356
+    },
+    {
+      "audio_event_id": "AB0309",
+      "relation": "beat_candidate (unknown) at frame 3356; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3356
+    },
+    {
+      "audio_event_id": "AH01391",
+      "relation": "band_onset_candidate (unknown) at frame 3356; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3356
+    },
+    {
+      "audio_event_id": "AH01392",
+      "relation": "band_onset_candidate (unknown) at frame 3356; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3356
+    },
+    {
+      "audio_event_id": "AH01393",
+      "relation": "band_onset_candidate (unknown) at frame 3357; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3357
+    },
+    {
+      "audio_event_id": "AH01394",
+      "relation": "band_onset_candidate (unknown) at frame 3357; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3357
+    },
+    {
+      "audio_event_id": "AW0235",
+      "relation": "vocal_word_candidate (unknown) at frame 3357–3359; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3357
+    },
+    {
+      "audio_event_id": "AH01395",
+      "relation": "band_onset_candidate (unknown) at frame 3362; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3362
+    },
+    {
+      "audio_event_id": "AH01396",
+      "relation": "band_onset_candidate (unknown) at frame 3362; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3362
+    },
+    {
+      "audio_event_id": "AH01397",
+      "relation": "band_onset_candidate (unknown) at frame 3365; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3365
+    },
+    {
+      "audio_event_id": "AH01398",
+      "relation": "band_onset_candidate (unknown) at frame 3367; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3367
+    },
+    {
+      "audio_event_id": "AB0310",
+      "relation": "beat_candidate (unknown) at frame 3367; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3367
+    },
+    {
+      "audio_event_id": "AH01399",
+      "relation": "band_onset_candidate (unknown) at frame 3367; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3367
+    },
+    {
+      "audio_event_id": "AH01400",
+      "relation": "band_onset_candidate (unknown) at frame 3367; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3367
+    },
+    {
+      "audio_event_id": "AH01401",
+      "relation": "band_onset_candidate (unknown) at frame 3367; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3367
+    },
+    {
+      "audio_event_id": "AH01402",
+      "relation": "band_onset_candidate (unknown) at frame 3368; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3368
+    },
+    {
+      "audio_event_id": "AH01403",
+      "relation": "band_onset_candidate (unknown) at frame 3370; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3370
+    },
+    {
+      "audio_event_id": "AH01404",
+      "relation": "band_onset_candidate (unknown) at frame 3372; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3372
+    },
+    {
+      "audio_event_id": "AW0236",
+      "relation": "vocal_word_candidate (unknown) at frame 3377–3386; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3377
+    },
+    {
+      "audio_event_id": "AB0311",
+      "relation": "beat_candidate (unknown) at frame 3378; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3378
+    },
+    {
+      "audio_event_id": "AH01405",
+      "relation": "band_onset_candidate (unknown) at frame 3385; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3385
+    },
+    {
+      "audio_event_id": "AW0237",
+      "relation": "vocal_word_candidate (unknown) at frame 3388–3394; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3388
+    },
+    {
+      "audio_event_id": "AB0312",
+      "relation": "beat_candidate (unknown) at frame 3389; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3389
+    },
+    {
+      "audio_event_id": "AW0238",
+      "relation": "vocal_word_candidate (unknown) at frame 3399–3406; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3399
+    },
+    {
+      "audio_event_id": "AB0313",
+      "relation": "beat_candidate (unknown) at frame 3400; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3400
+    },
+    {
+      "audio_event_id": "AB0314",
+      "relation": "beat_candidate (unknown) at frame 3411; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3411
+    },
+    {
+      "audio_event_id": "AW0239",
+      "relation": "vocal_word_candidate (unknown) at frame 3420–3427; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3420
+    },
+    {
+      "audio_event_id": "AB0315",
+      "relation": "beat_candidate (unknown) at frame 3421; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3421
+    },
+    {
+      "audio_event_id": "AH01406",
+      "relation": "band_onset_candidate (unknown) at frame 3421; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3421
+    },
+    {
+      "audio_event_id": "AH01407",
+      "relation": "band_onset_candidate (unknown) at frame 3421; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3421
+    },
+    {
+      "audio_event_id": "AH01408",
+      "relation": "band_onset_candidate (unknown) at frame 3421; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3421
+    },
+    {
+      "audio_event_id": "AH01409",
+      "relation": "band_onset_candidate (unknown) at frame 3421; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3421
+    },
+    {
+      "audio_event_id": "AH01410",
+      "relation": "band_onset_candidate (unknown) at frame 3422; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3422
+    },
+    {
+      "audio_event_id": "AW0240",
+      "relation": "vocal_word_candidate (unknown) at frame 3428–3432; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3428
+    },
+    {
+      "audio_event_id": "AB0316",
+      "relation": "beat_candidate (unknown) at frame 3432; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3432
+    },
+    {
+      "audio_event_id": "AH01411",
+      "relation": "band_onset_candidate (unknown) at frame 3432; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3432
+    },
+    {
+      "audio_event_id": "AH01412",
+      "relation": "band_onset_candidate (unknown) at frame 3432; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3432
+    },
+    {
+      "audio_event_id": "AH01413",
+      "relation": "band_onset_candidate (unknown) at frame 3432; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3432
+    },
+    {
+      "audio_event_id": "AH01414",
+      "relation": "band_onset_candidate (unknown) at frame 3433; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3433
+    },
+    {
+      "audio_event_id": "AB0317",
+      "relation": "beat_candidate (unknown) at frame 3443; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3443
+    },
+    {
+      "audio_event_id": "AH01415",
+      "relation": "band_onset_candidate (unknown) at frame 3443; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3443
+    },
+    {
+      "audio_event_id": "AH01416",
+      "relation": "band_onset_candidate (unknown) at frame 3443; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3443
+    },
+    {
+      "audio_event_id": "AH01417",
+      "relation": "band_onset_candidate (unknown) at frame 3443; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3443
+    },
+    {
+      "audio_event_id": "AH01418",
+      "relation": "band_onset_candidate (unknown) at frame 3443; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3443
+    },
+    {
+      "audio_event_id": "AH01419",
+      "relation": "band_onset_candidate (unknown) at frame 3444; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3444
+    },
+    {
+      "audio_event_id": "AB0318",
+      "relation": "beat_candidate (unknown) at frame 3454; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3454
+    },
+    {
+      "audio_event_id": "AH01420",
+      "relation": "band_onset_candidate (unknown) at frame 3454; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3454
+    },
+    {
+      "audio_event_id": "AH01421",
+      "relation": "band_onset_candidate (unknown) at frame 3454; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3454
+    },
+    {
+      "audio_event_id": "AH01422",
+      "relation": "band_onset_candidate (unknown) at frame 3454; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3454
+    },
+    {
+      "audio_event_id": "AH01423",
+      "relation": "band_onset_candidate (unknown) at frame 3454; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3454
+    },
+    {
+      "audio_event_id": "AH01424",
+      "relation": "band_onset_candidate (unknown) at frame 3454; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3454
+    },
+    {
+      "audio_event_id": "AW0241",
+      "relation": "vocal_word_candidate (unknown) at frame 3464–3472; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3464
+    },
+    {
+      "audio_event_id": "AH01425",
+      "relation": "band_onset_candidate (unknown) at frame 3465; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3465
+    },
+    {
+      "audio_event_id": "AB0319",
+      "relation": "beat_candidate (unknown) at frame 3465; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3465
+    },
+    {
+      "audio_event_id": "AH01426",
+      "relation": "band_onset_candidate (unknown) at frame 3465; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3465
+    },
+    {
+      "audio_event_id": "AH01427",
+      "relation": "band_onset_candidate (unknown) at frame 3465; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3465
+    },
+    {
+      "audio_event_id": "AH01428",
+      "relation": "band_onset_candidate (unknown) at frame 3465; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3465
+    },
+    {
+      "audio_event_id": "AW0242",
+      "relation": "vocal_word_candidate (unknown) at frame 3474–3505; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3474
+    },
+    {
+      "audio_event_id": "AH01429",
+      "relation": "band_onset_candidate (unknown) at frame 3475; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3475
+    },
+    {
+      "audio_event_id": "AH01430",
+      "relation": "band_onset_candidate (unknown) at frame 3475; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3475
+    },
+    {
+      "audio_event_id": "AH01431",
+      "relation": "band_onset_candidate (unknown) at frame 3475; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3475
+    },
+    {
+      "audio_event_id": "AH01432",
+      "relation": "band_onset_candidate (unknown) at frame 3476; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3476
+    },
+    {
+      "audio_event_id": "AB0320",
+      "relation": "beat_candidate (unknown) at frame 3476; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 3476
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0078.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "shape_wipe",
+      "boundary_id": "B2-009",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        3354,
+        3358
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "shape_wipe",
+      "boundary_id": "B2-010",
+      "description": "穿白衬衣黑背带的少女在走廊正面演唱，随后双手把灰色连帽衣拉过头。左侧命令行窗口被信任条款卡替换，再变羊绒洗护吊牌，底部CASHMERE大字与圆形放大窗接下一镜。",
+      "span": [
+        3484,
+        3484
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "Not AI. SI. It sounds much better.",
+    "Trust us.",
+    "CASHMERE.",
+    "Before you continue",
+    "Verify UNAVAILABLE",
+    "Trust us",
+    "AGREE"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      3420,
+      3476
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "iris-v2-user-gate-decision/1",
+  "unit": "S8a",
+  "chosen": "S8av3",
+  "gates": {
+    "S8av3": "qa/gate-S8av3/post-media-gate.json (FAIL)"
+  },
+  "question": "S8av3（副歌第一遍）表演明顯比 c1 活，但「I just」對嘴晚 4–5 幀，逐鏡檢查不合格。要怎麼處理？",
+  "user_answer": "用 S8av3，晚 2 幀 (Recommended)",
+  "scope": "S8av3 with in-point 0.5333 (clip 0 = master 18.3333), film window master 18.867-22.567 s = clip 0.533-4.233 s; 'didn't' mouth about 3 frames early, 'I just' about 2 frames late",
+  "review_clip": "renders/review/S8av3-slip2f-master-audio.mp4",
+  "recorded_at": "2026-11-02T11:16:42.778301+00:00",
+  "authority": "user decision on a FAIL verdict; the sealed gate verdict is unchanged"
+}

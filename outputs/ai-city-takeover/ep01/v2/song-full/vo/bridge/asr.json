@@ -1,0 +1,89 @@
+{
+ "mode": "transcribe",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song-full/vo/bridge/tts_[whis_20261103_220847.mp3",
+ "audio_sha256": "8f3d1483856b7aa8c19578aecc58c0a4518e93575787b137f6caac6d1c71631a",
+ "start": 0.0,
+ "end": 4.64,
+ "text": "I keep the sun in yesterday. I know the shape of outside now.",
+ "words": [
+  {
+   "text": " I",
+   "start": 0.0,
+   "end": 0.14,
+   "probability": 0.8747186660766602
+  },
+  {
+   "text": " keep",
+   "start": 0.14,
+   "end": 0.4,
+   "probability": 0.9871891140937805
+  },
+  {
+   "text": " the",
+   "start": 0.4,
+   "end": 0.56,
+   "probability": 0.9806503057479858
+  },
+  {
+   "text": " sun",
+   "start": 0.56,
+   "end": 0.84,
+   "probability": 0.9416331052780151
+  },
+  {
+   "text": " in",
+   "start": 0.84,
+   "end": 1.06,
+   "probability": 0.9836915731430054
+  },
+  {
+   "text": " yesterday.",
+   "start": 1.06,
+   "end": 1.42,
+   "probability": 0.9826228618621826
+  },
+  {
+   "text": " I",
+   "start": 2.04,
+   "end": 2.56,
+   "probability": 0.9942905902862549
+  },
+  {
+   "text": " know",
+   "start": 2.56,
+   "end": 2.8,
+   "probability": 0.9974391460418701
+  },
+  {
+   "text": " the",
+   "start": 2.8,
+   "end": 2.94,
+   "probability": 0.9973384737968445
+  },
+  {
+   "text": " shape",
+   "start": 2.94,
+   "end": 3.26,
+   "probability": 0.9992280006408691
+  },
+  {
+   "text": " of",
+   "start": 3.26,
+   "end": 3.42,
+   "probability": 0.9966944456100464
+  },
+  {
+   "text": " outside",
+   "start": 3.42,
+   "end": 3.72,
+   "probability": 0.9897728562355042
+  },
+  {
+   "text": " now.",
+   "start": 3.72,
+   "end": 4.1,
+   "probability": 0.989189863204956
+  }
+ ]
+}

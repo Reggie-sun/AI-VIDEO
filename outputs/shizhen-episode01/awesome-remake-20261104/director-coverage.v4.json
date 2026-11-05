@@ -1,0 +1,506 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "那你用awesome-seedance测试下我看看\n这不是之前已经做的吗,我让你用awesome seedance从做",
+    "creative_constraints": [
+      {
+        "constraint_id": "awesome",
+        "scope": "global",
+        "source_text": "用awesome-seedance测试"
+      },
+      {
+        "constraint_id": "remake",
+        "scope": "global",
+        "source_text": "我让你用awesome seedance从做"
+      }
+    ],
+    "target_duration_seconds": 60,
+    "coverage_strategy": "multi_shot",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "跨地点异常逐一获得可见证据，镜头切换由报告与证据揭示推动；以平淡调度连接，最后站台固定比较两位与一位。全段从头新制作，时长按事件容量而非均分格数。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "municipal",
+      "duration_seconds": 6,
+      "beat_function": "establish",
+      "objective": "从受力细节进入市政异常，第一眼已有事件",
+      "open_state": "低机位近处能看见绞盘钢索收紧，背景工人靠近断电开关",
+      "close_state": "工人切断电闸后回头，钢索和绞盘仍继续收，铁门抵住限位",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "pan",
+      "camera_intent": "先看收紧钢索与工人操作，短摇把断电动作和仍在收紧的绞盘纳入同一关系，证据出现后切出",
+      "visible_change": "断电后运动未停，工人的回看由机械异常触发",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    },
+    {
+      "unit_id": "D1",
+      "duration_seconds": 3,
+      "beat_function": "reaction",
+      "objective": "让无情绪的日常接报对照异常",
+      "open_state": "董文慧坐记录台，扬声器正在播报，双手尚未敲键",
+      "close_state": "听完后开始敲下这条报告，保持平淡工作状态",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "侧向中近景把脸、扬声器与键盘放在同一层次；声音先至，敲键提供切到下一现场的动作节奏",
+      "visible_change": "从听到记录，没有惊恐",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    },
+    {
+      "unit_id": "D2",
+      "duration_seconds": 6,
+      "beat_function": "reveal",
+      "objective": "让观众自己确认回到同一层",
+      "open_state": "凹陷红灭火器在前景，黄帆布包住户从同层平台往下离画",
+      "close_state": "同一住户重新从上方楼梯下来，在同一灭火器前停下",
+      "shot_scale": "wide",
+      "camera_treatment": "static",
+      "camera_intent": "斜侧固定广角同时覆盖上下梯口与凹陷灭火器，人物离画后保留空平台片刻，再从上方重现；不用切镜制造回层",
+      "visible_change": "黄包与同一凹陷位置让回层可辨，不是普通一次下楼",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    },
+    {
+      "unit_id": "D3",
+      "duration_seconds": 6,
+      "beat_function": "reversal",
+      "objective": "在同一空间对照系统判死与活人",
+      "open_state": "近处护士举扫码器对准病人手环，后方病人面部可辨",
+      "close_state": "两次红灯后护士抬眼；病人睁着眼正常呼吸",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "push_in",
+      "camera_intent": "由前景手环和红灯缓推并转移焦点至病人眼睛，护士抬眼连接两个证据；不另插无来由特写",
+      "visible_change": "红灯重复失败与活人形成同镜反差",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    },
+    {
+      "unit_id": "D4",
+      "duration_seconds": 7,
+      "beat_function": "reveal",
+      "objective": "让报告的七楼有空间证据，呼救有来源",
+      "open_state": "雨夜旧楼外墙与低楼层窗可见，手电光从下往上找",
+      "close_state": "上摇停在第七层封死木板窗；报告后窗内轻声救命",
+      "shot_scale": "wide",
+      "camera_treatment": "tilt",
+      "camera_intent": "跟随手电沿可计数楼层上摇，到封窗停止；视点来自地面保安，不作无人机飞升",
+      "visible_change": "从楼层定位到封死窗后的声音，封闭与有人矛盾成立",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    },
+    {
+      "unit_id": "D5",
+      "duration_seconds": 4,
+      "beat_function": "detail",
+      "objective": "把城市异常压成日常计数",
+      "open_state": "董文慧在电脑之外的纸本上准备落笔",
+      "close_state": "添一行，笔停，低声说记上第十四起",
+      "shot_scale": "close_up",
+      "camera_treatment": "static",
+      "camera_intent": "斜侧近景以笔与停顿为视觉重心，保留部分脸/口型而非只拍字；字迹不可读、不承载数字",
+      "visible_change": "一次普通记录揭示已不是首例",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    },
+    {
+      "unit_id": "D6",
+      "duration_seconds": 4,
+      "beat_function": "transition",
+      "objective": "以暂无报告制造反讽并无缝交给两位",
+      "open_state": "站棚正面，两人等车，罗敏右、高峥左；雨声持续",
+      "close_state": "同两人自然微动作续到B6通话开头",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "站棚同轴中远景，点名问答作为记录台声音画外传来，镜头不让站台两人开口回答；两人平常等车",
+      "visible_change": "声音说无异常，画面已经给观众两个人作为比较基线",
+      "transition_out": "match_cut",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    },
+    {
+      "unit_id": "B6",
+      "duration_seconds": 24,
+      "beat_function": "payoff",
+      "objective": "从两人日常关心到只剩一人却无人记得",
+      "open_state": "罗敏右手手机贴右耳，高峥在左戴眼镜，站棚出口和背景可见",
+      "close_state": "货车遮挡后高峥及随身物不在，罗敏平静回答就我一个；片名失帧与翌夜收束",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "static",
+      "camera_intent": "两位和路滑在同一固定中远景；货车完全遮挡后同构图显露空位，留辨认时间，再有动机切同轴罗敏中近景回答，最后后期片名",
+      "visible_change": "两位→一位，身体消失与记忆抹除同时通过日常回答可读",
+      "transition_out": "end",
+      "constraint_ids": [
+        "awesome",
+        "remake"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "awesome",
+      "statement": "按awesome方法制作",
+      "source_refs": [
+        {
+          "source_hash": "600aef76fe638f9a53ad516b47eb0e7830e66c03ca4a01026e7b233702048a2b",
+          "locator": "creative-input.txt",
+          "intent_item_id": "awesome",
+          "quote": "用awesome-seedance测试",
+          "origin": "explicit_user",
+          "fixed": true
+        }
+      ],
+      "origin": "explicit_user",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "remake",
+      "statement": "从头重做，不用旧成片充当新测试",
+      "source_refs": [
+        {
+          "source_hash": "600aef76fe638f9a53ad516b47eb0e7830e66c03ca4a01026e7b233702048a2b",
+          "locator": "creative-input.txt",
+          "intent_item_id": "remake",
+          "quote": "我让你用awesome seedance从做",
+          "origin": "explicit_user",
+          "fixed": true
+        }
+      ],
+      "origin": "explicit_user",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "new-media",
+      "statement": "所有画面声音新制作",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "new-media",
+          "quote": "所有画面及声音从头制作，不拼接复用旧MP4/WAV",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-municipal",
+      "statement": "从受力细节进入市政异常，第一眼已有事件",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-municipal",
+          "quote": "低机位近处能看见绞盘钢索收紧，背景工人靠近断电开关 → 工人切断电闸后回头，钢索和绞盘仍继续收，铁门抵住限位",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-D1",
+      "statement": "让无情绪的日常接报对照异常",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-D1",
+          "quote": "董文慧坐记录台，扬声器正在播报，双手尚未敲键 → 听完后开始敲下这条报告，保持平淡工作状态",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-D2",
+      "statement": "让观众自己确认回到同一层",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-D2",
+          "quote": "凹陷红灭火器在前景，黄帆布包住户从同层平台往下离画 → 同一住户重新从上方楼梯下来，在同一灭火器前停下",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-D3",
+      "statement": "在同一空间对照系统判死与活人",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-D3",
+          "quote": "近处护士举扫码器对准病人手环，后方病人面部可辨 → 两次红灯后护士抬眼；病人睁着眼正常呼吸",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-D4",
+      "statement": "让报告的七楼有空间证据，呼救有来源",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-D4",
+          "quote": "雨夜旧楼外墙与低楼层窗可见，手电光从下往上找 → 上摇停在第七层封死木板窗；报告后窗内轻声救命",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-D5",
+      "statement": "把城市异常压成日常计数",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-D5",
+          "quote": "董文慧在电脑之外的纸本上准备落笔 → 添一行，笔停，低声说记上第十四起",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-D6",
+      "statement": "以暂无报告制造反讽并无缝交给两位",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-D6",
+          "quote": "站棚正面，两人等车，罗敏右、高峥左；雨声持续 → 同两人自然微动作续到B6通话开头",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event-B6",
+      "statement": "从两人日常关心到只剩一人却无人记得",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "event-B6",
+          "quote": "罗敏右手手机贴右耳，高峥在左戴眼镜，站棚出口和背景可见 → 货车遮挡后高峥及随身物不在，罗敏平静回答就我一个；片名失帧与翌夜收束",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "flat-delivery",
+      "statement": "董文慧平淡日常调度",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "flat-delivery",
+          "quote": "董文慧调度语气平淡日常",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": [
+        "event-D1",
+        "event-D5"
+      ]
+    },
+    {
+      "intent_item_id": "identity",
+      "statement": "沿用原故事人物和异常",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "identity",
+          "quote": "沿用故事人物与各异常事实",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-shortcuts",
+      "statement": "事件因果不能靠字幕或特效替代",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "no-shortcuts",
+          "quote": "不靠旁白、剪辑跳跃或特效删掉应被看到的异常因果",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-copy-layout",
+      "statement": "身份图不控制旧背景/姿势",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "no-copy-layout",
+          "quote": "不把旧图姿势/背景误当身份约束",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "duration",
+      "statement": "工作容量约60秒",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "duration",
+          "quote": "总长暂按60秒容量",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "natural-timing",
+      "statement": "依实际台词和事件调整，不强制格长",
+      "source_refs": [
+        {
+          "source_hash": "cab8b86d0817122a5bf103c17cf961413381ce09ca7cdefa2c3824f73ff91f7f",
+          "locator": "director-choices.txt",
+          "intent_item_id": "natural-timing",
+          "quote": "实际对白、可见事件与自然反应优先，不能强制每格等长",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": [
+        "duration"
+      ]
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "awesome"
+      },
+      {
+        "intent_item_id": "remake"
+      },
+      {
+        "intent_item_id": "new-media"
+      },
+      {
+        "intent_item_id": "event-municipal"
+      },
+      {
+        "intent_item_id": "event-D1"
+      },
+      {
+        "intent_item_id": "event-D2"
+      },
+      {
+        "intent_item_id": "event-D3"
+      },
+      {
+        "intent_item_id": "event-D4"
+      },
+      {
+        "intent_item_id": "event-D5"
+      },
+      {
+        "intent_item_id": "event-D6"
+      },
+      {
+        "intent_item_id": "event-B6"
+      },
+      {
+        "intent_item_id": "identity"
+      }
+    ],
+    "must_not_happen": [
+      {
+        "intent_item_id": "no-shortcuts"
+      },
+      {
+        "intent_item_id": "no-copy-layout"
+      }
+    ],
+    "preferred_performance": [
+      {
+        "intent_item_id": "flat-delivery"
+      }
+    ],
+    "timing_targets": [
+      {
+        "intent_item_id": "duration",
+        "target_kind": "delivery_constraint"
+      }
+    ],
+    "acceptable_variation": [
+      {
+        "intent_item_id": "natural-timing"
+      }
+    ]
+  }
+}

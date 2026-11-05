@@ -1,0 +1,57 @@
+{
+  "shot_id": "ep01-intro",
+  "attempt_id": "iris-ep01-a01-qualification-001",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/generation/project/state/video-generation/fetch/files/65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5.mp4",
+  "artifact_sha256": "65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5",
+  "verdict": "FAIL",
+  "current_attempt_decision": "STOP",
+  "proof": "analyzer",
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "NOT_EVALUATED",
+      "reason": "本次未完成脸部、左耳装置及左领灯线在所有时间片的逐项完整审查，不从参考图或工具成功推断身份通过。",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg"
+      ]
+    },
+    {
+      "requirement_id": "quiet-observer",
+      "verdict": "NOT_EVALUATED",
+      "reason": "本次未完成正常速度的自然呼吸、轻微眨眼和闭口观察全项审看；不把静态联系图当作完整表演通过。",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg"
+      ]
+    },
+    {
+      "requirement_id": "camera-space",
+      "verdict": "FAIL",
+      "reason": "按[camera-space]核对已认可 A01-v1.png 与本 exact MP4 的首段样本/contact-sheet.jpg：认可图是较正面的头胸中近景，实际样本明显更远、人物更侧身并露出肩背；起始景别和姿态未保持认可构图。仍为同一阳台且 MCP 报告单一场景不能抵消该偏差。",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg"
+      ]
+    },
+    {
+      "requirement_id": "visual",
+      "verdict": "FAIL",
+      "reason": "按[visual]旧封存要求『不新增文字、屏幕或人物』核对：exact MP4 的已审样本左上可见平台『AI生成』标识。用户后续认可保留 AI 标识仅用于未来修订，不追改本次旧封存要求或本次失败历史。",
+      "evidence_refs": [
+        "mcp-analysis.json",
+        "mcp-review.json",
+        "contact-sheet.jpg"
+      ]
+    }
+  ],
+  "human_acceptance": "NOT_EVALUATED",
+  "audio_semantics": "NOT_EVALUATED",
+  "production_activation": false,
+  "next_shot_submit_allowed": false,
+  "user_ai_label_exception": "Future authoring only; old sealed findings remain unchanged.",
+  "new_provider_calls": 0
+}

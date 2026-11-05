@@ -1,0 +1,15 @@
+{
+  "checks": {
+    "actual_reference_order": false,
+    "chinese_body": true,
+    "same_set_and_no_flip": true,
+    "quiet_observer": true,
+    "camera_settles": true,
+    "no_text_or_screen": true,
+    "no_song_lipsync_claim": true,
+    "one_native_prompt": true
+  },
+  "request_hash": "bded8cef436f7b256b99521a159e6efaa9daa5a09e1c3ee36a3d2faf43727222",
+  "source_artifact": "outputs/ai-city-takeover/ep01/live-binding/prepared.json",
+  "new_paid_calls": 0
+}

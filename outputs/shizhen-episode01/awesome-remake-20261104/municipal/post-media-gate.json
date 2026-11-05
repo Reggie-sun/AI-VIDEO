@@ -1,0 +1,38 @@
+{
+  "kind": "agent-per-shot-review/1",
+  "attempt_id": "shizhen-awesome-municipal-preview-001",
+  "sha256": "4df6946ac1e7b0bc47a6038d1814cea3aa6f3c1cc907b0183d7bced480458e4d",
+  "verdict": "FAIL",
+  "workflow_action": "STOP_NEXT_SHOT",
+  "production_state_mutated": false,
+  "human_acceptance": "NOT_EVALUATED",
+  "evidence": "video-analysis.json",
+  "findings": [
+    {
+      "requirement": "same worker operates switch and turns toward winch",
+      "verdict": "FAIL",
+      "evidence": "0–1.0s left foreground operator hand and separate worker already visible at right; 1.5–6s right worker remains."
+    },
+    {
+      "requirement": "switch pulled down and hand released",
+      "verdict": "PASS",
+      "evidence": "0–1.5s visible switch motion and hand retreat; electrical disconnection itself not independently measurable."
+    },
+    {
+      "requirement": "winch cable pulls gate to stop, continuing tension",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "3–6s cable crosses in front of gate toward separate right spool; required attachment and reaching stop not established by extracted frames."
+    },
+    {
+      "requirement": "continuous shot with rightward pan and no grid",
+      "verdict": "PASS",
+      "evidence": "13 sampled frames and MCP scene detection one scene."
+    },
+    {
+      "requirement": "native rain/motor audio continues, no dialogue/music",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "AAC present; no audio semantics observation performed after visual FAIL."
+    }
+  ],
+  "repair_hypothesis": "Single clean image of one worker and explicit mechanical attachment may reduce ambiguity; untested, requires new visible exact preview. Do not blindly resubmit the whole grid."
+}

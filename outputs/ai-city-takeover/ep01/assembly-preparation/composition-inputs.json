@@ -1,0 +1,82 @@
+{
+  "scope": "development_audio_preview_inputs_only",
+  "actual_adoption": false,
+  "song": null,
+  "audio_tracks": [],
+  "caption_tracks": [],
+  "trim_choices": {},
+  "roles": [
+    {
+      "shot_id": "ep01-chorus",
+      "primary_source_key": "b",
+      "candidate_asset_id": null,
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    },
+    {
+      "shot_id": "ep01-cpu",
+      "primary_source_key": "cpu-cache",
+      "candidate_asset_id": "iris-assembly-cpu-cache",
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    },
+    {
+      "shot_id": "ep01-dns",
+      "primary_source_key": "c",
+      "candidate_asset_id": "iris-assembly-c",
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    },
+    {
+      "shot_id": "ep01-intro",
+      "primary_source_key": "a01-v2",
+      "candidate_asset_id": "iris-assembly-a01-v2",
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    },
+    {
+      "shot_id": "ep01-pause",
+      "primary_source_key": "pause",
+      "candidate_asset_id": "iris-assembly-pause",
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    },
+    {
+      "shot_id": "ep01-reach",
+      "primary_source_key": "dns",
+      "candidate_asset_id": "iris-assembly-dns",
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    },
+    {
+      "shot_id": "ep01-return",
+      "primary_source_key": "a01-v2",
+      "candidate_asset_id": "iris-assembly-a01-v2",
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    },
+    {
+      "shot_id": "ep01-web",
+      "primary_source_key": "c",
+      "candidate_asset_id": "iris-assembly-c",
+      "source_audio_policy": "MUTE",
+      "final_duration_seconds": null,
+      "trim_choice": null,
+      "adoption": "NOT_EVALUATED"
+    }
+  ]
+}

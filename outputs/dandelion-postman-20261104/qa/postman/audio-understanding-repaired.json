@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"554aad1f910e2c142385a236e7ff72a32bd880e6eef4eadc974e2224799af0da\",\n  \"source_size_bytes\": 31778915,\n  \"audio_sha256\": \"19d01d75c7c6081da9247b700cbe0f7a9e810967a6cd3f113adce01b0f7b490c\",\n  \"audio_size_bytes\": 2130044,\n  \"duration_seconds\": 12.07437641723356,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"5988fcae1b0da823025d4b4fed3b8e296e1654326f1895d4348e182bcec6aac0\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"122c7eb56d8a9b8500a7d8b6ead20784841df6de4145e986a8043228a64ff0c7\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"wind blowing\",\n      \"rustling foliage\",\n      \"sound of rainfall\",\n      \"water dripping and splattering\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/dandelion-postman-20261104/state/video-generation/fetch/files/554aad1f910e2c142385a236e7ff72a32bd880e6eef4eadc974e2224799af0da.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

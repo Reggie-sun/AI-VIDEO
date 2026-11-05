@@ -1,0 +1,22 @@
+{
+  "route": "patchright-1.64.2-MCP-public-context-existing-Chrome-35567",
+  "server_info": {
+    "name": "api",
+    "title": null,
+    "version": "1.64.0-alpha-1790635538000",
+    "websiteUrl": null,
+    "icons": null
+  },
+  "adapter_sha256": "9d51026c7053dcd196e85afaaa27b253179fe216e62bdfd212c62203244a756e",
+  "versions": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "patchright": "1.64.2"
+  },
+  "browser_tabs": "PASS",
+  "browser_snapshot": "PASS",
+  "browser_evaluate": "PASS",
+  "expected_account_visible": true,
+  "snapshot_account_present": true,
+  "generation_clicks": 0,
+  "captcha_solving": false
+}

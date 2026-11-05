@@ -1,0 +1,7 @@
+{
+  "caption_tokens": 171,
+  "caption_limit": 256,
+  "lyric_tokens": 166,
+  "lyric_limit": 2048,
+  "truncation": false
+}

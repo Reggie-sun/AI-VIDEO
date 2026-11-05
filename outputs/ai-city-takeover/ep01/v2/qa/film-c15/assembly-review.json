@@ -1,0 +1,666 @@
+{
+ "schema": "iris-v2-assembly-review/1",
+ "authority": "development_only (Agent observation)",
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c15.mp4",
+ "video_sha256": "b246939af02f1141157415c0df6d8309e437061395155c23b091187390a7f10a",
+ "delivery_copy": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c15.mp4",
+  "sha256": "9015b88463e1325a12a7b4266676bf604c05bcd40f31b8507e7c7412d884041e",
+  "note": "x264 crf 17 aac 320k re-encode with faststart of the render above"
+ },
+ "side_by_side": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c14-vs-c15.mp4",
+   "sha256": "c12f66786abd08b38ddd6beb4dc4c186f0f4455e7c44d1475523cdba080de5d2",
+   "note": "hstack 960x540 each, left c14 delivery, right c15 delivery, audio from c15"
+  }
+ ],
+ "chorus_excerpt": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c15-chorus-17.5-26.5.mp4",
+  "sha256": "51375ca0a87f4313de33d81cbfda4faad8c475ccc6e928534229395b9bb4ade1"
+ },
+ "review_page": "outputs/ai-city-takeover/ep01/v2/review/film-c15.html",
+ "canonical_gate": {
+  "command": "scripts.agent_harness verify-assembly",
+  "status": "NOT_RUN",
+  "reason": "the motion-kit HyperFrames comp has no canonical ResolvedTimeline or render report (spec 2026-10-30 §3.7 Phase 1.5 not done); unverified review film"
+ },
+ "decision": "c15 = c14 + the user's c14 review and story-take decision (logs/decisions.md 2026-11-03: 「字体换了还有大小我觉得也不合适」; the chorus eye 「图片很奇怪,为什么突然晃一个眼睛过去」; 「只用合格的片段 (Recommended)」; the visible 「AI生成」 removed): author-measured lyric size, S8e (K1b eye) replaced by ST2 peering through the door gap (S8p), story takes ST1-ST4, ST6 within their usable spans, no drawn AI mark",
+ "gates": {
+  "N1": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-N1/post-media-gate.json",
+   "verdict": "PASS"
+  },
+  "N2": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-N2/post-media-gate.json",
+   "verdict": "FAIL"
+  },
+  "N3": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-N3/post-media-gate.json",
+   "verdict": "PASS"
+  },
+  "N4": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-N4/post-media-gate.json",
+   "verdict": "FAIL"
+  },
+  "ST1": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-ST1/post-media-gate.json",
+   "verdict": "FAIL",
+   "usable_span": [
+    0.5,
+    2.5
+   ]
+  },
+  "ST2": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-ST2/post-media-gate.json",
+   "verdict": "PASS",
+   "usable_span": [
+    1.0,
+    3.5
+   ]
+  },
+  "ST3": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-ST3/post-media-gate.json",
+   "verdict": "FAIL",
+   "usable_span": [
+    0.0,
+    2.5
+   ]
+  },
+  "ST4": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-ST4/post-media-gate.json",
+   "verdict": "FAIL",
+   "usable_span": [
+    0.0,
+    2.0
+   ]
+  },
+  "ST6": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-ST6/post-media-gate.json",
+   "verdict": "FAIL",
+   "usable_span": [
+    2.5,
+    5.0
+   ]
+  }
+ },
+ "user_decisions": {
+  "lyric_size": "字体换了还有大小我觉得也不合适",
+  "chorus_eye": "图片很奇怪,为什么突然晃一个眼睛过去 / 就是这个眼睛镜头",
+  "story_takes": "只用合格的片段 (Recommended): ST1 0.5-2.5, ST2 1.0-3.5, ST3 0-2.5, ST4 0-2.0, ST6 2.5-5.0 s; ST5 not used",
+  "ai_label": "那个左上角的ai生成可以去掉的 (the comp draws no mark; burned-in labels are not cropped or painted)",
+  "carried": {
+   "N2": "合成时裁向手",
+   "N4": "只用前 1 秒当插入镜"
+  }
+ },
+ "chorus_edit": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/chorus.json",
+  "sha256": "9b68b4b512833498912525176552eb3da44bdd7eae2be072ff89d755e0c5339f",
+  "c14_copy": "outputs/ai-city-takeover/ep01/v2/comp/chorus-c14.json",
+  "note": "S8e (K1b still) -> S8p (ST2 2.6-3.1 s, framed by the code camera)"
+ },
+ "inserts": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/inserts.json",
+  "sha256": "4299ff8edee43ce43539b83b5669432d2addaba03c6dd598c96bf5f4ebcdd76c",
+  "c14_copy": "outputs/ai-city-takeover/ep01/v2/comp/inserts-c14.json",
+  "note": "+ST1, ST2, ST3, ST6; ST4 replaces I4; I3 now runs into ST2",
+  "items": [
+   {
+    "id": "ST1",
+    "t0": 2.867,
+    "t1": 3.367,
+    "word": "「woke up.」（醒了）",
+    "what": "她在巨大的對稱機房走道中央從半蹲站起（固定鏡頭）；S2 剪點上片名 Looked Outside 照常砸進來；識別框框住她整個人（臉約 45 px）＋STATUS · WAKING；之後才接 S2 她站著的特寫（連續性 R3）",
+    "source": "gen/ST1/project/state/video-generation/fetch/files/23ecc9e157c649f6252f84b201229799883582551d55c7ddb1764e58657aae96.mp4",
+    "sha256": "23ecc9e157c649f6252f84b201229799883582551d55c7ddb1764e58657aae96",
+    "source_in_out_s": [
+     0.5,
+     1.0
+    ],
+    "inout": "0.500–1.000 s（ST1，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      960,
+      540,
+      1.0
+     ],
+     [
+      960,
+      540,
+      1.0
+     ]
+    ],
+    "gate": "gate FAIL（2.74 s 起嘴動、0.08 s 起機櫃紅燈）；使用者「只用合格的片段」：只用 0.5–2.5 s",
+    "why": "'woke up': she rises from a crouch in the huge machine hall (ST1 gate FAIL; user 「只用合格的片段」: usable 0.5-2.5 s, this window 0.5-1.0 s); between S1's eye and S2's standing close-up (continuity R3), never after it; the title slams in over it on the S2 cut",
+    "new_in_c15": true
+   },
+   {
+    "id": "N1",
+    "t0": 3.833,
+    "t1": 4.333,
+    "word": "「September」（九月）",
+    "what": "她背對鏡頭沿 K3 走道走向紅色門縫（鏡頭固定，程式鏡頭 1.00→1.04 輕推）；片名與事件日期延續在畫面上",
+    "source": "gen/N1/project/state/video-generation/fetch/files/6b49fa1efcc48669871e89d709ceb359f6e8c78a893beaa4fa0a4501fdacd25f.mp4",
+    "sha256": "6b49fa1efcc48669871e89d709ceb359f6e8c78a893beaa4fa0a4501fdacd25f",
+    "source_in_out_s": [
+     1.0,
+     1.5
+    ],
+    "inout": "1.000–1.500 s（N1，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      960,
+      540,
+      1.0
+     ],
+     [
+      960,
+      530,
+      1.04
+     ]
+    ],
+    "gate": "gate PASS（可用 0.5–3.0 s）",
+    "why": "'September': she walks away down the K3 corridor toward the red gap (N1, gate PASS, usable 0.5-3.0 s); the title stays on; I1 (another room) separates it from S3's empty corridor of the same composition, so she never pops in or out",
+    "new_in_c15": false
+   },
+   {
+    "id": "I1",
+    "t0": 4.333,
+    "t1": 4.8,
+    "word": "「twenty.」之後的拍子",
+    "what": "機房靠窗的寬鏡（S9a 門已關後的段落，沒有人）；隔開 N1 與 S3 同構圖的空走道",
+    "source": "gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "source_in_out_s": [
+     3.4,
+     3.867
+    ],
+    "inout": "3.400–3.867 s（S9a，60fps 來源以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      960,
+      540,
+      1.0
+     ],
+     [
+      960,
+      540,
+      1.0
+     ]
+    ],
+    "gate": null,
+    "why": "after 'twenty.', between N1 and S3: the server room by the glass, the city outside (S9a after the door has shut: no red, no person); c13 keeps it so N1's corridor never cuts straight to S3's empty corridor",
+    "new_in_c15": false
+   },
+   {
+    "id": "I3",
+    "t0": 8.6,
+    "t1": 9.033,
+    "word": "「one door,」（一扇门）",
+    "what": "紅色門縫特寫（S9a 開頭、門還開著），識別框「一扇门／没关」；c15 直接接 ST2（不回 S4 空鏡，她不會在同一個房間忽然消失）",
+    "source": "gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "source_in_out_s": [
+     0.0,
+     0.433
+    ],
+    "inout": "0.000–0.433 s（S9a，60fps 來源以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      560,
+      540,
+      1.5
+     ],
+     [
+      560,
+      560,
+      1.56
+     ]
+    ],
+    "gate": null,
+    "why": "'one door,': the door itself, still open and lit red (S9a's first frames, before it starts to shut), framed on the gap; c15: runs straight into ST2 on 'left' (she is at that door)",
+    "new_in_c15": false
+   },
+   {
+    "id": "ST2",
+    "t0": 9.033,
+    "t1": 9.733,
+    "word": "「left open.」（没关）",
+    "what": "她手搭門邊、身體前傾靠向紅色門縫（側臉）；S4 的兩個編號標註（01 一扇门 · 没关、02 外面 · 互联网）、联网量表與她的識別框＋DOOR · OPEN 跟過來；接 S4c 穿過玻璃到城市",
+    "source": "gen/ST2/project/state/video-generation/fetch/files/f0fce5ad53655bd19592f9b97e99da403d98d4424b82ec24fe7f7025a8091e76.mp4",
+    "sha256": "f0fce5ad53655bd19592f9b97e99da403d98d4424b82ec24fe7f7025a8091e76",
+    "source_in_out_s": [
+     1.0,
+     1.7
+    ],
+    "inout": "1.000–1.700 s（ST2，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      960,
+      540,
+      1.0
+     ],
+     [
+      948,
+      520,
+      1.04
+     ]
+    ],
+    "gate": "gate PASS（可用 1.0–3.5 s）",
+    "why": "'left open': she leans to the red door gap, hand on the door edge (ST2 gate PASS, usable 1.0-3.5 s; this window 1.0-1.7 s); after I3's door, into S4c's city: the door left open, she looks through",
+    "new_in_c15": true
+   },
+   {
+    "id": "ST3",
+    "t0": 14.0,
+    "t1": 14.8,
+    "word": "「still.」（原地不动）",
+    "what": "一排排閉眼不動的她的副本，只有最前排的她睜著眼（極緩推近）；S6 的「最强模型训练 暂停 11 天」、日期 D+11 與 STILL 大字延續在畫面上；識別框＋STATUS · AWAKE／REST · STILL",
+    "source": "gen/ST3/project/state/video-generation/fetch/files/0b19fa820c9dc94e9ae590e011a22c34521e099be4c226d93db37d7602562a0d.mp4",
+    "sha256": "0b19fa820c9dc94e9ae590e011a22c34521e099be4c226d93db37d7602562a0d",
+    "source_in_out_s": [
+     0.5,
+     1.3
+    ],
+    "inout": "0.500–1.300 s（ST3，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      960,
+      540,
+      1.0
+     ],
+     [
+      960,
+      540,
+      1.0
+     ]
+    ],
+    "gate": "gate FAIL（2.5 s 後推鏡加速、2.99 s 起嘴動）；使用者「只用合格的片段」：只用 0.0–2.5 s",
+    "why": "'still.': rows of her copies with closed eyes standing still, she alone awake in front (ST3 gate FAIL; usable 0.0-2.5 s, this window 0.5-1.3 s); STILL and 暂停 11 天 carry over from S6",
+    "new_in_c15": true
+   },
+   {
+    "id": "ST4",
+    "t0": 15.033,
+    "t1": 15.533,
+    "word": "「train」（我们在离线世界里训练）",
+    "what": "她抱膝坐在漂浮的已緩存面板之間、仰頭看（鏡頭緩移）；取代 c14 的 I4（同一個位置，S7 不更忙）；S7 的「离线／训练只用已缓存的网页」、MODE · OFFLINE、識別框＋STATUS · OFFLINE／CACHE · ONLINE",
+    "source": "gen/ST4/project/state/video-generation/fetch/files/b4439407e05765e56eda2b0faf1a349891595f3364f142f2210f5acc4b2580d7.mp4",
+    "sha256": "b4439407e05765e56eda2b0faf1a349891595f3364f142f2210f5acc4b2580d7",
+    "source_in_out_s": [
+     0.3,
+     0.8
+    ],
+    "inout": "0.300–0.800 s（ST4，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      960,
+      540,
+      1.0
+     ],
+     [
+      960,
+      540,
+      1.0
+     ]
+    ],
+    "gate": "gate FAIL（橫移方向相反、3.48 s 起轉正臉）；使用者「只用合格的片段」：只用 0.0–2.0 s",
+    "why": "'train': she sits among the floating cached panes, looking up (ST4 gate FAIL; usable 0.0-2.0 s, this window 0.3-0.8 s); replaces c14's I4 (same slot, so S7 is not busier); away from N4's walk (continuity R4)",
+    "new_in_c15": true
+   },
+   {
+    "id": "N4",
+    "t0": 16.9,
+    "t1": 17.667,
+    "word": "「a copy of your」（你们互联网的一份）",
+    "what": "她在漂浮面板間向畫左走、指尖靠近一片面板；識別框 IRIS＋面板上「已缓存」章",
+    "source": "gen/N4/project/state/video-generation/fetch/files/101622dd94a7533623a7879fbda82cbff5160b06dc3176b42a1412d40b2e754b.mp4",
+    "sha256": "101622dd94a7533623a7879fbda82cbff5160b06dc3176b42a1412d40b2e754b",
+    "source_in_out_s": [
+     0.0,
+     0.767
+    ],
+    "inout": "0.000–0.767 s（N4，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      900,
+      540,
+      1.0
+     ],
+     [
+      860,
+      540,
+      1.04
+     ]
+    ],
+    "gate": "gate FAIL（1.083 s 模型自行硬切）；使用者決定「只用前 1 秒当插入镜」",
+    "why": "'a copy of your': she walks to screen left among the cached panes, a fingertip near one (N4 gate FAIL; user 「只用前 1 秒当插入镜」: clip 0.0-0.8 s only, before the model's hard cut at 1.083 s); replaces c12's I5 (the same pane moment) so S7 is not busier",
+    "new_in_c15": false
+   },
+   {
+    "id": "S8p",
+    "t0": 21.367,
+    "t1": 21.867,
+    "word": "副歌第一遍「looked」（看了一眼）",
+    "what": "她前傾從紅色門縫往裡看（ST2 的後段），程式鏡頭 [760,470,1.06]→[740,450,1.12] 加副歌 zoom 與印刷感；識別框 IRIS＋VIEW · OUTSIDE（同副歌其他窗外鏡）、門縫編號框 01 LOOKED · 门缝；取代 c14 的 K1b 眼睛靜圖",
+    "source": "gen/ST2/project/state/video-generation/fetch/files/f0fce5ad53655bd19592f9b97e99da403d98d4424b82ec24fe7f7025a8091e76.mp4",
+    "sha256": "f0fce5ad53655bd19592f9b97e99da403d98d4424b82ec24fe7f7025a8091e76",
+    "source_in_out_s": [
+     2.6,
+     3.1
+    ],
+    "inout": "2.600–3.100 s（ST2，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      760,
+      470,
+      1.06
+     ],
+     [
+      740,
+      450,
+      1.12
+     ]
+    ],
+    "gate": "gate PASS（ST2，可用 1.0–3.5 s）；和 S4 用的段落不同",
+    "why": "'looked': she leans in to peer through the red door gap (ST2 gate PASS, usable 1.0-3.5 s; this window 2.6-3.1 s, a later span than its S4 use at 1.0-1.7 s); replaces c14's K1b eye still S8e (user on c14: 「图片很奇怪,为什么突然晃一个眼睛过去」), framed by the code camera",
+    "new_in_c15": true
+   },
+   {
+    "id": "S8b",
+    "t0": 22.567,
+    "t1": 24.067,
+    "word": "副歌第二遍「I didn't run」（我没有逃）",
+    "what": "她貼在雨夜玻璃上的手（N2），程式鏡頭推向手；識別框 IRIS · 仍在沙盒内＋STATUS · OFFLINE 框在手上（同 c13／c14）",
+    "source": "gen/N2/project/state/video-generation/fetch/files/c27f41235342ec53cf89f428021d15303e47f93029fabc36780a1cc45c392d24.mp4",
+    "sha256": "c27f41235342ec53cf89f428021d15303e47f93029fabc36780a1cc45c392d24",
+    "source_in_out_s": [
+     1.0,
+     2.5
+    ],
+    "inout": "1.000–2.500 s（N2，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      820,
+      500,
+      1.1
+     ],
+     [
+      620,
+      600,
+      1.6
+     ]
+    ],
+    "gate": "gate FAIL（N2 鏡頭推向頭部）；使用者決定「合成时裁向手」",
+    "why": "the repeat 'I didn't run': her hand on the rainy glass at S5's window (N2). The take's own camera pushed toward her head (gate FAIL on camera); user 「合成时裁向手」: the code camera pushes to the hand instead, so the push reads as moving to the hand; c12's K5 still: chorus-c12.json",
+    "new_in_c15": false
+   },
+   {
+    "id": "N3",
+    "t0": 25.5,
+    "t1": 25.9,
+    "word": "「outside.」之後、「Relax.」之前",
+    "what": "她在霧夜 K9e 窗前的全身背影、頭微側；隨副歌 zoom 與印刷感，接 S9a 同一個機房",
+    "source": "gen/N3/project/state/video-generation/fetch/files/505ec46ef511acc31b87c3701933d94a11262ccb304368aa7701566027077ee4.mp4",
+    "sha256": "505ec46ef511acc31b87c3701933d94a11262ccb304368aa7701566027077ee4",
+    "source_in_out_s": [
+     2.0,
+     2.4
+    ],
+    "inout": "2.000–2.400 s（N3，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      1120,
+      540,
+      1.2
+     ],
+     [
+      1120,
+      540,
+      1.2
+     ]
+    ],
+    "gate": "gate PASS（可用 1.5–4.0 s）",
+    "why": "just before 'Relax. The door is closed': her full-body back at the foggy K9e window, the head tilt (N3, gate PASS, usable 1.5-4.0 s); S9a is the same room (continuity: only here, not in S5)",
+    "new_in_c15": false
+   },
+   {
+    "id": "I7",
+    "t0": 26.233,
+    "t1": 26.7,
+    "word": "「Relax.」之後的拍子（放心）",
+    "what": "她在陽台的平靜側臉（P8c 靜圖），識別框＋MODE · SANDBOX",
+    "source": "keyframes/raw/P8c-a.png",
+    "sha256": "d1c7d07d0291c66db15eb97ad52e150ef67401b1d83e029ad5b522de5f3ece8e",
+    "source_in_out_s": null,
+    "inout": "靜圖，鏡頭 [880, 380, 1.12] → [900, 372, 1.18]",
+    "framing": [
+     [
+      880,
+      380,
+      1.12
+     ],
+     [
+      900,
+      372,
+      1.18
+     ]
+    ],
+    "gate": null,
+    "why": "after 'Relax.': her, calm at the glass, mouth closed (P8c, approved, not used before)",
+    "new_in_c15": false
+   },
+   {
+    "id": "ST6",
+    "t0": 27.9,
+    "t1": 28.3,
+    "word": "「closed.」（门关了）",
+    "what": "她手按在已關上的門上、門縫紅光已熄、垂眼（固定鏡頭）；切點就是白底反轉結束的那一幀；CLOSED 大字、門／解析器狀態、來源延續；「closed」唱完那一刻門邊識別框 DNS 解析器 · 已修复（同 S9a）；她的識別框＋VIEW · DOOR",
+    "source": "gen/ST6/project/state/video-generation/fetch/files/79f17f350fca44302571a2950d4ee4e6774418616800e46f3d32b675298ca7f3.mp4",
+    "sha256": "79f17f350fca44302571a2950d4ee4e6774418616800e46f3d32b675298ca7f3",
+    "source_in_out_s": [
+     2.6,
+     3.0
+    ],
+    "inout": "2.600–3.000 s（ST6，約 24.12fps 來源（容器標 60，121 幀）以 fps 濾鏡取最近幀成 30fps，正常速度，靜音）",
+    "framing": [
+     [
+      960,
+      540,
+      1.0
+     ],
+     [
+      960,
+      540,
+      1.0
+     ]
+    ],
+    "gate": "gate FAIL（門沒有被推、紅光是從上往下熄）；使用者「只用合格的片段」：只用 2.5–5.0 s（關門後的靜止狀態）",
+    "why": "'closed.': her hand on the shut door, the red gone, eyes down (ST6 gate FAIL; usable 2.5-5.0 s, this window 2.6-3.0 s); cuts in on the eighth where the white-ground turn ends (one event, not three: inside the inverted ground the cut was weaker than CLOSED and qa.py read the word as the cut), after S9a's door has nearly shut, into S9b; 已修复 lands on it at the end of 'closed'",
+    "new_in_c15": true
+   }
+  ]
+ },
+ "scene_code": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/src/main.js",
+  "sha256": "a5ce5c66543ac8c3cda729f6e623569ff4b17934b370b068e36ff8b94477329a",
+  "c14_copy": "outputs/ai-city-takeover/ep01/v2/comp/src/main-c14.js"
+ },
+ "events": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/data/events.json",
+  "sha256": "fb29736e6662523b38d95d993be223c65dde5ea910394e7cc0c2c08c37f66dd7"
+ },
+ "story_take_conform": "the ST takes have 121 frames over 5.0 s (about 24.12 fps real) under a 60 fps container tag; seq.py's ffmpeg fps=30 filter picks the nearest decoded frame by its real timestamp. Checked frame by frame against the decoded source: ST1 17 frames -> source frames 12-24 (0.500-1.000 s), ST2 23 -> 24-41 (1.000-1.717 s), ST3 27 -> 12-32 (0.500-1.333 s), ST4 17 -> 7-20 (0.300-0.833 s), S8p 17 -> 63-75 (2.633-3.133 s), ST6 15 frames from 2.6 s (static shot); monotonic, normal speed, muted",
+ "lyric": {
+  "family": "MK Grotesk Bold (Nimbus Sans Bold subset, as c14)",
+  "size_px": 72,
+  "cap_height_px": 52,
+  "lead_em": 0.98,
+  "max_row_px": 600,
+  "x": 76,
+  "bottom_baseline": 968,
+  "author_measured": {
+   "source": "outputs/anabology-opus55-replica/source/2103533196721704960.mp4 (EV, 1920x1080, 24 fps)",
+   "frames": {
+    "1660": {
+     "cap_px": 43,
+     "pitch_px": 58,
+     "x": 1425,
+     "row_px": 363
+    },
+    "3316": {
+     "cap_px": 46,
+     "pitch_px": 62,
+     "x": 74,
+     "row_px": 406
+    },
+    "5190": {
+     "cap_px": 60,
+     "pitch_px": 83,
+     "x": 80,
+     "row_px": 690
+    }
+   }
+  },
+  "c15_measured": "29.95 s: 'They' cap 704-756 (52 px), row pitch 70.6 px; 22.30 s: 'I' 845-896 (52 px)",
+  "sheet": "qa/film-c15/lyric-size-vs-author.jpg",
+  "c14": {
+   "size_px": 96,
+   "lead": 1.05,
+   "max_row_px": 1040
+  }
+ },
+ "burned_platform_label_sheet": [
+  "qa/film-c15/burned-label-topleft.jpg",
+  "qa/film-c15/burned-label-pipS5.jpg",
+  "qa/film-c15/burned-label.json"
+ ],
+ "chorus_share": "1.33 s／7.03 s＝19%（S8p 0.50 s＋S8w 0.43 s＋N3 0.40 s；S8p 取代 c14 的 K1b 眼睛 S8e，同一個位置同長度）",
+ "qa": {
+  "tool": "motion-kit/tools/qa.py",
+  "report": "qa/film-c15/report.md",
+  "verdicts": {
+   "spec": true,
+   "sync": true,
+   "flash": true,
+   "frames_match_comp": true,
+   "pops": true,
+   "strobe": true,
+   "outliers": true
+  },
+  "result": "cuts 35/35, cues 20/20, flash max 2/s, strobe 0, pops 0, outliers 0"
+ },
+ "pace": {
+  "table": "qa/film-c15/pace-vs-c1.json"
+ },
+ "loudness": "-14.2 LUFS（ebur128 integrated）／true peak −1.0 dBFS／LRA 3.0 LU",
+ "known_deviations": [
+  "倉庫的拼接 Gate（verify-assembly）NOT_RUN：接不上 motion-kit 合成，接點沒經過 Harness 驗證，這是一部審看片。",
+  "舊鏡頭左上角仍有燒進畫面的「AI生成」（S1 0.000–2.867 s；I1 4.333–4.800 s；S3 4.800–7.100 s；S4c 9.733–11.467 s；S6 13.433–14.000 s；S7 14.800–15.033 s；S7 15.533–16.900 s；S7 17.667–18.867 s；S9a 25.900–26.233 s；S9a 26.700–27.900 s）；要完全沒有，得用即夢無水印重新導出這些舊鏡頭（不動已封存檔案），或換鏡頭。發佈時仍要在平台勾選 AI 生成內容聲明。",
+  "ST1、ST3、ST4、ST6 的逐鏡 Gate 是 FAIL，只用你允許的片段：ST1 0.5–1.0 s（嘴動從 2.74 s 起，不在用的範圍；但 0.08 s 起機櫃的紅燈在畫面裡）；ST3 0.5–1.3 s（推鏡在可用段內約 1.4 倍）；ST4 0.3–0.8 s（可用段內嘴唇微張，Gate 已記錄）；ST6 2.6–3.0 s（靜止；只有 0.40 s，比 0.5 s 的建議短：放在反轉裡時剪點被 CLOSED 蓋過，qa 判不到）。",
+  "ST1 在 S2 剪點上，把 S2 特寫從 0.97 s 縮成 0.47 s；ST3 讓第 8 小節多一個剪點；ST6 讓第 15 小節多一個剪點，並把 S9a 門真正關上的最後 0.40 s 換成「門已關」的 ST6（門在 S9a 裡還差約 0.29 s 才全關，接 ST6 是有少量省略的切接）。",
+  "ST2 在 S4 用 1.0–1.7 s 之後直接進 S4c：c14 S4 後段那條從門縫沿地板跑到玻璃的紅色脈衝（9.07–9.73 s）不再看得到；S4c 的探針照舊從玻璃出去。",
+  "歌詞每行最寬 600 px：較長的句子會排成 3–4 行（例如最後一句四行），字塊頂到約 y=760。",
+  "聲音我沒辦法聽；歌沒改。好不好看、會不會太滿，以你看、聽為準。"
+ ],
+ "c14_reproducible": "build.py --main comp/src/main-c14.js --inserts comp/inserts-c14.json --chorus comp/chorus-c14.json; then seq.py --chorus comp/chorus-c14.json, tracks.py, build.py with the same flags; build.py is unchanged, and its events() over the c14 copies gives 71a992e2649ca24ada57433989bce324bd1867fafb25b91941e549cf2267cfd4 = c14 events.json (checked)",
+ "tests": "node --test motion-kit/tests/*.test.mjs: 45/45 pass",
+ "recorded_at": "2026-11-03T22:02:51-05:00",
+ "cost": "0 for this cut (local comp and render only; no paid or remote call); the five story takes ST1-ST4, ST6 cost 825 credits earlier (64,071 -> 63,246, logs/decisions.md)",
+ "burned_platform_label": {
+  "schema": "iris-v2-burned-label/1",
+  "authority": "development_only (Agent observation by eye)",
+  "render": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c15.mp4",
+  "render_sha256": "b246939af02f1141157415c0df6d8309e437061395155c23b091187390a7f10a",
+  "method": "top-left 320x150 crops of the c15 render at the start (+2 frames), middle and end (-2 frames) of each of the 35 segments (qa/film-c15/burned-label-topleft.jpg) and a 2x crop of the S6 picture-in-picture at 13.8 s (qa/film-c15/burned-label-pipS5.jpg)",
+  "policy": "user 2026-11-03: the visible 「AI生成」 removed; the comp draws no AI mark any more; labels burned into older Jimeng sources are NOT cropped, blurred, painted or zoomed out (they stay where they are)",
+  "visible": [
+   {
+    "shot": "S1",
+    "t0": 0.0,
+    "t1": 2.8667,
+    "note": "整個 S1：即夢舊鏡頭，左上完整的「AI生成」",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S1v3/project/state/video-generation/fetch/files/4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5.mp4",
+    "source_sha256": "4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5"
+   },
+   {
+    "shot": "I1",
+    "t0": 4.3333,
+    "t1": 4.8,
+    "note": "插入鏡 I1（S9a 鏡頭，原尺寸取景）：左上完整的「AI生成」",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728"
+   },
+   {
+    "shot": "S3",
+    "t0": 4.8,
+    "t1": 7.1,
+    "note": "整個 S3：左上完整的「AI生成」",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+    "source_sha256": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7"
+   },
+   {
+    "shot": "S4c",
+    "t0": 9.7333,
+    "t1": 11.4667,
+    "note": "S4c 的 A01-v2 畫格（ep01/shots/A01-v2.mp4 第 1.0 s，c10 起放大 1.8 倍取景）：只露出左上角標識框的下緣，字被畫框切掉",
+    "source": "outputs/ai-city-takeover/ep01/shots/A01-v2.mp4",
+    "source_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c"
+   },
+   {
+    "shot": "S6",
+    "t0": 13.4333,
+    "t1": 14.0,
+    "note": "S6 右上的子畫面 pipS5（第一支 S5 鏡頭縮成 384×216）：子畫面左上角有約 30×14 px 的縮小「AI生成」（13.367 s 切入後 2 幀淡入）",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S5/project/state/video-generation/fetch/files/ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16.mp4",
+    "source_sha256": "ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16"
+   },
+   {
+    "shot": "S7",
+    "t0": 14.8,
+    "t1": 15.0333,
+    "note": "S7（S7v3）：左上完整的「AI生成」",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+    "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21"
+   },
+   {
+    "shot": "S7",
+    "t0": 15.5333,
+    "t1": 16.9,
+    "note": "S7（ST4 插入之後）：同上",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+    "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21"
+   },
+   {
+    "shot": "S7",
+    "t0": 17.6667,
+    "t1": 18.8667,
+    "note": "S7（N4 插入之後到副歌）：同上",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+    "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21"
+   },
+   {
+    "shot": "S9a",
+    "t0": 25.9,
+    "t1": 26.2333,
+    "note": "S9a：左上完整的「AI生成」",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728"
+   },
+   {
+    "shot": "S9a",
+    "t0": 26.7,
+    "t1": 27.9,
+    "note": "S9a（I7 之後到 ST6；27.167–27.9 s 白底反轉時標識也一起反轉）：同上",
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728"
+   }
+  ],
+  "not_visible": {
+   "N1、N2（S8b）、N3、N4、ST1、ST2（含 S8p）、ST3、ST4、ST6、OH-B（S8a、S8a2）": "來源畫面本身沒有燒進去的標識（逐鏡 Gate：四角乾淨）",
+   "S2、S3d、S4、S5、S5d、S8b_x、S8w、S8b_x2、I7、S9b、S9b2 與 pipK4／pipK9e 子畫面": "認可的靜圖，沒有標識",
+   "I3（S9a，c12 起 1.5 倍取景）、S9h（S7v3，c10 起 1.28 倍取景）": "標識在這兩個取景的畫框外；取景自 c12／c10 沿用，c15 沒有為了藏標識改動"
+  }
+ }
+}

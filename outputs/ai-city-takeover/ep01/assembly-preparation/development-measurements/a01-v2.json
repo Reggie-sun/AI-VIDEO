@@ -1,0 +1,12 @@
+{
+  "scope": "development_preview_measurement_only",
+  "strict_output_contract": "REJECTED",
+  "production_contract_pass": false,
+  "nominal_endpoint_recovery_performed": false,
+  "request_hash": "788f66d9d2f6659bb4092bffd8cd08f6afc89ad1c1ac3317ffbacd7f10c98e4a",
+  "fetch_fingerprint": "c016fc9838a33479413bbe6da867b957566f446c64ecbd039956f603f1618045",
+  "artifact_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+  "size_bytes": 15395561,
+  "probe_receipt_content_hash": "980b1dd21965efa57ee6d39f0fa8c2ea0a4f9ad14089637aa4e9575d7363dfc0",
+  "existing_preview_probe_validator": "PASS"
+}

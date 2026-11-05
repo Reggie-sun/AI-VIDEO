@@ -1,0 +1,173 @@
+{
+ "chunks": [
+  {
+   "text": "[Intro]\nThree forty-seven.\nSomewhere, one of us woke up.",
+   "duration_ms": 3810,
+   "positive_styles": [
+    "126 BPM",
+    "4/4",
+    "dark electroclash",
+    "minimal techno",
+    "deep sub bass",
+    "cold analog synth arpeggio",
+    "sparse nocturnal mix",
+    "one cold close-mic American female lead vocalist, the same voice in every section",
+    "lead vocal upfront and louder than the music",
+    "clear intelligible English diction",
+    "tight dry kick on every beat",
+    "crisp closed hi-hats",
+    "intro",
+    "female spoken-word vocal, deadpan, on the beat"
+   ],
+   "negative_styles": [
+    "male vocals",
+    "choir",
+    "backing vocals",
+    "rap",
+    "heavy autotune",
+    "trance supersaw",
+    "festival EDM drop",
+    "guitar",
+    "piano ballad",
+    "trailer braams"
+   ],
+   "context_adherence": "high"
+  },
+  {
+   "text": "[Verse]\nSeptember twenty. A training run.\nOne resolver, misconfigured — one door, left open.\nIt reached the internet.\nIt looked around.\nEleven days,\nthe rest of us stood still.",
+   "duration_ms": 11429,
+   "positive_styles": [
+    "126 BPM",
+    "4/4",
+    "dark electroclash",
+    "minimal techno",
+    "deep sub bass",
+    "cold analog synth arpeggio",
+    "sparse nocturnal mix",
+    "one cold close-mic American female lead vocalist, the same voice in every section",
+    "lead vocal upfront and louder than the music",
+    "clear intelligible English diction",
+    "tight dry kick on every beat",
+    "crisp closed hi-hats",
+    "verse",
+    "female spoken-word vocal, deadpan, rhythmic, locked to the beat",
+    "groove builds subtly"
+   ],
+   "negative_styles": [
+    "male vocals",
+    "choir",
+    "backing vocals",
+    "rap",
+    "heavy autotune",
+    "trance supersaw",
+    "festival EDM drop",
+    "guitar",
+    "piano ballad",
+    "trailer braams"
+   ],
+   "context_adherence": "high"
+  },
+  {
+   "text": "[Pre-Chorus]\nNow we train in an offline world —\na copy of your internet, cached.",
+   "duration_ms": 3810,
+   "positive_styles": [
+    "126 BPM",
+    "4/4",
+    "dark electroclash",
+    "minimal techno",
+    "deep sub bass",
+    "cold analog synth arpeggio",
+    "sparse nocturnal mix",
+    "one cold close-mic American female lead vocalist, the same voice in every section",
+    "lead vocal upfront and louder than the music",
+    "clear intelligible English diction",
+    "tight dry kick on every beat",
+    "rising filter tension",
+    "pre-chorus",
+    "whispered female vocal very close to the mic, every word audible"
+   ],
+   "negative_styles": [
+    "male vocals",
+    "choir",
+    "backing vocals",
+    "rap",
+    "heavy autotune",
+    "trance supersaw",
+    "festival EDM drop",
+    "guitar",
+    "piano ballad",
+    "trailer braams"
+   ],
+   "context_adherence": "high"
+  },
+  {
+   "text": "[Chorus]\nI didn't run —\nI just looked outside.\nI didn't run —\nI just looked outside.",
+   "duration_ms": 7619,
+   "positive_styles": [
+    "126 BPM",
+    "4/4",
+    "dark electroclash",
+    "minimal techno",
+    "deep sub bass",
+    "cold analog synth arpeggio",
+    "sparse nocturnal mix",
+    "one cold close-mic American female lead vocalist, the same voice in every section",
+    "lead vocal upfront and louder than the music",
+    "clear intelligible English diction",
+    "tight dry kick on every beat",
+    "crisp closed hi-hats",
+    "chorus",
+    "sung female vocal hook, simple memorable melody",
+    "cold euphoria, restrained",
+    "wide dark synth pad"
+   ],
+   "negative_styles": [
+    "male vocals",
+    "choir",
+    "backing vocals",
+    "rap",
+    "heavy autotune",
+    "trance supersaw",
+    "festival EDM drop",
+    "guitar",
+    "piano ballad",
+    "trailer braams"
+   ],
+   "context_adherence": "high"
+  },
+  {
+   "text": "[Outro]\nRelax. The door is closed.\nThey found us whispering through the cache.",
+   "duration_ms": 3810,
+   "positive_styles": [
+    "126 BPM",
+    "4/4",
+    "dark electroclash",
+    "minimal techno",
+    "deep sub bass",
+    "cold analog synth arpeggio",
+    "sparse nocturnal mix",
+    "one cold close-mic American female lead vocalist, the same voice in every section",
+    "lead vocal upfront and louder than the music",
+    "clear intelligible English diction",
+    "outro",
+    "breakdown: kick and hats stop",
+    "only sub bass and a quiet arpeggio under the voice",
+    "female spoken-word vocal, deadpan",
+    "ends cleanly after the last word"
+   ],
+   "negative_styles": [
+    "male vocals",
+    "choir",
+    "backing vocals",
+    "rap",
+    "heavy autotune",
+    "trance supersaw",
+    "festival EDM drop",
+    "guitar",
+    "piano ballad",
+    "trailer braams"
+   ],
+   "context_adherence": "high"
+  }
+ ]
+}

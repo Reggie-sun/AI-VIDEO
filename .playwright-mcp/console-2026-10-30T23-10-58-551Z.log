@@ -1,0 +1,5 @@
+[-6769564ms] [ERROR] Permissions policy violation: unload is not allowed in this document. @ https://hm.baidu.com/hm.js?855e457bd4d092e73a48a0ca23f4c551:1
+[-10190016ms] [INFO] This page uses Chrome's Built-In AI features (LanguageDetector)! We're always improving our models; please submit your feedback here: https://issues.chromium.org/issues/new?component=1583316 @ chrome-extension://bpoadfkcbjbfhfodiogcnhhhpibjhbnh/content_main.js:5638
+[-6769049ms] [INFO] This page uses Chrome's Built-In AI features (LanguageDetector)! We're always improving our models; please submit your feedback here: https://issues.chromium.org/issues/new?component=1583316 @ chrome-extension://bpoadfkcbjbfhfodiogcnhhhpibjhbnh/content_main.js:5638
+[-10192077ms] [LOG] %c EthanAI %c AI Subscription Store  background:#0071e3;color:#fff;padding:4px 8px;border-radius:4px 0 0 4px;font-weight:bold; background:#1d1d1f;color:#f5f5f7;padding:4px 8px;border-radius:0 4px 4px 0; @ https://ethanai.site/assets/index-mebQ3iL5.js:9
+[-10192077ms] [LOG] %cGitHub → https://github.com/dujiao-next color:#6e6e73; @ https://ethanai.site/assets/index-mebQ3iL5.js:9

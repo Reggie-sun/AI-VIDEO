@@ -1,0 +1,55 @@
+[
+ {
+  "name": "OH-A",
+  "take_sha256": "56a6de5bd25e951513864e9ff8fac50ef2608252193ce90c5926e6af8df12ba7",
+  "lag_s": 0.0251,
+  "ncc": 0.9988,
+  "copy": true,
+  "divergence": {
+   "frame": null,
+   "rule": "none",
+   "last_match": 500,
+   "clip_s": null,
+   "song_s": null
+  },
+  "synced_until": {
+   "clip_s": 4.958,
+   "song_s": 22.903
+  },
+  "spans": [
+   {
+    "clip_s": [
+     0.77,
+     5.0
+    ],
+    "song_s": [
+     18.715,
+     22.945
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": 0.0251,
+   "method": "tool 15 waveform lag (copy)",
+   "song_t_of_clip0": 17.9449,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 0.025,
+   "ncc": 0.997,
+   "max_dev_s": 0.0,
+   "steady": true,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      4.375
+     ],
+     "lag_s": 0.025,
+     "windows": 15,
+     "min_ncc": 0.993
+    }
+   ]
+  }
+ }
+]

@@ -1,0 +1,6 @@
+{
+  "allowed": [
+    "hyperframes"
+  ],
+  "default_preference": "hyperframes"
+}

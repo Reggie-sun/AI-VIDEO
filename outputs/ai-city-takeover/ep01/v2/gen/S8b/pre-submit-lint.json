@@ -1,0 +1,33 @@
+{
+  "unit": "S8b",
+  "checks": {
+    "exact_images_K8b_then_ID7b": true,
+    "exact_audio_reference": true,
+    "every_input_in_user_preview": true,
+    "markers_image_image_audio": true,
+    "chinese_body_only": true,
+    "sings_from_frame_0": true,
+    "close_and_look_to_city": true,
+    "locked_camera": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "bound_output_4s": true,
+    "operator_ceiling_matches_preview": true,
+    "v2_budget_room": true,
+    "s8a_decided_by_user": true
+  },
+  "pass": true,
+  "request_hash": "582046cd61042a709d791068c72f02d449023b3758a9473dbbea31f544a74668",
+  "continuity": "hard cut on the second-pass 'I' (22.567 s); S8a take 1 ends mid-'I' with the mouth open, S8b opens mid-singing; clip t=0 = master 22.20 s, film window clip 0.367-3.70 s",
+  "handoff": "S8a frontal chorus pass 1 -> S8b 3/4 pass 2, finish and look toward the city -> S9a the door shuts on 'Relax'",
+  "axis_action_camera": "K8b 3/4 view facing frame-left, city behind at right; locked camera; singing mouth, breath, blinks; after the line the gaze moves to the distant city",
+  "prompt_fit": "pure Chinese body 440 chars; K8b + ID7b + isolated vocal pass 2, all three in the user-approved S8b preview",
+  "budget": {
+    "v2_submits_before": 8,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 2000,
+    "v2_ceiling_CRD": 2500,
+    "expected_cost_4s_CRD": 132
+  },
+  "new_calls": 0
+}

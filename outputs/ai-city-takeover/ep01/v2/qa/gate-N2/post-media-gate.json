@@ -1,0 +1,59 @@
+{
+ "unit": "N2",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/N2/project/state/video-generation/fetch/files/c27f41235342ec53cf89f428021d15303e47f93029fabc36780a1cc45c392d24.mp4",
+ "sha256": "c27f41235342ec53cf89f428021d15303e47f93029fabc36780a1cc45c392d24",
+ "verdict": "FAIL",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum 相同；video_probe 5.057 s、1920x1080"
+  },
+  {
+   "id": "camera_push_in_to_hand(R5)",
+   "result": "FAIL",
+   "evidence": "推近的方向是她的頭和側臉：頭寬約 240→345+ px（約 +45%），手高約 180→215 px（約 +20%）；手從中左（x≈215–305，y 從 200 起）移到左下（x≈170–285，y 從 255 起）；相位相關 0→5 s (0,0)→(-42,-23) px（480 寬），取景偏向右側人物；不符合『镜头缓慢推近她贴在玻璃上的手』與 end_framing『更近的手与玻璃』"
+  },
+  {
+   "id": "hand_anatomy(R3)",
+   "result": "PASS",
+   "evidence": "N2_hands.png 0–4.95 s 全解析度：沒有多指、黏指或變形；2.0 s 起指尖收攏，拇指被手掌擋住"
+  },
+  {
+   "id": "performance_fingers_fog_head",
+   "result": "PASS",
+   "evidence": "指尖 2.0 s 起收攏；掌心霧圈 t0 亮霧到 t2.5 起變成較清的區域（N2_fog.png）；約 2.0–3.0 s 低頭、3.5 s 起抬頭望向窗外（畫面左）"
+  },
+  {
+   "id": "no_mouth_movement(R8)",
+   "result": "PASS",
+   "evidence": "N2_mouth.png 2.5–5.0 s 每秒 6 幀：雙唇一直閉合，沒有口型；video_transcribe 沒有文字"
+  },
+  {
+   "id": "identity_earpiece_collar",
+   "result": "PASS",
+   "evidence": "左耳黑色耳掛全程可見（N2_faces.png）；左領細紅線保持（N2_collar.png t0/2.5/4.95）；側臉和首幀 N2-a 一致"
+  },
+  {
+   "id": "no_model_text_label_kept(R6)",
+   "result": "PASS",
+   "evidence": "抽樣幀沒有模型畫出的文字；中繼資料 aigc 標識保留"
+  },
+  {
+   "id": "continuity_K5b",
+   "result": "PASS",
+   "evidence": "雨夜落地窗、高架車流、窗框位置和首幀/K5b 一致；她和窗在畫面左側，沒有跳軸"
+  },
+  {
+   "id": "face_tracking_box(R9)",
+   "result": "NOT_EVALUATED",
+   "evidence": "屬於合成時重新追蹤 S8b 臉框的工作，原始媒體無法判斷"
+  }
+ ],
+ "usable_span": [
+  1.0,
+  3.5
+ ],
+ "notes": "鏡頭運動 FAIL，這個 attempt 要停止。1.0–3.5 s 是指尖收攏到低頭再抬頭的段落，只是給參考的區段，不代表可以放行；重做或修補由主會話依付費授權另外決定。",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

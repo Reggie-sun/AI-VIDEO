@@ -1,0 +1,49 @@
+{
+  "a2.1 修订（a2 在审看点 B 认可后的三处小修）": [
+    "本页播放 a2.1 的 CRF 20 代理 renders/IRIS-EP01-v3-animatic-a2.1-review.mp4（SHA-256 1a050aa67b0a9a8917682b963e680e2be9de08844215f1a1f4d1b8f26cc68f0c）；母带 renders/IRIS-EP01-v3-animatic-a2.1.mp4（1920×1080、30 fps、7847 帧、261.567 s，SHA-256 c3fb2aefc39730442e1f248b910ef061095e6e73bb8c63a5dcb7c7c18bacd2c9，HyperFrames 渲染 843 s）。音轨与 a2 是同一条 AAC 流（逐字节相同）。a2 的全部输出（两条 mp4、样片、animatic-a2.html、thumbs-a2、qa/animatic-a2）未动；你对 a2 的认可绑定在 a2 审片 mp4 的 SHA-256 上。下面其余各节是 a2 时的原说明（其中的文件与 SHA 指 a2）。",
+    "修正 1，U012 歌词：CTC 把 DNS 拆成 D / N / S 三个词，a2 显示成 “One D N S resolver”。现在连续两个以上的单个大写字母合成一个词显示为 “One DNS resolver”，DNS 从 D 的起音（35.01 s）点亮，到 S 结束（35.59 s）；所有歌词版式都适用，words.json 未改。全曲只有这一处字母串，单独的 I、A 不受影响。",
+    "修正 2，右上 IRIS CLOCK 标签：从 03:46 开始，第 304 帧（10.133 s）变 03:47，与 U004 翻牌落在 03:47 的同一帧；第 7496 帧（249.85 s）变 03:48，与 U082 翻牌同帧（主会话已更新 shots-map 的 chrome.top_right）。",
+    "修正 3，U084 结尾：整个单元的监控录制点改为中性灰（a2 是暗红色在呼吸），结尾画面里唯一的红是她在 cue（第 7772 帧，259.07 s）闪亮的那一盏灯；其余 system 单元的录制点仍是红色。a2“已知问题”里录制点那一条因此已修正。系统画面的胶片色差会在灰点和白色 OSD 字边缘带出 1 像素的冷暖色边（所有 system 单元都有），不是红色物体。",
+    "与 a2 逐帧对比（480×270 灰度，差值大于 12 才算）：只有三处变化——第 0–303 帧右上标签最后一位数字、第 1042–1094 帧 U012 的歌词、U084 的录制点（第 7764–7789 和 7811–7835 帧，录制点较亮的时段）；其余只有编码造成的零星单像素差。",
+    "QA（qa/animatic-a2.1/report.md）：所有判定为 True，100 个对拍事件全部 PASS（cut_U083 和 U001_cue 为 +1 帧，在容差内），闪烁每秒最多 1 次，无单帧突跳、strobe 格和离群帧。QA 只证明时间与闪烁，观感由你判断。"
+  ],
+  "这一版是什么": [
+    "计划阶段 5 的全长动画分镜 a2（Codex 审核 a1 为 REVISE 后的修订版）：84 个单元按 shots-map.json（分镜 v2-a2）的时间切换，静图＋2.5D 代码镜头＋基础图形＋英文歌词，音轨是 T4 母带。不是成片；之后生成的视频按同一时间替换静图。a1 的视频、审片页和 QA 保留未动。",
+    "视点规则不变：system 单元有监控 OSD（机位标签、故事时钟时间码、识别框、状态条）；iris 单元不画监控 OSD；graphic 单元是纯图形全屏。另有一层全片贯穿的剪辑界面（见下），属于剪辑层，不是剧中监控 OSD。画面里没有中文。",
+    "歌词只取新的 CTC 逐字时间（song-v3/timing/words.json：终副歌最后一句 211.85 s 唱完，尾声句 222.44 s 起）：每个单元只显示本单元 [t0, t1) 内发声的词，每个词在它的 CTC 起点那一帧点亮；最后一句在 212.30 s 收起，到 222.44 s 之前画面上没有唱词。",
+    "红色只用信号红 #E3342F（她的灯、门缝光、图形里的强调色）；红队测试室 U036–U040 没有红色（标签、印章、连线用钢蓝或深钢色）。",
+    "这一版的文件：母带 renders/IRIS-EP01-v3-animatic-a2.mp4（1920×1080、30 fps、7847 帧、261.567 s，SHA-256 e487ab57d0a733a29647a43861207e75532b94c5ffbd5482a4c5670b59b5bca5，HyperFrames 渲染 697 s）；本页播放 CRF 20 代理 renders/IRIS-EP01-v3-animatic-a2-review.mp4（SHA-256 91ebc2a38be95b20fa779afbb6283d421457436880594ecfa54136c0c3fb5f50）。音轨与 a1 是同一条 AAC 流（逐字节相同），即 T4 母带，未改响度。",
+    "QA（qa/animatic-a2/report.md）：100 个对拍事件全部 PASS（84 个剪点、换图与大变化 cue；a1 的四个 FAIL——U004 翻牌、U053 剪点、U056 两次换图——现在都是 0 帧），闪烁每秒最多 1 次（上限 3），无单帧突跳、无 strobe 格、无离群帧。QA 只证明时间与闪烁，观感由你判断。"
+  ],
+  "a2 相对 a1 的改动": [
+    "剪辑界面层（新）：四角细十字；左上 IRIS · EP01 与 DAY 00 / 11（92.43 s 起 DAY 11 / 11）；右上 LOOKED OUTSIDE · IRIS CLOCK 03:47（249.85 s 起 03:48，与 U082 翻牌同帧）；底部两条细线之间五行英文事实循环向左滚动，90 px/s（每帧 3 px，约每秒 10 个字符）。字体用工程里已有的等宽 MK Mono SC（Noto Sans Mono CJK SC；本机没有作者用的 IBM Plex Mono 500），15 px（大写字高约 11 px）、全大写、字距加宽。暗底浅字；亮底（白色测试室 U036/U038/U040、U070 白底）深字，上排文字后垫一条浅色圆角条；U041–U042、U060–U065 降到 40%；U083 不显示滚动条。文字切换处直接切（翻牌会闪出编造的数字）。为了不和这层重叠，system 单元的监控 OSD 整体内收到距画边 72 px。",
+    "版式按角色分工——画外念白＋静图单元（U005、U006、U010、U011、U015、U018、U019、U031、U032、U034、U035、U036、U038、U040，以及同为 lyric_word、由她说或唱的 U033、U076、U080）：作者式大号句式标题，MK Grotesk Bold（Nimbus Sans Bold）88 px（大写字高约 63 px），句首大写、左对齐 x=76（system 单元在 OSD 框内 x=116），一句一行，未出声的词先淡显、按 CTC 逐词点亮，关键词信号红（测试室里是深色字、不红）。",
+    "版式按角色分工——画外念白＋纯图形单元（U004、U009、U012、U013、U017、U030、U037、U082）：保留左下小号逐词字幕，避免和图形重复。",
+    "版式按角色分工——唱句（lyric_stack）沿用 c15 堆叠（72 px、x=76、关键词红）；句末关键词是 ≥0.8 s 的长音时（U022、U027、U044、U048、U072 的 outside），它单独一行用高窄粗体 MK Narrow Bold（Nimbus Sans Narrow Bold）190 px 大写信号红，起音那帧砸入、长音中略微展宽。Drop 合唱（U049–U056）：当前词用 MK Narrow Bold 260 px 全大写，起音砸入并随底鼓轻微放大。耳语与桥段（lyric_whisper、lyric_tiny）保持极小；U057/U058 翻牌逐词不变。",
+    "版式按角色分工——系统图解与标签：等宽大写；U036 的 SEPARATE · CONTROLLED RED-TEAM TEST 改为等宽粗体 52 px（大写字高约 38 px），U037 的 PROCESSOR CACHE TIMING 改为 44 px（大写字高约 32 px），都不用红。黑白反转：U053 两帧反白（白底黑字），U070 白底黑大字，界面层随之变深色。",
+    "新组件：U013 nodegraph_control_gap（沿用 U012 的节点位置；MODEL 和解析器外画出 CONTROL 边界，去 EXTERNAL 的线先被边界挡住、虚线；念到 misconfigured 时 DNS RESOLVER 变红、下方出现 MISCONFIGURED，边界在连线处裂开，红线从缺口穿出到 EXTERNAL）；U017 nodegraph_single_endpoint（裂开的边界和里面的 DNS，右边一片没有名字的灰色节点，红线只接到一个亮起的 EXTERNAL CHATBOT，线上方小字 LIMITED，不画城市）；U074 spotlight_flicker（cue 帧起两帧探照灯几乎熄灭，随后略过亮再回落）；U084 fade_out_end（最后 0.8 s 连同界面一起收黑，最后一帧全黑）。",
+    "U002 修正：灯亮前换成一张派生静图（comp/plates/P-row-lit-a--off.png）：立领灯条和耳灯范围内，每个像素的红色压到衣料本身的灰（按周围未受光像素的绿、蓝推算红），灯条本身是一条更暗的熄灭灯带，耳灯是暗色镜片；范围外与原图逐字节一致。6.667 s（第 200 帧）起闪两下（200–201、205–206 帧亮），209 帧起保持信号红。灯亮前画面里没有红色（实测只剩她嘴唇的自然肤色）。U084 用同法做的 P-dark-hall-b--off.png，259.07 s 起再亮。",
+    "QA 对拍修正：U004 翻牌在 cue 帧（第 304 帧）直接换成 03:47（a1 早 3 帧；改版中途曾在 cue 帧闪出一个随机数字 03:48，也已去掉，日数翻牌同样逐日直接切换）；U053 剪点那一帧即反白；U056 两次换图在换图那一帧上半张就换成新照片，下半张在随后 3 帧翻下（a1 晚 2 帧）。",
+    "事实卡 U083：四行按拍逐行出现（第一行在剪点后约 0.5 s，约 1.9 s 内出齐），之后停住到单元结束（全部可读约 3.8 s）；三行事实按词换行（每行不超过 62 个字符，等宽 30 px），来源一行小号灰字。只用 graphic_text 的字。",
+    "U073 监控墙：九块屏是她不唱、看向镜头的静图（P-gaze-b、P-door-latch-a、P-headturn-b、P-speak-aisle-b、P-spotlight-low-a、P-catwalk-b、P-behind-glass-a、P-hairflip-a、P-door-face-a），识别框每半拍锁上一个，顺序打散，锁上后不离开。",
+    "屏上文字：U004/U082 翻牌下小字 IRIS CLOCK；U010 TRAINING RUN · INDEXED, CACHED PAGES；U028/U031 STRONGEST MODELS · RELATED WORK PAUSED；U069 的机位标签 CAM 07。同一句两机位：U020、U044、U046、U067、U072 在单元内按 plates[].from 切到第二张静图（U025 原本就是两张）。"
+  ],
+  "组件完成度": [
+    "完整（按家族通用绘制、由数据驱动）：a1 的全部 OSD、翻牌、标签、灯光、示意图组件，加上 a2 新增的 nodegraph_control_gap、nodegraph_single_endpoint、spotlight_flicker、fade_out_end 和剪辑界面层；六种歌词样式按角色分成七种版式。",
+    "简版：spotlight_snap_on（只做曝光跳变，光束来自静图）；spotlight_flicker（整幅画面暗两帧再回亮，不是只有光束闪）；city_flicker_on_beat（整张图随底鼓整体呼吸）；lights_back_on（身后机柜按拍逐条去掉压暗）；reflection_layer（同一张静图镜像、半透明、错位）；breath_fog（程序生成的一小片雾）；monitor_wall（九块屏是静图，不会动）；两张节点图是示意，不是真实网络拓扑。",
+    "占位：无。49 张底图（47 张静图＋2 张派生的熄灯图）全部在位。"
+  ],
+  "已知问题": [
+    "这是静图替身：人物不动，唱歌镜头是静止画面加歌词，证明不了真唱；正式片里唱句换成数字人真唱、动作镜头换成 Seedance。U072 第二张静图 P-spotlight-low-a 是闭嘴的，但这一段在唱 outside。",
+    "同一张静图被多个单元重复使用（如 P-gaze-b 用在 U046/U052/U057/U076/U077，P-backlit-b 用在 U067/U072，P-spotlight-low-a 用在 U072/U074，监控墙也复用了七张）；正式生成时换不同景别和角度。",
+    "几张静图背景机柜上有小红点状态灯（如 P-headturn-b、P-hairflip-a、P-speak-aisle-b、P-walk-against-a、P-gaze-b、P-backlit-b、P-behind-glass-a、P-glass-profile-a），严格说不属于“她的灯和门缝光”；这是静图内容，a2 没有逐点修图，正式生成或修图时去掉。",
+    "U084 灯亮之前，监控 OSD 左上的录制点仍是暗红色在呼吸（system 单元的固定元素；只有 red_off 单元才变灰），离她的灯再亮还有约 0.9 s；如果要让“黑暗里唯一的红点”更纯，下一版可让录制点在灯亮前也变灰（需要重新渲染）。",
+    "osd_glitch 单元（U058、U069）的 OSD 字按设计会随机错乱，U069 的 CAM 07 大约三分之一的时间是完整的。",
+    "system 单元画面四角的胶片色差（CA）会给 OSD 字和亮边带出一点红蓝边（a1 也有；白色测试室里已关掉）。",
+    "事实卡三行事实约 50 个词，全部出齐后停约 3.8 s，正常速度不一定读得完（可暂停看）。滚动条 15 px 等宽字在手机上偏小。",
+    "简版组件见上。渲染音轨是 T4 母带经 HyperFrames 转成 AAC 48 kHz，内容未改；审片页播放的是同一渲染的轻量转码版（CRF 20）。"
+  ],
+  "怎么看": [
+    "直接用浏览器打开本页即可播放；若拖动不顺，可在仓库根运行 uv run python motion-kit/tools/serve.py（只绑 loopback）后从 http://127.0.0.1 打开。点表格任一行跳到该单元，[ 和 ] 前后跳单元。缩略图在 review/thumbs-a2/，a1 的审片页仍用 review/thumbs/。"
+  ]
+}

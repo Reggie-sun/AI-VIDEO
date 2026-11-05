@@ -1,0 +1,31 @@
+{
+  "provider_preview": {
+    "resolved_generation_hash": "20f9e26c7de1229c29ab69e21cbde092226e86f8d5993d1fa99657fb843e8f55",
+    "execution_kind": "remote",
+    "billing_kind": "metered",
+    "estimated_cost_upper_bound_microunits": 1500000000,
+    "currency": "CRD",
+    "destination": "https://jimeng.jianying.com",
+    "egress_item_ids": [
+      "prompt",
+      "postman-reference-v1"
+    ],
+    "preview_fingerprint": "c5e9922c9d28d73762198617663c669fbf3ab51450c47a4be27e416ff079eb05"
+  },
+  "egress_items": [
+    {
+      "item_id": "prompt",
+      "sha256": "db4f2cd398d24554ab2b3c8d5ea01022f012623b41b36b5d123c24ae607b56c7",
+      "size_bytes": 1194,
+      "mime_type": "text/plain",
+      "purpose": "prompt"
+    },
+    {
+      "item_id": "postman-reference-v1",
+      "sha256": "8125187d8eba4f1b9d13262ade2301c81391ccb756c32237b9b1ffebca68cd48",
+      "size_bytes": 2367619,
+      "mime_type": "image/png",
+      "purpose": "reference"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "artifact_id": "iris-v2-lszh2-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "ac0d62c0f006a209b70a8d1ff4a27293c21b96485b7d2e25ab2e95f4dbe29016",
+  "creation_receipt_id": "iris-v2-LSzh2-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/91cf271fa0f8b4d3053880c151a0031023be8b0da9ea144c01ec128cf23105fc.json",
+      "content_hash": "91cf271fa0f8b4d3053880c151a0031023be8b0da9ea144c01ec128cf23105fc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d.json",
+      "content_hash": "feee6070199261e5c233c368f38e7bcae7f418383a17067f93c920808d77980d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/186d69ed29958b1f61771f70abdd49733908bfee6cfa16441b3d898ac7f4344b.json",
+      "content_hash": "186d69ed29958b1f61771f70abdd49733908bfee6cfa16441b3d898ac7f4344b"
+    }
+  ],
+  "shot_id": "ep01v2-s8a",
+  "scene_id": "balcony",
+  "storyboard_beat_id": "chorus-1",
+  "intent": "{{image:0}}中的她演唱{{audio:1}}。她的口型严格对准{{audio:1}}，每个字都准时：\"I didn't run — I just looked outside. I\"。中近景：{{image:0}}中的女人，深色头发向后梳成低发髻，左耳戴黑色耳挂，左领口一条细细的红色灯线，站在夜雨中的玻璃阳台上，面向镜头，冷静地唱，眼睛看着镜头，长音时头微微倾斜。背后是冷蓝色的城市灯光。镜头固定，不切镜，不转头。画面中没有任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由底片A02与prompt外型描述承担）",
+    "歌词期间嘴在唱、无声处闭合；对嘴准确度由同步量测与使用者看叠歌审看片判定（试验计划第4、5节，付费前封存）",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，不切镜",
+    "保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-ls-1-a02"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

@@ -1,0 +1,65 @@
+{
+ "n": "1",
+ "at": "2026-11-04T06:50:30.956Z",
+ "fields_sha256": {
+  "title": "056dcb5218faa397f9ba7e223726e897a111e7d9210266d0e01e806a59a77a18",
+  "style": "ef5963e7d7a46a34493624a7b811632774d939532c0383ec32393d51cdb71eb9",
+  "exclude": "7805210c96aacccf9659c719b234effb78b6119e194e2c7f2646736683a8eb52",
+  "lyrics": "7be9188b80d47ffe998a7ae9ed57fcc81c74a8ae27435b77fd3e78aa380fd565"
+ },
+ "read": {
+  "lyrics": "[Intro - spoken, deadpan female voice, close and dry]\n\nThree forty-seven.\n\nSomewhere, one of us woke up.\n\n\n\n\n[Verse 1 - …",
+  "style": "fashion show electroclash techno, 126 BPM, 4/4, dry analog kick, rolling acid bassline, cold detuned synth stabs, sweeping string builds, one cool close-mic American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, euphoric sung chorus with a supersaw lift and big clear vowels, stacked female chants in the drop, key change up into the final chorus, cold luxurious catwalk energy, clean modern mix",
+  "exclude": "rap, rock guitar, lo-fi, male lead vocal, mumbled vocals, big room EDM, dubstep",
+  "title": "Looked Outside",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 0,
+  "lyrics_sha256": "6e9b933099a19476871f0494a5d5aba893785002370c88ed1555e1934e0dcb17"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

@@ -1,0 +1,59 @@
+{
+ "mode": "transcribe",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song/vo/intro/tts_Three_20261102_005237.mp3",
+ "audio_sha256": "68224c71ab8d823b1fac43ef9774b27a60e4633a6df83f89150e41d3aa457f8c",
+ "start": 0.0,
+ "end": 4.16,
+ "text": "3.47. Somewhere, one of us woke up.",
+ "words": [
+  {
+   "text": " 3",
+   "start": 0.0,
+   "end": 0.22,
+   "probability": 0.6286476850509644
+  },
+  {
+   "text": ".47.",
+   "start": 0.22,
+   "end": 0.7,
+   "probability": 0.5064296256750822
+  },
+  {
+   "text": " Somewhere,",
+   "start": 1.34,
+   "end": 2.02,
+   "probability": 0.9740592241287231
+  },
+  {
+   "text": " one",
+   "start": 2.4,
+   "end": 2.98,
+   "probability": 0.9946255087852478
+  },
+  {
+   "text": " of",
+   "start": 2.98,
+   "end": 3.16,
+   "probability": 0.998980700969696
+  },
+  {
+   "text": " us",
+   "start": 3.16,
+   "end": 3.36,
+   "probability": 0.9995408058166504
+  },
+  {
+   "text": " woke",
+   "start": 3.36,
+   "end": 3.56,
+   "probability": 0.9972048401832581
+  },
+  {
+   "text": " up.",
+   "start": 3.56,
+   "end": 3.94,
+   "probability": 0.9995349645614624
+  }
+ ]
+}

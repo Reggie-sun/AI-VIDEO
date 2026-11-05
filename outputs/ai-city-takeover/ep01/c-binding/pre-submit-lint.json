@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "exact_two_refs": true,
+    "actual_ref_responsibilities": true,
+    "same_identity": true,
+    "monitor_back_maintained": true,
+    "quiet_observer": true,
+    "axis_camera": true,
+    "no_new_plot_graphics": true,
+    "ai_label_preserved": true,
+    "independent_final_audio": true,
+    "chinese_body": true,
+    "bound_output": true
+  },
+  "request_hash": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+  "prior_paid_calls": 2,
+  "prior_observed_credits": 396,
+  "new_calls": 0,
+  "cumulative_attempt_ceiling": 3,
+  "lint_note": "Exact canonical IRIS Character is unchanged; native wording refers to the same left-ear device and fine red left-collar line. No QA requirement changed."
+}

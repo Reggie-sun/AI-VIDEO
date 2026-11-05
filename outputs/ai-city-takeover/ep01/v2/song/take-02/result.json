@@ -1,0 +1,19 @@
+{
+ "schema": "iris-ep01-song-result/1",
+ "take": 2,
+ "file": "music__20261102_002805.mp3",
+ "sha256": "884f5bbaf546fd36012a95de9ff8886130b636434b837ebf4ea38dfc229e0a88",
+ "song_id_for_inpainting": "EEkHSCJRyecb1l5idA8y",
+ "duration": 30.482167,
+ "vocals_by_section_unprompted_whisper_large_v3": {
+  "intro": "'.' no_speech 0.82",
+  "verse": "'Thank you.' no_speech 0.56",
+  "pre": "'Thank you.' no_speech 0.72",
+  "chorus": "'I didn't run, son, I just slipped outside' no_speech 0.25",
+  "outro": "'Thank you.' no_speech 0.77"
+ },
+ "finding": "vocal rendered only in the sung chunk; every spoken/whispered chunk came out without intelligible vocal (same as take 1)",
+ "account_character_count_after": 1924,
+ "charge_two_takes_observed": 762,
+ "verdict": "REJECTED (technical: spoken and whispered sections have no intelligible vocal)"
+}

@@ -1,0 +1,76 @@
+{
+ "source": "outputs/ai-city-takeover/ep01/v2/song-v3/stems/htdemucs_ft/IRIS-01-T4/vocals.wav",
+ "format": "pcm_s16le 44.1 kHz mono (same as OH-B)",
+ "windows": {
+  "U020": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U020.wav",
+   "song_window": [
+    54.39,
+    60.8
+   ],
+   "unit": [
+    54.69,
+    60.5
+   ],
+   "handle_s": 0.3,
+   "seconds": 6.41,
+   "sha256": "2ad08570d6f15567ec292f2135918fdc621b725ab2f1f74286607d000e583552"
+  },
+  "U021": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+   "song_window": [
+    60.2,
+    64.56
+   ],
+   "unit": [
+    60.5,
+    64.26
+   ],
+   "handle_s": 0.3,
+   "seconds": 4.36,
+   "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e"
+  },
+  "U022": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U022.wav",
+   "song_window": [
+    63.96,
+    67.53
+   ],
+   "unit": [
+    64.26,
+    67.23
+   ],
+   "handle_s": 0.3,
+   "seconds": 3.57,
+   "sha256": "cf6e1128cd21da9af38eda200b06a6a4232814ea86aab4420fe22b0d3806b385"
+  },
+  "U025": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U025.wav",
+   "song_window": [
+    72.23,
+    78.44
+   ],
+   "unit": [
+    72.53,
+    78.14
+   ],
+   "handle_s": 0.3,
+   "seconds": 6.21,
+   "sha256": "47d8219c76ecc0834e9808b40f57235afc41de33837c130cd841b9957c856314"
+  },
+  "U027": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U027.wav",
+   "song_window": [
+    79.26,
+    83.43
+   ],
+   "unit": [
+    79.56,
+    83.13
+   ],
+   "handle_s": 0.3,
+   "seconds": 4.17,
+   "sha256": "ea5e90b1918aa1d6c2c8c19895e4acbd120abc41cd196cd6674c9bd64092ae41"
+  }
+ }
+}

@@ -1,0 +1,10 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/LSen1/project",
+  "task_id": "iris-v2-lsen1-source-001",
+  "request_hash": "f02ed94c5eae3d0eb06eb8d885b1d74e99d00110818a521e4d2a264fa82c2975",
+  "resolved_reference_order": [
+    "iris-ls-1-a02"
+  ],
+  "new_provider_calls": 0,
+  "new_attempt_started": false
+}

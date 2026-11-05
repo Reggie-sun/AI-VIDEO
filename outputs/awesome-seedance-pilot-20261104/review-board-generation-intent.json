@@ -1,0 +1,16 @@
+{
+  "calls_ceiling": 1,
+  "auto_retry": false,
+  "source": {
+    "path": "outputs/awesome-seedance-pilot-20261104/opening-reference.png",
+    "sha256": "c964b47599528c301a3cef86b7b180aedca59720ac3dec27f2e403284f233ff4",
+    "size": [
+      1672,
+      941
+    ],
+    "status": "CANDIDATE_NOT_USER_APPROVED",
+    "observation": "Face, right index finger separated from red PTT, complete microphone and speaker visible; static image cannot prove contact motion or acting."
+  },
+  "purpose": "review-only three decisive states; never video input",
+  "prompt": "Same scene and identity, 3 sequential review panels: listening before press, right index pressing while speaking, released hand and worried waiting. Fixed viewpoint, unchanged microphone/speaker, no panels as video input."
+}

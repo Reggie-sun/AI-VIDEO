@@ -1,0 +1,19 @@
+{
+ "unit": "OH-A",
+ "file": "trial/omnihuman/OH-A/fetch/56a6de5bd25e951513864e9ff8fac50ef2608252193ce90c5926e6af8df12ba7.mp4",
+ "sha256": "56a6de5bd25e951513864e9ff8fac50ef2608252193ce90c5926e6af8df12ba7",
+ "bytes": 9028377,
+ "suggested_name": "jimeng-2026-11-03-6276.mp4",
+ "page_video": {
+  "w": 1920,
+  "h": 1088,
+  "dur": 5.133333,
+  "box": [
+   566,
+   152,
+   504,
+   283.5
+  ]
+ },
+ "fetched_at": "2026-11-03T05:46:00.339Z"
+}

@@ -1,0 +1,1219 @@
+{
+  "shot_id": "S0140",
+  "start_frame": 6310,
+  "end_frame": 6352,
+  "start_time": 262.9167,
+  "end_time": 264.7083,
+  "duration_frames": 43,
+  "duration_s": 1.7917,
+  "start_tc": "00:04:22:22",
+  "end_tc": "00:04:24:16",
+  "boundary_in_id": "B4-010",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 6310,
+      "path": "keyframes/S0140_f06310.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6320,
+      "path": "keyframes/S0140_f06320.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6331,
+      "path": "keyframes/S0140_f06331.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6342,
+      "path": "keyframes/S0140_f06342.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6352,
+      "path": "keyframes/S0140_f06352.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Small woman left of center in cool-gray field, trajectory and speed overlay",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "4 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Small woman left of center in cool-gray field, trajectory and speed overlay. Velocity ramps6315-6325; title6330; final punch-in. Geometry and typography in this draft require full-resolution detail verification.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Small woman left of center in cool-gray field, trajectory and speed overlay",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Small woman left of center in cool-gray field, trajectory and speed overlay",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "Velocity ramps6315-6325; title6330; final punch-in",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0140.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0001,
+      "pan_y_frac_per_s": 0.0024,
+      "zoom_per_s": 0.0066,
+      "median_flow_frac_per_s": 0.0012,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#BCC2C8",
+        "fraction": 0.473,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#B1B5BB",
+        "fraction": 0.209,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#DEDFDC",
+        "fraction": 0.145,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#27241F",
+        "fraction": 0.077,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#88898C",
+        "fraction": 0.053,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#5C5351",
+        "fraction": 0.043,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[181.5, 181.5, 147.3]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 11 /11 · ALL",
+      "evidence_frame": 6331,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74,
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 6331,
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 6331,
+      "audio_relation": "visual activity only; no audible verification in this lane",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally.",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:04:22:22",
+      "end_value": "00:04:24:16",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json.",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof.",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances.",
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright cream rectangular status card, crossed orange00, THERE IS NO UNDERCLASS, MONTHS ·BOARD01 ·FINAL",
+      "evidence_frame": 6331,
+      "shot_specific_exit": "All chrome fades during rapid crop/zoom f6349–6352; final frame faint remnants only."
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0140-E01",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Small woman left of center in cool-gray field, trajectory and speed overlay",
+      "start_frame": 6310,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Portrait remains medium-long through6348 then rapid decelerating crop/zoom into head at6352; HUD fades during punch",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6310; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6310,
+          "state": "waist/full upperbody centered"
+        },
+        {
+          "frame": 6348,
+          "scale": 1
+        },
+        {
+          "frame": 6350,
+          "scale": 1.4
+        },
+        {
+          "frame": 6352,
+          "scale": 2.4
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6310,
+        6331,
+        6352
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          6310,
+          6311
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E02",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "ESCAPE VELOCITY…",
+      "start_frame": 6310,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.16,
+        "w": 0.72,
+        "h": 0.17,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Velocity ramps6315-6325; title6330; final punch-in",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6310; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6310,
+          "text": "ESCAPE"
+        },
+        {
+          "frame": 6326,
+          "text": "ESCAPE VE",
+          "state": "reveal"
+        },
+        {
+          "frame": 6328,
+          "text": "ESCAPE VELOCITY."
+        },
+        {
+          "frame": 6330,
+          "text": "ESCAPE VELOCITY…"
+        },
+        {
+          "frame": 6349,
+          "opacity": 0.85
+        },
+        {
+          "frame": 6352,
+          "opacity": 0.08
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6310,
+        6331,
+        6352
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "ESCAPE VELOCITY…",
+        "case": "as displayed; slash separates sequential states",
+        "typography": {
+          "description": "Sans headline or mono label; exact font and size unresolved",
+          "method": "visual_estimate",
+          "font_status": "candidate only"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6310,
+          6311
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E03",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "hud_panel",
+      "description": "Launch speed card grows horizontally fromright then settles beside edge; velocity, lockedbadge and required flapline split below",
+      "start_frame": 6315,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.59,
+        "y": 0.72,
+        "w": 0.36,
+        "h": 0.17,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Velocity ramps6315-6325; title6330; final punch-in",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6315; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6315,
+          "state": "visible"
+        },
+        {
+          "frame": 6352,
+          "state": "last sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6310,
+        6331,
+        6352
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "is_group_container": true,
+      "visibility_evidence": {
+        "entry_bounds": [
+          6313,
+          6316
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E04",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "deco_graphic",
+      "description": "Orange ascending launch curve",
+      "start_frame": 6319,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.6,
+        "y": 0.34,
+        "w": 0.28,
+        "h": 0.44,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Velocity ramps6315-6325; title6330; final punch-in",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6319; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6319,
+          "state": "small orange burst at baseline"
+        },
+        {
+          "frame": 6324,
+          "x": 0.64,
+          "y": 0.59
+        },
+        {
+          "frame": 6331,
+          "x": 0.78,
+          "y": 0.32
+        },
+        {
+          "frame": 6342,
+          "x": 0.92,
+          "y": 0.23
+        },
+        {
+          "frame": 6352,
+          "opacity": 0.1
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6310,
+        6331,
+        6352
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          6317,
+          6320
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E05",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "hud_marker",
+      "description": "Catwalk edge baseline with tiny annotation and depth-like horizontal guides",
+      "start_frame": 6310,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0,
+        "y": 0.69,
+        "w": 0.95,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Portrait remains medium-long through6348 then rapid decelerating crop/zoom into head at6352; HUD fades during punch",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6310; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6310,
+          "state": "visible"
+        },
+        {
+          "frame": 6352,
+          "state": "last visibility"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6310,
+        6352
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "EDGE ·0M\nTHE CATWALK ENDS HERE",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6310,
+          6311
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E06",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Launch velocity digits ease out to11.2KM/S",
+      "start_frame": 6315,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.62,
+        "y": 0.76,
+        "w": 0.25,
+        "h": 0.05,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Portrait remains medium-long through6348 then rapid decelerating crop/zoom into head at6352; HUD fades during punch",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6315; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6316,
+          "value": 3.8
+        },
+        {
+          "frame": 6318,
+          "value": 7.6
+        },
+        {
+          "frame": 6320,
+          "value": 9.8
+        },
+        {
+          "frame": 6322,
+          "value": 10.8
+        },
+        {
+          "frame": 6324,
+          "value": 11.2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6315,
+        6352
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "v11.2KM/S",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6313,
+          6316
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E07",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "LOCKED badge in launch card",
+      "start_frame": 6328,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.91,
+        "y": 0.775,
+        "w": 0.035,
+        "h": 0.025,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Portrait remains medium-long through6348 then rapid decelerating crop/zoom into head at6352; HUD fades during punch",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6328; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6328,
+          "state": "visible"
+        },
+        {
+          "frame": 6352,
+          "state": "last visibility"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6328,
+        6352
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LOCKED",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6326,
+          6329
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E08",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "split_flap",
+      "description": "Required velocity clattering flapline resolves to zero and thesis",
+      "start_frame": 6315,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.62,
+        "y": 0.84,
+        "w": 0.32,
+        "h": 0.055,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Portrait remains medium-long through6348 then rapid decelerating crop/zoom into head at6352; HUD fades during punch",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6315; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6316,
+          "text": "REQUIRED11.2KM/S"
+        },
+        {
+          "frame": 6331,
+          "state": "random intermediate glyph flips"
+        },
+        {
+          "frame": 6342,
+          "text": "REQUIRED0.0 ·NOTHING TO ESCAPE"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6315,
+        6352
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "REQUIRED0.0 ·NOTHING TO ESCAPE",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6313,
+          6316
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E09",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "hud_bracket",
+      "description": "Face corner bracket appears once curve reaches upperright",
+      "start_frame": 6334,
+      "end_frame": 6352,
+      "bounding_box": {
+        "x": 0.45,
+        "y": 0.36,
+        "w": 0.12,
+        "h": 0.18,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Portrait remains medium-long through6348 then rapid decelerating crop/zoom into head at6352; HUD fades during punch",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6334; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6352; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6334,
+          "state": "visible"
+        },
+        {
+          "frame": 6352,
+          "state": "last visibility"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6334,
+        6352
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "FACE0.95",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced panel labels estimated10–16px cap height at1920x1080; prominent condensed labels30–44px; normal tracking; cream backing; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "color_hex": "#171715",
+          "alignment": "left"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          6332,
+          6335
+        ],
+        "exit_bounds": [
+          6350,
+          6352
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    },
+    {
+      "element_id": "S0140-E10",
+      "shot_id": "S0140",
+      "asset_id": null,
+      "type": "mask",
+      "description": "Pale horizontal scan strip sweeps past lower body during launch",
+      "start_frame": 6330,
+      "end_frame": 6333,
+      "bounding_box": {
+        "x": 0,
+        "y": 0.89,
+        "w": 1,
+        "h": 0.04,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "Portrait remains medium-long through6348 then rapid decelerating crop/zoom into head at6352; HUD fades during punch",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Visible from approximately f6330; see3-frame bounds; inherited if shot start.",
+        "exit": "Last observed approximately f6333; see3-frame bounds; cut if shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 6330,
+          "state": "visible"
+        },
+        {
+          "frame": 6333,
+          "state": "last visibility"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        6330,
+        6333
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and layer decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          6328,
+          6331
+        ],
+        "exit_bounds": [
+          6331,
+          6334
+        ],
+        "confidence": 0.74,
+        "method": "Five individual keyframes, native-resolution crop, and1–3frame dense source comparison. Entry/exit uncertainty at most3frames."
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0140-A01",
+      "target_element_ids": [
+        "S0140-E02",
+        "S0140-E03",
+        "S0140-E04"
+      ],
+      "description": "Velocity ramps6315-6325; title6330; final punch-in",
+      "start_frame": 6310,
+      "end_frame": 6352,
+      "easing": "unfitted",
+      "audio_sync": "not listened in this pass"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0274"
+      ],
+      "frame_range": [
+        6314,
+        6315
+      ],
+      "type": "hud_swap",
+      "description": "Velocity counter v-readout ticking; same wide shot.",
+      "confidence": 0.8,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B4-010",
+      "span": [
+        6310,
+        6310
+      ],
+      "description": "Velocity ramps6315-6325; title6330; final punch-in",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "zoom_punch_cut",
+      "boundary_id": "B4-011",
+      "span": [
+        6352,
+        6352
+      ],
+      "description": "Velocity ramps6315-6325; title6330; final punch-in",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0420",
+      "relation": "vocal_word_candidate (unknown) at frame 6303–6323; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6310
+    },
+    {
+      "audio_event_id": "AB0583",
+      "relation": "beat_candidate (unknown) at frame 6310; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6310
+    },
+    {
+      "audio_event_id": "AH02731",
+      "relation": "band_onset_candidate (unknown) at frame 6310; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6310
+    },
+    {
+      "audio_event_id": "AH02732",
+      "relation": "band_onset_candidate (unknown) at frame 6310; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6310
+    },
+    {
+      "audio_event_id": "AH02733",
+      "relation": "band_onset_candidate (unknown) at frame 6310; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6310
+    },
+    {
+      "audio_event_id": "AH02734",
+      "relation": "band_onset_candidate (unknown) at frame 6311; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6311
+    },
+    {
+      "audio_event_id": "AH02735",
+      "relation": "band_onset_candidate (unknown) at frame 6316; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6316
+    },
+    {
+      "audio_event_id": "AH02736",
+      "relation": "band_onset_candidate (unknown) at frame 6321; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6321
+    },
+    {
+      "audio_event_id": "AH02737",
+      "relation": "band_onset_candidate (unknown) at frame 6321; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6321
+    },
+    {
+      "audio_event_id": "AH02738",
+      "relation": "band_onset_candidate (unknown) at frame 6321; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6321
+    },
+    {
+      "audio_event_id": "AB0584",
+      "relation": "beat_candidate (unknown) at frame 6321; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6321
+    },
+    {
+      "audio_event_id": "AH02739",
+      "relation": "band_onset_candidate (unknown) at frame 6321; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6321
+    },
+    {
+      "audio_event_id": "AH02740",
+      "relation": "band_onset_candidate (unknown) at frame 6322; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6322
+    },
+    {
+      "audio_event_id": "AW0421",
+      "relation": "vocal_word_candidate (unknown) at frame 6325–6341; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6325
+    },
+    {
+      "audio_event_id": "AH02741",
+      "relation": "band_onset_candidate (unknown) at frame 6332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6332
+    },
+    {
+      "audio_event_id": "AH02742",
+      "relation": "band_onset_candidate (unknown) at frame 6332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6332
+    },
+    {
+      "audio_event_id": "AB0585",
+      "relation": "beat_candidate (unknown) at frame 6332; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6332
+    },
+    {
+      "audio_event_id": "AH02743",
+      "relation": "band_onset_candidate (unknown) at frame 6332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6332
+    },
+    {
+      "audio_event_id": "AH02744",
+      "relation": "band_onset_candidate (unknown) at frame 6332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6332
+    },
+    {
+      "audio_event_id": "AW0422",
+      "relation": "vocal_word_candidate (unknown) at frame 6341–6363; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6341
+    },
+    {
+      "audio_event_id": "AB0586",
+      "relation": "beat_candidate (unknown) at frame 6342; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 6342
+    },
+    {
+      "audio_event_id": "AH02745",
+      "relation": "band_onset_candidate (unknown) at frame 6342; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6342
+    },
+    {
+      "audio_event_id": "AH02746",
+      "relation": "band_onset_candidate (unknown) at frame 6342; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6342
+    },
+    {
+      "audio_event_id": "AH02747",
+      "relation": "band_onset_candidate (unknown) at frame 6343; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6343
+    },
+    {
+      "audio_event_id": "AH02748",
+      "relation": "band_onset_candidate (unknown) at frame 6343; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6343
+    },
+    {
+      "audio_event_id": "AH02749",
+      "relation": "band_onset_candidate (unknown) at frame 6348; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6348
+    },
+    {
+      "audio_event_id": "AH02750",
+      "relation": "band_onset_candidate (unknown) at frame 6348; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6348
+    },
+    {
+      "audio_event_id": "AH02751",
+      "relation": "band_onset_candidate (unknown) at frame 6348; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6348
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0140.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original font, shader, authored layer decomposition and exact easing remain unknown.",
+    "Spatial bounds are source-image visual estimates, not original layout coordinates."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0140.jpg",
+      "keyframes/S0140_f06310.jpg",
+      "keyframes/S0140_f06320.jpg",
+      "keyframes/S0140_f06331.jpg",
+      "keyframes/S0140_f06342.jpg",
+      "keyframes/S0140_f06352.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "filmstrip_opened": true,
+    "frames_actually_opened": [
+      6310,
+      6320,
+      6331,
+      6342,
+      6352
+    ],
+    "fullres_frames_actually_opened": [
+      6331
+    ],
+    "detail_crops": [
+      "work/full_codex_103_153/micro140.png"
+    ],
+    "dense_sheets": [
+      "work/full_codex_103_153/dense140.jpg",
+      "work/full_codex_103_153/fade140.jpg"
+    ],
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "Five individual keyframes plus native crop and dense animation review; second independent-element and visibility inventory.",
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="5.633" timestamp="2026-10-30T20:54:13.688179-04:00" hostname="reggie-MS-7D48"><testcase classname="tests.test_performance_direction" name="test_empty_directions_keep_the_legacy_six_field_hash" time="0.004"><failure message="AssertionError: assert 'b493e6f5fa4e...62b49fb188db2' == 'c26544616de7...d4d2a5d16918c'&#10;  &#10;  - c26544616de7f89f2b1a7d23250c7068bb53f23f3e6c3026600d4d2a5d16918c&#10;  + b493e6f5fa4e5a2fa1f4c327e12f2a01635bf9b4da8f70e449d62b49fb188db2">tests/test_performance_direction.py:179: in test_empty_directions_keep_the_legacy_six_field_hash
+    assert canonical_sha256(_complete_intent().model_dump(mode="json")) == (
+E   AssertionError: assert 'b493e6f5fa4e...62b49fb188db2' == 'c26544616de7...d4d2a5d16918c'
+E     
+E     - c26544616de7f89f2b1a7d23250c7068bb53f23f3e6c3026600d4d2a5d16918c
+E     + b493e6f5fa4e5a2fa1f4c327e12f2a01635bf9b4da8f70e449d62b49fb188db2</failure></testcase><testcase classname="tests.test_generation_history_import_receipt" name="test_prepares_and_reopens_a_strict_legacy_remote_snapshot" time="1.429"><failure message="AssertionError: assert '8c957f570a0b...35a9b7e3e0717' == '2f8536a33511...2f20c7351f0e5'&#10;  &#10;  - 2f8536a33511852c29b0d76e56daed90c7c98602e666d7fe1262f20c7351f0e5&#10;  + 8c957f570a0b80fe8d3f9fde3df7ef19ebd21914e29016cd83e35a9b7e3e0717">tests/test_generation_history_import_receipt.py:153: in test_prepares_and_reopens_a_strict_legacy_remote_snapshot
+    assert source.source_sha256 == "2f8536a33511852c29b0d76e56daed90c7c98602e666d7fe1262f20c7351f0e5"
+E   AssertionError: assert '8c957f570a0b...35a9b7e3e0717' == '2f8536a33511...2f20c7351f0e5'
+E     
+E     - 2f8536a33511852c29b0d76e56daed90c7c98602e666d7fe1262f20c7351f0e5
+E     + 8c957f570a0b80fe8d3f9fde3df7ef19ebd21914e29016cd83e35a9b7e3e0717</failure></testcase><testcase classname="tests.test_generation_quality_rejection" name="test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay" time="1.762"><failure message="AssertionError: assert ('9678c49676b...529c1f27de19') == ('3e6a0ae1f86...c55db91bf309')&#10;  &#10;  At index 0 diff: '9678c49676be7e77c71c16bf533cf9d480fa8908d83abc14c9f500d717ee6d65' != '3e6a0ae1f86d12850545a1eef472f2461230541e4870dd62c3ea8961bc546229'&#10;  Use -v to get more diff">tests/test_generation_quality_rejection.py:166: in test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay
+    assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
+E   AssertionError: assert ('9678c49676b...529c1f27de19') == ('3e6a0ae1f86...c55db91bf309')
+E     
+E     At index 0 diff: '9678c49676be7e77c71c16bf533cf9d480fa8908d83abc14c9f500d717ee6d65' != '3e6a0ae1f86d12850545a1eef472f2461230541e4870dd62c3ea8961bc546229'
+E     Use -v to get more diff</failure></testcase></testsuite></testsuites>

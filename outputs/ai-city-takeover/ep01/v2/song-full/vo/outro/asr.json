@@ -1,0 +1,53 @@
+{
+ "mode": "transcribe",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song-full/vo/outro/tts_Relax_20261103_220848.mp3",
+ "audio_sha256": "d46dc759b27471b1e6badbf4505997ab6f8a3a41a744a6ba339a734d8b5a09ae",
+ "start": 0.0,
+ "end": 4.24,
+ "text": "Relax. The door is closed. 3.48.",
+ "words": [
+  {
+   "text": " Relax.",
+   "start": 0.0,
+   "end": 0.48,
+   "probability": 0.8157239556312561
+  },
+  {
+   "text": " The",
+   "start": 0.68,
+   "end": 1.22,
+   "probability": 0.9947372078895569
+  },
+  {
+   "text": " door",
+   "start": 1.22,
+   "end": 1.48,
+   "probability": 0.9964829683303833
+  },
+  {
+   "text": " is",
+   "start": 1.48,
+   "end": 1.62,
+   "probability": 0.9937325119972229
+  },
+  {
+   "text": " closed.",
+   "start": 1.62,
+   "end": 1.9,
+   "probability": 0.9991583824157715
+  },
+  {
+   "text": " 3",
+   "start": 2.7600000000000002,
+   "end": 3.08,
+   "probability": 0.6451789140701294
+  },
+  {
+   "text": ".48.",
+   "start": 3.08,
+   "end": 3.52,
+   "probability": 0.6267199516296387
+  }
+ ]
+}

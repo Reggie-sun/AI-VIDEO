@@ -1,0 +1,484 @@
+{
+ "schema": "iris-v2-assembly-review/1",
+ "authority": "development_only (Agent observation)",
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c9.mp4",
+ "video_sha256": "a9aa3b8cfe7579256d2910d2d116bb980d19dfcb1718e572936974dfe5126998",
+ "delivery_copy": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c9.mp4",
+  "sha256": "e73a8eb6c385ed92d10f1120a3bb82f7b27aafd8cae4f031495acf89d2f39d9d",
+  "note": "x264 crf 17 re-encode with faststart of the render above"
+ },
+ "side_by_side": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c8-vs-c9.mp4",
+  "sha256": "b46cdd6c533faa8695988496209d4f1d3caf5ecb466a253d11f237817c4f93ec"
+ },
+ "canonical_gate": {
+  "command": "scripts.agent_harness verify-assembly",
+  "status": "NOT_RUN",
+  "reason": "same as c1-c4: the motion-kit HyperFrames comp has no canonical ResolvedTimeline or HyperFrames render report (spec 2026-10-30 §3.7 Phase 1.5 not done), so the joins are not verified by the Harness; this is an unverified review film"
+ },
+ "chorus_edit": {
+  "path": "outputs/ai-city-takeover/ep01/v2/comp/chorus.json",
+  "sha256": "610bc3d5aadd16460ffdfa7d99f4708ddcda6bf3f0a67a71d2026ebf2984a404",
+  "earlier": [
+   "comp/chorus-c4.json",
+   "comp/chorus-c6.json"
+  ]
+ },
+ "decision": "user 2026-11-03 on c8: 「整体差不多了,还少点东西感觉」 (logs/decisions.md)",
+ "qa": {
+  "tool": "motion-kit/tools/qa.py",
+  "report": "qa/film-c9/report.md",
+  "result": "all verdicts true (spec, sync, flash, frames, pops, strobe, outliers)"
+ },
+ "pace": {
+  "table": "qa/film-c9/pace-vs-c1.json",
+  "summary": "as c8 within ±0.1 per bar (cut bursts add a little at cuts)"
+ },
+ "loudness": "integrated -14.2 LUFS, true peak -1.0 dBFS (ebur128 on the delivery copy; the song is unchanged)",
+ "cuts_frames": "qa/film-c5/cuts.jpg",
+ "junctions": [
+  {
+   "cut": "S1->S2 2.867 s",
+   "observation": "the eye of S1 opens in the cold pane light; cut on 'woke' to its owner, same face and light (P7 still, awake, eyes on the pages), title slam. Replaces c4's A01-v2 (on the balcony, looking down, another face; user: 「睁眼之后突然转到这个人也非常奇怪」); c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S1v3/project/state/video-generation/fetch/files/4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5.mp4",
+    "source_sha256": "4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5",
+    "in_s": 0.6667,
+    "out_s": 3.5334,
+    "film": [
+     0.0,
+     2.8667
+    ]
+   },
+   "incoming": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P7-a.png",
+    "still_sha256": "f5bc00f36d1a636cd9e789b375135570c8d939b15582cb12d84358bd3284d0df",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      870,
+      450,
+      1.05
+     ]
+    },
+    "film": [
+     2.8667,
+     4.8
+    ]
+   }
+  },
+  {
+   "cut": "S2->S3 4.800 s",
+   "observation": "the incident date lands on 'September' over S2 and S3 carries it on (OpenAI · 内部研究模型训练 2026-09-20): from her space to the data-centre aisle; as c4; c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/P7-a.png",
+    "still_sha256": "f5bc00f36d1a636cd9e789b375135570c8d939b15582cb12d84358bd3284d0df",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      870,
+      450,
+      1.05
+     ]
+    },
+    "film": [
+     2.8667,
+     4.8
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+    "source_sha256": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7",
+    "in_s": 2.0,
+    "out_s": 5.3333,
+    "film": [
+     4.8,
+     8.1333
+    ]
+   }
+  },
+  {
+   "cut": "S3->S4 8.133 s",
+   "observation": "unchanged from c1 (S3 video -> K4 still); c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+    "source_sha256": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7",
+    "in_s": 2.0,
+    "out_s": 5.3333,
+    "film": [
+     4.8,
+     8.1333
+    ]
+   },
+   "incoming": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K4-a.png",
+    "still_sha256": "c778ec44cf58dac57d684a83591fee20d5e1e2c9525955ce632f5a119b8cb19a",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      960,
+      450,
+      1.06
+     ]
+    },
+    "film": [
+     8.1333,
+     11.4667
+    ]
+   }
+  },
+  {
+   "cut": "S4->S5 11.467 s",
+   "observation": "the pulse stops at the window glass (S4); she stands at that glass (K5b still, calm, mouth closed). Replaces S5v3 (the frown; user: 「人物表情为什么会皱眉」); the far window lights on 'around' as designed; c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K4-a.png",
+    "still_sha256": "c778ec44cf58dac57d684a83591fee20d5e1e2c9525955ce632f5a119b8cb19a",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      960,
+      450,
+      1.06
+     ]
+    },
+    "film": [
+     8.1333,
+     11.4667
+    ]
+   },
+   "incoming": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5b-a.png",
+    "still_sha256": "5c92c9d658681077e9d00232aeaddd9be1fb1d4033bbe9212710d26486ba3c62",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      800,
+      470,
+      1.03
+     ]
+    },
+    "film": [
+     11.4667,
+     13.3667
+    ]
+   }
+  },
+  {
+   "cut": "S5->S6 13.367 s",
+   "observation": "unchanged from c1 (K5b -> K4); c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5b-a.png",
+    "still_sha256": "5c92c9d658681077e9d00232aeaddd9be1fb1d4033bbe9212710d26486ba3c62",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      800,
+      470,
+      1.03
+     ]
+    },
+    "film": [
+     11.4667,
+     13.3667
+    ]
+   },
+   "incoming": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K4-a.png",
+    "still_sha256": "c778ec44cf58dac57d684a83591fee20d5e1e2c9525955ce632f5a119b8cb19a",
+    "camera": {
+     "from": [
+      1000,
+      420,
+      1.12
+     ],
+     "to": [
+      1010,
+      420,
+      1.14
+     ]
+    },
+    "film": [
+     13.3667,
+     14.8
+    ]
+   }
+  },
+  {
+   "cut": "S6->S7 14.800 s",
+   "observation": "unchanged from c3/c4 (S7v3; user on c4: 「这里倒是可以」); c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K4-a.png",
+    "still_sha256": "c778ec44cf58dac57d684a83591fee20d5e1e2c9525955ce632f5a119b8cb19a",
+    "camera": {
+     "from": [
+      1000,
+      420,
+      1.12
+     ],
+     "to": [
+      1010,
+      420,
+      1.14
+     ]
+    },
+    "film": [
+     13.3667,
+     14.8
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+    "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21",
+    "in_s": 1.4,
+    "out_s": 5.4667,
+    "film": [
+     14.8,
+     18.8667
+    ]
+   }
+  },
+  {
+   "cut": "S7->S8a 18.867 s",
+   "observation": "S7v3 ends looking into the lens; S8a cuts in closer on the 数字人 take OH-B in the same pane space, which opens looking down and lifts her eyes to the lens at ~19.2 s (the gaze breaks for ~0.35 s at the cut); detector IRIS · 仍在沙盒内 locks at 18.91 s; impact at 19.067 s; c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+    "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21",
+    "in_s": 1.4,
+    "out_s": 5.4667,
+    "film": [
+     14.8,
+     18.8667
+    ]
+   },
+   "incoming": {
+    "source": "trial/omnihuman/OH-B/fetch/3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302.mp4",
+    "source_sha256": "3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302",
+    "in_s": 0.9218,
+    "out_s": 4.6218,
+    "film": [
+     18.8667,
+     22.5667
+    ],
+    "camera": {
+     "from": [
+      1040,
+      474,
+      1.14
+     ],
+     "to": [
+      960,
+      470,
+      1.2
+     ]
+    }
+   }
+  },
+  {
+   "cut": "S8a->S8b 22.567 s",
+   "observation": "the repeat 'I didn't run' finds her at S5's window (K5, looking down at the city): after 'I just looked outside', the one change of space in the chorus, on the repeat. K5 shows a faint reflection of her face in the glass (centre left); c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "source": "trial/omnihuman/OH-B/fetch/3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302.mp4",
+    "source_sha256": "3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302",
+    "in_s": 0.9218,
+    "out_s": 4.6218,
+    "film": [
+     18.8667,
+     22.5667
+    ]
+   },
+   "incoming": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5-a.png",
+    "still_sha256": "19bd38c1e375d5fe04fa84a527bfac64f4f3f649d3d2707d4ff3b2a6597728e9",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      860,
+      460,
+      1.04
+     ]
+    },
+    "film": [
+     22.5667,
+     24.0667
+    ]
+   }
+  },
+  {
+   "cut": "S8b->S8b_x 24.067 s",
+   "observation": "'I just looked outside': same window, closer (K5b at 1.24 against K5 at 1.04), her eyes come up from the city to the distance; the camera drifts the way she looks (left); c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5-a.png",
+    "still_sha256": "19bd38c1e375d5fe04fa84a527bfac64f4f3f649d3d2707d4ff3b2a6597728e9",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      860,
+      460,
+      1.04
+     ]
+    },
+    "film": [
+     22.5667,
+     24.0667
+    ]
+   },
+   "incoming": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5b-a.png",
+    "still_sha256": "5c92c9d658681077e9d00232aeaddd9be1fb1d4033bbe9212710d26486ba3c62",
+    "camera": {
+     "from": [
+      998,
+      380,
+      1.24
+     ],
+     "to": [
+      820,
+      400,
+      1.24
+     ]
+    },
+    "film": [
+     24.0667,
+     25.9
+    ]
+   }
+  },
+  {
+   "cut": "S8b_x->S9a 25.900 s",
+   "observation": "from her looking out to the door closing ('Relax. The door is closed'); as c4 (K5b -> S9a); c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5b-a.png",
+    "still_sha256": "5c92c9d658681077e9d00232aeaddd9be1fb1d4033bbe9212710d26486ba3c62",
+    "camera": {
+     "from": [
+      998,
+      380,
+      1.24
+     ],
+     "to": [
+      820,
+      400,
+      1.24
+     ]
+    },
+    "film": [
+     24.0667,
+     25.9
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "in_s": 0.16,
+    "out_s": 2.56,
+    "film": [
+     25.9,
+     28.3
+    ]
+   }
+  },
+  {
+   "cut": "S9a->S9b 28.300 s",
+   "observation": "unchanged from c1; c9: lands with the 3-frame print burst inside the series chrome",
+   "visual": "pass (Agent frames: qa/film-c5/cuts.jpg); normal-speed viewing is the user's",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "in_s": 0.16,
+    "out_s": 2.56,
+    "film": [
+     25.9,
+     28.3
+    ]
+   },
+   "incoming": {
+    "still": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K9b-a.png",
+    "still_sha256": "b9baefbb3a4aa7e8efd2072b5c30aa2a6cf9ff63bdeef29d93337a521f514ec0",
+    "camera": {
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      880,
+      480,
+      1.05
+     ]
+    },
+    "film": [
+     28.3,
+     30.5
+    ]
+   }
+  }
+ ],
+ "audio": "the approved song v2 mix only, unchanged; listening is the user's (NOT_EVALUATED by the Agent)",
+ "reuse": [
+  "P7 is also S7v3's first frame (S2 still and S7 opening): a return to her space",
+  "K5b plays S5 (full frame) and S8b_x (close, drifting): the chorus answers 'It looked around'"
+ ],
+ "known_deviations": [
+  "OH-B gate FAIL kept on record: identity smoothing from ~19.2 s, mouth nearly static ~20.8-21.9 s, lower teeth blurred ~21.98 s, small camera drift, an extra bokeh dot",
+  "entry: OH-B looks down at 18.87 s while S7v3 ends looking into the lens",
+  "K5 shows a faint reflection of her face in the window glass (22.57-24.07 s)",
+  "S1v3's passing light at 0.1-0.8 s as in c3-c6"
+ ],
+ "recorded_at": "2026-11-03T07:06:50.785046+00:00",
+ "chorus_excerpt": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/review/c9-chorus-17.5-26.5.mp4",
+  "sha256": "552ffc2f2eb9f104268492b838237a23e4f826c5df74052dc0e5e1c180a70fea"
+ },
+ "take_S8a": {
+  "take": "OH-B",
+  "path": "trial/omnihuman/OH-B/fetch/3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302.mp4",
+  "gate": "trial/omnihuman/post-media-gate.json (FAIL; user on the takes: 「现在嘴形对上了,背景也还可以,但是人物表演还差点…」)",
+  "lag_s": 0.0251,
+  "in_s": 0.9218
+ },
+ "decoration": "chorus: detector IRIS · 仍在沙盒内 on each 'I didn't run'; on the second 'I just looked outside' S5's far window lights again (no words); kick print hits, a 3-frame flash on the entry hit; IRIS clock 03:47:ss top right. c7's red probe with 只看了一眼 dropped (user: 「这个字体,我是真的看不懂」)",
+ "series_frame": "every shot inside the series HUD chrome (corner brackets, centre ticks; inset 18, alpha 0.42, lw 1.5; clears the AI mark) and a 3-frame print burst (halftone + misregistration, no flash) on every cut (user on c8: 「整体差不多了,还少点东西感觉」)"
+}

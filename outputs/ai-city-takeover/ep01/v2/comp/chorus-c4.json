@@ -1,0 +1,75 @@
+{
+ "about": "Chorus edit (spec 2026-11-02 §5.3, then the author's post-production after the lip-sync trial). Each pass is a list of segments. A 'take' segment plays a lip-sync take at the lag motion-kit/tools/sync_check.py measured (sync = its sync.json, relative to ep01/v2); a 'still' segment is an approved plate moved by the code camera from 'from' to 'to' ([centre x, centre y, zoom] in plate px). A later segment starts at a lyric line's vocal entry ('at_line', two frames early like build.py's vocal()) or on the last eighth note before the named take stops being in sync ('eighth_before_sync_end_of', the author's EV cut). Lyrics stay on screen.",
+ "decision": "user 2026-11-02: 「嘴没有对好,然后我记得原作者不是就是这样简单的放一个视频还有很多后期处理」 「先停，用 LSen1 的同步段＋靜圖後製」 (logs/decisions.md)",
+ "passes": [
+  {
+   "segments": [
+    {
+     "shot": "S8a",
+     "kind": "take",
+     "take": "LSen1",
+     "sync": "trial/lipsync-ev/LSen1/sync/LSen1/sync.json",
+     "why": "trial take LSen1 at its own soundtrack lag (the author's placement): 'I didn't run' in sync until 20.53 s"
+    },
+    {
+     "shot": "S8a_x",
+     "kind": "still",
+     "start": {
+      "eighth_before_sync_end_of": "S8a"
+     },
+     "plate": "P8c",
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      600,
+      380,
+      1.1
+     ],
+     "why": "'I just looked outside': on the same balcony she has stopped singing and looks away, a slow push to her face"
+    }
+   ]
+  },
+  {
+   "segments": [
+    {
+     "shot": "S8b",
+     "kind": "still",
+     "plate": "P8b",
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      640,
+      380,
+      1.07
+     ],
+     "why": "second 'I didn't run': eyes closed, head up, the line let go; a slow push"
+    },
+    {
+     "shot": "S8b_x",
+     "kind": "still",
+     "start": {
+      "at_line": 14
+     },
+     "plate": "K5b",
+     "from": [
+      836,
+      470,
+      1.0
+     ],
+     "to": [
+      930,
+      400,
+      1.07
+     ],
+     "why": "'I just looked outside': at the window, calm, looking out at the city (S5's plate before the reaction)"
+    }
+   ]
+  }
+ ]
+}

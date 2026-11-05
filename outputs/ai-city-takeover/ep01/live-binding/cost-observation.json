@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-10-30T22:36:28.629050+00:00",
+  "before_balance_credits": 68189,
+  "after_balance_credits": 67991,
+  "observed_delta_credits": 198,
+  "native_quote_credits": 198,
+  "operator_ceiling_credits": 250,
+  "source": "current same-account native canvas UI after accepted source submit",
+  "formal_billing_receipt": "not separately retrieved",
+  "submit_count": 1,
+  "automatic_retries": 0
+}

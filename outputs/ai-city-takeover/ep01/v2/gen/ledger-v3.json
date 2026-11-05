@@ -1,0 +1,48 @@
+{
+ "schema": "iris-v2-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "S1v3",
+   "attempt_id": "iris-s1v3-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T10:27:56.089741+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S8av3",
+   "attempt_id": "iris-s8av3-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T10:35:25.607953+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S8bv3",
+   "attempt_id": "iris-s8bv3-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T11:17:19.480972+00:00",
+   "outcome": "known_no_effect",
+   "evidence": "gen/S8bv3/project/state/paid-provider/submits/9f5a0c11c5e9ea6f3d3facbcfcea30df546169cf58122901caccfb99cfb72c05.json: reference upload failed before the generation request; no external effect, no charge"
+  },
+  {
+   "unit": "S8bv3b",
+   "attempt_id": "iris-s8bv3b-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T11:19:35.133721+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S5v3",
+   "attempt_id": "iris-s5v3-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T11:36:50.415425+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S7v3",
+   "attempt_id": "iris-s7v3-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T11:43:50.470410+00:00",
+   "outcome": "submitted"
+  }
+ ]
+}

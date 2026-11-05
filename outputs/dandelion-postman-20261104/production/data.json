@@ -1,0 +1,172 @@
+{
+  "objective": "全新原创12秒蒲公英邮差：机器人两步停下，风吹种子，一粒落头",
+  "images": [
+    {
+      "asset_id": "postman-reference-v1",
+      "node_id": "postman-reference-v1-node",
+      "resource_id": "postman-reference-v1-local",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/dandelion-postman-20261104/reference-v1.png",
+      "usage_license": "Task-owned original fictional reference generated for Dandelion Postman",
+      "generated_source": {
+        "record_path": "outputs/dandelion-postman-20261104/production/reference-source.json",
+        "record_sha256": "e58eb47f457ca212ed3f123309dcff2d3bb809eda76e7d36692e4924ce95e4d1",
+        "tool": {
+          "name": "image_gen.imagegen",
+          "version": "runtime-tool-version-not-exposed"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "postman-robot",
+      "name": "蒲公英邮差",
+      "identity": "唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。",
+      "appearance_bible": "浅青金属、双玻璃眼、右胯黄色邮袋",
+      "reference_asset_ids": [
+        "postman-reference-v1"
+      ]
+    }
+  ],
+  "scene": {
+    "scene_id": "sunlit-meadow",
+    "location": "午后微缩草地",
+    "mood": "温暖幽默"
+  },
+  "scene_images": [],
+  "observations": {
+    "identity": "唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。",
+    "action": "机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。",
+    "camera": "12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。",
+    "performance": "机器人正常走两步停下，随种子抬头；头上种子落定后停住",
+    "space": "机器人左蒲公英右，种子来自花托向左上漂，落头不瞬移",
+    "sound": "原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。",
+    "art": "温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+    ],
+    "action": [
+      "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+    ],
+    "camera": [
+      "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+    ],
+    "performance": [
+      "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+    ],
+    "space": [
+      "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+    ],
+    "sound": [
+      "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+    ],
+    "art": [
+      "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。"
+    ]
+  },
+  "intent_sha256": "d62c74932bc736a5269a81fdff2bfb1a9c1dce61cba8457922d26f4401fac7cc",
+  "coverage": {
+    "coverage_hash": "a9bd4189f449d32dacac411063f9390e456969963a209ef274e7100336d18f9d",
+    "unit_id": "postman"
+  }
+}

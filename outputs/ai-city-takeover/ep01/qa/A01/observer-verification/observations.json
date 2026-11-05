@@ -1,0 +1,135 @@
+{
+  "scope": "QA observation only; does not mutate canonical feedback, Gate, acceptance or lifecycle",
+  "source_sha256": "65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5",
+  "source_size_bytes": 10354579,
+  "decoded_video_frame_count": 145,
+  "video_duration_seconds": 6.016667,
+  "container_duration_seconds": 6.061,
+  "r_frame_rate": "60/1",
+  "avg_frame_rate": "8700/361",
+  "timing_interpretation": "VFR source; not constant 60 fps",
+  "references": [
+    {
+      "path": "outputs/ai-city-takeover/series/casting/raw/CF-a.png",
+      "sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb"
+    },
+    {
+      "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+      "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/reference-package/A01-v1.png",
+      "sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087"
+    }
+  ],
+  "normal_speed_playback": {
+    "evidence": "normal-speed-playback.json",
+    "playback_rate": 1,
+    "wall_seconds": 6.345,
+    "total_video_frames": 145,
+    "dropped_frames": 0,
+    "corrupted_frames": 0,
+    "muted": true,
+    "human_listening_or_acceptance": "NOT_EVALUATED"
+  },
+  "findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "proof_layer": "analyzer_visual_observation",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "observation": "已查看全部145个PTS标记脸部帧及0/3/5.95秒全幅。可见同一女性面貌与CF-a高度一致；深棕后梳低髻、浅肤雀斑、灰蓝眼、解剖左耳黑色耳挂、左领红灯线及炭黑高领大衣持续保留，未观察到换脸、装置换侧、明显五官变形或服装切换。此为可见特征连续性判断，不是人类审美/身份验收。",
+      "evidence_refs": [
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "faces-000-048.jpg",
+        "faces-049-097.jpg",
+        "faces-098-144.jpg",
+        "frame-probe.json",
+        "normal-speed-playback.json"
+      ]
+    },
+    {
+      "requirement_id": "quiet-observer",
+      "verdict": "FAIL",
+      "proof_layer": "analyzer_visual_observation",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "observation": "严格闭口未满足：0/3/5.95秒全幅及全部脸部帧可见持续微张唇缝，未呈上下唇完整接触。未见连续说话/演唱式开合；但静止微张不等于封存的闭口要求。约1.333–1.550秒有一次完整自然眨眼，最闭合约1.417–1.467秒。未见明显转身或抬手；极轻呼吸和衣领风动无法与微小视角/摄影机变化可靠区分，不能补判通过。",
+      "subfindings": [
+        {
+          "check": "strict_lips_closed",
+          "verdict": "FAIL",
+          "span_millis": [
+            0,
+            6000
+          ]
+        },
+        {
+          "check": "visible_blink",
+          "verdict": "PASS",
+          "span_millis": [
+            1333,
+            1550
+          ],
+          "closed_eye_interval_millis": [
+            1417,
+            1467
+          ]
+        },
+        {
+          "check": "no_visible_speech_or_singing_articulation",
+          "verdict": "PASS",
+          "scope": "visual articulation only; audio meaning not evaluated"
+        },
+        {
+          "check": "no_obvious_turn_or_hand_raise",
+          "verdict": "PASS",
+          "scope": "normal-speed full-frame playback plus 0.5s full-frame snapshots; hands mostly outside frame"
+        },
+        {
+          "check": "natural_breathing",
+          "verdict": "NOT_EVALUATED",
+          "reason": "amplitude not separable from camera/perspective motion with available evidence"
+        },
+        {
+          "check": "very_light_collar_wind",
+          "verdict": "NOT_EVALUATED",
+          "reason": "no confidently distinguishable independent collar motion"
+        }
+      ],
+      "evidence_refs": [
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "faces-000-048.jpg",
+        "faces-049-097.jpg",
+        "faces-098-144.jpg",
+        "normal-speed-playback.json"
+      ]
+    }
+  ],
+  "reference_pose_fact": {
+    "CF-a.png": "侧身露肩背的阳台姿态，与raw首帧基本一致",
+    "CF-ID7b-a.png": "更正面的头胸细节图，嘴明显张开",
+    "A01-v1.png": "认可的较正面头胸中近景，亦有轻微唇缝",
+    "repair_inference": "不能把ID7b称为侧身竞争图；去掉ID7b并保留CF-a不是已被本证据隔离验证的构图修复。"
+  },
+  "untouched_findings": [
+    "camera-space FAIL",
+    "old sealed visual FAIL"
+  ],
+  "new_provider_calls": 0,
+  "canonical_state_writes": 0,
+  "limitations": [
+    "正常速度播放为headless Chrome技术读回，不等于真人观看或听审。",
+    "未观察AI自然度/好看与否，不修改原camera-space/visual裁决。",
+    "quiet-observer中的呼吸/风动仍是明确缺口；FAIL基于可见唇缝，不为关闭attempt凑PASS。"
+  ]
+}

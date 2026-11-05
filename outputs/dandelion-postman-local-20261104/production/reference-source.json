@@ -1,0 +1,13 @@
+{
+  "kind": "task-generated-reference-observation/1",
+  "path": "outputs/dandelion-postman-20261104/reference-v1.png",
+  "sha256": "8125187d8eba4f1b9d13262ade2301c81391ccb756c32237b9b1ffebca68cd48",
+  "generator": "image_gen.imagegen",
+  "generation_intent": "outputs/dandelion-postman-20261104/generation-intent.json",
+  "role": "new robot identity and initial meadow spatial relation soft reference",
+  "user_preview": "Original image approved: 可以; current request: 那你用我现在的体系做一个呢",
+  "video_acceptance": "NOT_EVALUATED",
+  "width": 1672,
+  "height": 941,
+  "size_bytes": 2367619
+}

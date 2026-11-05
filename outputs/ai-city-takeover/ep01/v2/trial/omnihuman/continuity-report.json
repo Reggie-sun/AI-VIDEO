@@ -1,0 +1,175 @@
+{
+ "schema": "iris-v2-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-03T05:26:01Z",
+ "scope": "IRIS EP01 v2 副歌近景 S8a 的即夢數字人（大師模式）試驗 OH-A、OH-B 付費送出前的連續性報告。只讀：沒有開頁、沒有上傳、沒有送出、沒有改倉庫檔；沒有執行 gen/omnihuman.py（它的 lint 會寫 lint.json），改用唯讀程式重算。路徑相對於倉庫根 /home/reggie/vscode_folder/AI-VIDEO。",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/preview-approval.json",
+   "sha256": "09730173ff1a09da75d0b7e815900b884db9eeafe663df0048377076e0232f26",
+   "note": "與兩支 lint.json 的 approval_sha256 相同；user_quote「你寫程式自動操作」；logs/decisions.md 最後一則記錄同一認可"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/preview.html",
+   "sha256": "92a8103e3283756867c1ed3be56af753aac91e718845a6680f5845558b85e586",
+   "note": "與 approval 記錄相同"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/preview-inputs.json",
+   "sha256": "6429b865d037b0382cc1cbe0c81da5da56e41b478a28493dbe04828c1ffe0aad",
+   "note": "與 approval 記錄相同；takes 與 approval 完全一致"
+  },
+  "research": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/research-2026-11-02.md",
+   "sha256": "e8d019059e97bf96e6e2fd1f209f3aeedfcb315891547fc70c45b4a9b36e9e4a"
+  },
+  "singer_image_K7": {
+   "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K7-a.png",
+   "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+   "size": "1672x941",
+   "origin": "Codex image_gen，run K7-20261102-011114-c43926（keyframes/raw/K7.log）；c5、c6 副歌近景用的同一張"
+  },
+  "vocal_window": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+   "format": "pcm_s16le 44100 Hz mono 5.000 s",
+   "meta": {
+    "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window.json",
+    "sha256": "20c6a6c2cabbd89727828e5ac10008bed51da964980bc23fce65aa9595c344d6"
+   }
+  },
+  "action_text_OH-B_sha256": "c2ab14038f4d267c32e25cba8cb5071ab459abbf5abf4bffed1aed6e027eac99",
+  "probe": {
+   "dh_panel_json": {"path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/probe/dh-panel.json", "sha256": "401df78c399e8326b8da33f160029beb7178aaa9622d98e517d7981ad1cb4a0a"},
+   "dh_panel_png": {"path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/probe/dh-panel.png", "sha256": "789617f39f8d52a258a660d63135bbc9d69c0f9ab2c88f412d9eecf021b1a397"},
+   "dh_modes_json": {"path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/probe/dh-modes.json", "sha256": "05b739e15f7c5571d0c405b8d8d5ce8e9e7cbede054c6a2d674c633b2202015e"},
+   "dh_modes_png": {"path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/probe/dh-modes.png", "sha256": "c7b954d69e44493555b29d1054cd86fd33849cc210ee82930f541d0751563ab4"},
+   "observed": "面板欄位：角色、音色、说话内容、动作描述（placeholder「(可选) 添加动作描述和镜头语言，如：镜头推进，他摘下眼镜，对着镜头笑着说」）、数字人、快速模式、上传音频，價格 0。選單標題「选择模型：快速模式 by OmniHuman 1.5」出現時勾選的是快速模式。畫面上沒有解析度或生動模式選項。右上餘額顯示「6.5万 超级会员」。"
+  },
+  "lint_tool": {"path": "outputs/ai-city-takeover/ep01/v2/gen/omnihuman.py", "sha256": "dcdc79e1e637e2efcff0dc6ed36a416919efa07aa6af352a63d751c551810458"},
+  "browser_tool": {"path": "outputs/ai-city-takeover/ep01/v2/gen/omnihuman.cjs", "sha256": "0c13b1e6b7e8abf6b8cd27bbac1cfad10e7f7752bd7ce2fe7933968b2c76c202"},
+  "lint_OH-A": {"path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/OH-A/lint.json", "sha256": "34e2bbd5263f96baeba43cfd984cbc016aa6b6f3d6167ff02416c210eb85c4c6"},
+  "lint_OH-B": {"path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/OH-B/lint.json", "sha256": "b5b8064fa093544c8d5aad9e54a40d5baf9e9d56a20a3213df5a8a8ef2037631"},
+  "film_c6": {
+   "path": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c6.mp4",
+   "sha256": "a9d51ff248d6369e3fd1e76319a0b85502dfef5e1a5f592dbd3208d1b60d9c52",
+   "probe": "ffprobe：1920x1080、30 fps、915 幀、30.5 s；sha 與 qa/film-c6/assembly-review.json 記錄相同；未經 Harness verify-assembly（canonical_gate NOT_RUN）"
+  },
+  "prev_shot_S7v3": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+   "sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21",
+   "probe": "1920x1080、約 24 fps（時間戳不等距）、6.017 s；c6 用片內 1.4–5.4667 s＝成片 14.8–18.8667 s",
+   "user": "c4 審看「这里倒是可以」"
+  },
+  "next_shot_K5": {
+   "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K5-a.png",
+   "sha256": "19bd38c1e375d5fe04fa84a527bfac64f4f3f649d3d2707d4ff3b2a6597728e9",
+   "c6_span": "成片 22.567–24.067 s，鏡頭 (836,470,1.0)→(860,460,1.04)"
+  },
+  "chorus_edit": {
+   "path": "outputs/ai-city-takeover/ep01/v2/comp/chorus.json",
+   "sha256": "59ead9ca5f2818e01d07d872a47d99095f62db4cbe9f6a66a0f10caf036ffb40",
+   "S8a": "still K7，鏡頭 (930,400,1.18)→(930,380,1.26)（底片像素：中心 x、中心 y、縮放）；c4 的 take 段格式（comp/chorus-c4.json）沒有 from/to 鏡頭欄位"
+  },
+  "c6_assembly_review": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/film-c6/assembly-review.json",
+   "sha256": "9ebbaa5ce1dda83418a103d15c16259c04fd00175a42416312d9bed1c9726482"
+  },
+  "comp_mark": {
+   "path": "outputs/ai-city-takeover/ep01/v2/comp/src/main.js",
+   "sha256": "0dbfcc3952f37616315439fe8fa24b1b475415b37de0f6c7b50b3d8d50174a56",
+   "note": "aiMark() 在 (25,26) 畫 152x70 的「AI生成」框，與平台烙印同位置"
+  },
+  "comp_audio": {
+   "path": "outputs/ai-city-takeover/ep01/v2/comp/index.html",
+   "sha256": "27544d16fab9080aa6f396af78193903ea9a339f8cd05e9792d082101d34df38",
+   "note": "唯一的 <audio> 是 audio/IRIS-01-v2.wav（build.py 由 song/mix/IRIS-01-v2.wav 複製）"
+  },
+  "director_coverage": {
+   "path": "outputs/ai-city-takeover/ep01/v2/director-coverage.json",
+   "sha256": "3eb70a235d9adc8487af2f8249936a523464ee1df53b2fbebc74e556d9fd9bad",
+   "S8a": "close_up、static、camera_intent「固定正面近景，讓對嘴與表情清楚可讀」、open_state「陽台正面近景，嘴閉」、3.7 s（陽台與對嘴同步是原案，見 notes）"
+  },
+  "board": {
+   "path": "outputs/ai-city-takeover/ep01/v2/board.md",
+   "sha256": "da739a8451f16d66285542a1107c332777dcff3154985555db09ee4c4b9d91b6"
+  },
+  "decisions_log": {
+   "path": "outputs/ai-city-takeover/logs/decisions.md",
+   "sha256": "3e3ddc1b9eb253dc1bfab09413c1d4b4c0a2dcf482729227ca1854a8d66917a3"
+  },
+  "balance_reader": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/balance.cjs",
+   "sha256": "0500bb0a1a0538c85af562af5bbb20ddb5a9450f82963482ac8346361a5e47cd"
+  },
+  "prior_report": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/continuity-report.json",
+   "sha256": "46c65da61c12ebcea04f6e5cbfd9215909edd2001259527982fd9344aa9cde4e"
+  },
+  "media_evidence": {
+   "method": "ffmpeg select=eq(n,N) 依幀號從 c6 render 取幀，另取 S7v3 源片 5.42 s；K7 縮成 1920x1080 全幅，再依 c6 鏡頭裁 1.18；做帶像素尺的臉部對照。暫存在 /tmp/cs-oh-af729（不在倉庫，可依幀號重取）。沒有用 video-analysis MCP（不需要）。",
+   "frames": [
+    "c6 n=540（18.000 s，S7v3：頭轉向畫左、視線落向左下、閉嘴淺笑）",
+    "c6 n=555（18.500 s，S7v3：視線回到鏡頭）",
+    "c6 n=565（18.833 s，S7v3 最後一幀：3/4 朝畫左、看鏡頭、閉嘴淺笑）",
+    "c6 n=566（18.867 s，S8a 首幀：K7＋鏡頭 1.18，換嘴型張口）",
+    "c6 n=676（22.533 s，S8a 末幀：K7 微張口）",
+    "c6 n=677（22.567 s，S8b 首幀：K5 窗前、側臉朝畫左、低頭、閉嘴）",
+    "S7v3 源片 5.42 s（無後期字幕；左上角有平台烙印「AI生成」）",
+    "K7 原檔、K7 全幅 1920x1080、K7 依 c6 鏡頭裁 1.18，以及 S7v3 末幀和 K7 全幅的帶尺臉部對照"
+   ],
+   "audio": "窗口 50 ms RMS：0–0.630 s 全零（歌曲 17.97–18.600 s）；0.63–1.25 s 輕聲「I」約 −27 至 −39 dBFS；約 1.30 s「didn't」起（歌曲 ≈19.27 s）；2.55–2.70 s 換行低谷（歌曲 20.52–20.67 s）；2.75 s「I just」起；3.70–3.90 s 短低谷；約 4.45–4.85 s 下一行長音「I」，之後回落到窗口結尾。"
+  }
+ },
+ "shared_findings": {
+  "continuity": "K7 實看，對照 S7v3 實際末態（源片 5.42 s、c6 n=565）：同一張臉（極淡雀斑、淺灰藍眼、濃眉、深棕後梳低髻、鬢邊碎髮）；同一件炭黑高領包覆式大衣；黑色耳挂都在她左耳（畫面右側）；細紅燈線都在她左領緣（畫面右側，S7v3 那條有一小段斷口）。同一個窗片空間（深色背景上的半透明發光薄片）。光線都是冷調，主光都偏她右側（畫左）。K7 的薄片更多更亮，左下有大塊失焦的前景薄片，右側薄片帶紅邊；這是 c5 起已記錄的已知偏差（「K7's panes are brighter than S7v3's last frames」），使用者審 c5、c6 時沒有對此提出意見。構圖：兩者都是頭到上胸、人物偏右、眼線約在畫高 1/3。數字人以未修改的 K7 當角色圖（sha 已核），兩支都沒有外觀文字，身份完全由 K7 承擔。",
+  "handoff": "入點（S7→S8a，18.867 s）：S7v3 最後一秒的實際動作是 18.0 s 頭轉向畫左、視線落向左下，18.5 s 視線回到鏡頭，18.833 s 末幀已經穩定：3/4 朝畫左、看鏡頭、閉嘴淺笑。K7 的起始狀態是正面、看鏡頭、閉嘴，符合 coverage S8a open_state「嘴閉」。c5/c6 的接法是「同一窗片空間、同一個看鏡頭的視線，副歌進入時切近」（assembly-review 的 S7->S8a）。使用者 c4 反對的是跳回陽台，對 c5/c6 這個接點沒有意見。「切近」只靠 c6 的程式鏡頭成立：K7 全幅和 S7v3 末幀幾乎同尺寸，全幅放會變成同景別跳切（R9）。表情從淺笑轉為開口唱，動機是副歌進入，合理。切入時（片內 0.897 s）歌聲正在輕聲長音「I」中段，不是靜音，嘴應該張開或正在張開（R6）。出點（S8a→S8b，22.567 s）：片內 4.597 s 落在下一行長音「I」（約 4.45–4.85 s），take 裡她應該是張口的；接 K5：S5 的窗前、側臉朝畫左、低頭、閉嘴，歌聲延續成畫外聲。這和 c5/c6 的換場相同（副歌裡唯一一次換空間，放在重唱處），屏幕方向一致（S7v3 頭偏畫左，K5 面向畫左）。",
+  "axis_action_camera": "兩鏡都直視鏡頭，沒有兩人之間的 180 度線問題。屏幕方向：S7v3 頭偏畫左→K7 正面→K5 面向畫左，連貫。機位依 coverage S8a：close_up、static、「固定正面近景」；K7 是正面頭到上胸。可接受的動作：嘴隨樂句開合、樂句間換氣（2.55–2.70 s 低谷）、肩膀隨呼吸微動、眨眼、幾度以內的點頭或微側頭、眉眼的小表情（冷靜但活著）。不可接受：皺眉或擠眉、轉頭離開鏡頭或長時間移開視線、模型自己推拉搖移或改構圖、鏡內切鏡、手進入畫面（K7 畫內沒有手）、軀幹大幅擺動、誇張張口或牙齒變形、背景薄片移動或變形。動作階段依窗口：輕聲「I」→「didn't run」→換氣→「I just looked outside」→下一行長音「I」。若沿用 c6 的緩推（1.18→1.26，3.7 s 內約 7%），那是後製鏡頭，不是模型運鏡。",
+  "prompt_fit": "送出的參考只有兩個：角色＝K7（sha 881537a1…0f09），上傳音頻＝窗口 wav（sha 851ce8a5…d5d7），都和使用者看過的預覽相同；不用說話內容（TTS），不用音色；模式為大師模式。OH-A 依認可不寫動作描述（null，對照組）。OH-B 的文字與 approval 逐字相同（sha c2ab1403…ac99，72 字，沒有拉丁字母，沒有否定詞）。它符合即夢欄位自帶的範例「(可选) 添加动作描述和镜头语言，如：镜头推进，他摘下眼镜，对着镜头笑着说」（probe/dh-panel.png），也符合調研引用的「鏡頭運動＋情緒＋說話狀態＋具體動作」：「镜头固定特写」（鏡頭語言）＋「冷静但投入地对着镜头唱歌」（情緒與唱的狀態）＋具體動作。逐項對照使用者方向「我们只需要让人物真的表现在唱歌就好」：開合＝「嘴随歌词自然张合」；呼吸＝「乐句之间轻轻换气」「肩膀随呼吸微微起伏」；表情、不皺眉＝「冷静但投入」「眉头舒展」；頭肩小動作＝「头随乐句轻轻点动」；不過度＝「轻轻」「微微」「冷静」；看鏡頭＝「眼神始终看着镜头」。沒有多加外觀、場景、手勢或運鏡，也沒有要求逐字精準對嘴，與放寬後的方向一致。唯一的用詞差異：「特写」比 K7 的頭到上胸（中文慣例的近景）緊一級，但和 coverage 的 close_up 同義（R11）。",
+  "lint": "兩支 lint.json 都是 9 項中 8 項 true，只差 continuity_report_ready。依 gen/omnihuman.py lint() 的邏輯用唯讀程式重算（沒有執行它，因為它會寫 lint.json）：8 項全 true，和兩份 lint.json 逐項相同。approval_sha256 09730173… 等於現檔；兩個輸入的 sha 與 approval 相同；OH-B 文字 sha 相同。trial/omnihuman/ledger.json 不存在，也就是已送 0 支、0 積分，上限 2 支、330、每支 165。OH-A、OH-B 都沒有 submit-intent.json、permit.json、fill-observed.json。OH-B lint 寫於 00:00:35、OH-A 寫於 00:02:38（本地 −05:00），都在 omnihuman.py 最後修改的 00:00:25 之後。覆蓋範圍的缺口見 R12。"
+ },
+ "risks": {
+  "R1": "數字人入口對寫實 AI 臉的規則未驗證。調研：網頁版禁真人臉（新京報 2026-02）；K7 是 Codex 生成的寫實臉，過了 Seedance，但數字人會不會放行是 UNVERIFIED。認可的放棄條件：被擋就停，不修圖繞過。若在送出後才被擋且已扣費，record 會記成非 submitted，試驗就此關閉，不重送。這是認可方案本身的性質，不判 FAIL。",
+  "R2": "可見標記。S7v3 源片左上角烙有平台的「AI生成」標；c6 成片同位置的標是 comp/src/main.js aiMark() 畫的，目的是讓標記不閃。數字人輸出有沒有標、標的位置和樣式、有沒有其他浮水印，目前都未知。全幅放時，同位置同樣式的標會和 comp 的標重疊；不同的標會變成畫面上第二個標。若用 c6 鏡頭 1.18 裁 1920x1080 的輸出，裁框約 x 254–1881、y 2–917，四角的標都會被裁掉，成片仍保留 comp 自己的「AI生成」。這只是構圖的附帶結果，不構成去除平台標識的授權；輸出若帶不同的標，先記錄，由主會話決定。",
+  "R3": "價格。數字人每秒價格官方未公開；認可上限每支 165、合計 330。permit 會擋網頁價格高於 165 或累計超過 330，但：(a) omnihuman.cjs 的 balance_text 讀的是首頁右上的「6.5万 超级会员」（千位精度，見 probe/dh-modes.png），量不出 165 這個級距的扣款；gen/balance.cjs 在 IRIS 畫布頁讀 4–6 位的精確餘額（logs/ledger.md 用過：64,906→64,791）。(b) ledger 的 room 只用網頁價格，不用實扣；調研有單例「顯示 210、實扣 2240」（UNVERIFIED）。第一支送出後，應先用精確餘額算出實扣，與網頁價格和 165 比對，不符就停下問，再決定是否送第二支。",
+  "R4": "嘴、牙與表演。輸出可能出現誇張張口、牙齒糊掉或崩壞、表情過度、節拍器式點頭（OH-B 寫了「头随乐句轻轻点动」），或模型自己加手勢讓手進入畫面（K7 畫內沒有手）。這些屬於落盤後的逐鏡 Gate 和使用者判定；認可的放棄條件已經涵蓋。",
+  "R5": "身份漂移與背景變形。可能出現雀斑、眼色、髮際改變，耳挂或紅線消失或換邊。K7 有大塊亮薄片，左下的失焦前景薄片緊鄰她右肩，肩膀起伏時容易被一起拉動；薄片也可能閃爍或漂移。認可的驗收項是「identity matches K7, pane background stable」。K7 薄片比 S7v3 末態亮，是 c5 起的已知偏差，會原樣帶進 take。",
+  "R6": "前導段的嘴型。主會話寫的「17.97–18.91 s 無聲前導」和實測不符：全零只到片內 0.630 s（歌曲 18.600 s），之後是輕聲「I」（−27 至 −39 dBFS，到約 1.25 s），「didn't」約 1.30 s 起。S8a 用的片內 0.897 s 落在輕聲「I」裡。K7 以閉嘴起始，所以靜音段多半自然閉嘴，風險比 A02 張嘴底片低（前例 qa/gate-S8a 的失敗就是 A02 張嘴）；靜音段也不在成片使用的範圍內。真正的風險是模型對輕聲「I」反應弱，S8a 開頭約 0.4 s 嘴幾乎不動，看起來像還沒開始唱。「I just」前的換氣只有 2.55–2.70 s 約 0.15 s，驗收項「a breath is visible before 'I just'」可能不明顯。",
+  "R7": "輸出規格。比例、解析度、fps 都未知。認可的設定是「大师模式 · 1080P · single subject (not 生动模式, which crops to 1:1)」，但 probe 只拍到快速模式面板，沒有解析度或生動模式選項；omnihuman.cjs fill 不選也不讀解析度和生動模式，permit 也不查。permit 前要在 fill.png／fill-observed.json 確認 1080P 和非生動模式；不符就和預覽不同，不送。落盤後用 video-analysis MCP video_probe 核對：1:1 或低於 1080 行就不符認可。成片是 1920x1080、30 fps，非 30 fps 的輸出要重採樣。c6 鏡頭裁到 1.26 需要約 1524x857 的原始像素，720P 輸出會被明顯放大而變軟。",
+  "R8": "聲音與 lag。成片的聲音維持已認可的歌曲混音：comp/index.html 唯一的 <audio> 是 audio/IRIS-01-v2.wav，影片只取畫面，take 自帶的音軌不進成片。「lag 0 放在 17.97 s」只是假設：前例 LSen1 的自帶音軌差 −0.804 s（trial/lipsync-ev/LSen1/sync/LSen1/sync.json）；平台可能裁掉或補上前導靜音，或重新編碼。放片前應以 motion-kit/tools/sync_check.py 對窗口量 lag，並確認時長仍涵蓋所用區間（若前導 0.63 s 被裁掉，片內區間要依實測 lag 換算）。",
+  "R9": "接點構圖。K7 全幅和 S7v3 末幀幾乎同構圖：眼線 y≈350 對 ≈355，臉中心 x≈1030 對 ≈990，臉的尺寸約 1.0–1.15 倍（1920x1080 座標，用像素尺量）。c4 的 take 段沒有鏡頭欄位；若照它全幅放，S7→S8a 會變成同一個人、同一空間、同一視線、幾乎同尺寸的跳切，也會失去 c5/c6「副歌進入時切近」的接法（no-regression）。c6 S8a 的鏡頭 (930,400,1.18)→(930,380,1.26)（K7 底片像素）把尺寸拉到約 1.2–1.45 倍，接點才成立。主會話應明確決定沿用這個鏡頭（依 take 像素等比換算）或另定構圖；沿用就需要 1080P 輸出（R7）。",
+  "R10": "模型版本。probe 選單標題「选择模型：快速模式 by OmniHuman 1.5」出現時勾選的是快速模式，所以只證明快速模式是 OmniHuman 1.5；大師模式背後的版本沒有畫面證據。調研的證據都是 OmniHuman 1.5。panelState 不讀選單標題，建議 fill 後在截圖記下切到大師模式後的標題。這不影響連續性判定。",
+  "R11": "構圖與運鏡。OH-B 的「镜头固定特写」：中文慣例的特寫是肩以上，K7 是頭到上胸（近景），模型可能推近，或開場就重新構圖。文字前面有「镜头固定」，又和 coverage 的 close_up 同義，而且是使用者認可的文字，所以只列為風險。OH-A 沒有任何鏡頭語言，大師模式標榜「电影级的表演效果」，可能自帶推拉或搖移。兩支都由逐鏡 Gate 檢查構圖是否固定；若之後套 c6 鏡頭，模型自帶的運鏡會疊在程式鏡頭上。",
+  "R12": "lint／permit 覆蓋缺口（送出前要人工補看，或先補程式）：(a) lint 的 mode_is_master 只查 approval 字串，頁面上的模式由 permit 的 page_mode_master 查。(b) permit 的 page_action_text_matches 只要面板裡任一輸入欄等於該文字就通過，不區分「动作描述」和「说话内容」；fill 是點「动作描述」字樣後 insertText，若焦點落進說話內容，文字會被當成台詞，而 permit 照樣通過。(c) OH-A 的 action_text 不讀輸入欄，直接記成空字串；若即夢保留了草稿（例如另一個分頁的 OH-B 文字），對照組會被汙染，permit 看不出來。(d) 不查 1080P 和非生動模式（R7）。(e) 不查說話內容和音色是否為空。(f) omnihuman.cjs 目前只有 fill、observe，docstring 提到的 submit、fetch 不在現檔（00:02:33 修改，晚於 OH-B 的 lint）。permit 前請在 fill-observed.json 的 panel.editors 確認：只有 placeholder 為「(可选) 添加动作描述…」的那一欄有 OH-B 文字；OH-A 的所有欄位都空；說話內容為空。"
+ },
+ "units": {
+  "OH-A": {
+   "verdict": "ready",
+   "continuity": "PASS：K7 和 S7v3 實際末態（源片 5.42 s、c6 n=565）是同一張臉、同一件大衣，左耳耳挂和左領紅線同側，同一窗片空間；K7 薄片較亮是 c5 起的已知偏差。沒有動作描述，身份只靠未修改的 K7（sha 已核）。見 shared_findings.continuity。",
+   "handoff": "PASS：入點接 S7v3 末幀的看鏡頭；K7 起始為閉嘴、正面、看鏡頭，符合 open_state「嘴閉」。接點語義是 c5/c6 的「同空間、同視線、切近」，前提是放片時沿用 c6 鏡頭（R9；這是放片決定，不改送出內容）。出點片內 4.597 s 在長音「I」中，接 K5 窗前低頭、閉嘴的換場，與 c5/c6 相同。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：直視鏡頭，沒有 180 度線問題；屏幕方向 S7v3 偏畫左→K7 正面→K5 面向畫左，連貫；固定正面近景符合 coverage S8a 的 close_up／static。OH-A 沒有文字，動作與鏡頭全由模型預設，這正是對照組的目的（運鏡風險見 R11）；可接受和不可接受的動作見 shared_findings.axis_action_camera，由逐鏡 Gate 判。",
+   "prompt_fit": "PASS：依認可不寫動作描述（action_prompt 為 null）；只送 K7（角色）和窗口 wav（上傳音頻），sha 與預覽相同；不用說話內容、不用音色；大師模式。permit 前須確認頁面上所有文字欄都是空的（R12c），以及 1080P、非生動模式（R7）。",
+   "lint": "PASS（continuity_report_ready 待本報告存檔後重跑）：OH-A/lint.json（34e2bbd5…）其餘 8 項 true，唯讀重算結果相同；approval sha 09730173… 就是現檔；尚未填頁、未送出，帳本 0/330。覆蓋缺口見 R12。",
+   "gaps": [],
+   "risks": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12"]
+  },
+  "OH-B": {
+   "verdict": "ready",
+   "continuity": "PASS：輸入與 OH-A 相同（同一張 K7、同一段窗口）。文字只寫動作、不寫外觀，不會把外觀帶向別處；「眼神始终看着镜头」維持與 S7v3 末態相同的視線。見 shared_findings.continuity。",
+   "handoff": "PASS：同 OH-A；「眼神始终看着镜头」直接支撐入點的視線銜接。切近的前提見 R9。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：「镜头固定特写」即固定機位、不切鏡；動作只寫嘴、換氣、肩、點頭、眉、眼，全在可接受範圍內，沒有轉頭、手勢或運鏡。「特写」比 K7 的構圖緊一級（R11）；點頭可能變成節拍器式（R4）。",
+   "prompt_fit": "PASS：與 approval 逐字相同（sha c2ab14038f4d267c32e25cba8cb5071ab459abbf5abf4bffed1aed6e027eac99，72 字，沒有拉丁字母和否定詞）；套用即夢欄位範例（鏡頭語言＋動作＋對著鏡頭的唱的狀態）；逐項涵蓋使用者「真的表现在唱歌」的方向（開合、換氣、表情不皺眉、頭肩小動作、不過度、看鏡頭），沒有多加，也沒有遺漏。只送 K7 和窗口 wav。permit 前須確認文字落在「动作描述」欄而不是「说话内容」欄（R12b），以及 1080P、非生動模式（R7）。",
+   "lint": "PASS（continuity_report_ready 待本報告存檔後重跑）：OH-B/lint.json（b5b8064f…）其餘 8 項 true，唯讀重算結果相同；action_text_is_approved_text、action_text_pure_chinese 都為真。覆蓋缺口見 R12。",
+   "gaps": [],
+   "risks": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12"]
+  }
+ },
+ "notes": [
+  "兩支是同一鏡 S8a 的 A/B 試驗，不是兩個鏡頭。建議逐支送：第一支取回後，先核對實扣、入口審核結果和輸出規格（比例、解析度、fps、標記），再送第二支；這些是兩支共用的條件，第一支出問題，第二支多半會重演。任何非 submitted 的結果都會讓 ledger 關閉（spent() 的 closed）。",
+  "director-coverage.json 的 S8a 仍是原案（陽台、A02、「對嘴同步」）。現在的 S8a（K7、窗片空間、不求精準對嘴）來自 logs/decisions.md 的 c5 剪輯決定、使用者 c6 審看「不行,太low了.我看了下这个对嘴,要不不用对的狠准,我们只需要让人物真的表现在唱歌就好」，以及這次的 preview-approval。coverage 檔沒有改版；這裡只記錄依據。",
+  "trial/omnihuman/、gen/omnihuman.py、gen/omnihuman.cjs 目前都是 git 未追蹤檔；本報告依據的是當下的位元（sha 見 inputs）。",
+  "lint 讀的是 trial/omnihuman/continuity-report.json 中 units.<unit>.verdict 是否等於 ready；存檔後要重跑兩支 lint，continuity_report_sha256 才會記錄本報告。",
+  "c6 仍是未經 Harness verify-assembly 的審看片（assembly-review 的 canonical_gate 為 NOT_RUN）。本報告的接點判斷用的是它的實際幀，不代表接點已驗證。",
+  "NOT_EVALUATED（不屬送出前檢查）：實際輸出、唱歌的自然度與觀感、人耳聽感、接點的原速觀看；這些屬於落盤後的逐鏡 Gate、assembly 審看和使用者。"
+ ]
+}

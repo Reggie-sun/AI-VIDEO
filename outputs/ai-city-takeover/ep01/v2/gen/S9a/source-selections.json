@@ -1,0 +1,26 @@
+[
+  {
+    "asset_id": "iris-c-v2-s9a-1-door-open",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K4-a.png",
+    "sha256": "c778ec44cf58dac57d684a83591fee20d5e1e2c9525955ce632f5a119b8cb19a",
+    "size_bytes": 1912936,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K4: start frame, half-open red-lit rack door",
+    "need_id": "door-open",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v2-s9a-2-door-closed",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K9e-a.png",
+    "sha256": "d66b2fe2af4da9768da66da4148773c699b686ddec58c4f48d45bf5198bc95eb",
+    "size_bytes": 1904677,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K9e: end frame, same view with the door closed",
+    "need_id": "door-closed",
+    "anchor_role": "composition",
+    "selected_for_provider": true
+  }
+]

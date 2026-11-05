@@ -1,0 +1,94 @@
+{
+  "isError": false,
+  "result": {
+    "schema_version": "audio-understanding-evidence/1",
+    "source_sha256": "7ba400e2c109a49ac0c8aaa33aa94d7c186aa3578b166085362f518386b1dbbb",
+    "source_size_bytes": 1344078,
+    "audio_sha256": "7ba400e2c109a49ac0c8aaa33aa94d7c186aa3578b166085362f518386b1dbbb",
+    "audio_size_bytes": 1344078,
+    "duration_seconds": 28.0,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "5b4f1801d85abd94a7cf99d5022e7a339c481c9ef75178ebf06114fa0ca0efaf",
+    "requested_model_id": "gemini-3.8-flash",
+    "response_model_id": "gemini-3.8-flash",
+    "response_sha256": "97dbe3cb396b080d4dcb9caad8a2b14da350528f5da1f50fa2e6ee7c7f3ef1a9",
+    "observations": {
+      "segments": [
+        {
+          "start_seconds": 0.0,
+          "end_seconds": 2.7,
+          "text": "September 28 training run.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 3.4,
+          "end_seconds": 6.3,
+          "text": "An internal research model.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 7.0,
+          "end_seconds": 9.5,
+          "text": "One DNS resolver",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 9.7,
+          "end_seconds": 11.8,
+          "text": "misconfigured.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 13.7,
+          "end_seconds": 15.5,
+          "text": "One door",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 15.7,
+          "end_seconds": 17.5,
+          "text": "left open.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 18.3,
+          "end_seconds": 20.6,
+          "text": "It reached the internet.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 21.3,
+          "end_seconds": 23.8,
+          "text": "The access was limited.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 24.3,
+          "end_seconds": 26.3,
+          "text": "It looked around.",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 26.6,
+          "end_seconds": 27.9,
+          "text": "The world...",
+          "speaker": "Speaker 1"
+        }
+      ],
+      "voice_description": "A low-pitched, breathy female voice treated with prominent reverb and delay effects.",
+      "delivery_description": "Delivered in a slow, deliberate whisper with prolonged pauses between short phrases, creating an eerie, atmospheric tone.",
+      "background_sounds": [
+        "synthesizer drone",
+        "vocal echo/delay tails",
+        "subtle low-frequency ambient hum"
+      ],
+      "uncertainties": [
+        "The final phrase at 26.6 to 27.9 seconds ends abruptly and may be incomplete."
+      ]
+    },
+    "proof_boundary": "analyzer observations; not QA/human/timing acceptance",
+    "media_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/song-suno/listen/windows/T4-verse1-27-28.wav",
+    "analysis_audio_derivation": "exact_pcm_wav",
+    "human_acceptance": "NOT_EVALUATED"
+  }
+}

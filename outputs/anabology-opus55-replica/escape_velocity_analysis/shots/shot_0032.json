@@ -1,0 +1,951 @@
+{
+  "shot_id": "S0032",
+  "start_frame": 1178,
+  "end_frame": 1221,
+  "start_time": 49.0833,
+  "end_time": 50.9167,
+  "duration_frames": 44,
+  "duration_s": 1.8333,
+  "start_tc": "00:00:49:02",
+  "end_tc": "00:00:50:21",
+  "boundary_in_id": "B0-031",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 1178,
+      "path": "keyframes/S0032_f01178.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1189,
+      "path": "keyframes/S0032_f01189.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1200,
+      "path": "keyframes/S0032_f01200.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1211,
+      "path": "keyframes/S0032_f01211.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1221,
+      "path": "keyframes/S0032_f01221.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1199,
+      "path": "work/full_batch/01199.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 1221,
+      "path": "work/full_batch/01221.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "character_plate",
+  "narrative_role": "人物服装Look章节推进与歌词概念的可视化解释；具体内容见分镜描述",
+  "subject": "短发女主近景",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "短发女主近景，手提竖长白价格吊牌，右侧$60B大数和下方滚动金额。摄影在宽脸、紧脸和吊牌间切换数字裁切，伴乳白闪光；右下四枚缩略图随裁切高亮。最后推近到白纸占满画面并退出。",
+  "composition": {
+    "shot_size": "人物/环境，见分镜描述",
+    "subject_position": "见scene_description与各独立元素bbox",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可观察视角见scene_description；真实相机焦距/型号未知",
+    "layers": {
+      "foreground": "歌词、计数、检测框、图形窗口",
+      "midground": "女主或主要图形/道具",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "filmstrip和首中末观察；光流仅为画面运动不能证明相机: {'pan_x_frac_per_s': 0.0003, 'pan_y_frac_per_s': 0.0012, 'zoom_per_s': 0.024, 'median_flow_frac_per_s': 0.0165, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": 0.0003,
+      "pan_y_frac_per_s": 0.0012,
+      "zoom_per_s": 0.024,
+      "median_flow_frac_per_s": 0.0165,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "见描述；实际灯位未知",
+    "quality": "可见屏幕/红色小点光与强反差；图形镜头为代码明暗平面",
+    "effects": [
+      "全片印刷网点纹理"
+    ],
+    "temporal_change": "实测亮度首中末 [76.4, 81.0, 221.5]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#1B1F1C",
+        "fraction": 0.409,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#E3E3DE",
+        "fraction": 0.198,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#B9B4BF",
+        "fraction": 0.101,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#A78786",
+        "fraction": 0.1,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#433E3A",
+        "fraction": 0.1,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#796563",
+        "fraction": 0.093,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "实测亮度首中末 [76.4, 81.0, 221.5]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 04 / 11，采样可见，变值精确帧待核",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "右上18 MONTHS / TO ESCAPE，底部微字THE PERMANENT UNDERCLASS及DEPARTURES · SS27 · COLLECTION01",
+    "G-TICKER": "底部持续向左滚动，条目见visual_system；逐镜窗口随时间变化",
+    "G-FLAP-BOARD": "无底部大翻牌；18由右上小控件承载",
+    "G-CORNER-MARKS": "四角浅灰十字",
+    "G-AUDIO-SPECTRUM": "右上白条，随时间起伏",
+    "G-LEFT-RULER": "左侧白刻度，y540橙指针",
+    "G-TIMECODE": {
+      "first": "00:00:49:02",
+      "last": "00:00:50:21"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0032-E01",
+      "shot_id": "S0032",
+      "type": "background_media",
+      "description": "短发女主近景，手提竖长白价格吊牌，右侧$60B大数和下方滚动金额。摄影在宽脸、紧脸和吊牌间切换数字裁切，伴乳白闪光；右下四枚缩略图随裁切高亮。最后推近到白纸占满画面并退出。",
+      "start_frame": 1178,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "短发女主近景，手提竖长白价格吊牌，右侧$60B大数和下方滚动金额。摄影在宽脸、紧脸和吊牌间切换数字裁切，伴乳白闪光；右下四枚缩略图随裁切高亮。最后推近到白纸占满画面并退出。",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1178,
+          "observed_state": "短发女主近景，手提竖长白价格吊牌，右侧$60B大数和下方滚动金额。摄影在宽脸、紧脸和吊牌间切换数字裁切，伴乳白闪光；右下四枚缩略图随裁切高亮。最后推近到白纸占满画面并退出。"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1178,
+        1189,
+        1200,
+        1211,
+        1221
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0032-E02",
+      "shot_id": "S0032",
+      "type": "tag_card",
+      "description": "白色竖长价格牌在左侧部分出画，写$60,000,000,000 / AT THE DOOR · NORTH BEACH；f1210推进后f1221全屏白纸纹理。",
+      "start_frame": 1178,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.24351851851851852,
+        "w": 0.07552083333333333,
+        "h": 0.6620370370370371,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "左侧竖白价格吊牌，向后推近到满屏",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1178,
+          "observed_state": "左侧竖白价格吊牌，向后推近到满屏"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1178,
+        1189,
+        1200,
+        1211,
+        1221
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "$60,000,000,000 / AT THE DOOR · NORTH BEACH",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 25,
+          "visual_family": "heading condensed sans; metadata monospace",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 20,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "bold heading / medium fields",
+          "secondary_cap_height_px": 11
+        }
+      }
+    },
+    {
+      "element_id": "S0032-E03",
+      "shot_id": "S0032",
+      "type": "text_title",
+      "description": "右上巨大窄无衬线金额",
+      "start_frame": 1178,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0.7291666666666666,
+        "y": 0.24074074074074073,
+        "w": 0.22395833333333334,
+        "h": 0.2037037037037037,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "右上巨大窄无衬线金额",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1178,
+          "observed_state": "$60B橙底",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1180,
+          "observed_state": "$60B白字",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1178,
+        1189,
+        1200,
+        1211,
+        1221
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "$60B",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 70,
+          "visual_family": "condensed grotesque",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "bold"
+        }
+      }
+    },
+    {
+      "element_id": "S0032-E04",
+      "shot_id": "S0032",
+      "type": "counter",
+      "description": "大数下方快速增长的金额细字",
+      "start_frame": 1178,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0.7427083333333333,
+        "y": 0.4759259259259259,
+        "w": 0.20729166666666668,
+        "h": 0.06481481481481481,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "大数下方快速增长的金额细字",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1178,
+          "observed_state": "大数下方快速增长的金额细字"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1178,
+        1189,
+        1200,
+        1211,
+        1221
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "$60,000,000,000\nSPACEX × CURSOR · ANNOUNCED JUN 16 · CLOSED AUG 14",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 70,
+          "visual_family": "condensed grotesque",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium"
+        }
+      },
+      "full_resolution_text_observation": {
+        "frame": 1199,
+        "content": "$56,605,000,000\nSPACEX × CURSOR · ANNOUNCED JUN 16 · CLOSED AUG 14",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      }
+    },
+    {
+      "element_id": "S0032-E05",
+      "shot_id": "S0032",
+      "type": "image_inset",
+      "description": "右下四个白边横向缩略图，当前裁切对应图橙框；WIDE→TIGHT→REVEAL→TAG依时切换。",
+      "start_frame": 1178,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0.6875,
+        "y": 0.8185185185185185,
+        "w": 0.2625,
+        "h": 0.09537037037037037,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "右下四格灰缩略图与橙色高亮边",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1178,
+          "observed_state": "右下四格灰缩略图与橙色高亮边"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1178,
+        1189,
+        1200,
+        1211,
+        1221
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "COVERAGE · 4 ANGLES / CV ENHANCED\n01 WIDE / 02 TIGHT / 03 REVEAL / 04 TAG",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 70,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "bold sans"
+        }
+      }
+    },
+    {
+      "element_id": "S0032-E06",
+      "shot_id": "S0032",
+      "type": "flash",
+      "description": "数字裁切跳变上的乳白闪光",
+      "start_frame": 1188,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "数字裁切跳变上的乳白闪光",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1188,
+          "observed_state": "脸部推进与白闪",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1200,
+          "observed_state": "裁切退宽",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1210,
+          "observed_state": "价格牌推进与白闪",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1220,
+          "observed_state": "价格牌近满屏",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1189,
+        1200,
+        1211,
+        1221
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0032-E07",
+      "shot_id": "S0032",
+      "type": "text_caption",
+      "description": "左上跨镜逐词歌词，坐标详见边框",
+      "start_frame": 1178,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.11481481481481481,
+        "w": 0.31354166666666666,
+        "h": 0.09722222222222222,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "左上跨镜逐词歌词",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1180,
+          "observed_state": "$60B",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1202,
+          "observed_state": "at",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1208,
+          "observed_state": "the door.",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1178,
+        1189,
+        1200,
+        1211,
+        1221
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "Look 04. Shoes off in North Beach. $60B at the door.",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 40,
+          "visual_family": "bold sans",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 64,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "bold"
+        }
+      }
+    },
+    {
+      "element_id": "S0032-E08",
+      "shot_id": "S0032",
+      "type": "text_label",
+      "description": "左字幕下look章节索引",
+      "start_frame": 1178,
+      "end_frame": 1221,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.28888888888888886,
+        "w": 0.2916666666666667,
+        "h": 0.028703703703703703,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f1178首次采样可见",
+        "exit": "f1221仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1178,
+          "observed_state": "承接未完成索引"
+        },
+        {
+          "frame": 1199,
+          "observed_state": "LOOK04/11·NORTH"
+        },
+        {
+          "frame": 1221,
+          "observed_state": "被全屏价格牌覆盖"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1221
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "LOOK 04 / 11 · NORTH",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "bold sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0049"
+      ],
+      "frame_range": [
+        1188,
+        1188
+      ],
+      "type": "zoom_punch",
+      "description": "Washed/flash frame on a punch-in of the same $60B portrait: f1187 wide (tag left, red light) -> f1189 tighter face crop; same photo and pose, thumbnail strip highlight steps 1->2",
+      "confidence": 0.55,
+      "chunk": 0
+    },
+    {
+      "dist_ids": [
+        "D0050"
+      ],
+      "frame_range": [
+        1199,
+        1199
+      ],
+      "type": "zoom_punch",
+      "description": "Flash frame on punch-out of same portrait: f1198 tight face -> f1200 wide with tag and red light; thumbnail highlight step 3",
+      "confidence": 0.55,
+      "chunk": 0
+    },
+    {
+      "dist_ids": [
+        "D0051"
+      ],
+      "frame_range": [
+        1210,
+        1210
+      ],
+      "type": "zoom_punch",
+      "description": "Flash frame on punch-in to the tag of same photo: f1209 wide -> f1211 large tag, face off-frame; thumbnail highlight step 4; zoom continues to f1221",
+      "confidence": 0.55,
+      "chunk": 0
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "film_start",
+      "boundary_id": null,
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-001",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AX0055",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 1176–1184; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 1178
+    },
+    {
+      "audio_event_id": "AW0068",
+      "relation": "vocal_word_candidate (unknown) at frame 1178–1185; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1178
+    },
+    {
+      "audio_event_id": "AB0109",
+      "relation": "beat_candidate (unknown) at frame 1178; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1178
+    },
+    {
+      "audio_event_id": "AH00363",
+      "relation": "band_onset_candidate (unknown) at frame 1178; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1178
+    },
+    {
+      "audio_event_id": "AH00364",
+      "relation": "band_onset_candidate (unknown) at frame 1178; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1178
+    },
+    {
+      "audio_event_id": "AH00365",
+      "relation": "band_onset_candidate (unknown) at frame 1179; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1179
+    },
+    {
+      "audio_event_id": "AH00366",
+      "relation": "band_onset_candidate (unknown) at frame 1179; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1179
+    },
+    {
+      "audio_event_id": "AW0069",
+      "relation": "vocal_word_candidate (unknown) at frame 1188–1198; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1188
+    },
+    {
+      "audio_event_id": "AB0110",
+      "relation": "beat_candidate (unknown) at frame 1189; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1189
+    },
+    {
+      "audio_event_id": "AH00367",
+      "relation": "band_onset_candidate (unknown) at frame 1189; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1189
+    },
+    {
+      "audio_event_id": "AH00368",
+      "relation": "band_onset_candidate (unknown) at frame 1189; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1189
+    },
+    {
+      "audio_event_id": "AH00369",
+      "relation": "band_onset_candidate (unknown) at frame 1189; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1189
+    },
+    {
+      "audio_event_id": "AH00370",
+      "relation": "band_onset_candidate (unknown) at frame 1190; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1190
+    },
+    {
+      "audio_event_id": "AH00371",
+      "relation": "band_onset_candidate (unknown) at frame 1190; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1190
+    },
+    {
+      "audio_event_id": "AB0111",
+      "relation": "beat_candidate (unknown) at frame 1200; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1200
+    },
+    {
+      "audio_event_id": "AH00372",
+      "relation": "band_onset_candidate (unknown) at frame 1200; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1200
+    },
+    {
+      "audio_event_id": "AW0070",
+      "relation": "vocal_word_candidate (unknown) at frame 1200–1203; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1200
+    },
+    {
+      "audio_event_id": "AH00373",
+      "relation": "band_onset_candidate (unknown) at frame 1200; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1200
+    },
+    {
+      "audio_event_id": "AH00374",
+      "relation": "band_onset_candidate (unknown) at frame 1200; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1200
+    },
+    {
+      "audio_event_id": "AH00375",
+      "relation": "band_onset_candidate (unknown) at frame 1201; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1201
+    },
+    {
+      "audio_event_id": "AW0071",
+      "relation": "vocal_word_candidate (unknown) at frame 1204–1206; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1204
+    },
+    {
+      "audio_event_id": "AH00376",
+      "relation": "band_onset_candidate (unknown) at frame 1204; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1204
+    },
+    {
+      "audio_event_id": "AH00377",
+      "relation": "band_onset_candidate (unknown) at frame 1208; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1208
+    },
+    {
+      "audio_event_id": "AW0072",
+      "relation": "vocal_word_candidate (unknown) at frame 1208–1215; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1208
+    },
+    {
+      "audio_event_id": "AH00378",
+      "relation": "band_onset_candidate (unknown) at frame 1211; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1211
+    },
+    {
+      "audio_event_id": "AH00379",
+      "relation": "band_onset_candidate (unknown) at frame 1211; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1211
+    },
+    {
+      "audio_event_id": "AH00380",
+      "relation": "band_onset_candidate (unknown) at frame 1211; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1211
+    },
+    {
+      "audio_event_id": "AB0112",
+      "relation": "beat_candidate (unknown) at frame 1211; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1211
+    },
+    {
+      "audio_event_id": "AH00381",
+      "relation": "band_onset_candidate (unknown) at frame 1212; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1212
+    },
+    {
+      "audio_event_id": "AH00382",
+      "relation": "band_onset_candidate (unknown) at frame 1212; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1212
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "几何为fullres视觉像素估计±4–12px，非作者源坐标。",
+    "密集采样时点存在1–2帧区间；半翻字形与插值不猜测。",
+    "原字体identity、shader和摄影层抠像方式未知。",
+    "音频待主会话绑定。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0032.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      1199,
+      1221
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation；独立2帧全镜复看后补录主字、局部HUD、擦除/闪光关键状态，时点为首次采样可见且允许前1帧起显",
+    "remaining": "原始shader/font/插值保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        1178,
+        1221,
+        2
+      ]
+    ],
+    "closure": "本轮fullres逐层检查并补遗漏独立层；已复核text.content和各bbox，密集时间精度见keyframes"
+  }
+}

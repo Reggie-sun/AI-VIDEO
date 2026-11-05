@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "action": "poll",
+  "state": "running",
+  "progress_milli": 500
+}

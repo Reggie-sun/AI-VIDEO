@@ -1,0 +1,1154 @@
+{
+  "shot_id": "S0149",
+  "start_frame": 6794,
+  "end_frame": 6923,
+  "start_time": 283.0833,
+  "end_time": 288.5,
+  "duration_frames": 130,
+  "duration_s": 5.4167,
+  "start_tc": "00:04:43:02",
+  "end_tc": "00:04:48:11",
+  "boundary_in_id": "B4-019",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 6794,
+      "path": "keyframes/S0149_f06794.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6826,
+      "path": "keyframes/S0149_f06826.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6859,
+      "path": "keyframes/S0149_f06859.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6891,
+      "path": "keyframes/S0149_f06891.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6923,
+      "path": "keyframes/S0149_f06923.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 6858,
+      "path": "work/full_batch/06858.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 reference"
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Woman holds white care tag at mouth, orange sleeve insert and cream checklist",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "7 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Woman holds white care tag at mouth, orange sleeve insert and cream checklist. Iron6810-6820;DO6850 NOT6856 NERF6861;care clears6881;barcode6889;map6914. 独立图层、时序与屏幕坐标已根据实际参考帧复核；隐藏原参数保留unknown。",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Woman holds white care tag at mouth, orange sleeve insert and cream checklist",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Woman holds white care tag at mouth, orange sleeve insert and cream checklist",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "Iron6810-6820;DO6850 NOT6856 NERF6861;care clears6881;barcode6889;map6914",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0149.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0003,
+      "pan_y_frac_per_s": 0.0007,
+      "zoom_per_s": 0.0007,
+      "median_flow_frac_per_s": 0.0031,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#C8C6C8",
+        "fraction": 0.257,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#E5E5E4",
+        "fraction": 0.225,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#C0A294",
+        "fraction": 0.156,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#A27E69",
+        "fraction": 0.144,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#0D0C08",
+        "fraction": 0.141,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#64452E",
+        "fraction": 0.076,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[152.8, 154.1, 170.7]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "Small upper-left chrome present in filmstrip; exact look digits require full-resolution review"
+    },
+    "G-TITLE-TAG": {
+      "state": "Upper-right small collection chrome visible except final black"
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Zero-month / final no-underclass state after countdown; exact per-frame widget content unresolved"
+    },
+    "G-TICKER": {
+      "state": "Bottom ticker visible; microtext not transcribed from thumbnail"
+    },
+    "G-TIMECODE": {
+      "state": "Bottom-right timecode; exact per-frame expected time from supplied timeline"
+    },
+    "G-HALFTONE": {
+      "state": "Colored print dots visible; finale coarse-dot modulation especially S0151-S0152"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0149-E01",
+      "shot_id": "S0149",
+      "type": "background_media",
+      "description": "Woman holds white care tag at mouth, orange sleeve insert and cream checklist. Iron6810-6820;DO6850 NOT6856 NERF6861;care clears6881;barcode6889;map6914.",
+      "start_frame": 6794,
+      "end_frame": 6923,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Woman holds white care tag at mouth, orange sleeve insert and cream checklist. Iron6810-6820;DO6850 NOT6856 NERF6861;care clears6881;barcode6889;map6914."
+      },
+      "motion": {
+        "path": "Woman holds white care tag at mouth, orange sleeve insert and cream checklist. Iron6810-6820;DO6850 NOT6856 NERF6861;care clears6881;barcode6889;map6914.",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6794; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6923"
+      },
+      "keyframes": [
+        {
+          "frame": 6794,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6923,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6794,
+        6923
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0149-E02",
+      "shot_id": "S0149",
+      "type": "character",
+      "description": "Tilted direct portrait, hand holds tag at mouth; orange sleeve insert at shoulder",
+      "start_frame": 6794,
+      "end_frame": 6923,
+      "bounding_box": {
+        "x": 0.21875,
+        "y": 0.0,
+        "w": 0.78125,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Tilted direct portrait, hand holds tag at mouth; orange sleeve insert at shoulder"
+      },
+      "motion": {
+        "path": "Tilted direct portrait, hand holds tag at mouth; orange sleeve insert at shoulder",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6794; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6923"
+      },
+      "keyframes": [
+        {
+          "frame": 6794,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6923,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6794,
+        6923
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0149-E03",
+      "shot_id": "S0149",
+      "type": "prop",
+      "description": "White care tag in fingers near lips, crossed-iron icon stamped over it during care instructions",
+      "start_frame": 6794,
+      "end_frame": 6923,
+      "bounding_box": {
+        "x": 0.421875,
+        "y": 0.5092592592592593,
+        "w": 0.22916666666666666,
+        "h": 0.2962962962962963,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 6,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "White care tag in fingers near lips, crossed-iron icon stamped over it during care instructions"
+      },
+      "motion": {
+        "path": "White care tag in fingers near lips, crossed-iron icon stamped over it during care instructions",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6794; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6923"
+      },
+      "keyframes": [
+        {
+          "frame": 6794,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6923,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6794,
+        6923
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0149-E04",
+      "shot_id": "S0149",
+      "type": "hud_panel",
+      "description": "Upper-left care checklist paper inherits Washcold, then types Donotiron and Donotnerf",
+      "start_frame": 6794,
+      "end_frame": 6879,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.0962962962962963,
+        "w": 0.3125,
+        "h": 0.2962962962962963,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Upper-left care checklist paper inherits Washcold, then types Donotiron and Donotnerf"
+      },
+      "motion": {
+        "path": "Upper-left care checklist paper inherits Washcold, then types Donotiron and Donotnerf",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6794; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6879"
+      },
+      "keyframes": [
+        {
+          "frame": 6794,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6805,
+          "text": "Do no"
+        },
+        {
+          "frame": 6814,
+          "text": "Do not iron."
+        },
+        {
+          "frame": 6849,
+          "text": "Do"
+        },
+        {
+          "frame": 6858,
+          "text": "Do not"
+        },
+        {
+          "frame": 6864,
+          "text": "Do not nerf."
+        },
+        {
+          "frame": 6879,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6794,
+        6805,
+        6814,
+        6849,
+        6858,
+        6864,
+        6879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "CARE INSTRUCTIONS · ISO 3758 / Wash cold. / Do not iron. / Do not nerf.",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 48,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0149-E05",
+      "shot_id": "S0149",
+      "type": "icon",
+      "description": "Washtub30, crossed iron and crossed agent/nerf icon stack into independent checklist rows",
+      "start_frame": 6794,
+      "end_frame": 6879,
+      "bounding_box": {
+        "x": 0.04895833333333333,
+        "y": 0.16666666666666666,
+        "w": 0.033854166666666664,
+        "h": 0.18703703703703703,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 31,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Washtub30, crossed iron and crossed agent/nerf icon stack into independent checklist rows"
+      },
+      "motion": {
+        "path": "Washtub30, crossed iron and crossed agent/nerf icon stack into independent checklist rows",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6794; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6879"
+      },
+      "keyframes": [
+        {
+          "frame": 6794,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6879,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6794,
+        6879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0149-E06",
+      "shot_id": "S0149",
+      "type": "hud_panel",
+      "description": "PATCH NOTES model01 V11.2 paper opens below care panel",
+      "start_frame": 6848,
+      "end_frame": 6879,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.41574074074074074,
+        "w": 0.22916666666666666,
+        "h": 0.1648148148148148,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "PATCH NOTES model01 V11.2 paper opens below care panel"
+      },
+      "motion": {
+        "path": "PATCH NOTES model01 V11.2 paper opens below care panel",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6848; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6879"
+      },
+      "keyframes": [
+        {
+          "frame": 6848,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6879,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6848,
+        6879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "PATCH NOTES · MODEL 01 V11.2 / CHANGELOG",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0149-E07",
+      "shot_id": "S0149",
+      "type": "hud_chart",
+      "description": "Three reasoning/capability/charm bars:100/70/100; orange capability loses30percent, diagonal REVERTED stamp",
+      "start_frame": 6852,
+      "end_frame": 6879,
+      "bounding_box": {
+        "x": 0.04479166666666667,
+        "y": 0.46574074074074073,
+        "w": 0.21875,
+        "h": 0.08981481481481482,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 31,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Three reasoning/capability/charm bars:100/70/100; orange capability loses30percent, diagonal REVERTED stamp"
+      },
+      "motion": {
+        "path": "Three reasoning/capability/charm bars:100/70/100; orange capability loses30percent, diagonal REVERTED stamp",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6852; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6879"
+      },
+      "keyframes": [
+        {
+          "frame": 6852,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6858,
+          "state": "capability70"
+        },
+        {
+          "frame": 6864,
+          "state": "REVERTED stamped"
+        },
+        {
+          "frame": 6879,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6852,
+        6858,
+        6864,
+        6879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "REASONING 100% / CAPABILITY 70% / CHARM 100% / -30% NERF / REVERTED",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0149-E08",
+      "shot_id": "S0149",
+      "type": "text_title",
+      "description": "Lower-left giant DO→NOT→NERF. changes whole word in cream box",
+      "start_frame": 6848,
+      "end_frame": 6879,
+      "bounding_box": {
+        "x": 0.026041666666666668,
+        "y": 0.7314814814814815,
+        "w": 0.22916666666666666,
+        "h": 0.2074074074074074,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 24,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Lower-left giant DO→NOT→NERF. changes whole word in cream box"
+      },
+      "motion": {
+        "path": "Lower-left giant DO→NOT→NERF. changes whole word in cream box",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6848; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6879"
+      },
+      "keyframes": [
+        {
+          "frame": 6848,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6850,
+          "text": "DO"
+        },
+        {
+          "frame": 6856,
+          "text": "NOT"
+        },
+        {
+          "frame": 6861,
+          "text": "NERF."
+        },
+        {
+          "frame": 6879,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6848,
+        6850,
+        6856,
+        6861,
+        6879
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "DO / NOT / NERF.",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 194,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0149-E09",
+      "shot_id": "S0149",
+      "type": "hud_bracket",
+      "description": "Face and TAG CARE0.93 corner boxes; hand tag corner line moves with the object",
+      "start_frame": 6794,
+      "end_frame": 6923,
+      "bounding_box": {
+        "x": 0.4192708333333333,
+        "y": 0.2962962962962963,
+        "w": 0.265625,
+        "h": 0.37037037037037035,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Face and TAG CARE0.93 corner boxes; hand tag corner line moves with the object"
+      },
+      "motion": {
+        "path": "Face and TAG CARE0.93 corner boxes; hand tag corner line moves with the object",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6794; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6923"
+      },
+      "keyframes": [
+        {
+          "frame": 6794,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6923,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6794,
+        6923
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "FACE · TO LENS 0.97 / TAG · CARE 0.93",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0149-E10",
+      "shot_id": "S0149",
+      "type": "tag_card",
+      "description": "Cream ESCAPE VELOCITY full garment card appears over chest after care panels clear",
+      "start_frame": 6887,
+      "end_frame": 6923,
+      "bounding_box": {
+        "x": 0.7260416666666667,
+        "y": 0.6481481481481481,
+        "w": 0.16145833333333334,
+        "h": 0.24537037037037038,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Cream ESCAPE VELOCITY full garment card appears over chest after care panels clear"
+      },
+      "motion": {
+        "path": "Cream ESCAPE VELOCITY full garment card appears over chest after care panels clear",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6887; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6923"
+      },
+      "keyframes": [
+        {
+          "frame": 6887,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6923,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6887,
+        6923
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "LOOK 00 · TAG BACK / SS27 / ESCAPE VELOCITY / SHELL 100% OPTIMISM / LINING 100% DOOM / WASH COLD · 30 / IRON DO NOT / NERF DO NOT / MADE IN SAN FRANCISCO / EV-27-0000",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0149-E11",
+      "shot_id": "S0149",
+      "type": "hud_panel",
+      "description": "Blank FIG13 origin-map paper expands from left after cleanup",
+      "start_frame": 6914,
+      "end_frame": 6923,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.1111111111111111,
+        "w": 0.2604166666666667,
+        "h": 0.5,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Blank FIG13 origin-map paper expands from left after cleanup"
+      },
+      "motion": {
+        "path": "Blank FIG13 origin-map paper expands from left after cleanup",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f6914; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f6923"
+      },
+      "keyframes": [
+        {
+          "frame": 6914,
+          "state": "first visible state"
+        },
+        {
+          "frame": 6923,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        6914,
+        6923
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code",
+      "text": {
+        "content": "FIG. 13 · ORIGIN OF THE COLLECTION / SF",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidate_only": true,
+          "description": "monospaced HUD or condensed numeric; bold grotesque lyric; compare actual frame glyphs",
+          "cap_height_px_estimate": 12,
+          "alignment": "left unless ring/centred board",
+          "stroke": "none separately observed",
+          "shadow": "none separately observed",
+          "confidence": 0.72
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0149-A04",
+      "target_element_ids": [
+        "S0149-E04"
+      ],
+      "description": "Upper-left care checklist paper inherits Washcold, then types Donotiron and Donotnerf",
+      "start_frame": 6794,
+      "end_frame": 6879,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0149-A07",
+      "target_element_ids": [
+        "S0149-E07"
+      ],
+      "description": "Three reasoning/capability/charm bars:100/70/100; orange capability loses30percent, diagonal REVERTED stamp",
+      "start_frame": 6852,
+      "end_frame": 6879,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    },
+    {
+      "anim_id": "S0149-A08",
+      "target_element_ids": [
+        "S0149-E08"
+      ],
+      "description": "Lower-left giant DO→NOT→NERF. changes whole word in cream box",
+      "start_frame": 6848,
+      "end_frame": 6879,
+      "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+      "audio_sync": "candidate temporal relations only; no direct listening proof"
+    }
+  ],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0300"
+      ],
+      "frame_range": [
+        6879,
+        6881
+      ],
+      "type": "hud_swap",
+      "description": "Wash-cold HUD panel and NERF. text removed from left; same girl shot.",
+      "confidence": 0.8,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    },
+    {
+      "dist_ids": [
+        "D0301"
+      ],
+      "frame_range": [
+        6914,
+        6920
+      ],
+      "type": "hud_swap",
+      "description": "Empty map-panel frame animates open on left side; girl static.",
+      "confidence": 0.8,
+      "chunk": 4,
+      "verification": "Consistent with filmstrip; exact boundaries inherited, not independently remeasured"
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B4-019",
+      "span": [
+        6794,
+        6794
+      ],
+      "description": "Iron6810-6820;DO6850 NOT6856 NERF6861;care clears6881;barcode6889;map6914",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B4-020",
+      "span": [
+        6923,
+        6923
+      ],
+      "description": "Iron6810-6820;DO6850 NOT6856 NERF6861;care clears6881;barcode6889;map6914",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0628",
+      "relation": "beat_candidate (unknown) at frame 6795; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6795
+    },
+    {
+      "audio_event_id": "AW0438",
+      "relation": "vocal_word_candidate (unknown) at frame 6800–6802; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6800
+    },
+    {
+      "audio_event_id": "AW0439",
+      "relation": "vocal_word_candidate (unknown) at frame 6804–6808; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6804
+    },
+    {
+      "audio_event_id": "AB0629",
+      "relation": "beat_candidate (unknown) at frame 6805; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6805
+    },
+    {
+      "audio_event_id": "AW0440",
+      "relation": "vocal_word_candidate (unknown) at frame 6815–6820; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6815
+    },
+    {
+      "audio_event_id": "AB0630",
+      "relation": "beat_candidate (unknown) at frame 6816; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6816
+    },
+    {
+      "audio_event_id": "AB0631",
+      "relation": "beat_candidate (unknown) at frame 6827; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6827
+    },
+    {
+      "audio_event_id": "AB0632",
+      "relation": "beat_candidate (unknown) at frame 6838; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6838
+    },
+    {
+      "audio_event_id": "AB0633",
+      "relation": "beat_candidate (unknown) at frame 6848; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6848
+    },
+    {
+      "audio_event_id": "AW0441",
+      "relation": "vocal_word_candidate (unknown) at frame 6848–6850; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6848
+    },
+    {
+      "audio_event_id": "AW0442",
+      "relation": "vocal_word_candidate (unknown) at frame 6852–6857; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6852
+    },
+    {
+      "audio_event_id": "AX0386",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 6855–6862; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 6855
+    },
+    {
+      "audio_event_id": "AB0634",
+      "relation": "beat_candidate (unknown) at frame 6859; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6859
+    },
+    {
+      "audio_event_id": "AW0443",
+      "relation": "vocal_word_candidate (unknown) at frame 6859–6865; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 6859
+    },
+    {
+      "audio_event_id": "AH02868",
+      "relation": "band_onset_candidate (unknown) at frame 6864; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6864
+    },
+    {
+      "audio_event_id": "AB0635",
+      "relation": "beat_candidate (unknown) at frame 6870; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6870
+    },
+    {
+      "audio_event_id": "AB0636",
+      "relation": "beat_candidate (unknown) at frame 6881; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6881
+    },
+    {
+      "audio_event_id": "AB0637",
+      "relation": "beat_candidate (unknown) at frame 6892; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6892
+    },
+    {
+      "audio_event_id": "AB0638",
+      "relation": "beat_candidate (unknown) at frame 6902; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6902
+    },
+    {
+      "audio_event_id": "AH02869",
+      "relation": "band_onset_candidate (unknown) at frame 6903; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6903
+    },
+    {
+      "audio_event_id": "AB0639",
+      "relation": "beat_candidate (unknown) at frame 6913; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 6913
+    },
+    {
+      "audio_event_id": "AH02870",
+      "relation": "band_onset_candidate (unknown) at frame 6913; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 6913
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0149.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Unknown font files, physical plate/overlay decomposition, original curve, alpha and random flip seed",
+    "Measured visual boxes +/-0.02 normalized; event start bounds +/-3f; precise audio alignment still requires listening",
+    "Author eight-point star statement does not override observed nine-point ending; uncounted clips remain unknown"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0149.jpg",
+      "keyframes/S0149_f06794.jpg",
+      "keyframes/S0149_f06826.jpg",
+      "keyframes/S0149_f06859.jpg",
+      "keyframes/S0149_f06891.jpg",
+      "keyframes/S0149_f06923.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "reviewer": "root",
+    "method": "whole filmstrip, native1920 midpoint and independent1–4f regional/whole-shot second pass",
+    "timing_precision_frames": 3,
+    "reference_sheet": "work/root_review/tail_micro_S0149.jpg",
+    "pending": []
+  },
+  "observed_text_inventory": [
+    "CARE INSTRUCTIONS · ISO 3758 / Wash cold. / Do not iron. / Do not nerf.",
+    "PATCH NOTES · MODEL 01 V11.2 / CHANGELOG",
+    "REASONING 100% / CAPABILITY 70% / CHARM 100% / -30% NERF / REVERTED",
+    "DO / NOT / NERF.",
+    "FACE · TO LENS 0.97 / TAG · CARE 0.93",
+    "LOOK 00 · TAG BACK / SS27 / ESCAPE VELOCITY / SHELL 100% OPTIMISM / LINING 100% DOOM / WASH COLD · 30 / IRON DO NOT / NERF DO NOT / MADE IN SAN FRANCISCO / EV-27-0000",
+    "FIG. 13 · ORIGIN OF THE COLLECTION / SF"
+  ]
+}

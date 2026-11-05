@@ -1,0 +1,21 @@
+{
+  "schema_version": "audio-understanding-preview/1",
+  "preview": {
+    "operation": "audio_understand",
+    "provider": "gemini",
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    "model_id": "gemini-3.8-flash",
+    "source_sha256": "41f44af39d83658e30f5e86ca2fc4802d3da23ab154205745af1af491f76bb60",
+    "source_size_bytes": 31513323,
+    "audio_sha256": "637826feeb7c953840f6b6ecebc58685be97a442bd57c1c7100d65dd01ee3bc3",
+    "audio_size_bytes": 2130044,
+    "duration_seconds": 12.07437641723356,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "e096272dee63f5bb489933ec22566adc72549ebf9ed83a987f828b6301dfa656"
+  },
+  "network_calls": 0,
+  "production_acceptance": "NOT_EVALUATED",
+  "media_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/dandelion-postman-local-20261104/state/video-generation/fetch/files/41f44af39d83658e30f5e86ca2fc4802d3da23ab154205745af1af491f76bb60.mp4",
+  "analysis_audio_derivation": "full_source_track_pcm_derivative",
+  "human_acceptance": "NOT_EVALUATED"
+}

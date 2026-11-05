@@ -4,6 +4,7 @@
 
 ## Browse
 
+- 新增 [IRIS 身份参考](iris/README.md)（IRIS EP01，2026-11-04 使用者认可）：表情表、四视角定妆、唱歌首帧与出图身份参考。
 - 新增 [第一季其余16名角色总览](shizhen/season-cast-20261027/index.html)：16张四视角身份合图，另为林晚、周竞、谢振宇、陆建平各补一张场次参考；[选用清单与记录](shizhen/season-cast-20261027/README.md)。
 - 新增 [董文慧、罗敏、高峥、闻素芬四人总览](shizhen/character-packs-20261027/index.html)：每套独立存放人物身份底图和当前场次参考，取材、职业／性格依据及候选状态见 [说明](shizhen/character-packs-20261027/README.md)。
 - 第一集快递员见 [简单三视图进度](shizhen/courier/three-views-20261027/README.md)：正面、侧面已返回；背面调用UNKNOWN，未重复提交。

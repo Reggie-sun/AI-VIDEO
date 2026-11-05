@@ -1,0 +1,54 @@
+artifact_id: iris-v2-s3-shot
+character_ids: []
+composition_directives: []
+content_hash: 55ccb2ca888ea4e4f3934e948da212cd96e09136bd70f63ad58e219f9d2885f3
+continuity_constraints:
+- 以K3走道为起始画面，空无一人，尽头左侧半开机柜门漏出窄红光
+- 摄影机沿走道中轴缓慢平稳推进，红色门缝逐渐变近，不转向、不切镜
+- 保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。
+creation_receipt_id: iris-v2-S3-authoring:shot
+dialogue: ''
+duration_policy:
+  maximum_seconds: null
+  minimum_seconds: null
+  mode: fixed
+  seconds: 6.0
+generated_video_rationale: 需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。
+hybrid_layers: []
+intent: '真人电影摄影，横幅十六比九，连续六秒。参考图是这个镜头的起始画面、场景与光线：凌晨的数据中心机房走道，两侧是黑色服务器机柜，尽头左侧一扇半开的机柜门漏出一道窄窄的红光。
+
+  画面中没有人。摄影机从走道中央齐胸高度出发，沿走道中轴非常缓慢、平稳地向前推进，越来越接近尽头那道红色门缝；红光在地面和对面机柜玻璃上的反光随推进变化。机柜玻璃后细小的冷蓝指示灯轻微闪烁，空气中有极淡的薄雾。
+
+  保持对称构图，不转向、不摇镜、不切镜，末段平滑收稳。蓝黑与钢蓝冷色，红色只来自那道门缝。机柜上不出现可读文字。
+
+  保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。只有极轻的机房风扇环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨。'
+motion_directives: []
+narration: ''
+required_asset_roles:
+- allowed_asset_types:
+  - video
+  asset_ids: []
+  role: primary_visual
+- allowed_asset_types:
+  - image
+  asset_ids:
+  - iris-v2-s3-aisle
+  role: reference
+review_policy:
+  required_checks: []
+revision: 1
+scene_id: aisle
+schema_version: '2.0'
+shot_id: ep01v2-s3
+source_provenance:
+- content_hash: 853a114851a23a5d1e64827af8d01a19810a5124c70348694f211302f72df379
+  kind: user_input
+  reference: evidence/authoring-input/853a114851a23a5d1e64827af8d01a19810a5124c70348694f211302f72df379.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 75891233ebc0961acafcaa42573a81ae93340822a05ac75a0758ad440725f152
+  kind: user_input
+  reference: evidence/authoring-input/75891233ebc0961acafcaa42573a81ae93340822a05ac75a0758ad440725f152.json
+storyboard_beat_id: training
+visual_strategy: generated_video

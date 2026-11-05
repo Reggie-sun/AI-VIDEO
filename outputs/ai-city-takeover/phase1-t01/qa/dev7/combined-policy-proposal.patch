@@ -1,0 +1,52 @@
+--- a/.agent/harness/policy.yaml
++++ b/.agent/harness/policy.yaml
+@@ -96,0 +97,12 @@
++  motionkit_runtime_tests:
++    argv: [node, --test, motion-kit/tests/runtime.test.mjs]
++    cwd: .
++    execution_priority: 20
++    timeout_seconds: 120
++    description: Verify variable-tempo clocks, frame boundaries, deterministic noise and perspective mapping without rendering or Provider effects.
++  motionkit_tool_tests:
++    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_motionkit_tools.py, -q]
++    cwd: .
++    execution_priority: 20
++    timeout_seconds: 120
++    description: Verify bounded audio windows, fail-closed QA exits and immutable image-reference input identity with fake effects only.
+@@ -267,3 +279,3 @@
+-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_elevenlabs.py, tests/test_production_elevenlabs_batch.py, tests/test_voice_routing_elevenlabs.py, -q]
+-    cwd: .
+-    description: Verify ElevenLabs transport, bounded speech execution, and selected voice routing.
++    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_elevenlabs.py, tests/test_production_elevenlabs_batch.py, tests/test_voice_routing_elevenlabs.py, tests/test_production_dotenv_source.py, -q]
++    cwd: .
++    description: Verify ElevenLabs transport, bounded speech execution, selected voice routing and shared fail-closed credential-source suppliers.
+@@ -447,0 +460 @@
++      - motionkit_tool_tests
+@@ -526,0 +540,12 @@
++  motionkit_pilot:
++    patterns:
++      - tests/test_motionkit_tools.py
++      - motion-kit/**
++      - outputs/ai-city-takeover/**
++      - docs/superpowers/specs/2026-10-30-ev-motion-douyin-pipeline.md
++      - docs/record_for_agent/2026-10-30-iris-t01-readable-takeover.md
++    focused_check_ids: [motionkit_runtime_tests, motionkit_tool_tests]
++    check_ids:
++      - motionkit_runtime_tests
++      - motionkit_tool_tests
++      - task_architecture_gate
+@@ -532,0 +558 @@
++      - src/ai_video/production/preview_approval.py
+@@ -753,0 +780 @@
++      - src/ai_video/production/preview_approval.py
+@@ -1791,0 +1819,10 @@
++  provider_credential_source:
++    patterns:
++      - src/ai_video/production/dotenv_source.py
++      - tests/test_production_dotenv_source.py
++    focused_check_ids: [elevenlabs_speech_tests]
++    check_ids:
++      - elevenlabs_speech_tests
++      - minimax_speech_batch_tests
++      - mcp_tests
++      - task_architecture_gate

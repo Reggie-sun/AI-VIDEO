@@ -1,0 +1,82 @@
+{
+  "artifact_id": "iris-c-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "ba37e2a445b12972367caed56fd22affd8cc13d40110429b6b6054c96e9405ca",
+  "creation_receipt_id": "iris-c-draft-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/97c7bbecd09bbb939c3e00e2cf6178c942b8d5f8acf8af98a6e2d1c892fd2324.json",
+      "content_hash": "97c7bbecd09bbb939c3e00e2cf6178c942b8d5f8acf8af98a6e2d1c892fd2324"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a0df3da2d491ce7b5de699e0998482aabaf4657441e61fa81b0ced19af5546bd.json",
+      "content_hash": "a0df3da2d491ce7b5de699e0998482aabaf4657441e61fa81b0ced19af5546bd"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/28318591450187d862a17d8ba599bd03ff25914de4646ca8b53db62f98cb6430.json",
+      "content_hash": "28318591450187d862a17d8ba599bd03ff25914de4646ca8b53db62f98cb6430"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0786263c62b6bb16fed178d912cb3de91e86fe541c9fdeb987ffc2b4f078acd6.json",
+      "content_hash": "0786263c62b6bb16fed178d912cb3de91e86fe541c9fdeb987ffc2b4f078acd6"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/d651f50bcc5714eabb6a72a0185813c160a81423777f87f838a29156aecad414.json",
+      "content_hash": "d651f50bcc5714eabb6a72a0185813c160a81423777f87f838a29156aecad414"
+    }
+  ],
+  "shot_id": "ep01-dns",
+  "scene_id": "interior",
+  "storyboard_beat_id": "dns",
+  "intent": "真人电影摄影，横幅十六比九，连续六秒。以第一张已认可室内图作为场景、光线、构图与起始人物姿态的主要参考；第二张已认可正面头胸身份图控制同一女性的完整面貌、身份、左耳装置和左领极细红线，不继承身份图背景。\n同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，在原窗边设备前保持原站位。观察者看到的始终是显示器背面，保持背壳、支架和原人物相对位置；不转屏幕、不展示屏幕正面、不向背面贴图，不生成任何屏幕内容。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持自然皮肤与衣料。\n她保持原图身体朝向与设备视线，嘴唇自然静置、平静观察；允许自然呼吸、轻微自然眨眼与极轻视线反应；不说话、不唱歌、不出现说话或演唱的连续口型、不抬手、不敲键盘、不操作设备、不转身，不把她演成黑客。摄影机沿原视轴极缓慢微幅推近，保持原观察侧与人物、显示器背面的相对位置，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍嘴唇自然静置，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。\n保持原室内与窗外冷光，保留平台正常人工智能生成标识，不删除、不遮挡它；不新增剧情字幕、片名、新闻图形、人物、屏幕或界面。新闻解释图形由独立剪辑承接，不出现在这个人物镜头中。只允许极轻房间环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨，本源片原生声音在剪辑中静音。",
+  "dialogue": "",
+  "narration": "September twenty. A training run.\nOne resolver, misconfigured — one door, left open.",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "保持认可A03的身体朝向与设备视线，嘴唇自然静置，不出现说话或演唱的连续口型；不操作设备、不敲键盘、不抬手；自然呼吸或眨眼属可接受变化，不要求必须观察到某次事件",
+    "沿原视轴极缓慢微幅推近，保持原观察侧与人物、显示器背面的相对位置，末段平滑收稳",
+    "保持显示器背面、背壳与支架，绝不转向正面或向背面贴图；新闻解释图形由独立剪辑承接"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-interior",
+        "iris-cf-details"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实人物表演与同一空间内的自然运动；静帧不证明视频或对嘴已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

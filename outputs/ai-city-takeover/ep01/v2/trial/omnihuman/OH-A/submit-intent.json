@@ -1,0 +1,8 @@
+{
+ "unit": "OH-A",
+ "price": 30,
+ "balance_before": 64791,
+ "permit_sha256": "52212e79cc2c669718a5d0012b0fe9e3ce4f49fedf3e4b25fbd923510905c475",
+ "observed_sha256": "f3c8012696e0360d4e89ae2703b43b07fb79f06717b26f0cca8e1c344aa19606",
+ "clicked_at": "2026-11-03T05:42:15.745Z"
+}

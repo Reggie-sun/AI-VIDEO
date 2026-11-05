@@ -1,0 +1,845 @@
+{
+ "mp4": "outputs/ai-city-takeover/ep01/v2/gen/S8a/project/state/video-generation/fetch/files/8631894f86f4bedd10bdc8b7f41402e8236405a43499a0a032da6f5bcf21eda7.mp4",
+ "reference": "outputs/ai-city-takeover/ep01/v2/song/isolation/S8a-vocal-ref-18.40-23.40.wav",
+ "fps": 30,
+ "frames": 151,
+ "audio_offset": {
+  "clip_audio_lags_reference_seconds": -0.09,
+  "onset_corr": 0.413,
+  "frames": -3
+ },
+ "geometry": {
+  "face": [
+   462,
+   91,
+   209,
+   209
+  ],
+  "mouth_box": [
+   518,
+   228,
+   96,
+   54
+  ],
+  "dark_threshold": 47.5
+ },
+ "aperture_vs_vocal": {
+  "best_lag_frames": -2,
+  "corr": 0.33,
+  "note": "positive lag: mouth follows the vocal by that many frames"
+ },
+ "levels": {
+  "closed_p10": 0.0585,
+  "open_p90": 0.1255
+ },
+ "silences": [
+  {
+   "clip_seconds": "0:0.20",
+   "frames": [
+    -3,
+    3
+   ],
+   "median_level": 0.47,
+   "max_level": 0.48
+  },
+  {
+   "clip_seconds": "4.53:5.0",
+   "frames": [
+    133,
+    147
+   ],
+   "median_level": 0.03,
+   "max_level": 0.11
+  }
+ ],
+ "pauses": [
+  {
+   "clip_seconds": "2.17:2.33",
+   "min_level": 0.42,
+   "vowel_median_level": 0.38
+  }
+ ],
+ "onsets": [
+  {
+   "clip_seconds": 0.2,
+   "expected_frame": 3,
+   "opening_frame": 1,
+   "delta_frames": -2
+  },
+  {
+   "clip_seconds": 0.85,
+   "expected_frame": 23,
+   "opening_frame": 23,
+   "delta_frames": 0
+  },
+  {
+   "clip_seconds": 2.33,
+   "expected_frame": 67,
+   "opening_frame": 61,
+   "delta_frames": -6
+  },
+  {
+   "clip_seconds": 3.5,
+   "expected_frame": 102,
+   "opening_frame": 104,
+   "delta_frames": 2
+  }
+ ],
+ "per_frame": [
+  {
+   "frame": 0,
+   "aperture": 0.0606,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 1,
+   "aperture": 0.0901,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 2,
+   "aperture": 0.0908,
+   "vocal_db": -159.5
+  },
+  {
+   "frame": 3,
+   "aperture": 0.0921,
+   "vocal_db": -37.7
+  },
+  {
+   "frame": 4,
+   "aperture": 0.0981,
+   "vocal_db": -28.5
+  },
+  {
+   "frame": 5,
+   "aperture": 0.1027,
+   "vocal_db": -25.0
+  },
+  {
+   "frame": 6,
+   "aperture": 0.1075,
+   "vocal_db": -23.4
+  },
+  {
+   "frame": 7,
+   "aperture": 0.1085,
+   "vocal_db": -21.2
+  },
+  {
+   "frame": 8,
+   "aperture": 0.1116,
+   "vocal_db": -19.7
+  },
+  {
+   "frame": 9,
+   "aperture": 0.1198,
+   "vocal_db": -19.4
+  },
+  {
+   "frame": 10,
+   "aperture": 0.1278,
+   "vocal_db": -20.9
+  },
+  {
+   "frame": 11,
+   "aperture": 0.1357,
+   "vocal_db": -19.3
+  },
+  {
+   "frame": 12,
+   "aperture": 0.1399,
+   "vocal_db": -19.2
+  },
+  {
+   "frame": 13,
+   "aperture": 0.144,
+   "vocal_db": -21.4
+  },
+  {
+   "frame": 14,
+   "aperture": 0.1264,
+   "vocal_db": -20.5
+  },
+  {
+   "frame": 15,
+   "aperture": 0.1063,
+   "vocal_db": -22.3
+  },
+  {
+   "frame": 16,
+   "aperture": 0.0749,
+   "vocal_db": -25.1
+  },
+  {
+   "frame": 17,
+   "aperture": 0.0612,
+   "vocal_db": -26.0
+  },
+  {
+   "frame": 18,
+   "aperture": 0.0485,
+   "vocal_db": -28.9
+  },
+  {
+   "frame": 19,
+   "aperture": 0.0498,
+   "vocal_db": -29.7
+  },
+  {
+   "frame": 20,
+   "aperture": 0.0535,
+   "vocal_db": -29.8
+  },
+  {
+   "frame": 21,
+   "aperture": 0.0599,
+   "vocal_db": -30.2
+  },
+  {
+   "frame": 22,
+   "aperture": 0.0674,
+   "vocal_db": -29.4
+  },
+  {
+   "frame": 23,
+   "aperture": 0.0756,
+   "vocal_db": -15.7
+  },
+  {
+   "frame": 24,
+   "aperture": 0.0811,
+   "vocal_db": -8.8
+  },
+  {
+   "frame": 25,
+   "aperture": 0.0829,
+   "vocal_db": -7.8
+  },
+  {
+   "frame": 26,
+   "aperture": 0.0826,
+   "vocal_db": -12.3
+  },
+  {
+   "frame": 27,
+   "aperture": 0.0818,
+   "vocal_db": -23.9
+  },
+  {
+   "frame": 28,
+   "aperture": 0.0811,
+   "vocal_db": -22.0
+  },
+  {
+   "frame": 29,
+   "aperture": 0.0813,
+   "vocal_db": -22.7
+  },
+  {
+   "frame": 30,
+   "aperture": 0.0811,
+   "vocal_db": -17.3
+  },
+  {
+   "frame": 31,
+   "aperture": 0.0801,
+   "vocal_db": -13.6
+  },
+  {
+   "frame": 32,
+   "aperture": 0.0738,
+   "vocal_db": -9.1
+  },
+  {
+   "frame": 33,
+   "aperture": 0.0625,
+   "vocal_db": -6.0
+  },
+  {
+   "frame": 34,
+   "aperture": 0.0571,
+   "vocal_db": -4.8
+  },
+  {
+   "frame": 35,
+   "aperture": 0.0575,
+   "vocal_db": -4.6
+  },
+  {
+   "frame": 36,
+   "aperture": 0.0732,
+   "vocal_db": -4.3
+  },
+  {
+   "frame": 37,
+   "aperture": 0.0842,
+   "vocal_db": -5.5
+  },
+  {
+   "frame": 38,
+   "aperture": 0.1046,
+   "vocal_db": -6.0
+  },
+  {
+   "frame": 39,
+   "aperture": 0.1136,
+   "vocal_db": -2.9
+  },
+  {
+   "frame": 40,
+   "aperture": 0.1218,
+   "vocal_db": -1.6
+  },
+  {
+   "frame": 41,
+   "aperture": 0.1163,
+   "vocal_db": -0.9
+  },
+  {
+   "frame": 42,
+   "aperture": 0.1062,
+   "vocal_db": -0.0
+  },
+  {
+   "frame": 43,
+   "aperture": 0.0963,
+   "vocal_db": 0.0
+  },
+  {
+   "frame": 44,
+   "aperture": 0.0837,
+   "vocal_db": -0.7
+  },
+  {
+   "frame": 45,
+   "aperture": 0.0767,
+   "vocal_db": -1.7
+  },
+  {
+   "frame": 46,
+   "aperture": 0.068,
+   "vocal_db": -3.2
+  },
+  {
+   "frame": 47,
+   "aperture": 0.0658,
+   "vocal_db": -4.9
+  },
+  {
+   "frame": 48,
+   "aperture": 0.0637,
+   "vocal_db": -5.3
+  },
+  {
+   "frame": 49,
+   "aperture": 0.0633,
+   "vocal_db": -5.4
+  },
+  {
+   "frame": 50,
+   "aperture": 0.0635,
+   "vocal_db": -4.7
+  },
+  {
+   "frame": 51,
+   "aperture": 0.0642,
+   "vocal_db": -3.3
+  },
+  {
+   "frame": 52,
+   "aperture": 0.0671,
+   "vocal_db": -2.9
+  },
+  {
+   "frame": 53,
+   "aperture": 0.0739,
+   "vocal_db": -3.7
+  },
+  {
+   "frame": 54,
+   "aperture": 0.0844,
+   "vocal_db": -5.0
+  },
+  {
+   "frame": 55,
+   "aperture": 0.0926,
+   "vocal_db": -6.3
+  },
+  {
+   "frame": 56,
+   "aperture": 0.0993,
+   "vocal_db": -6.5
+  },
+  {
+   "frame": 57,
+   "aperture": 0.1042,
+   "vocal_db": -8.0
+  },
+  {
+   "frame": 58,
+   "aperture": 0.1107,
+   "vocal_db": -11.4
+  },
+  {
+   "frame": 59,
+   "aperture": 0.1185,
+   "vocal_db": -13.2
+  },
+  {
+   "frame": 60,
+   "aperture": 0.124,
+   "vocal_db": -16.1
+  },
+  {
+   "frame": 61,
+   "aperture": 0.1276,
+   "vocal_db": -19.3
+  },
+  {
+   "frame": 62,
+   "aperture": 0.1286,
+   "vocal_db": -27.7
+  },
+  {
+   "frame": 63,
+   "aperture": 0.1306,
+   "vocal_db": -28.3
+  },
+  {
+   "frame": 64,
+   "aperture": 0.1278,
+   "vocal_db": -28.5
+  },
+  {
+   "frame": 65,
+   "aperture": 0.1237,
+   "vocal_db": -30.2
+  },
+  {
+   "frame": 66,
+   "aperture": 0.1105,
+   "vocal_db": -24.5
+  },
+  {
+   "frame": 67,
+   "aperture": 0.1018,
+   "vocal_db": -12.6
+  },
+  {
+   "frame": 68,
+   "aperture": 0.0864,
+   "vocal_db": -6.3
+  },
+  {
+   "frame": 69,
+   "aperture": 0.0804,
+   "vocal_db": -4.8
+  },
+  {
+   "frame": 70,
+   "aperture": 0.075,
+   "vocal_db": -8.3
+  },
+  {
+   "frame": 71,
+   "aperture": 0.0763,
+   "vocal_db": -26.1
+  },
+  {
+   "frame": 72,
+   "aperture": 0.0779,
+   "vocal_db": -17.8
+  },
+  {
+   "frame": 73,
+   "aperture": 0.0805,
+   "vocal_db": -12.0
+  },
+  {
+   "frame": 74,
+   "aperture": 0.0853,
+   "vocal_db": -11.5
+  },
+  {
+   "frame": 75,
+   "aperture": 0.0883,
+   "vocal_db": -11.2
+  },
+  {
+   "frame": 76,
+   "aperture": 0.0878,
+   "vocal_db": -7.3
+  },
+  {
+   "frame": 77,
+   "aperture": 0.0833,
+   "vocal_db": -5.8
+  },
+  {
+   "frame": 78,
+   "aperture": 0.0772,
+   "vocal_db": -5.9
+  },
+  {
+   "frame": 79,
+   "aperture": 0.074,
+   "vocal_db": -6.0
+  },
+  {
+   "frame": 80,
+   "aperture": 0.0727,
+   "vocal_db": -7.9
+  },
+  {
+   "frame": 81,
+   "aperture": 0.0727,
+   "vocal_db": -13.6
+  },
+  {
+   "frame": 82,
+   "aperture": 0.0725,
+   "vocal_db": -16.5
+  },
+  {
+   "frame": 83,
+   "aperture": 0.0726,
+   "vocal_db": -16.3
+  },
+  {
+   "frame": 84,
+   "aperture": 0.0739,
+   "vocal_db": -16.9
+  },
+  {
+   "frame": 85,
+   "aperture": 0.0752,
+   "vocal_db": -17.3
+  },
+  {
+   "frame": 86,
+   "aperture": 0.079,
+   "vocal_db": -17.7
+  },
+  {
+   "frame": 87,
+   "aperture": 0.0847,
+   "vocal_db": -17.5
+  },
+  {
+   "frame": 88,
+   "aperture": 0.0889,
+   "vocal_db": -9.8
+  },
+  {
+   "frame": 89,
+   "aperture": 0.0878,
+   "vocal_db": -7.1
+  },
+  {
+   "frame": 90,
+   "aperture": 0.0838,
+   "vocal_db": -6.4
+  },
+  {
+   "frame": 91,
+   "aperture": 0.0813,
+   "vocal_db": -6.0
+  },
+  {
+   "frame": 92,
+   "aperture": 0.0768,
+   "vocal_db": -5.8
+  },
+  {
+   "frame": 93,
+   "aperture": 0.0689,
+   "vocal_db": -5.8
+  },
+  {
+   "frame": 94,
+   "aperture": 0.0606,
+   "vocal_db": -8.1
+  },
+  {
+   "frame": 95,
+   "aperture": 0.0567,
+   "vocal_db": -14.8
+  },
+  {
+   "frame": 96,
+   "aperture": 0.0562,
+   "vocal_db": -25.1
+  },
+  {
+   "frame": 97,
+   "aperture": 0.057,
+   "vocal_db": -27.6
+  },
+  {
+   "frame": 98,
+   "aperture": 0.0572,
+   "vocal_db": -27.8
+  },
+  {
+   "frame": 99,
+   "aperture": 0.0597,
+   "vocal_db": -27.9
+  },
+  {
+   "frame": 100,
+   "aperture": 0.0615,
+   "vocal_db": -30.1
+  },
+  {
+   "frame": 101,
+   "aperture": 0.0689,
+   "vocal_db": -30.9
+  },
+  {
+   "frame": 102,
+   "aperture": 0.0846,
+   "vocal_db": -21.5
+  },
+  {
+   "frame": 103,
+   "aperture": 0.1001,
+   "vocal_db": -17.4
+  },
+  {
+   "frame": 104,
+   "aperture": 0.1181,
+   "vocal_db": -9.5
+  },
+  {
+   "frame": 105,
+   "aperture": 0.1255,
+   "vocal_db": -6.7
+  },
+  {
+   "frame": 106,
+   "aperture": 0.132,
+   "vocal_db": -6.8
+  },
+  {
+   "frame": 107,
+   "aperture": 0.1226,
+   "vocal_db": -7.1
+  },
+  {
+   "frame": 108,
+   "aperture": 0.1036,
+   "vocal_db": -6.8
+  },
+  {
+   "frame": 109,
+   "aperture": 0.0808,
+   "vocal_db": -6.4
+  },
+  {
+   "frame": 110,
+   "aperture": 0.0664,
+   "vocal_db": -8.0
+  },
+  {
+   "frame": 111,
+   "aperture": 0.0593,
+   "vocal_db": -14.2
+  },
+  {
+   "frame": 112,
+   "aperture": 0.0569,
+   "vocal_db": -17.8
+  },
+  {
+   "frame": 113,
+   "aperture": 0.0554,
+   "vocal_db": -15.6
+  },
+  {
+   "frame": 114,
+   "aperture": 0.0588,
+   "vocal_db": -15.4
+  },
+  {
+   "frame": 115,
+   "aperture": 0.0622,
+   "vocal_db": -15.3
+  },
+  {
+   "frame": 116,
+   "aperture": 0.0689,
+   "vocal_db": -15.5
+  },
+  {
+   "frame": 117,
+   "aperture": 0.0835,
+   "vocal_db": -16.7
+  },
+  {
+   "frame": 118,
+   "aperture": 0.1056,
+   "vocal_db": -11.3
+  },
+  {
+   "frame": 119,
+   "aperture": 0.1273,
+   "vocal_db": -8.3
+  },
+  {
+   "frame": 120,
+   "aperture": 0.1383,
+   "vocal_db": -8.1
+  },
+  {
+   "frame": 121,
+   "aperture": 0.1416,
+   "vocal_db": -7.7
+  },
+  {
+   "frame": 122,
+   "aperture": 0.1395,
+   "vocal_db": -6.9
+  },
+  {
+   "frame": 123,
+   "aperture": 0.1332,
+   "vocal_db": -6.3
+  },
+  {
+   "frame": 124,
+   "aperture": 0.1195,
+   "vocal_db": -5.8
+  },
+  {
+   "frame": 125,
+   "aperture": 0.1076,
+   "vocal_db": -5.0
+  },
+  {
+   "frame": 126,
+   "aperture": 0.0965,
+   "vocal_db": -4.0
+  },
+  {
+   "frame": 127,
+   "aperture": 0.0932,
+   "vocal_db": -3.4
+  },
+  {
+   "frame": 128,
+   "aperture": 0.0871,
+   "vocal_db": -3.4
+  },
+  {
+   "frame": 129,
+   "aperture": 0.0817,
+   "vocal_db": -4.4
+  },
+  {
+   "frame": 130,
+   "aperture": 0.0761,
+   "vocal_db": -7.8
+  },
+  {
+   "frame": 131,
+   "aperture": 0.0713,
+   "vocal_db": -16.4
+  },
+  {
+   "frame": 132,
+   "aperture": 0.0684,
+   "vocal_db": -28.3
+  },
+  {
+   "frame": 133,
+   "aperture": 0.0659,
+   "vocal_db": -56.7
+  },
+  {
+   "frame": 134,
+   "aperture": 0.0642,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 135,
+   "aperture": 0.0633,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 136,
+   "aperture": 0.0615,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 137,
+   "aperture": 0.061,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 138,
+   "aperture": 0.0605,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 139,
+   "aperture": 0.0608,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 140,
+   "aperture": 0.061,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 141,
+   "aperture": 0.0606,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 142,
+   "aperture": 0.0602,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 143,
+   "aperture": 0.0597,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 144,
+   "aperture": 0.0593,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 145,
+   "aperture": 0.0588,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 146,
+   "aperture": 0.0585,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 147,
+   "aperture": 0.0578,
+   "vocal_db": -180.0
+  },
+  {
+   "frame": 148,
+   "aperture": 0.057,
+   "vocal_db": -80.0
+  },
+  {
+   "frame": 149,
+   "aperture": 0.0563,
+   "vocal_db": -80.0
+  },
+  {
+   "frame": 150,
+   "aperture": 0.0376,
+   "vocal_db": -80.0
+  }
+ ]
+}

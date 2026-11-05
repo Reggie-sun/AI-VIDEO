@@ -1,0 +1,19 @@
+{
+ "unit": "U021",
+ "file": "outputs/ai-city-takeover/ep01/v3/pilot/oh/U021/fetch/94d47304111359835cfe4cba4c7fe937631dbda125d140c59413094bf7f410ac.mp4",
+ "sha256": "94d47304111359835cfe4cba4c7fe937631dbda125d140c59413094bf7f410ac",
+ "bytes": 9864507,
+ "suggested_name": "jimeng-2026-11-04-1371-镜头固定中景。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，肩膀放松，重心落在后....mp4",
+ "page_video": {
+  "w": 1270,
+  "h": 720,
+  "dur": 4.365011,
+  "box": [
+   566,
+   152,
+   504,
+   283.5
+  ]
+ },
+ "fetched_at": "2026-11-05T01:52:47.490Z"
+}

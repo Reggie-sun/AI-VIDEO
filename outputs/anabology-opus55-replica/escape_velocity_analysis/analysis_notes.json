@@ -1,0 +1,151 @@
+{
+ "schema": "ev-analysis-notes/v1",
+ "scope": "逆向分析与参考提取；未开始复刻，未生成视频，未调用付费生成模型",
+ "session_recovered": "7ba6b3ef-4ca7-482a-ae07-ede0dd151135",
+ "observation": {
+  "method": "主会话实际查看13张总览，包含全部153镜的中间帧；分镜子代理另查看逐镜filmstrip与首中末帧。总览不能证明逐帧动画或全部微文字已核实。",
+  "review_sheets": [
+   "work/root_review/overview_00.jpg",
+   "work/root_review/overview_01.jpg",
+   "work/root_review/overview_02.jpg",
+   "work/root_review/overview_03.jpg",
+   "work/root_review/overview_04.jpg",
+   "work/root_review/overview_05.jpg",
+   "work/root_review/overview_06.jpg",
+   "work/root_review/overview_07.jpg",
+   "work/root_review/overview_08.jpg",
+   "work/root_review/overview_09.jpg",
+   "work/root_review/overview_10.jpg",
+   "work/root_review/overview_11.jpg",
+   "work/root_review/overview_12.jpg"
+  ],
+  "visual_findings": [
+   "实际成片以深色短bob、橙色发丝/星形发饰、白短衬衫、黑吊带与短裙的女主为中心；作者公开casting中出现的铂金发色不能当成最终成片外观。",
+   "前半以青黑环境、红色车灯、白色服装及橙色界面强调为主，人物镜头和账单、调查、终端、图表等解释性图形交替。",
+   "底部ticker、右上月份翻牌、左上LOOK计数、定位角标与时间信息构成持续界面；不能把同一套界面重复注册成每镜新资产。",
+   "主字幕至少包含普通逐词句子、大号凝缩无衬线、衬线Look标题、翻牌字符阵列、后段圆角扩展几何字与服装标签等不同模式。字体文件和字号需按镜测量，不能只指定一个字体。",
+   "S0001中间帧f25显示24 MONTHS，后续S0002已落为18；翻牌过渡值不能误记成稳定倒计时。",
+   "S0085附近画面转为白底/浅色图层，黑色大字与白面板成为主导；这次黑白界面反转需要保留。",
+   "S0102–S0108把3、2、1、0倒数拆成眼部极近景、翻牌全屏、细条遮罩等不同画面，不可合并成一条普通数字动画。",
+   "S0111以后THERE IS NO UNDERCLASS改变叙事意义；后续Lock In、数据中心、肾脏、Sora、loop等以实物、人物和解释性UI逐项响应。",
+   "尾段以服装成分/洗护标签、旧金山地图、女主全身留白、头顶橙色星形和极短黑场收束。",
+   "S0152原片明确标示9-PT STAR与9×40°，实际尾段九角星不能按作者八角canon自动纠正；S0151网点示意写7→60PX、45°，与早期FFT轴向估计必须分开。"
+  ]
+ },
+ "observed_blocks": [
+  {
+   "id": "OB01",
+   "shots": [
+    "S0001",
+    "S0019"
+   ],
+   "label": "车辆、秀场、主角与界面引入"
+  },
+  {
+   "id": "OB02",
+   "shots": [
+    "S0020",
+    "S0044"
+   ],
+   "label": "Look 01–06与技术梗解释图形"
+  },
+  {
+   "id": "OB03",
+   "shots": [
+    "S0045",
+    "S0052"
+   ],
+   "label": "18个月、翻牌、锁定与吸气准备"
+  },
+  {
+   "id": "OB04",
+   "shots": [
+    "S0053",
+    "S0064"
+   ],
+   "label": "首轮副歌、油门与逃逸速度"
+  },
+  {
+   "id": "OB05",
+   "shots": [
+    "S0065",
+    "S0080"
+   ],
+   "label": "Look 07–11、复制体、透明与永生"
+  },
+  {
+   "id": "OB06",
+   "shots": [
+    "S0081",
+    "S0110"
+   ],
+   "label": "六个月、浅色系统、速度定义与倒数"
+  },
+  {
+   "id": "OB07",
+   "shots": [
+    "S0111",
+    "S0134"
+   ],
+   "label": "无下层阶级、Lock In与密集Drop"
+  },
+  {
+   "id": "OB08",
+   "shots": [
+    "S0135",
+    "S0153"
+   ],
+   "label": "零个月、副歌终段与服装标签尾声"
+  }
+ ],
+ "block_authority": "主会话根据实际总览观察组织的导航分区，不是作者未公开的9个chapter；边界与意义为分析性归纳。",
+ "reconstruction_strategy": [
+  {
+   "layer": "source_media",
+   "recommendation": "先冻结精确镜头区间和素材identity；用source_mapping检索公开prompt与候选素材。仅按歌曲时间窗相交的匹配仍属inferred，不可冒充exact plate匹配。",
+   "difficulty": 4
+  },
+  {
+   "layer": "timeline",
+   "recommendation": "后续正式制作经现有ProductionProject、Registry和ResolvedTimeline组织；分析JSON只作输入参考，不创建第二条Production timeline owner。",
+   "difficulty": 3
+  },
+  {
+   "layer": "typography",
+   "recommendation": "先测同一shot中字号、cap height、行宽、字间距、锚点和逐词首帧；候选字体用字形对照，不把作者wiki通用字体清单当已证实文件。",
+   "difficulty": 4
+  },
+  {
+   "layer": "hud_panels",
+   "recommendation": "HyperFrames / motion-kit实现统一坐标、翻牌单元、ticker、追踪框和图表；共享asset_id，状态逐镜更新；数据文字与人物底片分层。",
+   "difficulty": 4
+  },
+  {
+   "layer": "print_pass",
+   "recommendation": "用实际成片取样测量半调方向、点距、明暗响应与色彩，最后应用Canvas/WebGL印刷效果；不能在生成输入中破坏原始颜色。原shader参数unknown。",
+   "difficulty": 5
+  },
+  {
+   "layer": "motion",
+   "recommendation": "区分底片人物/相机运动、裁切推拉、2.5D深度运动和图形动画；实际曲线只给观测支持的范围。遮挡、光效或glitch逐帧核实后再定实现。",
+   "difficulty": 5
+  },
+  {
+   "layer": "audio",
+   "recommendation": "先听审并修正audio_alignment_review中的异常；使用局部beat map和可信词边界，不使用固定BPM。频带onset不等于独立后加音效。",
+   "difficulty": 4
+  },
+  {
+   "layer": "comparison",
+   "recommendation": "将参考与未来复刻按同一帧号采样，分别比布局bbox、可读文字、图形状态、色彩分布、切点与声音时序；视觉估计容差应明示，技术分数不代替人审。",
+   "difficulty": 4
+  }
+ ],
+ "known_limits": [
+  "只有本地下载版本的7353个可解码帧得到覆盖；作者7354帧master与本地容器报告差异已保留。",
+  "原始engine、shot board、字体文件、原shader、逐词时间文件未公开；隐藏参数只允许估计或unknown。",
+  "当前模型工具返回audio content omitted because you do not support audio input，不能声称本会话已实际听审；本地ASR、CTC和频谱不是听觉验收。",
+  "153镜均有实际filmstrip、关键帧/原分辨率细节与密采视觉复核。坐标及显示时序给出置信度/有界误差；未知原字体、shader、随机翻牌序列与原始素材拆层仍保留unknown。",
+  "音频听审与SFX来源受当前工具输入边界阻塞，delivery validator继续保留ANALYSIS_INCOMPLETE；结构/视觉复核通过不等于整项高精度音画分析完成。"
+ ]
+}

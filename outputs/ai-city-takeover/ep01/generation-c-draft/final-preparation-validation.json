@@ -1,0 +1,39 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/generation-c-draft/project",
+  "authoring_project_revision": 1,
+  "validation_manifest_revision": 5,
+  "selected_strategy": "multimodal A03 scene + ID7b full identity",
+  "prepare_disposition": "GENERATE_ONCE",
+  "compiled": true,
+  "actual_reference_order": [
+    "iris-c-interior",
+    "iris-cf-details"
+  ],
+  "actual_reference_sha256": [
+    "24e5bb452e90e1c9566ad914ac11213cfaecb9596131db6a1b8b5f585199ca0f",
+    "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+  ],
+  "cf_a_in_payload": false,
+  "canonical_iris_character_exactly_preserved": true,
+  "all_payload_bytes_verified": true,
+  "stale_binding_rejected": true,
+  "a2_parent_gate_exact_all_pass": true,
+  "a1_fail_retained": true,
+  "ai_label_allowed": true,
+  "natural_static_lips_no_continuous_articulation": true,
+  "no_added_pixel_or_required_breathing_event_measurement": true,
+  "monitor_back_and_no_operation": true,
+  "prior_video_submits": 2,
+  "prior_observed_credits": 396,
+  "cumulative_video_submit_ceiling": 3,
+  "cumulative_operator_credit_ceiling": 750,
+  "new_c_unit_submit_ceiling": 1,
+  "new_c_operator_credit_ceiling": 250,
+  "request_sha256": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+  "binding_sha256": "65965441988e4e1536e194905520b45f97dbc64f64b1e539dd46bba39c9b946b",
+  "prompt_sha256": "a9543e6c6dd04793ebd8eb438ff1a12f555b726916f05190d941c3c7c2f6d3c8",
+  "c_video_attempts_started": 0,
+  "new_provider_calls": 0,
+  "c_media_quality": "NOT_EVALUATED",
+  "production_activation": false
+}

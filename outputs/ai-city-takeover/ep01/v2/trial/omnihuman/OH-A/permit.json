@@ -1,0 +1,10 @@
+{
+ "unit": "OH-A",
+ "one_use": true,
+ "issued_at": "2026-11-03T05:40:59.684328+00:00",
+ "expires_at": "2026-11-03T06:00:59.684333+00:00",
+ "fill_observed_sha256": "f3c8012696e0360d4e89ae2703b43b07fb79f06717b26f0cca8e1c344aa19606",
+ "price": 30,
+ "approval_sha256": "09730173ff1a09da75d0b7e815900b884db9eeafe663df0048377076e0232f26",
+ "user_quote": "你寫程式自動操作"
+}

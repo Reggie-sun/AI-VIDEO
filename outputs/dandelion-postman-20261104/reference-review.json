@@ -1,0 +1,10 @@
+{
+  "status": "AWAITING_USER_PREVIEW",
+  "sha256": "8125187d8eba4f1b9d13262ade2301c81391ccb756c32237b9b1ffebca68cd48",
+  "source": "new imagegen, no image inputs",
+  "observed": "one turquoise robot at left, yellow bag on robot right hip, one intact dandelion at right, gold meadow, no grid",
+  "adjustment": "Draft left-hip detail superseded by actual new image right hip before any user approval; preserve actual bag placement.",
+  "video_submits": 0,
+  "image_calls": 1,
+  "image_cost": "not_returned"
+}

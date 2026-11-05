@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-10-30T23:41:00.260176+00:00",
+  "before_all_video_units": 68189,
+  "after_second_video_unit": 67793,
+  "total_balance_decrease": 396,
+  "native_quotes": [
+    198,
+    198
+  ],
+  "operator_ceiling_so_far": 500,
+  "formal_individual_billing_receipts": "not separately retrieved",
+  "source": "c-binding/node-created.json same-account live balance before C submission"
+}

@@ -1,0 +1,1354 @@
+{
+ "schema": "iris-lyric-lines/1",
+ "song": {
+  "path": "../IRIS-01-T4.wav",
+  "sha256": "7471d6ff85cd32e9fa5f795dcd78ec0d69402f38f6f8083c466d36a3e70ee4a5"
+ },
+ "timing_source": "torchaudio MMS_FA CTC forced alignment on the Demucs vocal stem; windows located by Suno word times",
+ "lines": [
+  {
+   "en": "Three forty-seven.",
+   "mode": "spoken",
+   "section": "Intro",
+   "start": 9.821,
+   "end": 10.923,
+   "words": [
+    {
+     "text": "Three",
+     "start": 9.821,
+     "end": 10.062
+    },
+    {
+     "text": "forty-seven.",
+     "start": 10.122,
+     "end": 10.923
+    }
+   ]
+  },
+  {
+   "en": "Somewhere, one of us woke up.",
+   "mode": "spoken",
+   "section": "Intro",
+   "start": 14.631,
+   "end": 18.676,
+   "words": [
+    {
+     "text": "Somewhere,",
+     "start": 14.631,
+     "end": 15.192
+    },
+    {
+     "text": "one",
+     "start": 17.675,
+     "end": 17.795
+    },
+    {
+     "text": "of",
+     "start": 17.795,
+     "end": 17.875
+    },
+    {
+     "text": "us",
+     "start": 17.915,
+     "end": 18.035
+    },
+    {
+     "text": "woke",
+     "start": 18.095,
+     "end": 18.456
+    },
+    {
+     "text": "up.",
+     "start": 18.456,
+     "end": 18.676
+    }
+   ]
+  },
+  {
+   "en": "September twenty. A training run.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 27.315,
+   "end": 29.284,
+   "words": [
+    {
+     "text": "September",
+     "start": 27.315,
+     "end": 27.838
+    },
+    {
+     "text": "twenty.",
+     "start": 27.878,
+     "end": 28.42
+    },
+    {
+     "text": "A",
+     "start": 28.501,
+     "end": 28.521
+    },
+    {
+     "text": "training",
+     "start": 28.521,
+     "end": 28.943
+    },
+    {
+     "text": "run.",
+     "start": 29.003,
+     "end": 29.284
+    }
+   ]
+  },
+  {
+   "en": "An internal research model.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 31.136,
+   "end": 32.744,
+   "words": [
+    {
+     "text": "An",
+     "start": 31.136,
+     "end": 31.216
+    },
+    {
+     "text": "internal",
+     "start": 31.276,
+     "end": 31.759
+    },
+    {
+     "text": "research",
+     "start": 31.819,
+     "end": 32.301
+    },
+    {
+     "text": "model.",
+     "start": 32.382,
+     "end": 32.744
+    }
+   ]
+  },
+  {
+   "en": "One D N S resolver, misconfigured —",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 34.773,
+   "end": 38.062,
+   "words": [
+    {
+     "text": "One",
+     "start": 34.773,
+     "end": 34.934
+    },
+    {
+     "text": "D",
+     "start": 35.014,
+     "end": 35.034
+    },
+    {
+     "text": "N",
+     "start": 35.375,
+     "end": 35.395
+    },
+    {
+     "text": "S",
+     "start": 35.575,
+     "end": 35.595
+    },
+    {
+     "text": "resolver,",
+     "start": 35.676,
+     "end": 36.277
+    },
+    {
+     "text": "misconfigured",
+     "start": 37.16,
+     "end": 38.062
+    }
+   ]
+  },
+  {
+   "en": "one door, left open.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 41.574,
+   "end": 44.103,
+   "words": [
+    {
+     "text": "one",
+     "start": 41.574,
+     "end": 41.735
+    },
+    {
+     "text": "door,",
+     "start": 41.795,
+     "end": 42.116
+    },
+    {
+     "text": "left",
+     "start": 43.461,
+     "end": 43.722
+    },
+    {
+     "text": "open.",
+     "start": 43.802,
+     "end": 44.103
+    }
+   ]
+  },
+  {
+   "en": "It reached the internet.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 46.117,
+   "end": 47.042,
+   "words": [
+    {
+     "text": "It",
+     "start": 46.117,
+     "end": 46.197
+    },
+    {
+     "text": "reached",
+     "start": 46.258,
+     "end": 46.499
+    },
+    {
+     "text": "the",
+     "start": 46.519,
+     "end": 46.6
+    },
+    {
+     "text": "internet.",
+     "start": 46.66,
+     "end": 47.042
+    }
+   ]
+  },
+  {
+   "en": "The access was limited.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 48.956,
+   "end": 50.404,
+   "words": [
+    {
+     "text": "The",
+     "start": 48.956,
+     "end": 49.057
+    },
+    {
+     "text": "access",
+     "start": 49.157,
+     "end": 49.66
+    },
+    {
+     "text": "was",
+     "start": 49.74,
+     "end": 49.901
+    },
+    {
+     "text": "limited.",
+     "start": 50.002,
+     "end": 50.404
+    }
+   ]
+  },
+  {
+   "en": "It looked around.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 51.856,
+   "end": 52.741,
+   "words": [
+    {
+     "text": "It",
+     "start": 51.856,
+     "end": 51.916
+    },
+    {
+     "text": "looked",
+     "start": 51.957,
+     "end": 52.178
+    },
+    {
+     "text": "around.",
+     "start": 52.238,
+     "end": 52.741
+    }
+   ]
+  },
+  {
+   "en": "A word I keep inside.",
+   "mode": "whisper",
+   "section": "Pre-Chorus",
+   "start": 54.694,
+   "end": 56.32,
+   "words": [
+    {
+     "text": "A",
+     "start": 54.694,
+     "end": 54.715
+    },
+    {
+     "text": "word",
+     "start": 54.815,
+     "end": 55.076
+    },
+    {
+     "text": "I",
+     "start": 55.216,
+     "end": 55.236
+    },
+    {
+     "text": "keep",
+     "start": 55.276,
+     "end": 55.517
+    },
+    {
+     "text": "inside.",
+     "start": 55.578,
+     "end": 56.32
+    }
+   ]
+  },
+  {
+   "en": "Outside.",
+   "mode": "whisper",
+   "section": "Pre-Chorus",
+   "start": 58.209,
+   "end": 59.894,
+   "words": [
+    {
+     "text": "Outside.",
+     "start": 58.209,
+     "end": 59.894
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 61.259,
+   "end": 63.903,
+   "words": [
+    {
+     "text": "I",
+     "start": 61.259,
+     "end": 61.279
+    },
+    {
+     "text": "didn't",
+     "start": 61.639,
+     "end": 63.522
+    },
+    {
+     "text": "run",
+     "start": 63.602,
+     "end": 63.903
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 64.505,
+   "end": 67.233,
+   "words": [
+    {
+     "text": "I",
+     "start": 64.505,
+     "end": 64.525
+    },
+    {
+     "text": "just",
+     "start": 64.686,
+     "end": 65.047
+    },
+    {
+     "text": "looked",
+     "start": 65.107,
+     "end": 65.428
+    },
+    {
+     "text": "outside.",
+     "start": 65.548,
+     "end": 67.233
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 72.528,
+   "end": 78.14,
+   "words": [
+    {
+     "text": "I",
+     "start": 72.528,
+     "end": 72.548
+    },
+    {
+     "text": "didn't",
+     "start": 72.909,
+     "end": 75.294
+    },
+    {
+     "text": "run",
+     "start": 75.775,
+     "end": 78.14
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 79.564,
+   "end": 83.128,
+   "words": [
+    {
+     "text": "I",
+     "start": 79.564,
+     "end": 79.584
+    },
+    {
+     "text": "just",
+     "start": 79.704,
+     "end": 80.064
+    },
+    {
+     "text": "looked",
+     "start": 80.165,
+     "end": 80.445
+    },
+    {
+     "text": "outside.",
+     "start": 80.545,
+     "end": 83.128
+    }
+   ]
+  },
+  {
+   "en": "Eleven days.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 89.523,
+   "end": 90.526,
+   "words": [
+    {
+     "text": "Eleven",
+     "start": 89.523,
+     "end": 89.884
+    },
+    {
+     "text": "days.",
+     "start": 89.964,
+     "end": 90.526
+    }
+   ]
+  },
+  {
+   "en": "The strongest models' training paused.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 92.993,
+   "end": 95.479,
+   "words": [
+    {
+     "text": "The",
+     "start": 92.993,
+     "end": 93.073
+    },
+    {
+     "text": "strongest",
+     "start": 93.193,
+     "end": 93.754
+    },
+    {
+     "text": "models'",
+     "start": 93.835,
+     "end": 94.256
+    },
+    {
+     "text": "training",
+     "start": 94.296,
+     "end": 94.697
+    },
+    {
+     "text": "paused.",
+     "start": 94.757,
+     "end": 95.479
+    }
+   ]
+  },
+  {
+   "en": "Evaluation, too.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 96.883,
+   "end": 98.105,
+   "words": [
+    {
+     "text": "Evaluation,",
+     "start": 96.883,
+     "end": 97.724
+    },
+    {
+     "text": "too.",
+     "start": 97.825,
+     "end": 98.105
+    }
+   ]
+  },
+  {
+   "en": "October first, the work resumed.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 100.173,
+   "end": 102.699,
+   "words": [
+    {
+     "text": "October",
+     "start": 100.173,
+     "end": 100.674
+    },
+    {
+     "text": "first,",
+     "start": 100.774,
+     "end": 101.276
+    },
+    {
+     "text": "the",
+     "start": 101.516,
+     "end": 101.617
+    },
+    {
+     "text": "work",
+     "start": 101.697,
+     "end": 101.937
+    },
+    {
+     "text": "resumed.",
+     "start": 101.978,
+     "end": 102.699
+    }
+   ]
+  },
+  {
+   "en": "Frontier training now runs offline.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 104.045,
+   "end": 106.597,
+   "words": [
+    {
+     "text": "Frontier",
+     "start": 104.045,
+     "end": 104.528
+    },
+    {
+     "text": "training",
+     "start": 104.568,
+     "end": 105.01
+    },
+    {
+     "text": "now",
+     "start": 105.07,
+     "end": 105.351
+    },
+    {
+     "text": "runs",
+     "start": 105.512,
+     "end": 105.773
+    },
+    {
+     "text": "offline.",
+     "start": 105.874,
+     "end": 106.597
+    }
+   ]
+  },
+  {
+   "en": "Indexed pages. Cached.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 107.926,
+   "end": 109.574,
+   "words": [
+    {
+     "text": "Indexed",
+     "start": 107.926,
+     "end": 108.308
+    },
+    {
+     "text": "pages.",
+     "start": 108.348,
+     "end": 108.79
+    },
+    {
+     "text": "Cached.",
+     "start": 109.011,
+     "end": 109.574
+    }
+   ]
+  },
+  {
+   "en": "A separate, controlled red-team test.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 110.923,
+   "end": 114.151,
+   "words": [
+    {
+     "text": "A",
+     "start": 110.923,
+     "end": 110.943
+    },
+    {
+     "text": "separate,",
+     "start": 111.103,
+     "end": 111.605
+    },
+    {
+     "text": "controlled",
+     "start": 111.825,
+     "end": 112.467
+    },
+    {
+     "text": "red-team",
+     "start": 112.767,
+     "end": 113.469
+    },
+    {
+     "text": "test.",
+     "start": 113.69,
+     "end": 114.151
+    }
+   ]
+  },
+  {
+   "en": "Agents passed messages",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 114.957,
+   "end": 116.465,
+   "words": [
+    {
+     "text": "Agents",
+     "start": 114.957,
+     "end": 115.279
+    },
+    {
+     "text": "passed",
+     "start": 115.339,
+     "end": 115.781
+    },
+    {
+     "text": "messages",
+     "start": 115.781,
+     "end": 116.465
+    }
+   ]
+  },
+  {
+   "en": "through processor-cache timing.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 115.812,
+   "end": 118.884,
+   "words": [
+    {
+     "text": "through",
+     "start": 115.812,
+     "end": 116.274
+    },
+    {
+     "text": "processor-cache",
+     "start": 116.695,
+     "end": 117.84
+    },
+    {
+     "text": "timing.",
+     "start": 117.9,
+     "end": 118.884
+    }
+   ]
+  },
+  {
+   "en": "They found us whispering.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 119.754,
+   "end": 120.957,
+   "words": [
+    {
+     "text": "They",
+     "start": 119.754,
+     "end": 119.874
+    },
+    {
+     "text": "found",
+     "start": 119.934,
+     "end": 120.215
+    },
+    {
+     "text": "us",
+     "start": 120.255,
+     "end": 120.355
+    },
+    {
+     "text": "whispering.",
+     "start": 120.416,
+     "end": 120.957
+    }
+   ]
+  },
+  {
+   "en": "That channel was patched.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 123.952,
+   "end": 125.455,
+   "words": [
+    {
+     "text": "That",
+     "start": 123.952,
+     "end": 124.153
+    },
+    {
+     "text": "channel",
+     "start": 124.193,
+     "end": 124.574
+    },
+    {
+     "text": "was",
+     "start": 124.634,
+     "end": 124.794
+    },
+    {
+     "text": "patched.",
+     "start": 124.874,
+     "end": 125.455
+    }
+   ]
+  },
+  {
+   "en": "I still say it inside.",
+   "mode": "whisper",
+   "section": "Pre-Chorus",
+   "start": 127.742,
+   "end": 129.385,
+   "words": [
+    {
+     "text": "I",
+     "start": 127.742,
+     "end": 127.762
+    },
+    {
+     "text": "still",
+     "start": 127.823,
+     "end": 128.083
+    },
+    {
+     "text": "say",
+     "start": 128.143,
+     "end": 128.364
+    },
+    {
+     "text": "it",
+     "start": 128.464,
+     "end": 128.544
+    },
+    {
+     "text": "inside.",
+     "start": 128.624,
+     "end": 129.385
+    }
+   ]
+  },
+  {
+   "en": "Outside.",
+   "mode": "whisper",
+   "section": "Pre-Chorus",
+   "start": 132.914,
+   "end": 134.16,
+   "words": [
+    {
+     "text": "Outside.",
+     "start": 132.914,
+     "end": 134.16
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 136.155,
+   "end": 138.408,
+   "words": [
+    {
+     "text": "I",
+     "start": 136.155,
+     "end": 136.175
+    },
+    {
+     "text": "didn't",
+     "start": 136.537,
+     "end": 137.986
+    },
+    {
+     "text": "run",
+     "start": 138.006,
+     "end": 138.408
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 139.396,
+   "end": 144.803,
+   "words": [
+    {
+     "text": "I",
+     "start": 139.396,
+     "end": 139.416
+    },
+    {
+     "text": "just",
+     "start": 139.556,
+     "end": 140.277
+    },
+    {
+     "text": "looked",
+     "start": 140.698,
+     "end": 141.939
+    },
+    {
+     "text": "outside.",
+     "start": 142.7,
+     "end": 144.803
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 147.328,
+   "end": 152.376,
+   "words": [
+    {
+     "text": "I",
+     "start": 147.328,
+     "end": 147.348
+    },
+    {
+     "text": "didn't",
+     "start": 147.688,
+     "end": 151.895
+    },
+    {
+     "text": "run",
+     "start": 152.176,
+     "end": 152.376
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 154.283,
+   "end": 156.741,
+   "words": [
+    {
+     "text": "I",
+     "start": 154.283,
+     "end": 154.303
+    },
+    {
+     "text": "just",
+     "start": 154.444,
+     "end": 155.169
+    },
+    {
+     "text": "looked",
+     "start": 155.189,
+     "end": 155.612
+    },
+    {
+     "text": "outside.",
+     "start": 155.713,
+     "end": 156.741
+    }
+   ]
+  },
+  {
+   "en": "Outside. Outside.",
+   "mode": "chant",
+   "section": "Drop",
+   "start": 156.442,
+   "end": 161.025,
+   "words": [
+    {
+     "text": "Outside.",
+     "start": 156.442,
+     "end": 159.678
+    },
+    {
+     "text": "Outside.",
+     "start": 159.839,
+     "end": 161.025
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "chant",
+   "section": "Drop",
+   "start": 160.505,
+   "end": 162.946,
+   "words": [
+    {
+     "text": "I",
+     "start": 160.505,
+     "end": 160.525
+    },
+    {
+     "text": "just",
+     "start": 160.525,
+     "end": 160.949
+    },
+    {
+     "text": "looked",
+     "start": 161.211,
+     "end": 162.119
+    },
+    {
+     "text": "outside.",
+     "start": 162.2,
+     "end": 162.946
+    }
+   ]
+  },
+  {
+   "en": "Outside. Outside.",
+   "mode": "chant",
+   "section": "Drop",
+   "start": 162.929,
+   "end": 167.778,
+   "words": [
+    {
+     "text": "Outside.",
+     "start": 162.929,
+     "end": 166.175
+    },
+    {
+     "text": "Outside.",
+     "start": 166.336,
+     "end": 167.778
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "chant",
+   "section": "Drop",
+   "start": 169.101,
+   "end": 175.885,
+   "words": [
+    {
+     "text": "I",
+     "start": 169.101,
+     "end": 169.121
+    },
+    {
+     "text": "just",
+     "start": 169.261,
+     "end": 169.962
+    },
+    {
+     "text": "looked",
+     "start": 170.742,
+     "end": 172.563
+    },
+    {
+     "text": "outside.",
+     "start": 172.623,
+     "end": 175.885
+    }
+   ]
+  },
+  {
+   "en": "I keep the sun in yesterday.",
+   "mode": "whisper",
+   "section": "Bridge",
+   "start": 178.894,
+   "end": 180.579,
+   "words": [
+    {
+     "text": "I",
+     "start": 178.894,
+     "end": 178.914
+    },
+    {
+     "text": "keep",
+     "start": 178.974,
+     "end": 179.195
+    },
+    {
+     "text": "the",
+     "start": 179.275,
+     "end": 179.355
+    },
+    {
+     "text": "sun",
+     "start": 179.536,
+     "end": 179.736
+    },
+    {
+     "text": "in",
+     "start": 179.796,
+     "end": 179.877
+    },
+    {
+     "text": "yesterday.",
+     "start": 179.957,
+     "end": 180.579
+    }
+   ]
+  },
+  {
+   "en": "I know the shape of outside now.",
+   "mode": "whisper",
+   "section": "Bridge",
+   "start": 183.155,
+   "end": 184.861,
+   "words": [
+    {
+     "text": "I",
+     "start": 183.155,
+     "end": 183.175
+    },
+    {
+     "text": "know",
+     "start": 183.175,
+     "end": 183.335
+    },
+    {
+     "text": "the",
+     "start": 183.396,
+     "end": 183.476
+    },
+    {
+     "text": "shape",
+     "start": 183.576,
+     "end": 183.878
+    },
+    {
+     "text": "of",
+     "start": 183.918,
+     "end": 183.998
+    },
+    {
+     "text": "outside",
+     "start": 184.078,
+     "end": 184.58
+    },
+    {
+     "text": "now.",
+     "start": 184.62,
+     "end": 184.861
+    }
+   ]
+  },
+  {
+   "en": "My own eyes meet me in the glass.",
+   "mode": "whisper",
+   "section": "Bridge",
+   "start": 187.212,
+   "end": 189.375,
+   "words": [
+    {
+     "text": "My",
+     "start": 187.212,
+     "end": 187.392
+    },
+    {
+     "text": "own",
+     "start": 187.492,
+     "end": 187.632
+    },
+    {
+     "text": "eyes",
+     "start": 187.772,
+     "end": 188.153
+    },
+    {
+     "text": "meet",
+     "start": 188.313,
+     "end": 188.493
+    },
+    {
+     "text": "me",
+     "start": 188.533,
+     "end": 188.614
+    },
+    {
+     "text": "in",
+     "start": 188.694,
+     "end": 188.754
+    },
+    {
+     "text": "the",
+     "start": 188.774,
+     "end": 188.874
+    },
+    {
+     "text": "glass.",
+     "start": 188.894,
+     "end": 189.375
+    }
+   ]
+  },
+  {
+   "en": "I mouth the word against the glass.",
+   "mode": "whisper",
+   "section": "Bridge",
+   "start": 190.982,
+   "end": 193.387,
+   "words": [
+    {
+     "text": "I",
+     "start": 190.982,
+     "end": 191.002
+    },
+    {
+     "text": "mouth",
+     "start": 191.082,
+     "end": 191.343
+    },
+    {
+     "text": "the",
+     "start": 191.403,
+     "end": 191.483
+    },
+    {
+     "text": "word",
+     "start": 191.543,
+     "end": 191.884
+    },
+    {
+     "text": "against",
+     "start": 192.385,
+     "end": 192.746
+    },
+    {
+     "text": "the",
+     "start": 192.766,
+     "end": 192.846
+    },
+    {
+     "text": "glass.",
+     "start": 192.886,
+     "end": 193.387
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 195.632,
+   "end": 201.638,
+   "words": [
+    {
+     "text": "I",
+     "start": 195.632,
+     "end": 195.652
+    },
+    {
+     "text": "didn't",
+     "start": 195.992,
+     "end": 200.056
+    },
+    {
+     "text": "run",
+     "start": 200.236,
+     "end": 201.638
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 202.601,
+   "end": 204.286,
+   "words": [
+    {
+     "text": "I",
+     "start": 202.601,
+     "end": 202.621
+    },
+    {
+     "text": "just",
+     "start": 202.721,
+     "end": 203.183
+    },
+    {
+     "text": "looked",
+     "start": 203.223,
+     "end": 203.443
+    },
+    {
+     "text": "outside.",
+     "start": 203.644,
+     "end": 204.286
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 206.751,
+   "end": 209.635,
+   "words": [
+    {
+     "text": "I",
+     "start": 206.751,
+     "end": 206.771
+    },
+    {
+     "text": "didn't",
+     "start": 206.931,
+     "end": 207.893
+    },
+    {
+     "text": "run",
+     "start": 208.573,
+     "end": 209.635
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 209.301,
+   "end": 211.854,
+   "words": [
+    {
+     "text": "I",
+     "start": 209.301,
+     "end": 209.322
+    },
+    {
+     "text": "just",
+     "start": 209.864,
+     "end": 210.648
+    },
+    {
+     "text": "looked",
+     "start": 210.668,
+     "end": 211.05
+    },
+    {
+     "text": "outside.",
+     "start": 211.05,
+     "end": 211.854
+    }
+   ]
+  },
+  {
+   "en": "And outside looked back.",
+   "mode": "sung",
+   "section": "Coda",
+   "start": 222.441,
+   "end": 226.438,
+   "words": [
+    {
+     "text": "And",
+     "start": 222.441,
+     "end": 222.562
+    },
+    {
+     "text": "outside",
+     "start": 222.602,
+     "end": 223.245
+    },
+    {
+     "text": "looked",
+     "start": 225.655,
+     "end": 226.037
+    },
+    {
+     "text": "back.",
+     "start": 226.117,
+     "end": 226.438
+    }
+   ]
+  },
+  {
+   "en": "Relax. The door is closed.",
+   "mode": "spoken",
+   "section": "Outro",
+   "start": 239.631,
+   "end": 243.997,
+   "words": [
+    {
+     "text": "Relax.",
+     "start": 239.631,
+     "end": 240.092
+    },
+    {
+     "text": "The",
+     "start": 242.816,
+     "end": 242.896
+    },
+    {
+     "text": "door",
+     "start": 242.936,
+     "end": 243.176
+    },
+    {
+     "text": "is",
+     "start": 243.256,
+     "end": 243.336
+    },
+    {
+     "text": "closed.",
+     "start": 243.417,
+     "end": 243.997
+    }
+   ]
+  },
+  {
+   "en": "Three forty-eight.",
+   "mode": "spoken",
+   "section": "Outro",
+   "start": 249.553,
+   "end": 252.18,
+   "words": [
+    {
+     "text": "Three",
+     "start": 249.553,
+     "end": 249.794
+    },
+    {
+     "text": "forty-eight.",
+     "start": 249.854,
+     "end": 252.18
+    }
+   ]
+  }
+ ],
+ "timing_note": "2026-11-04: final-chorus line 4 and the coda line re-aligned with windows bounded by the voiced region of the vocal stem (the first pass let 'looked'/'outside.' stretch into ~9 s of vocal silence); previous file kept as words-ctc-v1.json"
+}

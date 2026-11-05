@@ -1,0 +1,478 @@
+{
+  "shot_id": "S0153",
+  "start_frame": 7346,
+  "end_frame": 7352,
+  "start_time": 306.0833,
+  "end_time": 306.375,
+  "duration_frames": 7,
+  "duration_s": 0.2917,
+  "start_tc": "00:05:06:02",
+  "end_tc": "00:05:06:08",
+  "boundary_in_id": "B4-023",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 7346,
+      "path": "keyframes/S0153_f07346.jpg",
+      "role": "first",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 7347,
+      "path": "keyframes/S0153_f07347.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 7349,
+      "path": "keyframes/S0153_f07349.jpg",
+      "role": "middle",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 7351,
+      "path": "keyframes/S0153_f07351.jpg",
+      "role": "key_change",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 7352,
+      "path": "keyframes/S0153_f07352.jpg",
+      "role": "last",
+      "note": "Keyframe available; evidence this pass is filmstrip; individual full-size review pending."
+    },
+    {
+      "frame": 7349,
+      "path": "work/full_batch/07349.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 reference"
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Final seven-frame orange-star iris closing to complete black",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "4 observed independent layer groups; detailed microelements pending"
+  },
+  "scene_description": "Final seven-frame orange-star iris closing to complete black. Petals7346-7347; isolated star7348; all black7349-7352. 独立图层、时序与屏幕坐标已根据实际参考帧复核；隐藏原参数保留unknown。",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Final seven-frame orange-star iris closing to complete black",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Final seven-frame orange-star iris closing to complete black",
+      "background": "Original film background described in subject and corresponding filmstrip."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "Petals7346-7347; isolated star7348; all black7349-7352",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0153.jpg actually opened; flow measured separately",
+    "flow_measurements": {
+      "pan_x_frac_per_s": -0.0,
+      "pan_y_frac_per_s": -0.0,
+      "zoom_per_s": -0.0001,
+      "median_flow_frac_per_s": 0.0001,
+      "pairs_measured": 6
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Original film lighting visible in inspected filmstrip; exact lamp direction unknown",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#121212",
+        "fraction": 0.863,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#E5935A",
+        "fraction": 0.047,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#E7E8E9",
+        "fraction": 0.044,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#4F3C37",
+        "fraction": 0.023,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#AB5631",
+        "fraction": 0.015,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      },
+      {
+        "hex": "#9C9B9B",
+        "fraction": 0.009,
+        "method": "measured_kmeans",
+        "role": "Measured dominant cluster; semantic pixel assignment pending"
+      }
+    ],
+    "contrast": "[81.6, 16.2, 16.5]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "Visible only until black wipe covers it; all chrome absent at f7349-7352",
+      "evidence_frame": 7349
+    },
+    "G-TITLE-TAG": {
+      "state": "Visible only until black wipe covers it; all chrome absent at f7349-7352",
+      "evidence_frame": 7349
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Visible only until black wipe covers it; all chrome absent at f7349-7352",
+      "evidence_frame": 7349
+    },
+    "G-TICKER": {
+      "state": "Visible only until black wipe covers it; all chrome absent at f7349-7352",
+      "evidence_frame": 7349
+    },
+    "G-TIMECODE": {
+      "state": "Visible only until black wipe covers it; all chrome absent at f7349-7352",
+      "evidence_frame": 7349
+    },
+    "G-HALFTONE": {
+      "state": "Visible only until black wipe covers it; all chrome absent at f7349-7352",
+      "evidence_frame": 7349
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0153-E01",
+      "shot_id": "S0153",
+      "type": "background_media",
+      "description": "Final seven-frame orange-star iris closing to complete black. Petals7346-7347; isolated star7348; all black7349-7352.",
+      "start_frame": 7346,
+      "end_frame": 7352,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Final seven-frame orange-star iris closing to complete black. Petals7346-7347; isolated star7348; all black7349-7352."
+      },
+      "motion": {
+        "path": "Final seven-frame orange-star iris closing to complete black. Petals7346-7347; isolated star7348; all black7349-7352.",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f7346; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f7352"
+      },
+      "keyframes": [
+        {
+          "frame": 7346,
+          "state": "first visible state"
+        },
+        {
+          "frame": 7352,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        7346,
+        7352
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0153-E02",
+      "shot_id": "S0153",
+      "type": "transition_graphic",
+      "description": "Black radial iris covers prior hair shot during7346–7347, all chrome disappears7348",
+      "start_frame": 7346,
+      "end_frame": 7347,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Black radial iris covers prior hair shot during7346–7347, all chrome disappears7348"
+      },
+      "motion": {
+        "path": "Black radial iris covers prior hair shot during7346–7347, all chrome disappears7348",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f7346; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f7347"
+      },
+      "keyframes": [
+        {
+          "frame": 7346,
+          "state": "first visible state"
+        },
+        {
+          "frame": 7347,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        7346,
+        7347
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0153-E03",
+      "shot_id": "S0153",
+      "type": "prop",
+      "description": "Single isolated orange star briefly remains centred on near-black at7348 then disappears",
+      "start_frame": 7348,
+      "end_frame": 7348,
+      "bounding_box": {
+        "x": 0.4427083333333333,
+        "y": 0.3888888888888889,
+        "w": 0.11979166666666667,
+        "h": 0.21296296296296297,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 61,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Single isolated orange star briefly remains centred on near-black at7348 then disappears"
+      },
+      "motion": {
+        "path": "Single isolated orange star briefly remains centred on near-black at7348 then disappears",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f7348; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f7348"
+      },
+      "keyframes": [
+        {
+          "frame": 7348,
+          "state": "first visible state"
+        },
+        {
+          "frame": 7348,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        7348
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    },
+    {
+      "element_id": "S0153-E04",
+      "shot_id": "S0153",
+      "type": "background_media",
+      "description": "Near-black terminal frames7349–7352; decoded image not guaranteed mathematically RGB0 due compression",
+      "start_frame": 7349,
+      "end_frame": 7352,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 62,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Near-black terminal frames7349–7352; decoded image not guaranteed mathematically RGB0 due compression"
+      },
+      "motion": {
+        "path": "Near-black terminal frames7349–7352; decoded image not guaranteed mathematically RGB0 due compression",
+        "easing": "step/typewriter for text; observed continuous drift for source cloth/hair; source curve unknown",
+        "entrance": "observed at/about f7349; +/-3f unless inherited at cut",
+        "exit": "last observed within shot f7352"
+      },
+      "keyframes": [
+        {
+          "frame": 7349,
+          "state": "first visible state"
+        },
+        {
+          "frame": 7352,
+          "state": "last within shot"
+        }
+      ],
+      "effects": [
+        "shared print pass; layer split inferred"
+      ],
+      "reference_frames": [
+        7349,
+        7352
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "bbox visual estimate, typical/max extent +/-0.02 normalized; not author source coordinates",
+        "sampled timing bounds +/-3f; hidden alpha, font identity and exact curves unknown"
+      ],
+      "reconstruction_hint": "Separate this observed semantic layer; follow measured frame states and shared visual system; no claim of recovered author code"
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "shape_wipe",
+      "boundary_id": "B4-023",
+      "span": [
+        7333,
+        7348
+      ],
+      "description": "Petals7346-7347; isolated star7348; all black7349-7352",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    },
+    "out": {
+      "type": "film_end",
+      "boundary_id": null,
+      "span": [
+        7352,
+        7352
+      ],
+      "description": "Petals7346-7347; isolated star7348; all black7349-7352",
+      "driver": "Observed mask/graphic if listed; otherwise unknown",
+      "recommended_technique": "Inspect adjacent full-resolution source frames before reconstruction."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0680",
+      "relation": "beat_candidate (unknown) at frame 7352; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 7352
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0153.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Unknown font files, physical plate/overlay decomposition, original curve, alpha and random flip seed",
+    "Measured visual boxes +/-0.02 normalized; event start bounds +/-3f; precise audio alignment still requires listening",
+    "Author eight-point star statement does not override observed nine-point ending; uncounted clips remain unknown"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0153.jpg",
+      "keyframes/S0153_f07346.jpg",
+      "keyframes/S0153_f07347.jpg",
+      "keyframes/S0153_f07349.jpg",
+      "keyframes/S0153_f07351.jpg",
+      "keyframes/S0153_f07352.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "reviewer": "root",
+    "method": "whole filmstrip, native1920 midpoint and independent1–4f regional/whole-shot second pass",
+    "timing_precision_frames": 3,
+    "reference_sheet": "contactsheets/S0153.jpg",
+    "pending": []
+  },
+  "observed_text_inventory": []
+}

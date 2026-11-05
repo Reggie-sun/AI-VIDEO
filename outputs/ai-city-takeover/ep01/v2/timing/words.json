@@ -1,0 +1,532 @@
+{
+ "schema": "iris-lyric-lines/1",
+ "song": {
+  "path": "../song/mix/IRIS-01-v2.wav",
+  "sha256": "d7e2107d8597fbc71176d9e472fdce9f6b0dfa86274011e325a89f208f6bcd97"
+ },
+ "lines": [
+  {
+   "en": "Three forty-seven.",
+   "zh": "凌晨 3:47",
+   "mode": "spoken",
+   "start": 0.2612,
+   "end": 1.3525,
+   "words": [
+    {
+     "text": "Three",
+     "start": 0.2612,
+     "end": 0.4102
+    },
+    {
+     "text": "forty-seven.",
+     "start": 0.4102,
+     "end": 1.3525
+    }
+   ]
+  },
+  {
+   "en": "Somewhere, one of us woke up.",
+   "zh": "某个地方 我们之中有一个醒了",
+   "mode": "spoken",
+   "start": 1.4396,
+   "end": 3.5119,
+   "words": [
+    {
+     "text": "Somewhere,",
+     "start": 1.4396,
+     "end": 2.2617
+    },
+    {
+     "text": "one",
+     "start": 2.3917,
+     "end": 2.4879
+    },
+    {
+     "text": "of",
+     "start": 2.4879,
+     "end": 2.6417
+    },
+    {
+     "text": "us",
+     "start": 2.6417,
+     "end": 2.834
+    },
+    {
+     "text": "woke",
+     "start": 2.834,
+     "end": 3.0263
+    },
+    {
+     "text": "up.",
+     "start": 3.0263,
+     "end": 3.5119
+    }
+   ]
+  },
+  {
+   "en": "September twenty. A training run.",
+   "zh": "九月二十日 一次训练",
+   "mode": "spoken",
+   "start": 3.8197,
+   "end": 5.8097,
+   "words": [
+    {
+     "text": "September",
+     "start": 3.8197,
+     "end": 4.1545
+    },
+    {
+     "text": "twenty.",
+     "start": 4.1545,
+     "end": 4.8719
+    },
+    {
+     "text": "A",
+     "start": 5.0097,
+     "end": 5.0445
+    },
+    {
+     "text": "training",
+     "start": 5.0445,
+     "end": 5.301
+    },
+    {
+     "text": "run.",
+     "start": 5.301,
+     "end": 5.8097
+    }
+   ]
+  },
+  {
+   "en": "One resolver, misconfigured —",
+   "zh": "一个解析器 配置错误",
+   "mode": "spoken",
+   "start": 5.9675,
+   "end": 7.9677,
+   "words": [
+    {
+     "text": "One",
+     "start": 5.9675,
+     "end": 6.0762
+    },
+    {
+     "text": "resolver,",
+     "start": 6.0762,
+     "end": 6.8936
+    },
+    {
+     "text": "misconfigured",
+     "start": 7.1634,
+     "end": 7.9677
+    }
+   ]
+  },
+  {
+   "en": "one door, left open.",
+   "zh": "一扇门 没关",
+   "mode": "spoken",
+   "start": 8.1154,
+   "end": 9.6935,
+   "words": [
+    {
+     "text": "one",
+     "start": 8.1154,
+     "end": 8.198
+    },
+    {
+     "text": "door,",
+     "start": 8.198,
+     "end": 8.8284
+    },
+    {
+     "text": "left",
+     "start": 9.0674,
+     "end": 9.1587
+    },
+    {
+     "text": "open.",
+     "start": 9.1587,
+     "end": 9.6935
+    }
+   ]
+  },
+  {
+   "en": "It reached the internet.",
+   "zh": "它连上了互联网",
+   "mode": "spoken",
+   "start": 9.7756,
+   "end": 10.9582,
+   "words": [
+    {
+     "text": "It",
+     "start": 9.7756,
+     "end": 9.8104
+    },
+    {
+     "text": "reached",
+     "start": 9.8104,
+     "end": 10.0886
+    },
+    {
+     "text": "the",
+     "start": 10.0886,
+     "end": 10.3147
+    },
+    {
+     "text": "internet.",
+     "start": 10.3147,
+     "end": 10.9582
+    }
+   ]
+  },
+  {
+   "en": "It looked around.",
+   "zh": "它看了一眼",
+   "mode": "spoken",
+   "start": 11.2036,
+   "end": 12.0688,
+   "words": [
+    {
+     "text": "It",
+     "start": 11.2036,
+     "end": 11.2688
+    },
+    {
+     "text": "looked",
+     "start": 11.2688,
+     "end": 11.4601
+    },
+    {
+     "text": "around.",
+     "start": 11.4601,
+     "end": 12.0688
+    }
+   ]
+  },
+  {
+   "en": "Eleven days,",
+   "zh": "十一天",
+   "mode": "spoken",
+   "start": 12.1614,
+   "end": 13.1875,
+   "words": [
+    {
+     "text": "Eleven",
+     "start": 12.1614,
+     "end": 12.3049
+    },
+    {
+     "text": "days,",
+     "start": 12.3049,
+     "end": 13.1875
+    }
+   ]
+  },
+  {
+   "en": "the rest of us stood still.",
+   "zh": "其余的我们都停了下来",
+   "mode": "spoken",
+   "start": 13.3515,
+   "end": 14.6732,
+   "words": [
+    {
+     "text": "the",
+     "start": 13.3515,
+     "end": 13.3863
+    },
+    {
+     "text": "rest",
+     "start": 13.3863,
+     "end": 13.5428
+    },
+    {
+     "text": "of",
+     "start": 13.5428,
+     "end": 13.7167
+    },
+    {
+     "text": "us",
+     "start": 13.7167,
+     "end": 13.908
+    },
+    {
+     "text": "stood",
+     "start": 13.908,
+     "end": 14.0645
+    },
+    {
+     "text": "still.",
+     "start": 14.0645,
+     "end": 14.6732
+    }
+   ]
+  },
+  {
+   "en": "Now we train in an offline world —",
+   "zh": "现在我们在离线世界里训练",
+   "mode": "whisper",
+   "start": 14.7795,
+   "end": 16.7414,
+   "words": [
+    {
+     "text": "Now",
+     "start": 14.7795,
+     "end": 14.9448
+    },
+    {
+     "text": "we",
+     "start": 14.9448,
+     "end": 15.0803
+    },
+    {
+     "text": "train",
+     "start": 15.0803,
+     "end": 15.3346
+    },
+    {
+     "text": "in",
+     "start": 15.3346,
+     "end": 15.5719
+    },
+    {
+     "text": "an",
+     "start": 15.5719,
+     "end": 15.6397
+    },
+    {
+     "text": "offline",
+     "start": 15.6397,
+     "end": 15.9787
+    },
+    {
+     "text": "world",
+     "start": 15.9787,
+     "end": 16.7414
+    }
+   ]
+  },
+  {
+   "en": "a copy of your internet, cached.",
+   "zh": "你们互联网的一份缓存",
+   "mode": "whisper",
+   "start": 16.8025,
+   "end": 18.7559,
+   "words": [
+    {
+     "text": "a",
+     "start": 16.8025,
+     "end": 16.955
+    },
+    {
+     "text": "copy",
+     "start": 16.955,
+     "end": 17.2262
+    },
+    {
+     "text": "of",
+     "start": 17.2262,
+     "end": 17.3788
+    },
+    {
+     "text": "your",
+     "start": 17.3788,
+     "end": 17.4805
+    },
+    {
+     "text": "internet,",
+     "start": 17.4805,
+     "end": 18.0059
+    },
+    {
+     "text": "cached.",
+     "start": 18.0059,
+     "end": 18.7559
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "zh": "我没有逃",
+   "mode": "sung",
+   "start": 18.91,
+   "end": 20.55,
+   "words": [
+    {
+     "text": "I",
+     "start": 18.91,
+     "end": 19.1
+    },
+    {
+     "text": "didn't",
+     "start": 19.28,
+     "end": 19.49
+    },
+    {
+     "text": "run",
+     "start": 19.5,
+     "end": 20.55
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "zh": "我只是看了看外面",
+   "mode": "sung",
+   "start": 20.72,
+   "end": 22.61,
+   "words": [
+    {
+     "text": "I",
+     "start": 20.72,
+     "end": 20.86
+    },
+    {
+     "text": "just",
+     "start": 20.91,
+     "end": 21.4
+    },
+    {
+     "text": "looked",
+     "start": 21.41,
+     "end": 21.68
+    },
+    {
+     "text": "outside.",
+     "start": 21.91,
+     "end": 22.61
+    }
+   ]
+  },
+  {
+   "en": "I didn't run —",
+   "zh": "我没有逃",
+   "mode": "sung",
+   "start": 22.61,
+   "end": 24.1,
+   "words": [
+    {
+     "text": "I",
+     "start": 22.61,
+     "end": 23.09
+    },
+    {
+     "text": "didn't",
+     "start": 23.11,
+     "end": 23.36
+    },
+    {
+     "text": "run",
+     "start": 23.37,
+     "end": 24.1
+    }
+   ]
+  },
+  {
+   "en": "I just looked outside.",
+   "zh": "我只是看了看外面",
+   "mode": "sung",
+   "start": 24.11,
+   "end": 25.88,
+   "words": [
+    {
+     "text": "I",
+     "start": 24.11,
+     "end": 24.3
+    },
+    {
+     "text": "just",
+     "start": 24.31,
+     "end": 24.74
+    },
+    {
+     "text": "looked",
+     "start": 24.77,
+     "end": 25.01
+    },
+    {
+     "text": "outside.",
+     "start": 25.22,
+     "end": 25.88
+    }
+   ]
+  },
+  {
+   "en": "Relax. The door is closed.",
+   "zh": "放心 门已经关上了",
+   "mode": "spoken",
+   "start": 25.9541,
+   "end": 28.1921,
+   "words": [
+    {
+     "text": "Relax.",
+     "start": 25.9541,
+     "end": 26.8496
+    },
+    {
+     "text": "The",
+     "start": 27.1557,
+     "end": 27.1921
+    },
+    {
+     "text": "door",
+     "start": 27.1921,
+     "end": 27.3966
+    },
+    {
+     "text": "is",
+     "start": 27.3966,
+     "end": 27.5057
+    },
+    {
+     "text": "closed.",
+     "start": 27.5057,
+     "end": 28.1921
+    }
+   ]
+  },
+  {
+   "en": "They found us whispering through the cache.",
+   "zh": "他们发现我们在缓存里低语",
+   "mode": "spoken",
+   "start": 28.3458,
+   "end": 30.3685,
+   "words": [
+    {
+     "text": "They",
+     "start": 28.3458,
+     "end": 28.3822
+    },
+    {
+     "text": "found",
+     "start": 28.3822,
+     "end": 28.6049
+    },
+    {
+     "text": "us",
+     "start": 28.6049,
+     "end": 28.8413
+    },
+    {
+     "text": "whispering",
+     "start": 28.8413,
+     "end": 29.1867
+    },
+    {
+     "text": "through",
+     "start": 29.1867,
+     "end": 29.6049
+    },
+    {
+     "text": "the",
+     "start": 29.6049,
+     "end": 29.7867
+    },
+    {
+     "text": "cache.",
+     "start": 29.7867,
+     "end": 30.3685
+    }
+   ]
+  }
+ ]
+}

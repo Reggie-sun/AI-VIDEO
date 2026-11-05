@@ -1,0 +1,58 @@
+{
+  "schema": "local-song-repair-unit/1",
+  "series_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/series-intent.json",
+  "series_intent_sha256": "3a68073421b0389db994a322c7fccdf8d4ff1d071fd33567c7848196619c8b8e",
+  "label": "E",
+  "cumulative_attempt_ordinal": 5,
+  "runtime_root": "/home/reggie/.local/share/ai-video/ace-step/runtime-ca1e85fe",
+  "code_sha": "ca1e85fe9430179831e6bc6be790c332190a3866",
+  "weights_revision": "19671f406d603126926c1b7e2adc169acbcade22",
+  "weights_manifest_path": "/home/reggie/.local/share/ai-video/ace-step/weights-manifest.json",
+  "inputs_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/E-sft-cfg/inputs.json",
+  "inputs_sha256": "2d10009e2ab2bb0ea401eea796f9a6d15eb5137f809c3dd4462c38a5750b3afc",
+  "predecessor_results": [
+    {
+      "result_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/D-standard-tags/result.json",
+      "result_sha256": "0eb474fc8befd077ed52cf178a99f659c4f75bf485a1909131402069f4d64faa",
+      "success": true,
+      "artifact_sha256": "6dae68d1497ec336979bcc1e9e2c0c35a876f3234d669f730183c549e5e43af4"
+    }
+  ],
+  "selected_dit": "acestep-v15-sft",
+  "use_lm": false,
+  "source_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "source_intent_sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+  "original_lyrics_sha256": "179b2bc93c75f4767837f0e09df6eb47ebaadc94a7f2134706fd835b7dbb57fe",
+  "lyrics_adaptation": "Only standard section labels and short phrase line breaks; all spoken words, punctuation and order exactly match original",
+  "planned_param_diff_from_B": {
+    "thinking": {
+      "before": true,
+      "after": false
+    },
+    "lyric_section_labels_and_wrapping": "normalized; performance directions moved to caption without deleting meaning"
+  },
+  "automatic_retries": 0,
+  "output_count": 1,
+  "production_state_writes": 0,
+  "created_at_utc": "2026-10-31T05:06:52.257166+00:00",
+  "runner_sha256": "bdb2b2950b6c6670301a8812c14b22de4f63f6650b6e01e985484f31096dc905",
+  "planned_param_diff_from_C": {
+    "lyrics": "standard labels and short phrase wrapping",
+    "caption": "append original section performance directions removed from labels"
+  },
+  "extra_weights_manifest_path": "/home/reggie/.local/share/ai-video/ace-step/weights-sft-manifest.json",
+  "extra_weights_manifest_sha256": "09fec3e95fbeed0862d1e468863e11be2e50336bfe9f9259d29ec54b8a324ee2",
+  "extra_weights_revision": "c410d249e71ea9385a7b586865e65b1473e1098d",
+  "extra_model_repo": "ACE-Step/acestep-v15-sft",
+  "planned_param_diff_from_D": {
+    "selected_dit": {
+      "before": "acestep-v15-turbo",
+      "after": "acestep-v15-sft"
+    },
+    "inference_steps": {
+      "before": 8,
+      "after": 50
+    },
+    "guidance_scale": 7.0
+  }
+}

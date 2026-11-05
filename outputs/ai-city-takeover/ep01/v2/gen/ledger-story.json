@@ -1,0 +1,40 @@
+{
+ "schema": "iris-v2-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "ST1",
+   "attempt_id": "iris-st1-source-001",
+   "operator_ceiling": 165,
+   "intent_at": "2026-11-03T13:54:38.084600+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "ST2",
+   "attempt_id": "iris-st2-source-001",
+   "operator_ceiling": 165,
+   "intent_at": "2026-11-03T13:54:51.043075+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "ST3",
+   "attempt_id": "iris-st3-source-001",
+   "operator_ceiling": 165,
+   "intent_at": "2026-11-03T13:55:03.863396+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "ST4",
+   "attempt_id": "iris-st4-source-001",
+   "operator_ceiling": 165,
+   "intent_at": "2026-11-03T13:55:16.973706+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "ST6",
+   "attempt_id": "iris-st6-source-001",
+   "operator_ceiling": 165,
+   "intent_at": "2026-11-03T13:55:29.802918+00:00",
+   "outcome": "submitted"
+  }
+ ]
+}

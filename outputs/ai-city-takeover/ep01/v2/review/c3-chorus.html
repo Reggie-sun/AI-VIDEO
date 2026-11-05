@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8">
+<title>IRIS 01 · c3 副歌：同步量測與候選</title>
+<style>
+ :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; --ok:#9fd3a8; }
+ body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK TC","Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+ h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:18px; font-weight:600; margin:30px 0 8px; }
+ .dim { color:var(--dim); font-size:13px; } table { border-collapse:collapse; width:100%; max-width:1500px; }
+ td, th { border-bottom:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; } th { color:var(--dim); font-weight:500; }
+ .row { display:flex; gap:14px; flex-wrap:wrap; } figure { margin:8px 0; } video { width:min(740px,46vw); background:#000; display:block; }
+ figcaption { color:var(--dim); font-size:13px; } .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 16px; max-width:1480px; }
+ img { max-width:1500px; width:100%; margin:8px 0; border:1px solid var(--line); } details { margin:8px 0; } summary { cursor:pointer; }
+ b.a { color:#ffd479; }
+</style>
+<h1>IRIS 01 · c3 副歌：同步量測與候選（請你看完決定）</h1>
+<div class="dim">候選都是 c3 合成工程的實際渲染（正常速度、帶母帶），只取副歌那一段；還沒加副歌的 punch／impact 動效。歌詞照樣上屏。</div>
+
+<h2>怎麼量的</h2>
+<div class="box"><ul>
+ <li>新工具 <code>motion-kit/tools/sync_check.py</code> 照作者 toolkit §15、§63：拿每支 take 自帶的音軌和當初送出的人聲窗口比，量延遲、找分歧點，再把 take 依量到的延遲放上歌。</li>
+ <li>作者的前提是「嘴跟著 take 自己的音軌走」。數字只決定放哪裡、從哪裡切；<b>對嘴準不準以你看疊歌片為準</b>。</li>
+ <li>每一遍只用一支 take，不在 take 之間互換。</li>
+</ul></div>
+
+<h2>6 支對嘴片的量測</h2>
+<table><tr><th>take</th><th>判定</th><th>放置延遲</th><th>同步區段（歌曲秒）</th><th>分歧點</th><th>結論</th></tr><tr><td><b>S8a</b><br><span class=dim>8631894f86f4</span></td><td>照抄<br><span class=dim>NCC 0.28</span></td><td>-0.033 s<br><span class=dim>tool 15 waveform lag (copy)</span></td><td>19.61–20.54、21.03–22.87</td><td>—</td><td>照抄，但第一句「I didn't run」早約 0.39 s；第二句「I just looked outside」才對上（包絡分段 −0.39 → −0.08 s）</td></tr><tr><td><b>S8ar</b><br><span class=dim>474fc1db7ff5</span></td><td>照抄<br><span class=dim>NCC 0.29</span></td><td>-0.359 s<br><span class=dim>tool 15 waveform lag (copy)</span></td><td>19.75–20.56、22.12–22.88</td><td>—</td><td>照抄判定（NCC 0.29），但延遲從 −0.16 漂到 −0.30 s，同步片段短</td></tr><tr><td><b>S8av3</b><br><span class=dim>20e7642b073a</span></td><td>照抄<br><span class=dim>NCC 0.40</span></td><td>-0.107 s<br><span class=dim>tool 15 waveform lag (copy)</span></td><td>18.84–20.78、21.07–21.64</td><td>21.78</td><td>照抄最穩（NCC 0.40）：「I didn't run — I just looked」同步，「outside」起分歧</td></tr><tr><td><b>S8b2</b><br><span class=dim>098b41979918</span></td><td>照抄<br><span class=dim>NCC 0.33</span></td><td>-0.133 s<br><span class=dim>tool 15 waveform lag (copy)</span></td><td>22.97–24.57</td><td>24.62</td><td>照抄：「I didn't run」到「I just」同步，「looked outside」起分歧</td></tr><tr><td><b>S8br</b><br><span class=dim>1baeab8a1892</span></td><td>重唱<br><span class=dim>NCC 0.15</span></td><td>-1.060 s<br><span class=dim>tool 63 envelope lag (re-sung, NOT steady: judge by eye)</span></td><td>—</td><td>22.88</td><td>重唱：約 2.1 s 後就不唱了，延遲量不穩（依作者 §63 應剔除）</td></tr><tr><td><b>S8bv3b</b><br><span class=dim>83576dce4c71</span></td><td>重唱<br><span class=dim>NCC 0.03</span></td><td>+0.699 s<br><span class=dim>tool 63 envelope lag (re-sung, NOT steady: judge by eye)</span></td><td>—</td><td>22.10</td><td>重唱：延遲在 +0.2 到 +1.2 s 間跳動，量不出穩定延遲（依作者 §63 應剔除）；c2 用的就是這支</td></tr></table>
+<div class="dim">延遲為負＝take 比歌早唱；入點＝鏡頭起點 − 窗口起點 + 延遲。同步區段已截到分歧點為止。</div>
+
+<h2>第一遍副歌（18.87–22.57 s）：用 S8av3</h2>
+<div class="row">
+ <figure><video controls preload=metadata src="../renders/review/c3-pass1-A.mp4"></video><figcaption><b class=a>A</b>：S8av3 整遍不切走。「outside」（約 21.78 s 起）量到分歧，嘴可能對不上。</figcaption></figure>
+ <figure><video controls preload=metadata src="../renders/review/c3-pass1-B.mp4"></video><figcaption><b class=a>B</b>：唱完「I didn't run —」，在換行的停頓（20.67 s）切到她睜開的眼睛（S1v3 片內 4.0 s 起，接續開場那一鏡），「I just looked outside」照樣上屏。</figcaption></figure>
+</div>
+<div class="dim">片段從 17.9 s 開始（含 S7 結尾），到 23.0 s（含第二遍開頭）。S8av3 在 c2 是晚 2 幀放的；量到的延遲是早 0.107 s，所以 c3 比 c2 早約 5 幀。</div>
+<details><summary><b>S8av3</b> 單支疊歌片與診斷圖（照抄最穩（NCC 0.40）：「I didn't run — I just looked」同步，「outside」起分歧）</summary><div class=row><figure><video controls preload=metadata src='../qa/sync/S8av3/review-S8av3-20e7642b073a-placement-lag-0.107.mp4'></video><figcaption>依量到的延遲（延遲 -0.107 s）</figcaption></figure><figure><video controls preload=metadata src='../qa/sync/S8av3/review-S8av3-20e7642b073a-prior-lag+0.067.mp4'></video><figcaption>先前成片用的位置（延遲 +0.067 s）</figcaption></figure></div><img src='../qa/sync/S8av3/sync.png' alt='S8av3 sync check'></details><details><summary><b>S8a</b> 單支疊歌片與診斷圖（照抄，但第一句「I didn't run」早約 0.39 s；第二句「I just looked outside」才對上（包絡分段 −0.39 → −0.08 s））</summary><div class=row><figure><video controls preload=metadata src='../qa/sync/S8a/review-S8a-8631894f86f4-placement-lag-0.033.mp4'></video><figcaption>依量到的延遲（延遲 -0.033 s）</figcaption></figure></div><img src='../qa/sync/S8a/sync.png' alt='S8a sync check'></details><details><summary><b>S8ar</b> 單支疊歌片與診斷圖（照抄判定（NCC 0.29），但延遲從 −0.16 漂到 −0.30 s，同步片段短）</summary><div class=row><figure><video controls preload=metadata src='../qa/sync/S8ar/review-S8ar-474fc1db7ff5-placement-lag-0.359.mp4'></video><figcaption>依量到的延遲（延遲 -0.359 s）</figcaption></figure><figure><video controls preload=metadata src='../qa/sync/S8ar/review-S8ar-474fc1db7ff5-prior-lag+0.000.mp4'></video><figcaption>先前成片用的位置（延遲 +0.000 s）</figcaption></figure></div><img src='../qa/sync/S8ar/sync.png' alt='S8ar sync check'></details>
+
+<h2>第二遍副歌（22.57–25.90 s）：用 S8b2</h2>
+<div class="row">
+ <figure><video controls preload=metadata src="../renders/review/c3-pass2-A.mp4"></video><figcaption><b class=a>A</b>：S8b2 整遍不切走。「looked outside」（約 24.62 s 起）量到分歧。</figcaption></figure>
+ <figure><video controls preload=metadata src="../renders/review/c3-pass2-B.mp4"></video><figcaption><b class=a>B</b>：唱完「I didn't run —」，在換行處（24.07 s）切到她在窗前看著城市（S5v3 片內 3.0 s 起，接續 S5 那一鏡），25.90 s 切到機櫃門。</figcaption></figure>
+</div>
+<div class="dim">片段從 22.0 s 開始（含第一遍結尾，所以 A、B 開頭會不同），到 26.6 s。第二遍「run」直接連到「I」，中間沒有靜音，所以換行處就是切點；24.07 s 前 S8b2 都在同步區段內。c2 用的 S8bv3b 量不出穩定延遲，依作者規則不放。</div>
+<details><summary><b>S8b2</b> 單支疊歌片與診斷圖（照抄：「I didn't run」到「I just」同步，「looked outside」起分歧）</summary><div class=row><figure><video controls preload=metadata src='../qa/sync/S8b2/review-S8b2-098b41979918-placement-lag-0.133.mp4'></video><figcaption>依量到的延遲（延遲 -0.133 s）</figcaption></figure><figure><video controls preload=metadata src='../qa/sync/S8b2/review-S8b2-098b41979918-prior-lag+0.000.mp4'></video><figcaption>先前成片用的位置（延遲 +0.000 s）</figcaption></figure></div><img src='../qa/sync/S8b2/sync.png' alt='S8b2 sync check'></details><details><summary><b>S8bv3b</b> 單支疊歌片與診斷圖（重唱：延遲在 +0.2 到 +1.2 s 間跳動，量不出穩定延遲（依作者 §63 應剔除）；c2 用的就是這支）</summary><div class=row><figure><video controls preload=metadata src='../qa/sync/S8bv3b/review-S8bv3b-83576dce4c71-placement-lag+0.699.mp4'></video><figcaption>依量到的延遲（延遲 +0.699 s）</figcaption></figure><figure><video controls preload=metadata src='../qa/sync/S8bv3b/review-S8bv3b-83576dce4c71-prior-lag+0.000.mp4'></video><figcaption>先前成片用的位置（延遲 +0.000 s）</figcaption></figure></div><img src='../qa/sync/S8bv3b/sync.png' alt='S8bv3b sync check'></details><details><summary><b>S8br</b> 單支疊歌片與診斷圖（重唱：約 2.1 s 後就不唱了，延遲量不穩（依作者 §63 應剔除））</summary><div class=row><figure><video controls preload=metadata src='../qa/sync/S8br/review-S8br-1baeab8a1892-placement-lag-1.060.mp4'></video><figcaption>依量到的延遲（延遲 -1.060 s）</figcaption></figure><figure><video controls preload=metadata src='../qa/sync/S8br/review-S8br-1baeab8a1892-prior-lag+0.000.mp4'></video><figcaption>先前成片用的位置（延遲 +0.000 s）</figcaption></figure></div><img src='../qa/sync/S8br/sync.png' alt='S8br sync check'></details>
+
+<h2>我自己看到、要你一起判斷的</h2>
+<div class="box"><ul>
+ <li><b>第二遍 B 的 24.07 s 接點</b>：S8b2 與 S5v3 她都臉朝左、景別相近，可能被看成跳接。若你覺得跳，可以把兩遍的切走畫面對調（第一遍用窗前、第二遍用眼睛）。</li>
+ <li><b>c1 就有的歌詞時間問題</b>：第一遍「I just looked outside」這行在 20.27 s 就上屏，她實際 20.71 s 才唱，當時還在唱「run」。副歌的逐字時間來自信心很低的 Whisper 對齊；可以改用這次量到的人聲起點校正副歌四行。</li>
+ <li>倉庫的拼接 Gate（verify-assembly）接不上 motion-kit 合成，接點未經 Harness 驗證；聲音與對嘴的聽感我無法聆聽，以你為準。</li>
+</ul></div>
+</html>

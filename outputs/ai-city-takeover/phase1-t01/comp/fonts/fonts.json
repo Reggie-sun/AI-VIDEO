@@ -1,14 +1,14 @@
 {
- "text_sha256": "e78d41cd8b4dbcdf3041913db752af186ad85f256da29f923b6022235d2c10f8",
- "chars": 187,
+ "text_sha256": "a79e21ac8bb913a4fe4153556e364763eb76b5d9f7bb427dda86c6e36736b82f",
+ "chars": 188,
  "faces": [
   {
    "family": "MK Sans SC",
    "source_family": "Noto Sans CJK SC",
    "weight": "Bold",
    "file": "MK-Sans-SC.otf",
-   "bytes": 69564,
-   "sha256": "dae2a8c15abf160fb783fccc01d01d235bac625cf401077c7a67be4de1734ba9",
+   "bytes": 69712,
+   "sha256": "687189d59b44381df1fdefc4633a9c5642bf63baec76a5cc325370450790f7a2",
    "license": "SIL Open Font License 1.1",
    "missing": ""
   },
@@ -17,8 +17,8 @@
    "source_family": "Noto Sans CJK SC",
    "weight": "Regular",
    "file": "MK-Sans-SC-Regular.otf",
-   "bytes": 68396,
-   "sha256": "5d29a305c77fffa36a8da281f66ebe63c5f98b1e8919516da068520a6da3b528",
+   "bytes": 68536,
+   "sha256": "c9c6aafa3773718df4fd6960cfe60e3d241775b491f1b9dc2ef2c71b228687e8",
    "license": "SIL Open Font License 1.1",
    "missing": ""
   },
@@ -27,8 +27,8 @@
    "source_family": "Noto Sans Mono CJK SC",
    "weight": "Regular",
    "file": "MK-Mono-SC.otf",
-   "bytes": 62440,
-   "sha256": "160b781b7aef4626e065a6e10c882f638b7594e4d8636e97de8768bc2fb3e0ad",
+   "bytes": 62580,
+   "sha256": "f782e59f16b47eeee185341863800cf66d57e413fc3ef7b38a0aba72da3818fd",
    "license": "SIL Open Font License 1.1",
    "missing": ""
   },
@@ -37,8 +37,8 @@
    "source_family": "Noto Sans Mono CJK SC",
    "weight": "Bold",
    "file": "MK-Mono-SC-Bold.otf",
-   "bytes": 63624,
-   "sha256": "9594c60eb300bd82a657460d4caa3133f4b89cf4be03aeebd47712fa97680d0f",
+   "bytes": 63772,
+   "sha256": "64aaef851457ffe38a2275a7b91df6bf37ac99d5ae80714e3a4174230a0b3f21",
    "license": "SIL Open Font License 1.1",
    "missing": ""
   },
@@ -47,8 +47,8 @@
    "source_family": "Noto Serif CJK SC",
    "weight": "Bold",
    "file": "MK-Serif-SC.otf",
-   "bytes": 93096,
-   "sha256": "fc77ea9ee4bb40adeb17d9a77a632d2b4d5ab057a8430bad4876ae54e234ec7c",
+   "bytes": 93240,
+   "sha256": "d5d8ca8cc9d428e05f4f95129a6cb8d02ff42a0f661e2a87d5ecff46f22ea992",
    "license": "SIL Open Font License 1.1",
    "missing": ""
   }

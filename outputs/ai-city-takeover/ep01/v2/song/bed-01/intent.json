@@ -1,0 +1,24 @@
+{
+ "schema": "iris-ep01-song-take/1",
+ "created_at_utc": "2026-11-02T05:41:15.718301+00:00",
+ "service": "ElevenLabs Music inpainting via project MCP elevenlabs-direct.compose_music",
+ "model_id": "music_v2",
+ "seed": 260106,
+ "store_for_inpainting": true,
+ "plan_sha256": "3ce7ce78f3c30185d546ce2bc08219ae719e83a2ab5b488a1f665354b6bcc782",
+ "keeps": {
+  "song_id": "adAwLxlOTRPdVH4Pq0x6",
+  "take": 3,
+  "range_ms": [
+   18800,
+   26669
+  ],
+  "why": "sung chorus twice, vocal 18.91-25.75 s"
+ },
+ "budget": {
+  "cap": "3 generations approved 2026-11-02 (half-sung retry cap)",
+  "this_ordinal_in_cap": 2,
+  "director_quote": "保留第 3 版副歌，其餘補念白 (Recommended)"
+ },
+ "account_character_count_before": 2305
+}

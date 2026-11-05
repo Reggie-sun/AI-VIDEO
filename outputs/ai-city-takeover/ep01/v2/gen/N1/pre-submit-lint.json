@@ -1,0 +1,40 @@
+{
+ "unit": "N1",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "e1b088bcf9d4c78eba022e68e27702937eff4ad4109888ea6491451a586e093b",
+ "compiled_prompt_sha256": "36ddbc5a90e06e61a314ebfe9428234603c33c11f8f37a5533f27ff2ac1e0601",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/action/continuity-report.json",
+  "sha256": "0af3fc1e681decd974c28b7faade05c92dcdcd8502d5117f0889856b8c8dbabf",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS：N1-a 是 K3 的編修版，走道、兩側機櫃藍燈、盡頭紅光門縫、天花燈帶和構圖都與 K3 相同；炭黑高領大衣、後梳低髻與身份設定一致；背影看不到耳朵，所以耳挂不可見，符合預期；光線是冷藍加門縫紅光，與 K3 和 c11 S3（5.0 s 那一幀）一致。領口紅線跨過整個後領，見 R1。",
+   "handoff": "PASS（附條件）：開頭就是 K3 構圖加上她走在走道中央，結尾是她走得更遠、仍背對鏡頭，是乾淨的出點。條件：不要直接接 S3 的空走道（同一構圖，硬切時她會突然出現或消失）；建議放在 I1 之後、S3 之前或取代 S3 前段，並先在剪接決定裡寫明是省略剪接還是取代。",
+   "axis_action_camera": "PASS：她沿走道中央直線遠離鏡頭，沒有左右方向問題；與 K3 消失點相同；鏡頭固定（LOCKED，prompt 寫「镜头固定」）；動作只有一段：走向門縫。首幀已在跨步中，與設定 action_start「站在」差一點，但不影響理解。風險見 R4、R5、R10。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 36ddbc5a…；compiled 檔 f5088098…，差在檔尾換行）；寫了「始终看不到她的脸」，沒有對白或唱歌；設定 open_event、close_event 的字句都在 prompt 裡。",
+   "lint": "PASS（只差本報告）：lint.py N1 只有 continuity_report_ready 未過；request_hash e1b088bc…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   4,
+   660
+  ]
+ },
+ "new_calls": 0
+}

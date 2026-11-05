@@ -1,0 +1,6 @@
+{
+ "note": "lint.json in this folder was overwritten on 2026-11-04 by a regression re-run of gen/omnihuman.py lint after the script gained the OMNI_TRIAL option; the current lint.json shows the post-submit state (never_submitted / ledger_has_room false), not the pre-submit result.",
+ "pre_submit_evidence": "permit.json exists: gen/omnihuman.py permit() issues a permit only when lint passes at that moment (checks.lint_pass), so the pre-submit lint passed",
+ "permit_sha256": "1938767d4bf0d605c7edd2cfe3acf7b5763c3847e2aa95a64d7649bb9caa542f",
+ "written_at": "2026-11-04T03:23:03.150062+00:00"
+}

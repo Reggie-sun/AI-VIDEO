@@ -1,0 +1,31 @@
+{
+ "unit": "S8bv3b",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "chinese_body_only": true,
+  "directed_behaviour_in_text": true,
+  "ai_label_preserved": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "identical_to_S8bv3_request": true
+ },
+ "pass": true,
+ "request_hash": "3689823e3480f87b36bcf1b60fc27d08f26336546f933bed31a23c729fc76b08",
+ "continuity": "hard cut on the second-pass 'I' at 22.567 s; clip t=0 = master 22.00 s, film window clip 0.567-3.90 s",
+ "handoff": "S8a frontal pass 1 -> S8b 3/4 pass 2, last line opens up, then mouth closed looking at the city -> S9a door on 'Relax'",
+ "axis_action_camera": "K8b 3/4 view facing frame-left, city behind at right; locked camera",
+ "prompt_fit": "pure Chinese body 538 chars; performance still bound as expression-only reference; all inputs in preview-approval-v3.json",
+ "budget": {
+  "operator_ceiling_CRD": 250,
+  "v3_ceiling_CRD": 1850,
+  "expected_cost_CRD": 165,
+  "v3_submits_before": 2,
+  "v3_ceiling_CRD_used_before": 500
+ },
+ "new_calls": 0,
+ "identical_fields": "model, mode, prompt text, 4 image bindings (sha, mime, size, order), vocal binding (sha, duration), output timing/duration/resolution; only node, generation ids and project revision differ",
+ "retry_of": "S8bv3 (known_no_effect: reference upload failed before dispatch, no charge; balance 65,467 after S1v3 198 + S8av3 165 confirms it)",
+ "s8a_decided_by_user": "用 S8av3，晚 2 幀 (Recommended)"
+}

@@ -1,0 +1,13 @@
+{
+  "audio_sha256": "7142d8cf2f6af2b5a67380bf36e115002e3cb85517dc0fe8487fb6b8fe7ddac4",
+  "sample_rate": 48000,
+  "channels": 2,
+  "frames": 1440000,
+  "duration_seconds": 30.0,
+  "rms": 0.14046406388395394,
+  "peak": 0.891265869140625,
+  "clipped_sample_count": 0,
+  "finite": true,
+  "full_decode": "PASS",
+  "human_hearing": "NOT_EVALUATED"
+}

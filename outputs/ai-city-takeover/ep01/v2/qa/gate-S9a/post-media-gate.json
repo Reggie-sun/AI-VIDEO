@@ -1,0 +1,70 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S9a",
+  "shot_id": "ep01v2-s9a",
+  "attempt_id": "iris-v2-s9a-source-001",
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+  "artifact_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+  "intent": "board v2.1 S9a: the door that was left open shuts and the red light goes out (Relax. The door is closed.); native first/last frame K4 -> K9e",
+  "source_audio_policy": "MUTE (final film uses the approved song v2; raw audio not counted)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 6.08 s, 145 frames (24 fps cadence on a 60 tbn grid), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S9a/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, issues []",
+    "frames": "first-mid-last.jpg, quarter-second-sheet.jpg, door-0-24-40-52-144.jpg",
+    "camera_drift": "qa/frame_drift.py: scale 0.00-0.01%, shift <= 0.3 px over 6 s (774-792 of 800 inliers)",
+    "red_light_pixels_every_6_frames": [
+      48683,
+      62604,
+      71524,
+      76634,
+      78869,
+      70659,
+      48857,
+      26114,
+      5486,
+      1309,
+      249,
+      44,
+      39,
+      40,
+      48,
+      51,
+      52,
+      52,
+      40,
+      52,
+      61,
+      52,
+      61,
+      61,
+      4
+    ],
+    "endpoints": "mean abs RGB difference at 836x470: first frame vs K4 11.8, last frame vs K9e 10.6 (last vs K4 13.6)"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "door-closes",
+      "verdict": "PASS",
+      "reason": "the red gap holds about 1 s (the glow brightens slightly), the door swings shut from about 1.2 s to 2.45 s, the gap narrows to nothing, red light and floor reflection go out by 2.5 s, then the frame stays still"
+    },
+    {
+      "requirement_id": "same-view",
+      "verdict": "PASS",
+      "reason": "locked camera on the K4 view throughout; the take opens in the K4 state and ends in the K9e state"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; no subtitles, titles, text or interface added; no person in frame"
+    }
+  ],
+  "edit_note": "the door is fully shut at about clip 2.45 s; with the source in-point at about 0.16 s the shut lands on the end of 'closed' (shot time 2.29 s)",
+  "verdict": "PASS",
+  "all_required_observed_pass": true,
+  "not_evaluated": [
+    "human 1.0x viewing in the assembled film",
+    "final audio (MUTE here)"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

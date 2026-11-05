@@ -1,0 +1,115 @@
+........................................................................ [ 10%]
+.................F...................................................... [ 21%]
+........................................................................ [ 32%]
+........................................................................ [ 43%]
+........................................................................ [ 54%]
+...........s............................................................ [ 65%]
+........................................................................ [ 76%]
+....F....F.............................................................. [ 87%]
+........................................................................ [ 98%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+_____________ test_empty_directions_keep_the_legacy_six_field_hash _____________
+
+    def test_empty_directions_keep_the_legacy_six_field_hash() -> None:
+        legacy = _complete_intent().performance_intent
+        assert legacy is not None
+        explicit_empty = legacy.model_copy(update={"character_directions": ()})
+    
+        assert tuple(explicit_empty.model_dump(mode="json")) == (
+            "trigger",
+            "visible_response",
+            "gaze_target",
+            "body_behavior",
+            "hand_behavior",
+            "terminal_performance_state",
+        )
+        assert canonical_sha256(explicit_empty.model_dump(mode="json")) == (
+            "b33f58485e4c0f9a2fef257335cac9cc1bc5e39dff589b989ef35aea49310206"
+        )
+        # The pre-planning golden is unchanged once the newly declared fixture
+        # reference_planning is the only difference.  The full fixture intent hash
+        # moved only because fresh fixture planning now also binds preview_approval;
+        # without that single field it equals the previous golden (3580...3bab).
+        assert canonical_sha256(
+            _complete_intent().model_copy(update={"reference_planning": None}).model_dump(mode="json")
+        ) == "6c61c0afdc861ff99c956003e4e9d84adb53467560bc25ec5eb578d2d4fc9ed0"
+>       assert canonical_sha256(_complete_intent().model_dump(mode="json")) == (
+            "c26544616de7f89f2b1a7d23250c7068bb53f23f3e6c3026600d4d2a5d16918c"
+        )
+E       AssertionError: assert 'b493e6f5fa4e...62b49fb188db2' == 'c26544616de7...d4d2a5d16918c'
+E         
+E         - c26544616de7f89f2b1a7d23250c7068bb53f23f3e6c3026600d4d2a5d16918c
+E         + b493e6f5fa4e5a2fa1f4c327e12f2a01635bf9b4da8f70e449d62b49fb188db2
+
+tests/test_performance_direction.py:179: AssertionError
+__________ test_prepares_and_reopens_a_strict_legacy_remote_snapshot ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2100/test_prepares_and_reopens_a_st0')
+
+    def test_prepares_and_reopens_a_strict_legacy_remote_snapshot(tmp_path):
+        loaded, experience, policy, source = _legacy_source(tmp_path)
+        source_payload = source.model_dump(mode="json")
+        assert source.schema_version == "generation-evaluation/1"
+        # This fixture is freshly authored, then projected into legacy receipt
+        # shape; its fingerprints include the new explicit acting input/rubric and the
+        # declared planning with sealed coverage and the approved identity waiver.
+        # Historical /1 payload hashes remain frozen in test_generation_evaluation.py.
+>       assert source.source_sha256 == "2f8536a33511852c29b0d76e56daed90c7c98602e666d7fe1262f20c7351f0e5"
+E       AssertionError: assert '8c957f570a0b...35a9b7e3e0717' == '2f8536a33511...2f20c7351f0e5'
+E         
+E         - 2f8536a33511852c29b0d76e56daed90c7c98602e666d7fe1262f20c7351f0e5
+E         + 8c957f570a0b80fe8d3f9fde3df7ef19ebd21914e29016cd83e35a9b7e3e0717
+
+tests/test_generation_history_import_receipt.py:153: AssertionError
+______ test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay ______
+
+tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2100/test_abandon_preserves_mixed_d0')
+
+    def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path):
+        committer, experience, manifest, before = _fetched_mixed_failure(tmp_path)
+        state = before.video_generation_state
+        assert tuple(source.schema_version for source in experience.evaluation_sources) == (
+            "generation-evaluation/1", "generation-evaluation/1", "generation-evaluation/1",
+        )
+        # Freshly authored fixture: fingerprints bind its declared reference_planning
+        # and sealed Director coverage/approved identity waiver, like its acting input.
+        # Historical /1 payload hashes remain frozen in test_generation_evaluation.py.
+>       assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
+            "3e6a0ae1f86d12850545a1eef472f2461230541e4870dd62c3ea8961bc546229",
+            "b49d0b54d62ee464d2c09d64d51d54371537ddc341895aa7c151347655cd03ff",
+            "3691ae8f75147e785102229e4c077e66cc3f12d99c7d8c2068f1c55db91bf309",
+        )
+E       AssertionError: assert ('9678c49676b...529c1f27de19') == ('3e6a0ae1f86...c55db91bf309')
+E         
+E         At index 0 diff: '9678c49676be7e77c71c16bf533cf9d480fa8908d83abc14c9f500d717ee6d65' != '3e6a0ae1f86d12850545a1eef472f2461230541e4870dd62c3ea8961bc546229'
+E         Use -v to get more diff
+
+tests/test_generation_quality_rejection.py:166: AssertionError
+- generated xml file: /tmp/ai-video-song-preview-verification-j9amrmjo/mixed/.agent/harness/runs/iris-captioned-music-mixed-focused-20261030/02-generation_feedback_tests.junit.xml -
+============================= slowest 20 durations =============================
+13.91s call     tests/test_jimeng_qualification_trial.py::test_qualification_paid_no_effect_extension_authorizes_only_fifth_submit
+11.66s call     tests/test_jimeng_qualification_trial.py::test_qualification_paid_no_effect_extension_authorizes_only_fourth_submit
+11.59s call     tests/test_generation_runtime_repair.py::test_exact_extended_local_repair_preserves_history_replay_and_one_use[6]
+9.56s call     tests/test_requirement_semantics_replay.py::test_historical_s01_reopens_and_replays_but_cannot_be_newly_published
+9.52s call     tests/test_s02_prospective_review.py::test_s02_new_policy_can_publish_without_rewriting_history
+9.21s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates1-actor1-None-6]
+9.20s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates5-actor5-0000000000000000000000000000000000000000000000000000000000000000-6]
+9.20s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates4-actor4-None-6]
+9.11s call     tests/test_generation_runtime_repair.py::test_exact_extended_local_repair_preserves_history_replay_and_one_use[5]
+9.02s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates0-actor0-None-6]
+9.00s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates3-actor3-None-6]
+8.98s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates2-actor2-None-6]
+6.95s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates0-actor0-None-5]
+6.92s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates3-actor3-None-5]
+6.91s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates4-actor4-None-5]
+6.89s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates2-actor2-None-5]
+6.83s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates1-actor1-None-5]
+6.83s call     tests/test_generation_runtime_repair.py::test_extended_repair_rejects_identity_and_stale_revision[updates5-actor5-0000000000000000000000000000000000000000000000000000000000000000-5]
+6.82s call     tests/test_generation_runtime_repair.py::test_exact_extended_local_repair_preserves_history_replay_and_one_use[4]
+5.22s call     tests/test_generation_feedback_driver.py::test_driver_executes_real_seedance_compiler_committer_and_scripted_transport
+=========================== short test summary info ============================
+FAILED tests/test_performance_direction.py::test_empty_directions_keep_the_legacy_six_field_hash
+FAILED tests/test_generation_history_import_receipt.py::test_prepares_and_reopens_a_strict_legacy_remote_snapshot
+FAILED tests/test_generation_quality_rejection.py::test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay
+3 failed, 654 passed, 1 skipped in 725.04s (0:12:05)

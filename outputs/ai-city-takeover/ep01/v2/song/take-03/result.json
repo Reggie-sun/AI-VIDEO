@@ -1,0 +1,20 @@
+{
+ "schema": "iris-ep01-song-result/1",
+ "take": 3,
+ "file": "music__20261102_003342.mp3",
+ "sha256": "4ae7b04fbfc2281466127eb6320394f65506955492ed18d1ecd4bcff813db315",
+ "song_id_for_inpainting": "adAwLxlOTRPdVH4Pq0x6",
+ "duration": 30.482167,
+ "beatmap_bpm": 126.05,
+ "vocals_word_timestamps_unprompted_whisper_large_v3_15_27_to_end": [
+  "Now we train in an offline world (15.27-18.19); rest of pre-chorus line missing",
+  "I didn't run, I just looked outside (18.91-22.39)",
+  "I didn't run, I just looked outside (22.61-25.75)",
+  "Relax, the door is closed (26.47-29.67); last outro line missing"
+ ],
+ "intro_and_verse": "no intelligible vocal (no_speech 0.63-0.80)",
+ "finding": "model sings ~1.5-2 words/s and drops dense lines; the approved 75 words in 30.5 s need ~2.5 words/s",
+ "account_character_count_after": 2305,
+ "charge_observed": 381,
+ "verdict": "PARTIAL: chorus complete twice; intro/verse missing; pre/outro half missing"
+}

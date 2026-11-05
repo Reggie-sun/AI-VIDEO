@@ -1,0 +1,17 @@
+{
+  "source": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-02/5a45ffec-a1ce-3076-523a-2995110ca730.wav",
+  "source_sha256": "ab0000749101d9cc9d85526683b760ae1d2e20b5dad455ac2eb67c8c0d509b06",
+  "sample_rate": 48000,
+  "channels": 2,
+  "frames": 1440000,
+  "duration_seconds": 30.0,
+  "peak_amplitude": 0.891265869140625,
+  "rms_amplitude": 0.1267785279964519,
+  "clipped_sample_count": 0,
+  "finite_samples": true,
+  "human_listening": "NOT_EVALUATED",
+  "full_decode": "PASS",
+  "playable_wav": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-B.wav",
+  "playable_mp3": "outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/IRIS-01-Looked-Outside-ACE-Step-B.mp3",
+  "playable_mp3_sha256": "228a3a6b96cbbfc317524925d7593442256094e1476bd3cd11628e72c9e4faaa"
+}

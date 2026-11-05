@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-character",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "87b06e8c7962c04a171078e8f24047238f96f71569177d93ce2f053f3a151273",
+  "creation_receipt_id": "director-draft:iris-ep01:20261030",
+  "source_provenance": [
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/ep01/lyrics-v1.md",
+      "content_hash": "0489e1606ed8a9337a3345dfc244ca9eb3c5cf857c33d74c6c0e6e3c8d8416a3"
+    },
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/series/BIBLE.md",
+      "content_hash": "73bafc509866ee32063feca204dd22e4ed49d4734a301461905d1dbf31d312b5"
+    },
+    {
+      "kind": "user_input",
+      "reference": "outputs/ai-city-takeover/ep01/production-input/reference-approval.txt",
+      "content_hash": "a2b86dc6a00a87de7721f3c5fb016a0b0fc0239d398403825c27dbfb9308e26e"
+    }
+  ],
+  "character_id": "IRIS",
+  "name": "IRIS",
+  "identity": "已定稿CF女性；冷静观察者，以英文念白与克制副歌演唱新闻",
+  "appearance_bible": "欧美女性，极淡雀斑、浅灰蓝眼、深棕后梳低髻；左耳黑色耳挂；炭黑高领长大衣，左领口极细红灯线。",
+  "wardrobe": [
+    "炭黑长大衣",
+    "黑色直筒裤",
+    "黑色皮质短靴"
+  ],
+  "voice_profile": null,
+  "reference_asset_ids": [],
+  "allowed_variations": [
+    "同一身份的镜头角度与景别变化；不继承影棚背景"
+  ]
+}

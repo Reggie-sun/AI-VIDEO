@@ -1,0 +1,24 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/generation-c-draft/project",
+  "independent_source": true,
+  "parent_gate": {
+    "post_media_gate_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/qa/A01-v2/post-media-gate.json",
+    "post_media_gate_sha256": "69a428fad163a3473c189a839919caadf5b830eb0fd15e91fc33a7ec124c14b6",
+    "attempt_id": "iris-ep01-a01-two-reference-repair-002",
+    "artifact_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+    "evaluation_evidence_hashes": [
+      "e78e0a9ada8031d141bdcadc241092bf3b181ccb0e1014b56f733e8f4ab6293e"
+    ],
+    "state_status": "running",
+    "state_phase": "validate",
+    "parent_project_sha256": "5ebbee68c7241548bf89bb6f723604298539af60a9c232a3c20ea145d49340f6"
+  },
+  "binding_validation": {
+    "actual_reference_order_verified": true,
+    "resolved_generation_hash": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+    "actual_quality": "NOT_EVALUATED"
+  },
+  "request_hash": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+  "new_provider_calls": 0,
+  "new_attempt_started": false
+}

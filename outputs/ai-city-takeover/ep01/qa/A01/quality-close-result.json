@@ -1,0 +1,45 @@
+{
+  "attempt_id": "iris-ep01-a01-qualification-001",
+  "actor": {
+    "actor_id": "codex-a01-quality-review",
+    "actor_kind": "codex"
+  },
+  "status": "failed",
+  "error_code": "video_quality_rejected",
+  "manifest_revision_before_close": 33,
+  "manifest_revision_after_close": 34,
+  "quality_rejection": {
+    "path": "state/video-generation/rejections/454fac31bcf688f9d5e7e4c36731f2ebcaa32145211ecd60ae31255197b8d31f.json",
+    "content_hash": "454fac31bcf688f9d5e7e4c36731f2ebcaa32145211ecd60ae31255197b8d31f",
+    "attempt_id": "iris-ep01-a01-qualification-001",
+    "request_fingerprint": "193f75aed3aa53a15c9f113e815572f26f2b63aa5c683c756f539d39822f408f",
+    "artifact_sha256": "65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5",
+    "experience_content_hash": "0d1b6b626917901eca9a299f4411b39d685c7a8e1dceee4821c9dc744e3283d0",
+    "file_sha256": "4a1fc8612c880864fc6b58025fe942ffee772fc3a0475ef6ad8d7f15012f3e23"
+  },
+  "diagnosis": {
+    "failure_classes": [
+      "QUALITY_FAILURE"
+    ],
+    "failed_requirements": [
+      "camera-space",
+      "quiet-observer",
+      "visual"
+    ],
+    "preserved_requirements": [
+      "identity"
+    ],
+    "evidence_hashes": [
+      "18ec6f63f48485f24d02e01def5102fdf32ec6ebdff20842a48cef700aa10f92",
+      "c1e52bd5c6cbf2fd68225fdb034a7096ae037a0ab1ff757add6eabd5fd0c1c0e"
+    ],
+    "next_owner": "shot_router",
+    "all_required_observed_pass": false
+  },
+  "paid_history_unchanged": true,
+  "fetched_source_unchanged": true,
+  "exact_replay_manifest_unchanged": true,
+  "canonical_readback": "PASS",
+  "new_provider_calls": 0,
+  "abandonment": false
+}

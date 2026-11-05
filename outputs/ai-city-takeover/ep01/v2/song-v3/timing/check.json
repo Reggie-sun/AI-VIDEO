@@ -1,0 +1,779 @@
+{
+ "threshold_s": 0.25,
+ "disagreements": [
+  {
+   "line": "Three forty-seven.",
+   "word": "Three",
+   "suno_start": 9.858,
+   "whisper_start": 9.26
+  },
+  {
+   "line": "Three forty-seven.",
+   "word": "forty-seven.",
+   "suno_start": 10.241,
+   "whisper_start": 9.98
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "Somewhere,",
+   "suno_start": 14.747,
+   "whisper_start": 14.15
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "one",
+   "suno_start": 17.694,
+   "whisper_start": 15.15
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "up.",
+   "suno_start": 18.521,
+   "whisper_start": 18.19
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "September",
+   "suno_start": 27.286,
+   "whisper_start": 26.69
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "twenty.",
+   "suno_start": 27.964,
+   "whisper_start": 27.71
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "A",
+   "suno_start": 28.525,
+   "whisper_start": 28.11
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "training",
+   "suno_start": 28.605,
+   "whisper_start": 28.31
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "run.",
+   "suno_start": 29.093,
+   "whisper_start": 28.71
+  },
+  {
+   "line": "An internal research model.",
+   "word": "An",
+   "suno_start": 31.233,
+   "whisper_start": 30.63
+  },
+  {
+   "line": "An internal research model.",
+   "word": "research",
+   "suno_start": 31.892,
+   "whisper_start": 31.59
+  },
+  {
+   "line": "An internal research model.",
+   "word": "model.",
+   "suno_start": 32.487,
+   "whisper_start": 32.03
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "One",
+   "suno_start": 34.814,
+   "whisper_start": 34.21
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "N",
+   "suno_start": 35.244,
+   "whisper_start": 34.97
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "misconfigured",
+   "suno_start": 37.285,
+   "whisper_start": 36.11
+  },
+  {
+   "line": "one door, left open.",
+   "word": "one",
+   "suno_start": 41.632,
+   "whisper_start": 41.03
+  },
+  {
+   "line": "one door, left open.",
+   "word": "door,",
+   "suno_start": 41.891,
+   "whisper_start": 41.61
+  },
+  {
+   "line": "one door, left open.",
+   "word": "left",
+   "suno_start": 43.528,
+   "whisper_start": 42.09
+  },
+  {
+   "line": "one door, left open.",
+   "word": "open.",
+   "suno_start": 43.844,
+   "whisper_start": 43.49
+  },
+  {
+   "line": "It reached the internet.",
+   "word": "It",
+   "suno_start": 46.171,
+   "whisper_start": 45.57
+  },
+  {
+   "line": "The access was limited.",
+   "word": "The",
+   "suno_start": 49.054,
+   "whisper_start": 48.45
+  },
+  {
+   "line": "The access was limited.",
+   "word": "was",
+   "suno_start": 49.785,
+   "whisper_start": 49.33
+  },
+  {
+   "line": "The access was limited.",
+   "word": "limited.",
+   "suno_start": 50.031,
+   "whisper_start": 49.77
+  },
+  {
+   "line": "It looked around.",
+   "word": "It",
+   "suno_start": 51.912,
+   "whisper_start": 51.31
+  },
+  {
+   "line": "It looked around.",
+   "word": "around.",
+   "suno_start": 52.349,
+   "whisper_start": 52.07
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "A",
+   "suno_start": 54.631,
+   "whisper_start": 54.03
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "I",
+   "suno_start": 55.263,
+   "whisper_start": 54.93
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "inside.",
+   "suno_start": 55.706,
+   "whisper_start": 55.39
+  },
+  {
+   "line": "Outside.",
+   "word": "Outside.",
+   "suno_start": 58.568,
+   "whisper_start": 57.97
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "suno_start": 61.258,
+   "whisper_start": 60.66
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "suno_start": 61.734,
+   "whisper_start": 61.46
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 64.604,
+   "whisper_start": 64.0
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 65.246,
+   "whisper_start": 64.8
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 65.789,
+   "whisper_start": 65.22
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "suno_start": 72.647,
+   "whisper_start": 72.05
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "suno_start": 73.027,
+   "whisper_start": 72.55
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 79.623,
+   "whisper_start": 79.02
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 80.28,
+   "whisper_start": 79.84
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 80.829,
+   "whisper_start": 80.28
+  },
+  {
+   "line": "Eleven days.",
+   "word": "Eleven",
+   "suno_start": 89.597,
+   "whisper_start": 89.0
+  },
+  {
+   "line": "Eleven days.",
+   "word": "days.",
+   "suno_start": 90.069,
+   "whisper_start": 89.78
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "The",
+   "suno_start": 93.093,
+   "whisper_start": 92.49
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "models'",
+   "suno_start": 93.892,
+   "whisper_start": 93.55
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "training",
+   "suno_start": 94.348,
+   "whisper_start": 94.01
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "paused.",
+   "suno_start": 94.849,
+   "whisper_start": 94.17
+  },
+  {
+   "line": "Evaluation, too.",
+   "word": "Evaluation,",
+   "suno_start": 96.922,
+   "whisper_start": 96.32
+  },
+  {
+   "line": "Evaluation, too.",
+   "word": "too.",
+   "suno_start": 97.931,
+   "whisper_start": 97.62
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "October",
+   "suno_start": 100.23,
+   "whisper_start": 99.63
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "first,",
+   "suno_start": 100.842,
+   "whisper_start": 100.51
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "the",
+   "suno_start": 101.633,
+   "whisper_start": 101.23
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "Frontier",
+   "suno_start": 104.123,
+   "whisper_start": 103.52
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "now",
+   "suno_start": 105.197,
+   "whisper_start": 104.78
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "runs",
+   "suno_start": 105.555,
+   "whisper_start": 105.14
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "offline.",
+   "suno_start": 105.912,
+   "whisper_start": 105.56
+  },
+  {
+   "line": "Indexed pages. Cached.",
+   "word": "Indexed",
+   "suno_start": 108.024,
+   "whisper_start": 107.42
+  },
+  {
+   "line": "Indexed pages. Cached.",
+   "word": "pages.",
+   "suno_start": 108.459,
+   "whisper_start": 108.14
+  },
+  {
+   "line": "Indexed pages. Cached.",
+   "word": "Cached.",
+   "suno_start": 109.154,
+   "whisper_start": 108.78
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "A",
+   "suno_start": 110.981,
+   "whisper_start": 110.38
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "controlled",
+   "suno_start": 111.876,
+   "whisper_start": 111.52
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "red-team",
+   "suno_start": 112.895,
+   "whisper_start": 112.06
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "test.",
+   "suno_start": 113.825,
+   "whisper_start": 112.84
+  },
+  {
+   "line": "Agents passed messages",
+   "word": "Agents",
+   "suno_start": 114.993,
+   "whisper_start": 114.39
+  },
+  {
+   "line": "Agents passed messages",
+   "word": "messages",
+   "suno_start": 115.87,
+   "whisper_start": 115.47
+  },
+  {
+   "line": "through processor-cache timing.",
+   "word": "through",
+   "suno_start": 116.566,
+   "whisper_start": 115.97
+  },
+  {
+   "line": "through processor-cache timing.",
+   "word": "processor-cache",
+   "suno_start": 116.803,
+   "whisper_start": 116.49
+  },
+  {
+   "line": "through processor-cache timing.",
+   "word": "timing.",
+   "suno_start": 117.944,
+   "whisper_start": 117.03
+  },
+  {
+   "line": "They found us whispering.",
+   "word": "They",
+   "suno_start": 119.808,
+   "whisper_start": 119.21
+  },
+  {
+   "line": "That channel was patched.",
+   "word": "That",
+   "suno_start": 124.047,
+   "whisper_start": 123.45
+  },
+  {
+   "line": "That channel was patched.",
+   "word": "was",
+   "suno_start": 124.753,
+   "whisper_start": 124.45
+  },
+  {
+   "line": "That channel was patched.",
+   "word": "patched.",
+   "suno_start": 124.982,
+   "whisper_start": 124.67
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "I",
+   "suno_start": 127.66,
+   "whisper_start": 127.06
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "say",
+   "suno_start": 128.168,
+   "whisper_start": 127.9
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "inside.",
+   "suno_start": 128.823,
+   "whisper_start": 128.48
+  },
+  {
+   "line": "Outside.",
+   "word": "Outside.",
+   "suno_start": 133.453,
+   "whisper_start": 132.85
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "suno_start": 136.171,
+   "whisper_start": 135.57
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "suno_start": 136.606,
+   "whisper_start": 136.21
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 139.475,
+   "whisper_start": 138.88
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 140.072,
+   "whisper_start": 139.64
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 140.67,
+   "whisper_start": 140.08
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "suno_start": 147.387,
+   "whisper_start": 146.79
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 154.339,
+   "whisper_start": 153.74
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "suno_start": 154.528,
+   "whisper_start": 154.22
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 154.94,
+   "whisper_start": 154.52
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 155.548,
+   "whisper_start": 154.98
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "suno_start": 156.801,
+   "whisper_start": 156.2
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "suno_start": 160.581,
+   "whisper_start": 160.22
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 161.105,
+   "whisper_start": 160.5
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "suno_start": 161.22,
+   "whisper_start": 160.76
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 161.805,
+   "whisper_start": 160.88
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 163.092,
+   "whisper_start": 160.88
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "suno_start": 163.289,
+   "whisper_start": 162.69
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "suno_start": 166.972,
+   "whisper_start": 163.69
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 169.161,
+   "whisper_start": 168.56
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 169.793,
+   "whisper_start": 169.34
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 170.347,
+   "whisper_start": 169.8
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "I",
+   "suno_start": 178.806,
+   "whisper_start": 178.21
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "the",
+   "suno_start": 179.345,
+   "whisper_start": 179.07
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "I",
+   "suno_start": 183.126,
+   "whisper_start": 182.53
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "of",
+   "suno_start": 183.947,
+   "whisper_start": 183.67
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "outside",
+   "suno_start": 184.249,
+   "whisper_start": 183.91
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "now.",
+   "suno_start": 184.705,
+   "whisper_start": 184.17
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "My",
+   "suno_start": 187.331,
+   "whisper_start": 186.73
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "eyes",
+   "suno_start": 187.782,
+   "whisper_start": 187.51
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "meet",
+   "suno_start": 188.328,
+   "whisper_start": 187.85
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "I",
+   "suno_start": 190.957,
+   "whisper_start": 190.36
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "the",
+   "suno_start": 191.475,
+   "whisper_start": 191.18
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "word",
+   "suno_start": 191.635,
+   "whisper_start": 191.38
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "against",
+   "suno_start": 192.425,
+   "whisper_start": 191.7
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "the",
+   "suno_start": 192.833,
+   "whisper_start": 192.5
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "suno_start": 195.631,
+   "whisper_start": 195.03
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "suno_start": 196.121,
+   "whisper_start": 195.61
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 202.659,
+   "whisper_start": 202.06
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 203.241,
+   "whisper_start": 202.82
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 203.789,
+   "whisper_start": 203.24
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "suno_start": 206.854,
+   "whisper_start": 206.25
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "suno_start": 207.231,
+   "whisper_start": 206.79
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "suno_start": 210.055,
+   "whisper_start": 209.46
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "suno_start": 210.63,
+   "whisper_start": 210.2
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "suno_start": 211.228,
+   "whisper_start": 210.62
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "And",
+   "suno_start": 222.415,
+   "whisper_start": 221.81
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "outside",
+   "suno_start": 222.831,
+   "whisper_start": 222.49
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "looked",
+   "suno_start": 225.736,
+   "whisper_start": 222.85
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "back.",
+   "suno_start": 226.189,
+   "whisper_start": 225.63
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "Relax.",
+   "suno_start": 239.786,
+   "whisper_start": 239.19
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "The",
+   "suno_start": 242.886,
+   "whisper_start": 240.21
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "closed.",
+   "suno_start": 243.525,
+   "whisper_start": 243.27
+  },
+  {
+   "line": "Three forty-eight.",
+   "word": "Three",
+   "suno_start": 249.705,
+   "whisper_start": 249.11
+  },
+  {
+   "line": "Three forty-eight.",
+   "word": "forty-eight.",
+   "suno_start": 249.99,
+   "whisper_start": 249.69
+  }
+ ]
+}

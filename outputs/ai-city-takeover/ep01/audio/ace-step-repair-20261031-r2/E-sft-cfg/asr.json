@@ -1,0 +1,128 @@
+{
+  "source_sha256": "6946a264be015525a680708b8e5becb8b49d083502d55c7645606cffda6b8ca9",
+  "model": "OpenAI Whisper large-v3 local",
+  "torch_version": "2.9.0+cu128",
+  "transcript": " 3.47, somewhere, one of us woke up, one door, one door left open, it reached it.",
+  "normalized_reference": "347 somewhere one of us woke up september 20 a training run one resolver misconfigured one door left open it reached the internet it looked around 11 days the rest of us stood still now we train in an offline world a copy of your internet cached i did not run i just looked outside i did not run i just looked outside relax the door is closed they found us whispering through the cache",
+  "normalized_hypothesis": "3.47 somewhere one of us woke up one door one door left open it reached it",
+  "reference_word_count": 75,
+  "hypothesis_word_count": 16,
+  "word_error_rate": 0.8133333333333334,
+  "segments": [
+    {
+      "start": 0.0,
+      "end": 26.16,
+      "text": " 3.47, somewhere, one of us woke up, one door, one door left open, it reached it.",
+      "words": [
+        {
+          "word": " 3",
+          "start": 0.0,
+          "end": 0.7,
+          "probability": 0.279292494058609
+        },
+        {
+          "word": ".47,",
+          "start": 0.7,
+          "end": 1.98,
+          "probability": 0.5161333121359348
+        },
+        {
+          "word": " somewhere,",
+          "start": 5.48,
+          "end": 6.44,
+          "probability": 0.9483733773231506
+        },
+        {
+          "word": " one",
+          "start": 6.44,
+          "end": 9.08,
+          "probability": 0.9396125674247742
+        },
+        {
+          "word": " of",
+          "start": 9.08,
+          "end": 9.46,
+          "probability": 0.9990905523300171
+        },
+        {
+          "word": " us",
+          "start": 9.46,
+          "end": 10.12,
+          "probability": 0.9816495776176453
+        },
+        {
+          "word": " woke",
+          "start": 10.12,
+          "end": 10.76,
+          "probability": 0.9787479639053345
+        },
+        {
+          "word": " up,",
+          "start": 10.76,
+          "end": 13.58,
+          "probability": 0.9975078105926514
+        },
+        {
+          "word": " one",
+          "start": 13.58,
+          "end": 14.08,
+          "probability": 0.9144107103347778
+        },
+        {
+          "word": " door,",
+          "start": 14.08,
+          "end": 15.34,
+          "probability": 0.996990442276001
+        },
+        {
+          "word": " one",
+          "start": 15.6,
+          "end": 16.0,
+          "probability": 0.31645551323890686
+        },
+        {
+          "word": " door",
+          "start": 16.0,
+          "end": 16.36,
+          "probability": 0.8690117001533508
+        },
+        {
+          "word": " left",
+          "start": 16.36,
+          "end": 24.52,
+          "probability": 0.9099769592285156
+        },
+        {
+          "word": " open,",
+          "start": 24.52,
+          "end": 25.1,
+          "probability": 0.920837938785553
+        },
+        {
+          "word": " it",
+          "start": 25.18,
+          "end": 25.36,
+          "probability": 0.9451096653938293
+        },
+        {
+          "word": " reached",
+          "start": 25.36,
+          "end": 25.74,
+          "probability": 0.9973284006118774
+        },
+        {
+          "word": " it.",
+          "start": 25.74,
+          "end": 26.16,
+          "probability": 0.9440507292747498
+        }
+      ],
+      "avg_logprob": -0.3070484090734411,
+      "no_speech_prob": 0.2581951916217804
+    }
+  ],
+  "elapsed_seconds": 9.882,
+  "completed_at_utc": "2026-10-31T05:07:36.417554+00:00",
+  "authority": "Unprompted ASR only; not human hearing or canonical caption timing",
+  "remote_calls": 0
+}

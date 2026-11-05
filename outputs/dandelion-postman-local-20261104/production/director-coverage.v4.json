@@ -1,0 +1,86 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "那你用我现在的体系做一个呢",
+    "creative_constraints": [
+      {
+        "constraint_id": "local",
+        "scope": "global",
+        "source_text": "那你用我现在的体系做一个呢"
+      }
+    ],
+    "target_duration_seconds": 12,
+    "coverage_strategy": "single_take",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "温暖微小意外需要看清机器人走近、种子随风与抬头反应的因果；同一位置连续观看即可，不需要切镜。用户已认可全新角色画风与12秒方案。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "postman",
+      "duration_seconds": 12,
+      "beat_function": "payoff",
+      "objective": "小邮差被落在头顶的种子打断赶路，形成温暖幽默",
+      "open_state": "机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。",
+      "close_state": "机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。",
+      "shot_scale": "medium",
+      "camera_treatment": "push_in",
+      "camera_intent": "12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。",
+      "visible_change": "先向右迈两小步：一只脚抬起前移落地，另一只脚前移落地；双脚站稳后不再迈步。随后风吹草叶，部分白色种子从右侧花托脱离，向左上方飘过；它看见种子后缓缓抬头。一粒种子沿可见轨迹下降，轻落在头顶，它保持好奇的仰头姿态停顿。",
+      "transition_out": "end",
+      "constraint_ids": [
+        "local"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "local",
+      "statement": "使用项目现有制作体系",
+      "source_refs": [
+        {
+          "source_hash": "0b5038948b09b4211c480f47cc7997982f108447b15a3492ccfc4b4c8d92f2bb",
+          "locator": "outputs/dandelion-postman-local-20261104/production/creative-input.txt",
+          "intent_item_id": "local",
+          "quote": "那你用我现在的体系做一个呢",
+          "origin": "explicit_user",
+          "fixed": true
+        }
+      ],
+      "origin": "explicit_user",
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "event",
+      "statement": "全新原创蒲公英邮差，12秒16:9，一个连续镜头，机器人向右迈两步停下，风吹种子，机器人抬头，一粒落在头顶。无对白、无音乐，风声与金属脚步。",
+      "source_refs": [
+        {
+          "source_hash": "5ed02838d160d430745e8b92039cd52954e88186bc78e0d78264fd00b9f878f1",
+          "locator": "outputs/dandelion-postman-local-20261104/production/director-choices.txt",
+          "intent_item_id": "event",
+          "quote": "全新原创蒲公英邮差，12秒16:9，一个连续镜头，机器人向右迈两步停下，风吹种子，机器人抬头，一粒落在头顶。无对白、无音乐，风声与金属脚步。",
+          "origin": "director_choice",
+          "fixed": false
+        }
+      ],
+      "origin": "director_choice",
+      "related_intent_ids": []
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "local"
+      },
+      {
+        "intent_item_id": "event"
+      }
+    ],
+    "must_not_happen": [],
+    "preferred_performance": [],
+    "timing_targets": [],
+    "acceptable_variation": []
+  }
+}

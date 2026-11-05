@@ -1,0 +1,35 @@
+{
+ "unit": "OH-A",
+ "checks": {
+  "unit_in_approved_preview": true,
+  "user_approval_quoted": true,
+  "approved_inputs_unchanged": true,
+  "action_text_is_approved_text": true,
+  "action_text_pure_chinese": true,
+  "mode_is_master": true,
+  "continuity_report_ready": true,
+  "never_submitted": true,
+  "ledger_has_room": true
+ },
+ "pass": true,
+ "at": "2026-11-03T05:40:59.683969+00:00",
+ "approval_sha256": "09730173ff1a09da75d0b7e815900b884db9eeafe663df0048377076e0232f26",
+ "continuity_report_sha256": "1d300421641a5b0a6e8351299dea7ee058e17897d8ab19f6eae1979388a13aae",
+ "inputs": [
+  {
+   "path": "keyframes/raw/K7-a.png",
+   "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+   "role": "singer image"
+  },
+  {
+   "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+   "role": "uploaded vocal"
+  }
+ ],
+ "action_text": null,
+ "ledger": {
+  "takes": 0,
+  "credits": 0
+ }
+}

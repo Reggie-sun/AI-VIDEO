@@ -1,0 +1,2 @@
+{"event": "audio_validated", "audio_sha256": "0f202c1970655f2e6668921096b9ca0ecc15190b6a050a74e1e13aa175bcbf15", "sample_rate": 48000, "channels": 2, "frames": 480000, "duration_seconds": 10.0, "peak": 0.891265869140625, "rms": 0.12892995287167544, "clipped_sample_count": 0, "finite": true, "full_decode": "PASS", "human_hearing": "NOT_EVALUATED"}
+{"transcript": " Oh, I didn't run I just looked, looked outside", "reference_word_count": 16, "hypothesis_word_count": 10, "word_error_rate": 0.5}

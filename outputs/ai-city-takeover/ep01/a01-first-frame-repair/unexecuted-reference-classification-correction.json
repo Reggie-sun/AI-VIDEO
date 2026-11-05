@@ -1,0 +1,40 @@
+{
+  "status": "NOT_EXECUTED",
+  "hypothesis_rejected_before_submit": true,
+  "actual_provider_calls": 0,
+  "reason": "Parent and independent verifier inspected actual PNG bytes: CF-a is side/back pose, ID7b is front-ish full face; earlier classification was reversed",
+  "retained_unexecuted_lineage": {
+    "kind": "iris-a01-multimodal-two-reference-repair/1",
+    "selected_input_mode": "multimodal",
+    "prior_attempt_id": "iris-ep01-a01-qualification-001",
+    "prior_project_path": "outputs/ai-city-takeover/ep01/generation/project/project.yaml",
+    "prior_raw_sha256": "65f17d6860cbde39df398f42138149a7b4fc7a0bda7fdd96952b88134a0601d5",
+    "prior_raw_size_bytes": 10354579,
+    "prior_known_outcome": "video fetched; camera-space FAIL observed by Parent, original verdict preserved",
+    "prior_observed_cost_credits": 198,
+    "cost_evidence_sha256": "62c3fbac165444f2973181f2dba8edae523aeb57a1592ac94b1b33db4ed000e4",
+    "repair_variable": {
+      "before": "multimodal: A01 + CF details + CF face",
+      "after": "multimodal-two-reference: approved A01 + frontal CF-a; omit CF-ID7b",
+      "hypothesis": "the omitted three-quarter CF-ID7b pose competed with approved frontal head-and-chest composition",
+      "abandoned_first_frame": {
+        "reason": "current canonical identity selection cannot inherit identity solely from an approved keyframe",
+        "evidence_sha256": "5f003335876317c9c529b83a07ff44b412caf4cb67cf35c0016c29638a8a6357",
+        "shared_owner_changed": false
+      },
+      "quality_guarantee": false
+    },
+    "cumulative_attempt_ceiling": 2,
+    "cumulative_credit_ceiling": 500,
+    "prior_actual_attempts": 1,
+    "prior_actual_credits": 198,
+    "new_unit_max_submits": 1,
+    "new_unit_credit_ceiling": 250,
+    "automatic_retries": 0,
+    "stop_on_unknown": true,
+    "user_ai_mark_policy_quote": "保留 AI 标识，只禁止新增剧情字幕和图形",
+    "authority": "current Parent request and user steering; not a fabricated Provider receipt or feedback verdict"
+  },
+  "prior_lineage_sha256": "120f7956cc8d180915716b65c26bebfc2bf62aad05267bcbab94d456b44a1f5f",
+  "new_strategy": "multimodal-two-reference: A01 scene + ID7b full canonical identity; exclude CF-a side/back pose"
+}

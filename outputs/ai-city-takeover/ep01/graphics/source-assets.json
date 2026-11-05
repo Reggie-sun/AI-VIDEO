@@ -1,0 +1,119 @@
+{
+  "scope": "development_source_asset",
+  "not_a_registry_or_production_manifest": true,
+  "items": [
+    {
+      "kind": "dns",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/graphics/renders/dns.mp4",
+      "repo_relative_path": "outputs/ai-city-takeover/ep01/graphics/renders/dns.mp4",
+      "sha256": "2f15da162ed6db67f13d6a5e93b29a6d37f4d6925ae3aee074d56a8270120b03",
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 120,
+      "duration_seconds": 4.0,
+      "has_audio": false,
+      "source_span": [
+        0,
+        4
+      ],
+      "local_static_criteria": "PASS",
+      "mcp_video_review": {
+        "called": true,
+        "transcribe_audio": false,
+        "sampled_frames": 4,
+        "unique_frames": 4,
+        "issues": []
+      },
+      "review_path": "outputs/ai-city-takeover/ep01/graphics/qa/dns/review.md",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "kind": "pause",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/graphics/renders/pause.mp4",
+      "repo_relative_path": "outputs/ai-city-takeover/ep01/graphics/renders/pause.mp4",
+      "sha256": "af43f9a3d842398d043f098e219f4a0d3d4780daba9f79651535ef92171b7f1f",
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 120,
+      "duration_seconds": 4.0,
+      "has_audio": false,
+      "source_span": [
+        0,
+        4
+      ],
+      "local_static_criteria": "PASS",
+      "mcp_video_review": {
+        "called": true,
+        "transcribe_audio": false,
+        "sampled_frames": 4,
+        "unique_frames": 4,
+        "issues": []
+      },
+      "review_path": "outputs/ai-city-takeover/ep01/graphics/qa/pause/review.md",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "kind": "web-cache",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/graphics/renders/web-cache.mp4",
+      "repo_relative_path": "outputs/ai-city-takeover/ep01/graphics/renders/web-cache.mp4",
+      "sha256": "54c190609411845492cf876ecec389e7496619866c7097dc550a5bed56baf172",
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 120,
+      "duration_seconds": 4.0,
+      "has_audio": false,
+      "source_span": [
+        0,
+        4
+      ],
+      "local_static_criteria": "PASS",
+      "mcp_video_review": {
+        "called": true,
+        "transcribe_audio": false,
+        "sampled_frames": 4,
+        "unique_frames": 4,
+        "issues": []
+      },
+      "review_path": "outputs/ai-city-takeover/ep01/graphics/qa/web-cache/review.md",
+      "human_acceptance": "NOT_EVALUATED"
+    },
+    {
+      "kind": "cpu-cache",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/graphics/renders/cpu-cache.mp4",
+      "repo_relative_path": "outputs/ai-city-takeover/ep01/graphics/renders/cpu-cache.mp4",
+      "sha256": "dbf491acd79334df6df01e3c530c0f65bf7c0d658a0d92deed994860cb1497cb",
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": 120,
+      "duration_seconds": 4.0,
+      "has_audio": false,
+      "source_span": [
+        0,
+        4
+      ],
+      "local_static_criteria": "PASS",
+      "mcp_video_review": {
+        "called": true,
+        "transcribe_audio": false,
+        "sampled_frames": 4,
+        "unique_frames": 4,
+        "issues": []
+      },
+      "review_path": "outputs/ai-city-takeover/ep01/graphics/qa/cpu-cache/review.md",
+      "human_acceptance": "NOT_EVALUATED"
+    }
+  ],
+  "participating_sha256": {
+    "motion-kit/src/news-graphics.js": "53d36073b5842c4ba6cbf82ee950f431ffa634452c5d9db9741ae07dd214b0fd",
+    "motion-kit/src/draw2d.js": "cba6c0f6ebd27504bd2bca12f0d6f86966f606284700925c25611746115adbf1",
+    "motion-kit/src/math.js": "5b26e7e269cc66cc74a0bcf1ec5aa62333ed4e0da545247aa15277f53d546b57",
+    "outputs/ai-city-takeover/ep01/graphics/src/main.js": "ff6b010623f23f2f12c9307099533361e17fea85aaaa583a4113a8c938de41cc",
+    "outputs/ai-city-takeover/ep01/graphics/build.py": "26462be29c6d630701fb77fcf4049bc81019fcbd676244966ff5a384002f0d4a",
+    "outputs/ai-city-takeover/ep01/graphics/engine.js": "cf4e0bd0ada4b999de9a7ba7f1156b1c504c499343f329a06c71a502b2eb6e9b",
+    "outputs/ai-city-takeover/ep01/graphics/fonts/fonts.json": "881d7dc06cee839295067c0fac5a09613a00a5302a3958f3bd1c1f1d9dc54e20"
+  }
+}

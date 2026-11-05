@@ -1,0 +1,29 @@
+artifact_id: iris-v2-s7-scene
+content_hash: dd6fc03c71d1c103d790780664010f55db409700cee48fc5f1040dca1c296ac8
+continuity_constraints:
+- 人物身份、左耳装置与左领红光位置一致
+- 蓝黑/钢蓝，红为唯一暖色
+creation_receipt_id: iris-v2-S7-authoring:scene
+location: 几乎全黑的房间，悬浮着半透明发光薄片
+mood: 安静、疏离
+participant_ids:
+- IRIS
+revision: 1
+scene_id: cache-room
+schema_version: '2.0'
+source_provenance:
+- content_hash: ffde1cd1d139de20842ef8adb025f62a9a8d7253be947519c02e4c018423bd58
+  kind: user_input
+  reference: evidence/authoring-input/ffde1cd1d139de20842ef8adb025f62a9a8d7253be947519c02e4c018423bd58.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 784fae6328896ff2ed2aecdded0360a5c6f2df43707b19f3a837ab31074d1c50
+  kind: user_input
+  reference: evidence/authoring-input/784fae6328896ff2ed2aecdded0360a5c6f2df43707b19f3a837ab31074d1c50.json
+time: 凌晨
+visual_reference_asset_ids:
+- iris-c-v2-s7-cache-room

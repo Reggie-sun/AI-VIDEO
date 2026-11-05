@@ -1,0 +1,147 @@
+{
+  "generation_id": "canvas-generation-9b70d12567560c3c7e3755cb78b43c75",
+  "request_input_hash": "c2f3b203beeb0d8f1b22a429c0c914c7eb22ac84c26e05d602649064510a93f6",
+  "provider_name": "jimeng",
+  "provider_kind": "jimeng",
+  "model_id": "seedance_2.0_vip",
+  "provider_profile": {
+    "profile_id": "jimeng",
+    "profile_version": "canvas-seedance-2.0-vip-v1",
+    "profile_path": "provider-profiles/81ba3442c2e2205c16d7c351e1a8e8a6382a69170b84aeecc904b82b4aa99fca.json",
+    "profile_sha256": "81ba3442c2e2205c16d7c351e1a8e8a6382a69170b84aeecc904b82b4aa99fca"
+  },
+  "requirement_hash": "ffdb3977f4a37ebd1e59fca9ce43010df5aeaa74f098cc274b62220c40f3f17d",
+  "provider_bound_request_hash": "f6a7b638a002dba685bb72daa55670679c82122f70a9ba8a9e90b97bfc968769",
+  "adapter_compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+  "adapter_compiler_version": "1",
+  "adapter_compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+  "execution_stack_hash": null,
+  "capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+  "execution_kind": "remote",
+  "billing_kind": "metered",
+  "mode": "reference_to_video",
+  "prompt_text": "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。",
+  "image_bindings": [
+    {
+      "role": "reference",
+      "asset_id": "postman-reference-v1",
+      "asset_sha256": "8125187d8eba4f1b9d13262ade2301c81391ccb756c32237b9b1ffebca68cd48",
+      "mime_type": "image/png",
+      "width": 1672,
+      "height": 941,
+      "size_bytes": 2367619
+    }
+  ],
+  "c4_multi_anchor_binding": null,
+  "continuity_binding": null,
+  "hard_cut_keyframe_binding": null,
+  "seal_terminal_frame": false,
+  "media_bindings": [],
+  "effective_output": {
+    "timing_mode": "nominal_seconds",
+    "duration_seconds": 12,
+    "frame_count": null,
+    "dimension_mode": "adaptive",
+    "width": null,
+    "height": null,
+    "resolution_label": "1080p",
+    "ratio": "16:9",
+    "fps": null,
+    "container": "mp4",
+    "mime_type": "video/mp4",
+    "native_audio": true
+  },
+  "provider_task_binding": null,
+  "effective_seed": null,
+  "effective_negative_prompt_text": "",
+  "output_asset_id": "canvas-video-9b70d12567560c3c7e3755cb78b43c75",
+  "activation_scope": {
+    "request": {
+      "generation_id": "canvas-generation-9b70d12567560c3c7e3755cb78b43c75",
+      "provider_name": "jimeng",
+      "provider_kind": "jimeng",
+      "model_id": "seedance_2.0_vip",
+      "provider_profile": {
+        "profile_id": "jimeng",
+        "profile_version": "canvas-seedance-2.0-vip-v1",
+        "profile_path": "provider-profiles/81ba3442c2e2205c16d7c351e1a8e8a6382a69170b84aeecc904b82b4aa99fca.json",
+        "profile_sha256": "81ba3442c2e2205c16d7c351e1a8e8a6382a69170b84aeecc904b82b4aa99fca"
+      },
+      "requirement_hash": "ffdb3977f4a37ebd1e59fca9ce43010df5aeaa74f098cc274b62220c40f3f17d",
+      "provider_bound_request_hash": "f6a7b638a002dba685bb72daa55670679c82122f70a9ba8a9e90b97bfc968769",
+      "adapter_compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+      "adapter_compiler_version": "1",
+      "adapter_compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+      "execution_stack_hash": null,
+      "target_shot_id": "postman",
+      "target_shot_revision": 1,
+      "target_shot_content_hash": "f544667945294669750bb9f7a4c921acb98fd3ce0eecc1e5bb69b42273a5d89d",
+      "target_asset_role": "primary_visual",
+      "target_visual_strategy": "generated_video",
+      "mode": "reference_to_video",
+      "prompt_text": "{{image:0}}是身份与空间的软参考，不是硬首帧；只继承本图机器人、右胯邮袋、蒲公英和午后草地，不固定姿势或阻止行走。\n唯一浅青色金属小邮差机器人，圆头双黑玻璃眼睛，黄色帆布邮袋始终在机器人右胯；保持参考图造型。\n机器人在画面左边朝右站立，右胯黄色邮袋固定；右侧蒲公英种子完整，机器人头上没有种子。\n机器人朝右侧蒲公英迈两小步，双脚交替落地，随后站稳。一阵风吹动草叶，部分种子脱离花托向左上方漂过机器人；机器人随种子缓慢抬头，一粒种子落在头顶，它停住片刻。\n12秒单一连续镜头，中景微距，机位在机器人正侧前方缓慢推近，保持机器人左、蒲公英右，不越轴、不切镜。\n机器人站稳并抬头，一粒白色蒲公英种子落在头顶，花托仍保留部分种子。\n建立唯一机器人与蒲公英的左右关系\n原生轻风与草叶声、两步轻金属脚步声；无对白、无配乐、无字幕。\n温暖午后阳光，精致微缩定格动画材质，草地背景；种子不变成鸟或光点，无瞬移、无新增角色、无宫格。",
+      "negative_prompt_text": "",
+      "image_bindings": [
+        {
+          "role": "reference",
+          "asset_id": "postman-reference-v1",
+          "asset_sha256": "8125187d8eba4f1b9d13262ade2301c81391ccb756c32237b9b1ffebca68cd48",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 2367619
+        }
+      ],
+      "c4_multi_anchor_binding": null,
+      "continuity_binding": null,
+      "hard_cut_keyframe_binding": null,
+      "seal_terminal_frame": false,
+      "media_bindings": [],
+      "output_requirement": {
+        "timing_mode": "nominal_seconds",
+        "duration_seconds": 12,
+        "frame_count": null,
+        "dimension_mode": "adaptive",
+        "width": null,
+        "height": null,
+        "resolution_label": "1080p",
+        "ratio": "16:9",
+        "fps": null,
+        "container": "mp4",
+        "mime_type": "video/mp4",
+        "native_audio": true
+      },
+      "seed": null,
+      "base_project": {
+        "path": "state/projects/project.1.412e1857bac5b9a553e6852fbd03cb0f1a74f38a5dff6148dfe4ec7a530e8c2c.yaml",
+        "revision": 1,
+        "content_hash": "412e1857bac5b9a553e6852fbd03cb0f1a74f38a5dff6148dfe4ec7a530e8c2c",
+        "file_sha256": "f0c0662fec1e9e51ccb7b360da4fe59db4d48b34901c8542ce37e5b0d1b5a0f4"
+      },
+      "base_registry": {
+        "path": "assets/registry.62404113a50d145dd02ad2ca078fa733d4a1bc7a8062f923ecbfd96ee51112e0.json",
+        "revision_id": "62404113a50d145dd02ad2ca078fa733d4a1bc7a8062f923ecbfd96ee51112e0",
+        "content_hash": "62404113a50d145dd02ad2ca078fa733d4a1bc7a8062f923ecbfd96ee51112e0",
+        "file_sha256": "2eb1838c75844bfa4c4f0a4de4dff9b5d361a460cc862006277e98609154b397"
+      },
+      "base_dependency_graph": {
+        "revision_id": "7e1c8ab36dd664e07109938d4a86014b88edc2010b8616f1dd8d4e801f8bf769",
+        "content_hash": "7e1c8ab36dd664e07109938d4a86014b88edc2010b8616f1dd8d4e801f8bf769",
+        "path": "state/dependency_graph.7e1c8ab36dd664e07109938d4a86014b88edc2010b8616f1dd8d4e801f8bf769.json",
+        "file_sha256": "cb36e1a4cd133b3696b7f2e8c1617529953a590269a9b6d31e12c53a5995093f"
+      },
+      "input_artifact_ids": [
+        "dandelion-postman-shot",
+        "dandelion-postman-scene",
+        "dandelion-postman-robot",
+        "postman-reference-v1"
+      ],
+      "output_asset_id": "canvas-video-9b70d12567560c3c7e3755cb78b43c75",
+      "request_input_hash": "c2f3b203beeb0d8f1b22a429c0c914c7eb22ac84c26e05d602649064510a93f6"
+    },
+    "usage_license": "provider-output",
+    "scope_fingerprint": "5104170aa956d0fe8ab0c6363675781793d79950058fc921be4e496d15141a5a"
+  },
+  "resolved_generation_hash": "20f9e26c7de1229c29ab69e21cbde092226e86f8d5993d1fa99657fb843e8f55",
+  "desired_generation_fingerprint": "20f9e26c7de1229c29ab69e21cbde092226e86f8d5993d1fa99657fb843e8f55"
+}

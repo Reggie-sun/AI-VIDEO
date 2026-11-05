@@ -1,0 +1,59 @@
+{
+ "unit": "ST1",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/ST1/project/state/video-generation/fetch/files/23ecc9e157c649f6252f84b201229799883582551d55c7ddb1764e58657aae96.mp4",
+ "sha256": "23ecc9e157c649f6252f84b201229799883582551d55c7ddb1764e58657aae96",
+ "verdict": "FAIL",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum与给定值一致；probe 1920x1080 5.057s 121帧"
+  },
+  {
+   "id": "no_hard_cut",
+   "result": "PASS",
+   "evidence": "121真实帧逐帧帧差中位数0.36，最大1.36(f1)，无跳变"
+  },
+  {
+   "id": "camera_locked",
+   "result": "PASS",
+   "evidence": "相位相关累计位移0,0；f0到f120缩放1.000"
+  },
+  {
+   "id": "action_rise_and_look_up",
+   "result": "PASS",
+   "evidence": "0-2.0s从半蹲站直；4.48-4.98s抬头；始终在走道中央（约3s向镜头迈了一小步，人物放大约12%）"
+  },
+  {
+   "id": "no_mouth_movement",
+   "result": "FAIL",
+   "evidence": "嘴部5倍放大：1.99-2.49s闭合，2.74s起张开且开口持续变化，4.48-4.98s张嘴抬头；prompt要求‘脸很小，看不清嘴’，实际脸约45px宽，嘴可辨"
+  },
+  {
+   "id": "red_only_collar_and_door_seam",
+   "result": "FAIL",
+   "evidence": "0.08-0.5s两侧机柜整排红色指示灯亮起（领口以外的红色像素从0升到约8100并保持到结尾），首帧没有"
+  },
+  {
+   "id": "identity_canon_earpiece_redline",
+   "result": "PASS",
+   "evidence": "红线是她左领（画面右侧）的短段，未成圈；耳挂在此景别下分辨不出，与认可首帧相同，没有反向耳挂迹象"
+  },
+  {
+   "id": "no_model_text",
+   "result": "PASS",
+   "evidence": "11帧拼图未见文字"
+  },
+  {
+   "id": "watermark_corners",
+   "result": "PASS",
+   "evidence": "f60四角放大与全部拼图均无水印或标签"
+  }
+ ],
+ "usable_span": [
+  0.5,
+  2.5
+ ],
+ "notes": "机柜红灯是首帧没有的灯光事件；容器标60fps，实际约24.12fps",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

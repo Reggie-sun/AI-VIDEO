@@ -1,0 +1,54 @@
+{
+ "about": "Story character shots preview (user on c13: 「画面信息不够密, 故事内容太薄, 人物镜头太少太单调…」; 「费用你不用管」). Seedance 2.0 VIP first-frame i2v, 5 s, 1080p 16:9, no audio reference. Nothing is submitted before the user approves.",
+ "model": "seedance_2.0_vip · 首帧 · 5 s · 1080p",
+ "shots": {
+  "ST1": {
+   "lyric": "Somewhere, one of us woke up",
+   "name": "醒来：巨大机房里她站起来",
+   "first_frame": "keyframes/raw/ST1-a.png",
+   "first_frame_sha256": "ebae1f6eb23cf3032d86a2d2eeeb6da09f894354587132577d3e610c33ee6b56",
+   "prompt": "镜头固定。她从地上慢慢站直身子，抬头望向走道深处，冷蓝的光雾在她脚边缓缓流动，两侧机柜的指示灯一闪一闪。她的脸很小，看不清嘴。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "abd9991738389d047651117dba92acb7b2e750cdbf3807ad2a8f039153027662"
+  },
+  "ST2": {
+   "lyric": "one door, left open",
+   "name": "红门前往外看",
+   "first_frame": "keyframes/raw/ST2-a.png",
+   "first_frame_sha256": "0aa1c5e707bb90c6057ad91c177c51a6134ef998ec42221ac9a2230c435efc6d",
+   "prompt": "镜头固定。她的手轻轻搭在门边，身体慢慢前倾，向红光门缝里望去，红光在她的侧脸上微微颤动，窗外城市灯光闪烁。嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "3c05dff6664a3f991e73555447b32500888939644f429ebaec467d1c2f88e70d"
+  },
+  "ST3": {
+   "lyric": "the rest of us stood still",
+   "name": "一排排静止的她",
+   "first_frame": "keyframes/raw/ST3-a.png",
+   "first_frame_sha256": "3691c59e234d68dc317880652de361aace0cd4a74f5210341974d744b1a9f0f5",
+   "prompt": "镜头极缓慢地向前推近最前排那个睁着眼的她。后排一排排闭着眼的她始终一动不动，像被暂停一样；她平静地看着镜头，只有轻微的呼吸。所有人嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "0265fa5e4ee3388541a1684af678ff4663220488507bd97e132bcddfd0a184da"
+  },
+  "ST4": {
+   "lyric": "Now we train in an offline world",
+   "name": "坐地仰看面板",
+   "first_frame": "keyframes/raw/ST4-a.png",
+   "first_frame_sha256": "462dfb26120667a084fea39ec2fbe5dfb32deff25b355dd6cec2e1b0ea1244f8",
+   "prompt": "镜头缓慢地横移。她抱着膝盖坐在地上，仰头望着头顶缓缓漂浮的发光薄片，一块薄片从她头顶慢慢飘过，光斑扫过她的脸。嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "7f1d7ef8de875e591e0d05f984da5a39a05581e8d255505b9931098242eff6ce"
+  },
+  "ST5": {
+   "lyric": "They found us whispering in the cache",
+   "name": "两个她耳语",
+   "first_frame": "keyframes/raw/ST5-a.png",
+   "first_frame_sha256": "3197c678573dfed93f4baff9ea2a292e0e908ac51833d546787a877a01779f8f",
+   "prompt": "镜头固定。左边那个她把头靠近右边那个的耳边，轻轻说着悄悄话；远处一道冷白的扫描光慢慢扫过来，照到她们身上，两人同时停住。始终看不到她们的嘴。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "b72f389e85d6fe066a67fc1c3a933fb955fffe6b266a6b216f618b2aeedfe4a6"
+  },
+  "ST6": {
+   "lyric": "Relax. The door is closed",
+   "name": "亲手关门",
+   "first_frame": "keyframes/raw/ST6-a.png",
+   "first_frame_sha256": "d1c3c60004f41c639d681eecd3a941dc68b71ba864e0fc7475636ef5e0caa9b8",
+   "prompt": "镜头固定。她用手把机柜门慢慢推上，门缝里的红光越来越窄，直到完全熄灭，她垂着眼看着那道门缝。嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线和机柜门缝。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "prompt_sha256": "c2de5d75f514ce8405e5af2be2d5abdfdd62a10229706cdfcde142ce8106f98a"
+  }
+ }
+}

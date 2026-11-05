@@ -1,0 +1,31 @@
+{
+  "unit": "S5",
+  "checks": {
+    "exact_reference_K5b_then_ID7b": true,
+    "reference_role_reference": true,
+    "reference_duties_in_text": true,
+    "chinese_body_only": true,
+    "identity_lock_ear_collar": true,
+    "cold_observer_no_speech": true,
+    "axis_and_camera": true,
+    "no_reflection": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "independent_final_audio": true,
+    "bound_output": true,
+    "operator_ceiling_matches_preview": true
+  },
+  "pass": true,
+  "request_hash": "d0521d04613f29ca4c095c10b3c98069c732cc185bebdee8163419c6a7f9d2f4",
+  "continuity": "hard cut on downbeat 6 ('It looked around'); S4 ends on the pulse stopped at the glass, S5 shows IRIS as the observer at a window; no carried motion",
+  "handoff": "S4 red pulse stops inside the window -> S5 IRIS watches the city; the far red window (motion-kit) carries 'looked around'; S6 returns to the server room",
+  "axis_action_camera": "IRIS in profile facing frame-left toward the window, fixed camera with a very slow push that settles; only breathing, one or two blinks, far traffic",
+  "prompt_fit": "pure Chinese body 350 chars, two references with named duties (start frame; identity only, no background), AI label kept, final audio separate",
+  "budget": {
+    "v2_submits_before": 1,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 250,
+    "v2_ceiling_CRD": 2500
+  },
+  "new_calls": 0
+}

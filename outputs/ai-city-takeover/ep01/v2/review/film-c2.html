@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 成片 c2</title>
+<style>
+  :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; --ok:#9fd3a8; }
+  body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+  h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:17px; font-weight:600; margin:26px 0 8px; }
+  .sub { color:var(--dim); } video { width:min(1280px,100%); display:block; margin:14px 0 6px; background:#000; }
+  table { border-collapse:collapse; max-width:1280px; width:100%; } td, th { border-bottom:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top; }
+  th { color:var(--dim); font-weight:500; } .pass { color:var(--ok); } .fail { color:var(--red); } code { color:#9fb7ff; }
+  .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:12px 16px; max-width:1248px; } li { margin:3px 0; }
+</style>
+<h1>IRIS 01 · Looked Outside — 成片 c2（待你審看）</h1>
+<div class="sub">1920×1080 · 30fps · 30.5 s · 整合響度 −14.2 LUFS · 交付檔 <code>renders/IRIS-EP01-Looked-Outside-v2-c2.mp4</code></div>
+<video controls preload="metadata" src="../renders/IRIS-EP01-Looked-Outside-v2-c2.mp4"></video>
+<div class="sub">
+  <ul>
+    <li><b>QA</b>：10 個剪點 ±0 幀；12 個圖形時機都在 ±1 幀內；沒有閃爍、頻閃或單幀錯畫面。</li>
+    <li><b>拼接檢查</b>：和 c1 一樣，倉庫的拼接 Gate（verify-assembly）還接不上這條合成路徑，所以接點<b>未經 Harness 驗證</b>，這是一部審看片。</li>
+    <li><b>聲音</b>：聲音與對嘴的聽感由你判斷，我無法聆聽。</li>
+  </ul>
+</div>
+
+<h2>這一版改了什麼（依你對 c1 的意見）</h2>
+<table>
+<tr><th>鏡</th><th>時間</th><th>改動</th><th>逐鏡檢查</th></tr>
+<tr><td>S1</td><td>0.00–3.37</td><td>眼睛在「woke」那一刻睜開（原生首尾幀）；S1 延長，S2 剪點移到 3.37 s 的拍點</td><td class="pass">PASS</td></tr>
+<tr><td>S5</td><td>11.47–13.37</td><td>她先平靜看窗外，遠處紅窗亮起後約 0.2 秒開始皺眉、瞇眼、微微前傾，一直盯住</td><td class="pass">PASS</td></tr>
+<tr><td>S7</td><td>14.80–18.87</td><td>她看著滑過的薄片，在「cached」時轉回鏡頭</td><td class="pass">PASS</td></tr>
+<tr><td>S8a</td><td>18.87–22.57</td><td>副歌第一遍重做：眼神鎖鏡頭、頭隨樂句動、最後長音放開；照你的選擇晚 2 幀</td><td class="fail">FAIL（你選用）：「I just」晚約 2 幀，「didn't」早約 3 幀</td></tr>
+<tr><td>S8b</td><td>22.57–25.90</td><td>副歌第二遍重做：仰頭、半閉眼，情緒放開</td><td class="fail">FAIL（你選用）：停頓和「outside」沒對上，剪點時嘴還留縫</td></tr>
+</table>
+
+<h2>其他小修</h2>
+<div class="box"><ul>
+  <li>S7 開頭那條紅色「斷線」原本橫過她的眼睛，已移到胸口下方。</li>
+  <li>S7 的「已缓存」戳記限制在畫面安全區內，這版只有 2 個。</li>
+</ul></div>
+
+<h2>花費（v3 表演重做）</h2>
+<div class="box"><ul>
+  <li>即夢 5 次付費生成：S1v3 198、S8av3 165、S8bv3b 165、S5v3 198、S7v3 198，合計約 924 積分。</li>
+  <li>前兩筆已由餘額確認（65,830 → 65,467），後三筆待餘額讀數確認。</li>
+  <li>另有 1 次參考上傳失敗、沒有送出，不扣費。</li>
+  <li>沒有用到修復次數；上限 1,850。</li>
+</ul></div>
+</html>

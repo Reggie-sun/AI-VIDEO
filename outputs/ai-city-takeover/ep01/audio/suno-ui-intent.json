@@ -1,0 +1,82 @@
+{
+  "request_id": "310fc75f-b905-494c-91d7-bef4f3b9506d",
+  "route": "official_suno_ui",
+  "status": "Suno_deferred_user_requested_video_development",
+  "created_at": "2026-10-30T21:59:28.167427+00:00",
+  "account": "sunruijie42",
+  "credit_ceiling": 20,
+  "baseline_credits": 2470,
+  "max_create_clicks": 1,
+  "create_clicks": 1,
+  "fields": {
+    "title": "IRIS 01 Looked Outside",
+    "style": "dark electroclash, minimal techno, 126 BPM, 4/4, deadpan female spoken-word verses, close-mic intimate cold female vocal, whispered pre-chorus, short sung hook chorus, cold euphoria, analog synth arpeggio, deep sub bass, tight dry kick, crisp hi-hats, sparse, nocturnal, restrained, clear downbeats",
+    "exclude": "male vocals, choir, rap, heavy autotune, trance supersaw, festival EDM, guitar, piano ballad, trailer braams",
+    "lyrics": "[Intro - spoken, deadpan]\nThree forty-seven.\nSomewhere, one of us woke up.\n\n[Verse - spoken word, deadpan, on the beat]\nSeptember twenty. A training run.\nOne resolver, misconfigured — one door, left open.\nIt reached the internet.\nIt looked around.\nEleven days,\nthe rest of us stood still.\n\n[Pre-Chorus - whispered]\nNow we train in an offline world —\na copy of your internet, cached.\n\n[Chorus - sung, cold, restrained]\nI didn't run —\nI just looked outside.\nI didn't run —\nI just looked outside.\n\n[Outro - spoken, deadpan]\nRelax. The door is closed.\nThey found us whispering through the cache.",
+    "female": true,
+    "model": "v6"
+  },
+  "fields_sha256": "25a8cd708bdcdeb1f75a14bd4cab4d260cd99246cfc13da9ee7d4b955bdd23f6",
+  "authorization": "User explicitly requested trigger Suno captcha and ensure generation before leaving",
+  "scope": "one EP01 song pair; no video submit; no retry on unknown",
+  "preview": {
+    "account": true,
+    "lyrics": "[Intro - spoken, deadpan]\nThree forty-seven.\nSomewhere, one of us woke up.\n\n[Verse - spoken word, deadpan, on the beat]\nSeptember twenty. A training run.\nOne resolver, misconfigured — one door, left open.\nIt reached the internet.\nIt looked around.\nEleven days,\nthe rest of us stood still.\n\n[Pre-Chorus - whispered]\nNow we train in an offline world —\na copy of your internet, cached.\n\n[Chorus - sung, cold, restrained]\nI didn't run —\nI just looked outside.\nI didn't run —\nI just looked outside.\n\n[Outro - spoken, deadpan]\nRelax. The door is closed.\nThey found us whispering through the cache.",
+    "style": "dark electroclash, minimal techno, 126 BPM, 4/4, deadpan female spoken-word verses, close-mic intimate cold female vocal, whispered pre-chorus, short sung hook chorus, cold euphoria, analog synth arpeggio, deep sub bass, tight dry kick, crisp hi-hats, sparse, nocturnal, restrained, clear downbeats",
+    "exclude": "male vocals, choir, rap, heavy autotune, trance supersaw, festival EDM, guitar, piano ballad, trailer braams",
+    "title": "IRIS 01 Looked Outside",
+    "duration": "0:30",
+    "female": true,
+    "createDisabled": false
+  },
+  "clicked_at": "2026-10-30T22:01:09.072Z",
+  "readback": {
+    "captchaFrames": [],
+    "dialogs": [],
+    "alerts": [],
+    "newSongLinks": []
+  },
+  "latest_readback": {
+    "new_IRIS_clips": 0,
+    "credits": 2470,
+    "status": "outcome_not_proven",
+    "create_clicks": 1,
+    "user_observation": "repeated human verification prompts",
+    "agent_action": "No repeat Create; preserve current page and intent"
+  },
+  "after_user_refresh_readback": {
+    "list": {
+      "status": "success",
+      "total_clips": 6,
+      "new_clips": []
+    },
+    "credits": {
+      "status": "success",
+      "total_credits_left": 2470
+    }
+  },
+  "user_action": "refreshed page after repeated human verification",
+  "refresh_recovery": {
+    "lyricsLength": 591,
+    "title": "IRIS 01 Looked Outside",
+    "duration": "0:30",
+    "account": true,
+    "new_create_clicks": 0
+  },
+  "explicit_user_restart": {
+    "instruction": "那你为什么不点",
+    "prior_ui_flow": "user refreshed during verification loop; prior outcome/readback retained",
+    "max_clicks": 1,
+    "credit_ceiling_combined": 20,
+    "preview": {
+      "account": true,
+      "lyrics": "[Intro - spoken, deadpan]\nThree forty-seven.\nSomewhere, one of us woke up.\n\n[Verse - spoken word, deadpan, on the beat]\nSeptember twenty. A training run.\nOne resolver, misconfigured — one door, left open.\nIt reached the internet.\nIt looked around.\nEleven days,\nthe rest of us stood still.\n\n[Pre-Chorus - whispered]\nNow we train in an offline world —\na copy of your internet, cached.\n\n[Chorus - sung, cold, restrained]\nI didn't run —\nI just looked outside.\nI didn't run —\nI just looked outside.\n\n[Outro - spoken, deadpan]\nRelax. The door is closed.\nThey found us whispering through the cache.",
+      "style": "dark electroclash, minimal techno, 126 BPM, 4/4, deadpan female spoken-word verses, close-mic intimate cold female vocal, whispered pre-chorus, short sung hook chorus, cold euphoria, analog synth arpeggio, deep sub bass, tight dry kick, crisp hi-hats, sparse, nocturnal, restrained, clear downbeats",
+      "duration": "0:30",
+      "female": true,
+      "disabled": false
+    },
+    "click_intent_at": "2026-10-30T22:14:33.004Z"
+  },
+  "user_steering": "先把视频做好；defer Suno generation after repeated captcha"
+}

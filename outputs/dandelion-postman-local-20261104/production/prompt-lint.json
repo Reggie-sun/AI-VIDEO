@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "checks": {
+    "only_new_postman_reference": true,
+    "exact_native_prompt": true,
+    "current_user_quote": true,
+    "no_awesome_coverage_requirement": true,
+    "same_duration": true,
+    "same_model_resolution": true,
+    "qualification_only": true,
+    "once_no_resample": true,
+    "no_full_prompt_mapping": true,
+    "fragments_are_actual_substrings": true,
+    "all_categories_preserved": true,
+    "two_step_relative_phase": true,
+    "no_timestamp_choreography": true,
+    "new_visual_not_claimed": true,
+    "no_old_story": true
+  },
+  "prompt_characters": 487,
+  "proof_boundary": "offline structure and exact bindings, not model execution or media quality"
+}

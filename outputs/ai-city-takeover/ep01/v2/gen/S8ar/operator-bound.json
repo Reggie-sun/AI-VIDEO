@@ -1,0 +1,31 @@
+{
+  "schema_version": "iris-v2-unit/1",
+  "unit": "S8ar",
+  "task": "IRIS EP01 v2 S8a bounded repair: vocal reference starts on the sung onset (no lead-in silence), 5 s",
+  "repair_of": {
+    "unit": "S8a",
+    "attempt_id": "iris-v2-s8a-source-001",
+    "gate": "outputs/ai-city-takeover/ep01/v2/qa/gate-S8a/post-media-gate.json",
+    "failed_requirement": "lip-sync (criterion 2: mouth open in the lead-in silence; lips not fully shut at the end)",
+    "repair_variable": "reference audio lead-in 0.20 s silence -> none (clip t=0 = master 18.60 s)",
+    "repairs_allowed_for_unit": 1,
+    "repairs_used_before": 0
+  },
+  "user_quote": "認可，開始生成",
+  "ai_label_quote": "保留 AI 标识，只禁止新增剧情字幕和图形",
+  "criteria": [
+    "outputs/ai-city-takeover/ep01/v2/s8a-lipsync-amendment.md#有界修復 S8ar"
+  ],
+  "attempt_id": "iris-v2-s8ar-source-001",
+  "policy_id": "iris-v2-s8ar-source-001",
+  "reservation_id": "iris-v2-s8ar-reservation-001",
+  "max_submit_count": 1,
+  "automatic_retries": 0,
+  "operator_currency": "CRD",
+  "operator_ceiling": 250,
+  "v2_cumulative_submit_ceiling": 10,
+  "v2_cumulative_operator_credit_ceiling": 2500,
+  "issued_at": "2026-11-02T08:10:34.042525+00:00",
+  "expires_at": "2026-11-02T11:10:34.042525+00:00",
+  "stop_on_unknown": true
+}

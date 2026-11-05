@@ -1,0 +1,86 @@
+{
+  "schema": "local-song-music-repair-series/1",
+  "authority": "development_source_authoring_only",
+  "created_at_utc": "2026-10-31T08:51:02.482275+00:00",
+  "user_authorization": [
+    "那继续修",
+    "这个版本为什么bgm都没有，只有词语"
+  ],
+  "failed_result": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/G-guided-retention/result.json",
+    "sha256": "9dbbc03fbee1acf5616d23effd82d066bfe1e406d1d30432cdf47390b8a347f0"
+  },
+  "human_feedback": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/human-feedback-missing-bgm.json",
+    "sha256": "f7a5404f6a56cc891752f66321fd41b3268900ea7292838f1922988e5b299335"
+  },
+  "old_ceiling_history": [
+    2,
+    5,
+    7
+  ],
+  "previous_ceiling": 7,
+  "previous_used": 7,
+  "previous_known_results": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-01/result.json",
+      "sha256": "08c4ca8b8e5ae9f7a20f8b1368dc3d094988cdec84e9149cc9d187b074076f52"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-local-20261031/attempt-02/result.json",
+      "sha256": "d10831145a42fee50ccb4ab015c24cd601d1048620265796cb40d866d9d307b9"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/C-direct-dit/result.json",
+      "sha256": "6a27519848801377b6b879b39c49b31e3891738b51fc04fd0d49925a93231898"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/D-standard-tags/result.json",
+      "sha256": "0eb474fc8befd077ed52cf178a99f659c4f75bf485a1909131402069f4d64faa"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/E-sft-cfg/result.json",
+      "sha256": "c1516fb6cdfc80e01def5129f2388eeb97052f3b327c67d7d67e026d86f16151"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/F-guided-cover/result.json",
+      "sha256": "3626b6a236f88f0082e7a9ba3ee2971ae10ba9b80c005ddba9feccbf82755474"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/G-guided-retention/result.json",
+      "sha256": "9dbbc03fbee1acf5616d23effd82d066bfe1e406d1d30432cdf47390b8a347f0"
+    }
+  ],
+  "additional_generation_limit": 3,
+  "cumulative_ceiling": 10,
+  "automatic_retries": 0,
+  "paid_calls": 0,
+  "new_downloads": 0,
+  "original_intent": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+    "sha256": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6"
+  },
+  "original_lyrics_sha256": "179b2bc93c75f4767837f0e09df6eb47ebaadc94a7f2134706fd835b7dbb57fe",
+  "preserved_goal": {
+    "all_original_words_in_order": true,
+    "duration_seconds": 30,
+    "original_style": "dark electroclash, minimal techno, 126 BPM, 4/4, deadpan female spoken-word verses, close-mic intimate cold female vocal, whispered pre-chorus, short sung hook chorus, cold euphoria, analog synth arpeggio, deep sub bass, tight dry kick, crisp hi-hats, sparse, nocturnal, restrained, clear downbeats",
+    "short_sung_hook": true,
+    "audible_music_bed": true,
+    "no_post_output_speedup": true
+  },
+  "source_strategy": "Independent instrumental source, exact spoken source retained outside hook, actual sung hook source. Full song source audition only; no final-film timeline, activation, P6 or Registry mutation.",
+  "unit_plan": {
+    "H": {
+      "role": "instrumental",
+      "seconds": 30
+    },
+    "I": {
+      "role": "sung_hook",
+      "seconds": 10
+    },
+    "J": "Reserved only for one evidence-bound known hook failure, no blind repeats"
+  },
+  "stop": "Unknown consumption outcome, outside original words/style/duration, exhausted10, or completed corrected source audition",
+  "human_music_acceptance": "REQUIRED; automatic measurements do not substitute"
+}

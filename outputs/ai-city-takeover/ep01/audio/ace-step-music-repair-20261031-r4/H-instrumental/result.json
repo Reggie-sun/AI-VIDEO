@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "error": null,
+  "status_message": "Generation completed successfully!",
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/H-instrumental/9a6a6771-859c-e9c3-8cdf-b5b37c00278c.wav",
+      "sha256": "dda4ce0ed63b1c5dd4736c835d22967cd1e0b82095b822c00b869d77f81e0304",
+      "bytes": 5760044
+    }
+  ],
+  "ordinal": 8,
+  "role": "instrumental",
+  "intent_sha256": "f26d9d4dc33fc4555a23eb7114a3f3bcc3c27ca6c99250428869b188412b528d",
+  "elapsed_seconds": 6.318,
+  "peak_gpu_allocated_bytes": 7825463808,
+  "completed_at_utc": "2026-10-31T08:51:19.643135+00:00",
+  "human_listening": "NOT_EVALUATED",
+  "production_state_writes": 0,
+  "remote_generation_calls": 0
+}

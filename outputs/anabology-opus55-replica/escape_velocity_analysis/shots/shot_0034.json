@@ -1,0 +1,740 @@
+{
+  "shot_id": "S0034",
+  "start_frame": 1277,
+  "end_frame": 1319,
+  "start_time": 53.2083,
+  "end_time": 55.0,
+  "duration_frames": 43,
+  "duration_s": 1.7917,
+  "start_tc": "00:00:53:05",
+  "end_tc": "00:00:54:23",
+  "boundary_in_id": "B0-033",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 1277,
+      "path": "keyframes/S0034_f01277.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1287,
+      "path": "keyframes/S0034_f01287.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1298,
+      "path": "keyframes/S0034_f01298.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1309,
+      "path": "keyframes/S0034_f01309.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1319,
+      "path": "keyframes/S0034_f01319.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1298,
+      "path": "work/full_batch/01298.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 1319,
+      "path": "work/full_batch/01319.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "character_plate",
+  "narrative_role": "人物服装Look章节推进与歌词概念的可视化解释；具体内容见分镜描述",
+  "subject": "俯看女主在金属栏杆小平台上先直立再深鞠躬",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "俯看女主在金属栏杆小平台上先直立再深鞠躬，左上红灯点亮，背景灰墙。左边Sorry.先橙后白，左下大窄字ENCORE.进入；右下黑色量角面板指针随鞠躬从00°转至72°，在深弯腰处保持。",
+  "composition": {
+    "shot_size": "人物/环境，见分镜描述",
+    "subject_position": "见scene_description与各独立元素bbox",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可观察视角见scene_description；真实相机焦距/型号未知",
+    "layers": {
+      "foreground": "歌词、计数、检测框、图形窗口",
+      "midground": "女主或主要图形/道具",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "filmstrip和首中末观察；光流仅为画面运动不能证明相机: {'pan_x_frac_per_s': -0.002, 'pan_y_frac_per_s': 0.0033, 'zoom_per_s': -0.0051, 'median_flow_frac_per_s': 0.0067, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": -0.002,
+      "pan_y_frac_per_s": 0.0033,
+      "zoom_per_s": -0.0051,
+      "median_flow_frac_per_s": 0.0067,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "见描述；实际灯位未知",
+    "quality": "可见屏幕/红色小点光与强反差；图形镜头为代码明暗平面",
+    "effects": [
+      "全片印刷网点纹理"
+    ],
+    "temporal_change": "实测亮度首中末 [69.1, 70.4, 80.5]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#0F100A",
+        "fraction": 0.373,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#7D7D81",
+        "fraction": 0.21,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#37312B",
+        "fraction": 0.138,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#625A55",
+        "fraction": 0.115,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#A49E9F",
+        "fraction": 0.098,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#E8E3E3",
+        "fraction": 0.066,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "实测亮度首中末 [69.1, 70.4, 80.5]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 04 / 11，采样可见，变值精确帧待核",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "右上18 MONTHS / TO ESCAPE，底部微字THE PERMANENT UNDERCLASS及DEPARTURES · SS27 · COLLECTION01",
+    "G-TICKER": "底部持续向左滚动，条目见visual_system；逐镜窗口随时间变化",
+    "G-FLAP-BOARD": "无底部大翻牌；18由右上小控件承载",
+    "G-CORNER-MARKS": "四角浅灰十字",
+    "G-AUDIO-SPECTRUM": "右上白条，随时间起伏",
+    "G-LEFT-RULER": "左侧白刻度，y540橙指针",
+    "G-TIMECODE": {
+      "first": "00:00:53:05",
+      "last": "00:00:54:23"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0034-E01",
+      "shot_id": "S0034",
+      "type": "background_media",
+      "description": "俯看女主在金属栏杆小平台上先直立再深鞠躬，左上红灯点亮，背景灰墙。左边Sorry.先橙后白，左下大窄字ENCORE.进入；右下黑色量角面板指针随鞠躬从00°转至72°，在深弯腰处保持。",
+      "start_frame": 1277,
+      "end_frame": 1319,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "俯看女主在金属栏杆小平台上先直立再深鞠躬，左上红灯点亮，背景灰墙。左边Sorry.先橙后白，左下大窄字ENCORE.进入；右下黑色量角面板指针随鞠躬从00°转至72°，在深弯腰处保持。",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1319仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1277,
+          "observed_state": "俯看女主在金属栏杆小平台上先直立再深鞠躬，左上红灯点亮，背景灰墙。左边Sorry.先橙后白，左下大窄字ENCORE.进入；右下黑色量角面板指针随鞠躬从00°转至72°，在深弯腰处保持。"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1277,
+        1287,
+        1298,
+        1309,
+        1319
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0034-E02",
+      "shot_id": "S0034",
+      "type": "text_caption",
+      "description": "左侧问候白字当前词橙色",
+      "start_frame": 1287,
+      "end_frame": 1319,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.44166666666666665,
+        "w": 0.15520833333333334,
+        "h": 0.08148148148148149,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "左侧问候白字当前词橙色",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1319仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1287,
+          "observed_state": "Sorry.淡入",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1289,
+          "observed_state": "Sorry.橙色",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1293,
+          "observed_state": "Sorry.白色",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1313,
+          "observed_state": "开始消退",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1298,
+        1309,
+        1319
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "Sorry.",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 40,
+          "visual_family": "bold sans",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 64,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "bold"
+        }
+      }
+    },
+    {
+      "element_id": "S0034-E03",
+      "shot_id": "S0034",
+      "type": "text_title",
+      "description": "左下大型凝缩大写文字",
+      "start_frame": 1297,
+      "end_frame": 1319,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.6814814814814815,
+        "w": 0.3338541666666667,
+        "h": 0.1537037037037037,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "左下大型凝缩大写文字",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1319仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1297,
+          "observed_state": "ENCORE.橙色",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1299,
+          "observed_state": "ENCORE.白色",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1298,
+        1309,
+        1319
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "ENCORE.",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 70,
+          "visual_family": "condensed grotesque",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "bold"
+        }
+      }
+    },
+    {
+      "element_id": "S0034-E04",
+      "shot_id": "S0034",
+      "type": "hud_gauge",
+      "description": "右下APOLOGY量角器与斜三角指针",
+      "start_frame": 1283,
+      "end_frame": 1319,
+      "bounding_box": {
+        "x": 0.6770833333333334,
+        "y": 0.5555555555555556,
+        "w": 0.2708333333333333,
+        "h": 0.30648148148148147,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "右下APOLOGY量角器与斜三角指针",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1319仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1283,
+          "observed_state": "量表底淡入",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1285,
+          "observed_state": "底完整",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1293,
+          "observed_state": "0°",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1295,
+          "observed_state": "11°",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1297,
+          "observed_state": "29°",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1299,
+          "observed_state": "52°",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1301,
+          "observed_state": "69°",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1303,
+          "observed_state": "72°",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1287,
+        1298,
+        1309,
+        1319
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "APOLOGY METER · VIA BOW\n0° UPRIGHT / 30° SORRY / 60° DEEP\n72°\nSLOGAN RETIRED / APOLOGY ISSUED / ENCORE BOOKED",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 70,
+          "visual_family": "monospaced sans",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium"
+        }
+      },
+      "full_resolution_text_observation": {
+        "frame": 1298,
+        "content": "APOLOGY METER · VIA BOW\n0° UPRIGHT / 30° SORRY / 60° DEEP\n40° [f1298]\nSLOGAN RETIRED / APOLOGY ISSUED / ENCORE BOOKED",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      }
+    },
+    {
+      "element_id": "S0034-E05",
+      "shot_id": "S0034",
+      "type": "hud_bracket",
+      "description": "跟随头部俯下的白色脸框",
+      "start_frame": 1277,
+      "end_frame": 1319,
+      "bounding_box": {
+        "x": 0.37604166666666666,
+        "y": 0.19537037037037036,
+        "w": 0.4234375,
+        "h": 0.6703703703703704,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "跟随头部俯下的白色脸框",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1319仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1277,
+          "observed_state": "跟随头部俯下的白色脸框"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1277,
+        1287,
+        1298,
+        1309,
+        1319
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "full_resolution_text_observation": {
+        "frame": 1298,
+        "content": "MODEL 01 · BOWING / 0.97",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "MODEL 01 · BOWING 0.97",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 11,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "monospaced sans"
+        }
+      }
+    },
+    {
+      "element_id": "S0034-E06",
+      "shot_id": "S0034",
+      "type": "text_label",
+      "description": "Sorry字幕下水平线与未完成的L0微字",
+      "start_frame": 1296,
+      "end_frame": 1319,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.5601851851851852,
+        "w": 0.23958333333333334,
+        "h": 0.027777777777777776,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f1296首次采样可见",
+        "exit": "f1319仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1296,
+          "observed_state": "L0初显"
+        },
+        {
+          "frame": 1313,
+          "observed_state": "随Sorry淡出"
+        },
+        {
+          "frame": 1319,
+          "observed_state": "不可见"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1319
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "L0",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "bold sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "film_start",
+      "boundary_id": null,
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-001",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0118",
+      "relation": "beat_candidate (unknown) at frame 1277; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1277
+    },
+    {
+      "audio_event_id": "AH00410",
+      "relation": "band_onset_candidate (unknown) at frame 1277; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1277
+    },
+    {
+      "audio_event_id": "AH00411",
+      "relation": "band_onset_candidate (unknown) at frame 1277; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1277
+    },
+    {
+      "audio_event_id": "AH00412",
+      "relation": "band_onset_candidate (unknown) at frame 1277; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1277
+    },
+    {
+      "audio_event_id": "AH00413",
+      "relation": "band_onset_candidate (unknown) at frame 1277; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1277
+    },
+    {
+      "audio_event_id": "AH00414",
+      "relation": "band_onset_candidate (unknown) at frame 1278; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1278
+    },
+    {
+      "audio_event_id": "AH00415",
+      "relation": "band_onset_candidate (unknown) at frame 1284; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1284
+    },
+    {
+      "audio_event_id": "AW0077",
+      "relation": "vocal_word_candidate (unknown) at frame 1287–1294; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1287
+    },
+    {
+      "audio_event_id": "AB0119",
+      "relation": "beat_candidate (unknown) at frame 1288; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 1288
+    },
+    {
+      "audio_event_id": "AH00416",
+      "relation": "band_onset_candidate (unknown) at frame 1293; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1293
+    },
+    {
+      "audio_event_id": "AW0078",
+      "relation": "vocal_word_candidate (unknown) at frame 1296–1311; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1296
+    },
+    {
+      "audio_event_id": "AB0120",
+      "relation": "beat_candidate (unknown) at frame 1299; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 1299
+    },
+    {
+      "audio_event_id": "AB0121",
+      "relation": "beat_candidate (unknown) at frame 1310; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 1310
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "几何为fullres视觉像素估计±4–12px，非作者源坐标。",
+    "密集采样时点存在1–2帧区间；半翻字形与插值不猜测。",
+    "原字体identity、shader和摄影层抠像方式未知。",
+    "音频待主会话绑定。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0034.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      1298,
+      1319
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation；独立2帧全镜复看后补录主字、局部HUD、擦除/闪光关键状态，时点为首次采样可见且允许前1帧起显",
+    "remaining": "原始shader/font/插值保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        1277,
+        1319,
+        2
+      ]
+    ],
+    "closure": "本轮fullres逐层检查并补遗漏独立层；已复核text.content和各bbox，密集时间精度见keyframes"
+  }
+}

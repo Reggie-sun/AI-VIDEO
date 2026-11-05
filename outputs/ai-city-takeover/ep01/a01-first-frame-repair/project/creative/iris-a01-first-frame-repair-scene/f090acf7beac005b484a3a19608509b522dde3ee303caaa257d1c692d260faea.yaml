@@ -1,0 +1,41 @@
+artifact_id: iris-a01-first-frame-repair-scene
+content_hash: f090acf7beac005b484a3a19608509b522dde3ee303caaa257d1c692d260faea
+continuity_constraints:
+- 人物身份、左耳装置与左领红光位置一致
+- 蓝黑/钢蓝，红为唯一暖色
+creation_receipt_id: iris-a01-first-frame-repair-authoring:scene
+location: 雨后雾城高层玻璃阳台
+mood: 冷静、精密、疏离
+participant_ids:
+- IRIS
+revision: 2
+scene_id: balcony
+schema_version: '2.0'
+source_provenance:
+- content_hash: 08aeb291feeacb19d87647af419c0725565c4561b9582f097735ea281ac53c0c
+  kind: user_input
+  reference: evidence/authoring-input/08aeb291feeacb19d87647af419c0725565c4561b9582f097735ea281ac53c0c.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: 635f087286f651075d22ca00c9c71e12969622a7f5481b92e030cad6b0bdb89f
+  kind: user_input
+  reference: evidence/authoring-input/635f087286f651075d22ca00c9c71e12969622a7f5481b92e030cad6b0bdb89f.json
+- content_hash: 9bf6ca4d17685f27fd8d748c3cabb832216109755efac15c38a149ed456405dc
+  kind: user_input
+  reference: evidence/authoring-input/9bf6ca4d17685f27fd8d748c3cabb832216109755efac15c38a149ed456405dc.json
+- content_hash: 9c67d74e5f7ad8458adca64578b33eca7d85869d7c75938ab83d1b5f639d7ae4
+  kind: user_input
+  reference: evidence/authoring-input/9c67d74e5f7ad8458adca64578b33eca7d85869d7c75938ab83d1b5f639d7ae4.json
+- content_hash: 2fd3fb75ff8fbe34aa0648529f2748632c260bf8ba4c4c396b14484d38512640
+  kind: user_input
+  reference: evidence/authoring-input/2fd3fb75ff8fbe34aa0648529f2748632c260bf8ba4c4c396b14484d38512640.json
+time: 凌晨；03:47为虚构系列时钟
+visual_reference_asset_ids:
+- iris-a01-first-frame-repair-balcony

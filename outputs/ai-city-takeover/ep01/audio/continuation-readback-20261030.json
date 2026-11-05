@@ -1,0 +1,53 @@
+{
+  "scope": "development_session_continuation_observation",
+  "recorded_at_utc": "2026-10-31T00:30:02.864167+00:00",
+  "source_session_id": "01a18ea5-cafe-7c73-a5b9-75c95b39f5e0",
+  "observations": {
+    "browser_account": "sunruijie42",
+    "browser_page": "https://suno.com/create",
+    "browser_visible_challenge_at_readback": false,
+    "cli_authenticated": true,
+    "cli_model": "v6",
+    "cli_model_access": true,
+    "cli_credits_left": 2470,
+    "cli_captcha_preflight_required": true,
+    "library_total_clips": 6,
+    "library_latest_created_at": "2026-10-25T22:03:15.080Z",
+    "iris_clip_ids": []
+  },
+  "prior_submission_outcome": "UNRESOLVED",
+  "no_effect_proven": false,
+  "historical_ui_create_actions_at_least": 4,
+  "new_create_actions": 0,
+  "new_paid_submissions": 0,
+  "challenge_solving_or_token_access": false,
+  "next_required_evidence": "Human verification result or exact generated clip identity; no automatic retry of unresolved submissions",
+  "intent_anchors": {
+    "suno-ui-intent.json": "f5b2cf832a5d27203f2d5f67168937d27b1719537abad2b9c8d952c81005d6d6",
+    "suno-mcp-create-intent.json": "0182540b04a3e0de2a9377c85a0c16d7b617d6d27bbdf6ff63dca76ce3a36d9e",
+    "suno-patchright-create-intent.json": "e7981fc7b00d79a1a0bc3d3c4cabf3cd8114c7eadded6854d25d18a0c88f00fc",
+    "suno-patchright-create-result.json": "87de18f09a6bffb70750d2b77683b1166e8b89daebbf6bb0308f81519105e9b4"
+  },
+  "source_validation": {
+    "typed_video_assets": 6,
+    "typed_shot_candidates": 8,
+    "validate_exit_code": 0,
+    "require_preview_ready_exit_code": 2,
+    "focused_preparation_tests_passed": 6,
+    "production_state_writes": 0,
+    "final_compose_ready": false
+  },
+  "latest_readback": {
+    "list": {
+      "status": "success",
+      "total_clips": 6,
+      "has_more": false,
+      "recent_clips": []
+    },
+    "credits": {
+      "status": "success",
+      "credits_left": 2470
+    },
+    "observed_at_utc": "2026-10-31T00:54:38.946320+00:00"
+  }
+}

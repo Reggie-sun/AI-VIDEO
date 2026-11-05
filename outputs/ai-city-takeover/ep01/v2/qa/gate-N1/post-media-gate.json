@@ -1,0 +1,69 @@
+{
+ "unit": "N1",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/N1/project/state/video-generation/fetch/files/6b49fa1efcc48669871e89d709ceb359f6e8c78a893beaa4fa0a4501fdacd25f.mp4",
+ "sha256": "6b49fa1efcc48669871e89d709ceb359f6e8c78a893beaa4fa0a4501fdacd25f",
+ "verdict": "PASS",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum 與主會話給的相同；video_probe 5.057 s、1920x1080、h264、aac"
+  },
+  {
+   "id": "camera_locked(R5)",
+   "result": "PASS",
+   "evidence": "0–5 s 相位相關位移全是 (0,0)；scene_detect 只有 1 段；t0 與 t5 的走道透視和燈帶不變"
+  },
+  {
+   "id": "performance_walk_to_red_gap",
+   "result": "PASS",
+   "evidence": "背對鏡頭沿走道中央走遠：t0 頭 y≈190、腳 y≈410，t5 頭 y≈222、腳 y≈360（960 寬）；大衣下擺擺動、倒影跟隨（N1_hr.png 0–4.9 s）"
+  },
+  {
+   "id": "gait_foot_sliding(R4)",
+   "result": "PASS",
+   "evidence": "每秒 6 幀腳部條帶（N1_feet.png）：雙腳交替著地、倒影同步，沒有穿地或明顯滑步"
+  },
+  {
+   "id": "collar_red_line(R1)",
+   "result": "PASS",
+   "evidence": "t0–t4.9 後領發光線和首幀 N1-a 相同，沒有變成整圈發光或跑到右前領"
+  },
+  {
+   "id": "identity_back_view(R2)",
+   "result": "PASS",
+   "evidence": "全程沒露臉；後梳低髻、炭黑高領長大衣保持；看不到耳朵是預期內"
+  },
+  {
+   "id": "no_mouth_movement(R8)",
+   "result": "PASS",
+   "evidence": "臉一直不可見；video_transcribe 沒有文字"
+  },
+  {
+   "id": "no_model_text_label_kept(R6)",
+   "result": "PASS",
+   "evidence": "11 幀抽樣沒有模型畫出的文字；中繼資料 UserComment aigc_label_type:0 source dreamina 保留，未移除"
+  },
+  {
+   "id": "red_gap_occlusion(R10)",
+   "result": "PASS",
+   "evidence": "人物在 x≈440–520，紅光門縫在 x≈400（960 寬），全程沒被擋住"
+  },
+  {
+   "id": "continuity_K3",
+   "result": "PASS",
+   "evidence": "走道、機櫃藍燈、盡頭紅光門縫、燈帶與首幀/K3 構圖一致"
+  },
+  {
+   "id": "usable_subspan(R7)",
+   "result": "PASS",
+   "evidence": "全程動作勻速、鏡頭靜止，任取 1–2.5 s 都看得出在走遠"
+  }
+ ],
+ "usable_span": [
+  0.5,
+  3.0
+ ],
+ "notes": "0.5–3.0 s 人物較大、步態清楚；仍需依 continuity-report 的接點條件，不要直接硬切到 S3 空走道。",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

@@ -1,0 +1,8 @@
+{
+ "unit": "U021",
+ "price": 24,
+ "balance_before": 61852,
+ "permit_sha256": "6e45a707db9ccd62a79afe615ca5a566060eb07d84e172bd85fb3e7da6abcf10",
+ "observed_sha256": "dd28c44b92c86cb2ad60c8c1158739a85af7a82a5dbf734a41e6b3b557f714aa",
+ "clicked_at": "2026-11-05T08:18:39.204Z"
+}

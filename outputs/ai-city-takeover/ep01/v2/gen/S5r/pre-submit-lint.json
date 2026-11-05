@@ -1,0 +1,36 @@
+{
+  "unit": "S5r",
+  "checks": {
+    "exact_reference_K5b_then_ID7b": true,
+    "reference_role_reference": true,
+    "reference_duties_in_text": true,
+    "chinese_body_only": true,
+    "identity_lock_ear_collar": true,
+    "cold_observer_no_speech": true,
+    "locked_camera_no_push": true,
+    "keep_first_frame_scale": true,
+    "axis": true,
+    "no_reflection": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "independent_final_audio": true,
+    "bound_output": true,
+    "operator_ceiling_matches_preview": true,
+    "repair_budget": true
+  },
+  "pass": true,
+  "request_hash": "0d1c3bde9bee0c6ca950d71b5c0cf1d157332d0e152ff0b7fdb857cc23424ef4",
+  "continuity": "same as S5: hard cut on downbeat 6; no carried motion",
+  "handoff": "S4 pulse stops at the glass -> S5 IRIS observes; far red window by motion-kit on a now static plate",
+  "axis_action_camera": "profile facing frame-left toward the window; locked tripod camera for the full 6 s; only breathing, blinks, far traffic",
+  "prompt_fit": "pure Chinese body 371 chars; only the camera sentence changed from S5",
+  "repair": "one bounded known-quality repair of S5 (camera FAIL); no further S5 repair allowed under the approved bound",
+  "budget": {
+    "v2_submits_before": 2,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 500,
+    "v2_ceiling_CRD": 2500,
+    "observed_cost_per_6s_CRD": 198
+  },
+  "new_calls": 0
+}

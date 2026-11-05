@@ -1,0 +1,268 @@
+{
+ "schema": "iris-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-03T00:22:55Z",
+ "scope": "IRIS EP01 對嘴方法試驗 LSen1、LSen2、LSzh1、LSzh2 付費送出前的連續性報告。只讀：未送出、未改倉庫檔、未 git add。",
+ "inputs": {
+  "plan": {
+   "path": "docs/superpowers/plans/2026-11-02-iris-ep01-lipsync-trial.md",
+   "sha256": "f1b3c49cfea94c7c569bf593a59631edd9523018f840c40e5a09706d5b5149fb",
+   "note": "與 preview-approval.json 記錄的 plan sha 相同"
+  },
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/preview-approval.json",
+   "sha256": "459d98c5918d365bf0faab3698031047e3973281f1e615a24d9be0ee356630dd"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/preview.html",
+   "sha256": "957c6331beea06e1b2859127832930f4ecaefc6b91519c16ba624243f2ce4e36",
+   "note": "與 approval 記錄相同"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/preview-inputs.json",
+   "sha256": "26adeb4529060c10fdfd3952002ff584af32979f9858833a9e1ad298bb015cdf"
+  },
+  "approved_prompt_sha256": {
+   "EV-en": "fe58d95c9ed01fddb87d1797f4deb198408f3ad78e0c3436a0611e3029e5433d",
+   "EV-zh": "179feb47fd70744b7e3683dfe72bdd2fa15a16aea66c225bc0f3abd126344e79"
+  },
+  "plate_A02": {
+   "path": "outputs/ai-city-takeover/ep01/reference-package/A02-v1.png",
+   "sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039",
+   "size": "1672x941",
+   "trial_copy": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/A02-v1.png（sha 相同）"
+  },
+  "vocal_window": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+   "format": "pcm_s16le 44100 Hz mono 5.000 s",
+   "meta": {
+    "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window.json",
+    "sha256": "20c6a6c2cabbd89727828e5ac10008bed51da964980bc23fce65aa9595c344d6"
+   }
+  },
+  "vocal_stem": {
+   "path": "outputs/ai-city-takeover/ep01/v2/song/isolation/chorus-18.6-26.0-isolated.mp3",
+   "sha256": "9a454000b362f094a35898f5f3b844548c5dd48c83bceb5dc89d79870f9050db"
+  },
+  "master_excerpt_not_sent": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/master-17.97-22.97.wav",
+   "sha256": "2e08a982e095e6ee197fd5994bb37f9d981545d480b68a44a31aa574a9bdc512"
+  },
+  "c3_delivery": {
+   "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c3.mp4",
+   "sha256": "437fddcb4c8ab0dcffe72e128fe568725981a9010f45d0d53ca72dc383301ca3",
+   "probe": "video-analysis MCP video_probe：1920x1080、30 fps、915 幀、30.528 s"
+  },
+  "prev_shot_S7v3": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+   "sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21",
+   "c3_span": "成片 14.8–18.8667 s＝片內 1.4–5.4667 s",
+   "gate": {
+    "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-S7v3/post-media-gate.json",
+    "sha256": "33b0615bb981f56f5802d88a45b8c99df5474c1c5b7171ed83abf9bb1a91d3da",
+    "verdict": "PASS（Agent），human 1.0x 未評"
+   }
+  },
+  "next_shot_plate_K8b": {
+   "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K8b-a.png",
+   "sha256": "e6c6e7714ef4b18009a91bb17663c9a4ff871d67268291719007f2d3fea86af6"
+  },
+  "next_shot_current_S8b2": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/S8b2/project/state/video-generation/fetch/files/098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148.mp4",
+   "sha256": "098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148"
+  },
+  "iris_canon": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/LSen1/project/creative/iris-a01-character/19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969.yaml",
+   "content_hash": "19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969",
+   "appearance_bible": "欧美女性，极淡雀斑、浅灰蓝眼、深棕后梳低髻；左耳黑色耳挂；炭黑高领长大衣，左领口极细红灯线。"
+  },
+  "director_coverage": {
+   "path": "outputs/ai-city-takeover/ep01/v2/director-coverage.json",
+   "sha256": "3eb70a235d9adc8487af2f8249936a523464ee1df53b2fbebc74e556d9fd9bad",
+   "coverage_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d",
+   "S8a": "close_up、static、open_state「陽台正面近景，嘴閉」、3.7 s"
+  },
+  "board": {
+   "path": "outputs/ai-city-takeover/ep01/v2/board.md",
+   "sha256": "da739a8451f16d66285542a1107c332777dcff3154985555db09ee4c4b9d91b6"
+  },
+  "c3_assembly_review": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/film-c3/assembly-review.json",
+   "sha256": "aa3db735927f3b9abb21f3185380f5b191ee413c6b5db1504d3808aabfe660fa"
+  },
+  "c3_chorus_edit": {
+   "path": "outputs/ai-city-takeover/ep01/v2/comp/chorus.json",
+   "sha256": "5e4c234e4c5155cb5e53346d9c784626e14786d8f377426469c4bed5f59c8d62"
+  },
+  "prior_A02_gate": {
+   "path": "outputs/ai-city-takeover/ep01/v2/qa/gate-S8a/post-media-gate.json",
+   "sha256": "c8fc5057f2155d1ece42dc450a469f10087a06c35a0c95f01fe1662661198557"
+  },
+  "decisions_log": {
+   "path": "outputs/ai-city-takeover/logs/decisions.md",
+   "sha256": "bb5fea0769a4e6db8cc4c9e28bd14c057835e114210e64f2e1f2bd580ee57919"
+  },
+  "lint_py": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/lint.py",
+   "sha256": "2a29af3fd405a45237e9044014a27b87d933865deb4add0bd435d0da0fa9f28f"
+  },
+  "unit_py": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/unit.py",
+   "sha256": "d10a0080147f219005949e9365a3c371136352a82b789c1f1dcf1659c1eb5d7e"
+  },
+  "operator_py": {
+   "path": "outputs/ai-city-takeover/ep01/v2/gen/operator.py",
+   "sha256": "61113cc7e235898a266392f3956a40de924cdfc3610425ce2b1f820b7dbe4397"
+  },
+  "unit_files": {
+   "LSen1": {
+    "compiled_prompt": "630be18667c67ca5097418357605b753f9593b2303fc977b45fb64d63f3577fb",
+    "source_selections": "d8284f4e232c08c45cc60c6474c582df66f995558efef019679c92ac04444a8e",
+    "row": "d31eff4e855202d7f1353a73abcf537fd7a3d827f971f50c5fbf2a00df127d37",
+    "profile": "baad51318e82cf9f2e960689227ef07227977faeb7dee9f784f8572b13462729",
+    "operator_bound": "5101e196c2c605b6c92fe1b7b794d4ecc413e6e985fae63512f103766b43a2b1",
+    "pre_submit_lint": "08e23933c5612c2d95634a3d1f8872544b3cb2c2d58485838510f4a6059a3baa",
+    "prepare_result": "8619da2a60b696601f71fa58670411d668a594de2568b18f88d2a682c50f563d",
+    "request_hash": "f02ed94c5eae3d0eb06eb8d885b1d74e99d00110818a521e4d2a264fa82c2975",
+    "node_id": "node_qmr2mgz9g9"
+   },
+   "LSen2": {
+    "compiled_prompt": "630be18667c67ca5097418357605b753f9593b2303fc977b45fb64d63f3577fb",
+    "source_selections": "d8284f4e232c08c45cc60c6474c582df66f995558efef019679c92ac04444a8e",
+    "row": "d31eff4e855202d7f1353a73abcf537fd7a3d827f971f50c5fbf2a00df127d37",
+    "profile": "9cf8ff175fe66cfcf0053c772f6d360e71b5e7734f248e4d8f3f02d9bd30a469",
+    "operator_bound": "bbb876fd359d2a927fc73194f0a608d7380e7ac8d332c88cf758e3dc5b89c812",
+    "pre_submit_lint": "7c984996681c9ea8fa97d7ca0d310ba72577ab76fae97efc31b4998b225c06b7",
+    "prepare_result": "8a9798ca426453e2e7e4413c13255779fd86e2efe0c2da4b2196713ae6e69b19",
+    "request_hash": "5eab828e27b1ded44b29b51b27203268e5a47ec941c33250ff4db95e85ff19b6",
+    "node_id": "node_7mp1a8f205"
+   },
+   "LSzh1": {
+    "compiled_prompt": "ea70cc82bffebc0c342607a799717242f3cb1f84f198a3307e28e4e8b3aa465a",
+    "source_selections": "d8284f4e232c08c45cc60c6474c582df66f995558efef019679c92ac04444a8e",
+    "row": "d3e8b3ef962f38e5ae93f547f97c8f5f1b5f6f7923f36ab0aed1855522b77d9e",
+    "profile": "37551f1824415d98a77cc3ac7362823314716253430e63f0cf78447a946b3645",
+    "operator_bound": "eb987606f8dc41e8724b99c39da10c5f10b5744af62131470fe1da2a719d0c8e",
+    "pre_submit_lint": "1830b017a7d3ad6e9bf2eb2477e3236deffacd9732d94db166635e7a90a98739",
+    "prepare_result": "8d91c356244172f76df0b434e2e90538accef748fab7cc4836471a4fdb581660",
+    "request_hash": "d55f56289754ecdf9886897c24345612fc71369d300ae7fefe134e2eef7f972b",
+    "node_id": "node_ctqftjzng6"
+   },
+   "LSzh2": {
+    "compiled_prompt": "ea70cc82bffebc0c342607a799717242f3cb1f84f198a3307e28e4e8b3aa465a",
+    "source_selections": "d8284f4e232c08c45cc60c6474c582df66f995558efef019679c92ac04444a8e",
+    "row": "d3e8b3ef962f38e5ae93f547f97c8f5f1b5f6f7923f36ab0aed1855522b77d9e",
+    "profile": "f56c53f984120aa61a427975bb4b51ec3d1e4a1afe5e67c0c08c17366b0c8422",
+    "operator_bound": "ce8e0dba66fb96a37446f58529bfe5f4e759ca7fc15c869d160e03d86d1f7ec6",
+    "pre_submit_lint": "34b3b84e473f9d07668e9698a21049f52e0e916e26127353da8df1bc1e7edbcb",
+    "prepare_result": "4a9e3f45b4443b19ca8f40600f8cc80db831571a6d96ca8b5b79e272bceecce2",
+    "request_hash": "9c4a5e7a3cd091d699220fa63e1b6ee2485ff51b9cb8e96dbe195678ca779b9b",
+    "node_id": "node_wr3xr898vj"
+   }
+  },
+  "media_evidence": {
+   "method": "ffmpeg 依幀號 select=eq(n,N) 從 c3 交付檔（sha 437fddcb…）取幀，另取 S7v3 源片 5.42 s；暫存於 /tmp/cs-lipsync-trial（不在倉庫），可依幀號重取",
+   "frames": [
+    "c3 n=540（18.000 s，S7v3：視線落向畫左下）",
+    "c3 n=555（18.500 s，S7v3：已回到鏡頭、閉嘴）",
+    "c3 n=565（18.833 s，S7v3 最後一幀：看鏡頭、閉嘴、近景偏右）",
+    "c3 n=566（18.867 s，現行 S8av3：A02 陽台）",
+    "c3 n=620（20.667 s，S8a_x：S1v3 睜開的眼）",
+    "c3 n=677、n=690（22.567 s、23.000 s，S8b2：K8b 3/4 面向畫左）",
+    "S7v3 源片 5.42 s（無後期字幕的末態）",
+    "A02 臉部、左領、四角放大"
+   ],
+   "audio": "窗口包絡：前 0.651 s 全零取樣，「I」從片內 0.65 s 起、約 -28 至 -33 dBFS；分離人聲中第二行「I」長音在 22.44–22.83 s，22.86–23.10 s 為低位停頓，窗口 22.97 s 結尾落在停頓內。video-analysis MCP video_transcribe（Whisper small，窗口臨時包成 mp4）：「I didn't run, I just looked outside」（末尾長音 I 未轉出）。"
+  }
+ },
+ "shared_findings": {
+  "continuity": "A02 實看：同一張臉（淡雀斑、淺灰藍眼）、深棕後梳低髻（髻在耳後可見）、黑色耳挂在她左耳、細紅燈線在她左領（兩者都在畫面右側）、炭黑高領大衣；與 canon 五項一致。S7v3 實際末態（源片 5.42 s、c3 n=565）：同一身份、同一大衣、耳挂與紅線同側，紅線同為領緣細線（兩邊都有一小段斷口）。地點與光線由離線暗房換成雨夜藍色陽台，是 board S7→S8a 的既定換場。K8b 與現行 S8b2 也是同一身份與同側道具。",
+  "handoff": "入點：S7v3 在 18.0 s 視線落向畫左下，18.5 s 起回到鏡頭，最後一幀 18.833 s 看鏡頭、閉嘴、近景偏右；A02 為正面近景偏右、看鏡頭，視線方向連續；換地點的硬切，c1 記為「scene change, not a jump cut」，c2、c3 同此接點。歌聲「I」18.62 s 起在 S7v3 尾段先聽到，與 c1–c3 相同。row.json boundary independent、continuity_mode none、無 state_reference，不要求複製前鏡終態。出點有兩種已核過的接法：(a) 片段填滿 18.867–22.567 s（片內 0.897–4.597 s）接第二遍副歌，切在第二行「I」長音內，兩邊嘴都張開，c1、c2 用過同一切法；K8b 的畫面左右翻轉與換機位一致（A02 玻璃立面在畫右、欄杆與城市在畫左；K8b 深色立柱在畫左、欄杆與城市在畫右），是換角度而非鏡像，符合 coverage S8b「陽台左前 3/4」。(b) 保留 c3 使用者決定 B（comp/chorus.json），20.667 s 在 20.56–20.70 s 換行停頓處切到 S1v3 睜開的眼，片段只用到片內 2.697 s。",
+  "axis_action_camera": "A02：正面近景（頭到上胸）、人物在畫面中偏右、城市在畫左、頭略偏畫左、眼看鏡頭、嘴張開露齒（唱歌姿態）。兩組 prompt 的景別、面向鏡頭、看鏡頭、固定機位、不切鏡、不轉頭都與底片和 coverage S8a（close_up、static、固定正面近景）一致。resolved_request.mode=reference_to_video、image_bindings role=reference、沒有首幀綁定，與計畫的 EV 參考模式一致。表演只多使用者已認可的「長音時頭微傾」。",
+  "prompt_fit": "compiled-native-prompt.zh.txt 只比認可文字多一個檔尾換行（unit.py 寫檔時加的，lint 讀取時去掉）；去掉後與認可文字逐字相同，resolved_request.prompt_text、compilation.provider_native_prompt、execution_binding.compiled_request.prompt_text 都相同。以 src/ai_video/production/jimeng.py 的 jimeng_meta_list 離線重算（images→audios→videos 的原生序號）：{{image:0}}→iris-ls-1-a02（type 2 圖）、{{audio:1}}→iris-ls-vocal（type 4 音訊），各出現 2 次，兩個素材都被引用；只送 1 張圖＋1 段音訊，sha 與使用者預覽一致；registry 裡的身份表 iris-cf-face、iris-cf-details 沒有綁定（canonical_character_references 為空，符合已認可的身份豁免）；master 對照檔沒有送出。引號內歌詞與 window.json words 逐字相同。沒有第二個人、另一首歌或其他人聲的寫法；兩組結尾都有明確的無文字句。輸出 5 s、1080p、16:9、seedance_2.0_vip，與認可相同。",
+  "lint": "四支 pre-submit-lint.json 都是 10 項 true、只差 continuity_report_ready。我依 lint.py 的邏輯獨立重算這 10 項，四支全 true；各支 request_hash 等於 prepare-result 的 resolved_generation_hash；lint 檔寫於 prepare-result 與 lint.py 最後修改之後；ledger-trial.json 尚未建立，已花 0 支；各支 manifest 只有 bootstrap_dependency_graph，沒有 video_generation attempt，也沒有 prepared.json 或 submit-intent.json。"
+ },
+ "risks": {
+  "R1": "開頭無聲段的嘴型（最需要先處理）。A02 的嘴是張開露齒的唱歌姿態；窗口前 0.651 s 是全零靜音，結尾 22.86–22.97 s 只有約 0.11 s 停頓；計畫第 5 節要求「無聲處閉合」；EV prompt 沒有閉嘴指示。前例 qa/gate-S8a 同樣是 reference_to_video、A02 當參考圖，prompt 還明寫「音频开始前和结束后嘴唇自然闭合」，仍因 0.20 s 無聲前導時嘴張開露齒（gate 原文標為 the A02 pose）判 FAIL（原因之一，另一個是結尾沒合緊）。本次前導更長、prompt 也沒寫閉嘴，所以重現的可能性不低。若第一支出現這個情形並歸因於共用底片，第 5 節停止條件會讓其餘三支不送，四支比較就做不成。這段前導不在成片會用的片內 0.897–4.597 s，但仍在封存的逐鏡檢查範圍內。本報告不把它判為 FAIL：送出內容與使用者認可的底片、窗口、prompt 完全一致，這是認可方案本身帶的結果風險。但它該怎麼歸因（共用輸入造成而停止，或算方法表現而繼續），計畫沒寫清楚，主會話應在第一支送出前決定，必要時問使用者。",
+  "R2": "畫面文字。引號內的英文歌詞可能被畫成畫面文字；兩組結尾都有明確的無文字句（作者的做法），封存檢查會查。",
+  "R3": "重唱。輸出帶原生音軌（native_audio true），模型可能自己再唱一遍；prompt 把唱綁在 {{audio:1}}，並逐字引用同一句。成片不用片段原聲（row.json composition.muted），重唱只影響 sync_check 量測。",
+  "R4": "出點接法未定。主會話所說的後一鏡（第二遍副歌）只在放棄 c3 第一遍插入鏡時成立；c3 現行剪法依使用者決定 B，在 20.667 s 切到 S1v3 睜開的眼，22.567 s 才接 S8b2。兩種接法本報告都核過；採用哪一種由使用者或剪輯決定。第二遍副歌計畫用 K8b 重做，所以出點同時對照了 K8b-a.png 和現行 S8b2。",
+  "R5": "lint 覆蓋範圍。operator.py submit 只看 lint 的 pass，不比對送出時的 request hash 是否等於 lint 記錄的 request_hash；送出時請核對 submit-intent.json 的 request_hash 與 unit_files 所列相同。本報告存檔後要重跑各支 lint，continuity_report_ready 才會轉 true。英文組的語言檢查只確認例外引文存在。",
+  "R6": "只影響中文組的景別用詞。EV-zh 的「中近景」依中文景別慣例比 A02 與 coverage 的「近景」寬一級，模型可能拉寬；英文組的 Medium close-up 與 A02 構圖相符。封存檢查不含景別；若拉寬，只影響之後接 S7v3 時兩鏡景別的相近程度。"
+ },
+ "units": {
+  "LSen1": {
+   "verdict": "ready",
+   "continuity": "PASS：A02 與 IRIS canon 五項一致；與 S7v3 實際末態（源片 5.42 s、c3 n=565）身份、大衣、左耳耳挂、左領紅線同側一致；換場是 board 既定。prompt 沒寫大衣，由底片承擔（已認可的身份豁免，request 沒帶身份表）。見 shared_findings.continuity。",
+   "handoff": "PASS：入點 S7v3 最後一幀看鏡頭、閉嘴、近景偏右，接 A02 正面近景偏右、看鏡頭，換場硬切，boundary independent。出點 (a) 接第二遍副歌 K8b，或 (b) 依 c3 決定 B 接睜開的眼，兩種都合理，接法待決（R4）。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：Medium close-up、facing the camera、eyes on the lens、Locked camera, no cuts, no head turns 與 A02 和 coverage S8a 一致；reference_to_video、不帶首幀；屏幕方向與 S7v3 末態一致（臉略偏畫左、人物偏右）。動作階段：A02 是張嘴唱歌姿態，而片頭 0.651 s 無聲，封存檢查要求閉嘴，前例 gate-S8a 在同一模式同一底片上失敗過，見 R1。",
+   "prompt_fit": "PASS：去檔尾換行後與 EV-en 逐字相同（sha256 fe58d95c9ed01fddb87d1797f4deb198408f3ad78e0c3436a0611e3029e5433d）；{{image:0}}→A02、{{audio:1}}→窗口，經 jimeng_meta_list 驗證；只送 1 圖＋1 音訊，皆在使用者預覽中；沒有多人或另一首歌的寫法；結尾有 No on-screen text。英文是使用者認可、只限本次試驗的語言例外。",
+   "lint": "PASS（continuity_report_ready 待本報告）：pre-submit-lint.json（08e23933…）10 項 true，已獨立重算；request_hash f02ed94c5eae3d0eb06eb8d885b1d74e99d00110818a521e4d2a264fa82c2975 等於 prepare-result。",
+   "gaps": [],
+   "risks": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+   ]
+  },
+  "LSen2": {
+   "verdict": "ready",
+   "continuity": "PASS：與 LSen1 相同的輸入與判定（row.json、source-selections.json 與 LSen1 位元相同，是事先登記的重複）。見 shared_findings.continuity。",
+   "handoff": "PASS：同 LSen1；出點接法待決（R4）。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：同 LSen1。動作階段風險見 R1。",
+   "prompt_fit": "PASS：去檔尾換行後與 EV-en 逐字相同（sha256 fe58d95c9ed01fddb87d1797f4deb198408f3ad78e0c3436a0611e3029e5433d）；標記與綁定經 jimeng_meta_list 驗證；只送 1 圖＋1 音訊，皆在使用者預覽中；獨立 node_7mp1a8f205、attempt iris-lsen2-source-001。",
+   "lint": "PASS（continuity_report_ready 待本報告）：pre-submit-lint.json（7c984996…）10 項 true，已獨立重算；request_hash 5eab828e27b1ded44b29b51b27203268e5a47ec941c33250ff4db95e85ff19b6 等於 prepare-result。",
+   "gaps": [],
+   "risks": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+   ]
+  },
+  "LSzh1": {
+   "verdict": "ready",
+   "continuity": "PASS：A02 與 IRIS canon 五項一致；與 S7v3 實際末態身份、大衣、左耳耳挂、左領紅線同側一致；換場是 board 既定。prompt 寫了低髮髻、左耳黑色耳挂、左領紅色燈線，沒寫大衣，由底片承擔。見 shared_findings.continuity。",
+   "handoff": "PASS：同 LSen1；出點接法待決（R4）。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：面向镜头、眼睛看着镜头、镜头固定、不切镜、不转头與 A02 和 coverage S8a 一致；reference_to_video、不帶首幀；屏幕方向與 S7v3 末態一致。「中近景」比 A02 與 coverage 的「近景」寬一級，是用詞差異、不是矛盾（R6）。動作階段：A02 張嘴姿態對片頭 0.651 s 無聲，見 R1。",
+   "prompt_fit": "PASS：去檔尾換行後與 EV-zh 逐字相同（sha256 179feb47fd70744b7e3683dfe72bdd2fa15a16aea66c225bc0f3abd126344e79）；去掉素材標記與引號歌詞後沒有任何拉丁字母（符合 D1）；{{image:0}}→A02、{{audio:1}}→窗口，經 jimeng_meta_list 驗證；只送 1 圖＋1 音訊，皆在使用者預覽中；結尾有「画面中没有任何文字」。",
+   "lint": "PASS（continuity_report_ready 待本報告）：pre-submit-lint.json（1830b017…）10 項 true，已獨立重算；request_hash d55f56289754ecdf9886897c24345612fc71369d300ae7fefe134e2eef7f972b 等於 prepare-result。",
+   "gaps": [],
+   "risks": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6"
+   ]
+  },
+  "LSzh2": {
+   "verdict": "ready",
+   "continuity": "PASS：與 LSzh1 相同的輸入與判定（row.json、source-selections.json 與 LSzh1 位元相同，是事先登記的重複）。見 shared_findings.continuity。",
+   "handoff": "PASS：同 LSzh1；出點接法待決（R4）。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：同 LSzh1（R6 用詞差異；動作階段風險見 R1）。",
+   "prompt_fit": "PASS：去檔尾換行後與 EV-zh 逐字相同（sha256 179feb47fd70744b7e3683dfe72bdd2fa15a16aea66c225bc0f3abd126344e79）；標記與綁定經 jimeng_meta_list 驗證；只送 1 圖＋1 音訊，皆在使用者預覽中；獨立 node_wr3xr898vj、attempt iris-lszh2-source-001。",
+   "lint": "PASS（continuity_report_ready 待本報告）：pre-submit-lint.json（34b3b84e…）10 項 true，已獨立重算；request_hash 9c4a5e7a3cd091d699220fa63e1b6ee2485ff51b9cb8e96dbe195678ca779b9b 等於 prepare-result。",
+   "gaps": [],
+   "risks": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6"
+   ]
+  }
+ },
+ "notes": [
+  "四支各有獨立 node_id、attempt、reservation；operator 窗口都是 2026-11-03T00:05:59Z 到 03:05:59Z。",
+  "source-selections 的 derived_from 指向 bed-01 mp3（f45c385ef6ec3c5ef817cce72ba6c9d6e5f6fbb21849e80ed8b794d137f08973），window.json 寫的直接來源是分離人聲 chorus-18.6-26.0-isolated.mp3（9a454000…）。送出的位元由窗口 sha 釘住且經使用者預覽，不影響這次送出；只記為來源鏈記錄不一致。",
+  "計畫第 4 節的字起點（I 18.60、didn't 19.28…）與分離人聲包絡相符（I 從 18.62 s 起、didn't 從 19.28 s 起）；timing/words.json 的副歌時間是低信心對齊（decisions.md 已記），量嘴時不要用它。",
+  "NOT_EVALUATED（不屬送出前檢查）：人耳聽感、對嘴觀感、模型實際輸出；這些屬於落盤後的逐鏡檢查和使用者。"
+ ]
+}

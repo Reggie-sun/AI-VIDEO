@@ -1,0 +1,177 @@
+{
+ "unit": "OH-A",
+ "observed_at": "2026-11-03T05:40:21.080Z",
+ "tab": "https://jimeng.jianying.com/ai-tool/home#omnihuman-OH-A",
+ "generation_POSTs": 0,
+ "inputs": [
+  {
+   "path": "keyframes/raw/K7-a.png",
+   "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09"
+  },
+  {
+   "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7"
+  }
+ ],
+ "mode_label": "大师模式",
+ "model_title": "选择模型：大师模式 by OmniHuman 1.5",
+ "price": 30,
+ "balance_text": "6.5万 超级会员",
+ "balance_precise": 64791,
+ "rows": {
+  "speech_text": null,
+  "speech_audio": "00:05",
+  "action": ""
+ },
+ "resolution": null,
+ "vivid": false,
+ "image_uploaded": true,
+ "audio_uploaded": true,
+ "action_text": "",
+ "panel": {
+  "found": true,
+  "text": "音频原声\n\n角色说\n00:00\n/\n00:05\n\n\n\n动作描述\n\n数字人\n大师模式\n上传音频\n30",
+  "mode": "大师模式",
+  "imgs": [
+   {
+    "src": "blob:https://jimeng.jianying.com/cb74ecae-041b-4239-9874-96d7a9d2a94e",
+    "w": 48,
+    "h": 64
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/cb74ecae-041b-4239-9874-96d7a9d2a94e",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/cb74ecae-041b-4239-9874-96d7a9d2a94e",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/cb74ecae-041b-4239-9874-96d7a9d2a94e",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/cb74ecae-041b-4239-9874-96d7a9d2a94e",
+    "w": 16,
+    "h": 16
+   }
+  ],
+  "editors": [
+   {
+    "tag": "DIV",
+    "value": "角色说\n00:00\n/\n00:05\n\n\n\n动作描述",
+    "placeholder": null
+   },
+   {
+    "tag": "DIV",
+    "value": "",
+    "placeholder": null
+   }
+  ],
+  "buttons": [
+   {
+    "text": "移除 · 参考内容",
+    "x": 55,
+    "y": 12,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "移除 · 参考内容",
+    "x": 133,
+    "y": 17,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "",
+    "x": 244,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 352,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-gIRG2a"
+   },
+   {
+    "text": "",
+    "x": 244,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 352,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-gIRG2a"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 109,
+    "w": 32,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU submit-button"
+   },
+   {
+    "text": "上传音频",
+    "x": 215,
+    "y": 109,
+    "w": 84,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-default lv-btn-shape-square button-EkZazO button-E9b8NU toolbar-button-J5Ou4K"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 109,
+    "w": 32,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU submit-button"
+   }
+  ],
+  "numbers": [
+   {
+    "n": 30,
+    "x": 1128,
+    "y": 119
+   }
+  ],
+  "price": 30,
+  "size": [
+   1200,
+   158
+  ],
+  "rows": {
+   "speech_text": null,
+   "speech_audio": "00:05",
+   "action": ""
+  },
+  "resolution": null,
+  "vivid": false
+ }
+}

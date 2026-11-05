@@ -1,0 +1,55 @@
+{
+ "schema": "iris-v2-post-media-gate/1",
+ "unit": "S8bv3b",
+ "shot_id": "ep01v2-s8b",
+ "attempt_id": "iris-s8bv3b-source-001",
+ "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S8bv3b/project/state/video-generation/fetch/files/83576dce4c71fe88cdda4e2f93679e9a58f6cd564214dbc681f04bd69443a4b4.mp4",
+ "artifact_sha256": "83576dce4c71fe88cdda4e2f93679e9a58f6cd564214dbc681f04bd69443a4b4",
+ "intent": "v3 performance redo of the second chorus pass (calm but alive, last line opens up, then mouth closed looking at the city); same request as S8bv3, whose reference upload failed before dispatch",
+ "source_audio_policy": "MUTE in the film (master song only); the clip's own audio is evidence only",
+ "evidence": {
+  "mcp_video_probe": "1920x1080, 5.057 s, 121 frames, h264, aac stereo; dreamina AIGC metadata",
+  "mcp_video_extract_frames": "6 frames at 1 s steps -> qa/gate-S8bv3b/mcp-frame-*.jpg, mcp-sheet.jpg",
+  "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 2.0 s, issues []",
+  "lipsync_review": "qa/gate-S8bv3b/mouth-timeline.jpg, onsets.jpg; DTW puts the clip's own singing 0.3-0.9 s late against the reference (the mouth is judged against the reference)",
+  "mouth_closeups": "qa/gate-S8bv3b/onset-0.90-1.27.jpg, onset-2.03-2.43.jpg, onset-3.00-3.37.jpg, close-3.40-3.97.jpg (qa/mouth_strip.py, 30 fps CFR)",
+  "aperture": "largest dark inner-mouth blob per frame (px, fixed box): 0.80-0.90 ~1400, pause 0.97-1.07 1567-1837 (rising), 1.10 2045, 1.17-1.40 2571-2921; 2.90-3.03 ~1800, then falling steadily 3.07 1709, 3.23 1365, 3.50 763, 3.70 531, 3.83-3.93 224-246, 3.97-4.47 ~280-370 (lips stay slightly parted)",
+  "performance": "qa/gate-S8bv3b/face-performance.jpg, quarter-second-sheet.jpg",
+  "camera": "qa/region_drift.py: background 1200,0,1920,500 dx <= 0.3 px, dy <= 1.6 px over 5 s; 0,0,300,300 dx/dy 0.0 px"
+ },
+ "required_findings": [
+  {
+   "requirement_id": "onsets",
+   "verdict": "FAIL",
+   "reason": "1.10 s (23.10 'didn't'): the mouth opens wide from 1.10-1.17, on time. 2.233 s (24.233 'I just'): legato, the mouth widens from 2.267, within 1 frame. 3.233 s (25.233 'outside'): no opening; the aperture keeps falling through the word (1365 at 3.23 -> 763 at 3.50)"
+  },
+  {
+   "requirement_id": "pauses-and-closing",
+   "verdict": "FAIL",
+   "reason": "pause 22.967-23.10 (clip 0.967-1.10): no narrowing, the aperture rises (1567 -> 1837). Pause 25.033-25.233 (clip 3.033-3.233): narrows only to about 74 % of the previous vowel, not to half. The reference is silent from 25.60; the lips reach their narrowest at 3.83-3.93 (+0.23 s) and still show a gap with teeth, then part slightly again from 3.97: not closed by 25.70 +-3 frames, and not still until 25.90"
+  },
+  {
+   "requirement_id": "performance",
+   "verdict": "FAIL",
+   "reason": "the last line opens up clearly: chin raised and eyes half closed from 1.2 to 3.0 s, visibly committed singing. But the look toward the distant city comes only after about 4.0 s (eyes open and level by 4.5 s), after the film cut at clip 3.90; inside the window the eyes stay half closed"
+  },
+  {
+   "requirement_id": "locked-camera",
+   "verdict": "PASS",
+   "reason": "background does not move (<= 0.3 px horizontally); K8b three-quarter framing kept"
+  },
+  {
+   "requirement_id": "identity-teeth-jaw",
+   "verdict": "PASS",
+   "reason": "same IRIS face in three-quarter view, black hook on the left ear, thin red line on the left collar, charcoal high collar, slicked-back hair; teeth and jaw stable"
+  }
+ ],
+ "verdict": "FAIL",
+ "all_required_observed_pass": false,
+ "not_evaluated": [
+  "human 1.0x viewing with sound in the assembled film"
+ ],
+ "review_clip": "renders/review/S8bv3b-film-window.mp4 (in-point 0.5667 = master 22.567-25.90 with the master song)",
+ "next": "stop the attempt; the user decides between using S8bv3b, the one bounded repair (a new reference needs a new preview approval), or keeping S8b2",
+ "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

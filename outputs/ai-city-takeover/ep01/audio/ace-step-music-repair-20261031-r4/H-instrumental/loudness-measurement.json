@@ -1,0 +1,15 @@
+{
+  "source_sha256": "dda4ce0ed63b1c5dd4736c835d22967cd1e0b82095b822c00b869d77f81e0304",
+  "measurement": {
+    "input_i": "-17.95",
+    "input_tp": "-0.84",
+    "input_lra": "4.80",
+    "input_thresh": "-28.23",
+    "output_i": "-18.46",
+    "output_tp": "-1.50",
+    "output_lra": "4.50",
+    "output_thresh": "-28.79",
+    "normalization_type": "dynamic",
+    "target_offset": "0.46"
+  }
+}

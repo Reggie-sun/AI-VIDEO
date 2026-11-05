@@ -1,0 +1,68 @@
+{
+  "src": "http://127.0.0.1:8767/phase1-t01/review/T01-dev7-review.mp4",
+  "duration": 10.005,
+  "currentTime": 10.005,
+  "rate": 1,
+  "elapsedMs": 10174,
+  "frames": 300,
+  "droppedFrames": 0,
+  "error": null,
+  "muted": false,
+  "volume": 1,
+  "images": [
+    {
+      "src": "dev7-f024.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f072.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f141.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f174.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f184.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f194.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f195.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f201.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f249.jpg",
+      "loaded": true
+    },
+    {
+      "src": "dev7-f294.jpg",
+      "loaded": true
+    }
+  ],
+  "pageErrors": [],
+  "httpFailures": [
+    {
+      "url": "http://127.0.0.1:8767/favicon.ico",
+      "status": 404
+    },
+    {
+      "url": "http://127.0.0.1:8767/favicon.ico",
+      "status": 404
+    }
+  ],
+  "normalSpeedPlaybackObservedByAutomation": true,
+  "humanVisualListeningAcceptance": "NOT_EVALUATED",
+  "favicon_note": "Initial page requested missing favicon; final page uses data favicon. Media/image requests succeeded."
+}

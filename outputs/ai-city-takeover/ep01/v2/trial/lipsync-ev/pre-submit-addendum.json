@@ -1,0 +1,13 @@
+{
+ "schema": "iris-trial-addendum/1",
+ "sealed_before_first_submit": true,
+ "plan": {"path": "docs/superpowers/plans/2026-11-02-iris-ep01-lipsync-trial.md", "sha256": "f1b3c49cfea94c7c569bf593a59631edd9523018f840c40e5a09706d5b5149fb", "unchanged": true},
+ "source": "continuity-report.json risk R1 (continuity-supervisor asked for the attribution rule before the first submit)",
+ "decision_by": "main session (AGENTS.md: rule clarification inside the approved trial scope; no extra spend, no input change)",
+ "attribution_rule": {
+  "lead_in_and_trailing_silence": "The window's lead-in silence (clip 0-0.63 s, before the first sung word at song 18.60 s) and the trailing pause (clip after about 4.89 s) are outside the comparison section (plan section 4: 'I didn't run', 18.60-20.57 s) and outside the film window (clip 0.897-4.597 s). A mouth that is open there is the expected result of the approved plate A02 (open, singing pose; qa/gate-S8a found the same) and is recorded in the gate as such. It is not a stop condition.",
+  "stop_conditions_kept": "An objective FAIL inside the sung section or the film window (identity, deformation, on-screen text including the quoted lyric drawn as text, camera not locked, a second person) whose cause is a shared input stops the remaining units of the same prompt group; if the cause is the plate or the window (shared by both groups), all remaining units stop. An UNKNOWN outcome stops everything.",
+  "lip_sync_accuracy": "Unchanged: it is the measured variable, judged by the user on the review videos, not a stop condition."
+ },
+ "operator_guard": "operator.py submit refuses unless the request hash it is about to send equals the request_hash recorded by the passing pre-submit lint (continuity-report R5)."
+}

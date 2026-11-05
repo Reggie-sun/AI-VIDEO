@@ -1,0 +1,182 @@
+{
+ "schema": "iris-v2-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-03",
+ "scope": "选角试镜 SC1–SC4（即梦 数字人 大师模式 OmniHuman 1.5，同 OH-B 方法）：各方向头肩特写 + 已认可副歌人声窗口 5 s + 一句纯中文动作描述。不是成片镜头，不放进片中：连续性、交接、轴线不适用（N/A 视为通过）。只读核对：裁图单一主体无文字、图像/音频 SHA 与认可一致、动作描述纯中文/正向/符合方法与方向性格、无去标识要求、预算字段、lint 输入。",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/screentest/preview-approval.json",
+   "sha256": "002cd8e9f849196683ed6384f68cc9572c7066a29bdeb124f8e49e401b8af564",
+   "note": "user_quote「先做出来我看」；approved_at 2026-11-04T03:23:52Z；logs/decisions.md:474-476 记录同一决定",
+   "sha256_after_SC4_amendment": "9ed404b77d1784fc7f1ab0f53a99988cf17df09f759c90ef075b60da56832416"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v2/review/casting-v2/index.html",
+   "sha256": "a3eec31ddb8967f0d03fc3ee8d08be321cd962649ba8588197038e89c59a1bbd",
+   "note": "与认可记录一致；页面显示的 review/casting-v2/C*-sheet.png 与 raw/C*-sheet-a.png 同 SHA"
+  },
+  "audio": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+   "note": "pcm_s16le 44.1 kHz 单声道 5.000 s；与 OH-A/OH-B 同一文件；role uploaded vocal"
+  },
+  "images": {
+   "SC1": {
+    "path": "outputs/ai-city-takeover/ep01/v2/trial/screentest/C1-closeup.png",
+    "sha256": "a507233de7d8adcdd6f41d77d7d897ad18f5003cfa12a0345ee253d81b123583",
+    "size": [
+     732,
+     941
+    ],
+    "derived_from": "outputs/ai-city-takeover/series/casting-v2/raw/C1-sheet-a.png (6a3404b4…) crop_x0=940，像素逐一相同"
+   },
+   "SC2": {
+    "path": "outputs/ai-city-takeover/ep01/v2/trial/screentest/C2b-closeup.png",
+    "sha256": "412096ef0a2e5a28d8d454fdc297dd84f0a3a7cac3aabb4913fd667e210b2588",
+    "size": [
+     712,
+     941
+    ],
+    "derived_from": "outputs/ai-city-takeover/series/casting-v2/raw/C2b-sheet-a.png (43ed087d…) crop_x0=960，像素逐一相同"
+   },
+   "SC3": {
+    "path": "outputs/ai-city-takeover/ep01/v2/trial/screentest/C3-closeup.png",
+    "sha256": "907ff1b0d575cfbe192c6b3a273c266f188a4b28baf2492f0e10c2feeebc1947",
+    "size": [
+     692,
+     941
+    ],
+    "derived_from": "outputs/ai-city-takeover/series/casting-v2/raw/C3-sheet-a.png (6fdd8ae5…) crop_x0=980，像素逐一相同"
+   },
+   "SC4": {
+    "path": "outputs/ai-city-takeover/ep01/v2/trial/screentest/C4-closeup.png",
+    "sha256": "f7aa938e7fd96973e391533a4027a4b297143ac526c64934afc7bf7e8a236023",
+    "size": [
+     697,
+     941
+    ],
+    "derived_from": "outputs/ai-city-takeover/series/casting-v2/raw/C4-sheet-a.png (e907a8bc…) crop_x0=975，像素逐一相同"
+   }
+  },
+  "action_prompt_sha256": {
+   "SC1": "79f39f1ca9fbc604efd4f0120452d57883cda722ebf49c8528212096874c84ba",
+   "SC2": "bb59f5db68b5a92023179150b32d91e83f5957574e25d64b081cf377bcf9d1c2",
+   "SC3": "56e3669a26f7a0b0c69b14bdd155adf0d928889c1fe37e30ee0ca1ad504ee057",
+   "SC4": "70e1361901cd390114b8b96ed387ebfeb49e0e3ade97a71b06ec4d45d309428f"
+  },
+  "method_reference": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/preview-approval.json",
+   "sha256": "09730173ff1a09da75d0b7e815900b884db9eeafe663df0048377076e0232f26",
+   "note": "OH-B 动作描述＝镜头＋情绪＋说话状态＋具体动作，纯中文、正向、只写动作（trial/omnihuman/research-2026-11-02.md:38）；OH-B 表现力经用户认可（logs/decisions.md:326），其逐镜 Gate 为 FAIL（trial/omnihuman/post-media-gate.json）"
+  }
+ },
+ "shared_findings": {
+  "sha_match": "PASS：4 张裁图、wav、预览页现档 SHA-256 与认可完全一致；takes.SCn.image 与 preview_artifacts 一致；4 段 action_prompt 的 UTF-8 SHA 与 action_prompt_sha256 一致。",
+  "crop_derivation": "PASS：每张裁图与对应设定图 sheet[:, crop_x0:] 像素逐一相同（全高 941）；该设定图就是选角页上用户看到的那张。",
+  "single_subject_no_text": "PASS：4 张都是单一人物正面头肩、纯深灰背景，无文字、字母、标志、水印；上方 55% 左右缘各 6 列非背景像素均为 0（没有相邻全身视图残片）；左下 160 px 放大只见本人服装；裁线落在背面全身视图与特写之间的背景空隙。符合 reference-continuity「多视图人物表不自动等于干净输入」的处理。",
+  "action_text_form": "SC1–SC3 PASS，SC4 FAIL：4 段只含汉字与中文标点（无 ASCII），都有 镜头固定近景＋情绪＋“对着镜头唱歌，嘴随歌词自然张合”＋具体动作（换气、头/肩/身体、视线），近景与头肩裁图一致；否定字扫描只命中 SC4 的“几乎不笑”。",
+  "personality_fit": "PASS：与 series/casting-v2/prompts.md 设定一致——C1“下巴微抬，嘴角一边上扬，眼神带着挑衅”；C2b“自信张扬，像秀场上的主唱，眼神直视镜头”；C3“歪着头咧嘴笑，眼神好奇又调皮”；C4“居高临下，冷艳强势”。裁图起始姿态与描述一致（C1 仰头斜笑、C2b 直视闭唇、C3 歪头露齿笑、C4 后仰俯视闭唇）。",
+  "no_label_removal": "PASS：认可文件、4 段动作描述、gen/omnihuman.cjs 均无去除、遮挡或裁切水印/AIGC 标识的要求或步骤（正则扫描为空）。OH-B 产出无可见标识，元数据 AIGC Label 1。",
+  "budget": "PASS：generations 4、retries 0、operator_ceiling_per_take_CRD 165、cumulative_CRD 660 齐全；trial/screentest/ledger.json 尚不存在，lint 以这些上限起账；即使每支 165，第 4 支仍有余量（3×165+165=660）。decisions.md:476 预估约 120（OH-A/OH-B 实价各 30）。",
+  "pipeline_binding": "PASS：gen/omnihuman.cjs 取 takes[unit].image（单元自带图），上传前核对文件 SHA 与认可、上传后核对页面内 digest；音频按 role“uploaded vocal”取得同一 wav；mode 含“大师模式”，permit 另查非生动模式与不低于 1080P。"
+ },
+ "risks": {
+  "R1": "C3 起始帧是露上齿的张嘴笑，wav 开头约 0.63 s 静音（trial/lipsync-ev/window.json）——静音时嘴可能仍张开；“笑着唱”可能把嘴型锁在笑形、开合不明显；牙齿风险（OH-B 4.03–4.10 s 下齿错位）。",
+  "R2": "C4 起始为闭合噘唇、半垂眼俯视；“几乎不笑”＋“动作很少”压低动态，正对验收“no frozen face”；OH-A/OH-B 第二句中段都出现嘴不动（约 2.83–3.97 s）。",
+  "R3": "入口审核：数字人是否放行这 4 张写实 AI 脸未验证（research-2026-11-02.md:23 网页版禁真人脸；K7 曾放行）。被拒按认可 drop 只报告、不绕过。",
+  "R4": "C2b 红色挑染在画面左＝她的右侧，prompts.md 写“左侧一缕电光红挑染”，左右指代不明；对试镜无影响，若选定 C2b 需在 canon 写明是谁的左侧。（C1 右眼下红纹、左耳耳夹与描述同侧。）",
+  "R5": "雀斑丢失：C2b（淡雀斑）与 C3（满脸雀斑）——OH-A/OH-B 都把 K7 的雀斑抹平（post-media-gate.json identity 项），直接威胁“identity stays the casting look”。",
+  "R6": "SC2“像站在舞台上的主唱一样”可能引出舞台光或背景变化；“头随乐句有力地点动”“肩膀随节拍律动”幅度大，OH-B 在转头时（1.28–1.40 s）出现身份突变。",
+  "R7": "SC3“像在分享一个秘密”可能引出前倾或手指抵唇等手势（OH-A 出现新手 1.37–5.12 s）；“身体随节拍轻轻摇摆”有躯干晃动风险（OH-B 领口摆动约 245 px）。",
+  "R8": "裁图为约 3:4 竖幅（OH-B 用 16:9 的 K7），页面输出比例或分辨率选项可能不同；permit 的 page_resolution_not_below_1080p 遇低于 1080P 会 fail closed。",
+  "R9": "gen/omnihuman.py 与 gen/omnihuman.cjs 每次都必须带 OMNI_TRIAL=trial/screentest；未设时默认 trial/omnihuman，lint 会先建 trial/omnihuman/SCn 再因单元不在该认可里抛 KeyError（decisions.md:470 已有一次覆盖 OH-B/lint.json 的前例）。",
+  "R10": "同一音频、同一路线：OH-B 的已知弱点（开头低眼、1.88–2.00 s 最响处闭嘴、第二句中段嘴静止）大概率 4 支都会出现；比较性格时应区分路线共性与选角差异。"
+ },
+ "units": {
+  "SC1": {
+   "verdict": "ready",
+   "continuity": "N/A: casting screen test, not placed in the film",
+   "handoff": "N/A: casting screen test, not placed in the film",
+   "axis_action_camera": "N/A: casting screen test, not placed in the film（镜头固定近景与头肩裁图一致）",
+   "prompt_fit": "PASS：镜头固定近景＋挑衅的冷笑＋对着镜头唱歌、嘴随歌词自然张合＋下巴微抬、一侧眉毛轻挑、乐句间换气、头随节拍点动、视线始终看镜头；纯中文、无否定；与 C1 叛逆设定及裁图起始姿态（仰头斜笑）一致。",
+   "lint": "PASS（输入核对）：to be run by the main session (gen/omnihuman.py lint with OMNI_TRIAL=trial/screentest)；唯读重算 unit_in_approved_preview、user_approval_quoted、approved_inputs_unchanged、action_text_is_approved_text、action_text_pure_chinese、mode_is_master、never_submitted、ledger_has_room 均为 true；continuity_report_ready 待本报告存为 trial/screentest/continuity-report.json。",
+   "risks": [
+    "R3",
+    "R8",
+    "R9",
+    "R10"
+   ]
+  },
+  "SC2": {
+   "verdict": "ready",
+   "continuity": "N/A: casting screen test, not placed in the film",
+   "handoff": "N/A: casting screen test, not placed in the film",
+   "axis_action_camera": "N/A: casting screen test, not placed in the film（镜头固定近景与头肩裁图一致）",
+   "prompt_fit": "PASS：镜头固定近景＋像舞台主唱般充满自信＋对着镜头唱歌、嘴随歌词自然张合＋眼神锁住镜头、肩随节拍律动、乐句间换气、头随乐句有力点动；纯中文、无否定；与 C2b 偶像设定“像秀场上的主唱，眼神直视镜头”一致。",
+   "lint": "PASS（输入核对）：to be run by the main session (gen/omnihuman.py lint with OMNI_TRIAL=trial/screentest)；唯读重算 8 项 true，continuity_report_ready 待本报告存档。",
+   "risks": [
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R8",
+    "R9",
+    "R10"
+   ]
+  },
+  "SC3": {
+   "verdict": "ready",
+   "continuity": "N/A: casting screen test, not placed in the film",
+   "handoff": "N/A: casting screen test, not placed in the film",
+   "axis_action_camera": "N/A: casting screen test, not placed in the film（镜头固定近景与头肩裁图一致）",
+   "prompt_fit": "PASS：镜头固定近景＋调皮歪头、笑着＋对着镜头唱歌、嘴随歌词自然张合＋眼睛发亮、身体随节拍轻摆、乐句间换气、像分享秘密；纯中文、无否定；与 C3 黑客少女设定“歪着头咧嘴笑，眼神好奇又调皮”及裁图起始姿态一致。",
+   "lint": "PASS（输入核对）：to be run by the main session (gen/omnihuman.py lint with OMNI_TRIAL=trial/screentest)；唯读重算 8 项 true，continuity_report_ready 待本报告存档。",
+   "risks": [
+    "R1",
+    "R3",
+    "R5",
+    "R7",
+    "R8",
+    "R9",
+    "R10"
+   ]
+  },
+  "SC4": {
+   "verdict": "ready",
+   "continuity": "N/A: casting screen test, not placed in the film",
+   "handoff": "N/A: casting screen test, not placed in the film",
+   "axis_action_camera": "N/A: casting screen test, not placed in the film",
+   "prompt_fit": "PASS：修订文本「镜头固定近景。她冷艳地微微俯视镜头唱歌，嘴随歌词自然张合，嘴角平直，神情冷峻，眼神锐利，头微微后仰，乐句之间缓慢换气，动作克制而有力量。」的 UTF-8 SHA-256 为 70e1361901cd390114b8b96ed387ebfeb49e0e3ade97a71b06ec4d45d309428f，与 takes.SC4.action_prompt_sha256 一致，与 amendments[0].new 逐字相同（amendments[0].old 的 SHA 7217b70d… 即上次复核的文本）。纯中文：只含汉字与「，」「。」，无 ASCII，无 [A-Za-z]。正向：否定字（不/没/无/别/勿/非/未/莫/否/禁/免）扫描零命中，「笑」字已去除，「动作克制而有力量」是正向的方式描述。结构齐全：镜头（镜头固定近景）＋情绪（冷艳、神情冷峻、有力量）＋唱歌状态（俯视镜头唱歌、嘴随歌词自然张合）＋具体动作（嘴角平直、眼神锐利、头微微后仰、乐句之间缓慢换气），符合 trial/omnihuman/research-2026-11-02.md:38 的方法。方向适配：对应 series/casting-v2/prompts.md:44「眼神锐利……居高临下，冷艳强势」与 :50「下巴微抬，居高临下地看着镜头」，没有加设定以外的内容；canon 的「一侧眉毛微微挑起」未写，可以省略，不算遗漏。与 C4-closeup.png 起始状态一致（头后仰、下巴抬、垂眼俯视、闭唇、嘴角平直）；近景与 697×941 头肩裁图一致。",
+   "lint": "PASS（输入核对；只读重算，未运行 gen/omnihuman.py lint，因为它会建 SC4/ 并写 lint.json）：按 gen/omnihuman.py:70-90、OMNI_TRIAL=trial/screentest 重算。为 true 的 8 项：unit_in_approved_preview；user_approval_quoted；approved_inputs_unchanged（wav 851ce8a5…、C1 a507233d…、C2b 412096ef…、C3 907ff1b0…、C4 f7aa938e… 现档 SHA 全部一致，takes.SC4.image 与 preview_artifacts 一致，C4 裁图与 raw/C4-sheet-a.png（e907a8bc…）[:, 975:] 像素逐一相同）；action_text_is_approved_text；action_text_pure_chinese；mode_is_master；never_submitted（SC4/ 不存在）；ledger_has_room（已送出 3 支共 90 积分，第 4 支 4≤4、90+165=255≤660，没有 unknown，未关闭）。continuity_report_ready 在现档报告（continuity-report.json sha 5b3b08c4…，SC4 仍为 not_ready）中为 false：须由主会话把本单元 verdict 写入 trial/screentest/continuity-report.json，再实际运行 lint 并保存 SC4/lint.json。认可文件现档 SHA 为 9ed404b77d1784fc7f1ab0f53a99988cf17df09f759c90ef075b60da56832416。",
+   "risks": [
+    "R2（更新）：否定措辞和「动作很少」已经去掉，冻脸风险降低但没有消除。「嘴角平直」「神情冷峻」「缓慢换气」「动作克制」都是低动态提示，而且 SC4 是四支里唯一没有随节拍的头、肩或身体动作的一支（SC1 头随节拍点动、SC2 肩膀律动与头有力点动、SC3 身体轻摆）。起始帧是闭合的饱满双唇和半垂眼，「嘴角平直」可能被读成抿嘴，压低张合幅度。再加上 OH-A/OH-B 第二句中段嘴不动（约 2.83–3.97 s）的前例，「no frozen face」要在逐镜 Gate 里对实际 MP4 判断。",
+    "R3：入口审核会不会放行 C4 的写实 AI 脸还没有验证。SC1–SC3 已送出（ledger outcome submitted，各 30）不能证明 C4 会通过；被拒就按认可的 drop 只报告，不绕过。",
+    "R8：SC1–SC3 填表时 resolution 观察值为 None（页面没有分辨率项，permit 按 None 放行）。697×941 竖幅裁图的实际输出分辨率和画幅只能从 MP4 得知，须在逐镜 Gate 核对。",
+    "R9：lint、fill、permit 每次都必须带 OMNI_TRIAL=trial/screentest；不带时默认用 trial/omnihuman。",
+    "R10：这条路线的共性弱点（开头低眼、1.88–2.00 s 最响处闭嘴、第二句中段嘴静止）预计仍会出现。C4 起始半垂眼加上「微微俯视」可能放大开头低眼，看起来像闭眼。比较性格时要区分路线共性和选角差异。",
+    "溯源（新）：合并到 trial/screentest/continuity-report.json 时，须把 inputs.preview_approval.sha256 从 002cd8e9… 改为 9ed404b77d1784fc7f1ab0f53a99988cf17df09f759c90ef075b60da56832416，把 inputs.action_prompt_sha256.SC4 从 7217b70d… 改为 70e1361901cd390114b8b96ed387ebfeb49e0e3ade97a71b06ec4d45d309428f；lint 只读 units.SC4.verdict，发现不了这两处过期。SC1–SC3 的 lint 和 permit 绑定的是修订前的 002cd8e9…（它们的文本没变，SHA 已核），SC4 会绑定 9ed404b7…，这是预期结果；这次修订已记在 approval amendments 和 logs/decisions.md:477。"
+   ],
+   "rechecked_at": "2026-11-04T03:41:32.775113+00:00"
+  },
+  "SC4_superseded": {
+   "verdict": "not_ready",
+   "continuity": "N/A: casting screen test, not placed in the film",
+   "handoff": "N/A: casting screen test, not placed in the film",
+   "axis_action_camera": "N/A: casting screen test, not placed in the film（镜头固定近景与头肩裁图一致）",
+   "prompt_fit": "FAIL：“几乎不笑”是否定式（含“不”），不满足方法要求的正向描述（trial/omnihuman/research-2026-11-02.md:38；OH-B 认可 why 写明 positive，并以“眉头舒展”代替否定）；提到“笑”可能反向诱发笑容，叠加“动作很少”加重冻脸风险（R2）。其余项符合：纯中文，镜头＋情绪＋唱歌状态＋动作齐全，与 C4 女王设定“居高临下，冷艳强势”及裁图起始姿态一致。修复归主会话：改为对表情状态的正向描述（例如“嘴角平直、神情冷峻”），重新封存 action_prompt 与 action_prompt_sha256，再请本角色复核 SC4。",
+   "lint": "输入核对 PASS（唯读重算 8 项 true），但本报告 verdict 为 not_ready，continuity_report_ready 将为 false，lint 会按设计失败。",
+   "risks": [
+    "R2",
+    "R3",
+    "R8",
+    "R9",
+    "R10"
+   ]
+  }
+ },
+ "notes": [
+  "SC1–SC3 与 SC4 相互独立，可先提交 SC1–SC3；若重封 SC4 文本，认可文件 SHA（现为 002cd8e9…）会变，本报告需就新 SHA 重出。",
+  "只读：未运行 gen/omnihuman.py lint（它会写 SCn/lint.json），以唯读脚本重算其检查；未读 .env，未打开即梦页面；为目视检查在 /tmp 生成的临时拼图已删除。",
+  "性格是否“有个性”、好不好看由用户判；入口审核结果、实际价格、输出规格只能在填表时观察；人类听感 NOT_EVALUATED。"
+ ]
+}

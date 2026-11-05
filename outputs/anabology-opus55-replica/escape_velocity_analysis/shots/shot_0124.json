@@ -1,0 +1,733 @@
+{
+  "shot_id": "S0124",
+  "start_frame": 5643,
+  "end_frame": 5647,
+  "start_time": 235.125,
+  "end_time": 235.3333,
+  "duration_frames": 5,
+  "duration_s": 0.2083,
+  "start_tc": "00:03:55:03",
+  "end_tc": "00:03:55:07",
+  "boundary_in_id": "B3-029",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5643,
+      "path": "keyframes/S0124_f05643.jpg",
+      "role": "first",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5644,
+      "path": "keyframes/S0124_f05644.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5645,
+      "path": "keyframes/S0124_f05645.jpg",
+      "role": "middle",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5646,
+      "path": "keyframes/S0124_f05646.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5647,
+      "path": "keyframes/S0124_f05647.jpg",
+      "role": "last",
+      "note": "Actually opened individually in detail pass."
+    }
+  ],
+  "scene_type": "detail_insert",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Extreme detail of draped black cloth",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "4 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Extreme detail of draped black cloth. Only black fabric and upper table lip across lower frame, tiny portion of model’s arm at far right. GONE enters boxed then plain; crop intentionally removes face.",
+  "composition": {
+    "shot_size": "detail",
+    "subject_position": "Extreme detail of draped black cloth",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Extreme detail of draped black cloth",
+      "background": "Only black fabric and upper table lip across lower frame, tiny portion of model’s arm at far right."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "GONE enters boxed then plain; crop intentionally removes face",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0124.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0002,
+      "pan_y_frac_per_s": 0.0001,
+      "zoom_per_s": 0.0012,
+      "median_flow_frac_per_s": 0.0029,
+      "pairs_measured": 4
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "Only black fabric and upper table lip across lower frame, tiny portion of model’s arm at far right.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#131712",
+        "fraction": 0.352,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#DEE0E4",
+        "fraction": 0.31,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#D2D5D8",
+        "fraction": 0.171,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#7C7B77",
+        "fraction": 0.069,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#AAABAB",
+        "fraction": 0.068,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#444440",
+        "fraction": 0.029,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [131.9, 132.9, 132.7]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 05 /11",
+      "evidence_frame": 5645,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5645
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5645,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:55:03",
+      "end_value": "00:03:55:07"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5645
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0124-E01",
+      "shot_id": "S0124",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "Only black fabric and upper table lip across lower frame, tiny portion of model’s arm at far right.",
+      "start_frame": 5643,
+      "end_frame": 5647,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "GONE enters boxed then plain; crop intentionally removes face",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5643, 5645]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5645, 5647]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5643,
+          "state": "present"
+        },
+        {
+          "frame": 5647,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5643,
+        5645,
+        5647
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5643,
+          5645
+        ],
+        "exit_bounds": [
+          5645,
+          5647
+        ],
+        "precision_note": "Every short-shot frame inspected;2-frame ambiguity for fades/subpixels"
+      }
+    },
+    {
+      "element_id": "S0124-E02",
+      "shot_id": "S0124",
+      "asset_id": null,
+      "type": "character",
+      "description": "Extreme detail of draped black cloth",
+      "start_frame": 5643,
+      "end_frame": 5647,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "GONE enters boxed then plain; crop intentionally removes face",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5643, 5645]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5645, 5647]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5643,
+          "state": "present"
+        },
+        {
+          "frame": 5647,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5643,
+        5645,
+        5647
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5643,
+          5645
+        ],
+        "exit_bounds": [
+          5645,
+          5647
+        ],
+        "precision_note": "Every short-shot frame inspected;2-frame ambiguity for fades/subpixels"
+      }
+    },
+    {
+      "element_id": "S0124-E03",
+      "shot_id": "S0124",
+      "asset_id": null,
+      "type": "text_title",
+      "description": "Visible text_title bearing GONE",
+      "start_frame": 5643,
+      "end_frame": 5647,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.48,
+        "w": 0.28,
+        "h": 0.17,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "GONE enters boxed then plain; crop intentionally removes face",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5643, 5645]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5645, 5647]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5643,
+          "text": "GONE",
+          "backing": "black"
+        },
+        {
+          "frame": 5644,
+          "text": "GONE",
+          "backing": "none"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5643,
+        5645,
+        5647
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "GONE",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5643,
+          5645
+        ],
+        "exit_bounds": [
+          5645,
+          5647
+        ],
+        "precision_note": "Every short-shot frame inspected;2-frame ambiguity for fades/subpixels"
+      }
+    },
+    {
+      "element_id": "S0124-E04",
+      "shot_id": "S0124",
+      "asset_id": null,
+      "type": "prop",
+      "description": "Black hanging fabric on tabletop edge",
+      "start_frame": 5643,
+      "end_frame": 5647,
+      "bounding_box": {
+        "x": 0.15,
+        "y": 0.46,
+        "w": 0.85,
+        "h": 0.54,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "GONE enters boxed then plain; crop intentionally removes face",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5643, 5645]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5645, 5647]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5643,
+          "state": "present"
+        },
+        {
+          "frame": 5647,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5643,
+        5645,
+        5647
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5643,
+          5645
+        ],
+        "exit_bounds": [
+          5645,
+          5647
+        ],
+        "precision_note": "Every short-shot frame inspected;2-frame ambiguity for fades/subpixels"
+      }
+    },
+    {
+      "element_id": "S0124-E05",
+      "shot_id": "S0124",
+      "asset_id": null,
+      "type": "hud_bracket",
+      "description": "MONITOR · SORA ·0.94 corner rectangle around covered monitor",
+      "start_frame": 5643,
+      "end_frame": 5647,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.16,
+        "w": 0.68,
+        "h": 0.83,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "GONE enters boxed then plain; crop intentionally removes face",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5643, 5645]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5645, 5647]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5643,
+          "state": "present"
+        },
+        {
+          "frame": 5647,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5643,
+        5647
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5643,
+          5645
+        ],
+        "exit_bounds": [
+          5645,
+          5647
+        ],
+        "precision_note": "Every short-shot frame inspected;2-frame ambiguity for fades/subpixels"
+      }
+    },
+    {
+      "element_id": "S0124-E06",
+      "shot_id": "S0124",
+      "asset_id": null,
+      "type": "text_caption",
+      "description": "Sora’s gone",
+      "start_frame": 5643,
+      "end_frame": 5647,
+      "bounding_box": {
+        "x": 0.035,
+        "y": 0.892,
+        "w": 0.2,
+        "h": 0.045,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "GONE enters boxed then plain; crop intentionally removes face",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed interval [5643, 5645]; inherited state or cut at shot boundary.",
+        "exit": "Observed interval [5645, 5647]; inherited state or cut at shot boundary."
+      },
+      "keyframes": [
+        {
+          "frame": 5643,
+          "state": "present"
+        },
+        {
+          "frame": 5647,
+          "state": "present"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5643,
+        5647
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "Sora’s gone",
+        "typography": {
+          "font_status": "unknown",
+          "description": "Mono metadata or sans caption",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5643,
+          5645
+        ],
+        "exit_bounds": [
+          5645,
+          5647
+        ],
+        "precision_note": "Every short-shot frame inspected;2-frame ambiguity for fades/subpixels"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0124-A01",
+      "target_element_ids": [
+        "S0124-E02",
+        "S0124-E03",
+        "S0124-E04"
+      ],
+      "description": "GONE enters boxed then plain; crop intentionally removes face",
+      "start_frame": 5643,
+      "end_frame": 5647,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-029",
+      "span": [
+        5643,
+        5643
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-030",
+      "span": [
+        5647,
+        5647
+      ],
+      "description": "GONE enters boxed then plain; crop intentionally removes face",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0363",
+      "relation": "vocal_word_candidate (unknown) at frame 5643–5651; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5643
+    },
+    {
+      "audio_event_id": "AH02373",
+      "relation": "band_onset_candidate (unknown) at frame 5643; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5643
+    },
+    {
+      "audio_event_id": "AH02374",
+      "relation": "band_onset_candidate (unknown) at frame 5643; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5643
+    },
+    {
+      "audio_event_id": "AH02375",
+      "relation": "band_onset_candidate (unknown) at frame 5643; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5643
+    },
+    {
+      "audio_event_id": "AB0521",
+      "relation": "beat_candidate (unknown) at frame 5643; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5643
+    },
+    {
+      "audio_event_id": "AH02376",
+      "relation": "band_onset_candidate (unknown) at frame 5643; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5643
+    },
+    {
+      "audio_event_id": "AH02377",
+      "relation": "band_onset_candidate (unknown) at frame 5644; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5644
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0124.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.75,
+  "uncertainties": [
+    "Original font, shader, lens and layer decomposition remain unknown.",
+    "Spatial bounds are visual estimates from full-resolution source, not authored values."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0124.jpg",
+      "keyframes/S0124_f05643.jpg",
+      "keyframes/S0124_f05644.jpg",
+      "keyframes/S0124_f05645.jpg",
+      "keyframes/S0124_f05646.jpg",
+      "keyframes/S0124_f05647.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "filmstrip_opened": true,
+    "frames_actually_opened": [
+      5643,
+      5644,
+      5645,
+      5646,
+      5647
+    ],
+    "fullres_frames_actually_opened": [
+      5645
+    ],
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "method": "Every-frame short filmstrip, all individual keyframes and full-resolution source frame.",
+    "final_random_spot_check": {
+      "seed": 41,
+      "frame": 5645,
+      "result": "Reopened after all owned shots finished; independent-element inventory checked; S0127 HALL B label added."
+    },
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

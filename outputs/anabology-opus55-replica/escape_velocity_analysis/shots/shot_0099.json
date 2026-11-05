@@ -1,0 +1,1023 @@
+{
+  "shot_id": "S0099",
+  "start_frame": 4662,
+  "end_frame": 4748,
+  "duration_frames": 87,
+  "start_time": 194.25,
+  "end_time": 197.875,
+  "duration_s": 3.625,
+  "start_tc": "00:03:14:06",
+  "end_tc": "00:03:17:20",
+  "boundary_in_id": "B3-004",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    4662,
+    4662
+  ],
+  "boundary_out_id": "B3-005",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升。左上大号年份翻牌2025变2026再2027又回2026，旁边生物年龄始终34.0，下面加减年份算式展开。",
+  "reference_frames": [
+    {
+      "frame": 4662,
+      "path": "keyframes/S0099_f04662.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4683,
+      "path": "keyframes/S0099_f04683.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4705,
+      "path": "keyframes/S0099_f04705.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4727,
+      "path": "keyframes/S0099_f04727.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4748,
+      "path": "keyframes/S0099_f04748.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4705,
+      "path": "work/full_batch/04705.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 frame"
+    }
+  ],
+  "composition": {
+    "shot_size": "按scene_description中的实际景别",
+    "subject_position": "见scene_description与bounding_box",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可见倾斜/俯仰见scene_description；焦距unknown",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升。左上大号年份翻牌2025变2026再2027又回2026，旁边生物年龄始终34.0，下面加减年份算式展开。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0028, \"pan_y_frac_per_s\": 0.0416, \"zoom_per_s\": -0.0228, \"median_flow_frac_per_s\": 0.0237, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[137.5, 121.9, 115.9]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#EAE9ED",
+        "fraction": 0.279,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#191E14",
+        "fraction": 0.186,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#C6C3C6",
+        "fraction": 0.152,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#A19C9C",
+        "fraction": 0.136,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#48493E",
+        "fraction": 0.127,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#7B7771",
+        "fraction": 0.119,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[137.5, 121.9, 115.9]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0099-E01",
+      "shot_id": "S0099",
+      "type": "background_media",
+      "description": "路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升。左上大号年份翻牌2025变2026再2027又回2026，旁边生物年龄始终34.0，下面加减年份算式展开。",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. 路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升。左上大号年份翻牌2025变2026再2027又回2026，旁边生物年龄始终34.0，下面加减年份算式展开。"
+      },
+      "motion": {
+        "path": "路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升。左上大号年份翻牌2025变2026再2027又回2026，旁边生物年龄始终34.0，下面加减年份算式展开。",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    },
+    {
+      "element_id": "S0099-E02",
+      "shot_id": "S0099",
+      "type": "character",
+      "description": "Model low in frame, head tilted upward under black gantry truss, body cropped at hips",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.38281,
+        "y": 0.5,
+        "w": 0.20312,
+        "h": 0.5,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Model low in frame, head tilted upward under black gantry truss, body cropped at hips"
+      },
+      "motion": {
+        "path": "Model low in frame, head tilted upward under black gantry truss, body cropped at hips",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    },
+    {
+      "element_id": "S0099-E03",
+      "shot_id": "S0099",
+      "type": "environment",
+      "description": "Large black overhead steel truss crosses top; white fog opens behind, crash barriers converge on road",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 0.50926,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Large black overhead steel truss crosses top; white fog opens behind, crash barriers converge on road"
+      },
+      "motion": {
+        "path": "Large black overhead steel truss crosses top; white fog opens behind, crash barriers converge on road",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    },
+    {
+      "element_id": "S0099-E04",
+      "shot_id": "S0099",
+      "type": "split_flap",
+      "description": "Four large calendar tiles alternate2025→2026 and later2027→2026; each digit has horizontal hinge",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.04375,
+        "y": 0.27778,
+        "w": 0.22917,
+        "h": 0.14815,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Four large calendar tiles alternate2025→2026 and later2027→2026; each digit has horizontal hinge"
+      },
+      "motion": {
+        "path": "Four large calendar tiles alternate2025→2026 and later2027→2026; each digit has horizontal hinge",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4662,
+          "value": 2025
+        },
+        {
+          "frame": 4669,
+          "value": 2026
+        },
+        {
+          "frame": 4718,
+          "value": 2027
+        },
+        {
+          "frame": 4726,
+          "value": 2026
+        },
+        {
+          "frame": 4741,
+          "value": 2027
+        },
+        {
+          "frame": 4748,
+          "value": 2026
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4669,
+        4718,
+        4726,
+        4741,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "2026",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 120,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0099-E05",
+      "shot_id": "S0099",
+      "type": "counter",
+      "description": "Smaller BIOLOGICAL AGE tiles beside year,34.0 then35.0 then34.0; keep displayed inconsistency rather than forcing calendar monotonicity",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.2875,
+        "y": 0.27778,
+        "w": 0.10156,
+        "h": 0.06667,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Smaller BIOLOGICAL AGE tiles beside year,34.0 then35.0 then34.0; keep displayed inconsistency rather than forcing calendar monotonicity"
+      },
+      "motion": {
+        "path": "Smaller BIOLOGICAL AGE tiles beside year,34.0 then35.0 then34.0; keep displayed inconsistency rather than forcing calendar monotonicity",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4662,
+          "value": 34.0
+        },
+        {
+          "frame": 4718,
+          "value": 35.0
+        },
+        {
+          "frame": 4726,
+          "value": 34.0
+        },
+        {
+          "frame": 4741,
+          "value": 35.0
+        },
+        {
+          "frame": 4748,
+          "value": 34.0
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4718,
+        4726,
+        4741,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "34.0",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 50,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0099-E06",
+      "shot_id": "S0099",
+      "type": "text_label",
+      "description": "Calendar and age column headings, net-since line below age",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.04375,
+        "y": 0.25,
+        "w": 0.35417,
+        "h": 0.11574,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Calendar and age column headings, net-since line below age"
+      },
+      "motion": {
+        "path": "Calendar and age column headings, net-since line below age",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "GANTRY 02 · CALENDAR · LOCAL / BIOLOGICAL AGE · YR / NET SINCE 2026 · 0.0",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0099-E07",
+      "shot_id": "S0099",
+      "type": "text_caption",
+      "description": "Inherited lower-left cream line appends one/year/back then wraps for/every/year",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.78704,
+        "w": 0.43229,
+        "h": 0.11574,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Inherited lower-left cream line appends one/year/back then wraps for/every/year"
+      },
+      "motion": {
+        "path": "Inherited lower-left cream line appends one/year/back then wraps for/every/year",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4662,
+          "text": "Longevity escape velocity:"
+        },
+        {
+          "frame": 4714,
+          "text": "Longevity escape velocity: one"
+        },
+        {
+          "frame": 4718,
+          "text": "Longevity escape velocity: one year"
+        },
+        {
+          "frame": 4724,
+          "state": "back entering"
+        },
+        {
+          "frame": 4728,
+          "text": "Longevity escape velocity: one year back"
+        },
+        {
+          "frame": 4732,
+          "state": "for on second line"
+        },
+        {
+          "frame": 4738,
+          "state": "for every"
+        },
+        {
+          "frame": 4744,
+          "state": "for every year."
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4714,
+        4718,
+        4724,
+        4728,
+        4732,
+        4738,
+        4744,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "Longevity escape velocity: one year back / for every year.",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 49,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0099-E08",
+      "shot_id": "S0099",
+      "type": "hud_bracket",
+      "description": "Small face bracket gazes upward; black label connected by diagonal leader to overhead coordinate",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.46042,
+        "y": 0.51204,
+        "w": 0.07604,
+        "h": 0.16019,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Small face bracket gazes upward; black label connected by diagonal leader to overhead coordinate"
+      },
+      "motion": {
+        "path": "Small face bracket gazes upward; black label connected by diagonal leader to overhead coordinate",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "GAZE ↑ · G2 0.93",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0099-E09",
+      "shot_id": "S0099",
+      "type": "text_label",
+      "description": "Black upper leader tag near(998,405), diagonal stem ends on head",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "bounding_box": {
+        "x": 0.48958,
+        "y": 0.37222,
+        "w": 0.1224,
+        "h": 0.14815,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 19,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Black upper leader tag near(998,405), diagonal stem ends on head"
+      },
+      "motion": {
+        "path": "Black upper leader tag near(998,405), diagonal stem ends on head",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4662, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4748; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4662,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4748,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4662,
+        4748
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "G2 · OVERHEAD · 6.1 M",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0099-A04",
+      "target_element_ids": [
+        "S0099-E04"
+      ],
+      "description": "Four large calendar tiles alternate2025→2026 and later2027→2026; each digit has horizontal hinge",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0099-A05",
+      "target_element_ids": [
+        "S0099-E05"
+      ],
+      "description": "Smaller BIOLOGICAL AGE tiles beside year,34.0 then35.0 then34.0; keep displayed inconsistency rather than forcing calendar monotonicity",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0099-A07",
+      "target_element_ids": [
+        "S0099-E07"
+      ],
+      "description": "Inherited lower-left cream line appends one/year/back then wraps for/every/year",
+      "start_frame": 4662,
+      "end_frame": 4748,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AB0430",
+      "relation": "beat_candidate (unknown) at frame 4663; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4663
+    },
+    {
+      "audio_event_id": "AB0431",
+      "relation": "beat_candidate (unknown) at frame 4674; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4674
+    },
+    {
+      "audio_event_id": "AB0432",
+      "relation": "beat_candidate (unknown) at frame 4685; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4685
+    },
+    {
+      "audio_event_id": "AB0433",
+      "relation": "beat_candidate (unknown) at frame 4695; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4695
+    },
+    {
+      "audio_event_id": "AB0434",
+      "relation": "beat_candidate (unknown) at frame 4706; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4706
+    },
+    {
+      "audio_event_id": "AW0312",
+      "relation": "vocal_word_candidate (unknown) at frame 4712–4715; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4712
+    },
+    {
+      "audio_event_id": "AW0313",
+      "relation": "vocal_word_candidate (unknown) at frame 4716–4721; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4716
+    },
+    {
+      "audio_event_id": "AB0435",
+      "relation": "beat_candidate (unknown) at frame 4716; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4716
+    },
+    {
+      "audio_event_id": "AH01929",
+      "relation": "band_onset_candidate (unknown) at frame 4717; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4717
+    },
+    {
+      "audio_event_id": "AH01930",
+      "relation": "band_onset_candidate (unknown) at frame 4717; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4717
+    },
+    {
+      "audio_event_id": "AW0314",
+      "relation": "vocal_word_candidate (unknown) at frame 4723–4729; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4723
+    },
+    {
+      "audio_event_id": "AB0436",
+      "relation": "beat_candidate (unknown) at frame 4728; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4728
+    },
+    {
+      "audio_event_id": "AH01931",
+      "relation": "band_onset_candidate (unknown) at frame 4729; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4729
+    },
+    {
+      "audio_event_id": "AH01932",
+      "relation": "band_onset_candidate (unknown) at frame 4729; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4729
+    },
+    {
+      "audio_event_id": "AW0315",
+      "relation": "vocal_word_candidate (unknown) at frame 4730–4733; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4730
+    },
+    {
+      "audio_event_id": "AW0316",
+      "relation": "vocal_word_candidate (unknown) at frame 4735–4741; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4735
+    },
+    {
+      "audio_event_id": "AB0437",
+      "relation": "beat_candidate (unknown) at frame 4739; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4739
+    },
+    {
+      "audio_event_id": "AW0317",
+      "relation": "vocal_word_candidate (unknown) at frame 4743–4749; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4743
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B5,B10"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Original font files, random flap seed, alpha and easing code are unknown",
+    "Positions are bounded visual measurements; digit transition glyphs are reference-frame backed, not fully transcribed random sequences",
+    "Source assertions remain confirmed/inferred/unknown as in original layer hypotheses; inferred film-layer separation is not recovered author source code",
+    "No direct listening proof; audio linkage is candidate timing only"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0099.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-004",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        4662,
+        4662
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-005",
+      "description": "路牌下少女正面半身缓慢仰头，镜头随其视线朝路牌和顶棚抬升。左上大号年份翻牌2025变2026再2027又回2026，旁边生物年龄始终34.0，下面加减年份算式展开。",
+      "span": [
+        4748,
+        4748
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "2026",
+    "34.0",
+    "GANTRY 02 · CALENDAR · LOCAL / BIOLOGICAL AGE · YR / NET SINCE 2026 · 0.0",
+    "Longevity escape velocity: one year back / for every year.",
+    "GAZE ↑ · G2 0.93",
+    "G2 · OVERHEAD · 6.1 M"
+  ],
+  "detail_review": {
+    "reviewer": "root",
+    "method": "actual whole filmstrip + native1920 midpoint +2f crop sequence, followed by separate1f panel visibility review",
+    "sheet": "work/root_review/micro_S0099.jpg",
+    "timing_precision_frames": 2,
+    "additional_sheets": [],
+    "visibility_note": "continuous plate persists throughout; diagram/word starts use inspected1–2f bounds; hidden renderer and font identity remain unknown",
+    "pending": []
+  }
+}

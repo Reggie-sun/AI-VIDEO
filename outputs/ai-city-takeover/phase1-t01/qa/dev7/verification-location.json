@@ -1,0 +1,7 @@
+{
+  "verification_root": "/tmp/ai-video-t01-verify-katu_0f1/repo",
+  "source_manifest": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/phase1-t01/qa/dev7/delivery-snapshot.json",
+  "owned_path_count": 99,
+  "base_commit": "43c330bc9509d4e14ff91411d9cdf1b190f61810",
+  "staged_tree": "9128466b5e9c407fd623b3bd1634bea10b6f1084"
+}

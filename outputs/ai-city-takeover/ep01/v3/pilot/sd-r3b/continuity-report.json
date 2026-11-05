@@ -1,0 +1,47 @@
+{
+ "schema": "iris-v3-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-05T08:17:20Z",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/sd-r3b/preview-approval.json",
+   "sha256": "5337c6a42d50d822e223a0cfb7f73bbd7ce359263ae314896051dbe10b924965"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs-r3b.json",
+   "sha256": "70c5fd8873133194a9972af63c07877aaa6fc39fff2a1428830cfc2e86cdebd3"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/r3/u021-text-r2.html",
+   "sha256": "ad7201be8e49ab30a4e2c962b86d5a0df98a5185a4e611e2465121522bc2aa62"
+  },
+  "supersedes_report": {
+   "path": "/tmp/cont-u021-r3/report.json",
+   "note": "r3 报告（oh-r3，verdict not_ready）"
+  }
+ },
+ "units": {
+  "U021": {
+   "verdict": "ready",
+   "continuity": "PASS：输入与 r3 报告相同，逐个重核 SHA-256 未变：首帧 plates/raw/P-gap-mcu-sing.png 4cb7b152…（与 referces/iris/raw/P-gap-mcu-sing-b.png 逐字节相同），身份参考 IRIS-expressions-c.png e6ef0a4f…、IRIS-turnaround-c.png c4f37026…，邻镜首帧 P-gap-face-whisper.png d52cfed2…（U020）、P-gap-34-sing.png 24638a5f…（U022），人声 pilot/audio/U021.wav b74a2cdb…。本镜之前仍没有已接受的实拍：pilot/ 下唯一的 post-media-gate.json 是 oh/U021（FAIL），oh-r3、sd-r3 都没有 submit-intent 或 ledger。所以连续性仍按使用者认可的新身份参考和邻镜首帧比对，结论同 r3（/tmp/cont-u021-r3/report.json 的 continuity 一项与 eyes-U021.jpg）：新脸，银白齐下巴波波头、银白眉、淡雀斑；左耳黑色耳挂与小红灯、左领红线都在画面右侧，领线在首帧中亮着；白色雕塑感立领外套＋黑色高领，与 U020、U022 首帧一致；门缝红光只在画面右侧，左侧冷蓝机柜，符合 canon-v4。立领红线的判法使用者已经定了（preview-inputs-r3b.json 的 collar_line_policy：熄灭时 Gate 记录区间、列入后期补画，不判 FAIL），不再是未决项。 Seedance 全能参考模式里这张图是参考，不是首帧：输出第一帧不一定和底图逐像素相同，取景、比例和红光位置可能会变，见 risks。",
+   "handoff": "PASS（按设计判断；邻镜都还没实拍）。切入 60.50 s = 参考人声片内 0.30 s，在 0–0.95 s 的静音里；语义是同时同地连续、进副歌的有动机硬切，不是省略或重置。新 prompt 写「开头她闭着眼睛，嘴轻轻合上，静静等待；唱第一个字时张开嘴」，静音里合嘴、I 起音时开嘴，r3 报告里前奏张嘴没处理的问题已经补上。切出 64.26 s（片内 4.06 s）在两句之间；「唱到句尾慢慢睁开眼睛，带着一点好奇平静地看着镜头」接 U022 首帧（四分之三近景、睁眼看镜头），符合 I-EYEJUMP，耳挂、领线、门缝都在画面右侧。这是按参考人声的时间判断的；输出的自带音轨可能比参考早约 0.8 s（v2 LSen1，logs/decisions.md 第 238 行，lag −0.804 s，in-point 0.093）。如果这次也早，切入点所需的片头静音在输出里只剩约 0.15 s，60.50 s 的入点可能拿不到画面，见 risks。",
+   "axis_action_camera": "PASS：单人对镜头，没有两人之间的 180 度线；U020、U021、U022 三张首帧的工作侧相同（走道在画面左，门缝在画面右，左耳装置和左领线在画面右），没有过轴或镜像。人声的动作阶段（片内时间，0 s = 歌曲 60.20 s，/tmp/cont-u021-r3/rms.py）：0–0.95 s 静音；0.95–1.25 s 唱 I（全片最响，−24 dB）；1.45–3.30 s 是 didn't 长拖腔；3.30–3.60 s 是很轻的 run；3.85–4.00 s 吸气；剪辑窗口为片内 0.30–4.06 s。新文本的阶段与此一一对应：开头闭眼合嘴等待（0–0.95 s）→唱第一个字时张嘴（0.95 s）→闭眼投入地唱（0.95–3.60 s）→句尾慢慢睁眼看镜头（约 3.4–4.06 s）。机位：prompt「中近景」「镜头全程锁定，一镜到底」与底图（头到上胸、正面）和 unit.py U021 spec 的 camera_motion LOCKED 一致；hold 慢漂由后期做。prompt 没写肩膀和身体，这与上一版 SD prompt 相同、使用者已认可，不算遗漏。",
+   "prompt_fit": "PASS：prompt 145 字符，UTF-8 SHA-256 ef8b8347…，与 sd-r3b/preview-approval.json、preview-inputs-r3b.json 的 seedance_multimodal.prompt 逐字相同；预览页 r3/u021-text-r2.html「B. Seedance／新」一行把 {{image:0}}／{{audio:1}} 显示成【图1】【音频1】，替换后逐字相同（approval 的 prompt_marker_note 说明了这一点）。materialize 之后的 compiled-native-prompt.zh.txt 去掉末尾换行后 SHA 也是 ef8b8347…；prepared.json 里 resolved_request.prompt_text 与之相同，effective_negative_prompt_text 为空，paid_provider_preview 的 prompt egress 是 391 字节、sha ef8b8347…。标记只有 {{image:0}}、{{audio:1}}，各出现一次；标记外没有英文字母。否定字 0 处（这条 lane 本来没有否定字规则，只是顺便核对）。r3 的三项都已改：「面无表情」改成「神情平静淡然」；写明开头合嘴等待；「带着一点好奇」出现两次。unit.py U021 spec 要求逐字出现的「中近景」「对着镜头唱歌」「逐字精确同步」「闭着眼睛投入地唱」「神情平静」「唱到句尾慢慢睁开眼睛」「镜头全程锁定」都在。参考包只有底图和人声两件，与预览一致，没有多加。coverage 仍写 medium 的问题按使用者认可首帧处理，不算差异。",
+   "lint": "PASS（12 项中 11 项为 true；continuity_report_ready 取决于本报告存档）。派发时 materialize/prepare 还没做，复核时（2026-11-05 08:13 UTC 左右）主会话已经写出 node-created.json、profile.json、operator-bound.json、compiled-native-prompt.zh.txt、prepare-result.json 和 prepared.json，所以全部 12 项都能算，没有待定项。没有运行 gen/lint.py（它会写 U021/pre-submit-lint.json）；用 /tmp/cont-u021-r3b/sdlint_ro.py 以 SD_TRIAL=outputs/ai-city-takeover/ep01/v3/pilot/sd-r3b、PYTHONDONTWRITEBYTECODE=1 导入 lint.py（12d74d6d…）的 lint() 只读调用，没有走 __main__ 的写文件步骤，跑完 gen/ 下没有新增 __pycache__。结果：exact_image_order、audio_binding（iris-c-v3-u021-vocal，b74a2cdb…）、every_input_in_user_preview、prompt_language_policy、prompt_is_user_approved_text、directed_behaviour_in_text、no_platform_label_removal、bound_output（seedance_2.0_vip／multimodal／5／1080p／16:9，与 approval.generation 和 spec 相同）、operator_ceiling_matches_preview（200＝200＝200）、bound_matches_approval（user_quote 逐字相同，cumulative 1／200）、cumulative_budget_left（ledger 不存在，0 条）都是 true；continuity_report_ready 为 false，因为 sd-r3b/continuity-report.json 还不存在。request_hash 723184fd…，approval_sha256 5337c6a4…。operator-bound 的有效期 2026-11-05T08:13:47Z 到 11:13:47Z，超时要重签 bound，不能沿用。本报告存为 sd-r3b/continuity-report.json 后，主会话提交前仍要真正运行 lint.py。",
+   "gaps": [
+    "sd-r3b 里的 canonical generation_intent 没有随新文本更新：unit.py（026c2164…）的 U021 spec 仍是旧写法，prepared.json／row.json／driver-config.json 中 subject_action.start_state 是「中近景正面，闭眼，嘴微张」（新文本写开头合嘴），performance facial_expression 是「神情平静，面无表情，眉头舒展」（没有「好奇」）；qa-policy.json 的 identity 规则写立领红灯线「完整保持」，与使用者的 collar_line_policy（熄灭不判 FAIL、后期补画）冲突。这些字段不进提供方请求（发出去的只有 prompt_text 和两个绑定），不影响生成；但逐镜 Gate 的封存判据会因此自相矛盾。按冲突规则以使用者为准：主会话要在 Gate 派发时写明以 preview-inputs-r3b（accept、collar_line_policy）和已批准 prompt 为准，或者改 spec 后重新 draft/materialize/prepare（request_hash 会变，本报告也要重做）。"
+   ],
+   "risks": [
+    "自带音轨提前：v2 LSen1 用同一 model/mode，自带音轨比参考早约 0.8 s（lag −0.804 s），嘴跟着自带音轨走，在停顿处与歌曲对不上（LSen1 失败的停顿在 2.58–2.75 s、3.71–3.94 s）。如果这次也早 0.8 s，I 会在输出约 0.15 s 起音：60.50 s 入点前的 0.65 s 合嘴等待在输出里大部分不存在，入点要后移，或接受只有约 0.15 s 的片头；句尾 3.85–4.00 s 的吸气停顿也可能对不上。Gate 要先用 motion-kit/tools/sync_check.py 量 lag，再看口型。",
+    "参考图不是首帧：全能参考模式下输出第一帧可能不是这张底图，取景、比例、红光侧别和耳挂位置都可能变。Gate 要核对耳挂、领线、门缝仍在画面右侧，没有镜像。",
+    "前奏合嘴与张嘴：如果输出从张嘴开始，要在 I 前合上再张开；合嘴拖到入点之后会像嘴在开合抖动。",
+    "神情：SD prompt 没写「轻声」，I 是全片最响的起音（−24 dB），可能演成像在喊；「好奇」也可能演成发空。观感由使用者判断。",
+    "句尾睁眼：窗口只有片内约 3.4–4.06 s（按参考时间；如果音轨提前要换算），可能到出点还是半睁，或提前睁眼。",
+    "立领红线熄灭按使用者决定处理：Gate 记录区间、列入后期补画，不判 FAIL；侧别变了仍算身份问题。",
+    "U020→U021 跳切风险同数字人报告：取决于 U020 是否保留四分之三近景。",
+    "时长与尺寸：输出 5 s、1080p 16:9，参考人声只有 4.36 s，末尾 0.64 s 没有对应人声；成片只取对齐后的 [60.50, 64.26]，音轨换成歌曲母带。",
+    "预算账：sd-r3b 上限 1 条、200 积分（node-created.json 记录余额读数「61852 超级会员」，没有 generation POST）；oh-r3b 另有 1 条、165 积分，旧 oh lane 已花 24 积分。最后汇报要合并计算，金额以提交前后的精确余额为准。"
+   ]
+  }
+ }
+}

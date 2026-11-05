@@ -1,0 +1,35 @@
+[
+  {
+    "asset_id": "iris-ls-1-a02",
+    "path": "outputs/ai-city-takeover/ep01/reference-package/A02-v1.png",
+    "sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039",
+    "size_bytes": 2051790,
+    "width": 1672,
+    "height": 941,
+    "role": "approved A02: the plate, sent as {{image:0}}",
+    "need_id": "balcony",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-ls-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+    "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+    "size_bytes": 441078,
+    "kind": "audio",
+    "duration_millis": 5000,
+    "sample_rate_hz": 44100,
+    "role": "the exact vocal window the mouth follows (EV method)",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v2/song/bed-01/music__20261102_004125.mp3",
+      "sha256": "f45c385ef6ec3c5ef817cce72ba6c9d6e5f6fbb21849e80ed8b794d137f08973",
+      "master_window_seconds": [
+        17.97,
+        22.97
+      ],
+      "tool": "ElevenLabs Voice Isolator, then ffmpeg trim, pad and gain",
+      "basis": "docs/superpowers/plans/2026-11-02-iris-ep01-lipsync-trial.md section 3 (sealed before payment); trial/lipsync-ev/preview-approval.json"
+    },
+    "selected_for_provider": true
+  }
+]

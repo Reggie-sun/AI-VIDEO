@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/iris-google-listening-20261031/operator-01",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/iris-google-listening-20261031/operator-01/intent.json",
+  "intent_sha256": "bd1e1afd24a588cdf6809f8d2e5d8c01af1b32cf443726103e4a8cffbb20355b",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/iris-google-listening-20261031/operator-01/reservation.json",
+  "reservation_sha256": "b10b916556e2ed563b6ca8ed7f8986d3eac2518b87461014a2d516a2773ee17f",
+  "source_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+  "source_size_bytes": 5760044,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

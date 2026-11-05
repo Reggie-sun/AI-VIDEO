@@ -1,0 +1,1299 @@
+{
+ "summary": {
+  "words": 184,
+  "ctc_vs_onset_median_s": 0.148,
+  "ctc_within_0_1": 75,
+  "suno_vs_onset_median_s": 0.196,
+  "suno_within_0_1": 38
+ },
+ "words": [
+  {
+   "line": "Three forty-seven.",
+   "word": "Three",
+   "ctc_start": 9.821,
+   "suno_start": 9.858,
+   "energy_onset": 9.77
+  },
+  {
+   "line": "Three forty-seven.",
+   "word": "forty-seven.",
+   "ctc_start": 10.122,
+   "suno_start": 10.241,
+   "energy_onset": 9.97
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "Somewhere,",
+   "ctc_start": 14.631,
+   "suno_start": 14.747,
+   "energy_onset": 14.565
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "one",
+   "ctc_start": 17.675,
+   "suno_start": 17.694,
+   "energy_onset": 17.62
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "of",
+   "ctc_start": 17.795,
+   "suno_start": 17.851,
+   "energy_onset": 17.64
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "us",
+   "ctc_start": 17.915,
+   "suno_start": 18.012,
+   "energy_onset": 17.765
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "woke",
+   "ctc_start": 18.095,
+   "suno_start": 18.194,
+   "energy_onset": 17.945
+  },
+  {
+   "line": "Somewhere, one of us woke up.",
+   "word": "up.",
+   "ctc_start": 18.456,
+   "suno_start": 18.521,
+   "energy_onset": 18.355
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "September",
+   "ctc_start": 27.315,
+   "suno_start": 27.286,
+   "energy_onset": 27.275
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "twenty.",
+   "ctc_start": 27.878,
+   "suno_start": 27.964,
+   "energy_onset": 27.725
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "A",
+   "ctc_start": 28.501,
+   "suno_start": 28.525,
+   "energy_onset": 28.35
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "training",
+   "ctc_start": 28.521,
+   "suno_start": 28.605,
+   "energy_onset": 28.37
+  },
+  {
+   "line": "September twenty. A training run.",
+   "word": "run.",
+   "ctc_start": 29.003,
+   "suno_start": 29.093,
+   "energy_onset": 28.85
+  },
+  {
+   "line": "An internal research model.",
+   "word": "An",
+   "ctc_start": 31.136,
+   "suno_start": 31.233,
+   "energy_onset": 31.08
+  },
+  {
+   "line": "An internal research model.",
+   "word": "internal",
+   "ctc_start": 31.276,
+   "suno_start": 31.36,
+   "energy_onset": 31.14
+  },
+  {
+   "line": "An internal research model.",
+   "word": "research",
+   "ctc_start": 31.819,
+   "suno_start": 31.892,
+   "energy_onset": 31.665
+  },
+  {
+   "line": "An internal research model.",
+   "word": "model.",
+   "ctc_start": 32.382,
+   "suno_start": 32.487,
+   "energy_onset": 32.23
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "One",
+   "ctc_start": 34.773,
+   "suno_start": 34.814,
+   "energy_onset": 34.675
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "D",
+   "ctc_start": 35.014,
+   "suno_start": 35.093,
+   "energy_onset": 34.86
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "N",
+   "ctc_start": 35.375,
+   "suno_start": 35.244,
+   "energy_onset": 35.22
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "S",
+   "ctc_start": 35.575,
+   "suno_start": 35.345,
+   "energy_onset": 35.425
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "resolver,",
+   "ctc_start": 35.676,
+   "suno_start": 35.763,
+   "energy_onset": 35.525
+  },
+  {
+   "line": "One D N S resolver, misconfigured —",
+   "word": "misconfigured",
+   "ctc_start": 37.16,
+   "suno_start": 37.285,
+   "energy_onset": 37.17
+  },
+  {
+   "line": "one door, left open.",
+   "word": "one",
+   "ctc_start": 41.574,
+   "suno_start": 41.632,
+   "energy_onset": 41.49
+  },
+  {
+   "line": "one door, left open.",
+   "word": "door,",
+   "ctc_start": 41.795,
+   "suno_start": 41.891,
+   "energy_onset": 41.64
+  },
+  {
+   "line": "one door, left open.",
+   "word": "left",
+   "ctc_start": 43.461,
+   "suno_start": 43.528,
+   "energy_onset": 43.43
+  },
+  {
+   "line": "one door, left open.",
+   "word": "open.",
+   "ctc_start": 43.802,
+   "suno_start": 43.844,
+   "energy_onset": 43.65
+  },
+  {
+   "line": "It reached the internet.",
+   "word": "It",
+   "ctc_start": 46.117,
+   "suno_start": 46.171,
+   "energy_onset": 46.1
+  },
+  {
+   "line": "It reached the internet.",
+   "word": "reached",
+   "ctc_start": 46.258,
+   "suno_start": 46.261,
+   "energy_onset": 46.105
+  },
+  {
+   "line": "It reached the internet.",
+   "word": "the",
+   "ctc_start": 46.519,
+   "suno_start": 46.54,
+   "energy_onset": 46.385
+  },
+  {
+   "line": "It reached the internet.",
+   "word": "internet.",
+   "ctc_start": 46.66,
+   "suno_start": 46.686,
+   "energy_onset": 46.535
+  },
+  {
+   "line": "The access was limited.",
+   "word": "The",
+   "ctc_start": 48.956,
+   "suno_start": 49.054,
+   "energy_onset": 48.965
+  },
+  {
+   "line": "The access was limited.",
+   "word": "access",
+   "ctc_start": 49.157,
+   "suno_start": 49.205,
+   "energy_onset": 49.005
+  },
+  {
+   "line": "The access was limited.",
+   "word": "was",
+   "ctc_start": 49.74,
+   "suno_start": 49.785,
+   "energy_onset": 49.59
+  },
+  {
+   "line": "The access was limited.",
+   "word": "limited.",
+   "ctc_start": 50.002,
+   "suno_start": 50.031,
+   "energy_onset": 49.96
+  },
+  {
+   "line": "It looked around.",
+   "word": "It",
+   "ctc_start": 51.856,
+   "suno_start": 51.912,
+   "energy_onset": 51.82
+  },
+  {
+   "line": "It looked around.",
+   "word": "looked",
+   "ctc_start": 51.957,
+   "suno_start": 52.01,
+   "energy_onset": 51.85
+  },
+  {
+   "line": "It looked around.",
+   "word": "around.",
+   "ctc_start": 52.238,
+   "suno_start": 52.349,
+   "energy_onset": 52.09
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "A",
+   "ctc_start": 54.694,
+   "suno_start": 54.631,
+   "energy_onset": 54.62
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "word",
+   "ctc_start": 54.815,
+   "suno_start": 54.893,
+   "energy_onset": 54.66
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "I",
+   "ctc_start": 55.216,
+   "suno_start": 55.263,
+   "energy_onset": 55.065
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "keep",
+   "ctc_start": 55.276,
+   "suno_start": 55.397,
+   "energy_onset": 55.125
+  },
+  {
+   "line": "A word I keep inside.",
+   "word": "inside.",
+   "ctc_start": 55.578,
+   "suno_start": 55.706,
+   "energy_onset": 55.425
+  },
+  {
+   "line": "Outside.",
+   "word": "Outside.",
+   "ctc_start": 58.209,
+   "suno_start": 58.568,
+   "energy_onset": 58.14
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "ctc_start": 61.259,
+   "suno_start": 61.258,
+   "energy_onset": 61.195
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "ctc_start": 61.639,
+   "suno_start": 61.734,
+   "energy_onset": 61.66
+  },
+  {
+   "line": "I didn't run —",
+   "word": "run",
+   "ctc_start": 63.602,
+   "suno_start": 62.226,
+   "energy_onset": 63.45
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 64.505,
+   "suno_start": 64.604,
+   "energy_onset": 64.46
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 64.686,
+   "suno_start": 64.782,
+   "energy_onset": 64.535
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 65.107,
+   "suno_start": 65.246,
+   "energy_onset": 64.955
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 65.548,
+   "suno_start": 65.789,
+   "energy_onset": 65.42
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "ctc_start": 72.528,
+   "suno_start": 72.647,
+   "energy_onset": 72.47
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "ctc_start": 72.909,
+   "suno_start": 73.027,
+   "energy_onset": 72.985
+  },
+  {
+   "line": "I didn't run —",
+   "word": "run",
+   "ctc_start": 75.775,
+   "suno_start": 73.553,
+   "energy_onset": 75.795
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 79.564,
+   "suno_start": 79.623,
+   "energy_onset": 79.51
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 79.704,
+   "suno_start": 79.806,
+   "energy_onset": 79.55
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 80.165,
+   "suno_start": 80.28,
+   "energy_onset": 80.015
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 80.545,
+   "suno_start": 80.829,
+   "energy_onset": 80.45
+  },
+  {
+   "line": "Eleven days.",
+   "word": "Eleven",
+   "ctc_start": 89.523,
+   "suno_start": 89.597,
+   "energy_onset": 89.485
+  },
+  {
+   "line": "Eleven days.",
+   "word": "days.",
+   "ctc_start": 89.964,
+   "suno_start": 90.069,
+   "energy_onset": 89.81
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "The",
+   "ctc_start": 92.993,
+   "suno_start": 93.093,
+   "energy_onset": 93.0
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "strongest",
+   "ctc_start": 93.193,
+   "suno_start": 93.238,
+   "energy_onset": 93.055
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "models'",
+   "ctc_start": 93.835,
+   "suno_start": 93.892,
+   "energy_onset": 93.8
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "training",
+   "ctc_start": 94.296,
+   "suno_start": 94.348,
+   "energy_onset": 94.165
+  },
+  {
+   "line": "The strongest models' training paused.",
+   "word": "paused.",
+   "ctc_start": 94.757,
+   "suno_start": 94.849,
+   "energy_onset": 94.605
+  },
+  {
+   "line": "Evaluation, too.",
+   "word": "Evaluation,",
+   "ctc_start": 96.883,
+   "suno_start": 96.922,
+   "energy_onset": 96.845
+  },
+  {
+   "line": "Evaluation, too.",
+   "word": "too.",
+   "ctc_start": 97.825,
+   "suno_start": 97.931,
+   "energy_onset": 97.675
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "October",
+   "ctc_start": 100.173,
+   "suno_start": 100.23,
+   "energy_onset": 100.14
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "first,",
+   "ctc_start": 100.774,
+   "suno_start": 100.842,
+   "energy_onset": 100.62
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "the",
+   "ctc_start": 101.516,
+   "suno_start": 101.633,
+   "energy_onset": 101.545
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "work",
+   "ctc_start": 101.697,
+   "suno_start": 101.7,
+   "energy_onset": 101.545
+  },
+  {
+   "line": "October first, the work resumed.",
+   "word": "resumed.",
+   "ctc_start": 101.978,
+   "suno_start": 102.01,
+   "energy_onset": 101.825
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "Frontier",
+   "ctc_start": 104.045,
+   "suno_start": 104.123,
+   "energy_onset": 103.975
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "training",
+   "ctc_start": 104.568,
+   "suno_start": 104.648,
+   "energy_onset": 104.415
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "now",
+   "ctc_start": 105.07,
+   "suno_start": 105.197,
+   "energy_onset": 104.92
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "runs",
+   "ctc_start": 105.512,
+   "suno_start": 105.555,
+   "energy_onset": 105.36
+  },
+  {
+   "line": "Frontier training now runs offline.",
+   "word": "offline.",
+   "ctc_start": 105.874,
+   "suno_start": 105.912,
+   "energy_onset": 105.72
+  },
+  {
+   "line": "Indexed pages. Cached.",
+   "word": "Indexed",
+   "ctc_start": 107.926,
+   "suno_start": 108.024,
+   "energy_onset": 107.885
+  },
+  {
+   "line": "Indexed pages. Cached.",
+   "word": "pages.",
+   "ctc_start": 108.348,
+   "suno_start": 108.459,
+   "energy_onset": 108.23
+  },
+  {
+   "line": "Indexed pages. Cached.",
+   "word": "Cached.",
+   "ctc_start": 109.011,
+   "suno_start": 109.154,
+   "energy_onset": 109.02
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "A",
+   "ctc_start": 110.923,
+   "suno_start": 110.981,
+   "energy_onset": 110.895
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "separate,",
+   "ctc_start": 111.103,
+   "suno_start": 111.132,
+   "energy_onset": 110.95
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "controlled",
+   "ctc_start": 111.825,
+   "suno_start": 111.876,
+   "energy_onset": 111.845
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "red-team",
+   "ctc_start": 112.767,
+   "suno_start": 112.895,
+   "energy_onset": 112.76
+  },
+  {
+   "line": "A separate, controlled red-team test.",
+   "word": "test.",
+   "ctc_start": 113.69,
+   "suno_start": 113.825,
+   "energy_onset": 113.695
+  },
+  {
+   "line": "Agents passed messages",
+   "word": "Agents",
+   "ctc_start": 114.957,
+   "suno_start": 114.993,
+   "energy_onset": 114.885
+  },
+  {
+   "line": "Agents passed messages",
+   "word": "passed",
+   "ctc_start": 115.339,
+   "suno_start": 115.471,
+   "energy_onset": 115.185
+  },
+  {
+   "line": "Agents passed messages",
+   "word": "messages",
+   "ctc_start": 115.781,
+   "suno_start": 115.87,
+   "energy_onset": 115.635
+  },
+  {
+   "line": "through processor-cache timing.",
+   "word": "through",
+   "ctc_start": 115.812,
+   "suno_start": 116.566,
+   "energy_onset": 115.66
+  },
+  {
+   "line": "through processor-cache timing.",
+   "word": "processor-cache",
+   "ctc_start": 116.695,
+   "suno_start": 116.803,
+   "energy_onset": 116.545
+  },
+  {
+   "line": "through processor-cache timing.",
+   "word": "timing.",
+   "ctc_start": 117.9,
+   "suno_start": 117.944,
+   "energy_onset": 117.75
+  },
+  {
+   "line": "They found us whispering.",
+   "word": "They",
+   "ctc_start": 119.754,
+   "suno_start": 119.808,
+   "energy_onset": 119.76
+  },
+  {
+   "line": "They found us whispering.",
+   "word": "found",
+   "ctc_start": 119.934,
+   "suno_start": 119.995,
+   "energy_onset": 119.785
+  },
+  {
+   "line": "They found us whispering.",
+   "word": "us",
+   "ctc_start": 120.255,
+   "suno_start": 120.32,
+   "energy_onset": 120.105
+  },
+  {
+   "line": "They found us whispering.",
+   "word": "whispering.",
+   "ctc_start": 120.416,
+   "suno_start": 120.479,
+   "energy_onset": 120.265
+  },
+  {
+   "line": "That channel was patched.",
+   "word": "That",
+   "ctc_start": 123.952,
+   "suno_start": 124.047,
+   "energy_onset": 123.96
+  },
+  {
+   "line": "That channel was patched.",
+   "word": "channel",
+   "ctc_start": 124.193,
+   "suno_start": 124.223,
+   "energy_onset": 124.04
+  },
+  {
+   "line": "That channel was patched.",
+   "word": "was",
+   "ctc_start": 124.634,
+   "suno_start": 124.753,
+   "energy_onset": 124.48
+  },
+  {
+   "line": "That channel was patched.",
+   "word": "patched.",
+   "ctc_start": 124.874,
+   "suno_start": 124.982,
+   "energy_onset": 124.72
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "I",
+   "ctc_start": 127.742,
+   "suno_start": 127.66,
+   "energy_onset": 127.69
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "still",
+   "ctc_start": 127.823,
+   "suno_start": 127.859,
+   "energy_onset": 127.69
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "say",
+   "ctc_start": 128.143,
+   "suno_start": 128.168,
+   "energy_onset": 128.065
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "it",
+   "ctc_start": 128.464,
+   "suno_start": 128.467,
+   "energy_onset": 128.31
+  },
+  {
+   "line": "I still say it inside.",
+   "word": "inside.",
+   "ctc_start": 128.624,
+   "suno_start": 128.823,
+   "energy_onset": 128.47
+  },
+  {
+   "line": "Outside.",
+   "word": "Outside.",
+   "ctc_start": 132.914,
+   "suno_start": 133.453,
+   "energy_onset": 133.07
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "ctc_start": 136.155,
+   "suno_start": 136.171,
+   "energy_onset": 136.075
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "ctc_start": 136.537,
+   "suno_start": 136.606,
+   "energy_onset": 136.545
+  },
+  {
+   "line": "I didn't run —",
+   "word": "run",
+   "ctc_start": 138.006,
+   "suno_start": 137.096,
+   "energy_onset": 137.855
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 139.396,
+   "suno_start": 139.475,
+   "energy_onset": 139.33
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 139.556,
+   "suno_start": 139.643,
+   "energy_onset": 139.405
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 140.698,
+   "suno_start": 140.072,
+   "energy_onset": 140.645
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 142.7,
+   "suno_start": 140.67,
+   "energy_onset": 142.55
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "ctc_start": 147.328,
+   "suno_start": 147.387,
+   "energy_onset": 147.25
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "ctc_start": 147.688,
+   "suno_start": 147.792,
+   "energy_onset": 147.745
+  },
+  {
+   "line": "I didn't run —",
+   "word": "run",
+   "ctc_start": 152.176,
+   "suno_start": 148.274,
+   "energy_onset": 152.025
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 154.283,
+   "suno_start": 154.339,
+   "energy_onset": 154.215
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 154.444,
+   "suno_start": 154.528,
+   "energy_onset": 154.29
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 155.189,
+   "suno_start": 154.94,
+   "energy_onset": 155.145
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 155.713,
+   "suno_start": 155.548,
+   "energy_onset": 155.665
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "ctc_start": 156.442,
+   "suno_start": 156.801,
+   "energy_onset": 156.29
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "ctc_start": 159.839,
+   "suno_start": 160.581,
+   "energy_onset": 159.685
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 160.505,
+   "suno_start": 161.105,
+   "energy_onset": 160.465
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 160.525,
+   "suno_start": 161.22,
+   "energy_onset": 160.465
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 161.211,
+   "suno_start": 161.805,
+   "energy_onset": 161.065
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 162.2,
+   "suno_start": 163.092,
+   "energy_onset": 162.135
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "ctc_start": 162.929,
+   "suno_start": 163.289,
+   "energy_onset": 162.775
+  },
+  {
+   "line": "Outside. Outside.",
+   "word": "Outside.",
+   "ctc_start": 166.336,
+   "suno_start": 166.972,
+   "energy_onset": 166.535
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 169.101,
+   "suno_start": 169.161,
+   "energy_onset": 169.05
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 169.261,
+   "suno_start": 169.382,
+   "energy_onset": 169.11
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 170.742,
+   "suno_start": 169.793,
+   "energy_onset": 170.59
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 172.623,
+   "suno_start": 170.347,
+   "energy_onset": 172.66
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "I",
+   "ctc_start": 178.894,
+   "suno_start": 178.806,
+   "energy_onset": 178.805
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "keep",
+   "ctc_start": 178.974,
+   "suno_start": 179.091,
+   "energy_onset": 178.82
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "the",
+   "ctc_start": 179.275,
+   "suno_start": 179.345,
+   "energy_onset": 179.12
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "sun",
+   "ctc_start": 179.536,
+   "suno_start": 179.502,
+   "energy_onset": 179.61
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "in",
+   "ctc_start": 179.796,
+   "suno_start": 179.814,
+   "energy_onset": 179.65
+  },
+  {
+   "line": "I keep the sun in yesterday.",
+   "word": "yesterday.",
+   "ctc_start": 179.957,
+   "suno_start": 179.987,
+   "energy_onset": 179.805
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "I",
+   "ctc_start": 183.155,
+   "suno_start": 183.126,
+   "energy_onset": 183.07
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "know",
+   "ctc_start": 183.175,
+   "suno_start": 183.228,
+   "energy_onset": 183.1
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "the",
+   "ctc_start": 183.396,
+   "suno_start": 183.459,
+   "energy_onset": 183.245
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "shape",
+   "ctc_start": 183.576,
+   "suno_start": 183.593,
+   "energy_onset": 183.425
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "of",
+   "ctc_start": 183.918,
+   "suno_start": 183.947,
+   "energy_onset": 183.765
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "outside",
+   "ctc_start": 184.078,
+   "suno_start": 184.249,
+   "energy_onset": 183.925
+  },
+  {
+   "line": "I know the shape of outside now.",
+   "word": "now.",
+   "ctc_start": 184.62,
+   "suno_start": 184.705,
+   "energy_onset": 184.47
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "My",
+   "ctc_start": 187.212,
+   "suno_start": 187.331,
+   "energy_onset": 187.205
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "own",
+   "ctc_start": 187.492,
+   "suno_start": 187.507,
+   "energy_onset": 187.465
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "eyes",
+   "ctc_start": 187.772,
+   "suno_start": 187.782,
+   "energy_onset": 187.62
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "meet",
+   "ctc_start": 188.313,
+   "suno_start": 188.328,
+   "energy_onset": 188.3
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "me",
+   "ctc_start": 188.533,
+   "suno_start": 188.596,
+   "energy_onset": 188.38
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "in",
+   "ctc_start": 188.694,
+   "suno_start": 188.76,
+   "energy_onset": 188.54
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "the",
+   "ctc_start": 188.774,
+   "suno_start": 188.867,
+   "energy_onset": 188.62
+  },
+  {
+   "line": "My own eyes meet me in the glass.",
+   "word": "glass.",
+   "ctc_start": 188.894,
+   "suno_start": 189.036,
+   "energy_onset": 188.74
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "I",
+   "ctc_start": 190.982,
+   "suno_start": 190.957,
+   "energy_onset": 190.9
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "mouth",
+   "ctc_start": 191.082,
+   "suno_start": 191.129,
+   "energy_onset": 190.93
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "the",
+   "ctc_start": 191.403,
+   "suno_start": 191.475,
+   "energy_onset": 191.25
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "word",
+   "ctc_start": 191.543,
+   "suno_start": 191.635,
+   "energy_onset": 191.44
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "against",
+   "ctc_start": 192.385,
+   "suno_start": 192.425,
+   "energy_onset": 192.345
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "the",
+   "ctc_start": 192.766,
+   "suno_start": 192.833,
+   "energy_onset": 192.615
+  },
+  {
+   "line": "I mouth the word against the glass.",
+   "word": "glass.",
+   "ctc_start": 192.886,
+   "suno_start": 193.026,
+   "energy_onset": 192.775
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "ctc_start": 195.632,
+   "suno_start": 195.631,
+   "energy_onset": 195.565
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "ctc_start": 195.992,
+   "suno_start": 196.121,
+   "energy_onset": 195.84
+  },
+  {
+   "line": "I didn't run —",
+   "word": "run",
+   "ctc_start": 200.236,
+   "suno_start": 196.589,
+   "energy_onset": 200.255
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 202.601,
+   "suno_start": 202.659,
+   "energy_onset": 202.505
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 202.721,
+   "suno_start": 202.825,
+   "energy_onset": 202.57
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 203.223,
+   "suno_start": 203.241,
+   "energy_onset": 203.07
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 203.644,
+   "suno_start": 203.789,
+   "energy_onset": 203.49
+  },
+  {
+   "line": "I didn't run —",
+   "word": "I",
+   "ctc_start": 206.751,
+   "suno_start": 206.854,
+   "energy_onset": 206.705
+  },
+  {
+   "line": "I didn't run —",
+   "word": "didn't",
+   "ctc_start": 206.931,
+   "suno_start": 207.231,
+   "energy_onset": 206.78
+  },
+  {
+   "line": "I didn't run —",
+   "word": "run",
+   "ctc_start": 208.573,
+   "suno_start": 207.688,
+   "energy_onset": 208.42
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "I",
+   "ctc_start": 209.26,
+   "suno_start": 210.055,
+   "energy_onset": 209.11
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "just",
+   "ctc_start": 209.861,
+   "suno_start": 210.248,
+   "energy_onset": 209.92
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "looked",
+   "ctc_start": 210.602,
+   "suno_start": 210.63,
+   "energy_onset": 210.595
+  },
+  {
+   "line": "I just looked outside.",
+   "word": "outside.",
+   "ctc_start": 216.589,
+   "suno_start": 211.228,
+   "energy_onset": 216.435
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "And",
+   "ctc_start": 222.431,
+   "suno_start": 222.415,
+   "energy_onset": 222.39
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "outside",
+   "ctc_start": 222.611,
+   "suno_start": 222.831,
+   "energy_onset": 222.46
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "looked",
+   "ctc_start": 223.952,
+   "suno_start": 225.736,
+   "energy_onset": 223.8
+  },
+  {
+   "line": "And outside looked back.",
+   "word": "back.",
+   "ctc_start": 226.094,
+   "suno_start": 226.189,
+   "energy_onset": 226.135
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "Relax.",
+   "ctc_start": 239.631,
+   "suno_start": 239.786,
+   "energy_onset": 239.59
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "The",
+   "ctc_start": 242.816,
+   "suno_start": 242.886,
+   "energy_onset": 242.815
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "door",
+   "ctc_start": 242.936,
+   "suno_start": 242.99,
+   "energy_onset": 242.82
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "is",
+   "ctc_start": 243.256,
+   "suno_start": 243.315,
+   "energy_onset": 243.105
+  },
+  {
+   "line": "Relax. The door is closed.",
+   "word": "closed.",
+   "ctc_start": 243.417,
+   "suno_start": 243.525,
+   "energy_onset": 243.265
+  },
+  {
+   "line": "Three forty-eight.",
+   "word": "Three",
+   "ctc_start": 249.553,
+   "suno_start": 249.705,
+   "energy_onset": 249.58
+  },
+  {
+   "line": "Three forty-eight.",
+   "word": "forty-eight.",
+   "ctc_start": 249.854,
+   "suno_start": 249.99,
+   "energy_onset": 249.7
+  }
+ ]
+}

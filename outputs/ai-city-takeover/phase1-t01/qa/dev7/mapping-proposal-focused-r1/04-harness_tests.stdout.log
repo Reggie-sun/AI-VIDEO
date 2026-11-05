@@ -1,0 +1,78 @@
+........................................................................ [ 22%]
+.................F...................................................... [ 44%]
+........................................................................ [ 66%]
+........................................................................ [ 88%]
+....................................                                     [100%]
+=================================== FAILURES ===================================
+______ test_production_policy_declares_only_complete_cross_check_coverage ______
+
+    def test_production_policy_declares_only_complete_cross_check_coverage() -> None:
+        policy = agent_harness.load_policy(POLICY_PATH)
+    
+        assert policy["checks"]["production_reader_tests"]["covered_by_check_ids"] == [
+            "production_contract_tests",
+            "cli_config_tests",
+        ]
+        for check_id in (
+            "production_state_tests",
+            "production_composition_audio_tests",
+            "production_dependency_tests",
+            "production_video_provider_tests",
+            "production_shot_router_tests",
+        ):
+            assert policy["checks"][check_id]["covered_by_check_ids"] == [
+                "production_contract_tests"
+            ]
+        for check_id in (
+            "production_review_tests",
+            "production_image_tests",
+            "provider_neutral_video_requirement_tests",
+        ):
+            assert "covered_by_check_ids" not in policy["checks"][check_id]
+    
+        python_pytest_check_ids = {
+            check_id
+            for check_id, check in policy["checks"].items()
+            if check_id != "full_tests" and "pytest" in check["argv"]
+        }
+>       assert set(policy["checks"]["full_tests"]["covers_check_ids"]) == (
+            python_pytest_check_ids
+        )
+E       AssertionError: assert {'agent_memor...n_tests', ...} == {'agent_memor...n_tests', ...}
+E         
+E         Extra items in the right set:
+E         'motionkit_tool_tests'
+E         Use -v to get more diff
+
+tests/test_agent_harness.py:1062: AssertionError
+=============================== warnings summary ===============================
+tests/test_agent_harness_canvas_data.py::test_referenced_image_bytes_are_checked_by_canonical_author[missing]
+tests/test_agent_harness_canvas_data.py::test_referenced_image_bytes_are_checked_by_canonical_author[bad_png]
+  /tmp/ai-video-harness-xhmdvvej/checkout/src/ai_video/production/reference_authoring.py:141: UserWarning: adjacent multi-shot units repeat director categories (shot_scale, camera_treatment); vary them when it improves coverage, but repetition is permitted.
+    validate_director_coverage(coverage)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 20 durations =============================
+6.25s call     tests/test_agent_harness_policy.py::test_real_pytest_duration_output_is_captured
+0.53s call     tests/test_agent_harness.py::test_repository_policy_audit_has_no_unmapped_owned_files
+0.53s call     tests/test_agent_harness.py::test_runner_timeout_terminates_descendant_processes
+0.25s call     tests/test_agent_harness.py::test_receipt_freshness_requires_complete_routing_and_execution_proof
+0.22s call     tests/test_record_ai_video_session_hook.py::test_concurrent_post_tool_callbacks_preserve_both_owned_paths
+0.21s call     tests/test_agent_harness_levels.py::test_full_receipt_requires_every_suite_and_cli_rejects_related_proof
+0.15s call     tests/test_agent_harness.py::test_ecommerce_production_job_routes_to_exact_application_suite[tests/test_production_ecommerce_job_projection.py]
+0.14s call     tests/test_agent_harness.py::test_voice_binding_owners_also_route_to_voice_regressions[src/ai_video/production/_state_commit_voice_intent.py]
+0.14s call     tests/test_agent_harness_policy.py::test_policy_exclusions_and_scope_paths_require_strict_types
+0.13s call     tests/test_agent_harness_policy.py::test_causal_expression_selects_related_boundaries_without_full_suite[tests/test_typed_causal_native_expression.py]
+0.13s call     tests/test_agent_harness.py::test_continuity_evaluator_routes_to_review_and_video_provider_suites
+0.13s call     tests/test_agent_harness.py::test_video_planner_routes_to_exact_contract_suite
+0.13s call     tests/test_agent_harness.py::test_previously_broad_fallback_paths_have_explicit_owners[.mcp.json-control_plane]
+0.12s call     tests/test_agent_harness.py::test_generation_feedback_routes_to_decision_and_provider_checks[src/ai_video/production/generation_execution.py]
+0.12s call     tests/test_docs_contract_gate.py::test_current_complete_registry_passes
+0.11s call     tests/test_agent_harness.py::test_staged_receipt_becomes_stale_when_scope_gets_unstaged_edits
+0.11s call     tests/test_agent_harness.py::test_commit_range_receipt_becomes_stale_after_new_staged_edit
+0.11s call     tests/test_agent_harness.py::test_commit_range_freshness_rejects_moved_head_ref
+
+(2 durations < 0.1s hidden.)
+=========================== short test summary info ============================
+FAILED tests/test_agent_harness.py::test_production_policy_declares_only_complete_cross_check_coverage
+1 failed, 323 passed, 2 warnings in 20.73s

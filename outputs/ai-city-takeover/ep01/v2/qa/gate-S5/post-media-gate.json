@@ -1,0 +1,64 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S5",
+  "shot_id": "ep01v2-s5",
+  "attempt_id": "iris-v2-s5-source-001",
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S5/project/state/video-generation/fetch/files/ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16.mp4",
+  "artifact_sha256": "ce189514d1189865c8cecc1a42d4d5e2b12dc83a26d5f2f44a5f71c2c1b93c16",
+  "intent": "board v2.1 S5: IRIS as a quiet observer at the window (It looked around / Eleven days); coverage camera_treatment static",
+  "source_audio_policy": "MUTE (final film uses the approved song v2; raw audio not counted)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 6.08 s, 145 frames (24 fps cadence on a 60 tbn grid), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S5/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 0.0 s, issues []",
+    "frames": "first-mid-last.jpg, half-second-sheet.jpg, face-quarter-second.jpg, face-0-1.5-3-5.9.jpg",
+    "camera_motion_profile": {
+      "tool": "OpenCV LK flow + partial affine at 960x540 (/tmp/iris-tools/motion_profile.py)",
+      "scale_per_frame_e-3": {
+        "0-1s": 0.206,
+        "1-2s": 0.451,
+        "2-3s": 0.499,
+        "3-4s": 0.487,
+        "4-5s": 0.411,
+        "5-6s": 0.855,
+        "last frames": 1.992
+      },
+      "reading": "steady very slow push for 0-5 s, then the push accelerates through the last second instead of settling"
+    },
+    "face_crop_continuity": "correlation to frame 0 falls monotonically 1.0 -> 0.70; no snap or loop; largest consecutive face diff at the last frames"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same face as ID7b/K5b (brows, freckles, nose), black hook on the visible left ear, thin red light line on the left collar, charcoal high-collar coat, low bun; opens in profile facing frame-left toward the window"
+    },
+    {
+      "requirement_id": "observer",
+      "verdict": "PASS",
+      "reason": "calm gaze stays out of the window throughout; head eases about 20 degrees from profile toward three-quarter without turning the body; lips stay closed, no speech (MCP speaking 0.0 s), hands out of frame"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "FAIL",
+      "reason": "sealed '末段平滑收稳' not met: the push accelerates through the last second (scale/frame 0.86e-3 at 5-6 s and ~2e-3 in the final frames vs 0.2-0.5e-3 before) instead of settling; also the sealed coverage treatment for S5 is static. No reflection on the glass (that part holds)"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; no subtitles, titles, text or interface added"
+    }
+  ],
+  "observations": [
+    "opening framing is a medium shot, wider than K5b's medium close-up (soft multimodal reference)",
+    "a faint 0.5 s periodic frame-difference bump (frames 12, 24, 48, 60, 72, 120, 132, 144) without visible jumps"
+  ],
+  "verdict": "FAIL",
+  "all_required_observed_pass": false,
+  "next": "stop this attempt; one bounded known-quality repair (S5r) with a fully locked camera as the approved coverage specifies",
+  "not_evaluated": [
+    "human 1.0x viewing in the assembled film",
+    "final audio (MUTE here)"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

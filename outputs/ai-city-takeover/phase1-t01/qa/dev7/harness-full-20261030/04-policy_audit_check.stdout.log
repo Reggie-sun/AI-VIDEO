@@ -1,0 +1,14 @@
+{
+  "candidate_count": 1246,
+  "docs_contract_diagnostics": [],
+  "missing_check_test_paths": [],
+  "unmapped_paths": [
+    "src/ai_video/production/dotenv_source.py",
+    "src/ai_video/production/preview_approval.py",
+    "tests/test_production_dotenv_source.py"
+  ],
+  "unreferenced_test_paths": [
+    "tests/test_production_dotenv_source.py"
+  ],
+  "unverified_paths": []
+}

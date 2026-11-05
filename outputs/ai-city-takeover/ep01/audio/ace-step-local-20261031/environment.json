@@ -1,0 +1,29 @@
+{
+  "python": "3.11.16",
+  "torch": "2.10.0+cu128",
+  "cuda_version": "12.8",
+  "device": "NVIDIA GeForce RTX 5090",
+  "compute_capability": [
+    12,
+    0
+  ],
+  "cuda_sum_test": 8128.0,
+  "torch_arches": [
+    "sm_70",
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90",
+    "sm_100",
+    "sm_120"
+  ],
+  "packages": {
+    "ace-step": "1.5.0",
+    "transformers": "4.57.6",
+    "diffusers": "0.37.1",
+    "torchaudio": "2.10.0+cu128",
+    "soundfile": "0.13.1"
+  },
+  "public_api_imports": "PASS",
+  "inference_network": "OFFLINE"
+}

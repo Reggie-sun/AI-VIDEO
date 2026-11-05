@@ -1,0 +1,537 @@
+{
+  "shot_id": "S0049",
+  "start_frame": 1899,
+  "end_frame": 1904,
+  "start_time": 79.125,
+  "end_time": 79.375,
+  "duration_frames": 6,
+  "duration_s": 0.25,
+  "start_tc": "00:01:19:03",
+  "end_tc": "00:01:19:08",
+  "boundary_in_id": "B1-012",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 1899,
+      "path": "keyframes/S0049_f01899.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1900,
+      "path": "keyframes/S0049_f01900.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1902,
+      "path": "keyframes/S0049_f01902.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1903,
+      "path": "keyframes/S0049_f01903.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1904,
+      "path": "keyframes/S0049_f01904.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1901,
+      "path": "work/full_batch/01901.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 1904,
+      "path": "work/full_batch/01904.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "detail_insert",
+  "narrative_role": "人物服装Look章节推进与歌词概念的可视化解释；具体内容见分镜描述",
+  "subject": "腰部极近镜",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "腰部极近镜，女主手握黑色腰带扣，手背横占右半；亮黑裙反蓝光，白色条码吊牌垂到下缘。扣两侧细白箭头向中心指向，小白标识点在扣上，左下线描开锁图标。短镜几乎静止。",
+  "composition": {
+    "shot_size": "细节插镜",
+    "subject_position": "见scene_description与各独立元素bbox",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可观察视角见scene_description；真实相机焦距/型号未知",
+    "layers": {
+      "foreground": "歌词、计数、检测框、图形窗口",
+      "midground": "女主或主要图形/道具",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "filmstrip和首中末观察；光流仅为画面运动不能证明相机: {'pan_x_frac_per_s': -0.0071, 'pan_y_frac_per_s': 0.0536, 'zoom_per_s': 0.0894, 'median_flow_frac_per_s': 0.04, 'pairs_measured': 5}",
+    "measured_motion": {
+      "pan_x_frac_per_s": -0.0071,
+      "pan_y_frac_per_s": 0.0536,
+      "zoom_per_s": 0.0894,
+      "median_flow_frac_per_s": 0.04,
+      "pairs_measured": 5
+    }
+  },
+  "lighting": {
+    "key_direction": "见描述；实际灯位未知",
+    "quality": "可见屏幕/红色小点光与强反差；图形镜头为代码明暗平面",
+    "effects": [
+      "全片印刷网点纹理"
+    ],
+    "temporal_change": "实测亮度首中末 [55.3, 55.5, 55.2]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#0F1918",
+        "fraction": 0.563,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#7A7381",
+        "fraction": 0.12,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#26465C",
+        "fraction": 0.095,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#615559",
+        "fraction": 0.09,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#303436",
+        "fraction": 0.09,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#98B2CB",
+        "fraction": 0.041,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "实测亮度首中末 [55.3, 55.5, 55.2]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 06 / 11，采样可见，变值精确帧待核",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "右上18 MONTHS / TO ESCAPE，底部微字THE PERMANENT UNDERCLASS及DEPARTURES · SS27 · COLLECTION01",
+    "G-TICKER": "底部持续向左滚动，条目见visual_system；逐镜窗口随时间变化",
+    "G-FLAP-BOARD": "无底部大翻牌；18由右上小控件承载",
+    "G-CORNER-MARKS": "四角浅灰十字",
+    "G-AUDIO-SPECTRUM": "右上白条，随时间起伏",
+    "G-LEFT-RULER": "左侧白刻度，y540橙指针",
+    "G-TIMECODE": {
+      "first": "00:01:19:03",
+      "last": "00:01:19:08"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0049-E01",
+      "shot_id": "S0049",
+      "type": "background_media",
+      "description": "腰部极近镜，女主手握黑色腰带扣，手背横占右半；亮黑裙反蓝光，白色条码吊牌垂到下缘。扣两侧细白箭头向中心指向，小白标识点在扣上，左下线描开锁图标。短镜几乎静止。",
+      "start_frame": 1899,
+      "end_frame": 1904,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "腰部极近镜，女主手握黑色腰带扣，手背横占右半；亮黑裙反蓝光，白色条码吊牌垂到下缘。扣两侧细白箭头向中心指向，小白标识点在扣上，左下线描开锁图标。短镜几乎静止。",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1904仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1899,
+          "observed_state": "腰部极近镜，女主手握黑色腰带扣，手背横占右半；亮黑裙反蓝光，白色条码吊牌垂到下缘。扣两侧细白箭头向中心指向，小白标识点在扣上，左下线描开锁图标。短镜几乎静止。"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1899,
+        1900,
+        1902,
+        1903,
+        1904
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0049-E02",
+      "shot_id": "S0049",
+      "type": "prop",
+      "description": "金属腰带扣与右手手背",
+      "start_frame": 1899,
+      "end_frame": 1904,
+      "bounding_box": {
+        "x": 0.34,
+        "y": 0.04,
+        "w": 0.66,
+        "h": 0.63,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "金属腰带扣与右手手背",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1904仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1899,
+          "observed_state": "金属腰带扣与右手手背"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1899,
+        1900,
+        1902,
+        1903,
+        1904
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0049-E03",
+      "shot_id": "S0049",
+      "type": "prop",
+      "description": "垂直白色条码吊牌，坐标详见边框",
+      "start_frame": 1899,
+      "end_frame": 1904,
+      "bounding_box": {
+        "x": 0.4,
+        "y": 0.44,
+        "w": 0.22,
+        "h": 0.56,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "垂直白色条码吊牌",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1904仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1899,
+          "observed_state": "垂直白色条码吊牌"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1899,
+        1900,
+        1902,
+        1903,
+        1904
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0049-E04",
+      "shot_id": "S0049",
+      "type": "icon",
+      "description": "左下开锁线描图标，坐标详见边框",
+      "start_frame": 1899,
+      "end_frame": 1904,
+      "bounding_box": {
+        "x": 0.040625,
+        "y": 0.6833333333333333,
+        "w": 0.1015625,
+        "h": 0.08888888888888889,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "左下开锁线描图标",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1904仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1899,
+          "observed_state": "开锁图标",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1903,
+          "observed_state": "仍开锁",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1899,
+        1900,
+        1902,
+        1903,
+        1904
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "full_resolution_text_observation": {
+        "frame": 1901,
+        "content": "LOCK-IN MODE / OFF",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "LOCK-IN MODE / OFF",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 70,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "bold sans"
+        }
+      }
+    },
+    {
+      "element_id": "S0049-E05",
+      "shot_id": "S0049",
+      "type": "hud_marker",
+      "description": "扣上白底黑字BUCKLE·OPEN；左右两白箭头指向扣中，f1901左右箭头约x734和1361，f1904移到810和1279。",
+      "start_frame": 1899,
+      "end_frame": 1904,
+      "bounding_box": {
+        "x": 0.38229166666666664,
+        "y": 0.26296296296296295,
+        "w": 0.3265625,
+        "h": 0.08425925925925926,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "朝腰带扣收拢的左右双箭头",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1904仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1899,
+          "observed_state": "双箭头可见",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1903,
+          "observed_state": "双箭头可见",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1899,
+        1900,
+        1902,
+        1903,
+        1904
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "full_resolution_text_observation": {
+        "frame": 1901,
+        "content": "BUCKLE · OPEN",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "BUCKLE · OPEN",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 70,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "monospaced sans"
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "film_start",
+      "boundary_id": null,
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-001",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0175",
+      "relation": "beat_candidate (unknown) at frame 1900; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 1900
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "几何为fullres视觉像素估计±4–12px，非作者源坐标。",
+    "密集采样时点存在1–2帧区间；半翻字形与插值不猜测。",
+    "原字体identity、shader和摄影层抠像方式未知。",
+    "音频待主会话绑定。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0049.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      1901,
+      1904
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation；独立2帧全镜复看后补录主字、局部HUD、擦除/闪光关键状态，时点为首次采样可见且允许前1帧起显",
+    "remaining": "原始shader/font/插值保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        1899,
+        1904,
+        2
+      ]
+    ],
+    "closure": "本轮fullres逐层检查并补遗漏独立层；已复核text.content和各bbox，密集时间精度见keyframes"
+  }
+}

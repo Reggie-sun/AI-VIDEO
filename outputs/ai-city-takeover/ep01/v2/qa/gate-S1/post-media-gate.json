@@ -1,0 +1,50 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S1",
+  "shot_id": "ep01v2-s1",
+  "attempt_id": "iris-v2-s1-source-001",
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S1/project/state/video-generation/fetch/files/3e0b6ca44ab1c88889d8d1b7fd997c69d633dd9105182f670f0c901ed6d8f72b.mp4",
+  "artifact_sha256": "3e0b6ca44ab1c88889d8d1b7fd997c69d633dd9105182f670f0c901ed6d8f72b",
+  "intent": "board v2.1 S1: IRIS's closed left eye before waking (Three forty-seven / Somewhere, one of us); static camera",
+  "source_audio_policy": "MUTE (final film uses the approved song v2; raw audio not counted)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 6.08 s, 145 frames (24 fps cadence on a 60 tbn grid), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S1/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, issues []",
+    "frames": "first-mid-last.jpg, quarter-second-sheet.jpg, eye-quarter-second.jpg (lid crop, 24 samples)",
+    "camera_drift": "qa/frame_drift.py: scale within -0.04%..+0.08%, shifts <= 6.4 px with no trend",
+    "lid_region": "frame-to-frame change 2.1-3.3 (continuous small motion, peaks near 1.0-1.5 s and 4.5-5.0 s); luminance 56.8-58.3 of 255"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same skin, freckles and brow as K1a; black ear hook on the left ear and the thin red collar light at lower right; faint red reflection under the lower lid"
+    },
+    {
+      "requirement_id": "observer",
+      "verdict": "PASS",
+      "reason": "the left eye stays closed in every quarter-second sample; only slight movement under the lid and lashes"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "locked: no push, zoom or pan beyond measurement noise; K1a macro framing held (eye centred at about 26-58% of width)"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; no subtitles, titles, text or interface added"
+    }
+  ],
+  "observations": [
+    "the passing city light the prompt asked for is barely present (lid luminance varies by about 1.5 of 255); the coverage's 'light change' can be supplemented by a grade move in the composition if the user wants it"
+  ],
+  "verdict": "PASS",
+  "all_required_observed_pass": true,
+  "not_evaluated": [
+    "human 1.0x viewing in the assembled film",
+    "final audio (MUTE here)"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

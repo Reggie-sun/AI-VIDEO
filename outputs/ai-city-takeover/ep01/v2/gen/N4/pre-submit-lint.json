@@ -1,0 +1,51 @@
+{
+ "unit": "N4",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "c64f81345b94646f38c3a25977b6199b455c89a7f73dbf502107d0ca6f368a42",
+ "compiled_prompt_sha256": "24ad649486dcef5a1a54a3437daf3d158337acf4bff5592e5571f4aa7ef72a5c",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/action/continuity-report.json",
+  "sha256": "099eda9f6c505e653cd514071265f6955db7da6599228592b4b8c5cf2fa9dbfa",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS: N4f-a (8efafcfc…) is an exact horizontal mirror of N4-a (pixel diff 0). She faces screen left with the near side being her left; the earpiece is on her left ear and the red line on the near (left) collar, matching canon, K7 and c12 S7 at 14.9-18.7 s. Space (floating panels, black background, cold floor light spots), coat, bun and lighting match K7/S7. Mirror side effects: no visible hair parting; the coat is an open lapel in side view with no visible buttoning; the raised hand becomes the far-side right hand, which the prompt does not specify; the panels are abstract with no text. None reads wrong.",
+   "handoff": "PASS: insert inside c12 S7 (14.8-18.867 s), same class as I4 (15.033-15.533) and I5 (16.900-17.433); same space and light; clear reason for the cut from close-up to wide; clean out-point as she withdraws her hand and walks on.",
+   "axis_action_camera": "PASS: in S7 her face and gaze lean to screen left; in N4f she walks and reaches to screen left, consistent, no axis jump. Spec is truck_left/left with envelope_direction 向左 and open text 向画面左侧走, matching the first frame. Action order walk-reach-touch-glow-drift-withdraw-walk is readable.",
+   "prompt_fit": "PASS: compiled-native-prompt.zh.txt matches approval prompts.N4.text and the superseded version verbatim; prepare-result compilation, resolved and execution image_bindings each have exactly one first_frame 8efafcfc… with empty media_bindings and no reference to the old 5c4f1789. The flip is user-approved (amendment quote 用翻轉版送出 (Recommended), takes.html shows N4f, preview_artifacts include N4f). The prompt says only 横移跟随 with no direction (see risks).",
+   "lint": "PASS except this report: lint.py N4 exit 2, failed=[continuity_report_ready] only; the other 10 checks (exact_image_order, audio_binding, every_input_in_user_preview, prompt_language_policy, prompt_is_user_approved_text, directed_behaviour_in_text, no_platform_label_removal, bound_output, operator_ceiling_matches_preview, cumulative_budget_left) are true; request_hash c64f8134…; spent_submits 3 of 4, ceiling 660. Re-run lint after continuity-report.json is updated.",
+   "risks": [
+    "R5: the prompt does not state the truck direction (spec truck_left); the per-shot gate must confirm the camera follows to the left, not reversed or static.",
+    "R4: side-view full-body walk with a truck may slide or fall out of sync with the camera.",
+    "R8: lips visible in profile and native_audio=true; check that the mouth does not move.",
+    "Identity during the shot: if she turns, the right ear must have no earpiece and the red line must not spread around the collar or move to the right collar.",
+    "Provenance: gen/N4/preview-approval.json user_quote is still 4 支都生成; the flip approval quote is only in the trial amendments; main session to confirm the chain is sufficient.",
+    "gen/N4/evidence/authoring-input holds orphaned evidence from the 07:23/07:25 builds, not referenced by the current request; keep it, do not delete.",
+    "Compositing: S7 carries subtitles and face-box overlays that need re-layout when N4 is inserted."
+   ],
+   "rechecked_at": "2026-11-03T12:49:50.345235+00:00",
+   "first_frame": "keyframes/raw/N4f-a.png"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 3,
+  "cumulative_ceilings": [
+   4,
+   660
+  ]
+ },
+ "new_calls": 0
+}

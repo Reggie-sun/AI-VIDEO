@@ -1,0 +1,11 @@
+{
+  "scope": "unmodified HEAD verification baseline",
+  "commit": "43c330bc9509d4e14ff91411d9cdf1b190f61810",
+  "command": "python -m pytest -p no:cacheprovider tests/test_qualification_preview_input.py::test_exact_paid_trial_capture_strict_reopens_and_cannot_promote -q --tb=short",
+  "exit_code": 1,
+  "passed": 0,
+  "failed": 1,
+  "failure": "Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]",
+  "boundary": "Existing generation fixture before qualification preview code",
+  "separate_working_dependencies": "See mixed-target.json; unrelated current working bytes are not this task ownership."
+}

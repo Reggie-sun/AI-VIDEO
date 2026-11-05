@@ -1,0 +1,25 @@
+{
+  "unit": "S8av3",
+  "checks": {
+    "exact_image_order": true,
+    "audio_binding": true,
+    "every_input_in_user_preview": true,
+    "chinese_body_only": true,
+    "directed_behaviour_in_text": true,
+    "ai_label_preserved": true,
+    "bound_output": true,
+    "operator_ceiling_matches_preview": true
+  },
+  "pass": true,
+  "request_hash": "28ea8e8dddc77351a750dfcd2ad93236362b0a53ea505c377b32b884979218cb",
+  "continuity": "hard cut from S7 into the chorus at 18.867 s; clip t=0 = master 18.40 s, film window clip 0.467-4.167 s",
+  "handoff": "S7 whisper ends -> S8a sings pass 1 alive on the balcony -> S8b pass 2 from the 3/4 angle",
+  "axis_action_camera": "A02 frontal close-up; slow even push; breath, eyes from the distance to the lens, head moving with the phrasing, the last long note opens up",
+  "prompt_fit": "pure Chinese body 509 chars; performance still bound as expression-only reference; all inputs in preview-approval-v3.json",
+  "budget": {
+    "operator_ceiling_CRD": 250,
+    "v3_ceiling_CRD": 1850,
+    "expected_cost_CRD": 165
+  },
+  "new_calls": 0
+}

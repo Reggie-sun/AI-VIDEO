@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><title>身份參考 v2 · CF</title>
+<style>
+body{margin:0;background:#0b0e12;color:#dfe5ea;font:15px/1.65 system-ui,"Noto Sans CJK TC",sans-serif}
+main{max-width:1500px;margin:28px auto 80px;padding:0 24px}
+h1{font-size:22px;font-weight:600;margin:0 0 6px} .sub{color:#8b97a3;margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+figure{margin:0} figure img{width:100%;display:block;border:1px solid #222a33;background:#111}
+figcaption{color:#8b97a3;font-size:13px;margin-top:4px}
+.canon{background:#121820;border:1px solid #222a33;padding:12px 16px;border-radius:4px;margin:12px 0 22px}
+a{color:#9fc3e6}
+</style></head><body><main>
+<h1>IRIS · 身份參考 v2（CF，已定稿 canon）</h1>
+<p class="sub">錨點：<a href="../casting/web/CF-a.jpg" target="_blank">CF-a</a>。每張都以 Codex image_gen 實際綁定錨點圖生成；中性影棚背景，只控制身份與服裝。點圖看原尺寸。 · <a href="../casting/">選角頁</a> · <a href="../../phase1-t01/review/">T01 審看</a></p>
+<div class="canon"><b>Canon（已定稿）</b>：二十七八歲歐美女性；鵝蛋臉、顴骨清晰、挺直鼻梁、自然飽滿的嘴唇；蒼白皮膚、極淡雀斑；淺灰藍色眼睛；深棕色頭髮全部後梳貼頭，腦後低髻，鬢角幾縷碎髮；<b>左耳</b>黑色耳掛裝置；炭黑色啞光技術風長大衣、高立領，<b>左側領口內嵌一道細紅色指示燈線</b>（系列唯一暖色）。下裝（補定）：黑色修身直筒長褲、黑色皮質短靴。</div>
+<div class="grid" id="g"></div>
+</main>
+<script>
+const items=[['CF-ID1','正面胸像'],['CF-ID2','左 3/4（左耳耳掛、左領紅光可見）'],['CF-ID3','右 3/4（耳掛與紅光在遠側）'],['CF-ID4','左側面'],['CF-ID5','全身正面（含下裝與鞋）'],['CF-ID6','左耳耳掛 + 領口紅光特寫'],['CF-ID7b','演唱中近景（定稿：冷靜克制）'],['CF-ID7','演唱 v1（已被 ID7b 取代，歷史）']];
+const g=document.getElementById('g');
+for(const [id,cap] of items){const f=document.createElement('figure');f.innerHTML=`<a href="web/${id}-a.jpg" target="_blank"><img src="web/${id}-a.jpg"></a><figcaption>${id} · ${cap}</figcaption>`;g.appendChild(f);}
+</script></body></html>

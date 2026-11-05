@@ -75,8 +75,8 @@
       const list = kind === "impact" ? (this.hits.hits || []).map((h) => h.t) : this.hits[kind];
       const e = this.last(list, t);
       if (e === null) return 0;
-      const dt = t - e;
-      return dt < 0 ? 0 : Math.exp(-dt / decay);
+      const dt = Math.max(0, t - e);
+      return Math.exp(-dt / decay);
     }
     // 24 fps envelope (0..1) linearly interpolated
     env(name, t) {
@@ -307,7 +307,9 @@ uniform vec3 uSpillColor; uniform float uSpill; uniform vec2 uScreenCenter; unif
 // interior mask (S2): r = interior (1) vs exterior through glass (0); sampled in plate uv
 uniform float uMaskOn; uniform sampler2D uMask;
 uniform vec4 uSweep; uniform float uSweepGain; // dir.x, dir.y, position, width
-uniform vec3 uFlowVP; // exterior forward flow: vp.x, vp.y (plate px), scale
+uniform vec3 uFlowVP; // exterior forward flow: vp.x, vp.y (plate px), scale (legacy radial zoom)
+uniform vec4 uRoad;    // ground-plane forward travel: vp.x, horizon y (plate px), speed (1/px per s), cycle (s)
+uniform float uRoadOn;
 // soft dark car bodies (output px): cx, cy, halfW, halfH ; opacity
 #define MAXB 12
 uniform int uBN; uniform vec4 uBP[MAXB]; uniform float uBA[MAXB];
@@ -323,6 +325,31 @@ vec2 outToPlate(vec2 px){
   d = mat2(c, s, -s, c) * d;
   return uView.xy + d / (uFit * uView.z);
 }
+// Sample the plate as if the camera travelled d forward over a ground (below the horizon) and a
+// mirrored ceiling plane (lamps, fog above it): depth \u221D 1/(y - yh); travelling d samples farther points.
+vec2 roadFlow(vec2 pp, float d){
+  float dy = pp.y - uRoad.y;
+  float s = sign(dy);
+  if (s < 0.0) d *= 0.5;                                  // lamps and fog above the horizon travel less
+  float a = max(abs(dy), 1.5);
+  float a2 = 1.0 / (1.0 / a + d);
+  return vec2(uRoad.x + (pp.x - uRoad.x) * (a2 / a), uRoad.y + s * a2);
+}
+vec3 exteriorTravel(vec2 pp){
+  vec3 acc = vec3(0.0);
+  for (int ph = 0; ph < 2; ph++) {
+    float f = fract(uTime / uRoad.w + 0.5 * float(ph));
+    float w = 1.0 - abs(2.0 * f - 1.0);                  // two phases always sum to 1
+    float d = f * uRoad.z * uRoad.w;
+    vec3 c = vec3(0.0);
+    for (int k = 0; k < 4; k++) {                         // shutter blur along the flow
+      float dk = d - float(k) * uRoad.z * 0.005;
+      c += toLin(sampleCR(uPlate, roadFlow(pp, max(dk, 0.0)) / uPlateSize, uPlateSize).rgb);
+    }
+    acc += w * c * 0.25;
+  }
+  return acc;
+}
 float segDist(vec2 p, vec2 a, vec2 b){ vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-4), 0.0, 1.0); return length(pa - ba * h); }
 
 void main(){
@@ -336,7 +363,9 @@ void main(){
     pp = mix(ppx, pp, interior);
   }
   vec2 uv = pp / uPlateSize;
-  vec3 col = toLin(sampleCR(uPlate, uv, uPlateSize).rgb) * uPlateGain * uPlateTint;
+  vec3 col = toLin(sampleCR(uPlate, uv, uPlateSize).rgb);
+  if (uRoadOn > 0.5 && interior < 0.999) col = mix(exteriorTravel(outToPlate(px)), col, interior);
+  col *= uPlateGain * uPlateTint;
   vec3 blurred = toLin(textureLod(uPlate, uv, 5.0).rgb);
   vec3 blurredWide = toLin(textureLod(uPlate, uv, 7.0).rgb);
 
@@ -495,13 +524,13 @@ void main(){
   vec2 px = pxCoord();
   vec2 uvb = vUv + uWeave / uRes;                          // gate weave, sub-pixel
   vec2 cd = vUv - 0.5;
-  float r2 = dot(cd, cd) * 4.0;
-  float ca = uCA * r2 * r2;
+  float r2 = dot(cd, cd) * 2.0;                             // 0 centre .. 1 corner
+  vec2 caOff = normalize(cd + 1e-6) * uCA * r2 / uRes;      // uCA px at the corners
   vec2 mis = vec2(uMisreg / uRes.x, 0.0);
   vec3 d;
-  d.r = gradeAt(uvb + cd * ca / 100.0 + mis).r;
+  d.r = gradeAt(uvb + caOff + mis).r;
   d.g = gradeAt(uvb).g;
-  d.b = gradeAt(uvb - cd * ca / 100.0 - mis).b;
+  d.b = gradeAt(uvb - caOff - mis).b;
   // additive colour halftone: light dots on dark, so a night scene keeps its colour
   vec3 ht = vec3(screenDot(px, 0.2618, uCell, d.r), screenDot(px, 1.309, uCell, d.g), screenDot(px, 0.7854, uCell, d.b));
   d = mix(d, ht * max(d * 1.35, vec3(0.0)) + d * 0.35, uHalftone);
@@ -519,6 +548,7 @@ void main(){
   float g = (vnoise(px / 1.35 + uFrame * vec2(37.1, 17.3)) - 0.5) * 1.6 + (hash12(px + uFrame * 7.7) - 0.5) * 0.7;
   float lm = luma(d);
   float amp = uGrain * (0.45 + 0.9 * (1.0 - abs(lm * 2.0 - 1.0))) * mix(1.0, uGrainOverlay, ov.a);
+  amp *= 0.45 + 0.55 * smoothstep(0.02, 0.20, lm);         // deep darks get less grain (survives platform transcodes)
   d += g * amp;
   d *= 1.0 - uFade;
   d += (hash12(px + uFrame * 3.1) - 0.5) / 255.0;           // dither before 8-bit quantisation
@@ -696,7 +726,7 @@ void main(){
     }
     ctx.restore();
   }
-  function detector(ctx, box, { t, t0, frame, label, sub = null, subColor = "#E3342F", color = "rgba(240,244,246,0.92)", s0 = 1.6, lw = 2 }) {
+  function detector(ctx, box, { t, t0, frame, label, sub = null, subColor = "#E3342F", color = "rgba(240,244,246,0.92)", s0 = 1.6, lw = 2, alpha = 1, size = 24 }) {
     if (t < t0) return;
     const k = clamp((t - t0) / 0.066);
     const e = easeOutCubic(k);
@@ -714,7 +744,7 @@ void main(){
     h += j(4);
     const L = Math.max(8, Math.min(w, h) * 0.24);
     ctx.save();
-    ctx.globalAlpha = Math.min(1, 0.3 + e);
+    ctx.globalAlpha = alpha * Math.min(1, 0.3 + e);
     ctx.strokeStyle = color;
     ctx.lineWidth = lw;
     ctx.lineCap = "square";
@@ -725,19 +755,20 @@ void main(){
       ctx.lineTo(px, py + dy * L);
     }
     ctx.stroke();
-    font(ctx, F.mono, 24, 0.5);
-    const tw = ctx.measureText(label).width + 14;
+    const th = Math.round(size * 1.33), pad = Math.round(size * 0.3);
+    font(ctx, F.mono, size, 0.5);
+    const tw = ctx.measureText(label).width + 2 * pad;
     ctx.fillStyle = color;
-    ctx.fillRect(Math.round(x), Math.round(y - 36), Math.round(tw), 32);
+    ctx.fillRect(Math.round(x), Math.round(y - th - 4), Math.round(tw), th);
     ctx.fillStyle = "rgba(8,10,12,0.95)";
-    ctx.fillText(label, Math.round(x + 7), Math.round(y - 12));
+    ctx.fillText(label, Math.round(x + pad), Math.round(y - 4 - th * 0.27));
     if (sub) {
-      font(ctx, F.monoB, 24, 1);
-      const sw = ctx.measureText(sub).width + 14;
+      font(ctx, F.monoB, size, 1);
+      const sw = ctx.measureText(sub).width + 2 * pad;
       ctx.fillStyle = subColor;
-      ctx.fillRect(Math.round(x + tw + 4), Math.round(y - 36), Math.round(sw), 32);
+      ctx.fillRect(Math.round(x + tw + 4), Math.round(y - th - 4), Math.round(sw), th);
       ctx.fillStyle = subColor.startsWith("#") ? "rgba(250,250,250,0.98)" : "rgba(8,10,12,0.95)";
-      ctx.fillText(sub, Math.round(x + tw + 11), Math.round(y - 12));
+      ctx.fillText(sub, Math.round(x + tw + 4 + pad), Math.round(y - 4 - th * 0.27));
     }
     ctx.restore();
   }
@@ -770,7 +801,7 @@ void main(){
     g.addColorStop(1, "#05080b");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W2, H2);
-    const k = clamp((t - on) / 0.18);
+    const k = clamp((t - on) / 0.06);
     if (k <= 0) {
       ctx.restore();
       return;
@@ -788,8 +819,12 @@ void main(){
     ctx.fillRect(72, 252, W2 - 144, 4);
     ctx.fillStyle = "rgba(242,245,247,0.95)";
     ctx.fillRect(72, 252, (W2 - 144) * clamp(progress), 4);
-    const dis = clamp((t - disabledAt) / 0.08);
-    const bw = 330, bh = 92, bx = W2 - 72 - bw, by = H2 - 40 - bh;
+    const dis = clamp((t - disabledAt) / 0.05);
+    if (dis > 0) {
+      ctx.fillStyle = `rgba(227,52,47,${0.95 * dis})`;
+      ctx.fillRect(72, 252, W2 - 144, 4);
+    }
+    const bw = 330, bh = 92, bx = W2 - 200 - bw, by = H2 - 40 - bh;
     ctx.lineWidth = 2;
     ctx.strokeStyle = `rgba(242,245,247,${lerp(0.9, 0.22, dis)})`;
     roundRect(ctx, bx, by, bw, bh, 14);
@@ -799,9 +834,9 @@ void main(){
     const tw = ctx.measureText(button).width;
     ctx.fillText(button, bx + (bw - tw) / 2, by + 62);
     if (dis > 0) {
-      font(ctx, F.sansR, 30, 2);
+      font(ctx, F.sans, 44, 3);
       ctx.fillStyle = `rgba(227,52,47,${0.95 * dis})`;
-      ctx.fillText("\u4E0D\u53EF\u7528", bx - 128, by + 58);
+      ctx.fillText("\u4E0D\u53EF\u7528", bx - 190, by + 62);
     }
     ctx.restore();
   }
@@ -859,10 +894,10 @@ void main(){
     uLiftAmt: 0.06,
     uHalftone: 0.1,
     uCell: 4,
-    uGrain: 0.035,
+    uGrain: 0.032,
     uGrainOverlay: 0.45,
     uVignette: 0.32,
-    uCA: 0.25,
+    uCA: 0.9,
     uMisreg: 0,
     uFlash: 0,
     uFade: 0,
@@ -957,6 +992,8 @@ void main(){
         uSweep: p.sweep || [1, 0, -9999, 1],
         uSweepGain: p.sweepGain || 0,
         uFlowVP: p.flowVP || [0, 0, 1],
+        uRoadOn: p.road ? 1 : 0,
+        uRoad: p.road || [0, 0, 0, 1],
         uTrailOn: 0,
         uBeatPos: 0,
         uLambda: 1,
@@ -1163,32 +1200,38 @@ void main(){
     const cardOn = ev(k, "s1_census");
     if (t >= cardOn) {
       const ai = rollNumber(1284180, 1284329, t, cardOn, at(1, 1), 8);
+      const sk = clamp((t - cardOn) / 0.06);
+      const g = o.createRadialGradient(330, 700, 20, 330, 700, 420);
+      g.addColorStop(0, `rgba(4,7,10,${0.42 * sk})`);
+      g.addColorStop(1, "rgba(4,7,10,0)");
+      o.fillStyle = g;
+      o.fillRect(0, 420, 900, 560);
       slam(o, (c) => {
         font(c, F.mono, 18, 3);
         c.fillStyle = "rgba(236,241,244,0.55)";
-        c.fillText("VEHICLE CENSUS \xB7 03:47", 120, 724);
+        c.fillText("VEHICLE CENSUS \xB7 03:47", 120, 604);
         c.fillStyle = "rgba(236,241,244,0.35)";
-        c.fillRect(120, 740, 640, 1);
+        c.fillRect(120, 620, 520, 1);
         font(c, F.sansR, 46, 4);
         c.fillStyle = "#E9EEF1";
-        c.fillText("\u81EA\u52A8\u9A7E\u9A76", 120, 806);
+        c.fillText("\u81EA\u52A8\u9A7E\u9A76", 120, 690);
         font(c, F.mono, 54, 0);
         c.textAlign = "right";
-        c.fillText(thousands(ai), 760, 806);
+        c.fillText(thousands(ai), 640, 690);
         c.textAlign = "left";
-      }, { t, t0: cardOn, dur: 0.06, s0: 1.05, ax: 120, ay: 780 });
+      }, { t, t0: cardOn, dur: 0.06, s0: 1.05, ax: 120, ay: 664 });
       slam(o, (c) => {
         font(c, F.sansR, 46, 4);
         c.fillStyle = "#E9EEF1";
-        c.fillText("\u4EBA\u7C7B\u9A7E\u9A76", 120, 884);
-        font(c, F.mono, 54, 0);
+        c.fillText("\u4EBA\u7C7B\u9A7E\u9A76", 120, 770);
+        font(c, F.monoB, 64, 0);
         c.fillStyle = RED;
         c.textAlign = "right";
-        c.fillText("1", 760, 884);
+        c.fillText("1", 640, 772);
         c.textAlign = "left";
         c.fillStyle = RED;
-        c.fillRect(120, 902, 18, 4);
-      }, { t, t0: ev(k, "s1_census2"), dur: 0.06, s0: 1.05, ax: 120, ay: 860 });
+        c.fillRect(120, 788, 18, 4);
+      }, { t, t0: ev(k, "s1_census2"), dur: 0.06, s0: 1.05, ax: 120, ay: 744 });
     }
     return {
       plate: "P1L",
@@ -1212,19 +1255,27 @@ void main(){
   var VP2 = [1010, 330];
   function S2(t, k) {
     const { clock, layers, t0, t1 } = k;
-    const at = (b2, be = 0, s = 0) => clock.at(b2, be, s);
+    const at = (b, be = 0, s = 0) => clock.at(b, be, s);
     const u = clamp((t - t0) / (t1 - t0));
     const rz = clock.riser(t);
     let z = 1.06 * (1 + 0.03 * easeInOutCubic(u));
     const amp = 3.5 * rz * rz;
     const shake = [2.4 * noise1(t * 0.7, 21) + amp * noise1(t * 9, 22), 1.8 * noise1(t * 0.6, 23) + amp * noise1(t * 8, 24)];
-    const view = clampView(960, 470, z);
+    const view = clampView(1e3, 470, z);
     const cm = cam(view, shake);
-    const b = clock.beat(t);
-    const beatInBar = Math.min(3, Math.floor(clock.bar(t).frac * 4 + 1e-6));
-    const sweepAge = beatInBar % 2 * b.len + b.frac * b.len;
-    const sweepPos = lerp(-300, 1500, clamp(sweepAge / 0.42));
-    const sweepGain = 0.85 * Math.exp(-sweepAge / 0.5);
+    const beats13 = [ev(k, "cut_s2"), clock.at(2, 2)];
+    const tb = beats13.reduce((m, x) => Math.abs(t - x) < Math.abs(t - m) ? x : m, beats13[0]);
+    const sweepP = (t - tb) / 0.42 + 0.5;
+    const sweepPos = lerp(-200, 2380, clamp(sweepP));
+    const sweepGain = 0.9 * Math.exp(-Math.pow((t - tb) / 0.28, 2));
+    const ahead = [];
+    [[1005, 333, 9, 0.55], [1062, 327, 6, 0.32], [962, 323, 4, 0.2]].forEach(([x, y, sep, I], i) => {
+      const bob = 0.6 * Math.sin(t * 2.1 + i * 1.7);
+      for (const dx of [-0.5, 0.5]) {
+        const [ox, oy] = cm.out([x + dx * sep, y + bob]);
+        ahead.push({ x: ox, y: oy, r: Math.max(0.9, 0.12 * sep * cm.s), I: I * 2.2, c: [1, 0.045, 0.02], refl: 0 });
+      }
+    });
     const ui = layers.ui;
     carDialog(ui.ctx, ui.c.width, ui.c.height, {
       t,
@@ -1246,7 +1297,9 @@ void main(){
       fit: FIT,
       shake,
       mask: "P2Lmask",
-      flowVP: [VP2[0], VP2[1], 1 + 0.1 * u],
+      flowVP: [VP2[0], VP2[1], 1],
+      road: [1005, 318, 65e-4, 1],
+      lights: packLights(ahead),
       sweep: [0.35, 0.94, sweepPos, 150],
       sweepGain,
       fogA: [0.1, 6e-3, 6, 0],
@@ -1263,20 +1316,22 @@ void main(){
     const { clock, frame, layers, data, t0 } = k;
     const at = (b2, be = 0, s = 0) => clock.at(b2, be, s);
     const dt = t - t0;
-    let z = lerp(1.1, 1.03, easeInOutCubic(clamp(dt / (DURATION - t0))));
+    const tStill = clock.at(4, 3);
+    let z = lerp(1.1, 1.03, easeInOutCubic(clamp((t - t0) / (tStill - t0))));
     z *= 1 + 0.06 * impactKick(dt);
     const view = clampView(836, 520, z);
     const cm = cam(view);
     const b = clock.beat(t);
     const beatPos = b.idx + easeOutCubic(clamp(b.frac / 0.35));
     const settleStart = t0 + 5 / FPS;
+    const takeoverAt = ev(k, "s3_takeover");
     const e = layers.emit.ctx;
     const LAMBDA = 110, DASH = 58;
     let hero = null;
     const bpRef = clock.beat(t0 + b.len).pos;
     data.paths.paths.forEach((path, i) => {
       const isHero = path.id === "f";
-      const settle = (isHero ? 1 : 0.5) * b.len;
+      const settle = isHero ? takeoverAt - settleStart : 0.5 * b.len;
       const chaos = 1 - easeInOutCubic(clamp((t - settleStart) / settle));
       const pts = path.points, arc = path.arc, len = arc[arc.length - 1];
       const at_s = (s) => {
@@ -1305,29 +1360,41 @@ void main(){
       [{ text: "AERIAL \xB7 CAM 01" }, { text: "\u73AF\u57CE\u7ACB\u4EA4", family: F.sansR, size: 22 }],
       [{ text: `03:48:${String(Math.max(0, Math.floor(dt))).padStart(2, "0")}` }]
     ]);
-    if (hero && t >= t0 + b.len * 1) {
+    const release = 1 - clamp((t - ev(k, "s3_time")) / 0.2);
+    if (hero && t >= ev(k, "s3_box") && release > 0) {
       const conf = (0.96 + 0.03 * hash2(frame, 9)).toFixed(2);
-      detector(f, [hero[0] - 44, hero[1] - 30, 88, 60], { t, t0: t0 + b.len * 1, frame, label: `car ${conf}`, sub: "AI", subColor: "rgba(240,244,246,0.92)" });
+      const flipped = t >= takeoverAt;
+      detector(f, [hero[0] - 52, hero[1] - 36, 104, 72], {
+        t,
+        t0: ev(k, "s3_box"),
+        frame,
+        label: `car ${conf}`,
+        sub: flipped ? "AI" : "HUMAN",
+        subColor: flipped ? "rgba(240,244,246,0.92)" : RED,
+        alpha: release,
+        size: 38
+      });
     }
     const o = layers.overlay.ctx;
+    const zero = frame >= Math.ceil(takeoverAt * FPS - 1e-6);
     slam(o, (c) => {
       font(c, F.sansR, 48, 6);
       c.fillStyle = "#E9EEF1";
       c.fillText("\u4EBA\u7C7B\u9A7E\u9A76", 124, 300);
       font(c, F.sans, 300, 0);
-      c.fillStyle = "#F4F6F8";
-      c.fillText("0", 108, 590);
+      c.fillStyle = zero ? "#F4F6F8" : RED;
+      c.fillText(zero ? "0" : "1", 108, 590);
     }, { t, t0, dur: 0.05, s0: 1.16, ax: 120, ay: 440, ghosts: 2 });
-    const tc = clamp((t - ev(k, "s3_time")) / 0.25);
+    const tc = clamp((t - ev(k, "s3_time")) / 0.06);
     if (tc > 0) {
       o.save();
       o.globalAlpha = tc;
-      font(o, F.mono, 34, 4);
-      o.fillStyle = "rgba(236,241,244,0.82)";
-      o.fillText("03:48", 128, 652);
+      font(o, F.mono, 56, 4);
+      o.fillStyle = "rgba(236,241,244,0.86)";
+      o.fillText("\xB7 03:48", 300, 588);
       o.restore();
     }
-    const mis = 4 * Math.max(0, 1 - dt / (3 / FPS));
+    const mis = 0;
     return {
       plate: "P3L",
       view,
@@ -1336,14 +1403,14 @@ void main(){
       fogB: [0.1, 8e-3, -10, 1],
       fogTint: [0.055, 0.07, 0.092],
       fogLift: 0.12,
-      emitGain: 2 + 0.4 * clock.pulse("kick", t, 0.12),
+      emitGain: 2 + 0.9 * clock.pulse("kick", t, 0.12),
       bloomThreshold: 1,
       feedGlow: 0.1,
       overlayGlow: 0.05,
       grade: {
         uMisreg: mis,
         uHalftone: 0.1 + 0.25 * Math.max(0, 1 - dt / (4 / FPS)),
-        uFlash: frame === Math.ceil(t0 * FPS - 1e-6) ? 0.06 : 0,
+        uFlash: frame === Math.ceil(t0 * FPS - 1e-6) ? 0.1 : 0,
         uWeave: [(hash2(frame, 13) - 0.5) * 0.5, (hash2(frame, 14) - 0.5) * 0.5]
       }
     };

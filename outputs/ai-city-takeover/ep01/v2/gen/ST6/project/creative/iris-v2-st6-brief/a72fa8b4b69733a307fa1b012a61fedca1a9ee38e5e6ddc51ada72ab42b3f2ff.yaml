@@ -1,0 +1,47 @@
+artifact_id: iris-v2-st6-brief
+audience: 中文短视频观众
+constraints:
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持
+- 同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由认可的首帧承担）
+- 她用手把机柜门慢慢推上，门缝里的红光越来越窄直到完全熄灭，她垂着眼看着那道门缝，嘴唇自然闭合
+- 摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图
+- 画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡
+content_hash: a72fa8b4b69733a307fa1b012a61fedca1a9ee38e5e6ddc51ada72ab42b3f2ff
+creation_receipt_id: iris-v2-st6-authoring
+format: 1920×1080 30fps horizontal source
+language: zh
+objective: 分镜 v2.1 S9a 五秒源片
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 27ee04d49e9d6db576480affa8fe516020884b4ed2b998d6b593c68a3dec0701
+  kind: user_input
+  reference: evidence/authoring-input/27ee04d49e9d6db576480affa8fe516020884b4ed2b998d6b593c68a3dec0701.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: adc608edc621f8ecbb25ff93153d331291bb1de806132b2267dd08192c4c4bd8
+  kind: user_input
+  reference: evidence/authoring-input/adc608edc621f8ecbb25ff93153d331291bb1de806132b2267dd08192c4c4bd8.json
+- content_hash: 9776d16f5243933e581e47d66328193824ba102a45a9e4c42a5da273b62d3316
+  kind: user_input
+  reference: evidence/authoring-input/9776d16f5243933e581e47d66328193824ba102a45a9e4c42a5da273b62d3316.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json
+title: IRIS EP01 v2 ST6 source

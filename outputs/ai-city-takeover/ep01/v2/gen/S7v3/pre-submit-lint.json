@@ -1,0 +1,25 @@
+{
+  "unit": "S7v3",
+  "checks": {
+    "exact_image_order": true,
+    "audio_binding": true,
+    "every_input_in_user_preview": true,
+    "chinese_body_only": true,
+    "directed_behaviour_in_text": true,
+    "ai_label_preserved": true,
+    "bound_output": true,
+    "operator_ceiling_matches_preview": true
+  },
+  "pass": true,
+  "request_hash": "9109534dc78f261229873cc12c873c40b042a314ac5edc84b1b2c693cdbf897b",
+  "continuity": "hard cut at 14.8 s into the whisper; no carried motion",
+  "handoff": "S6 frozen racks -> S7 cache room, eyes follow a pane and come back to the lens -> S8a chorus",
+  "axis_action_camera": "frontal, locked camera; eyes follow a pane to frame-left then return",
+  "prompt_fit": "pure Chinese body 446 chars; performance still bound as expression-only reference; all inputs in preview-approval-v3.json",
+  "budget": {
+    "operator_ceiling_CRD": 250,
+    "v3_ceiling_CRD": 1850,
+    "expected_cost_CRD": 198
+  },
+  "new_calls": 0
+}

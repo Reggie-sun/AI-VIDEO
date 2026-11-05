@@ -1,0 +1,48 @@
+artifact_id: iris-v2-s8ar-storyboard
+beats:
+- beat_id: chorus-1
+  narrative_intent: 分镜 v2.1 S8ar，由最终剪辑切接
+  scene_id: balcony
+  shot_ids:
+  - ep01v2-s8a
+content_hash: 24cd7dde09c99392a7cd86c372f3f628bfc6ff555046d7c47dd0b0dc42945fe0
+creation_receipt_id: iris-v2-s8ar-authoring
+revision: 1
+schema_version: '2.0'
+source_provenance:
+- content_hash: 686412c6d7dad23aa793ebf00bb773f6489407c1431dca10e010b0ff8153c375
+  kind: user_input
+  reference: evidence/authoring-input/686412c6d7dad23aa793ebf00bb773f6489407c1431dca10e010b0ff8153c375.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 7422bd29fdb96ce2fbe220fff5c6986473a1e32d77d5f6852e3aaf61eef09aa9
+  kind: user_input
+  reference: evidence/authoring-input/7422bd29fdb96ce2fbe220fff5c6986473a1e32d77d5f6852e3aaf61eef09aa9.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 1343541a5c788280c4b167a25558cb41314fc103354827726a31e67f43ee4310
+  kind: user_input
+  reference: evidence/authoring-input/1343541a5c788280c4b167a25558cb41314fc103354827726a31e67f43ee4310.json
+- content_hash: 46be94fa28a58b224668bc74befb5f6392a4f1903d744ea17759b64028b1dc66
+  kind: user_input
+  reference: evidence/authoring-input/46be94fa28a58b224668bc74befb5f6392a4f1903d744ea17759b64028b1dc66.json
+- content_hash: 41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5
+  kind: user_input
+  reference: evidence/authoring-input/41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be
+  kind: user_input
+  reference: evidence/authoring-input/bfb81aa7dc7cd63684ee8346383c36ff02fee3df0153e0fcbd40cb0251f099be.json
+- content_hash: ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc
+  kind: user_input
+  reference: evidence/authoring-input/ef1dddaecca80b53223e09fe58ea59f6c639aaa6289edaf1480fad0e9aa0dfbc.json

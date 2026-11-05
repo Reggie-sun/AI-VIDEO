@@ -1,0 +1,31 @@
+{
+  "provider_preview": {
+    "resolved_generation_hash": "ed3cf57ca7ce0c6a717936d5774eb60f96cc7c5acbb1ebca0f95fd0f32c3eca1",
+    "execution_kind": "remote",
+    "billing_kind": "metered",
+    "estimated_cost_upper_bound_microunits": 1500000000,
+    "currency": "CRD",
+    "destination": "https://jimeng.jianying.com",
+    "egress_item_ids": [
+      "prompt",
+      "municipal-board-v2"
+    ],
+    "preview_fingerprint": "8391247e08b6bff2b8902d8bc558c9f00319acfadb677ab3994ae17edfca3478"
+  },
+  "egress_items": [
+    {
+      "item_id": "prompt",
+      "sha256": "b5ff948253dbd71f79b824dab3ce02293a927c025ef1bc2727b7f446274f8622",
+      "size_bytes": 1340,
+      "mime_type": "text/plain",
+      "purpose": "prompt"
+    },
+    {
+      "item_id": "municipal-board-v2",
+      "sha256": "1509083877457f82b02f8ef471353ade303c21b997c913f0d6640c812c76c177",
+      "size_bytes": 2433989,
+      "mime_type": "image/png",
+      "purpose": "reference"
+    }
+  ]
+}

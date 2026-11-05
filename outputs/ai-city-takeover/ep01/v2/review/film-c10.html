@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8">
+<title>IRIS 01 · Looked Outside · 成片 c10（與 c1 並排）</title>
+<style>
+ :root { --bg:#0a0c10; --panel:#11141b; --line:#1f2430; --txt:#dfe3ea; --dim:#8b93a3; --red:#e5484d; --ok:#9fd3a8; }
+ body { background:var(--bg); color:var(--txt); font:15px/1.6 system-ui,"Noto Sans CJK TC","Noto Sans CJK SC",sans-serif; margin:0; padding:28px 40px 60px; }
+ h1 { font-size:22px; font-weight:600; margin:0 0 4px; } h2 { font-size:18px; font-weight:600; margin:28px 0 8px; }
+ .dim { color:var(--dim); font-size:13px; } .row { display:flex; gap:12px; flex-wrap:wrap; } figure { margin:8px 0; }
+ video { width:min(900px,45vw); background:#000; display:block; } figcaption { color:var(--dim); font-size:13px; }
+ table { border-collapse:collapse; width:100%; max-width:1600px; } td, th { border-bottom:1px solid var(--line); padding:5px 8px; text-align:left; vertical-align:top; }
+ th { color:var(--dim); font-weight:500; } .box { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 16px; max-width:1580px; }
+ td.up { color:#ffb35c; } td.down { color:#8fc3ff; } td.same { color:var(--dim); } button { font-size:15px; padding:6px 14px; margin:6px 8px 0 0; }
+ img { max-width:1600px; width:100%; border:1px solid var(--line); }
+</style>
+<h1>IRIS 01 · Looked Outside — 成片 c10（待你審看）</h1>
+<div class="dim">1920×1080 · 30fps · 30.5 s · 整合響度 −14.2 LUFS、峰值 −1.0 dBFS · 交付檔 <code>renders/IRIS-EP01-Looked-Outside-v2-c10.mp4</code>（SHA 39b1349aa3b7…）</div>
+<h2>c9 與 c10 並排（左 c9、右 c10；聲音是 c10）</h2>
+<video controls preload="auto" src="../renders/review/c9-vs-c10.mp4" style="width:min(1600px,96vw)"></video>
+<h2>副歌片段 17.5–26.5 s（正常速度、有聲）</h2>
+<video controls preload="auto" src="../renders/review/c10-chorus-17.5-26.5.mp4" style="width:min(1600px,96vw)"></video>
+<h2>c10 成片（正常速度、有聲）</h2>
+<video controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c10.mp4" style="width:min(1600px,96vw)"></video>
+<h2>c1 與 c10 並排</h2>
+<div><button onclick="both('play')">兩支一起從頭播</button><button onclick="both('pause')">暫停</button><span class="dim">（聲音來自右邊的 c10；兩支用同一首歌，左邊靜音）</span></div>
+<div class="row">
+ <figure><video id="v1" muted controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c1.mp4"></video><figcaption>c1（你較滿意節奏的那一版）</figcaption></figure>
+ <figure><video id="v3" controls preload="auto" src="../renders/IRIS-EP01-Looked-Outside-v2-c10.mp4"></video><figcaption>c10</figcaption></figure>
+</div>
+<div class="dim">也可以看合成好的並排檔 <code>renders/review/c1-vs-c10.mp4</code>（左 c1、右 c10，各 960×540，聲音是 c10）：</div>
+<video controls preload="metadata" src="../renders/review/c1-vs-c10.mp4" style="width:min(1600px,96vw)"></video>
+<script>
+const a = document.getElementById('v1'), b = document.getElementById('v3');
+function both(k) { if (k === 'play') { a.currentTime = 0; b.currentTime = 0; a.play(); b.play(); } else { a.pause(); b.pause(); } }
+b.addEventListener('seeked', () => { if (Math.abs(a.currentTime - b.currentTime) > 0.05) a.currentTime = b.currentTime; });
+b.addEventListener('pause', () => a.pause()); b.addEventListener('play', () => { a.currentTime = b.currentTime; a.play(); });
+</script>
+
+<h2>這版改了什麼（相對你剛看的 c9）</h2>
+<div class="box"><ul><li><b>鏡頭從 12 個變成 21 個</b>：每個新鏡頭都對準它在講的那個字，不是為了切而切。</li><li><b>7.1 s「misconfigured」→ 資訊圖</b>：研究模型 → DNS 解析器 → 互聯網。唱到這個字時解析器變紅、標「配置錯誤」，本該關著的那條路被紅線打通。</li><li><b>9.73 s「It reached the internet」→ 城市</b>：紅色探針從窗邊穿進城市，幾條連線碰到亮燈的樓，標「有限聯網」，句子唱完就收回。</li><li><b>12.1 s「Eleven days」→ 滿版大字</b>：巨大的數字從 1 數到 11，配上紅色「天」，壓在停擺的機櫃上。後面 S6 固定顯示 D+11。</li><li><b>副歌歌詞改用作者的 stack 版式</b>：大字一行一個字、堆在左邊，不壓臉，唱到哪個字就亮哪個字，中文在下面。</li><li><b>副歌插入鏡頭</b>：第一遍唱到「looked」切到她的眼睛特寫（S1 睜開的那隻眼），「outside」切回她唱；第二遍唱到「looked」切到 S5 那扇遠窗亮起紅光的特寫，「outside」切回她。切回來時鏡頭運動接得上，不會重新起步。</li><li><b>29.13 s「through the」→ 她的最後一眼</b>：S7 結尾那個帶一點笑、看著鏡頭的表情（你說可以的那段），再回到晶片和 03:48。</li><li><b>其他</b>：歌、數字人的表演、S7、識別框、系列畫框、剪點轉場都照舊。花費 0，全部用已認可的素材和程式圖形。</li></ul></div>
+
+<h2>節奏：每小節畫面動態（c1 對 c10）</h2>
+<div class="dim">畫面動態＝qa.py 每小節平均幀差（192×108 灰階，含剪點）；音樂＝母帶每小節 RMS · 中頻包絡（副歌約 0.35、其他約 0.18）。橘色＝c10 比 c1 動，藍色＝比 c1 靜。</div>
+<table><tr><th>小節</th><th>時間 (s)</th><th>段落</th><th>音樂</th><th>c1</th><th>c10</th><th>差</th><th>為什麼</th></tr><tr><td>1</td><td>0.04–1.92</td><td>開場</td><td>-12.8 dB · 0.17</td><td>0.91</td><td>1.98</td><td class=up>+1.08</td><td>S1v3 開頭有一道車燈光掃過下臉頰（0.1–0.8 s），同 c3/c4</td></tr><tr><td>2</td><td>1.92–3.82</td><td>開場</td><td>-14.0 dB · 0.18</td><td>1.99</td><td>3.35</td><td class=up>+1.36</td><td>睜眼；2.87 s 切到 P7 靜圖（c4 這裡是 A01-v2 影片）</td></tr><tr><td>3</td><td>3.82–5.72</td><td>主歌</td><td>-12.9 dB · 0.18</td><td>2.96</td><td>2.76</td><td class=down>-0.20</td><td>S2 靜圖緩推；4.8 s 接 S3，同 c1</td></tr><tr><td>4</td><td>5.72–7.63</td><td>主歌</td><td>-13.0 dB · 0.19</td><td>3.02</td><td>2.74</td><td class=down>-0.28</td><td>S3 → 7.1 s 資訊圖</td></tr><tr><td>5</td><td>7.63–9.53</td><td>主歌</td><td>-14.1 dB · 0.17</td><td>1.84</td><td>1.81</td><td class=same>-0.03</td><td>S4 門縫 → 9.73 s 城市與連線</td></tr><tr><td>6</td><td>9.53–11.44</td><td>主歌</td><td>-13.2 dB · 0.18</td><td>2.13</td><td>3.02</td><td class=up>+0.89</td><td>城市連線</td></tr><tr><td>7</td><td>11.44–13.35</td><td>主歌</td><td>-13.4 dB · 0.18</td><td>1.94</td><td>2.95</td><td class=up>+1.02</td><td>S5 → 12.1 s「11 天」大字</td></tr><tr><td>8</td><td>13.35–15.26</td><td>主歌</td><td>-14.1 dB · 0.18</td><td>3.11</td><td>2.25</td><td class=down>-0.85</td><td>S7v3，同 c3/c4</td></tr><tr><td>9</td><td>15.26–17.16</td><td>主歌</td><td>-14.0 dB · 0.17</td><td>5.79</td><td>1.71</td><td class=down>-4.09</td><td>同上</td></tr><tr><td>10</td><td>17.16–19.06</td><td>主歌</td><td>-14.2 dB · 0.22</td><td>3.39</td><td>2.61</td><td class=down>-0.77</td><td>S7v3 結尾看鏡頭；19.03 s impact 的第一幀落在這小節尾</td></tr><tr><td>11</td><td>19.06–20.98</td><td>副歌</td><td>-14.2 dB · 0.36</td><td>0.84</td><td>3.24</td><td class=up>+2.40</td><td>副歌：數字人 OH-B 唱＋識別框＋進入 impact＋punch</td></tr><tr><td>12</td><td>20.98–22.87</td><td>副歌</td><td>-15.1 dB · 0.38</td><td>1.78</td><td>4.80</td><td class=up>+3.02</td><td>副歌：stack 歌詞；21.37 s 眼睛特寫，21.87 s 切回她</td></tr><tr><td>13</td><td>22.87–24.78</td><td>副歌</td><td>-14.4 dB · 0.38</td><td>0.84</td><td>3.05</td><td class=up>+2.21</td><td>副歌：窗前 K5＋識別框＋punch</td></tr><tr><td>14</td><td>24.78–26.68</td><td>副歌</td><td>-14.3 dB · 0.34</td><td>1.63</td><td>3.63</td><td class=up>+1.99</td><td>副歌：24.73 s 遠窗特寫，25.17 s 切回她，25.9 s 接 S9a</td></tr><tr><td>15</td><td>26.68–28.58</td><td>尾段</td><td>-13.4 dB · 0.20</td><td>1.71</td><td>1.71</td><td class=same>+0.00</td><td>同 c1</td></tr><tr><td>16</td><td>28.58–30.48</td><td>尾段</td><td>-13.3 dB · 0.16</td><td>1.80</td><td>2.90</td><td class=up>+1.10</td><td>29.13 s 她的最後一眼，29.73 s 回到晶片</td></tr></table>
+
+<h2>QA（motion-kit/tools/qa.py）</h2>
+<div class="box"><ul>
+ <li>剪點 20/20 在預期幀；圖形與動效時機 15/15 在 ±1 幀內（副歌 impact 依設計早一幀）。</li>
+ <li>閃爍每秒最多 1 次（上限 3）；頻閃格 0；單幀突跳 0；離群幀 0。</li>
+ <li>每個剪點前後 −6／−1／0／+6 幀的聯繫圖：<code>qa/film-c10/cuts.jpg</code>。</li>
+</ul></div>
+<img src="../qa/film-c10/cuts.jpg" alt="cuts">
+
+<h2>還沒驗證、要你判斷的</h2>
+<div class="box"><ul><li>倉庫的拼接 Gate（verify-assembly）還接不上 motion-kit 合成，所以接點<b>沒經過 Harness 驗證</b>，這是一部審看片。</li><li>OH-B 的逐鏡檢查原判 FAIL，紀錄照留（<code>trial/omnihuman/post-media-gate.json</code>）。嘴型和背景你已經說可以。其餘照實列：約 19.2 s 起臉變得較光滑、雀斑變淡；第二句中段（約 20.8–21.9 s）嘴幾乎停住；約 21.98 s 下排牙有幾格糊掉；鏡頭會小幅漂移；紅邊面板下多一顆光點。</li><li>進副歌那一下（18.87 s），OH-B 是低頭往下看，S7 結尾則是看著鏡頭，視線會斷一下；約 19.2 s 她才抬眼看鏡頭。</li><li>新增的插入鏡頭都用已認可的素材：眼睛是 K1b，遠窗是 K5b 局部，她的最後一眼是 S7v3，城市是 A01v2 畫面裡只有天際線的那一塊（看不到陽台和人）。</li><li>這一版把副歌歌詞從小字幕換成大字堆疊；如果覺得太搶，可以只在某幾句用。</li><li>聲音我沒辦法聽；唱得像不像、裝飾會不會太多，以你看、聽為準。</li></ul></div>
+</html>

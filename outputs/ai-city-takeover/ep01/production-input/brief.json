@@ -1,0 +1,36 @@
+{
+  "artifact_id": "iris-ep01-brief",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "6a06c0c667feaa62e52cbbfe55f5106fd71e8f3d717daf0a33c4d0b51b21cfdd",
+  "creation_receipt_id": "director-draft:iris-ep01:20261030",
+  "source_provenance": [
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/ep01/lyrics-v1.md",
+      "content_hash": "0489e1606ed8a9337a3345dfc244ca9eb3c5cf857c33d74c6c0e6e3c8d8416a3"
+    },
+    {
+      "kind": "imported",
+      "reference": "outputs/ai-city-takeover/series/BIBLE.md",
+      "content_hash": "73bafc509866ee32063feca204dd22e4ed49d4734a301461905d1dbf31d312b5"
+    },
+    {
+      "kind": "user_input",
+      "reference": "outputs/ai-city-takeover/ep01/production-input/reference-approval.txt",
+      "content_hash": "a2b86dc6a00a87de7721f3c5fb016a0b0fc0239d398403825c27dbfb9308e26e"
+    }
+  ],
+  "title": "IRIS 01 — Looked Outside",
+  "objective": "冷静的英文歌唱新闻，保留完整歌词、事实范围、人物与电影化视觉一致性。",
+  "audience": "中文短视频观众",
+  "format": "横版16:9，25–30秒，1920×1080，30fps",
+  "language": "en",
+  "constraints": [
+    "英文逐字字幕与简中译句；词时序待实际歌曲，不造时间戳",
+    "03:47是IRIS虚构系列时间，不是事件时间",
+    "有限联网；11天暂停限相关最强研究工作；CPU缓存是另一项授权红队测试",
+    "蓝黑/钢蓝，红色为唯一暖色；不生成画面文字",
+    "歌曲、真实对嘴、参考认可与原有Production Gate不由草案代签"
+  ]
+}

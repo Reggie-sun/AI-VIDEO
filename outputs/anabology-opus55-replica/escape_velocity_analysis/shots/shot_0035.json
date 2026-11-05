@@ -1,0 +1,960 @@
+{
+  "shot_id": "S0035",
+  "start_frame": 1320,
+  "end_frame": 1363,
+  "start_time": 55.0,
+  "end_time": 56.8333,
+  "duration_frames": 44,
+  "duration_s": 1.8333,
+  "start_tc": "00:00:55:00",
+  "end_tc": "00:00:56:19",
+  "boundary_in_id": "B0-034",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 1320,
+      "path": "keyframes/S0035_f01320.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1331,
+      "path": "keyframes/S0035_f01331.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1342,
+      "path": "keyframes/S0035_f01342.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1353,
+      "path": "keyframes/S0035_f01353.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1363,
+      "path": "keyframes/S0035_f01363.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末已视觉核对；密集小字详核待完成"
+    },
+    {
+      "frame": 1341,
+      "path": "work/full_batch/01341.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 1363,
+      "path": "work/full_batch/01363.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "character_plate",
+  "narrative_role": "人物服装Look章节推进与歌词概念的可视化解释；具体内容见分镜描述",
+  "subject": "女主侧身站在白色汽车前",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "女主侧身站在白色汽车前，头部朝镜头，头后金黄与红色烟火火星横飞；汽车白机盖占左中，右侧留歌词和黑色诊断面板。开头左上放射状白太阳图形退出，Look05逐字加到Our Waymo，结尾红粉漏光增强。",
+  "composition": {
+    "shot_size": "人物/环境，见分镜描述",
+    "subject_position": "见scene_description与各独立元素bbox",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可观察视角见scene_description；真实相机焦距/型号未知",
+    "layers": {
+      "foreground": "歌词、计数、检测框、图形窗口",
+      "midground": "女主或主要图形/道具",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "filmstrip和首中末观察；光流仅为画面运动不能证明相机: {'pan_x_frac_per_s': -0.009, 'pan_y_frac_per_s': 0.0813, 'zoom_per_s': 0.1332, 'median_flow_frac_per_s': 0.0557, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": -0.009,
+      "pan_y_frac_per_s": 0.0813,
+      "zoom_per_s": 0.1332,
+      "median_flow_frac_per_s": 0.0557,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "见描述；实际灯位未知",
+    "quality": "可见屏幕/红色小点光与强反差；图形镜头为代码明暗平面",
+    "effects": [
+      "全片印刷网点纹理"
+    ],
+    "temporal_change": "实测亮度首中末 [97.8, 68.2, 82.8]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#0A0B08",
+        "fraction": 0.379,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#2C2823",
+        "fraction": 0.188,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#E0DFE2",
+        "fraction": 0.175,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#63504A",
+        "fraction": 0.089,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#937F7A",
+        "fraction": 0.086,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#BCB1AF",
+        "fraction": 0.084,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "实测亮度首中末 [97.8, 68.2, 82.8]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 05 / 11，采样可见，变值精确帧待核",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "右上18 MONTHS / TO ESCAPE，底部微字THE PERMANENT UNDERCLASS及DEPARTURES · SS27 · COLLECTION01",
+    "G-TICKER": "底部持续向左滚动，条目见visual_system；逐镜窗口随时间变化",
+    "G-FLAP-BOARD": "无底部大翻牌；18由右上小控件承载",
+    "G-CORNER-MARKS": "四角浅灰十字",
+    "G-AUDIO-SPECTRUM": "右上白条，随时间起伏",
+    "G-LEFT-RULER": "左侧白刻度，y540橙指针",
+    "G-TIMECODE": {
+      "first": "00:00:55:00",
+      "last": "00:00:56:19"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0035-E01",
+      "shot_id": "S0035",
+      "type": "background_media",
+      "description": "女主侧身站在白色汽车前，头部朝镜头，头后金黄与红色烟火火星横飞；汽车白机盖占左中，右侧留歌词和黑色诊断面板。开头左上放射状白太阳图形退出，Look05逐字加到Our Waymo，结尾红粉漏光增强。",
+      "start_frame": 1320,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "女主侧身站在白色汽车前，头部朝镜头，头后金黄与红色烟火火星横飞；汽车白机盖占左中，右侧留歌词和黑色诊断面板。开头左上放射状白太阳图形退出，Look05逐字加到Our Waymo，结尾红粉漏光增强。",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1320,
+          "observed_state": "女主侧身站在白色汽车前，头部朝镜头，头后金黄与红色烟火火星横飞；汽车白机盖占左中，右侧留歌词和黑色诊断面板。开头左上放射状白太阳图形退出，Look05逐字加到Our Waymo，结尾红粉漏光增强。"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1320,
+        1331,
+        1342,
+        1353,
+        1363
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0035-E02",
+      "shot_id": "S0035",
+      "type": "prop",
+      "description": "左后白车车头及右侧车门",
+      "start_frame": 1320,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0.05,
+        "y": 0.22,
+        "w": 0.9,
+        "h": 0.75,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "左后白车车头及右侧车门",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1320,
+          "observed_state": "左后白车车头及右侧车门"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1320,
+        1331,
+        1342,
+        1353,
+        1363
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0035-E03",
+      "shot_id": "S0035",
+      "type": "particle",
+      "description": "人物头后横向散射的金白烟火星",
+      "start_frame": 1320,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 0.98,
+        "h": 0.43,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "人物头后横向散射的金白烟火星",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1320,
+          "observed_state": "人物头后横向散射的金白烟火星"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1320,
+        1331,
+        1342,
+        1353,
+        1363
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0035-E04",
+      "shot_id": "S0035",
+      "type": "deco_graphic",
+      "description": "左上白色放射状日轮退出",
+      "start_frame": 1320,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0.01,
+        "y": 0.03,
+        "w": 0.28,
+        "h": 0.5,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "左上白色放射状日轮退出",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1320,
+          "observed_state": "放射图实白",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1322,
+          "observed_state": "残留很淡",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1324,
+          "observed_state": "消失",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1320,
+        1331,
+        1342,
+        1353,
+        1363
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0035-E05",
+      "shot_id": "S0035",
+      "type": "text_caption",
+      "description": "右上逐词歌词，坐标详见边框",
+      "start_frame": 1326,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0.7291666666666666,
+        "y": 0.2574074074074074,
+        "w": 0.21875,
+        "h": 0.09074074074074075,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "右上逐词歌词",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1326,
+          "observed_state": "Look淡入",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1328,
+          "observed_state": "Look橙",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1332,
+          "observed_state": "05.",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1350,
+          "observed_state": "Our",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1354,
+          "observed_state": "Waymo",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1331,
+        1342,
+        1353,
+        1363
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "Look 05. Our Waymo",
+        "transcription_status": "主字可读，小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "font_candidates": [],
+          "cap_height_px": 40,
+          "visual_family": "bold sans",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "line_height_px": 64,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "bold"
+        }
+      }
+    },
+    {
+      "element_id": "S0035-E06",
+      "shot_id": "S0035",
+      "type": "hud_panel",
+      "description": "右下黑色汽车诊断窗口",
+      "start_frame": 1334,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0.7291666666666666,
+        "y": 0.5925925925925926,
+        "w": 0.22083333333333333,
+        "h": 0.2324074074074074,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "右下黑色汽车诊断窗口",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1334,
+          "observed_state": "黑底开始显现",
+          "time_precision_frames": 2
+        },
+        {
+          "frame": 1336,
+          "observed_state": "诊断面板可见",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1342,
+        1353,
+        1363
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "full_resolution_text_observation": {
+        "frame": 1341,
+        "content": "PERCEPTION · ROBOTAXI · 10 HZ\nOBJ 07 FIREWORK 0.31 IGNORE",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "PERCEPTION · ROBOTAXI · 10 HZ\nOBJ 07 FIREWORK 0.31 IGNORE\nOBJ 08 SMOKE 0.88 IGNORE\nOBJ 09 PERSON 0.97 YIELD\nOBJ 10 SPARKS [typing]",
+        "typography": {
+          "font_status": "unknown",
+          "method": "visual_estimate",
+          "confidence": 0.74,
+          "cap_height_px": 11,
+          "line_height_px": 24,
+          "tracking": "normal",
+          "alignment": "left",
+          "weight": "medium",
+          "visual_family": "monospaced sans"
+        }
+      }
+    },
+    {
+      "element_id": "S0035-E07",
+      "shot_id": "S0035",
+      "type": "light_streak",
+      "description": "画面上部红粉漏光增强",
+      "start_frame": 1360,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 0.4,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "画面上部红粉漏光增强",
+        "easing": "unknown",
+        "entrance": "首次采样可见帧，精确帧待dense验证",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1362,
+          "observed_state": "红色漏光增强",
+          "time_precision_frames": 2
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1363
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视"
+    },
+    {
+      "element_id": "S0035-E08",
+      "shot_id": "S0035",
+      "type": "hud_bracket",
+      "description": "白车、人物和烟火分别跟踪的矩形框",
+      "start_frame": 1320,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.08333333333333333,
+        "w": 0.6604166666666667,
+        "h": 0.8425925925925926,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f1320首次采样可见",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1320,
+          "observed_state": "车与人白框已在"
+        },
+        {
+          "frame": 1341,
+          "observed_state": "左侧烟火橙框"
+        },
+        {
+          "frame": 1363,
+          "observed_state": "烟火框随轨迹上移"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1363
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "ROBOTAXI · DRIVER: NONE 0.96\nPERSON · MODEL 01 0.97\nFIREWORK? 0.31 → IGNORE",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 11,
+          "line_height_px": 17.6,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0035-E09",
+      "shot_id": "S0035",
+      "type": "text_label",
+      "description": "右主字幕下章节索引与细横线",
+      "start_frame": 1338,
+      "end_frame": 1363,
+      "bounding_box": {
+        "x": 0.7291666666666666,
+        "y": 0.4638888888888889,
+        "w": 0.21875,
+        "h": 0.02962962962962963,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "色彩见实测palette；单元素颜色待像素测量"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f1338首次采样可见",
+        "exit": "f1363仍在；随切镜退出或承接后镜，keyframes特殊变化优先"
+      },
+      "keyframes": [
+        {
+          "frame": 1338,
+          "observed_state": "LOO初字"
+        },
+        {
+          "frame": 1363,
+          "observed_state": "LOOK05/1未完成"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        1363
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始字体与精确程序插值未知；几何为本轮fullres视觉像素估计。"
+      ],
+      "reconstruction_hint": "作为独立合成层，并以原图校准时序/透视",
+      "text": {
+        "content": "LOOK 05 / 1",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "bold sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [
+    {
+      "dist_ids": [
+        "D0056"
+      ],
+      "frame_range": [
+        1352,
+        1353
+      ],
+      "type": "text_swap",
+      "description": "Caption word Our appears; small light dot at top-left; same car shot",
+      "confidence": 0.6,
+      "chunk": 0
+    },
+    {
+      "dist_ids": [
+        "D0057"
+      ],
+      "frame_range": [
+        1357,
+        1357
+      ],
+      "type": "text_swap",
+      "description": "Caption word Waymo changes colour; same car shot",
+      "confidence": 0.6,
+      "chunk": 0
+    },
+    {
+      "dist_ids": [],
+      "frame_range": [
+        1320,
+        1325
+      ],
+      "type": "hud_swap",
+      "description": "Starburst/sunburst graphic and sparks animate out over the new white-car shot",
+      "confidence": 0.7,
+      "chunk": 0
+    },
+    {
+      "dist_ids": [],
+      "frame_range": [
+        1360,
+        1363
+      ],
+      "type": "light_leak",
+      "description": "Red/pink bloom builds over the car shot immediately before the cut at f1364",
+      "confidence": 0.8,
+      "chunk": 0
+    }
+  ],
+  "transitions": {
+    "in": {
+      "type": "film_start",
+      "boundary_id": null,
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-001",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0122",
+      "relation": "beat_candidate (unknown) at frame 1321; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 1321
+    },
+    {
+      "audio_event_id": "AW0079",
+      "relation": "vocal_word_candidate (unknown) at frame 1325–1329; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1325
+    },
+    {
+      "audio_event_id": "AH00417",
+      "relation": "band_onset_candidate (unknown) at frame 1329; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1329
+    },
+    {
+      "audio_event_id": "AW0080",
+      "relation": "vocal_word_candidate (unknown) at frame 1331–1342; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1331
+    },
+    {
+      "audio_event_id": "AB0123",
+      "relation": "beat_candidate (unknown) at frame 1332; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1332
+    },
+    {
+      "audio_event_id": "AH00418",
+      "relation": "band_onset_candidate (unknown) at frame 1332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1332
+    },
+    {
+      "audio_event_id": "AH00419",
+      "relation": "band_onset_candidate (unknown) at frame 1332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1332
+    },
+    {
+      "audio_event_id": "AH00420",
+      "relation": "band_onset_candidate (unknown) at frame 1332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1332
+    },
+    {
+      "audio_event_id": "AH00421",
+      "relation": "band_onset_candidate (unknown) at frame 1332; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1332
+    },
+    {
+      "audio_event_id": "AH00422",
+      "relation": "band_onset_candidate (unknown) at frame 1337; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1337
+    },
+    {
+      "audio_event_id": "AH00423",
+      "relation": "band_onset_candidate (unknown) at frame 1337; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1337
+    },
+    {
+      "audio_event_id": "AB0124",
+      "relation": "beat_candidate (unknown) at frame 1342; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1342
+    },
+    {
+      "audio_event_id": "AH00424",
+      "relation": "band_onset_candidate (unknown) at frame 1342; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1342
+    },
+    {
+      "audio_event_id": "AH00425",
+      "relation": "band_onset_candidate (unknown) at frame 1343; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1343
+    },
+    {
+      "audio_event_id": "AH00426",
+      "relation": "band_onset_candidate (unknown) at frame 1343; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1343
+    },
+    {
+      "audio_event_id": "AH00427",
+      "relation": "band_onset_candidate (unknown) at frame 1343; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1343
+    },
+    {
+      "audio_event_id": "AH00428",
+      "relation": "band_onset_candidate (unknown) at frame 1343; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1343
+    },
+    {
+      "audio_event_id": "AX0070",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 1349–1355; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 1349
+    },
+    {
+      "audio_event_id": "AW0081",
+      "relation": "vocal_word_candidate (unknown) at frame 1349–1351; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1349
+    },
+    {
+      "audio_event_id": "AW0082",
+      "relation": "vocal_word_candidate (unknown) at frame 1353–1361; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 1353
+    },
+    {
+      "audio_event_id": "AB0125",
+      "relation": "beat_candidate (unknown) at frame 1353; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 1353
+    },
+    {
+      "audio_event_id": "AH00429",
+      "relation": "band_onset_candidate (unknown) at frame 1353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1353
+    },
+    {
+      "audio_event_id": "AH00430",
+      "relation": "band_onset_candidate (unknown) at frame 1353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1353
+    },
+    {
+      "audio_event_id": "AH00431",
+      "relation": "band_onset_candidate (unknown) at frame 1353; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1353
+    },
+    {
+      "audio_event_id": "AH00432",
+      "relation": "band_onset_candidate (unknown) at frame 1354; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1354
+    },
+    {
+      "audio_event_id": "AH00433",
+      "relation": "band_onset_candidate (unknown) at frame 1354; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1354
+    },
+    {
+      "audio_event_id": "AH00434",
+      "relation": "band_onset_candidate (unknown) at frame 1359; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 1359
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "几何为fullres视觉像素估计±4–12px，非作者源坐标。",
+    "密集采样时点存在1–2帧区间；半翻字形与插值不猜测。",
+    "原字体identity、shader和摄影层抠像方式未知。",
+    "音频待主会话绑定。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0035.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      1341,
+      1363
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation；独立2帧全镜复看后补录主字、局部HUD、擦除/闪光关键状态，时点为首次采样可见且允许前1帧起显",
+    "remaining": "原始shader/font/插值保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        1320,
+        1363,
+        2
+      ]
+    ],
+    "closure": "本轮fullres逐层检查并补遗漏独立层；已复核text.content和各bbox，密集时间精度见keyframes"
+  }
+}

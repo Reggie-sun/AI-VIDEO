@@ -1,0 +1,53 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S8a",
+  "shot_id": "ep01v2-s8a",
+  "attempt_id": "iris-v2-s8a-source-001",
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S8a/project/state/video-generation/fetch/files/8631894f86f4bedd10bdc8b7f41402e8236405a43499a0a032da6f5bcf21eda7.mp4",
+  "artifact_sha256": "8631894f86f4bedd10bdc8b7f41402e8236405a43499a0a032da6f5bcf21eda7",
+  "intent": "board v2.1 S8a lip-sync feasibility test (first chorus pass), criteria as amended before payment (s8a-lipsync-amendment.md)",
+  "source_audio_policy": "MUTE in the film (master song only); the clip's own audio is evidence of how the model used the reference",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 5.057 s, 121 frames (24 fps cadence), h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "6 frames at 1 s steps -> qa/gate-S8a/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, speaking 4.5 s, issues []",
+    "clip_audio": "Whisper on the clip: 'I didn't run, I just looked outside' (lyric right). Its own singing is a re-performance: DTW against the reference puts it 0.35-0.41 s early through the first half and 0.05-0.11 s early later, converging at the end",
+    "mouth_vs_reference": "frame review at 30 fps CFR against the sealed reference timeline (qa/gate-S8a/mouth-timeline.jpg, onsets-ref-timing.jpg, second-I-2.00-2.77.jpg): the mouth follows the reference, not the clip's own audio, at the clear landmarks",
+    "automatic_proxy": "qa/lipsync_measure.py dark-pixel aperture proved too noisy to decide (best lags at the search edge); kept as a record, not as the basis",
+    "frames": "face-key-frames.jpg"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same face as A02/ID7b, black hook on the left ear, thin red line on the left collar, charcoal high collar, low bun"
+    },
+    {
+      "requirement_id": "lip-sync",
+      "verdict": "FAIL",
+      "reason": "criterion 2 not met: before the first note (clip 0-0.20 s = master 18.40-18.60) the mouth is open with teeth showing (the A02 pose) while the reference is silent, and after the line (>= 4.53 s) the lips close only to a slight gap. Criterion 1 holds at the clear landmarks: 'I' opens at 0.167-0.200 s (onset 0.20), 'outside' opens at 3.467-3.533 s (onset 3.50), the soft 'I' after the pause opens slightly at 2.30-2.33 s (onset 2.33); the pause 2.17-2.33 s narrows to under half the vowel aperture by 2.23-2.27 s (closing starts 1-2 frames late); teeth and jaw are not deformed"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "no push, pan or zoom; framing and placement of A02 held (rain on the rail, city behind); the head tilts gently while singing, no nods"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; no subtitles, titles, text or interface added"
+    }
+  ],
+  "observations": [
+    "the film window (cut at master 18.867 s) starts after the open-mouth pre-roll, but the sealed criterion covers the whole clip",
+    "the model starts its own singing at t=0 and ignores the 0.20 s lead-in silence; the video mouth still waits for the reference onset"
+  ],
+  "verdict": "FAIL",
+  "all_required_observed_pass": false,
+  "next": "stop this attempt; one bounded repair (S8ar): the reference starts on the sung onset (no lead-in silence), so the open A02 mouth at frame 0 is already singing, and the line ends with a longer closed tail",
+  "not_evaluated": [
+    "human 1.0x viewing with the master audio",
+    "judgement of how natural the singing looks (user only)"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

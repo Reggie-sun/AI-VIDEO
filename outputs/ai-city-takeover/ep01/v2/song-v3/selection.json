@@ -1,0 +1,87 @@
+{
+ "schema": "iris-ep01-song-selection/1",
+ "selected_at_utc": "2026-11-04T07:37:50.599041+00:00",
+ "user_quote": "歌我选择好了t4",
+ "earlier_quote": "我都觉得可以,不考虑时常,你得从观众和质量角度考虑,和人物背景符合",
+ "take": "T4",
+ "suno_clip_id": "e80848a2-3a60-4862-b17c-ba035ba4dba5",
+ "model": "v6 (chirp-hawk)",
+ "master": {
+  "path": "outputs/ai-city-takeover/ep01/v2/song-v3/IRIS-01-T4.wav",
+  "sha256": "7471d6ff85cd32e9fa5f795dcd78ec0d69402f38f6f8083c466d36a3e70ee4a5",
+  "duration_s": 261.56
+ },
+ "fields": {
+  "path": "outputs/ai-city-takeover/ep01/v2/song-suno/fields.json",
+  "sha256": {
+   "title": "056dcb5218faa397f9ba7e223726e897a111e7d9210266d0e01e806a59a77a18",
+   "style": "ef5963e7d7a46a34493624a7b811632774d939532c0383ec32393d51cdb71eb9",
+   "exclude": "7805210c96aacccf9659c719b234effb78b6119e194e2c7f2646736683a8eb52",
+   "lyrics": "7be9188b80d47ffe998a7ae9ed57fcc81c74a8ae27435b77fd3e78aa380fd565"
+  }
+ },
+ "lyrics": "outputs/ai-city-takeover/ep01/lyrics-v2.2-suno.md",
+ "sections_from_suno_timing": [
+  [
+   "Intro",
+   9.9
+  ],
+  [
+   "Verse 1",
+   27.3
+  ],
+  [
+   "Pre-Chorus",
+   54.6
+  ],
+  [
+   "Chorus",
+   61.3
+  ],
+  [
+   "Verse 2",
+   89.6
+  ],
+  [
+   "Pre-Chorus",
+   127.7
+  ],
+  [
+   "Chorus",
+   136.2
+  ],
+  [
+   "Drop",
+   156.8
+  ],
+  [
+   "Bridge",
+   178.8
+  ],
+  [
+   "Final Chorus",
+   195.6
+  ],
+  [
+   "Coda",
+   222.4
+  ],
+  [
+   "Outro",
+   239.8
+  ]
+ ],
+ "objective": {
+  "first_vocal_s": 9.9,
+  "first_chorus_s": 61.3,
+  "chorus_lift_db": 3.0,
+  "final_vs_chorus1_db": 1.4,
+  "key_chorus1": "F min",
+  "key_final": "F min",
+  "tempo_bpm": 129.2,
+  "verse1_wer": 0.17,
+  "chorus1_wer": 0.0
+ },
+ "listen_check_needed": "verse 1 'September twenty. A training run.' was transcribed by Whisper as 'September 28 training run'; the user should confirm by ear whether it reads as twenty-eight",
+ "not_acceptance": "song selection only; not film acceptance"
+}

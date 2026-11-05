@@ -310,7 +310,10 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
         if source.sha256 != metadata.source_audio_sha256:
             raise _invalid(f"Caption asset {asset.asset_id} source audio hash is invalid.")
         if source_metadata.script_hash != metadata.script_hash:
-            raise _invalid(f"Caption asset {asset.asset_id} script hash is invalid.")
+            from ai_video.production.qualification_preview_input import allows_captioned_music_caption
+
+            if not allows_captioned_music_caption(bundle, asset, source):
+                raise _invalid(f"Caption asset {asset.asset_id} script hash is invalid.")
         if (
             asset.input_artifact_ids != (source.asset_id,)
             or asset.input_fingerprint != source.sha256

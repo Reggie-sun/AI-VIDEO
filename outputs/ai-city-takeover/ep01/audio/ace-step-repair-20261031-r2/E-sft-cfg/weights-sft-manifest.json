@@ -1,0 +1,58 @@
+{
+  "repo_id": "ACE-Step/acestep-v15-sft",
+  "revision": "c410d249e71ea9385a7b586865e65b1473e1098d",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 1519,
+      "expected_sha256": null,
+      "actual_sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5498,
+      "expected_sha256": null,
+      "actual_sha256": "ed42093e8f7903f23bd45ea56bea8f484c8aee47820ae8880d6da752681a1da7"
+    },
+    {
+      "path": "apg_guidance.py",
+      "bytes": 7956,
+      "expected_sha256": null,
+      "actual_sha256": "0c0ce9755952c99307ecad2fac67863d43258e34541cd37ce2f2221f59e76b15"
+    },
+    {
+      "path": "config.json",
+      "bytes": 1940,
+      "expected_sha256": null,
+      "actual_sha256": "9bb4f832f2e5e6c8bf7bddab3c6a6da1b13c01d072efbf0ed3c830536c473359"
+    },
+    {
+      "path": "configuration_acestep_v15.py",
+      "bytes": 13130,
+      "expected_sha256": null,
+      "actual_sha256": "b89870c5c7a7ce060eb0bcdbb5ffc86b0b1a324ca325a26be552ea1b42496dc5"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 4787825604,
+      "expected_sha256": "d4dd3a93870f06720027965b90771f529ab02094b3d29e2518f1d5e097e1af7e",
+      "actual_sha256": "d4dd3a93870f06720027965b90771f529ab02094b3d29e2518f1d5e097e1af7e"
+    },
+    {
+      "path": "modeling_acestep_v15_base.py",
+      "bytes": 95910,
+      "expected_sha256": null,
+      "actual_sha256": "5e3b475d46965dcd5b0d037e53a9af359305a7dbd78e2ee08b39e94c4b02ca48"
+    },
+    {
+      "path": "silence_latent.pt",
+      "bytes": 3841215,
+      "expected_sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b",
+      "actual_sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b"
+    }
+  ],
+  "started_at_utc": "2026-10-31T04:58:59.660775+00:00",
+  "public_download_without_credentials": true,
+  "all_files_verified": true,
+  "completed_at_utc": "2026-10-31T05:06:35.677952+00:00"
+}

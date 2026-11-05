@@ -1,0 +1,99 @@
+{
+ "up": [
+  {
+   "el": "div.label-qT3wG6",
+   "events": [],
+   "w": 22,
+   "h": 17
+  },
+  {
+   "el": "div.reference-upload-Jp_yFQ.light-eWKixE",
+   "events": [
+    "onKeyDown",
+    "onMouseEnter",
+    "onMouseLeave",
+    "onContextMenu",
+    "onClickCapture",
+    "onFocus",
+    "onBlur",
+    "onDropCapture",
+    "onClick",
+    "onDragEnter",
+    "onDragLeave",
+    "onDragOver",
+    "onDrop"
+   ],
+   "w": 56,
+   "h": 70
+  },
+  {
+   "el": "div.reference-item-se7IKP.expanded-QdG1He",
+   "events": [],
+   "w": 48,
+   "h": 64
+  },
+  {
+   "el": "div.reference-group-content-hUalkz.expanded-i34Z3O",
+   "events": [],
+   "w": 64,
+   "h": 108
+  },
+  {
+   "el": "div.reference-group-BMsz7K",
+   "events": [
+    "onMouseLeave"
+   ],
+   "w": 64,
+   "h": 84
+  },
+  {
+   "el": "div.references-mOMbyk",
+   "events": [],
+   "w": 136,
+   "h": 76
+  },
+  {
+   "el": "div.content-Eltzs6",
+   "events": [],
+   "w": 1166,
+   "h": 76
+  },
+  {
+   "el": "div.layout-kiCJ68.main-frame-2026-MQUmCl",
+   "events": [
+    "onBlurCapture",
+    "onFocusCapture",
+    "onMouseDown",
+    "onDragEnter",
+    "onDragLeave",
+    "onDragOver",
+    "onDrop",
+    "onClick",
+    "onFocus"
+   ],
+   "w": 1198,
+   "h": 156
+  }
+ ],
+ "down": [
+  {
+   "el": "div.reference-upload-Jp_yFQ.light-eWKixE",
+   "events": [
+    "onKeyDown",
+    "onMouseEnter",
+    "onMouseLeave",
+    "onContextMenu",
+    "onClickCapture",
+    "onFocus",
+    "onBlur",
+    "onDropCapture",
+    "onClick",
+    "onDragEnter",
+    "onDragLeave",
+    "onDragOver",
+    "onDrop"
+   ],
+   "text": "角色"
+  }
+ ]
+}

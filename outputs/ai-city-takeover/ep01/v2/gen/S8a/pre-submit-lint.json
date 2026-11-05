@@ -1,0 +1,36 @@
+{
+  "unit": "S8a",
+  "checks": {
+    "exact_images_A02_then_ID7b": true,
+    "exact_audio_reference": true,
+    "markers_image_image_audio": true,
+    "reference_duties_in_text": true,
+    "chinese_body_only": true,
+    "lip_sync_instruction": true,
+    "cold_restraint": true,
+    "teeth_jaw": true,
+    "locked_camera": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "independent_final_audio": true,
+    "bound_output_5s": true,
+    "operator_ceiling_matches_preview": true,
+    "criteria_sealed_before_payment": true,
+    "previous_gate_pass": true
+  },
+  "pass": true,
+  "request_hash": "c18217dae7b214fbc823e58ec819c7e3f950c30b2ca26969f60ec347c55696d4",
+  "continuity": "hard cut from S7 (cache room) into the chorus; clip t=0 is master 18.40 s, the source covers 18.40-23.40 s so the S7/S8a cut can sit at 18.867 s or two frames before the sung onset",
+  "handoff": "S7 whisper ends -> S8a IRIS sings the first chorus pass on the balcony (A02) -> S8b second pass from the 3/4 angle (not submitted before S8a passes)",
+  "axis_action_camera": "frontal close-up looking into the lens, locked camera; only the singing mouth, breathing and blinks; no nods or head swings",
+  "prompt_fit": "pure Chinese body 423 chars; images A02 (start frame) and ID7b (identity only), audio = isolated chorus vocal with 0.2 s lead and 0.5 s tail silence",
+  "lip_sync_criteria": "board.md S8a spec as amended before payment by s8a-lipsync-amendment.md; measured by qa/lipsync_measure.py plus frame review",
+  "budget": {
+    "v2_submits_before": 6,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 1500,
+    "v2_ceiling_CRD": 2500,
+    "expected_cost_5s_CRD": 165
+  },
+  "new_calls": 0
+}

@@ -1,0 +1,32 @@
+artifact_id: iris-v2-s8a-scene
+content_hash: 4d36cb386fc715d93fdbfb649d04bddbcef489e4d62ae202ed53315b209726d4
+continuity_constraints:
+- 人物身份、左耳装置与左领红光位置一致
+- 蓝黑/钢蓝，红为唯一暖色
+creation_receipt_id: iris-v2-S8a-authoring:scene
+location: 雨夜高层建筑的玻璃阳台
+mood: 冷静、克制
+participant_ids:
+- IRIS
+revision: 1
+scene_id: balcony
+schema_version: '2.0'
+source_provenance:
+- content_hash: 686412c6d7dad23aa793ebf00bb773f6489407c1431dca10e010b0ff8153c375
+  kind: user_input
+  reference: evidence/authoring-input/686412c6d7dad23aa793ebf00bb773f6489407c1431dca10e010b0ff8153c375.json
+- content_hash: ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3
+  kind: user_input
+  reference: evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json
+- content_hash: 517997248a9c37c75698b19edd4bb23745fbb2ea23614bd48a1ce573a38f5ef4
+  kind: user_input
+  reference: evidence/authoring-input/517997248a9c37c75698b19edd4bb23745fbb2ea23614bd48a1ce573a38f5ef4.json
+- content_hash: 826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d
+  kind: user_input
+  reference: evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json
+- content_hash: 1343541a5c788280c4b167a25558cb41314fc103354827726a31e67f43ee4310
+  kind: user_input
+  reference: evidence/authoring-input/1343541a5c788280c4b167a25558cb41314fc103354827726a31e67f43ee4310.json
+time: 凌晨
+visual_reference_asset_ids:
+- iris-c-v2-s8a-balcony

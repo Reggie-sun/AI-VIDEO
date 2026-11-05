@@ -1,0 +1,56 @@
+{
+  "isError": false,
+  "result": {
+    "schema_version": "audio-understanding-evidence/1",
+    "source_sha256": "e3586edc46b12d670211e9f223e25fc7280a7f69abe1cbbe0d868fc0068ea986",
+    "source_size_bytes": 1344078,
+    "audio_sha256": "e3586edc46b12d670211e9f223e25fc7280a7f69abe1cbbe0d868fc0068ea986",
+    "audio_size_bytes": 1344078,
+    "duration_seconds": 28.0,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "12c829cc64cc1e682ad38e07d6af5acde48ce01893ee60fbe9dbcf4459b02c75",
+    "requested_model_id": "gemini-3.8-flash",
+    "response_model_id": "gemini-3.8-flash",
+    "response_sha256": "cda3fc86df72e07642fd928997b1265303009b9b7e81dc431b4490b031e375cb",
+    "observations": {
+      "segments": [
+        {
+          "start_seconds": 0.0,
+          "end_seconds": 2.5,
+          "text": "I didn't run",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 3.4,
+          "end_seconds": 6.3,
+          "text": "I just looked outside",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 11.8,
+          "end_seconds": 14.1,
+          "text": "I didn't run",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 18.7,
+          "end_seconds": 21.6,
+          "text": "I just looked outside",
+          "speaker": "Speaker 1"
+        }
+      ],
+      "voice_description": "Young, high-pitched female singing voice, processed with significant digital reverb and stereo delay.",
+      "delivery_description": "Slow, ethereal, and melodic chanting delivery with prolonged vowels and soft articulation.",
+      "background_sounds": [
+        "ambient synthesizer drone",
+        "reverb tails",
+        "stuttering vocal delay effects"
+      ],
+      "uncertainties": []
+    },
+    "proof_boundary": "analyzer observations; not QA/human/timing acceptance",
+    "media_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/song-suno/listen/windows/T4-chorus1-60.5-28.wav",
+    "analysis_audio_derivation": "exact_pcm_wav",
+    "human_acceptance": "NOT_EVALUATED"
+  }
+}

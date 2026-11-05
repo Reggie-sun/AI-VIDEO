@@ -1,0 +1,14 @@
+{
+ "status": "ANALYSIS_INCOMPLETE",
+ "errors": [],
+ "unfinished": [
+  "audio perceptual listening/SFX identity not evaluated"
+ ],
+ "shots_expected": 153,
+ "shots_present": 153,
+ "elements": 1209,
+ "audio_events": 4242,
+ "fps": 24.0,
+ "decoded_frames": 7353,
+ "scope": "Analysis artifact integrity and recorded coverage only; not reconstruction qualification or human acceptance"
+}

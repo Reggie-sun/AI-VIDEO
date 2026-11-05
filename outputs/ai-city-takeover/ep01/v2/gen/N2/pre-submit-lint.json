@@ -1,0 +1,40 @@
+{
+ "unit": "N2",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "f9944417b056a9845a3c1c26ec0400a9fea3509ddbd01992f5b603d711d607cd",
+ "compiled_prompt_sha256": "6fbc62d9a494122d1942a56483ed28e8ade9bb931264fca27702bf5caf8bc31a",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/action/continuity-report.json",
+  "sha256": "0af3fc1e681decd974c28b7faade05c92dcdcd8502d5117f0889856b8c8dbabf",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS：N2-a 是 K5b 的編修版，同一扇雨夜落地窗、同樣的城市天際線和高架橋、窗框位置相同；左耳黑色耳挂、左領紅燈線（往後頸延伸）、濕的後梳低髻、炭黑大衣，都與 K5b 和 c11 24.2 s（S8b_x）一致；貼在玻璃上的是近側的左手，五指正常。註：prompt 本寫「抬起右手」，但已認可的首幀是左手；影片 prompt 沒指定哪隻手，所以沒有衝突。",
+   "handoff": "PASS：取代 S8b 的 K5 靜圖（22.57–24.07 s）。入點從 S8a2（玻璃面板空間，正面唱歌）在「I didn't run」硬切到窗前，換場的理由和 c11 現在一樣；出點接 S8b_x（K5b 更近的側臉、面向畫左），N2 結尾她抬頭望向城市、臉朝窗外（畫左），方向一致。S8b 中段的插入鏡頭 I6 和 S8b 臉框要重排，見 R9。",
+   "axis_action_camera": "PASS：她和窗在 c11 S5、S8b、S8b_x 裡都在畫左，臉朝畫左，N2 一樣，沒有跳軸；鏡頭緩慢推近到手（dolly_in），推向畫左的手和玻璃，看得懂；動作順序：手停住 → 指尖收攏 → 霧氣散開 → 頭低下再抬起望向城市，順序清楚。風險見 R3、R5、R8。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 6fbc62d9…）；寫了「嘴唇自然闭合」「脸始终朝着窗外」，沒有唱歌字句；設定的字句都在 prompt 裡。",
+   "lint": "PASS（只差本報告）：lint.py N2 只有 continuity_report_ready 未過；request_hash f9944417…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   4,
+   660
+  ]
+ },
+ "new_calls": 0
+}

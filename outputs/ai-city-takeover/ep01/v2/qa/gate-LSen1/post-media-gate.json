@@ -1,0 +1,71 @@
+{
+ "schema": "iris-trial-gate/1",
+ "unit": "LSen1",
+ "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/LSen1/project/state/video-generation/fetch/files/93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d.mp4",
+ "artifact_sha256": "93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d",
+ "identity_check": {
+  "artifact_sha256_recomputed": "match",
+  "a02_sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039 match",
+  "window_sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7 match",
+  "submitted_prompt": "compiled-native-prompt.zh.txt 與計畫 §3.1 EV-en 原句相同（目視比對）"
+ },
+ "reviewed_by": "shot-gate-reviewer",
+ "sealed_requirements": ["docs/superpowers/plans/2026-11-02-iris-ep01-lipsync-trial.md §5", "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/pre-submit-addendum.json"],
+ "mcp_calls": [
+  "video_probe：1920x1080 h264，121 幀，平均 24.12 fps（r_frame_rate 60 只是時基，pts 呈 3:2 間隔），5.057 s，AAC 立體聲；metadata 有 aigc_label_type=0、source dreamina",
+  "video_scene_detect（門檻 0.2，最短 0.1 s）：只有 1 個場景，0–5.057 s",
+  "video_extract_frames（每 0.5 s 一幀，共 11 幀，寬 960 px）：0.0–5.0 s",
+  "video_transcribe（small，en，有要求字級時間但只回段級）：0.00–4.18 s「I didn't run, I just looked outside」",
+  "audio_understand（execute=false，離線預覽，network_calls 0）：沒有執行遠端分析"
+ ],
+ "local_supplementary_evidence": "用 ffmpeg 取出全部 121 幀的嘴部裁切（用主會話的嘴框 [996,404,269,210]）和縮圖，再用 OpenCV 與 librosa 計算。這些是暫存檔，放在 /tmp/gate-LSen1/，不在 repo 內，可能被清除",
+ "items": {
+  "identity": {
+   "verdict": "PASS",
+   "requirement": "同一張臉、後梳低髻、左耳黑色耳挂、左領紅線、炭黑高領大衣（continuity-report iris_canon）",
+   "evidence": "看了 MCP 的 11 幀（0.0–5.0 s，每 0.5 s 一幀）和 41 幀全畫面（每 3 幀取一幀）。臉與 A02 相同（淡雀斑、淺灰藍眼）；深棕髮後梳成低髻；她的左耳（畫面右側）有黑色耳挂；她的左領（畫面右側）有細紅燈線；穿炭黑高領大衣。全片一致，沒有換臉或服裝漂移。"
+  },
+  "picture": {
+   "verdict": "PASS",
+   "requirement": "無變形、無多餘文字或介面（包括歌詞被畫成文字）、無第二個人、保留平台 AI 標識",
+   "evidence": "所有抽樣幀左上都有「AI生成」標識。沒有其他文字或介面，引號內的歌詞沒有被畫成畫面文字。全片只有一個人。121 張嘴部裁切中，嘴唇、牙齒、下巴都沒有變形。手沒有入鏡。全解析度下，臉部以外的相鄰幀平均差：中位數 0.47，最大 1.31（第 47→48 幀），沒有瞬間出現的物件、文字或閃動。"
+  },
+  "camera": {
+   "verdict": "PASS",
+   "requirement": "鏡頭固定，不切鏡",
+   "evidence": "scene_detect（門檻 0.2，最短 0.1 s）只找到 1 個場景。背景有紋理的區域做相位相關：城市區位移 ≤0.36 px，玻璃區 ≤0.65 px（以 480 px 寬計，換算到 1080p 約 ≤1.3 px），121 幀構圖不變。相鄰幀差沒有尖峰：全解析度下 0→1 幀是 0.46，與 1→2 幀相同。"
+  },
+  "singing": {
+   "verdict": "FAIL",
+   "requirement": "歌詞期間嘴在唱，無聲處閉合。前導靜音與結尾停頓依補充規則只記錄，不計入結論",
+   "evidence": "【歌詞期間嘴在唱：符合】0.63–4.89 s 嘴一直在動，開口面積 1058–3266 px²，口型有張開見口腔、圓唇、露齒、接近閉合幾種，開口起點在 0.75、1.17、1.80、3.17、3.33、3.83 s。【無聲處閉合：不符合（唱段與成片窗口 0.897–4.597 s 內）】(a)「run」後的停頓 2.58–2.75 s（words.json 20.55–20.72；主會話標 2.59–2.73；參考人聲比峰值低 27.6–29.5 dB）：#62–#65（2.583–2.717 s）雙唇分開、上下齒都看得到，開口 1625–1863 px²，沒有閉合。(b)「looked」與「outside」之間的空隙 3.71–3.94 s（words.json 21.68–21.91；參考人聲低 24.5–31 dB）：#89–#94（3.717–3.917 s）雙唇分開、露齒，開口 1511–2270 px²，沒有閉合。唱段內只有一處接近閉合：1.13–1.31 s 空隙（「I」到「didn't」之間）的 #26–#28（1.083–1.167 s），開口 1058–1248 px²。2.89–2.94 s 的空隙只有約 1 幀，不計。【補充規則記錄項，不計入結論，也不是停止條件】前導 0–0.63 s（參考是數位靜音，−112 dB）：#0 雙唇微開，與 A02 相同；從 #4（0.167 s）開始主動張大到看得見口腔，#10（0.417 s）最大，開口 2757 px²，比 #0 大 50%；0.50–0.63 s 轉為露齒口型。也就是說，這段是在無聲處做出唱的動作，不只是保持 A02 的姿勢。結尾停頓（≥4.89 s）：#117–#120 雙唇分開、露齒，開口 1907–1984 px²，到 5.0 s 還略微張大，沒有閉合。"
+  }
+ },
+ "lipsync_measurement": {
+  "per_onset": [
+   {"word": "I", "ref_clip_s": 0.63, "mouth_open_clip_s": 0.167, "offset_frames": -11.1, "own_clip_s": 0.02, "offset_vs_own_frames": 3.5, "note": "0.167 起張大到看得見口腔，0.417 最大，這時參考人聲還是靜音；0.75 另有一次小幅再張開（比參考晚 2.9 幀）"},
+   {"word": "didn't", "ref_clip_s": 1.31, "mouth_open_clip_s": 1.167, "offset_frames": -3.4, "own_clip_s": 0.48, "offset_vs_own_frames": null, "note": "1.083–1.167 接近閉合後重新張開，1.333 最大（圓唇、看得見口腔）；自帶音軌 0.48 時嘴正在收小，沒有張開"},
+   {"word": "run", "ref_clip_s": 1.53, "mouth_open_clip_s": 1.80, "offset_frames": 6.5, "own_clip_s": 0.72, "offset_vs_own_frames": 0.7, "note": "1.53 時沒有新的張開（1.42–1.72 是較小的露齒口型）；最大一次張開從 1.80 開始，2.08–2.13 最大。這段落在參考人聲拉長的「run」裡，也落在自帶音軌 1.83–2.17 的靜段"},
+   {"word": "I (just)", "ref_clip_s": 2.75, "mouth_open_clip_s": null, "offset_frames": null, "own_clip_s": 2.22, "offset_vs_own_frames": -10.1, "note": "2.42–3.13 沒有張開，開口從 1840 逐漸縮到 1306 px²；對自帶音軌的偏移取的是前一次張開（1.80 開始）"},
+   {"word": "just", "ref_clip_s": 2.94, "mouth_open_clip_s": 3.167, "offset_frames": 5.4, "own_clip_s": 2.43, "offset_vs_own_frames": 1.7, "note": "2.97–3.13 嘴最窄，接近閉合，3.167 起小幅張開；在自帶音軌這邊，對應的是 2.50 的小幅再張開（比 2.333 大 22%）"},
+   {"word": "looked", "ref_clip_s": 3.44, "mouth_open_clip_s": 3.333, "offset_frames": -2.6, "own_clip_s": 2.94, "offset_vs_own_frames": null, "note": "3.417 起大幅張開，3.50 最大；自帶音軌 2.94 時嘴最窄，沒有張開。這次張開比自帶音軌的「outside」（3.46）早 3.0 幀"},
+   {"word": "outside", "ref_clip_s": 3.94, "mouth_open_clip_s": 3.833, "offset_frames": -2.6, "own_clip_s": 3.46, "offset_vs_own_frames": -3.0, "note": "3.917–3.967 大幅張開，4.08 最大，是全片張得最大的一次；自帶音軌 3.46 對應的是 3.333 那次張開"},
+   {"word": "I (pass 2)", "ref_clip_s": 4.64, "mouth_open_clip_s": null, "offset_frames": null, "own_clip_s": 4.19, "offset_vs_own_frames": null, "note": "4.45–4.75 維持露齒、中等張開（1800–1850 px²），到 4.97 只大約 10%，沒有明顯張開；自帶音軌 4.19 時，嘴在 4.08 最大之後正在收小"},
+   {"word": "pause 20.56–20.70", "ref_clip_s": 2.59, "mouth_open_clip_s": null, "offset_frames": null, "note": "沒有閉合：#62–#65 雙唇分開、露齒，開口 1625–1863 px²"}
+  ],
+  "follows": "unclear",
+  "notes": "三段結果不一致。0–1.0 s 比較接近自帶音軌：參考人聲 0.63 前是靜音，嘴卻在 0.167 已經張大；自帶音軌約 0.02 s 起有聲；相關係數：自帶音軌 0.60（嘴比它晚約 0.28 s），參考人聲 ≤0.17。1.0–3.0 s 跟參考人聲：1.083–1.167 的接近閉合落在參考 1.13–1.31 的空隙，這時自帶音軌最響（0 到 −2 dB）；1.80–2.17 嘴張得最大，落在參考拉長的「run」裡，這時自帶音軌安靜（−18 到 −30 dB）；同一時間點的相關：參考 r=0.56，自帶音軌 r=−0.53（反相）。3.0–5.0 s 分不出來：這段自帶音軌比參考早約 0.45–0.50 s，大約一拍，所以 3.33–3.50 和 3.83–4.08 兩次張開，與兩條音軌的字起點都在 ±3 幀內；能量包絡的形狀比較接近自帶音軌（相關 0.66，嘴早 0.16 s），參考人聲最佳只有 0.28。量法：開口面積＝主會話嘴框內唇色遮罩的凸包面積減去唇色像素；開口起點＝第一個比前一個局部最小值大 ≥10%、且 0.30 s 內大到 ≥20% 的幀；約 24 fps；自帶音軌的字起點用主會話 dtw.json 換算，與自帶音軌能量上升點（0.48、0.78、2.23、2.45、2.95、3.50、4.00）一致。以上只是量測，不判對嘴好不好。"
+ },
+ "stop_condition": {
+  "triggered": false,
+  "why": "身份、畫面、鏡頭三項都 PASS。補充規則裡列為停止條件的 FAIL 類型（身份、變形、畫面文字含歌詞、鏡頭不固定、第二個人）都沒有出現。唯一的 FAIL 是唱段內停頓沒有閉嘴，它不在那份清單上。若主會話認為計畫 §5 的一般規則也適用於這項 FAIL，就要判斷成因：是共用輸入（A02 張嘴的姿勢或窗口），還是這一支的隨機表現。只看這一支無法判定，需由主會話或使用者決定。這一支結果已知（exact MP4 在、SHA 相符），所以「結果不明一律停止」不適用。"
+ },
+ "not_evaluated": [
+  "人以 1.0x 帶聲音觀看（觀感、對嘴能不能接受，由使用者判）",
+  "對嘴準確度的判定（這是試驗要量的變數，只量不判）",
+  "片段自帶音軌的語意與嗓音：audio_understand 只做了離線預覽，沒有執行遠端；這不在封存項目內，而且成片會把片段原聲靜音（continuity R3）",
+  "主會話產生的審看片（trial-LSen1-…-ref-master.mp4，以及 placement/prior 兩個版本）的內容，本次沒有重驗",
+  "唱這一項 FAIL 的成因歸屬"
+ ],
+ "gate": "FAIL"
+}

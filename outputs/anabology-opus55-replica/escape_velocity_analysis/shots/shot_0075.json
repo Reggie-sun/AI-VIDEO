@@ -1,0 +1,1050 @@
+{
+  "shot_id": "S0075",
+  "start_frame": 3237,
+  "end_frame": 3279,
+  "duration_frames": 43,
+  "start_time": 134.875,
+  "end_time": 136.6667,
+  "duration_s": 1.7917,
+  "start_tc": "00:02:14:21",
+  "end_tc": "00:02:16:15",
+  "boundary_in_id": "B2-006",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    3237,
+    3237
+  ],
+  "boundary_out_id": "B2-007",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 3243,
+      "end_frame": 3245,
+      "event": "Look与右座位图框出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3243,
+        3245
+      ],
+      "description": "Look与右座位图框出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3249,
+      "end_frame": 3251,
+      "event": "10及左EMPTY SEAT卡出现；36格填入",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3249,
+        3251
+      ],
+      "description": "10及左EMPTY SEAT卡出现；36格填入",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3258,
+      "end_frame": 3260,
+      "event": "Staff橙",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3258,
+        3260
+      ],
+      "description": "Staff橙",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3264,
+      "end_frame": 3266,
+      "event": "badge入词；小证件框出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3264,
+        3266
+      ],
+      "description": "badge入词；小证件框出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3267,
+      "end_frame": 3269,
+      "event": "证件引线标签出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3267,
+        3269
+      ],
+      "description": "证件引线标签出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3273,
+      "end_frame": 3275,
+      "event": "empty入词、A07引线与空座标记变橙",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3273,
+        3275
+      ],
+      "description": "empty入词、A07引线与空座标记变橙",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处。左下白色EMPTY SEAT卡和右下座位平面图渐入，空椅背及椅下证件各有检测框，歌词在左上逐词填入。",
+  "reference_frames": [
+    {
+      "frame": 3237,
+      "path": "keyframes/S0075_f03237.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3247,
+      "path": "keyframes/S0075_f03247.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3258,
+      "path": "keyframes/S0075_f03258.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3269,
+      "path": "keyframes/S0075_f03269.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3279,
+      "path": "keyframes/S0075_f03279.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3277,
+      "path": "work/full_batch/03277.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    }
+  ],
+  "composition": {
+    "shot_size": "full/long shot",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.42,
+      "y": 0.3,
+      "w": 0.2,
+      "h": 0.49,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处。左下白色EMPTY SEAT卡和右下座位平面图渐入，空椅背及椅下证件各有检测框，歌词在左上逐词填入。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0036, \"pan_y_frac_per_s\": -0.0014, \"zoom_per_s\": 0.0041, \"median_flow_frac_per_s\": 0.0059, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[30.0, 39.5, 41.9]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#081011",
+        "fraction": 0.458,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#0E2931",
+        "fraction": 0.246,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#154151",
+        "fraction": 0.166,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#85AEBF",
+        "fraction": 0.053,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#567685",
+        "fraction": 0.053,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#E7E6E1",
+        "fraction": 0.024,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[30.0, 39.5, 41.9]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 10 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "12",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0075-E01",
+      "shot_id": "S0075",
+      "type": "background_media",
+      "description": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处。左下白色EMPTY SEAT卡和右下座位平面图渐入，空椅背及椅下证件各有检测框，歌词在左上逐词填入。",
+      "start_frame": 3237,
+      "end_frame": 3279,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处。左下白色EMPTY SEAT卡和右下座位平面图渐入，空椅背及椅下证件各有检测框，歌词在左上逐词填入。"
+      },
+      "motion": {
+        "path": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处。左下白色EMPTY SEAT卡和右下座位平面图渐入，空椅背及椅下证件各有检测框，歌词在左上逐词填入。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3237–3279；入口按密采事件区间±2帧。",
+        "exit": "3279为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3243,
+          "state": "Look与右座位图框出现"
+        },
+        {
+          "frame": 3249,
+          "state": "10及左EMPTY SEAT卡出现；36格填入"
+        },
+        {
+          "frame": 3258,
+          "state": "Staff橙"
+        },
+        {
+          "frame": 3264,
+          "state": "badge入词；小证件框出现"
+        },
+        {
+          "frame": 3267,
+          "state": "证件引线标签出现"
+        },
+        {
+          "frame": 3273,
+          "state": "empty入词、A07引线与空座标记变橙"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3237,
+        3247,
+        3258,
+        3269,
+        3279
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0075-E02",
+      "shot_id": "S0075",
+      "type": "prop",
+      "description": "黑色折叠椅x0.43 y0.3 w0.2 h0.49，证件悬于座下。",
+      "start_frame": 3237,
+      "end_frame": 3279,
+      "bounding_box": {
+        "x": 0.42,
+        "y": 0.3,
+        "w": 0.2,
+        "h": 0.5,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "黑色折叠椅x0.43 y0.3 w0.2 h0.49，证件悬于座下。"
+      },
+      "motion": {
+        "path": "黑色折叠椅x0.43 y0.3 w0.2 h0.49，证件悬于座下。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3237–3279；入口按密采事件区间±2帧。",
+        "exit": "3279为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3237,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.42,
+            "y": 0.3,
+            "w": 0.2,
+            "h": 0.5,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3279,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3237,
+        3247,
+        3258,
+        3269,
+        3279
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0075-E03",
+      "shot_id": "S0075",
+      "type": "tag_card",
+      "description": "左下白EMPTY SEAT卡x0.04 y0.52 w0.16 h0.22，BADGE STAFF FACE DOWN / SEAT A-07 EMPTY。",
+      "start_frame": 3249,
+      "end_frame": 3279,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.52,
+        "w": 0.16,
+        "h": 0.22,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左下白EMPTY SEAT卡x0.04 y0.52 w0.16 h0.22，BADGE STAFF FACE DOWN / SEAT A-07 EMPTY。"
+      },
+      "motion": {
+        "path": "左下白EMPTY SEAT卡x0.04 y0.52 w0.16 h0.22，BADGE STAFF FACE DOWN / SEAT A-07 EMPTY。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3249–3279；入口按密采事件区间±2帧。",
+        "exit": "3279为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3249,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.52,
+            "w": 0.16,
+            "h": 0.22,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3279,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3258,
+        3269,
+        3279
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "LOOK 10 / 11 | SS27 | EMPTY SEAT | BADGE STAFF · FACE DOWN | SEAT A-07 · EMPTY | EV-27-1001",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        }
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0075-E04",
+      "shot_id": "S0075",
+      "type": "hud_chart",
+      "description": "右下座位矩阵三排十二格，A07空黑格描橙边，其余白灰填色。",
+      "start_frame": 3243,
+      "end_frame": 3279,
+      "bounding_box": {
+        "x": 0.7,
+        "y": 0.58,
+        "w": 0.25,
+        "h": 0.26,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右下座位矩阵三排十二格，A07空黑格描橙边，其余白灰填色。"
+      },
+      "motion": {
+        "path": "右下座位矩阵三排十二格，A07空黑格描橙边，其余白灰填色。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3243–3279；入口按密采事件区间±2帧。",
+        "exit": "3279为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3243,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.7,
+            "y": 0.58,
+            "w": 0.25,
+            "h": 0.26,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3279,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3247,
+        3258,
+        3269,
+        3279
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "FRONT ROW · PLAN | SHOW 01 | CATWALK | A B C | OCCUPIED 35 / 36 | A-07 · STAFF · VACATED 09.08",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0075-E05",
+      "shot_id": "S0075",
+      "type": "text_title",
+      "description": "左上白字逐词进入，Staff与empty初为橙。",
+      "start_frame": 3243,
+      "end_frame": 3279,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.18,
+        "w": 0.3,
+        "h": 0.13,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左上白字逐词进入，Staff与empty初为橙。"
+      },
+      "motion": {
+        "path": "左上白字逐词进入，Staff与empty初为橙。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3243–3279；入口按密采事件区间±2帧。",
+        "exit": "3279为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3243,
+          "text": "Look",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3249,
+          "text": "Look 10.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3258,
+          "text": "Look 10. Staff",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3264,
+          "text": "Look 10. Staff badge,",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3273,
+          "text": "Look 10. Staff badge,\nempty",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3247,
+        3258,
+        3269,
+        3279
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "Look 10. Staff\nbadge, empty",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 62 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0075-E06",
+      "shot_id": "S0075",
+      "type": "hud_bracket",
+      "description": "证件单独小四角框及标签，从椅框下分离。",
+      "start_frame": 3264,
+      "end_frame": 3279,
+      "bounding_box": {
+        "x": 0.48,
+        "y": 0.55,
+        "w": 0.2,
+        "h": 0.13,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "证件单独小四角框及标签，从椅框下分离。"
+      },
+      "motion": {
+        "path": "证件单独小四角框及标签，从椅框下分离。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3264–3279；入口按密采事件区间±2帧。",
+        "exit": "3279为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3264,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.48,
+            "y": 0.55,
+            "w": 0.2,
+            "h": 0.13,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3279,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3269,
+        3279
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "STAFF BADGE · FACE DOWN 0.94",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0075-E07",
+      "shot_id": "S0075",
+      "type": "hud_marker",
+      "description": "A07空座到实际椅背的橙色虚线引线，落点小圆靶独立于座位表格。",
+      "start_frame": 3273,
+      "end_frame": 3279,
+      "bounding_box": {
+        "x": 0.47,
+        "y": 0.3,
+        "w": 0.37,
+        "h": 0.4,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "A07空座到实际椅背的橙色虚线引线，落点小圆靶独立于座位表格。"
+      },
+      "motion": {
+        "path": "A07空座到实际椅背的橙色虚线引线，落点小圆靶独立于座位表格。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3273起±2帧，参见逐3帧密采",
+        "exit": "3279末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3273,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.47,
+            "y": 0.3,
+            "w": 0.37,
+            "h": 0.4,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3279,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3279,
+        3277
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0075-A03",
+      "target_element_ids": [
+        "S0075-E03"
+      ],
+      "description": "左下白EMPTY SEAT卡x0.04 y0.52 w0.16 h0.22，BADGE STAFF FACE DOWN / SEAT A-07 EMPTY。",
+      "start_frame": 3249,
+      "end_frame": 3279,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0075-A04",
+      "target_element_ids": [
+        "S0075-E04"
+      ],
+      "description": "右下座位矩阵三排十二格，A07空黑格描橙边，其余白灰填色。",
+      "start_frame": 3243,
+      "end_frame": 3279,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0075-A05",
+      "target_element_ids": [
+        "S0075-E05"
+      ],
+      "description": "左上白字逐词进入，Staff与empty初为橙。",
+      "start_frame": 3243,
+      "end_frame": 3279,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0075-A06",
+      "target_element_ids": [
+        "S0075-E06"
+      ],
+      "description": "证件单独小四角框及标签，从椅框下分离。",
+      "start_frame": 3264,
+      "end_frame": 3279,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AH01322",
+      "relation": "band_onset_candidate (unknown) at frame 3237; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3237
+    },
+    {
+      "audio_event_id": "AH01323",
+      "relation": "band_onset_candidate (unknown) at frame 3237; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3237
+    },
+    {
+      "audio_event_id": "AH01324",
+      "relation": "band_onset_candidate (unknown) at frame 3237; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3237
+    },
+    {
+      "audio_event_id": "AB0298",
+      "relation": "beat_candidate (unknown) at frame 3237; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3237
+    },
+    {
+      "audio_event_id": "AH01325",
+      "relation": "band_onset_candidate (unknown) at frame 3237; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3237
+    },
+    {
+      "audio_event_id": "AH01326",
+      "relation": "band_onset_candidate (unknown) at frame 3238; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3238
+    },
+    {
+      "audio_event_id": "AW0220",
+      "relation": "vocal_word_candidate (unknown) at frame 3242–3245; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3242
+    },
+    {
+      "audio_event_id": "AW0221",
+      "relation": "vocal_word_candidate (unknown) at frame 3247–3251; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3247
+    },
+    {
+      "audio_event_id": "AB0299",
+      "relation": "beat_candidate (unknown) at frame 3248; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3248
+    },
+    {
+      "audio_event_id": "AH01327",
+      "relation": "band_onset_candidate (unknown) at frame 3248; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3248
+    },
+    {
+      "audio_event_id": "AH01328",
+      "relation": "band_onset_candidate (unknown) at frame 3248; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3248
+    },
+    {
+      "audio_event_id": "AH01329",
+      "relation": "band_onset_candidate (unknown) at frame 3248; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3248
+    },
+    {
+      "audio_event_id": "AH01330",
+      "relation": "band_onset_candidate (unknown) at frame 3249; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3249
+    },
+    {
+      "audio_event_id": "AH01331",
+      "relation": "band_onset_candidate (unknown) at frame 3251; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3251
+    },
+    {
+      "audio_event_id": "AW0222",
+      "relation": "vocal_word_candidate (unknown) at frame 3253–3261; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3253
+    },
+    {
+      "audio_event_id": "AB0300",
+      "relation": "beat_candidate (unknown) at frame 3259; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3259
+    },
+    {
+      "audio_event_id": "AH01332",
+      "relation": "band_onset_candidate (unknown) at frame 3259; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3259
+    },
+    {
+      "audio_event_id": "AH01333",
+      "relation": "band_onset_candidate (unknown) at frame 3259; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3259
+    },
+    {
+      "audio_event_id": "AH01334",
+      "relation": "band_onset_candidate (unknown) at frame 3259; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3259
+    },
+    {
+      "audio_event_id": "AH01335",
+      "relation": "band_onset_candidate (unknown) at frame 3259; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3259
+    },
+    {
+      "audio_event_id": "AH01336",
+      "relation": "band_onset_candidate (unknown) at frame 3259; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3259
+    },
+    {
+      "audio_event_id": "AW0223",
+      "relation": "vocal_word_candidate (unknown) at frame 3263–3270; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3263
+    },
+    {
+      "audio_event_id": "AH01337",
+      "relation": "band_onset_candidate (unknown) at frame 3270; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3270
+    },
+    {
+      "audio_event_id": "AH01338",
+      "relation": "band_onset_candidate (unknown) at frame 3270; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3270
+    },
+    {
+      "audio_event_id": "AB0301",
+      "relation": "beat_candidate (unknown) at frame 3270; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3270
+    },
+    {
+      "audio_event_id": "AH01339",
+      "relation": "band_onset_candidate (unknown) at frame 3270; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3270
+    },
+    {
+      "audio_event_id": "AH01340",
+      "relation": "band_onset_candidate (unknown) at frame 3270; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3270
+    },
+    {
+      "audio_event_id": "AH01341",
+      "relation": "band_onset_candidate (unknown) at frame 3271; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3271
+    },
+    {
+      "audio_event_id": "AW0224",
+      "relation": "vocal_word_candidate (unknown) at frame 3271–3277; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3271
+    },
+    {
+      "audio_event_id": "AH01342",
+      "relation": "band_onset_candidate (unknown) at frame 3272; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3272
+    },
+    {
+      "audio_event_id": "AH01343",
+      "relation": "band_onset_candidate (unknown) at frame 3275; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3275
+    },
+    {
+      "audio_event_id": "AH01344",
+      "relation": "band_onset_candidate (unknown) at frame 3275; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3275
+    },
+    {
+      "audio_event_id": "AW0225",
+      "relation": "vocal_word_candidate (unknown) at frame 3279–3287; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3279
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0075.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B2-006",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        3237,
+        3237
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B2-007",
+      "description": "空折叠椅居中受青蓝顶光照亮，后排座椅沉入暗处。左下白色EMPTY SEAT卡和右下座位平面图渐入，空椅背及椅下证件各有检测框，歌词在左上逐词填入。",
+      "span": [
+        3279,
+        3279
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "Look 10. Staff badge, empty",
+    "EMPTY SEAT",
+    "FRONT ROW · PLAN",
+    "OCCUPIED 35 / 36",
+    "STAFF BADGE · FACE DOWN"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      3258,
+      3277
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

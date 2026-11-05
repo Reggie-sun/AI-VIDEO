@@ -1,0 +1,1564 @@
+{
+  "shot_id": "S0096",
+  "start_frame": 4436,
+  "end_frame": 4521,
+  "duration_frames": 86,
+  "start_time": 184.8333,
+  "end_time": 188.4167,
+  "duration_s": 3.5833,
+  "start_tc": "00:03:04:20",
+  "end_tc": "00:03:08:09",
+  "boundary_in_id": "B3-001",
+  "boundary_in_type": "dissolve",
+  "boundary_in_span": [
+    4432,
+    4437
+  ],
+  "boundary_out_id": "B3-002",
+  "boundary_out_type": "zoom_punch_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字。右下白纸物理示意图绘地球及轨道，左板速度从8.8升到10.7KM/S，右板永久底层六个月保持，末段面部叠化放大。",
+  "reference_frames": [
+    {
+      "frame": 4436,
+      "path": "keyframes/S0096_f04436.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4457,
+      "path": "keyframes/S0096_f04457.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4479,
+      "path": "keyframes/S0096_f04479.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4500,
+      "path": "keyframes/S0096_f04500.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4521,
+      "path": "keyframes/S0096_f04521.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4478,
+      "path": "work/full_batch/04478.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 frame"
+    }
+  ],
+  "composition": {
+    "shot_size": "按scene_description中的实际景别",
+    "subject_position": "见scene_description与bounding_box",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可见倾斜/俯仰见scene_description；焦距unknown",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字。右下白纸物理示意图绘地球及轨道，左板速度从8.8升到10.7KM/S，右板永久底层六个月保持，末段面部叠化放大。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0011, \"pan_y_frac_per_s\": 0.0035, \"zoom_per_s\": 0.0089, \"median_flow_frac_per_s\": 0.0051, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[132.9, 142.6, 68.0]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#A59B9D",
+        "fraction": 0.257,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#26251A",
+        "fraction": 0.215,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#4F463C",
+        "fraction": 0.17,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#E0DFDD",
+        "fraction": 0.141,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#BDB8BE",
+        "fraction": 0.12,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#807A7B",
+        "fraction": 0.097,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[132.9, 142.6, 68.0]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0096-E01",
+      "shot_id": "S0096",
+      "type": "background_media",
+      "description": "少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字。右下白纸物理示意图绘地球及轨道，左板速度从8.8升到10.7KM/S，右板永久底层六个月保持，末段面部叠化放大。",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. 少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字。右下白纸物理示意图绘地球及轨道，左板速度从8.8升到10.7KM/S，右板永久底层六个月保持，末段面部叠化放大。"
+      },
+      "motion": {
+        "path": "少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字。右下白纸物理示意图绘地球及轨道，左板速度从8.8升到10.7KM/S，右板永久底层六个月保持，末段面部叠化放大。",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    },
+    {
+      "element_id": "S0096-E02",
+      "shot_id": "S0096",
+      "type": "character",
+      "description": "Model centred below gantries, head bowed; hair and hanging garment tag remain in plate",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.36979,
+        "y": 0.28704,
+        "w": 0.25,
+        "h": 0.71296,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Model centred below gantries, head bowed; hair and hanging garment tag remain in plate"
+      },
+      "motion": {
+        "path": "Model centred below gantries, head bowed; hair and hanging garment tag remain in plate",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    },
+    {
+      "element_id": "S0096-E03",
+      "shot_id": "S0096",
+      "type": "split_flap",
+      "description": "Separate gantry board with cell-grid numerals: ESCAPE / VELOCITY / 8.8→10.7 KM/S",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.02083,
+        "y": 0.09259,
+        "w": 0.27604,
+        "h": 0.17593,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Separate gantry board with cell-grid numerals: ESCAPE / VELOCITY / 8.8→10.7 KM/S"
+      },
+      "motion": {
+        "path": "Separate gantry board with cell-grid numerals: ESCAPE / VELOCITY / 8.8→10.7 KM/S",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4436,
+          "state": "inherited board state"
+        },
+        {
+          "frame": 4517,
+          "state": "rocket value about10.7; six-month board stable"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4517,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "ESCAPE / VELOCITY / 8.8→10.7 KM/S",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 46,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E04",
+      "shot_id": "S0096",
+      "type": "split_flap",
+      "description": "Separate gantry board with cell-grid numerals: LONGEVITY / E.V. / ---- YR/YR",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.35938,
+        "y": 0.08981,
+        "w": 0.26823,
+        "h": 0.17593,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Separate gantry board with cell-grid numerals: LONGEVITY / E.V. / ---- YR/YR"
+      },
+      "motion": {
+        "path": "Separate gantry board with cell-grid numerals: LONGEVITY / E.V. / ---- YR/YR",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4436,
+          "state": "inherited board state"
+        },
+        {
+          "frame": 4517,
+          "state": "rocket value about10.7; six-month board stable"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4517,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "LONGEVITY / E.V. / ---- YR/YR",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 46,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E05",
+      "shot_id": "S0096",
+      "type": "split_flap",
+      "description": "Separate gantry board with cell-grid numerals: PERMANENT / UNDERCLASS / 06 MONTHS",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.70312,
+        "y": 0.08981,
+        "w": 0.27604,
+        "h": 0.17593,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Separate gantry board with cell-grid numerals: PERMANENT / UNDERCLASS / 06 MONTHS"
+      },
+      "motion": {
+        "path": "Separate gantry board with cell-grid numerals: PERMANENT / UNDERCLASS / 06 MONTHS",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4436,
+          "state": "inherited board state"
+        },
+        {
+          "frame": 4517,
+          "state": "rocket value about10.7; six-month board stable"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4517,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "PERMANENT / UNDERCLASS / 06 MONTHS",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 46,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E06",
+      "shot_id": "S0096",
+      "type": "text_title",
+      "description": "Very large low-opacity grey ESCAPE behind model and caption, aligned to road perspective",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.05208,
+        "y": 0.38889,
+        "w": 0.40625,
+        "h": 0.18519,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 19,
+      "appearance": {
+        "color_hex": "#808080",
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Very large low-opacity grey ESCAPE behind model and caption, aligned to road perspective"
+      },
+      "motion": {
+        "path": "Very large low-opacity grey ESCAPE behind model and caption, aligned to road perspective",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "ESCAPE",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 180,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E07",
+      "shot_id": "S0096",
+      "type": "text_caption",
+      "description": "Cream caption grows by word; Escape readable f4442, velocity rotates/reveals f4454–4456",
+      "start_frame": 4441,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.36296,
+        "w": 0.20312,
+        "h": 0.06019,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Cream caption grows by word; Escape readable f4442, velocity rotates/reveals f4454–4456"
+      },
+      "motion": {
+        "path": "Cream caption grows by word; Escape readable f4442, velocity rotates/reveals f4454–4456",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4441, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4441,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4442,
+          "text": "Escape"
+        },
+        {
+          "frame": 4454,
+          "state": "velocity entering below baseline"
+        },
+        {
+          "frame": 4456,
+          "text": "Escape velocity:"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4441,
+        4442,
+        4454,
+        4456,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "Escape velocity:",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 49,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E08",
+      "shot_id": "S0096",
+      "type": "hud_panel",
+      "description": "Right-lower FIG.1 paper panel reveals from top to full rectangle",
+      "start_frame": 4441,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.61979,
+        "y": 0.51852,
+        "w": 0.32292,
+        "h": 0.36111,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Right-lower FIG.1 paper panel reveals from top to full rectangle"
+      },
+      "motion": {
+        "path": "Right-lower FIG.1 paper panel reveals from top to full rectangle",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4441, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4441,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4441,
+          "state": "faint header"
+        },
+        {
+          "frame": 4442,
+          "state": "panel shallow"
+        },
+        {
+          "frame": 4445,
+          "state": "full paper panel"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4441,
+        4442,
+        4445,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "FIG. 1 · ESCAPE VELOCITY · EARTH / BOARD 01 · ROCKET",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E09",
+      "shot_id": "S0096",
+      "type": "hud_chart",
+      "description": "Earth circle, dashed7.9 orbit, solid ellipse and plotted launch-dot gradually draw; orbit opens upward into escaping trajectory",
+      "start_frame": 4447,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.63021,
+        "y": 0.68056,
+        "w": 0.22396,
+        "h": 0.18981,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 31,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Earth circle, dashed7.9 orbit, solid ellipse and plotted launch-dot gradually draw; orbit opens upward into escaping trajectory"
+      },
+      "motion": {
+        "path": "Earth circle, dashed7.9 orbit, solid ellipse and plotted launch-dot gradually draw; orbit opens upward into escaping trajectory",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4447, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4447,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4447,
+          "state": "Earth circle begins"
+        },
+        {
+          "frame": 4478,
+          "state": "ellipse orbit"
+        },
+        {
+          "frame": 4499,
+          "state": "escaping open curve"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4447,
+        4478,
+        4499,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "7.9 · ORBIT / EARTH · R 6,371 KM",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E10",
+      "shot_id": "S0096",
+      "type": "text_label",
+      "description": "Upper-right panel formulas and velocity readout; fall-back caption changes to escape near threshold",
+      "start_frame": 4447,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.8099,
+        "y": 0.55926,
+        "w": 0.1276,
+        "h": 0.125,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 32,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Upper-right panel formulas and velocity readout; fall-back caption changes to escape near threshold"
+      },
+      "motion": {
+        "path": "Upper-right panel formulas and velocity readout; fall-back caption changes to escape near threshold",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4447, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4447,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4478,
+          "text": "v 9.2 KM/S · FALLS BACK"
+        },
+        {
+          "frame": 4517,
+          "state": "near10.7 speed; formula unit not invented from a partial glyph"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4447,
+        4478,
+        4517,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "V = √(2GM / R) / G 6.674 × 10⁻¹¹ / M 5.972 × 10²⁴ [unit partly resolved] / v 9.2 KM/S · FALLS BACK",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 15,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E11",
+      "shot_id": "S0096",
+      "type": "text_label",
+      "description": "Black micro labels track boards and model; lower-left road weather metadata",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.81019,
+        "w": 0.15625,
+        "h": 0.06667,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Black micro labels track boards and model; lower-left road weather metadata"
+      },
+      "motion": {
+        "path": "Black micro labels track boards and model; lower-left road weather metadata",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "SEGMENT · 3 GANTRIES · 400 M / US 101 N · FOG · 06:52 / VISIBILITY 40 M · WIND 22 KT",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E12",
+      "shot_id": "S0096",
+      "type": "hud_bracket",
+      "description": "PAYLOAD 01 · LOOK 11 0.97 face/body bracket; TAG pointer to hanging label",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.375,
+        "y": 0.25926,
+        "w": 0.25,
+        "h": 0.72222,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. PAYLOAD 01 · LOOK 11 0.97 face/body bracket; TAG pointer to hanging label"
+      },
+      "motion": {
+        "path": "PAYLOAD 01 · LOOK 11 0.97 face/body bracket; TAG pointer to hanging label",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "PAYLOAD 01 · LOOK 11 0.97 / TAG",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E13",
+      "shot_id": "S0096",
+      "type": "text_label",
+      "description": "Small G1/G2/G3 labels below gantries, light/dark contrast differs",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.15365,
+        "y": 0.29167,
+        "w": 0.75,
+        "h": 0.03241,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Small G1/G2/G3 labels below gantries, light/dark contrast differs"
+      },
+      "motion": {
+        "path": "Small G1/G2/G3 labels below gantries, light/dark contrast differs",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4436, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4436,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4436,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "G1 · ROCKET / G2 · LONGEVITY / G3 · UNDERCLASS",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0096-E14",
+      "shot_id": "S0096",
+      "type": "transition_graphic",
+      "description": "Incoming eye close-up/fast crop overlaps face at end",
+      "start_frame": 4519,
+      "end_frame": 4521,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Incoming eye close-up/fast crop overlaps face at end"
+      },
+      "motion": {
+        "path": "Incoming eye close-up/fast crop overlaps face at end",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4519, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4521; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4519,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4521,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4519,
+        4521
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0096-A03",
+      "target_element_ids": [
+        "S0096-E03"
+      ],
+      "description": "Separate gantry board with cell-grid numerals: ESCAPE / VELOCITY / 8.8→10.7 KM/S",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0096-A04",
+      "target_element_ids": [
+        "S0096-E04"
+      ],
+      "description": "Separate gantry board with cell-grid numerals: LONGEVITY / E.V. / ---- YR/YR",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0096-A05",
+      "target_element_ids": [
+        "S0096-E05"
+      ],
+      "description": "Separate gantry board with cell-grid numerals: PERMANENT / UNDERCLASS / 06 MONTHS",
+      "start_frame": 4436,
+      "end_frame": 4521,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0096-A07",
+      "target_element_ids": [
+        "S0096-E07"
+      ],
+      "description": "Cream caption grows by word; Escape readable f4442, velocity rotates/reveals f4454–4456",
+      "start_frame": 4441,
+      "end_frame": 4521,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0096-A08",
+      "target_element_ids": [
+        "S0096-E08"
+      ],
+      "description": "Right-lower FIG.1 paper panel reveals from top to full rectangle",
+      "start_frame": 4441,
+      "end_frame": 4521,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0096-A09",
+      "target_element_ids": [
+        "S0096-E09"
+      ],
+      "description": "Earth circle, dashed7.9 orbit, solid ellipse and plotted launch-dot gradually draw; orbit opens upward into escaping trajectory",
+      "start_frame": 4447,
+      "end_frame": 4521,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0096-A10",
+      "target_element_ids": [
+        "S0096-E10"
+      ],
+      "description": "Upper-right panel formulas and velocity readout; fall-back caption changes to escape near threshold",
+      "start_frame": 4447,
+      "end_frame": 4521,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AW0305",
+      "relation": "vocal_word_candidate (unknown) at frame 4399–4456; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4436
+    },
+    {
+      "audio_event_id": "AB0409",
+      "relation": "beat_candidate (unknown) at frame 4436; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4436
+    },
+    {
+      "audio_event_id": "AH01881",
+      "relation": "band_onset_candidate (unknown) at frame 4436; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4436
+    },
+    {
+      "audio_event_id": "AH01882",
+      "relation": "band_onset_candidate (unknown) at frame 4436; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4436
+    },
+    {
+      "audio_event_id": "AH01883",
+      "relation": "band_onset_candidate (unknown) at frame 4436; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4436
+    },
+    {
+      "audio_event_id": "AH01884",
+      "relation": "band_onset_candidate (unknown) at frame 4437; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4437
+    },
+    {
+      "audio_event_id": "AH01885",
+      "relation": "band_onset_candidate (unknown) at frame 4437; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4437
+    },
+    {
+      "audio_event_id": "AB0410",
+      "relation": "beat_candidate (unknown) at frame 4447; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4447
+    },
+    {
+      "audio_event_id": "AH01886",
+      "relation": "band_onset_candidate (unknown) at frame 4447; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4447
+    },
+    {
+      "audio_event_id": "AH01887",
+      "relation": "band_onset_candidate (unknown) at frame 4447; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4447
+    },
+    {
+      "audio_event_id": "AH01888",
+      "relation": "band_onset_candidate (unknown) at frame 4447; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4447
+    },
+    {
+      "audio_event_id": "AH01889",
+      "relation": "band_onset_candidate (unknown) at frame 4448; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4448
+    },
+    {
+      "audio_event_id": "AH01890",
+      "relation": "band_onset_candidate (unknown) at frame 4458; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4458
+    },
+    {
+      "audio_event_id": "AB0411",
+      "relation": "beat_candidate (unknown) at frame 4458; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4458
+    },
+    {
+      "audio_event_id": "AH01891",
+      "relation": "band_onset_candidate (unknown) at frame 4458; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4458
+    },
+    {
+      "audio_event_id": "AH01892",
+      "relation": "band_onset_candidate (unknown) at frame 4458; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4458
+    },
+    {
+      "audio_event_id": "AH01893",
+      "relation": "band_onset_candidate (unknown) at frame 4459; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4459
+    },
+    {
+      "audio_event_id": "AH01894",
+      "relation": "band_onset_candidate (unknown) at frame 4463; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4463
+    },
+    {
+      "audio_event_id": "AH01895",
+      "relation": "band_onset_candidate (unknown) at frame 4469; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4469
+    },
+    {
+      "audio_event_id": "AH01896",
+      "relation": "band_onset_candidate (unknown) at frame 4469; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4469
+    },
+    {
+      "audio_event_id": "AB0412",
+      "relation": "beat_candidate (unknown) at frame 4469; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4469
+    },
+    {
+      "audio_event_id": "AH01897",
+      "relation": "band_onset_candidate (unknown) at frame 4469; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4469
+    },
+    {
+      "audio_event_id": "AH01898",
+      "relation": "band_onset_candidate (unknown) at frame 4469; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4469
+    },
+    {
+      "audio_event_id": "AH01899",
+      "relation": "band_onset_candidate (unknown) at frame 4474; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4474
+    },
+    {
+      "audio_event_id": "AH01900",
+      "relation": "band_onset_candidate (unknown) at frame 4474; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4474
+    },
+    {
+      "audio_event_id": "AH01901",
+      "relation": "band_onset_candidate (unknown) at frame 4474; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4474
+    },
+    {
+      "audio_event_id": "AH01902",
+      "relation": "band_onset_candidate (unknown) at frame 4479; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4479
+    },
+    {
+      "audio_event_id": "AH01903",
+      "relation": "band_onset_candidate (unknown) at frame 4480; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4480
+    },
+    {
+      "audio_event_id": "AB0413",
+      "relation": "beat_candidate (unknown) at frame 4480; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4480
+    },
+    {
+      "audio_event_id": "AH01904",
+      "relation": "band_onset_candidate (unknown) at frame 4480; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4480
+    },
+    {
+      "audio_event_id": "AH01905",
+      "relation": "band_onset_candidate (unknown) at frame 4480; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4480
+    },
+    {
+      "audio_event_id": "AH01906",
+      "relation": "band_onset_candidate (unknown) at frame 4480; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4480
+    },
+    {
+      "audio_event_id": "AH01907",
+      "relation": "band_onset_candidate (unknown) at frame 4482; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4482
+    },
+    {
+      "audio_event_id": "AH01908",
+      "relation": "band_onset_candidate (unknown) at frame 4485; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4485
+    },
+    {
+      "audio_event_id": "AH01909",
+      "relation": "band_onset_candidate (unknown) at frame 4485; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4485
+    },
+    {
+      "audio_event_id": "AH01910",
+      "relation": "band_onset_candidate (unknown) at frame 4486; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4486
+    },
+    {
+      "audio_event_id": "AH01911",
+      "relation": "band_onset_candidate (unknown) at frame 4488; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4488
+    },
+    {
+      "audio_event_id": "AB0414",
+      "relation": "beat_candidate (unknown) at frame 4490; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4490
+    },
+    {
+      "audio_event_id": "AH01912",
+      "relation": "band_onset_candidate (unknown) at frame 4490; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4490
+    },
+    {
+      "audio_event_id": "AH01913",
+      "relation": "band_onset_candidate (unknown) at frame 4490; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4490
+    },
+    {
+      "audio_event_id": "AH01914",
+      "relation": "band_onset_candidate (unknown) at frame 4490; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4490
+    },
+    {
+      "audio_event_id": "AH01915",
+      "relation": "band_onset_candidate (unknown) at frame 4491; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4491
+    },
+    {
+      "audio_event_id": "AH01916",
+      "relation": "band_onset_candidate (unknown) at frame 4491; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4491
+    },
+    {
+      "audio_event_id": "AH01917",
+      "relation": "band_onset_candidate (unknown) at frame 4496; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4496
+    },
+    {
+      "audio_event_id": "AH01918",
+      "relation": "band_onset_candidate (unknown) at frame 4496; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4496
+    },
+    {
+      "audio_event_id": "AH01919",
+      "relation": "band_onset_candidate (unknown) at frame 4496; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4496
+    },
+    {
+      "audio_event_id": "AH01920",
+      "relation": "band_onset_candidate (unknown) at frame 4498; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4498
+    },
+    {
+      "audio_event_id": "AB0415",
+      "relation": "beat_candidate (unknown) at frame 4501; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4501
+    },
+    {
+      "audio_event_id": "AB0416",
+      "relation": "beat_candidate (unknown) at frame 4512; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 4512
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B5,B10"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Original font files, random flap seed, alpha and easing code are unknown",
+    "Positions are bounded visual measurements; digit transition glyphs are reference-frame backed, not fully transcribed random sequences",
+    "Source assertions remain confirmed/inferred/unknown as in original layer hypotheses; inferred film-layer separation is not recovered author source code",
+    "No direct listening proof; audio linkage is candidate timing only"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0096.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "dissolve",
+      "boundary_id": "B3-001",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        4432,
+        4437
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "zoom_punch_cut",
+      "boundary_id": "B3-002",
+      "description": "少女立在三块翻牌板下低头，左侧巨大浅灰ESCAPE作为背景字。右下白纸物理示意图绘地球及轨道，左板速度从8.8升到10.7KM/S，右板永久底层六个月保持，末段面部叠化放大。",
+      "span": [
+        4521,
+        4521
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "ESCAPE / VELOCITY / 8.8→10.7 KM/S",
+    "LONGEVITY / E.V. / ---- YR/YR",
+    "PERMANENT / UNDERCLASS / 06 MONTHS",
+    "ESCAPE",
+    "Escape velocity:",
+    "FIG. 1 · ESCAPE VELOCITY · EARTH / BOARD 01 · ROCKET",
+    "7.9 · ORBIT / EARTH · R 6,371 KM",
+    "V = √(2GM / R) / G 6.674 × 10⁻¹¹ / M 5.972 × 10²⁴ [unit partly resolved] / v 9.2 KM/S · FALLS BACK",
+    "SEGMENT · 3 GANTRIES · 400 M / US 101 N · FOG · 06:52 / VISIBILITY 40 M · WIND 22 KT",
+    "PAYLOAD 01 · LOOK 11 0.97 / TAG",
+    "G1 · ROCKET / G2 · LONGEVITY / G3 · UNDERCLASS"
+  ],
+  "detail_review": {
+    "reviewer": "root",
+    "method": "actual whole filmstrip + native1920 midpoint +2f crop sequence, followed by separate1f panel visibility review",
+    "sheet": "work/root_review/micro_S0096.jpg",
+    "timing_precision_frames": 2,
+    "additional_sheets": [
+      "work/root_review/panels96.jpg"
+    ],
+    "visibility_note": "continuous plate persists throughout; diagram/word starts use inspected1–2f bounds; hidden renderer and font identity remain unknown",
+    "pending": []
+  }
+}

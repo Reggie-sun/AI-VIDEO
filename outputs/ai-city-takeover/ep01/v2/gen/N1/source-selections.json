@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v2-n1-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/N1-a.png",
+    "sha256": "f5afc9637788287044e6ea96af4d7cef93fc82224106e9ffa3f25b732e82888c",
+    "size_bytes": 2127111,
+    "width": 1672,
+    "height": 941,
+    "role": "approved N1-a: the first frame",
+    "need_id": "aisle",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

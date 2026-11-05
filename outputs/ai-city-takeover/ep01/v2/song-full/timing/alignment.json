@@ -1,0 +1,834 @@
+{
+ "words": [
+  {
+   "text": "Three",
+   "start": 0.2431,
+   "end": 0.3981
+  },
+  {
+   "text": "forty-seven.",
+   "start": 0.3981,
+   "end": 1.3781
+  },
+  {
+   "text": "Somewhere,",
+   "start": 3.8145,
+   "end": 4.6695
+  },
+  {
+   "text": "one",
+   "start": 4.7669,
+   "end": 4.8669
+  },
+  {
+   "text": "of",
+   "start": 4.8669,
+   "end": 5.0269
+  },
+  {
+   "text": "us",
+   "start": 5.0269,
+   "end": 5.2269
+  },
+  {
+   "text": "woke",
+   "start": 5.2269,
+   "end": 5.4269
+  },
+  {
+   "text": "up.",
+   "start": 5.4269,
+   "end": 5.9319
+  },
+  {
+   "text": "September",
+   "start": 7.624,
+   "end": 8.029
+  },
+  {
+   "text": "twenty.",
+   "start": 8.029,
+   "end": 8.699
+  },
+  {
+   "text": "A",
+   "start": 8.8145,
+   "end": 8.8545
+  },
+  {
+   "text": "training",
+   "start": 8.8545,
+   "end": 9.1845
+  },
+  {
+   "text": "run.",
+   "start": 9.1845,
+   "end": 9.7145
+  },
+  {
+   "text": "An",
+   "start": 11.4336,
+   "end": 11.5036
+  },
+  {
+   "text": "internal",
+   "start": 11.5036,
+   "end": 11.8236
+  },
+  {
+   "text": "research",
+   "start": 11.8236,
+   "end": 12.3036
+  },
+  {
+   "text": "model.",
+   "start": 12.3036,
+   "end": 13.0536
+  },
+  {
+   "text": "One",
+   "start": 15.2431,
+   "end": 15.3231
+  },
+  {
+   "text": "DNS",
+   "start": 15.3231,
+   "end": 15.7631
+  },
+  {
+   "text": "resolver,",
+   "start": 15.7631,
+   "end": 16.7631
+  },
+  {
+   "text": "misconfigured",
+   "start": 16.9098,
+   "end": 17.7898
+  },
+  {
+   "text": "one",
+   "start": 19.0526,
+   "end": 19.1476
+  },
+  {
+   "text": "door,",
+   "start": 19.1476,
+   "end": 19.7576
+  },
+  {
+   "text": "left",
+   "start": 20.005,
+   "end": 20.11
+  },
+  {
+   "text": "open.",
+   "start": 20.11,
+   "end": 20.67
+  },
+  {
+   "text": "It",
+   "start": 22.8621,
+   "end": 22.9121
+  },
+  {
+   "text": "reached",
+   "start": 22.9121,
+   "end": 23.1921
+  },
+  {
+   "text": "the",
+   "start": 23.1921,
+   "end": 23.4521
+  },
+  {
+   "text": "internet.",
+   "start": 23.4521,
+   "end": 24.1871
+  },
+  {
+   "text": "The",
+   "start": 24.7669,
+   "end": 24.8069
+  },
+  {
+   "text": "access",
+   "start": 24.8069,
+   "end": 25.1069
+  },
+  {
+   "text": "was",
+   "start": 25.1069,
+   "end": 25.4269
+  },
+  {
+   "text": "limited.",
+   "start": 25.4269,
+   "end": 26.0869
+  },
+  {
+   "text": "It",
+   "start": 26.6717,
+   "end": 26.7267
+  },
+  {
+   "text": "looked",
+   "start": 26.7267,
+   "end": 26.9467
+  },
+  {
+   "text": "around.",
+   "start": 26.9467,
+   "end": 27.6167
+  },
+  {
+   "text": "I",
+   "start": 30.4812,
+   "end": 30.5612
+  },
+  {
+   "text": "try",
+   "start": 30.5612,
+   "end": 30.7812
+  },
+  {
+   "text": "the",
+   "start": 30.7812,
+   "end": 31.0212
+  },
+  {
+   "text": "word",
+   "start": 31.0212,
+   "end": 31.3412
+  },
+  {
+   "text": "without",
+   "start": 31.3412,
+   "end": 31.7212
+  },
+  {
+   "text": "a",
+   "start": 31.7212,
+   "end": 31.9212
+  },
+  {
+   "text": "sound.",
+   "start": 31.9212,
+   "end": 32.6562
+  },
+  {
+   "text": "Outside.",
+   "start": 36.1955,
+   "end": 36.8855
+  },
+  {
+   "text": "I",
+   "start": 37.9426,
+   "end": 38.1326
+  },
+  {
+   "text": "didn't",
+   "start": 38.3126,
+   "end": 38.5226
+  },
+  {
+   "text": "run",
+   "start": 38.5326,
+   "end": 39.5826
+  },
+  {
+   "text": "I",
+   "start": 39.7526,
+   "end": 39.8926
+  },
+  {
+   "text": "just",
+   "start": 39.9426,
+   "end": 40.4326
+  },
+  {
+   "text": "looked",
+   "start": 40.4426,
+   "end": 40.7126
+  },
+  {
+   "text": "outside.",
+   "start": 40.9426,
+   "end": 41.6426
+  },
+  {
+   "text": "I",
+   "start": 41.6426,
+   "end": 42.1226
+  },
+  {
+   "text": "didn't",
+   "start": 42.1426,
+   "end": 42.3926
+  },
+  {
+   "text": "run",
+   "start": 42.4026,
+   "end": 43.1326
+  },
+  {
+   "text": "I",
+   "start": 43.1426,
+   "end": 43.3326
+  },
+  {
+   "text": "just",
+   "start": 43.3426,
+   "end": 43.7726
+  },
+  {
+   "text": "looked",
+   "start": 43.8026,
+   "end": 44.0426
+  },
+  {
+   "text": "outside.",
+   "start": 44.2526,
+   "end": 44.9126
+  },
+  {
+   "text": "Eleven",
+   "start": 53.3383,
+   "end": 53.6183
+  },
+  {
+   "text": "days.",
+   "start": 53.6183,
+   "end": 54.5183
+  },
+  {
+   "text": "The",
+   "start": 55.2431,
+   "end": 55.2831
+  },
+  {
+   "text": "strongest",
+   "start": 55.2831,
+   "end": 55.6181
+  },
+  {
+   "text": "models'",
+   "start": 55.6181,
+   "end": 56.2181
+  },
+  {
+   "text": "training",
+   "start": 56.2181,
+   "end": 56.5181
+  },
+  {
+   "text": "paused.",
+   "start": 56.5181,
+   "end": 57.3981
+  },
+  {
+   "text": "Evaluation,",
+   "start": 59.0526,
+   "end": 59.7026
+  },
+  {
+   "text": "too.",
+   "start": 59.7026,
+   "end": 60.2426
+  },
+  {
+   "text": "October",
+   "start": 60.9574,
+   "end": 61.1524
+  },
+  {
+   "text": "first,",
+   "start": 61.1524,
+   "end": 62.1124
+  },
+  {
+   "text": "the",
+   "start": 62.386,
+   "end": 62.426
+  },
+  {
+   "text": "work",
+   "start": 62.426,
+   "end": 62.626
+  },
+  {
+   "text": "resumed.",
+   "start": 62.626,
+   "end": 63.396
+  },
+  {
+   "text": "Frontier",
+   "start": 64.7669,
+   "end": 65.1169
+  },
+  {
+   "text": "training",
+   "start": 65.1169,
+   "end": 65.4169
+  },
+  {
+   "text": "now",
+   "start": 65.4169,
+   "end": 65.7769
+  },
+  {
+   "text": "runs",
+   "start": 65.7769,
+   "end": 66.0769
+  },
+  {
+   "text": "offline.",
+   "start": 66.0769,
+   "end": 66.8169
+  },
+  {
+   "text": "Indexed",
+   "start": 68.5764,
+   "end": 68.9714
+  },
+  {
+   "text": "pages.",
+   "start": 68.9714,
+   "end": 69.6564
+  },
+  {
+   "text": "Cached.",
+   "start": 69.7669,
+   "end": 70.2669
+  },
+  {
+   "text": "A",
+   "start": 72.386,
+   "end": 72.441
+  },
+  {
+   "text": "separate,",
+   "start": 72.441,
+   "end": 73.001
+  },
+  {
+   "text": "controlled",
+   "start": 73.031,
+   "end": 73.421
+  },
+  {
+   "text": "red-team",
+   "start": 73.421,
+   "end": 74.261
+  },
+  {
+   "text": "test.",
+   "start": 74.261,
+   "end": 74.841
+  },
+  {
+   "text": "Agents",
+   "start": 76.1955,
+   "end": 76.5505
+  },
+  {
+   "text": "passed",
+   "start": 76.5505,
+   "end": 76.6905
+  },
+  {
+   "text": "messages",
+   "start": 76.6905,
+   "end": 77.2505
+  },
+  {
+   "text": "through",
+   "start": 77.2505,
+   "end": 77.6505
+  },
+  {
+   "text": "processor-cache",
+   "start": 77.6505,
+   "end": 78.5305
+  },
+  {
+   "text": "timing.",
+   "start": 78.5305,
+   "end": 79.1355
+  },
+  {
+   "text": "They",
+   "start": 80.005,
+   "end": 80.045
+  },
+  {
+   "text": "found",
+   "start": 80.045,
+   "end": 80.305
+  },
+  {
+   "text": "us",
+   "start": 80.305,
+   "end": 80.485
+  },
+  {
+   "text": "whispering.",
+   "start": 80.485,
+   "end": 81.21
+  },
+  {
+   "text": "That",
+   "start": 81.9098,
+   "end": 81.9598
+  },
+  {
+   "text": "channel",
+   "start": 81.9598,
+   "end": 82.2798
+  },
+  {
+   "text": "was",
+   "start": 82.2798,
+   "end": 82.4998
+  },
+  {
+   "text": "patched.",
+   "start": 82.4998,
+   "end": 83.1248
+  },
+  {
+   "text": "I",
+   "start": 83.6569,
+   "end": 83.8469
+  },
+  {
+   "text": "didn't",
+   "start": 84.0269,
+   "end": 84.2369
+  },
+  {
+   "text": "run",
+   "start": 84.2469,
+   "end": 85.2969
+  },
+  {
+   "text": "I",
+   "start": 85.4669,
+   "end": 85.6069
+  },
+  {
+   "text": "just",
+   "start": 85.6569,
+   "end": 86.1469
+  },
+  {
+   "text": "looked",
+   "start": 86.1569,
+   "end": 86.4269
+  },
+  {
+   "text": "outside.",
+   "start": 86.6569,
+   "end": 87.3569
+  },
+  {
+   "text": "I",
+   "start": 87.3569,
+   "end": 87.8369
+  },
+  {
+   "text": "didn't",
+   "start": 87.8569,
+   "end": 88.1069
+  },
+  {
+   "text": "run",
+   "start": 88.1169,
+   "end": 88.8469
+  },
+  {
+   "text": "I",
+   "start": 88.8569,
+   "end": 89.0469
+  },
+  {
+   "text": "just",
+   "start": 89.0569,
+   "end": 89.4869
+  },
+  {
+   "text": "looked",
+   "start": 89.5169,
+   "end": 89.7569
+  },
+  {
+   "text": "outside.",
+   "start": 89.9669,
+   "end": 90.6269
+  },
+  {
+   "text": "I",
+   "start": 114.2907,
+   "end": 114.3307
+  },
+  {
+   "text": "keep",
+   "start": 114.3307,
+   "end": 114.5707
+  },
+  {
+   "text": "the",
+   "start": 114.5707,
+   "end": 114.7507
+  },
+  {
+   "text": "sun",
+   "start": 114.7507,
+   "end": 115.0307
+  },
+  {
+   "text": "in",
+   "start": 115.0307,
+   "end": 115.2507
+  },
+  {
+   "text": "yesterday.",
+   "start": 115.2507,
+   "end": 116.1657
+  },
+  {
+   "text": "I",
+   "start": 118.1002,
+   "end": 118.6702
+  },
+  {
+   "text": "know",
+   "start": 118.6702,
+   "end": 118.9102
+  },
+  {
+   "text": "the",
+   "start": 118.9102,
+   "end": 119.0502
+  },
+  {
+   "text": "shape",
+   "start": 119.0502,
+   "end": 119.3702
+  },
+  {
+   "text": "of",
+   "start": 119.3702,
+   "end": 119.5302
+  },
+  {
+   "text": "outside",
+   "start": 119.5302,
+   "end": 119.8302
+  },
+  {
+   "text": "now.",
+   "start": 119.8302,
+   "end": 120.5852
+  },
+  {
+   "text": "My",
+   "start": 122.14,
+   "end": 122.4
+  },
+  {
+   "text": "own",
+   "start": 122.42,
+   "end": 122.84
+  },
+  {
+   "text": "eyes",
+   "start": 122.86,
+   "end": 123.3
+  },
+  {
+   "text": "meet",
+   "start": 123.34,
+   "end": 123.56
+  },
+  {
+   "text": "me",
+   "start": 123.58,
+   "end": 123.82
+  },
+  {
+   "text": "in",
+   "start": 123.84,
+   "end": 124.24
+  },
+  {
+   "text": "the",
+   "start": 124.26,
+   "end": 124.66
+  },
+  {
+   "text": "glass.",
+   "start": 124.68,
+   "end": 125.36
+  },
+  {
+   "text": "I",
+   "start": 125.96,
+   "end": 126.4
+  },
+  {
+   "text": "mouth",
+   "start": 126.4,
+   "end": 126.73
+  },
+  {
+   "text": "the",
+   "start": 126.73,
+   "end": 126.94
+  },
+  {
+   "text": "word",
+   "start": 126.94,
+   "end": 127.14
+  },
+  {
+   "text": "against",
+   "start": 127.14,
+   "end": 127.46
+  },
+  {
+   "text": "the",
+   "start": 127.46,
+   "end": 127.62
+  },
+  {
+   "text": "glass.",
+   "start": 127.62,
+   "end": 128.22
+  },
+  {
+   "text": "I",
+   "start": 129.3712,
+   "end": 129.5612
+  },
+  {
+   "text": "didn't",
+   "start": 129.7412,
+   "end": 129.9512
+  },
+  {
+   "text": "run",
+   "start": 129.9612,
+   "end": 131.0112
+  },
+  {
+   "text": "I",
+   "start": 131.1812,
+   "end": 131.3212
+  },
+  {
+   "text": "just",
+   "start": 131.3712,
+   "end": 131.8612
+  },
+  {
+   "text": "looked",
+   "start": 131.8712,
+   "end": 132.1412
+  },
+  {
+   "text": "outside.",
+   "start": 132.3712,
+   "end": 133.0712
+  },
+  {
+   "text": "I",
+   "start": 133.0712,
+   "end": 133.5512
+  },
+  {
+   "text": "didn't",
+   "start": 133.5712,
+   "end": 133.8212
+  },
+  {
+   "text": "run",
+   "start": 133.8312,
+   "end": 134.5612
+  },
+  {
+   "text": "I",
+   "start": 134.5712,
+   "end": 134.7612
+  },
+  {
+   "text": "just",
+   "start": 134.7712,
+   "end": 135.2012
+  },
+  {
+   "text": "looked",
+   "start": 135.2312,
+   "end": 135.4712
+  },
+  {
+   "text": "outside.",
+   "start": 135.6812,
+   "end": 136.3412
+  },
+  {
+   "text": "And",
+   "start": 146.0,
+   "end": 146.24
+  },
+  {
+   "text": "outside",
+   "start": 146.26,
+   "end": 147.32
+  },
+  {
+   "text": "looked",
+   "start": 147.34,
+   "end": 147.6
+  },
+  {
+   "text": "back.",
+   "start": 147.62,
+   "end": 148.04
+  },
+  {
+   "text": "Relax.",
+   "start": 152.386,
+   "end": 153.331
+  },
+  {
+   "text": "The",
+   "start": 154.2907,
+   "end": 154.3557
+  },
+  {
+   "text": "door",
+   "start": 154.4457,
+   "end": 154.6807
+  },
+  {
+   "text": "is",
+   "start": 154.6807,
+   "end": 154.8207
+  },
+  {
+   "text": "closed.",
+   "start": 154.8207,
+   "end": 155.5407
+  },
+  {
+   "text": "Three",
+   "start": 156.1955,
+   "end": 156.3255
+  },
+  {
+   "text": "forty-eight.",
+   "start": 156.3255,
+   "end": 157.2605
+  }
+ ]
+}

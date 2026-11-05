@@ -1,0 +1,23 @@
+{
+  "source_sha256": "b469c215138b3b517dad78c84de0614fdf97821d853059f7c7106f8e99f4df13",
+  "derivatives": [
+    {
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/IRIS-01-Looked-Outside-G-repair.wav",
+      "bytes": 5760044,
+      "sha256": "b469c215138b3b517dad78c84de0614fdf97821d853059f7c7106f8e99f4df13"
+    },
+    {
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/IRIS-01-Looked-Outside-G-repair.mp3",
+      "bytes": 630668,
+      "sha256": "e1bc4be2216ae97cea65a04c6633ab73534eaadb709a3a2666b9ec849da7c6ae"
+    },
+    {
+      "file": "outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/IRIS-01-Looked-Outside-G-repair-mobile.opus",
+      "bytes": 462889,
+      "sha256": "665a33275485df97d2843523b5630b95a4c7eb925e3ff65118e5978f450b7d31"
+    }
+  ],
+  "source_words_or_speed_changed": false,
+  "full_decode": "PASS",
+  "human_hearing": "NOT_EVALUATED"
+}

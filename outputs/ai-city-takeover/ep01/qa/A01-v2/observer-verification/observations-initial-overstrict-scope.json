@@ -1,0 +1,175 @@
+{
+  "scope": "QA observations only, no canonical Gate, source artifact or lifecycle mutation",
+  "source_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+  "source_size_bytes": 15395561,
+  "project_revision": 4,
+  "qa_policy_hash": "657747bc189c9de527c836585be7b34990683c3a2d2a9844269c30aff25737d9",
+  "acceptance_profile_hash": "9550dd8d17a2eaf98c868c56cda4d5031f2292742b3cad5572d166272e639010",
+  "required_requirement_ids": [
+    "identity",
+    "quiet-observer",
+    "camera-space",
+    "visual"
+  ],
+  "references": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/reference-package/A01-v1.png",
+      "sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087"
+    },
+    {
+      "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+      "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+    }
+  ],
+  "video_timing": {
+    "decoded_frames": 145,
+    "video_duration_seconds": 6.016667,
+    "container_duration_seconds": 6.08,
+    "r_frame_rate": "60/1",
+    "avg_frame_rate": "8700/361",
+    "interpretation": "VFR timestamps; not constant60fps"
+  },
+  "normal_speed_playback": {
+    "rate": 1,
+    "ended": true,
+    "wall_seconds": 6.320700000047684,
+    "frames": 145,
+    "dropped_frames": 0,
+    "corrupted_frames": 0,
+    "muted": true,
+    "evidence": "normal-speed-playback.json",
+    "human_acceptance": "NOT_EVALUATED"
+  },
+  "findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "已对照真实A01/ID7b与全部145个PTS脸部帧、正常速度全片及首中尾全幅。同一女性脸部、浅肤雀斑、灰蓝眼、深棕后梳低髻、解剖左耳黑色耳挂、左领细红线与炭黑高领大衣保持；未见换脸、装置换侧或明显面部/服装形变。此为可见身份特征的analyzer判断，不是人类审美验收。",
+      "evidence_refs": [
+        "faces-000-048.jpg",
+        "faces-049-097.jpg",
+        "faces-098-144.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json"
+      ]
+    },
+    {
+      "requirement_id": "quiet-observer",
+      "verdict": "NOT_EVALUATED",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "新版嘴唇自然静置要求已满足，未见连续说话/演唱口型、明显转身或抬手；约1.333–1.500秒及4.800–5.050秒有两次轻微自然眨眼。局部胸肩/衣领有少量独立运动，但其幅度与形变不足以可靠归因为自然呼吸或极轻风动；不能仅凭静置姿态或小运动残差把整项补为PASS。未套用旧严格闭口要求。",
+      "subfindings": [
+        {
+          "check": "relaxed_static_lips_no_speech_articulation",
+          "verdict": "PASS"
+        },
+        {
+          "check": "light_blinks",
+          "verdict": "PASS",
+          "approx_spans_millis": [
+            [
+              1333,
+              1500
+            ],
+            [
+              4800,
+              5050
+            ]
+          ]
+        },
+        {
+          "check": "no_obvious_turn_or_hand_raise",
+          "verdict": "PASS"
+        },
+        {
+          "check": "natural_breathing",
+          "verdict": "NOT_EVALUATED"
+        },
+        {
+          "check": "independent_small_collar_motion",
+          "verdict": "PASS",
+          "limit": "motion observed; wind as its cause not proven"
+        }
+      ],
+      "evidence_refs": [
+        "faces-000-048.jpg",
+        "faces-049-097.jpg",
+        "faces-098-144.jpg",
+        "normal-speed-playback.json",
+        "motion-measurements.json"
+      ]
+    },
+    {
+      "requirement_id": "camera-space",
+      "verdict": "FAIL",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "v1侧身露背的明显偏差已消失，v2全段为正面头胸中近景且无翻轴/拉远；但本项还封存了起始人物大小保持。归一到1920x1080后，认可图瞳距约131px、主头高约509px；v2首帧约126px与491px，约小3-5%，头顶留白更多，起始大小未完全保持。以该严格人物大小要求判FAIL，不把仅同景别称为全项PASS。片中微推近和末段收稳得到2D证据支持，但不能抵消初始大小差异。",
+      "subfindings": [
+        {
+          "check": "frontal_same_axis_head_chest_framing",
+          "verdict": "PASS"
+        },
+        {
+          "check": "initial_subject_size_preserved",
+          "verdict": "FAIL",
+          "estimated_relative_size_difference": "approximately -3 to -5 percent"
+        },
+        {
+          "check": "no_profile_back_or_pullout",
+          "verdict": "PASS"
+        },
+        {
+          "check": "very_small_forward_image_motion_and_end_settle",
+          "verdict": "PASS",
+          "limit": "2D image-scale/background measurements only; no proof of physical3D dolly"
+        }
+      ],
+      "evidence_refs": [
+        "framing-measurements.json",
+        "framing-reference-vs-v2-grid.jpg",
+        "eye-position-grid.jpg",
+        "motion-measurements.json",
+        "normal-speed-playback.json"
+      ]
+    },
+    {
+      "requirement_id": "visual",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "真人摄影质感、同一蓝黑钢蓝雾城阳台、黑衣及细红领灯保持；只见已获用户允许的平台AI生成标识，未见新增剧情字幕、片名或新闻图形。未沿用旧版禁止全部文字的规则。",
+      "evidence_refs": [
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json"
+      ]
+    }
+  ],
+  "motion_summary": {
+    "background_similarity_scale_range_approx": "1.002 to1.0055 after onset",
+    "last_second_scale_change_approx": "0.0015 with integer-pixel matching and <=1px selected-background feature drift",
+    "limits": "NCC confirms small local movement, not physiological breathing, wind cause or a physical camera dolly"
+  },
+  "overall_verdict": "FAIL",
+  "next_shot_submit_allowed_by_this_report": false,
+  "crop_suggestion": "framing-measurements.json; recommendation only, no media edited",
+  "new_provider_calls": 0,
+  "canonical_state_writes": 0,
+  "human_acceptance": "NOT_EVALUATED",
+  "audio_meaning_or_listening": "NOT_EVALUATED"
+}

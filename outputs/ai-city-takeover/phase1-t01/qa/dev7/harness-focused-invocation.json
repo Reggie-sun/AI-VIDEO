@@ -1,0 +1,36 @@
+{
+  "level": "focused",
+  "snapshot_tree": "316f3bbf0f932630717742c557920397f6ccbd0f",
+  "exit_code": 2,
+  "stdout": "{\"error\": \"completion scope is empty\", \"status\": \"failed\"}\n",
+  "stderr": "",
+  "alternate_index_note": "Harness sanitizes Git environment; alternate-index invocation saw an empty actual index and ran no checks.",
+  "actual_staged_attempt": {
+    "argv": [
+      "python",
+      "scripts/agent_harness.py",
+      "verify",
+      "--staged",
+      "--level",
+      "focused",
+      "--run-id",
+      "iris-t01-dev7-focused-20261030"
+    ],
+    "index_tree": "075d5f8d3f4c27bc0bd010a9324f48e05f0b8806",
+    "staged_paths": [
+      "outputs/ai-city-takeover/phase1-t01/comp/data/events.json",
+      "outputs/ai-city-takeover/phase1-t01/comp/engine.js",
+      "outputs/ai-city-takeover/phase1-t01/comp/src/main.js"
+    ],
+    "exit_code": 2,
+    "error": "focused verification requires a module mapping",
+    "unmapped": [
+      "outputs/ai-city-takeover/phase1-t01/comp/data/events.json",
+      "outputs/ai-city-takeover/phase1-t01/comp/engine.js",
+      "outputs/ai-city-takeover/phase1-t01/comp/src/main.js"
+    ],
+    "checks_executed": false,
+    "receipt": "NOT_CREATED",
+    "full_regression": "NOT_EVALUATED"
+  }
+}

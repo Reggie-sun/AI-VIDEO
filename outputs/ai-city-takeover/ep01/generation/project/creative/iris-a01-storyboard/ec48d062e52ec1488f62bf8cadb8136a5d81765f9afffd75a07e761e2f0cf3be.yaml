@@ -1,0 +1,30 @@
+artifact_id: iris-a01-storyboard
+beats:
+- beat_id: intro
+  narrative_intent: 先制作独立阳台源片，完整歌曲剪辑另由最终时间线负责
+  scene_id: balcony
+  shot_ids:
+  - ep01-intro
+content_hash: ec48d062e52ec1488f62bf8cadb8136a5d81765f9afffd75a07e761e2f0cf3be
+creation_receipt_id: iris-a01-authoring:storyboard
+revision: 3
+schema_version: '2.0'
+source_provenance:
+- content_hash: 8931db29abddc8ddaa43a09485dbc51471e6cdce7ad5242a44b249a6698d8da0
+  kind: user_input
+  reference: evidence/authoring-input/8931db29abddc8ddaa43a09485dbc51471e6cdce7ad5242a44b249a6698d8da0.json
+- content_hash: d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5
+  kind: user_input
+  reference: evidence/authoring-input/d6bf2c4190f0e4331f4c147f8774b44f5ee0a5f1305bb8294ce8e6c4a2d94aa5.json
+- content_hash: 8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5
+  kind: user_input
+  reference: evidence/authoring-input/8c2b79b40d0f16ba24d9526c87afa27336b6755427b018f208d7e988e560ffa5.json
+- content_hash: f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199
+  kind: user_input
+  reference: evidence/authoring-input/f6456dec47745c8788e37d7fbabe10e96ecb2d15ad819028e503f00a769f9199.json
+- content_hash: 6c7fc0d7ac00a1a5c09de4a440646de96672356c9c543c56ca2e3b8e3d6aae99
+  kind: user_input
+  reference: evidence/authoring-input/6c7fc0d7ac00a1a5c09de4a440646de96672356c9c543c56ca2e3b8e3d6aae99.json
+- content_hash: 176ae895b88339237fe4c43d626863a4e42d129e1a620b76637fc7d6072b3ea4
+  kind: user_input
+  reference: evidence/authoring-input/176ae895b88339237fe4c43d626863a4e42d129e1a620b76637fc7d6072b3ea4.json

@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/song-suno/listen/T4-verse1/operator-01",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/song-suno/listen/T4-verse1/operator-01/intent.json",
+  "intent_sha256": "7b473eccedb66383ddc48347220252d03c3d6845317bf74f541fec21b61d159a",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/song-suno/listen/T4-verse1/operator-01/reservation.json",
+  "reservation_sha256": "880c9caca08e7006ada0fa866f7309da732618c96795103c3d8a8421778ad62d",
+  "source_sha256": "7ba400e2c109a49ac0c8aaa33aa94d7c186aa3578b166085362f518386b1dbbb",
+  "source_size_bytes": 1344078,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

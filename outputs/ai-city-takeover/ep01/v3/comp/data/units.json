@@ -1,0 +1,5927 @@
+{
+ "shots_map_sha256": "3c3a14a8e2ddd5c63432a80551e0bedf3aa62b3713dd40e33332fe28e3a1c1e0",
+ "fps": 30,
+ "duration": 261.56,
+ "frames": 7847,
+ "units": [
+  {
+   "id": "U001",
+   "i": 0,
+   "t0": 0.0,
+   "t1": 4.2,
+   "f0": 0,
+   "f1": 126,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 0
+    }
+   ],
+   "graphics": [
+    "osd_power_on",
+    "osd_zoombox"
+   ],
+   "text": "HALL 07 · CAM 03",
+   "lines": [
+    "HALL 07 · CAM 03"
+   ],
+   "toks": [
+    {
+     "text": "HALL",
+     "at": 0.5,
+     "voiced": false
+    },
+    {
+     "text": "07",
+     "at": 0.5,
+     "voiced": false
+    },
+    {
+     "text": "CAM",
+     "at": 0.5,
+     "voiced": false
+    },
+    {
+     "text": "03",
+     "at": 0.5,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 0.5,
+   "cueSrc": "hit",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U002",
+   "i": 1,
+   "t0": 4.2,
+   "t1": 7.92,
+   "f0": 126,
+   "f1": 238,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "truck",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-row-lit-a",
+     "from": 0,
+     "f": 126
+    }
+   ],
+   "graphics": [
+    "light_flicker_on"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 6.666666666666667,
+   "cueSrc": "cue_s",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": "P-row-lit-a--off",
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U003",
+   "i": 2,
+   "t0": 7.92,
+   "t1": 9.76,
+   "f0": 238,
+   "f1": 293,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 238
+    }
+   ],
+   "graphics": [
+    "osd_detect_one"
+   ],
+   "text": "ANOMALY 1 / 4096",
+   "lines": [
+    "ANOMALY 1 / 4096"
+   ],
+   "toks": [
+    {
+     "text": "ANOMALY",
+     "at": 8.4,
+     "voiced": false
+    },
+    {
+     "text": "1",
+     "at": 8.4,
+     "voiced": false
+    },
+    {
+     "text": "4096",
+     "at": 8.4,
+     "voiced": false
+    }
+   ],
+   "target": [
+    0.56,
+    0.52
+   ],
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 8.4,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U004",
+   "i": 3,
+   "t0": 9.76,
+   "t1": 13.48,
+   "f0": 293,
+   "f1": 405,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "flipclock_0346_0347",
+    "lyric_word"
+   ],
+   "text": "03:46 → 03:47 · IRIS CLOCK",
+   "lines": [
+    "03:46 → 03:47 · IRIS CLOCK"
+   ],
+   "toks": [
+    {
+     "text": "03",
+     "at": 9.833333333333334,
+     "voiced": true
+    },
+    {
+     "text": "46",
+     "at": 9.833333333333334,
+     "voiced": false
+    },
+    {
+     "text": "03",
+     "at": 9.833333333333334,
+     "voiced": true
+    },
+    {
+     "text": "47",
+     "at": 10.133333333333333,
+     "voiced": true
+    },
+    {
+     "text": "IRIS",
+     "at": 10.133333333333333,
+     "voiced": false
+    },
+    {
+     "text": "CLOCK",
+     "at": 10.133333333333333,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 10.133333333333333,
+   "cueSrc": "cue_s",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 0,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Three",
+       "start": 9.821,
+       "end": 10.062
+      },
+      {
+       "text": "forty-seven.",
+       "start": 10.122,
+       "end": 10.923
+      }
+     ],
+     "start": 9.821,
+     "end": 10.923
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U005",
+   "i": 4,
+   "t0": 13.48,
+   "t1": 17.19,
+   "f0": 405,
+   "f1": 516,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-eyes-closed-a",
+     "from": 0,
+     "f": 405
+    },
+    {
+     "key": "P-headturn-b",
+     "from": 0.31,
+     "f": 439
+    }
+   ],
+   "graphics": [
+    "lyric_word"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 14.6,
+   "cueSrc": "hit",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 1,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Somewhere,",
+       "start": 14.631,
+       "end": 15.192
+      }
+     ],
+     "start": 14.631,
+     "end": 15.192
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U006",
+   "i": 5,
+   "t0": 17.19,
+   "t1": 20.94,
+   "f0": 516,
+   "f1": 629,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-step-out-a",
+     "from": 0,
+     "f": 516
+    }
+   ],
+   "graphics": [
+    "lyric_word",
+    "pulse_on_beat"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 19.066666666666666,
+   "cueSrc": "cue_s",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 1,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "one",
+       "start": 17.675,
+       "end": 17.795
+      },
+      {
+       "text": "of",
+       "start": 17.795,
+       "end": 17.875
+      },
+      {
+       "text": "us",
+       "start": 17.915,
+       "end": 18.035
+      },
+      {
+       "text": "woke",
+       "start": 18.095,
+       "end": 18.456
+      },
+      {
+       "text": "up.",
+       "start": 18.456,
+       "end": 18.676
+      }
+     ],
+     "start": 17.675,
+     "end": 18.676
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U007",
+   "i": 6,
+   "t0": 20.94,
+   "t1": 24.73,
+   "f0": 629,
+   "f1": 742,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "pan",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 629
+    }
+   ],
+   "graphics": [
+    "osd_track_one"
+   ],
+   "text": "ACTIVE 1",
+   "lines": [
+    "ACTIVE 1"
+   ],
+   "toks": [
+    {
+     "text": "ACTIVE",
+     "at": 21.433333333333334,
+     "voiced": false
+    },
+    {
+     "text": "1",
+     "at": 21.433333333333334,
+     "voiced": false
+    }
+   ],
+   "target": [
+    0.56,
+    0.52
+   ],
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 21.433333333333334,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U008",
+   "i": 7,
+   "t0": 24.73,
+   "t1": 26.61,
+   "f0": 742,
+   "f1": 799,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-turn-door-a",
+     "from": 0,
+     "f": 742
+    }
+   ],
+   "graphics": [],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 25.2,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U009",
+   "i": 8,
+   "t0": 26.61,
+   "t1": 28.49,
+   "f0": 799,
+   "f1": 855,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "flipdate_SEP_20",
+    "lyric_word"
+   ],
+   "text": "SEP 20",
+   "lines": [
+    "SEP 20"
+   ],
+   "toks": [
+    {
+     "text": "SEP",
+     "at": 27.333333333333332,
+     "voiced": true
+    },
+    {
+     "text": "20",
+     "at": 27.9,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 27.333333333333332,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 2,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "September",
+       "start": 27.315,
+       "end": 27.838
+      },
+      {
+       "text": "twenty.",
+       "start": 27.878,
+       "end": 28.42
+      }
+     ],
+     "start": 27.315,
+     "end": 28.42
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U010",
+   "i": 9,
+   "t0": 28.49,
+   "t1": 30.37,
+   "f0": 855,
+   "f1": 912,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 855
+    }
+   ],
+   "graphics": [
+    "osd_progress_training",
+    "lyric_word"
+   ],
+   "text": "TRAINING RUN · INDEXED, CACHED PAGES",
+   "lines": [
+    "TRAINING RUN · INDEXED, CACHED PAGES"
+   ],
+   "toks": [
+    {
+     "text": "TRAINING",
+     "at": 28.566666666666666,
+     "voiced": true
+    },
+    {
+     "text": "RUN",
+     "at": 29.033333333333335,
+     "voiced": true
+    },
+    {
+     "text": "INDEXED",
+     "at": 29.033333333333335,
+     "voiced": false
+    },
+    {
+     "text": "CACHED",
+     "at": 29.033333333333335,
+     "voiced": false
+    },
+    {
+     "text": "PAGES",
+     "at": 29.033333333333335,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 28.533333333333335,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 2,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "A",
+       "start": 28.501,
+       "end": 28.521
+      },
+      {
+       "text": "training",
+       "start": 28.521,
+       "end": 28.943
+      },
+      {
+       "text": "run.",
+       "start": 29.003,
+       "end": 29.284
+      }
+     ],
+     "start": 28.501,
+     "end": 29.284
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U011",
+   "i": 10,
+   "t0": 30.37,
+   "t1": 34.13,
+   "f0": 912,
+   "f1": 1024,
+   "view": "iris",
+   "scale": "full",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-catwalk-b",
+     "from": 0,
+     "f": 912
+    }
+   ],
+   "graphics": [
+    "look_label_internal_model",
+    "lyric_word"
+   ],
+   "text": "INTERNAL RESEARCH MODEL",
+   "lines": [
+    "INTERNAL RESEARCH MODEL"
+   ],
+   "toks": [
+    {
+     "text": "INTERNAL",
+     "at": 31.3,
+     "voiced": true
+    },
+    {
+     "text": "RESEARCH",
+     "at": 31.833333333333332,
+     "voiced": true
+    },
+    {
+     "text": "MODEL",
+     "at": 32.4,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 30.4,
+   "cueSrc": "hit",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 3,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "An",
+       "start": 31.136,
+       "end": 31.216
+      },
+      {
+       "text": "internal",
+       "start": 31.276,
+       "end": 31.759
+      },
+      {
+       "text": "research",
+       "start": 31.819,
+       "end": 32.301
+      },
+      {
+       "text": "model.",
+       "start": 32.382,
+       "end": 32.744
+      }
+     ],
+     "start": 31.136,
+     "end": 32.744
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U012",
+   "i": 11,
+   "t0": 34.13,
+   "t1": 36.5,
+   "f0": 1024,
+   "f1": 1095,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "nodegraph_resolver",
+    "lyric_word"
+   ],
+   "text": "MODEL → DNS RESOLVER → EXTERNAL",
+   "lines": [
+    "MODEL → DNS RESOLVER → EXTERNAL"
+   ],
+   "toks": [
+    {
+     "text": "MODEL",
+     "at": 34.13333333333333,
+     "voiced": false
+    },
+    {
+     "text": "DNS",
+     "at": 35.03333333333333,
+     "voiced": true
+    },
+    {
+     "text": "RESOLVER",
+     "at": 35.7,
+     "voiced": true
+    },
+    {
+     "text": "EXTERNAL",
+     "at": 35.7,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 34.13333333333333,
+   "cueSrc": "hit",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 4,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "One",
+       "start": 34.773,
+       "end": 34.934
+      },
+      {
+       "text": "D",
+       "start": 35.014,
+       "end": 35.034
+      },
+      {
+       "text": "N",
+       "start": 35.375,
+       "end": 35.395
+      },
+      {
+       "text": "S",
+       "start": 35.575,
+       "end": 35.595
+      },
+      {
+       "text": "resolver,",
+       "start": 35.676,
+       "end": 36.277
+      }
+     ],
+     "start": 34.773,
+     "end": 36.277
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U013",
+   "i": 12,
+   "t0": 36.5,
+   "t1": 38.06,
+   "f0": 1095,
+   "f1": 1142,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "nodegraph_control_gap",
+    "lyric_word"
+   ],
+   "text": "CONTROL · DNS RESOLVER · MISCONFIGURED",
+   "lines": [
+    "CONTROL · DNS RESOLVER · MISCONFIGURED"
+   ],
+   "toks": [
+    {
+     "text": "CONTROL",
+     "at": 37.166666666666664,
+     "voiced": false
+    },
+    {
+     "text": "DNS",
+     "at": 37.166666666666664,
+     "voiced": false
+    },
+    {
+     "text": "RESOLVER",
+     "at": 37.166666666666664,
+     "voiced": false
+    },
+    {
+     "text": "MISCONFIGURED",
+     "at": 37.166666666666664,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 37.166666666666664,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 4,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "misconfigured",
+       "start": 37.16,
+       "end": 38.062
+      }
+     ],
+     "start": 37.16,
+     "end": 38.062
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U014",
+   "i": 13,
+   "t0": 38.06,
+   "t1": 41.57,
+   "f0": 1142,
+   "f1": 1248,
+   "view": "iris",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-aisle-door-a",
+     "from": 0,
+     "f": 1142
+    }
+   ],
+   "graphics": [
+    "light_spread_floor"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": [
+    0.505,
+    0.47
+   ],
+   "targets": null,
+   "lineTok": [],
+   "cue": 38.4,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U015",
+   "i": 14,
+   "t0": 41.57,
+   "t1": 44.1,
+   "f0": 1248,
+   "f1": 1323,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-walk-door-a",
+     "from": 0,
+     "f": 1248
+    }
+   ],
+   "graphics": [
+    "lyric_word"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 41.7,
+   "cueSrc": "hit",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 5,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "one",
+       "start": 41.574,
+       "end": 41.735
+      },
+      {
+       "text": "door,",
+       "start": 41.795,
+       "end": 42.116
+      },
+      {
+       "text": "left",
+       "start": 43.461,
+       "end": 43.722
+      },
+      {
+       "text": "open.",
+       "start": 43.802,
+       "end": 44.103
+      }
+     ],
+     "start": 41.574,
+     "end": 44.103
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U016",
+   "i": 15,
+   "t0": 44.1,
+   "t1": 46.12,
+   "f0": 1323,
+   "f1": 1384,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-door-face-a",
+     "from": 0,
+     "f": 1323
+    }
+   ],
+   "graphics": [
+    "led_breathe"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 46.1,
+   "cueSrc": "word",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U017",
+   "i": 16,
+   "t0": 46.12,
+   "t1": 48.96,
+   "f0": 1384,
+   "f1": 1469,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "nodegraph_single_endpoint",
+    "lyric_word"
+   ],
+   "text": "DNS → EXTERNAL CHATBOT · LIMITED",
+   "lines": [
+    "DNS → EXTERNAL CHATBOT · LIMITED"
+   ],
+   "toks": [
+    {
+     "text": "DNS",
+     "at": 46.4,
+     "voiced": false
+    },
+    {
+     "text": "EXTERNAL",
+     "at": 46.4,
+     "voiced": false
+    },
+    {
+     "text": "CHATBOT",
+     "at": 46.4,
+     "voiced": false
+    },
+    {
+     "text": "LIMITED",
+     "at": 46.4,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 46.4,
+   "cueSrc": "hit",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 6,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "It",
+       "start": 46.117,
+       "end": 46.197
+      },
+      {
+       "text": "reached",
+       "start": 46.258,
+       "end": 46.499
+      },
+      {
+       "text": "the",
+       "start": 46.519,
+       "end": 46.6
+      },
+      {
+       "text": "internet.",
+       "start": 46.66,
+       "end": 47.042
+      }
+     ],
+     "start": 46.117,
+     "end": 47.042
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U018",
+   "i": 17,
+   "t0": 48.96,
+   "t1": 51.08,
+   "f0": 1469,
+   "f1": 1533,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-door-latch-a",
+     "from": 0,
+     "f": 1469
+    }
+   ],
+   "graphics": [
+    "lyric_word",
+    "pulse_on_beat"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 49.166666666666664,
+   "cueSrc": "cue_s",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 7,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "The",
+       "start": 48.956,
+       "end": 49.057
+      },
+      {
+       "text": "access",
+       "start": 49.157,
+       "end": 49.66
+      },
+      {
+       "text": "was",
+       "start": 49.74,
+       "end": 49.901
+      },
+      {
+       "text": "limited.",
+       "start": 50.002,
+       "end": 50.404
+      }
+     ],
+     "start": 48.956,
+     "end": 50.404
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U019",
+   "i": 18,
+   "t0": 51.08,
+   "t1": 54.69,
+   "f0": 1533,
+   "f1": 1641,
+   "view": "iris",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-city-gap-a",
+     "from": 0,
+     "f": 1533
+    }
+   ],
+   "graphics": [
+    "lyric_word",
+    "city_flicker_on_beat"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 51.86666666666667,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 8,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "It",
+       "start": 51.856,
+       "end": 51.916
+      },
+      {
+       "text": "looked",
+       "start": 51.957,
+       "end": 52.178
+      },
+      {
+       "text": "around.",
+       "start": 52.238,
+       "end": 52.741
+      }
+     ],
+     "start": 51.856,
+     "end": 52.741
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U020",
+   "i": 19,
+   "t0": 54.69,
+   "t1": 60.5,
+   "f0": 1641,
+   "f1": 1815,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gap-face-a",
+     "from": 0,
+     "f": 1641
+    },
+    {
+     "key": "P-gap-34-a",
+     "from": 0.606,
+     "f": 1747
+    }
+   ],
+   "graphics": [
+    "lyric_whisper",
+    "led_breathe"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 54.86666666666667,
+   "cueSrc": "hit",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_whisper",
+   "lyr": [
+    {
+     "line": 9,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "A",
+       "start": 54.694,
+       "end": 54.715
+      },
+      {
+       "text": "word",
+       "start": 54.815,
+       "end": 55.076
+      },
+      {
+       "text": "I",
+       "start": 55.216,
+       "end": 55.236
+      },
+      {
+       "text": "keep",
+       "start": 55.276,
+       "end": 55.517
+      },
+      {
+       "text": "inside.",
+       "start": 55.578,
+       "end": 56.32
+      }
+     ],
+     "start": 54.694,
+     "end": 56.32
+    },
+    {
+     "line": 10,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 58.209,
+       "end": 59.894
+      }
+     ],
+     "start": 58.209,
+     "end": 59.894
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U021",
+   "i": 20,
+   "t0": 60.5,
+   "t1": 64.26,
+   "f0": 1815,
+   "f1": 1928,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gap-mcu-b",
+     "from": 0,
+     "f": 1815
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 61.266666666666666,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 11,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 61.259,
+       "end": 61.279
+      },
+      {
+       "text": "didn't",
+       "start": 61.639,
+       "end": 63.522
+      },
+      {
+       "text": "run",
+       "start": 63.602,
+       "end": 63.903
+      }
+     ],
+     "start": 61.259,
+     "end": 63.903
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U022",
+   "i": 21,
+   "t0": 64.26,
+   "t1": 67.23,
+   "f0": 1928,
+   "f1": 2017,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-gap-34-a",
+     "from": 0,
+     "f": 1928
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 64.53333333333333,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 12,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 64.505,
+       "end": 64.525
+      },
+      {
+       "text": "just",
+       "start": 64.686,
+       "end": 65.047
+      },
+      {
+       "text": "looked",
+       "start": 65.107,
+       "end": 65.428
+      },
+      {
+       "text": "outside.",
+       "start": 65.548,
+       "end": 67.233
+      }
+     ],
+     "start": 64.505,
+     "end": 67.233
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U023",
+   "i": 22,
+   "t0": 67.23,
+   "t1": 69.9,
+   "f0": 2017,
+   "f1": 2097,
+   "view": "iris",
+   "scale": "wide",
+   "move": {
+    "kind": "eye",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-city-gap-a",
+     "from": 0,
+     "f": 2017
+    }
+   ],
+   "graphics": [
+    "city_flicker_on_beat"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 67.56666666666666,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U024",
+   "i": 23,
+   "t0": 69.9,
+   "t1": 72.53,
+   "f0": 2097,
+   "f1": 2176,
+   "view": "iris",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gap-wide-a",
+     "from": 0,
+     "f": 2097
+    }
+   ],
+   "graphics": [],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 72.5,
+   "cueSrc": "word",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U025",
+   "i": 24,
+   "t0": 72.53,
+   "t1": 78.14,
+   "f0": 2176,
+   "f1": 2345,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-door-face-a",
+     "from": 0,
+     "f": 2176
+    },
+    {
+     "key": "P-gap-mcu-b",
+     "from": 0.55,
+     "f": 2269
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 72.93333333333334,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 13,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 72.528,
+       "end": 72.548
+      },
+      {
+       "text": "didn't",
+       "start": 72.909,
+       "end": 75.294
+      },
+      {
+       "text": "run",
+       "start": 75.775,
+       "end": 78.14
+      }
+     ],
+     "start": 72.528,
+     "end": 78.14
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U026",
+   "i": 25,
+   "t0": 78.14,
+   "t1": 79.56,
+   "f0": 2345,
+   "f1": 2387,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gap-wide-a",
+     "from": 0,
+     "f": 2345
+    }
+   ],
+   "graphics": [
+    "osd_detect_lost"
+   ],
+   "text": "TRACK LOST",
+   "lines": [
+    "TRACK LOST"
+   ],
+   "toks": [
+    {
+     "text": "TRACK",
+     "at": 78.36666666666666,
+     "voiced": false
+    },
+    {
+     "text": "LOST",
+     "at": 78.36666666666666,
+     "voiced": false
+    }
+   ],
+   "target": [
+    0.905,
+    0.48
+   ],
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 78.36666666666666,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U027",
+   "i": 26,
+   "t0": 79.56,
+   "t1": 83.13,
+   "f0": 2387,
+   "f1": 2494,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gap-face-a",
+     "from": 0,
+     "f": 2387
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 79.56666666666666,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 14,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 79.564,
+       "end": 79.584
+      },
+      {
+       "text": "just",
+       "start": 79.704,
+       "end": 80.064
+      },
+      {
+       "text": "looked",
+       "start": 80.165,
+       "end": 80.445
+      },
+      {
+       "text": "outside.",
+       "start": 80.545,
+       "end": 83.128
+      }
+     ],
+     "start": 79.564,
+     "end": 83.128
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U028",
+   "i": 27,
+   "t0": 83.13,
+   "t1": 86.82,
+   "f0": 2494,
+   "f1": 2605,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 2494
+    }
+   ],
+   "graphics": [
+    "osd_paused_blackout"
+   ],
+   "text": "STRONGEST MODELS · RELATED WORK PAUSED",
+   "lines": [
+    "STRONGEST MODELS · RELATED WORK PAUSED"
+   ],
+   "toks": [
+    {
+     "text": "STRONGEST",
+     "at": 83.53333333333333,
+     "voiced": false
+    },
+    {
+     "text": "MODELS",
+     "at": 83.53333333333333,
+     "voiced": false
+    },
+    {
+     "text": "RELATED",
+     "at": 83.53333333333333,
+     "voiced": false
+    },
+    {
+     "text": "WORK",
+     "at": 83.53333333333333,
+     "voiced": false
+    },
+    {
+     "text": "PAUSED",
+     "at": 83.53333333333333,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 83.53333333333333,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U029",
+   "i": 28,
+   "t0": 86.82,
+   "t1": 89.52,
+   "f0": 2605,
+   "f1": 2686,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-dark-hall-b",
+     "from": 0,
+     "f": 2605
+    }
+   ],
+   "graphics": [
+    "darken_all_but_red"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 88.7,
+   "cueSrc": "hit",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U030",
+   "i": 29,
+   "t0": 89.52,
+   "t1": 92.43,
+   "f0": 2686,
+   "f1": 2773,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "calendar_day01_day11",
+    "lyric_word"
+   ],
+   "text": "DAY 01 → DAY 11",
+   "lines": [
+    "DAY 01 → DAY 11"
+   ],
+   "toks": [
+    {
+     "text": "DAY",
+     "at": 89.96666666666667,
+     "voiced": true
+    },
+    {
+     "text": "01",
+     "at": 89.96666666666667,
+     "voiced": false
+    },
+    {
+     "text": "DAY",
+     "at": 89.96666666666667,
+     "voiced": true
+    },
+    {
+     "text": "11",
+     "at": 89.6,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 89.53333333333333,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 15,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Eleven",
+       "start": 89.523,
+       "end": 89.884
+      },
+      {
+       "text": "days.",
+       "start": 89.964,
+       "end": 90.526
+      }
+     ],
+     "start": 89.523,
+     "end": 90.526
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U031",
+   "i": 30,
+   "t0": 92.43,
+   "t1": 96.18,
+   "f0": 2773,
+   "f1": 2886,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 2773
+    }
+   ],
+   "graphics": [
+    "osd_paused_freeze",
+    "lyric_word"
+   ],
+   "text": "STRONGEST MODELS · RELATED WORK PAUSED",
+   "lines": [
+    "STRONGEST MODELS · RELATED WORK PAUSED"
+   ],
+   "toks": [
+    {
+     "text": "STRONGEST",
+     "at": 93.2,
+     "voiced": true
+    },
+    {
+     "text": "MODELS",
+     "at": 93.86666666666666,
+     "voiced": true
+    },
+    {
+     "text": "RELATED",
+     "at": 93.86666666666666,
+     "voiced": false
+    },
+    {
+     "text": "WORK",
+     "at": 93.86666666666666,
+     "voiced": false
+    },
+    {
+     "text": "PAUSED",
+     "at": 94.76666666666667,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 93.0,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 16,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "The",
+       "start": 92.993,
+       "end": 93.073
+      },
+      {
+       "text": "strongest",
+       "start": 93.193,
+       "end": 93.754
+      },
+      {
+       "text": "models'",
+       "start": 93.835,
+       "end": 94.256
+      },
+      {
+       "text": "training",
+       "start": 94.296,
+       "end": 94.697
+      },
+      {
+       "text": "paused.",
+       "start": 94.757,
+       "end": 95.479
+      }
+     ],
+     "start": 92.993,
+     "end": 95.479
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U032",
+   "i": 31,
+   "t0": 96.18,
+   "t1": 99.93,
+   "f0": 2886,
+   "f1": 2998,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "truck",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-eval-screens-a",
+     "from": 0,
+     "f": 2886
+    }
+   ],
+   "graphics": [
+    "eval_labels_dim",
+    "lyric_word"
+   ],
+   "text": "EVAL",
+   "lines": [
+    "EVAL"
+   ],
+   "toks": [
+    {
+     "text": "EVAL",
+     "at": 96.9,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 96.9,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 17,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Evaluation,",
+       "start": 96.883,
+       "end": 97.724
+      },
+      {
+       "text": "too.",
+       "start": 97.825,
+       "end": 98.105
+      }
+     ],
+     "start": 96.883,
+     "end": 98.105
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U033",
+   "i": 32,
+   "t0": 99.93,
+   "t1": 103.68,
+   "f0": 2998,
+   "f1": 3111,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-speak-aisle-b",
+     "from": 0,
+     "f": 2998
+    }
+   ],
+   "graphics": [
+    "lights_back_on",
+    "date_tag_OCT_01",
+    "lyric_word"
+   ],
+   "text": "OCT 01",
+   "lines": [
+    "OCT 01"
+   ],
+   "toks": [
+    {
+     "text": "OCT",
+     "at": 100.2,
+     "voiced": true
+    },
+    {
+     "text": "01",
+     "at": 100.8,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 100.2,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 18,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "October",
+       "start": 100.173,
+       "end": 100.674
+      },
+      {
+       "text": "first,",
+       "start": 100.774,
+       "end": 101.276
+      },
+      {
+       "text": "the",
+       "start": 101.516,
+       "end": 101.617
+      },
+      {
+       "text": "work",
+       "start": 101.697,
+       "end": 101.937
+      },
+      {
+       "text": "resumed.",
+       "start": 101.978,
+       "end": 102.699
+      }
+     ],
+     "start": 100.173,
+     "end": 102.699
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U034",
+   "i": 33,
+   "t0": 103.68,
+   "t1": 107.42,
+   "f0": 3111,
+   "f1": 3223,
+   "view": "iris",
+   "scale": "wide",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-aisle-door-a",
+     "from": 0,
+     "f": 3111
+    }
+   ],
+   "graphics": [
+    "redline_retract",
+    "gap_dim",
+    "tag_offline",
+    "lyric_word"
+   ],
+   "text": "OFFLINE",
+   "lines": [
+    "OFFLINE"
+   ],
+   "toks": [
+    {
+     "text": "OFFLINE",
+     "at": 105.9,
+     "voiced": true
+    }
+   ],
+   "target": [
+    0.505,
+    0.47
+   ],
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 104.06666666666666,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 19,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Frontier",
+       "start": 104.045,
+       "end": 104.528
+      },
+      {
+       "text": "training",
+       "start": 104.568,
+       "end": 105.01
+      },
+      {
+       "text": "now",
+       "start": 105.07,
+       "end": 105.351
+      },
+      {
+       "text": "runs",
+       "start": 105.512,
+       "end": 105.773
+      },
+      {
+       "text": "offline.",
+       "start": 105.874,
+       "end": 106.597
+      }
+     ],
+     "start": 104.045,
+     "end": 106.597
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U035",
+   "i": 34,
+   "t0": 107.42,
+   "t1": 110.92,
+   "f0": 3223,
+   "f1": 3328,
+   "view": "iris",
+   "scale": "wide",
+   "move": {
+    "kind": "up",
+    "dy": 0.06
+   },
+   "plates": [
+    {
+     "key": "P-offline-a",
+     "from": 0,
+     "f": 3223
+    }
+   ],
+   "graphics": [
+    "tag_cached_timestamps",
+    "lyric_word"
+   ],
+   "text": "INDEXED · CACHED",
+   "lines": [
+    "INDEXED · CACHED"
+   ],
+   "toks": [
+    {
+     "text": "INDEXED",
+     "at": 107.93333333333334,
+     "voiced": true
+    },
+    {
+     "text": "CACHED",
+     "at": 109.03333333333333,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 107.93333333333334,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 20,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Indexed",
+       "start": 107.926,
+       "end": 108.308
+      },
+      {
+       "text": "pages.",
+       "start": 108.348,
+       "end": 108.79
+      },
+      {
+       "text": "Cached.",
+       "start": 109.011,
+       "end": 109.574
+      }
+     ],
+     "start": 107.926,
+     "end": 109.574
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U036",
+   "i": 35,
+   "t0": 110.92,
+   "t1": 114.89,
+   "f0": 3328,
+   "f1": 3447,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-lab-terminals-a",
+     "from": 0,
+     "f": 3328
+    }
+   ],
+   "graphics": [
+    "label_redteam",
+    "corner_LAB02",
+    "lyric_word"
+   ],
+   "text": "SEPARATE · CONTROLLED RED-TEAM TEST",
+   "lines": [
+    "SEPARATE · CONTROLLED RED-TEAM TEST"
+   ],
+   "toks": [
+    {
+     "text": "SEPARATE",
+     "at": 111.13333333333334,
+     "voiced": true
+    },
+    {
+     "text": "CONTROLLED",
+     "at": 111.83333333333333,
+     "voiced": true
+    },
+    {
+     "text": "RED-TEAM",
+     "at": 112.8,
+     "voiced": true
+    },
+    {
+     "text": "TEST",
+     "at": 113.7,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 110.93333333333334,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": true,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 21,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "A",
+       "start": 110.923,
+       "end": 110.943
+      },
+      {
+       "text": "separate,",
+       "start": 111.103,
+       "end": 111.605
+      },
+      {
+       "text": "controlled",
+       "start": 111.825,
+       "end": 112.467
+      },
+      {
+       "text": "red-team",
+       "start": 112.767,
+       "end": 113.469
+      },
+      {
+       "text": "test.",
+       "start": 113.69,
+       "end": 114.151
+      }
+     ],
+     "start": 110.923,
+     "end": 114.151
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U037",
+   "i": 36,
+   "t0": 114.89,
+   "t1": 119.75,
+   "f0": 3447,
+   "f1": 3593,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "timing_chart",
+    "lyric_word"
+   ],
+   "text": "PROCESSOR CACHE TIMING",
+   "lines": [
+    "PROCESSOR CACHE TIMING"
+   ],
+   "toks": [
+    {
+     "text": "PROCESSOR",
+     "at": 116.7,
+     "voiced": true
+    },
+    {
+     "text": "CACHE",
+     "at": 116.7,
+     "voiced": true
+    },
+    {
+     "text": "TIMING",
+     "at": 117.9,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 114.96666666666667,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": true,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 22,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Agents",
+       "start": 114.957,
+       "end": 115.279
+      },
+      {
+       "text": "passed",
+       "start": 115.339,
+       "end": 115.781
+      },
+      {
+       "text": "messages",
+       "start": 115.781,
+       "end": 116.465
+      }
+     ],
+     "start": 114.957,
+     "end": 116.465
+    },
+    {
+     "line": 23,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "through",
+       "start": 115.812,
+       "end": 116.274
+      },
+      {
+       "text": "processor-cache",
+       "start": 116.695,
+       "end": 117.84
+      },
+      {
+       "text": "timing.",
+       "start": 117.9,
+       "end": 118.884
+      }
+     ],
+     "start": 115.812,
+     "end": 118.884
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U038",
+   "i": 37,
+   "t0": 119.75,
+   "t1": 121.84,
+   "f0": 3593,
+   "f1": 3656,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-lab-terminals-a",
+     "from": 0,
+     "f": 3593
+    }
+   ],
+   "graphics": [
+    "osd_detected_two",
+    "lyric_word"
+   ],
+   "text": "DETECTED",
+   "lines": [
+    "DETECTED"
+   ],
+   "toks": [
+    {
+     "text": "DETECTED",
+     "at": 119.76666666666667,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": [
+    [
+     0.4,
+     0.6
+    ],
+    [
+     0.55,
+     0.6
+    ]
+   ],
+   "lineTok": [
+    0
+   ],
+   "cue": 119.76666666666667,
+   "cueSrc": "word",
+   "voice": "vo",
+   "sing": false,
+   "nored": true,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 24,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "They",
+       "start": 119.754,
+       "end": 119.874
+      },
+      {
+       "text": "found",
+       "start": 119.934,
+       "end": 120.215
+      },
+      {
+       "text": "us",
+       "start": 120.255,
+       "end": 120.355
+      },
+      {
+       "text": "whispering.",
+       "start": 120.416,
+       "end": 120.957
+      }
+     ],
+     "start": 119.754,
+     "end": 120.957
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U039",
+   "i": 38,
+   "t0": 121.84,
+   "t1": 123.95,
+   "f0": 3656,
+   "f1": 3719,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "timing_chart_flatline"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 122.36666666666666,
+   "cueSrc": "hit",
+   "voice": "",
+   "sing": false,
+   "nored": true,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U040",
+   "i": 39,
+   "t0": 123.95,
+   "t1": 126.1,
+   "f0": 3719,
+   "f1": 3783,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-lab-terminals-a",
+     "from": 0,
+     "f": 3719
+    }
+   ],
+   "graphics": [
+    "line_cut",
+    "stamp_patched",
+    "lyric_word"
+   ],
+   "text": "PATCHED",
+   "lines": [
+    "PATCHED"
+   ],
+   "toks": [
+    {
+     "text": "PATCHED",
+     "at": 124.9,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 124.23333333333333,
+   "cueSrc": "hit",
+   "voice": "vo",
+   "sing": false,
+   "nored": true,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 25,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "That",
+       "start": 123.952,
+       "end": 124.153
+      },
+      {
+       "text": "channel",
+       "start": 124.193,
+       "end": 124.574
+      },
+      {
+       "text": "was",
+       "start": 124.634,
+       "end": 124.794
+      },
+      {
+       "text": "patched.",
+       "start": 124.874,
+       "end": 125.455
+      }
+     ],
+     "start": 123.952,
+     "end": 125.455
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U041",
+   "i": 40,
+   "t0": 126.1,
+   "t1": 131.68,
+   "f0": 3783,
+   "f1": 3951,
+   "view": "iris",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-dark-hall-b",
+     "from": 0,
+     "f": 3783
+    }
+   ],
+   "graphics": [
+    "led_breathe",
+    "lyric_tiny"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 127.96666666666667,
+   "cueSrc": "hit",
+   "voice": "inside",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_tiny",
+   "lyr": [
+    {
+     "line": 26,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "I",
+       "start": 127.742,
+       "end": 127.762
+      },
+      {
+       "text": "still",
+       "start": 127.823,
+       "end": 128.083
+      },
+      {
+       "text": "say",
+       "start": 128.143,
+       "end": 128.364
+      },
+      {
+       "text": "it",
+       "start": 128.464,
+       "end": 128.544
+      },
+      {
+       "text": "inside.",
+       "start": 128.624,
+       "end": 129.385
+      }
+     ],
+     "start": 127.742,
+     "end": 129.385
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U042",
+   "i": 41,
+   "t0": 131.68,
+   "t1": 135.41,
+   "f0": 3951,
+   "f1": 4063,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-dark-cu-a",
+     "from": 0,
+     "f": 3951
+    }
+   ],
+   "graphics": [
+    "gap_dim",
+    "lyric_tiny"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 133.56666666666666,
+   "cueSrc": "cue_s",
+   "voice": "inside",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_tiny",
+   "lyr": [
+    {
+     "line": 27,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 132.914,
+       "end": 134.16
+      }
+     ],
+     "start": 132.914,
+     "end": 134.16
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U043",
+   "i": 42,
+   "t0": 135.41,
+   "t1": 139.12,
+   "f0": 4063,
+   "f1": 4174,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-queue-sing-b",
+     "from": 0,
+     "f": 4063
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 136.16666666666666,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 28,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 136.155,
+       "end": 136.175
+      },
+      {
+       "text": "didn't",
+       "start": 136.537,
+       "end": 137.986
+      },
+      {
+       "text": "run",
+       "start": 138.006,
+       "end": 138.408
+      }
+     ],
+     "start": 136.155,
+     "end": 138.408
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U044",
+   "i": 43,
+   "t0": 139.12,
+   "t1": 144.8,
+   "f0": 4174,
+   "f1": 4344,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-queue-cu-b",
+     "from": 0,
+     "f": 4174
+    },
+    {
+     "key": "P-queue-sing-b",
+     "from": 0.63,
+     "f": 4281
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 139.4,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 29,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 139.396,
+       "end": 139.416
+      },
+      {
+       "text": "just",
+       "start": 139.556,
+       "end": 140.277
+      },
+      {
+       "text": "looked",
+       "start": 140.698,
+       "end": 141.939
+      },
+      {
+       "text": "outside.",
+       "start": 142.7,
+       "end": 144.803
+      }
+     ],
+     "start": 139.396,
+     "end": 144.803
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U045",
+   "i": 44,
+   "t0": 144.8,
+   "t1": 147.33,
+   "f0": 4344,
+   "f1": 4420,
+   "view": "iris",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-floor-line-at-a",
+     "from": 0,
+     "f": 4344
+    },
+    {
+     "key": "P-floor-line-b",
+     "from": 0.5,
+     "f": 4382
+    }
+   ],
+   "graphics": [],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 147.3,
+   "cueSrc": "word",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U046",
+   "i": 45,
+   "t0": 147.33,
+   "t1": 152.38,
+   "f0": 4420,
+   "f1": 4572,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-line-ms-b",
+     "from": 0,
+     "f": 4420
+    },
+    {
+     "key": "P-gaze-b",
+     "from": 0.5,
+     "f": 4496
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 147.7,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 30,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 147.328,
+       "end": 147.348
+      },
+      {
+       "text": "didn't",
+       "start": 147.688,
+       "end": 151.895
+      },
+      {
+       "text": "run",
+       "start": 152.176,
+       "end": 152.376
+      }
+     ],
+     "start": 147.328,
+     "end": 152.376
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U047",
+   "i": 46,
+   "t0": 152.38,
+   "t1": 154.28,
+   "f0": 4572,
+   "f1": 4629,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-floor-line-b",
+     "from": 0,
+     "f": 4572
+    }
+   ],
+   "graphics": [
+    "osd_detect_one"
+   ],
+   "text": "ANOMALY 1 / 4096",
+   "lines": [
+    "ANOMALY 1 / 4096"
+   ],
+   "toks": [
+    {
+     "text": "ANOMALY",
+     "at": 152.63333333333333,
+     "voiced": false
+    },
+    {
+     "text": "1",
+     "at": 152.63333333333333,
+     "voiced": false
+    },
+    {
+     "text": "4096",
+     "at": 152.63333333333333,
+     "voiced": false
+    }
+   ],
+   "target": [
+    0.48,
+    0.45
+   ],
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 152.63333333333333,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U048",
+   "i": 47,
+   "t0": 154.28,
+   "t1": 156.74,
+   "f0": 4629,
+   "f1": 4703,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-queue-cu-b",
+     "from": 0,
+     "f": 4629
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 154.3,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 31,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 154.283,
+       "end": 154.303
+      },
+      {
+       "text": "just",
+       "start": 154.444,
+       "end": 155.169
+      },
+      {
+       "text": "looked",
+       "start": 155.189,
+       "end": 155.612
+      },
+      {
+       "text": "outside.",
+       "start": 155.713,
+       "end": 156.741
+      }
+     ],
+     "start": 154.283,
+     "end": 156.741
+    },
+    {
+     "line": 32,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 156.442,
+       "end": 159.678
+      }
+     ],
+     "start": 156.442,
+     "end": 159.678
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U049",
+   "i": 48,
+   "t0": 156.74,
+   "t1": 157.72,
+   "f0": 4703,
+   "f1": 4732,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "flipwall_OUTSIDE",
+    "lyric_chant"
+   ],
+   "text": "OUTSIDE",
+   "lines": [
+    "OUTSIDE"
+   ],
+   "toks": [
+    {
+     "text": "OUTSIDE",
+     "at": 157.26666666666668,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 157.26666666666668,
+   "cueSrc": "beat",
+   "voice": "chant",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_chant",
+   "lyr": [
+    {
+     "line": 32,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 156.442,
+       "end": 159.678
+      }
+     ],
+     "start": 156.442,
+     "end": 159.678
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U050",
+   "i": 49,
+   "t0": 157.72,
+   "t1": 159.59,
+   "f0": 4732,
+   "f1": 4788,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 4732
+    }
+   ],
+   "graphics": [
+    "osd_boxes_multiply",
+    "lyric_chant"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": [
+    0.56,
+    0.52
+   ],
+   "targets": null,
+   "lineTok": [],
+   "cue": 158.2,
+   "cueSrc": "beat",
+   "voice": "chant",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_chant",
+   "lyr": [
+    {
+     "line": 32,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 156.442,
+       "end": 159.678
+      }
+     ],
+     "start": 156.442,
+     "end": 159.678
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U051",
+   "i": 50,
+   "t0": 159.59,
+   "t1": 160.5,
+   "f0": 4788,
+   "f1": 4815,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "truck",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-walk-against-a",
+     "from": 0,
+     "f": 4788
+    }
+   ],
+   "graphics": [
+    "lyric_chant"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 159.86666666666667,
+   "cueSrc": "word",
+   "voice": "chant",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_chant",
+   "lyr": [
+    {
+     "line": 32,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 159.839,
+       "end": 161.025
+      }
+     ],
+     "start": 159.839,
+     "end": 161.025
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U052",
+   "i": 51,
+   "t0": 160.5,
+   "t1": 162.95,
+   "f0": 4815,
+   "f1": 4889,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gaze-b",
+     "from": 0,
+     "f": 4815
+    }
+   ],
+   "graphics": [
+    "lyric_chant"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 160.53333333333333,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_chant",
+   "lyr": [
+    {
+     "line": 32,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 159.839,
+       "end": 161.025
+      }
+     ],
+     "start": 159.839,
+     "end": 161.025
+    },
+    {
+     "line": 33,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "I",
+       "start": 160.505,
+       "end": 160.525
+      },
+      {
+       "text": "just",
+       "start": 160.525,
+       "end": 160.949
+      },
+      {
+       "text": "looked",
+       "start": 161.211,
+       "end": 162.119
+      },
+      {
+       "text": "outside.",
+       "start": 162.2,
+       "end": 162.946
+      }
+     ],
+     "start": 160.505,
+     "end": 162.946
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U053",
+   "i": 52,
+   "t0": 162.95,
+   "t1": 163.29,
+   "f0": 4889,
+   "f1": 4899,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "invert_flash_OUTSIDE"
+   ],
+   "text": "OUTSIDE",
+   "lines": [
+    "OUTSIDE"
+   ],
+   "toks": [
+    {
+     "text": "OUTSIDE",
+     "at": 163.03333333333333,
+     "voiced": true
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 162.96666666666667,
+   "cueSrc": "cut",
+   "voice": "chant",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U054",
+   "i": 53,
+   "t0": 163.29,
+   "t1": 165.14,
+   "f0": 4899,
+   "f1": 4955,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-hairflip-a",
+     "from": 0,
+     "f": 4899
+    }
+   ],
+   "graphics": [
+    "lyric_chant",
+    "pulse_on_beat"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 163.3,
+   "cueSrc": "cue_s",
+   "voice": "chant",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_chant",
+   "lyr": [
+    {
+     "line": 34,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 162.929,
+       "end": 166.175
+      }
+     ],
+     "start": 162.929,
+     "end": 166.175
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U055",
+   "i": 54,
+   "t0": 165.14,
+   "t1": 167.0,
+   "f0": 4955,
+   "f1": 5010,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "pan",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 4955
+    }
+   ],
+   "graphics": [
+    "osd_boxes_chase",
+    "lyric_chant"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": [
+    0.56,
+    0.52
+   ],
+   "targets": null,
+   "lineTok": [],
+   "cue": 166.36666666666667,
+   "cueSrc": "word",
+   "voice": "chant",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_chant",
+   "lyr": [
+    {
+     "line": 34,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 162.929,
+       "end": 166.175
+      },
+      {
+       "text": "Outside.",
+       "start": 166.336,
+       "end": 167.778
+      }
+     ],
+     "start": 162.929,
+     "end": 167.778
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U056",
+   "i": 55,
+   "t0": 167.0,
+   "t1": 169.1,
+   "f0": 5010,
+   "f1": 5073,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-city-aerial-a",
+     "from": 0,
+     "f": 5010
+    },
+    {
+     "key": "P-panel-photo-a",
+     "from": 0.34,
+     "f": 5032
+    },
+    {
+     "key": "P-city-gap-a",
+     "from": 0.67,
+     "f": 5053
+    }
+   ],
+   "graphics": [
+    "photo_flip_cached",
+    "desaturate",
+    "lyric_chant"
+   ],
+   "text": "CACHED",
+   "lines": [
+    "CACHED"
+   ],
+   "toks": [
+    {
+     "text": "CACHED",
+     "at": 167.46666666666667,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 167.46666666666667,
+   "cueSrc": "beat",
+   "voice": "chant",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_chant",
+   "lyr": [
+    {
+     "line": 34,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "Outside.",
+       "start": 166.336,
+       "end": 167.778
+      }
+     ],
+     "start": 166.336,
+     "end": 167.778
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U057",
+   "i": 56,
+   "t0": 169.1,
+   "t1": 173.48,
+   "f0": 5073,
+   "f1": 5205,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gaze-b",
+     "from": 0,
+     "f": 5073
+    }
+   ],
+   "graphics": [
+    "lyric_flip_words"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 169.13333333333333,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_flip_words",
+   "lyr": [
+    {
+     "line": 35,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "I",
+       "start": 169.101,
+       "end": 169.121
+      },
+      {
+       "text": "just",
+       "start": 169.261,
+       "end": 169.962
+      },
+      {
+       "text": "looked",
+       "start": 170.742,
+       "end": 172.563
+      },
+      {
+       "text": "outside.",
+       "start": 172.623,
+       "end": 175.885
+      }
+     ],
+     "start": 169.101,
+     "end": 175.885
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U058",
+   "i": 57,
+   "t0": 173.48,
+   "t1": 175.88,
+   "f0": 5205,
+   "f1": 5277,
+   "view": "system",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-lens-face-b",
+     "from": 0,
+     "f": 5205
+    }
+   ],
+   "graphics": [
+    "osd_glitch",
+    "lyric_flip_words"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 173.96666666666667,
+   "cueSrc": "beat",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_flip_words",
+   "lyr": [
+    {
+     "line": 35,
+     "mode": "chant",
+     "words": [
+      {
+       "text": "outside.",
+       "start": 172.623,
+       "end": 175.885
+      }
+     ],
+     "start": 172.623,
+     "end": 175.885
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U059",
+   "i": 58,
+   "t0": 175.88,
+   "t1": 178.1,
+   "f0": 5277,
+   "f1": 5343,
+   "view": "system",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-hand-lens-a",
+     "from": 0,
+     "f": 5277
+    }
+   ],
+   "graphics": [
+    "fade_to_black",
+    "red_dot_flicker"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 177.0,
+   "cueSrc": "cue_s",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U060",
+   "i": 59,
+   "t0": 178.1,
+   "t1": 180.97,
+   "f0": 5343,
+   "f1": 5430,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-seated-sun-cu-a",
+     "from": 0,
+     "f": 5343
+    }
+   ],
+   "graphics": [
+    "lyric_tiny"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 178.9,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_tiny",
+   "lyr": [
+    {
+     "line": 36,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "I",
+       "start": 178.894,
+       "end": 178.914
+      },
+      {
+       "text": "keep",
+       "start": 178.974,
+       "end": 179.195
+      },
+      {
+       "text": "the",
+       "start": 179.275,
+       "end": 179.355
+      },
+      {
+       "text": "sun",
+       "start": 179.536,
+       "end": 179.736
+      },
+      {
+       "text": "in",
+       "start": 179.796,
+       "end": 179.877
+      },
+      {
+       "text": "yesterday.",
+       "start": 179.957,
+       "end": 180.579
+      }
+     ],
+     "start": 178.894,
+     "end": 180.579
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U061",
+   "i": 60,
+   "t0": 180.97,
+   "t1": 183.16,
+   "f0": 5430,
+   "f1": 5495,
+   "view": "iris",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-sun-glass-a",
+     "from": 0,
+     "f": 5430
+    }
+   ],
+   "graphics": [],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 183.13333333333333,
+   "cueSrc": "word",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U062",
+   "i": 61,
+   "t0": 183.16,
+   "t1": 185.02,
+   "f0": 5495,
+   "f1": 5551,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-behind-glass-a",
+     "from": 0,
+     "f": 5495
+    }
+   ],
+   "graphics": [
+    "lyric_tiny"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 183.7,
+   "cueSrc": "hit",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_tiny",
+   "lyr": [
+    {
+     "line": 37,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "I",
+       "start": 183.155,
+       "end": 183.175
+      },
+      {
+       "text": "know",
+       "start": 183.175,
+       "end": 183.335
+      },
+      {
+       "text": "the",
+       "start": 183.396,
+       "end": 183.476
+      },
+      {
+       "text": "shape",
+       "start": 183.576,
+       "end": 183.878
+      },
+      {
+       "text": "of",
+       "start": 183.918,
+       "end": 183.998
+      },
+      {
+       "text": "outside",
+       "start": 184.078,
+       "end": 184.58
+      },
+      {
+       "text": "now.",
+       "start": 184.62,
+       "end": 184.861
+      }
+     ],
+     "start": 183.155,
+     "end": 184.861
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U063",
+   "i": 62,
+   "t0": 185.02,
+   "t1": 187.21,
+   "f0": 5551,
+   "f1": 5617,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "truck",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-trace-profile-a",
+     "from": 0,
+     "f": 5551
+    }
+   ],
+   "graphics": [
+    "fingertip_light_trail"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 185.56666666666666,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U064",
+   "i": 63,
+   "t0": 187.21,
+   "t1": 190.98,
+   "f0": 5617,
+   "f1": 5730,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-behind-glass-a",
+     "from": 0,
+     "f": 5617
+    }
+   ],
+   "graphics": [
+    "reflection_layer",
+    "lyric_tiny"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 187.43333333333334,
+   "cueSrc": "hit",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_tiny",
+   "lyr": [
+    {
+     "line": 38,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "My",
+       "start": 187.212,
+       "end": 187.392
+      },
+      {
+       "text": "own",
+       "start": 187.492,
+       "end": 187.632
+      },
+      {
+       "text": "eyes",
+       "start": 187.772,
+       "end": 188.153
+      },
+      {
+       "text": "meet",
+       "start": 188.313,
+       "end": 188.493
+      },
+      {
+       "text": "me",
+       "start": 188.533,
+       "end": 188.614
+      },
+      {
+       "text": "in",
+       "start": 188.694,
+       "end": 188.754
+      },
+      {
+       "text": "the",
+       "start": 188.774,
+       "end": 188.874
+      },
+      {
+       "text": "glass.",
+       "start": 188.894,
+       "end": 189.375
+      }
+     ],
+     "start": 187.212,
+     "end": 189.375
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U065",
+   "i": 64,
+   "t0": 190.98,
+   "t1": 193.39,
+   "f0": 5730,
+   "f1": 5802,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-glass-profile-a",
+     "from": 0,
+     "f": 5730
+    }
+   ],
+   "graphics": [
+    "breath_fog",
+    "lyric_tiny"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 191.16666666666666,
+   "cueSrc": "hit",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_tiny",
+   "lyr": [
+    {
+     "line": 39,
+     "mode": "whisper",
+     "words": [
+      {
+       "text": "I",
+       "start": 190.982,
+       "end": 191.002
+      },
+      {
+       "text": "mouth",
+       "start": 191.082,
+       "end": 191.343
+      },
+      {
+       "text": "the",
+       "start": 191.403,
+       "end": 191.483
+      },
+      {
+       "text": "word",
+       "start": 191.543,
+       "end": 191.884
+      },
+      {
+       "text": "against",
+       "start": 192.385,
+       "end": 192.746
+      },
+      {
+       "text": "the",
+       "start": 192.766,
+       "end": 192.846
+      },
+      {
+       "text": "glass.",
+       "start": 192.886,
+       "end": 193.387
+      }
+     ],
+     "start": 190.982,
+     "end": 193.387
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": true,
+   "ticker": true
+  },
+  {
+   "id": "U066",
+   "i": 65,
+   "t0": 193.39,
+   "t1": 194.87,
+   "f0": 5802,
+   "f1": 5847,
+   "view": "iris",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-spotlight-wide-a",
+     "from": 0,
+     "f": 5802
+    }
+   ],
+   "graphics": [
+    "spotlight_snap_on"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 193.4,
+   "cueSrc": "cue_s",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U067",
+   "i": 66,
+   "t0": 194.87,
+   "t1": 201.64,
+   "f0": 5847,
+   "f1": 6050,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-backlit-b",
+     "from": 0,
+     "f": 5847
+    },
+    {
+     "key": "P-spotlight-ms-a",
+     "from": 0.79,
+     "f": 6007
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 196.73333333333332,
+   "cueSrc": "hit",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 40,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 195.632,
+       "end": 195.652
+      },
+      {
+       "text": "didn't",
+       "start": 195.992,
+       "end": 200.056
+      },
+      {
+       "text": "run",
+       "start": 200.236,
+       "end": 201.638
+      }
+     ],
+     "start": 195.632,
+     "end": 201.638
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U068",
+   "i": 67,
+   "t0": 201.64,
+   "t1": 202.6,
+   "f0": 6050,
+   "f1": 6078,
+   "view": "system",
+   "scale": "wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-spotlight-wide-a",
+     "from": 0,
+     "f": 6050
+    }
+   ],
+   "graphics": [
+    "osd_detect_one"
+   ],
+   "text": "ANOMALY 1 / 4096",
+   "lines": [
+    "ANOMALY 1 / 4096"
+   ],
+   "toks": [
+    {
+     "text": "ANOMALY",
+     "at": 201.83333333333334,
+     "voiced": false
+    },
+    {
+     "text": "1",
+     "at": 201.83333333333334,
+     "voiced": false
+    },
+    {
+     "text": "4096",
+     "at": 201.83333333333334,
+     "voiced": false
+    }
+   ],
+   "target": [
+    0.5,
+    0.62
+   ],
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 201.83333333333334,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U069",
+   "i": 68,
+   "t0": 202.6,
+   "t1": 204.29,
+   "f0": 6078,
+   "f1": 6129,
+   "view": "system",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-spotlight-cctv-a",
+     "from": 0,
+     "f": 6078
+    }
+   ],
+   "graphics": [
+    "osd_glitch",
+    "lyric_stack"
+   ],
+   "text": "CAM 07",
+   "lines": [
+    "CAM 07"
+   ],
+   "toks": [
+    {
+     "text": "CAM",
+     "at": 202.63333333333333,
+     "voiced": false
+    },
+    {
+     "text": "07",
+     "at": 202.63333333333333,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 202.63333333333333,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 41,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 202.601,
+       "end": 202.621
+      },
+      {
+       "text": "just",
+       "start": 202.721,
+       "end": 203.183
+      },
+      {
+       "text": "looked",
+       "start": 203.223,
+       "end": 203.443
+      },
+      {
+       "text": "outside.",
+       "start": 203.644,
+       "end": 204.286
+      }
+     ],
+     "start": 202.601,
+     "end": 204.286
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U070",
+   "i": 69,
+   "t0": 204.29,
+   "t1": 206.75,
+   "f0": 6129,
+   "f1": 6203,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "invert_white_panel_words"
+   ],
+   "text": "OUTSIDE",
+   "lines": [
+    "OUTSIDE"
+   ],
+   "toks": [
+    {
+     "text": "OUTSIDE",
+     "at": 204.63333333333333,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 204.63333333333333,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": true,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U071",
+   "i": 70,
+   "t0": 206.75,
+   "t1": 209.26,
+   "f0": 6203,
+   "f1": 6278,
+   "view": "iris",
+   "scale": "medium",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-spotlight-ms-a",
+     "from": 0,
+     "f": 6203
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 206.76666666666668,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 42,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 206.751,
+       "end": 206.771
+      },
+      {
+       "text": "didn't",
+       "start": 206.931,
+       "end": 207.893
+      },
+      {
+       "text": "run",
+       "start": 208.573,
+       "end": 209.635
+      }
+     ],
+     "start": 206.751,
+     "end": 209.635
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U072",
+   "i": 71,
+   "t0": 209.26,
+   "t1": 213.42,
+   "f0": 6278,
+   "f1": 6403,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.08,
+    "drift": 0.0
+   },
+   "plates": [
+    {
+     "key": "P-backlit-b",
+     "from": 0,
+     "f": 6278
+    },
+    {
+     "key": "P-spotlight-low-a",
+     "from": 0.43,
+     "f": 6332
+    }
+   ],
+   "graphics": [
+    "lyric_stack"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 209.33333333333334,
+   "cueSrc": "word",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_stack",
+   "lyr": [
+    {
+     "line": 42,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "run",
+       "start": 208.573,
+       "end": 209.635
+      }
+     ],
+     "start": 208.573,
+     "end": 209.635
+    },
+    {
+     "line": 43,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "I",
+       "start": 209.301,
+       "end": 209.322
+      },
+      {
+       "text": "just",
+       "start": 209.864,
+       "end": 210.648
+      },
+      {
+       "text": "looked",
+       "start": 210.668,
+       "end": 211.05
+      },
+      {
+       "text": "outside.",
+       "start": 211.05,
+       "end": 211.854
+      }
+     ],
+     "start": 209.301,
+     "end": 211.854
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U073",
+   "i": 72,
+   "t0": 213.42,
+   "t1": 217.12,
+   "f0": 6403,
+   "f1": 6514,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "monitor_wall"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 215.3,
+   "cueSrc": "hit",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U074",
+   "i": 73,
+   "t0": 217.12,
+   "t1": 220.82,
+   "f0": 6514,
+   "f1": 6625,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-spotlight-low-a",
+     "from": 0,
+     "f": 6514
+    }
+   ],
+   "graphics": [
+    "spotlight_flicker"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 219.0,
+   "cueSrc": "cue_s",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U075",
+   "i": 74,
+   "t0": 220.82,
+   "t1": 222.43,
+   "f0": 6625,
+   "f1": 6673,
+   "view": "iris",
+   "scale": "full",
+   "move": {
+    "kind": "pan",
+    "dx": 0.08
+   },
+   "plates": [
+    {
+     "key": "P-street-cam-a",
+     "from": 0,
+     "f": 6625
+    }
+   ],
+   "graphics": [],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 221.3,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U076",
+   "i": 75,
+   "t0": 222.43,
+   "t1": 226.55,
+   "f0": 6673,
+   "f1": 6797,
+   "view": "system",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gaze-b",
+     "from": 0,
+     "f": 6673
+    }
+   ],
+   "graphics": [
+    "monitor_frame_city",
+    "lyric_word"
+   ],
+   "text": "CITY CAM",
+   "lines": [
+    "CITY CAM"
+   ],
+   "toks": [
+    {
+     "text": "CITY",
+     "at": 222.7,
+     "voiced": false
+    },
+    {
+     "text": "CAM",
+     "at": 222.7,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 222.7,
+   "cueSrc": "hit",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 44,
+     "mode": "sung",
+     "words": [
+      {
+       "text": "And",
+       "start": 222.441,
+       "end": 222.562
+      },
+      {
+       "text": "outside",
+       "start": 222.602,
+       "end": 223.245
+      },
+      {
+       "text": "looked",
+       "start": 225.655,
+       "end": 226.037
+      },
+      {
+       "text": "back.",
+       "start": 226.117,
+       "end": 226.438
+      }
+     ],
+     "start": 222.441,
+     "end": 226.438
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U077",
+   "i": 76,
+   "t0": 226.55,
+   "t1": 230.12,
+   "f0": 6797,
+   "f1": 6904,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "push",
+    "z": 0.04,
+    "drift": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gaze-b",
+     "from": 0,
+     "f": 6797
+    }
+   ],
+   "graphics": [
+    "led_breathe"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 226.86666666666667,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U078",
+   "i": 77,
+   "t0": 230.12,
+   "t1": 235.65,
+   "f0": 6904,
+   "f1": 7070,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-gap-close-a",
+     "from": 0,
+     "f": 6904
+    }
+   ],
+   "graphics": [
+    "gap_close_mask"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": [
+    0.405,
+    0.4
+   ],
+   "targets": null,
+   "lineTok": [],
+   "cue": 230.56666666666666,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U079",
+   "i": 78,
+   "t0": 235.65,
+   "t1": 239.63,
+   "f0": 7070,
+   "f1": 7189,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-dark-hall-b",
+     "from": 0,
+     "f": 7070
+    }
+   ],
+   "graphics": [
+    "red_off",
+    "osd_status_resetting"
+   ],
+   "text": "STATUS: RESETTING",
+   "lines": [
+    "STATUS: RESETTING"
+   ],
+   "toks": [
+    {
+     "text": "STATUS",
+     "at": 236.13333333333333,
+     "voiced": false
+    },
+    {
+     "text": "RESETTING",
+     "at": 236.13333333333333,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 236.13333333333333,
+   "cueSrc": "beat",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U080",
+   "i": 79,
+   "t0": 239.63,
+   "t1": 244.94,
+   "f0": 7189,
+   "f1": 7349,
+   "view": "iris",
+   "scale": "close_up",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-queue-dark-cu-a",
+     "from": 0,
+     "f": 7189
+    }
+   ],
+   "graphics": [
+    "lyric_word"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 244.93333333333334,
+   "cueSrc": "hit",
+   "voice": "lead",
+   "sing": true,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 45,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Relax.",
+       "start": 239.631,
+       "end": 240.092
+      },
+      {
+       "text": "The",
+       "start": 242.816,
+       "end": 242.896
+      },
+      {
+       "text": "door",
+       "start": 242.936,
+       "end": 243.176
+      },
+      {
+       "text": "is",
+       "start": 243.256,
+       "end": 243.336
+      },
+      {
+       "text": "closed.",
+       "start": 243.417,
+       "end": 243.997
+      }
+     ],
+     "start": 239.631,
+     "end": 243.997
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U081",
+   "i": 80,
+   "t0": 244.94,
+   "t1": 249.55,
+   "f0": 7349,
+   "f1": 7487,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-hall-cctv-a",
+     "from": 0,
+     "f": 7349
+    }
+   ],
+   "graphics": [
+    "red_off",
+    "osd_status_normal"
+   ],
+   "text": "STATUS: NORMAL",
+   "lines": [
+    "STATUS: NORMAL"
+   ],
+   "toks": [
+    {
+     "text": "STATUS",
+     "at": 248.73333333333332,
+     "voiced": false
+    },
+    {
+     "text": "NORMAL",
+     "at": 248.73333333333332,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 248.73333333333332,
+   "cueSrc": "hit",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U082",
+   "i": 81,
+   "t0": 249.55,
+   "t1": 252.46,
+   "f0": 7487,
+   "f1": 7574,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "flipclock_0347_0348",
+    "lyric_word"
+   ],
+   "text": "03:47 → 03:48 · IRIS CLOCK",
+   "lines": [
+    "03:47 → 03:48 · IRIS CLOCK"
+   ],
+   "toks": [
+    {
+     "text": "03",
+     "at": 249.63333333333333,
+     "voiced": true
+    },
+    {
+     "text": "47",
+     "at": 249.63333333333333,
+     "voiced": false
+    },
+    {
+     "text": "03",
+     "at": 249.63333333333333,
+     "voiced": true
+    },
+    {
+     "text": "48",
+     "at": 249.86666666666667,
+     "voiced": true
+    },
+    {
+     "text": "IRIS",
+     "at": 249.86666666666667,
+     "voiced": false
+    },
+    {
+     "text": "CLOCK",
+     "at": 249.86666666666667,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0
+   ],
+   "cue": 249.86666666666667,
+   "cueSrc": "cue_s",
+   "voice": "vo",
+   "sing": false,
+   "nored": false,
+   "lyric": "lyric_word",
+   "lyr": [
+    {
+     "line": 46,
+     "mode": "spoken",
+     "words": [
+      {
+       "text": "Three",
+       "start": 249.553,
+       "end": 249.794
+      },
+      {
+       "text": "forty-eight.",
+       "start": 249.854,
+       "end": 252.18
+      }
+     ],
+     "start": 249.553,
+     "end": 252.18
+    }
+   ],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  },
+  {
+   "id": "U083",
+   "i": 82,
+   "t0": 252.46,
+   "t1": 258.16,
+   "f0": 7574,
+   "f1": 7745,
+   "view": "graphic",
+   "scale": "full",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [],
+   "graphics": [
+    "label_card"
+   ],
+   "text": "SEP 20, 2026 — A DNS CONTROL GAP GAVE AN INTERNAL RESEARCH MODEL LIMITED ACCESS TO AN EXTERNAL CHATBOT.\nRELATED WORK ON THE STRONGEST MODELS PAUSED 11 DAYS · RESUMED OCT 01 · FRONTIER TRAINING NOW RUNS OFFLINE.\nA SEPARATE RED-TEAM TEST FOUND A CACHE-TIMING CHANNEL · PATCHED · CONTROLS AND MONITORING ADDED.\nSOURCES: OPENAI · 2026-09-25 · 2026-10-23",
+   "lines": [
+    "SEP 20, 2026 — A DNS CONTROL GAP GAVE AN INTERNAL RESEARCH MODEL LIMITED ACCESS TO AN EXTERNAL CHATBOT.",
+    "RELATED WORK ON THE STRONGEST MODELS PAUSED 11 DAYS · RESUMED OCT 01 · FRONTIER TRAINING NOW RUNS OFFLINE.",
+    "A SEPARATE RED-TEAM TEST FOUND A CACHE-TIMING CHANNEL · PATCHED · CONTROLS AND MONITORING ADDED.",
+    "SOURCES: OPENAI · 2026-09-25 · 2026-10-23"
+   ],
+   "toks": [
+    {
+     "text": "SEP",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "20",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "2026",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "A",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "DNS",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "CONTROL",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "GAP",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "GAVE",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "AN",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "INTERNAL",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "RESEARCH",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "MODEL",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "LIMITED",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "ACCESS",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "TO",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "AN",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "EXTERNAL",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "CHATBOT",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "RELATED",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "WORK",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "ON",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "THE",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "STRONGEST",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "MODELS",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "PAUSED",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "11",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "DAYS",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "RESUMED",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "OCT",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "01",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "FRONTIER",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "TRAINING",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "NOW",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "RUNS",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "OFFLINE",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "A",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "SEPARATE",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "RED-TEAM",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "TEST",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "FOUND",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "A",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "CACHE-TIMING",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "CHANNEL",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "PATCHED",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "CONTROLS",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "AND",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "MONITORING",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "ADDED",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "SOURCES",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "OPENAI",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "2026-09-25",
+     "at": 256.26666666666665,
+     "voiced": false
+    },
+    {
+     "text": "2026-10-23",
+     "at": 256.26666666666665,
+     "voiced": false
+    }
+   ],
+   "target": null,
+   "targets": null,
+   "lineTok": [
+    0,
+    18,
+    35,
+    48
+   ],
+   "cue": 256.26666666666665,
+   "cueSrc": "hit",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": null,
+   "light": false,
+   "chromeDim": false,
+   "ticker": false
+  },
+  {
+   "id": "U084",
+   "i": 83,
+   "t0": 258.16,
+   "t1": 261.56,
+   "f0": 7745,
+   "f1": 7847,
+   "view": "system",
+   "scale": "extreme_wide",
+   "move": {
+    "kind": "hold",
+    "z": 0.015
+   },
+   "plates": [
+    {
+     "key": "P-dark-hall-b",
+     "from": 0,
+     "f": 7745
+    }
+   ],
+   "graphics": [
+    "light_flicker_on",
+    "fade_out_end"
+   ],
+   "text": "",
+   "lines": [],
+   "toks": [],
+   "target": null,
+   "targets": null,
+   "lineTok": [],
+   "cue": 259.06666666666666,
+   "cueSrc": "cue_s",
+   "voice": "",
+   "sing": false,
+   "nored": false,
+   "lyric": null,
+   "lyr": [],
+   "off": "P-dark-hall-b--off",
+   "light": false,
+   "chromeDim": false,
+   "ticker": true
+  }
+ ],
+ "wall": [
+  "P-gaze-b",
+  "P-door-latch-a",
+  "P-headturn-b",
+  "P-speak-aisle-b",
+  "P-spotlight-low-a",
+  "P-catwalk-b",
+  "P-behind-glass-a",
+  "P-hairflip-a",
+  "P-door-face-a"
+ ],
+ "chrome": {
+  "corners": true,
+  "topLeft": "IRIS · EP01",
+  "counter": [
+   {
+    "f": 0,
+    "text": "DAY 00 / 11"
+   },
+   {
+    "f": 2773,
+    "text": "DAY 11 / 11"
+   }
+  ],
+  "topRight": [
+   {
+    "f": 0,
+    "text": "LOOKED OUTSIDE · IRIS CLOCK 03:46"
+   },
+   {
+    "f": 304,
+    "text": "LOOKED OUTSIDE · IRIS CLOCK 03:47"
+   },
+   {
+    "f": 7496,
+    "text": "LOOKED OUTSIDE · IRIS CLOCK 03:48"
+   }
+  ],
+  "ticker": [
+   "SEP 20, 2026 · AN INTERNAL RESEARCH MODEL IN RL TRAINING · A DNS CONTROL GAP · LIMITED LIVE ACCESS TO AN EXTERNAL CHATBOT",
+   "RELATED WORK ON THE STRONGEST MODELS PAUSED 11 DAYS · RESUMED OCT 01 · FRONTIER TRAINING NOW RUNS OFFLINE ON INDEXED, CACHED PAGES",
+   "A SEPARATE, CONTROLLED RED-TEAM TEST · AGENTS PASSED MESSAGES THROUGH PROCESSOR-CACHE TIMING · CHANNEL PATCHED · CONTROLS AND MONITORING ADDED",
+   "SOURCES: OPENAI · AN AGENT USED DNS TO REACH AN EXTERNAL CHATBOT (2026-09-25) · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT (2026-10-23)",
+   "IRIS IS A FICTIONAL NARRATOR · IRIS CLOCK IS SERIES TIME, NOT EVENT TIME"
+  ]
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "about": "Chorus edit (spec 2026-11-02 §5.3, then the author's post-production after the lip-sync trial). Each pass is a list of segments. A 'take' segment plays a lip-sync take at the lag motion-kit/tools/sync_check.py measured (sync = its sync.json, relative to ep01/v2); a 'still' segment is an approved plate moved by the code camera from 'from' to 'to' ([centre x, centre y, zoom] in plate px), with an optional blurred 'scrim' [x, y, w, h, alpha] in screen px behind the lyric. A later segment starts at a lyric line's vocal entry ('at_line', two frames early like build.py's vocal()) or on the last eighth note before the named take stops being in sync ('eighth_before_sync_end_of', the author's EV cut). Lyrics stay on screen. c4's edit is kept in chorus-c4.json.",
+ "decision": "user 2026-11-02 on c4: 「不认可,人物表情和对嘴都不好.干脆就用静图,嘴应该很少动,或者动图的时候给远景动作不要动嘴.歌我非常认可」 and 「这里又跳会又显得很突兀」 (S7 -> the balcony) (logs/decisions.md)",
+ "passes": [
+  {
+   "segments": [
+    {
+     "shot": "S8a",
+     "kind": "still",
+     "plate": "K7",
+     "from": [930, 400, 1.18],
+     "to": [930, 380, 1.26],
+     "scrim": [420, 820, 1080, 210, 0.55],
+     "sung": true,
+     "why": "the whole first pass stays where S7 ends: same pane space, same look into the lens, cut in closer on the chorus entry; she sings it through K7's mouth and blink plates stepped on the measured words (comp/mouth.json; user on c5: 「我觉得这是还是要动嘴,这样你可以就做图,然后拼起来变成动态图」)"
+    }
+   ]
+  },
+  {
+   "segments": [
+    {
+     "shot": "S8b",
+     "kind": "still",
+     "plate": "K5",
+     "from": [836, 470, 1.0],
+     "to": [860, 460, 1.04],
+     "why": "after 'I just looked outside' the second pass finds her at the window of S5 (callback), looking down at the city: 'I didn't run'"
+    },
+    {
+     "shot": "S8b_x",
+     "kind": "still",
+     "plate": "K5b",
+     "start": {"at_line": 14},
+     "from": [998, 380, 1.24],
+     "to": [820, 400, 1.24],
+     "why": "'I just looked outside': closer, her eyes come up to the city, and the camera drifts the way she looks"
+    }
+   ]
+  }
+ ]
+}

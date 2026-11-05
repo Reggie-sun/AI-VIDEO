@@ -1,0 +1,1520 @@
+{
+  "shot_id": "S0095",
+  "start_frame": 4382,
+  "end_frame": 4435,
+  "duration_frames": 54,
+  "start_time": 182.5833,
+  "end_time": 184.8333,
+  "duration_s": 2.25,
+  "start_tc": "00:03:02:14",
+  "end_tc": "00:03:04:19",
+  "boundary_in_id": "B2-026",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    4382,
+    4382
+  ],
+  "boundary_out_id": "B3-001",
+  "boundary_out_type": "dissolve",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束。三块黑翻牌板逐步分化为火箭、长寿和底层阶级标题，左下白色三泳道计划图淡入，上一镜BACK白格退出。",
+  "reference_frames": [
+    {
+      "frame": 4382,
+      "path": "keyframes/S0095_f04382.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4395,
+      "path": "keyframes/S0095_f04395.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4409,
+      "path": "keyframes/S0095_f04409.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4422,
+      "path": "keyframes/S0095_f04422.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4435,
+      "path": "keyframes/S0095_f04435.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4408,
+      "path": "work/full_batch/04408.jpg",
+      "role": "detail",
+      "note": "root viewed native1920 frame"
+    }
+  ],
+  "composition": {
+    "shot_size": "按scene_description中的实际景别",
+    "subject_position": "见scene_description与bounding_box",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可见倾斜/俯仰见scene_description；焦距unknown",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束。三块黑翻牌板逐步分化为火箭、长寿和底层阶级标题，左下白色三泳道计划图淡入，上一镜BACK白格退出。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": -0.0009, \"pan_y_frac_per_s\": 0.0133, \"zoom_per_s\": 0.0166, \"median_flow_frac_per_s\": 0.0101, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[147.1, 147.6, 143.3]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#74767F",
+        "fraction": 0.268,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#8D8EA0",
+        "fraction": 0.227,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#ACB0C8",
+        "fraction": 0.224,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#D7D8DE",
+        "fraction": 0.128,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#4B4C53",
+        "fraction": 0.085,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#292D29",
+        "fraction": 0.069,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[147.1, 147.6, 143.3]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0095-E01",
+      "shot_id": "S0095",
+      "type": "background_media",
+      "description": "后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束。三块黑翻牌板逐步分化为火箭、长寿和底层阶级标题，左下白色三泳道计划图淡入，上一镜BACK白格退出。",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. 后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束。三块黑翻牌板逐步分化为火箭、长寿和底层阶级标题，左下白色三泳道计划图淡入，上一镜BACK白格退出。"
+      },
+      "motion": {
+        "path": "后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束。三块黑翻牌板逐步分化为火箭、长寿和底层阶级标题，左下白色三泳道计划图淡入，上一镜BACK白格退出。",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    },
+    {
+      "element_id": "S0095-E02",
+      "shot_id": "S0095",
+      "type": "character",
+      "description": "Dark bob model turns and approaches below three gantries, white puff blouse, black harness/skirt and hanging tag",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.34375,
+        "y": 0.25926,
+        "w": 0.27083,
+        "h": 0.74074,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Dark bob model turns and approaches below three gantries, white puff blouse, black harness/skirt and hanging tag"
+      },
+      "motion": {
+        "path": "Dark bob model turns and approaches below three gantries, white puff blouse, black harness/skirt and hanging tag",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    },
+    {
+      "element_id": "S0095-E03",
+      "shot_id": "S0095",
+      "type": "split_flap",
+      "description": "Left gantry settles ESCAPE VELOCITY; lower row still random flip states before later speed number",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.06354,
+        "y": 0.19444,
+        "w": 0.23958,
+        "h": 0.16667,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Left gantry settles ESCAPE VELOCITY; lower row still random flip states before later speed number"
+      },
+      "motion": {
+        "path": "Left gantry settles ESCAPE VELOCITY; lower row still random flip states before later speed number",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4382,
+          "state": "random characters"
+        },
+        {
+          "frame": 4408,
+          "state": "ESCAPE VELOCITY; lower digits scrambling"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4408,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "ESCAPE VELOCITY",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 43,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E04",
+      "shot_id": "S0095",
+      "type": "split_flap",
+      "description": "Middle gantry changes independently into LONGEVITY E.V.; lower line random until YR/YR suffix",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.32812,
+        "y": 0.18333,
+        "w": 0.26042,
+        "h": 0.16667,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Middle gantry changes independently into LONGEVITY E.V.; lower line random until YR/YR suffix"
+      },
+      "motion": {
+        "path": "Middle gantry changes independently into LONGEVITY E.V.; lower line random until YR/YR suffix",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4400,
+          "text": "LONGEVITY E.V."
+        },
+        {
+          "frame": 4430,
+          "state": "YR/YR suffix visible"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4400,
+        4430,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "LONGEVITY E.V. / YR/YR",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 43,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E05",
+      "shot_id": "S0095",
+      "type": "split_flap",
+      "description": "Right gantry turns from random letters into UNDERCLASS, then 06 MONTHS",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.64062,
+        "y": 0.17593,
+        "w": 0.26042,
+        "h": 0.17593,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Right gantry turns from random letters into UNDERCLASS, then 06 MONTHS"
+      },
+      "motion": {
+        "path": "Right gantry turns from random letters into UNDERCLASS, then 06 MONTHS",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4406,
+          "text": "UNDERCLASS"
+        },
+        {
+          "frame": 4428,
+          "text": "06 MONTHS"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4406,
+        4428,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "UNDERCLASS / 06 MONTHS",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 43,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E06",
+      "shot_id": "S0095",
+      "type": "text_title",
+      "description": "Residual individual cream BACK! tiles flip vertically and disappear near shot opening",
+      "start_frame": 4382,
+      "end_frame": 4387,
+      "bounding_box": {
+        "x": 0.64167,
+        "y": 0.22685,
+        "w": 0.30208,
+        "h": 0.21759,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Residual individual cream BACK! tiles flip vertically and disappear near shot opening"
+      },
+      "motion": {
+        "path": "Residual individual cream BACK! tiles flip vertically and disappear near shot opening",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4387; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4386,
+          "state": "tile halves rotating; not a new lyric"
+        },
+        {
+          "frame": 4387,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4386,
+        4387
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "BACK!",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "DIN-like condensed sans"
+          ],
+          "cap_height_px_estimate": 130,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E07",
+      "shot_id": "S0095",
+      "type": "hud_panel",
+      "description": "Cream PLAN · US-101 N · 06:40 1:4000 panel expands at lower left",
+      "start_frame": 4388,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.59259,
+        "w": 0.17188,
+        "h": 0.26944,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Cream PLAN · US-101 N · 06:40 1:4000 panel expands at lower left"
+      },
+      "motion": {
+        "path": "Cream PLAN · US-101 N · 06:40 1:4000 panel expands at lower left",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4388, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4388,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4388,
+          "state": "paper surface begins"
+        },
+        {
+          "frame": 4391,
+          "state": "panel filled"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4388,
+        4391,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "PLAN · US-101 N · 06:40 / 1:4000",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E08",
+      "shot_id": "S0095",
+      "type": "hud_chart",
+      "description": "Three horizontal gantry lanes G3/G2/G1; orange G3 top line, YOU orange dot below G1",
+      "start_frame": 4390,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.05833,
+        "y": 0.63333,
+        "w": 0.14062,
+        "h": 0.21296,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 31,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Three horizontal gantry lanes G3/G2/G1; orange G3 top line, YOU orange dot below G1"
+      },
+      "motion": {
+        "path": "Three horizontal gantry lanes G3/G2/G1; orange G3 top line, YOU orange dot below G1",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4390, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4390,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4408,
+          "state": "G3 orange; lower lanes black; YOU near x237 y878"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4390,
+        4408,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "G3 / G2 / G1 / YOU",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 11,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E09",
+      "shot_id": "S0095",
+      "type": "text_label",
+      "description": "Upper-left cream ad-lib and bridge navigation note",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.03333,
+        "y": 0.15833,
+        "w": 0.1375,
+        "h": 0.04907,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 22,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Upper-left cream ad-lib and bridge navigation note"
+      },
+      "motion": {
+        "path": "Upper-left cream ad-lib and bridge navigation note",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "AD-LIB · BA-DA— / NEXT · THE BRIDGE · 3 BOARDS",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 13,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E10",
+      "shot_id": "S0095",
+      "type": "text_label",
+      "description": "Black pointer-tag below corresponding gantry: BOARD 01 · ROCKET",
+      "start_frame": 4394,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.18229,
+        "y": 0.40741,
+        "w": 0.07604,
+        "h": 0.02315,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Black pointer-tag below corresponding gantry: BOARD 01 · ROCKET"
+      },
+      "motion": {
+        "path": "Black pointer-tag below corresponding gantry: BOARD 01 · ROCKET",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4394, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4394,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4394,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "BOARD 01 · ROCKET",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E11",
+      "shot_id": "S0095",
+      "type": "text_label",
+      "description": "Black pointer-tag below corresponding gantry: BOARD 02 · LONGEVITY",
+      "start_frame": 4394,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.45312,
+        "y": 0.43241,
+        "w": 0.09167,
+        "h": 0.02315,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Black pointer-tag below corresponding gantry: BOARD 02 · LONGEVITY"
+      },
+      "motion": {
+        "path": "Black pointer-tag below corresponding gantry: BOARD 02 · LONGEVITY",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4394, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4394,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4394,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "BOARD 02 · LONGEVITY",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E12",
+      "shot_id": "S0095",
+      "type": "text_label",
+      "description": "Black pointer-tag below corresponding gantry: BOARD 03 · UNDERCLASS",
+      "start_frame": 4394,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.77083,
+        "y": 0.43981,
+        "w": 0.09792,
+        "h": 0.02315,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 23,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Black pointer-tag below corresponding gantry: BOARD 03 · UNDERCLASS"
+      },
+      "motion": {
+        "path": "Black pointer-tag below corresponding gantry: BOARD 03 · UNDERCLASS",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4394, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4394,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4394,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "BOARD 03 · UNDERCLASS",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E13",
+      "shot_id": "S0095",
+      "type": "hud_bracket",
+      "description": "Model face/body corner brackets with MODEL 01 · TURNING 0.97 tag",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.36458,
+        "y": 0.28704,
+        "w": 0.24479,
+        "h": 0.63889,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 18,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Model face/body corner brackets with MODEL 01 · TURNING 0.97 tag"
+      },
+      "motion": {
+        "path": "Model face/body corner brackets with MODEL 01 · TURNING 0.97 tag",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4382, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4382,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4382,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json",
+      "text": {
+        "content": "MODEL 01 · TURNING 0.97",
+        "case": "as observed",
+        "typography": {
+          "font_identity": "unknown",
+          "candidates": [
+            "Helvetica-like grotesque / monospaced HUD"
+          ],
+          "cap_height_px_estimate": 12,
+          "weight": "visual estimate; condensed regular for flap, regular sans for cream caption",
+          "alignment": "left unless board cell-centred",
+          "tracking": "wide monospace on boards/HUD; normal in captions",
+          "stroke": "none observed",
+          "shadow": "none separately resolved",
+          "method": "visual_estimate",
+          "confidence": 0.72
+        }
+      }
+    },
+    {
+      "element_id": "S0095-E14",
+      "shot_id": "S0095",
+      "type": "transition_graphic",
+      "description": "Outgoing subject becomes ghosted with incoming closer portrait during dissolve",
+      "start_frame": 4432,
+      "end_frame": 4435,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "Observed appearance after print pass; source alpha unknown. Outgoing subject becomes ghosted with incoming closer portrait during dissolve"
+      },
+      "motion": {
+        "path": "Outgoing subject becomes ghosted with incoming closer portrait during dissolve",
+        "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+        "entrance": "visible from about f4432, +/-2f unless inherited at cut",
+        "exit": "last visible within this shot f4435; no inferred offscreen history"
+      },
+      "keyframes": [
+        {
+          "frame": 4432,
+          "state": "first observed/estimated visible state; onset uncertainty <=2 frames"
+        },
+        {
+          "frame": 4432,
+          "state": "incoming ghost starts"
+        },
+        {
+          "frame": 4435,
+          "state": "two subject positions visible"
+        },
+        {
+          "frame": 4435,
+          "state": "continues to cut unless exit described"
+        }
+      ],
+      "effects": [
+        "shared measured print pass"
+      ],
+      "reference_frames": [
+        4432,
+        4435
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "bbox is visual estimate of typical/max region, approx +/-0.02 normalized; static paper edges approximately +/-8px; not author source geometry",
+        "Visibility/word timing sampled every2f; bound +/-2f, not sample-accurate audio timing"
+      ],
+      "reconstruction_hint": "Use exact referenced frames for geometry, draw this layer independently, share global chrome from visual_system.json"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0095-A03",
+      "target_element_ids": [
+        "S0095-E03"
+      ],
+      "description": "Left gantry settles ESCAPE VELOCITY; lower row still random flip states before later speed number",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0095-A04",
+      "target_element_ids": [
+        "S0095-E04"
+      ],
+      "description": "Middle gantry changes independently into LONGEVITY E.V.; lower line random until YR/YR suffix",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0095-A05",
+      "target_element_ids": [
+        "S0095-E05"
+      ],
+      "description": "Right gantry turns from random letters into UNDERCLASS, then 06 MONTHS",
+      "start_frame": 4382,
+      "end_frame": 4435,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0095-A06",
+      "target_element_ids": [
+        "S0095-E06"
+      ],
+      "description": "Residual individual cream BACK! tiles flip vertically and disappear near shot opening",
+      "start_frame": 4382,
+      "end_frame": 4387,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0095-A07",
+      "target_element_ids": [
+        "S0095-E07"
+      ],
+      "description": "Cream PLAN · US-101 N · 06:40 1:4000 panel expands at lower left",
+      "start_frame": 4388,
+      "end_frame": 4435,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0095-A08",
+      "target_element_ids": [
+        "S0095-E08"
+      ],
+      "description": "Three horizontal gantry lanes G3/G2/G1; orange G3 top line, YOU orange dot below G1",
+      "start_frame": 4390,
+      "end_frame": 4435,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    },
+    {
+      "anim_id": "S0095-A14",
+      "target_element_ids": [
+        "S0095-E14"
+      ],
+      "description": "Outgoing subject becomes ghosted with incoming closer portrait during dissolve",
+      "start_frame": 4432,
+      "end_frame": 4435,
+      "easing": "snap/step for word and flap states; continuous underlying motion curve unknown",
+      "audio_sync": "temporal candidates only; listening not evaluated"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AH01842",
+      "relation": "band_onset_candidate (unknown) at frame 4383; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4383
+    },
+    {
+      "audio_event_id": "AH01843",
+      "relation": "band_onset_candidate (unknown) at frame 4383; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4383
+    },
+    {
+      "audio_event_id": "AB0404",
+      "relation": "beat_candidate (unknown) at frame 4383; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4383
+    },
+    {
+      "audio_event_id": "AH01844",
+      "relation": "band_onset_candidate (unknown) at frame 4383; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4383
+    },
+    {
+      "audio_event_id": "AH01845",
+      "relation": "band_onset_candidate (unknown) at frame 4383; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4383
+    },
+    {
+      "audio_event_id": "AH01846",
+      "relation": "band_onset_candidate (unknown) at frame 4388; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4388
+    },
+    {
+      "audio_event_id": "AH01847",
+      "relation": "band_onset_candidate (unknown) at frame 4388; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4388
+    },
+    {
+      "audio_event_id": "AH01848",
+      "relation": "band_onset_candidate (unknown) at frame 4388; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4388
+    },
+    {
+      "audio_event_id": "AB0405",
+      "relation": "beat_candidate (unknown) at frame 4393; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4393
+    },
+    {
+      "audio_event_id": "AH01849",
+      "relation": "band_onset_candidate (unknown) at frame 4393; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4393
+    },
+    {
+      "audio_event_id": "AH01850",
+      "relation": "band_onset_candidate (unknown) at frame 4393; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4393
+    },
+    {
+      "audio_event_id": "AH01851",
+      "relation": "band_onset_candidate (unknown) at frame 4394; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4394
+    },
+    {
+      "audio_event_id": "AH01852",
+      "relation": "band_onset_candidate (unknown) at frame 4394; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4394
+    },
+    {
+      "audio_event_id": "AH01853",
+      "relation": "band_onset_candidate (unknown) at frame 4396; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4396
+    },
+    {
+      "audio_event_id": "AW0305",
+      "relation": "vocal_word_candidate (unknown) at frame 4399–4456; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4399
+    },
+    {
+      "audio_event_id": "AH01854",
+      "relation": "band_onset_candidate (unknown) at frame 4399; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4399
+    },
+    {
+      "audio_event_id": "AH01855",
+      "relation": "band_onset_candidate (unknown) at frame 4399; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4399
+    },
+    {
+      "audio_event_id": "AH01856",
+      "relation": "band_onset_candidate (unknown) at frame 4401; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4401
+    },
+    {
+      "audio_event_id": "AH01857",
+      "relation": "band_onset_candidate (unknown) at frame 4404; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4404
+    },
+    {
+      "audio_event_id": "AH01858",
+      "relation": "band_onset_candidate (unknown) at frame 4404; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4404
+    },
+    {
+      "audio_event_id": "AH01859",
+      "relation": "band_onset_candidate (unknown) at frame 4404; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4404
+    },
+    {
+      "audio_event_id": "AB0406",
+      "relation": "beat_candidate (unknown) at frame 4404; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4404
+    },
+    {
+      "audio_event_id": "AH01860",
+      "relation": "band_onset_candidate (unknown) at frame 4404; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4404
+    },
+    {
+      "audio_event_id": "AH01861",
+      "relation": "band_onset_candidate (unknown) at frame 4405; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4405
+    },
+    {
+      "audio_event_id": "AH01862",
+      "relation": "band_onset_candidate (unknown) at frame 4409; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4409
+    },
+    {
+      "audio_event_id": "AH01863",
+      "relation": "band_onset_candidate (unknown) at frame 4410; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4410
+    },
+    {
+      "audio_event_id": "AH01864",
+      "relation": "band_onset_candidate (unknown) at frame 4412; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4412
+    },
+    {
+      "audio_event_id": "AB0407",
+      "relation": "beat_candidate (unknown) at frame 4415; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4415
+    },
+    {
+      "audio_event_id": "AH01865",
+      "relation": "band_onset_candidate (unknown) at frame 4415; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4415
+    },
+    {
+      "audio_event_id": "AH01866",
+      "relation": "band_onset_candidate (unknown) at frame 4415; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4415
+    },
+    {
+      "audio_event_id": "AH01867",
+      "relation": "band_onset_candidate (unknown) at frame 4415; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4415
+    },
+    {
+      "audio_event_id": "AH01868",
+      "relation": "band_onset_candidate (unknown) at frame 4415; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4415
+    },
+    {
+      "audio_event_id": "AH01869",
+      "relation": "band_onset_candidate (unknown) at frame 4416; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4416
+    },
+    {
+      "audio_event_id": "AH01870",
+      "relation": "band_onset_candidate (unknown) at frame 4418; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4418
+    },
+    {
+      "audio_event_id": "AH01871",
+      "relation": "band_onset_candidate (unknown) at frame 4418; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4418
+    },
+    {
+      "audio_event_id": "AH01872",
+      "relation": "band_onset_candidate (unknown) at frame 4420; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4420
+    },
+    {
+      "audio_event_id": "AH01873",
+      "relation": "band_onset_candidate (unknown) at frame 4421; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4421
+    },
+    {
+      "audio_event_id": "AB0408",
+      "relation": "beat_candidate (unknown) at frame 4426; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4426
+    },
+    {
+      "audio_event_id": "AH01874",
+      "relation": "band_onset_candidate (unknown) at frame 4426; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4426
+    },
+    {
+      "audio_event_id": "AH01875",
+      "relation": "band_onset_candidate (unknown) at frame 4426; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4426
+    },
+    {
+      "audio_event_id": "AH01876",
+      "relation": "band_onset_candidate (unknown) at frame 4426; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4426
+    },
+    {
+      "audio_event_id": "AH01877",
+      "relation": "band_onset_candidate (unknown) at frame 4426; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4426
+    },
+    {
+      "audio_event_id": "AH01878",
+      "relation": "band_onset_candidate (unknown) at frame 4426; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4426
+    },
+    {
+      "audio_event_id": "AH01879",
+      "relation": "band_onset_candidate (unknown) at frame 4431; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4431
+    },
+    {
+      "audio_event_id": "AH01880",
+      "relation": "band_onset_candidate (unknown) at frame 4432; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4432
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B5,B10"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.73,
+  "uncertainties": [
+    "Original font files, random flap seed, alpha and easing code are unknown",
+    "Positions are bounded visual measurements; digit transition glyphs are reference-frame backed, not fully transcribed random sequences",
+    "Source assertions remain confirmed/inferred/unknown as in original layer hypotheses; inferred film-layer separation is not recovered author source code",
+    "No direct listening proof; audio linkage is candidate timing only"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0095.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B2-026",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        4382,
+        4382
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "dissolve",
+      "boundary_id": "B3-001",
+      "description": "后退至三块高架路牌前的少女中景，雾中透视公路朝远方收束。三块黑翻牌板逐步分化为火箭、长寿和底层阶级标题，左下白色三泳道计划图淡入，上一镜BACK白格退出。",
+      "span": [
+        4435,
+        4435
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "ESCAPE VELOCITY",
+    "LONGEVITY E.V. / YR/YR",
+    "UNDERCLASS / 06 MONTHS",
+    "BACK!",
+    "PLAN · US-101 N · 06:40 / 1:4000",
+    "G3 / G2 / G1 / YOU",
+    "AD-LIB · BA-DA— / NEXT · THE BRIDGE · 3 BOARDS",
+    "BOARD 01 · ROCKET",
+    "BOARD 02 · LONGEVITY",
+    "BOARD 03 · UNDERCLASS",
+    "MODEL 01 · TURNING 0.97"
+  ],
+  "detail_review": {
+    "reviewer": "root",
+    "method": "actual whole filmstrip + native1920 midpoint +2f crop sequence, followed by separate1f panel visibility review",
+    "sheet": "work/root_review/micro_S0095.jpg",
+    "timing_precision_frames": 2,
+    "additional_sheets": [
+      "work/root_review/panels95.jpg"
+    ],
+    "visibility_note": "continuous plate persists throughout; diagram/word starts use inspected1–2f bounds; hidden renderer and font identity remain unknown",
+    "pending": []
+  }
+}

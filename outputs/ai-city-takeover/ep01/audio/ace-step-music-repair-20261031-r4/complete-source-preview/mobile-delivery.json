@@ -1,0 +1,29 @@
+{
+  "schema": "current-user-mobile-delivery/1",
+  "intent_at_utc": "2026-10-31T09:02:33.317776+00:00",
+  "project": "AI-VIDEO",
+  "platform": "feishu",
+  "current_session_key_sha256": "e9fc14342305eb409709e0efea0cda486bb017a2cdcfa402f640aa5fd377336b",
+  "attachments": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.mp3",
+      "sha256": "e973480eabe65318d34d55c2e488434fc702b3fc7069b5caa73df9aae2dd6c11",
+      "bytes": 663404,
+      "full_decode": "PASS"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.opus",
+      "sha256": "a1644d570a340f27b7399e2437ea95c423ba6bdbdda6be695bf586532f4e6dc1",
+      "bytes": 519412,
+      "full_decode": "PASS"
+    }
+  ],
+  "source_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+  "message": "这是补上伴奏后的30秒试听版，附可直接播放的语音和MP3。保留完整原词，副歌用了演唱片段；音乐听感和剪接是否自然仍待试听。",
+  "status": "SERVICE_ACKNOWLEDGED",
+  "automatic_retries": 0,
+  "human_playback": "NOT_EVALUATED",
+  "return_code": 0,
+  "completed_at_utc": "2026-10-31T09:02:36.388392+00:00",
+  "service_message": "Message sent successfully."
+}

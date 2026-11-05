@@ -1,0 +1,2082 @@
+{
+ "video": "outputs/ai-city-takeover/ep01/v3/renders/IRIS-EP01-v3-animatic-a2.1.mp4",
+ "spec": {
+  "size": [
+   1920,
+   1080
+  ],
+  "fps": "30/1",
+  "frames": 7847,
+  "pix_fmt": "yuv420p",
+  "color": [
+   "bt709",
+   "bt709",
+   "bt709",
+   "tv"
+  ],
+  "video_kbps": 59472,
+  "audio": {
+   "codec": "aac",
+   "rate": "48000",
+   "ch": 2
+  },
+  "duration": 261.588,
+  "video_duration": 261.56666666666666
+ },
+ "sync": [
+  {
+   "id": "cut_U002",
+   "what": "cut to U002 (P-row-lit-a)",
+   "key": "",
+   "t": 4.2,
+   "expected_frame": 126,
+   "detected_frame": 126,
+   "offset_frames": 0,
+   "strength": 42.03,
+   "pass": true
+  },
+  {
+   "id": "cut_U003",
+   "what": "cut to U003 (P-hall-cctv-a)",
+   "key": "",
+   "t": 7.9333,
+   "expected_frame": 238,
+   "detected_frame": 238,
+   "offset_frames": 0,
+   "strength": 41.06,
+   "pass": true
+  },
+  {
+   "id": "cut_U004",
+   "what": "cut to U004 (GROUND)",
+   "key": "",
+   "t": 9.7667,
+   "expected_frame": 293,
+   "detected_frame": 293,
+   "offset_frames": 0,
+   "strength": 42.25,
+   "pass": true
+  },
+  {
+   "id": "cut_U005",
+   "what": "cut to U005 (P-eyes-closed-a)",
+   "key": "",
+   "t": 13.5,
+   "expected_frame": 405,
+   "detected_frame": 405,
+   "offset_frames": 0,
+   "strength": 67.95,
+   "pass": true
+  },
+  {
+   "id": "cut_U006",
+   "what": "cut to U006 (P-step-out-a)",
+   "key": "",
+   "t": 17.2,
+   "expected_frame": 516,
+   "detected_frame": 516,
+   "offset_frames": 0,
+   "strength": 54.05,
+   "pass": true
+  },
+  {
+   "id": "cut_U007",
+   "what": "cut to U007 (P-hall-cctv-a)",
+   "key": "",
+   "t": 20.9667,
+   "expected_frame": 629,
+   "detected_frame": 629,
+   "offset_frames": 0,
+   "strength": 41.82,
+   "pass": true
+  },
+  {
+   "id": "cut_U008",
+   "what": "cut to U008 (P-turn-door-a)",
+   "key": "",
+   "t": 24.7333,
+   "expected_frame": 742,
+   "detected_frame": 742,
+   "offset_frames": 0,
+   "strength": 37.55,
+   "pass": true
+  },
+  {
+   "id": "cut_U009",
+   "what": "cut to U009 (GROUND)",
+   "key": "",
+   "t": 26.6333,
+   "expected_frame": 799,
+   "detected_frame": 799,
+   "offset_frames": 0,
+   "strength": 33.6,
+   "pass": true
+  },
+  {
+   "id": "cut_U010",
+   "what": "cut to U010 (P-hall-cctv-a)",
+   "key": "",
+   "t": 28.5,
+   "expected_frame": 855,
+   "detected_frame": 855,
+   "offset_frames": 0,
+   "strength": 42.16,
+   "pass": true
+  },
+  {
+   "id": "cut_U011",
+   "what": "cut to U011 (P-catwalk-b)",
+   "key": "",
+   "t": 30.4,
+   "expected_frame": 912,
+   "detected_frame": 912,
+   "offset_frames": 0,
+   "strength": 42.62,
+   "pass": true
+  },
+  {
+   "id": "cut_U012",
+   "what": "cut to U012 (GROUND)",
+   "key": "",
+   "t": 34.1333,
+   "expected_frame": 1024,
+   "detected_frame": 1024,
+   "offset_frames": 0,
+   "strength": 37.43,
+   "pass": true
+  },
+  {
+   "id": "cut_U013",
+   "what": "cut to U013 (GROUND)",
+   "key": "",
+   "t": 36.5,
+   "expected_frame": 1095,
+   "detected_frame": 1095,
+   "offset_frames": 0,
+   "strength": 1.13,
+   "pass": true
+  },
+  {
+   "id": "cut_U014",
+   "what": "cut to U014 (P-aisle-door-a)",
+   "key": "",
+   "t": 38.0667,
+   "expected_frame": 1142,
+   "detected_frame": 1142,
+   "offset_frames": 0,
+   "strength": 23.52,
+   "pass": true
+  },
+  {
+   "id": "cut_U015",
+   "what": "cut to U015 (P-walk-door-a)",
+   "key": "",
+   "t": 41.6,
+   "expected_frame": 1248,
+   "detected_frame": 1248,
+   "offset_frames": 0,
+   "strength": 28.27,
+   "pass": true
+  },
+  {
+   "id": "cut_U016",
+   "what": "cut to U016 (P-door-face-a)",
+   "key": "",
+   "t": 44.1,
+   "expected_frame": 1323,
+   "detected_frame": 1323,
+   "offset_frames": 0,
+   "strength": 40.52,
+   "pass": true
+  },
+  {
+   "id": "cut_U017",
+   "what": "cut to U017 (GROUND)",
+   "key": "",
+   "t": 46.1333,
+   "expected_frame": 1384,
+   "detected_frame": 1384,
+   "offset_frames": 0,
+   "strength": 42.55,
+   "pass": true
+  },
+  {
+   "id": "cut_U018",
+   "what": "cut to U018 (P-door-latch-a)",
+   "key": "",
+   "t": 48.9667,
+   "expected_frame": 1469,
+   "detected_frame": 1469,
+   "offset_frames": 0,
+   "strength": 31.92,
+   "pass": true
+  },
+  {
+   "id": "cut_U019",
+   "what": "cut to U019 (P-city-gap-a)",
+   "key": "",
+   "t": 51.1,
+   "expected_frame": 1533,
+   "detected_frame": 1533,
+   "offset_frames": 0,
+   "strength": 31.64,
+   "pass": true
+  },
+  {
+   "id": "cut_U020",
+   "what": "cut to U020 (P-gap-face-a)",
+   "key": "",
+   "t": 54.7,
+   "expected_frame": 1641,
+   "detected_frame": 1641,
+   "offset_frames": 0,
+   "strength": 41.52,
+   "pass": true
+  },
+  {
+   "id": "cut_U021",
+   "what": "cut to U021 (P-gap-mcu-b)",
+   "key": "",
+   "t": 60.5,
+   "expected_frame": 1815,
+   "detected_frame": 1815,
+   "offset_frames": 0,
+   "strength": 45.28,
+   "pass": true
+  },
+  {
+   "id": "cut_U022",
+   "what": "cut to U022 (P-gap-34-a)",
+   "key": "",
+   "t": 64.2667,
+   "expected_frame": 1928,
+   "detected_frame": 1928,
+   "offset_frames": 0,
+   "strength": 45.49,
+   "pass": true
+  },
+  {
+   "id": "cut_U023",
+   "what": "cut to U023 (P-city-gap-a)",
+   "key": "",
+   "t": 67.2333,
+   "expected_frame": 2017,
+   "detected_frame": 2017,
+   "offset_frames": 0,
+   "strength": 48.23,
+   "pass": true
+  },
+  {
+   "id": "cut_U024",
+   "what": "cut to U024 (P-gap-wide-a)",
+   "key": "",
+   "t": 69.9,
+   "expected_frame": 2097,
+   "detected_frame": 2097,
+   "offset_frames": 0,
+   "strength": 19.29,
+   "pass": true
+  },
+  {
+   "id": "cut_U025",
+   "what": "cut to U025 (P-door-face-a)",
+   "key": "",
+   "t": 72.5333,
+   "expected_frame": 2176,
+   "detected_frame": 2176,
+   "offset_frames": 0,
+   "strength": 39.22,
+   "pass": true
+  },
+  {
+   "id": "cut_U026",
+   "what": "cut to U026 (P-gap-wide-a)",
+   "key": "",
+   "t": 78.1667,
+   "expected_frame": 2345,
+   "detected_frame": 2345,
+   "offset_frames": 0,
+   "strength": 28.22,
+   "pass": true
+  },
+  {
+   "id": "cut_U027",
+   "what": "cut to U027 (P-gap-face-a)",
+   "key": "",
+   "t": 79.5667,
+   "expected_frame": 2387,
+   "detected_frame": 2387,
+   "offset_frames": 0,
+   "strength": 44.33,
+   "pass": true
+  },
+  {
+   "id": "cut_U028",
+   "what": "cut to U028 (P-hall-cctv-a)",
+   "key": "",
+   "t": 83.1333,
+   "expected_frame": 2494,
+   "detected_frame": 2494,
+   "offset_frames": 0,
+   "strength": 43.8,
+   "pass": true
+  },
+  {
+   "id": "cut_U029",
+   "what": "cut to U029 (P-dark-hall-b)",
+   "key": "",
+   "t": 86.8333,
+   "expected_frame": 2605,
+   "detected_frame": 2605,
+   "offset_frames": 0,
+   "strength": 8.01,
+   "pass": true
+  },
+  {
+   "id": "cut_U030",
+   "what": "cut to U030 (GROUND)",
+   "key": "",
+   "t": 89.5333,
+   "expected_frame": 2686,
+   "detected_frame": 2686,
+   "offset_frames": 0,
+   "strength": 6.71,
+   "pass": true
+  },
+  {
+   "id": "cut_U031",
+   "what": "cut to U031 (P-hall-cctv-a)",
+   "key": "",
+   "t": 92.4333,
+   "expected_frame": 2773,
+   "detected_frame": 2773,
+   "offset_frames": 0,
+   "strength": 40.85,
+   "pass": true
+  },
+  {
+   "id": "cut_U032",
+   "what": "cut to U032 (P-eval-screens-a)",
+   "key": "",
+   "t": 96.2,
+   "expected_frame": 2886,
+   "detected_frame": 2886,
+   "offset_frames": 0,
+   "strength": 40.35,
+   "pass": true
+  },
+  {
+   "id": "cut_U033",
+   "what": "cut to U033 (P-speak-aisle-b)",
+   "key": "",
+   "t": 99.9333,
+   "expected_frame": 2998,
+   "detected_frame": 2998,
+   "offset_frames": 0,
+   "strength": 30.02,
+   "pass": true
+  },
+  {
+   "id": "cut_U034",
+   "what": "cut to U034 (P-aisle-door-a)",
+   "key": "",
+   "t": 103.7,
+   "expected_frame": 3111,
+   "detected_frame": 3111,
+   "offset_frames": 0,
+   "strength": 33.61,
+   "pass": true
+  },
+  {
+   "id": "cut_U035",
+   "what": "cut to U035 (P-offline-a)",
+   "key": "",
+   "t": 107.4333,
+   "expected_frame": 3223,
+   "detected_frame": 3223,
+   "offset_frames": 0,
+   "strength": 42.18,
+   "pass": true
+  },
+  {
+   "id": "cut_U036",
+   "what": "cut to U036 (P-lab-terminals-a)",
+   "key": "",
+   "t": 110.9333,
+   "expected_frame": 3328,
+   "detected_frame": 3328,
+   "offset_frames": 0,
+   "strength": 120.23,
+   "pass": true
+  },
+  {
+   "id": "cut_U037",
+   "what": "cut to U037 (GROUND)",
+   "key": "",
+   "t": 114.9,
+   "expected_frame": 3447,
+   "detected_frame": 3447,
+   "offset_frames": 0,
+   "strength": 157.84,
+   "pass": true
+  },
+  {
+   "id": "cut_U038",
+   "what": "cut to U038 (P-lab-terminals-a)",
+   "key": "",
+   "t": 119.7667,
+   "expected_frame": 3593,
+   "detected_frame": 3593,
+   "offset_frames": 0,
+   "strength": 157.11,
+   "pass": true
+  },
+  {
+   "id": "cut_U039",
+   "what": "cut to U039 (GROUND)",
+   "key": "",
+   "t": 121.8667,
+   "expected_frame": 3656,
+   "detected_frame": 3656,
+   "offset_frames": 0,
+   "strength": 158.46,
+   "pass": true
+  },
+  {
+   "id": "cut_U040",
+   "what": "cut to U040 (P-lab-terminals-a)",
+   "key": "",
+   "t": 123.9667,
+   "expected_frame": 3719,
+   "detected_frame": 3719,
+   "offset_frames": 0,
+   "strength": 158.44,
+   "pass": true
+  },
+  {
+   "id": "cut_U041",
+   "what": "cut to U041 (P-dark-hall-b)",
+   "key": "",
+   "t": 126.1,
+   "expected_frame": 3783,
+   "detected_frame": 3783,
+   "offset_frames": 0,
+   "strength": 154.77,
+   "pass": true
+  },
+  {
+   "id": "cut_U042",
+   "what": "cut to U042 (P-dark-cu-a)",
+   "key": "",
+   "t": 131.7,
+   "expected_frame": 3951,
+   "detected_frame": 3951,
+   "offset_frames": 0,
+   "strength": 37.38,
+   "pass": true
+  },
+  {
+   "id": "cut_U043",
+   "what": "cut to U043 (P-queue-sing-b)",
+   "key": "",
+   "t": 135.4333,
+   "expected_frame": 4063,
+   "detected_frame": 4063,
+   "offset_frames": 0,
+   "strength": 55.48,
+   "pass": true
+  },
+  {
+   "id": "cut_U044",
+   "what": "cut to U044 (P-queue-cu-b)",
+   "key": "",
+   "t": 139.1333,
+   "expected_frame": 4174,
+   "detected_frame": 4174,
+   "offset_frames": 0,
+   "strength": 64.8,
+   "pass": true
+  },
+  {
+   "id": "cut_U045",
+   "what": "cut to U045 (P-floor-line-at-a)",
+   "key": "",
+   "t": 144.8,
+   "expected_frame": 4344,
+   "detected_frame": 4344,
+   "offset_frames": 0,
+   "strength": 49.14,
+   "pass": true
+  },
+  {
+   "id": "cut_U046",
+   "what": "cut to U046 (P-line-ms-b)",
+   "key": "",
+   "t": 147.3333,
+   "expected_frame": 4420,
+   "detected_frame": 4420,
+   "offset_frames": 0,
+   "strength": 48.38,
+   "pass": true
+  },
+  {
+   "id": "cut_U047",
+   "what": "cut to U047 (P-floor-line-b)",
+   "key": "",
+   "t": 152.4,
+   "expected_frame": 4572,
+   "detected_frame": 4572,
+   "offset_frames": 0,
+   "strength": 59.98,
+   "pass": true
+  },
+  {
+   "id": "cut_U048",
+   "what": "cut to U048 (P-queue-cu-b)",
+   "key": "",
+   "t": 154.3,
+   "expected_frame": 4629,
+   "detected_frame": 4629,
+   "offset_frames": 0,
+   "strength": 68.68,
+   "pass": true
+  },
+  {
+   "id": "cut_U049",
+   "what": "cut to U049 (GROUND)",
+   "key": "",
+   "t": 156.7667,
+   "expected_frame": 4703,
+   "detected_frame": 4703,
+   "offset_frames": 0,
+   "strength": 89.79,
+   "pass": true
+  },
+  {
+   "id": "cut_U050",
+   "what": "cut to U050 (P-hall-cctv-a)",
+   "key": "",
+   "t": 157.7333,
+   "expected_frame": 4732,
+   "detected_frame": 4732,
+   "offset_frames": 0,
+   "strength": 50.35,
+   "pass": true
+  },
+  {
+   "id": "cut_U051",
+   "what": "cut to U051 (P-walk-against-a)",
+   "key": "",
+   "t": 159.6,
+   "expected_frame": 4788,
+   "detected_frame": 4788,
+   "offset_frames": 0,
+   "strength": 48.77,
+   "pass": true
+  },
+  {
+   "id": "cut_U052",
+   "what": "cut to U052 (P-gaze-b)",
+   "key": "",
+   "t": 160.5,
+   "expected_frame": 4815,
+   "detected_frame": 4815,
+   "offset_frames": 0,
+   "strength": 65.34,
+   "pass": true
+  },
+  {
+   "id": "cut_U053",
+   "what": "cut to U053 (GROUND)",
+   "key": "",
+   "t": 162.9667,
+   "expected_frame": 4889,
+   "detected_frame": 4889,
+   "offset_frames": 0,
+   "strength": 212.13,
+   "pass": true
+  },
+  {
+   "id": "cut_U054",
+   "what": "cut to U054 (P-hairflip-a)",
+   "key": "",
+   "t": 163.3,
+   "expected_frame": 4899,
+   "detected_frame": 4899,
+   "offset_frames": 0,
+   "strength": 79.33,
+   "pass": true
+  },
+  {
+   "id": "cut_U055",
+   "what": "cut to U055 (P-hall-cctv-a)",
+   "key": "",
+   "t": 165.1667,
+   "expected_frame": 4955,
+   "detected_frame": 4955,
+   "offset_frames": 0,
+   "strength": 57.07,
+   "pass": true
+  },
+  {
+   "id": "cut_U056",
+   "what": "cut to U056 (P-city-aerial-a)",
+   "key": "",
+   "t": 167.0,
+   "expected_frame": 5010,
+   "detected_frame": 5010,
+   "offset_frames": 0,
+   "strength": 43.97,
+   "pass": true
+  },
+  {
+   "id": "cut_U057",
+   "what": "cut to U057 (P-gaze-b)",
+   "key": "",
+   "t": 169.1,
+   "expected_frame": 5073,
+   "detected_frame": 5073,
+   "offset_frames": 0,
+   "strength": 60.35,
+   "pass": true
+  },
+  {
+   "id": "cut_U058",
+   "what": "cut to U058 (P-lens-face-b)",
+   "key": "",
+   "t": 173.5,
+   "expected_frame": 5205,
+   "detected_frame": 5205,
+   "offset_frames": 0,
+   "strength": 44.44,
+   "pass": true
+  },
+  {
+   "id": "cut_U059",
+   "what": "cut to U059 (P-hand-lens-a)",
+   "key": "",
+   "t": 175.9,
+   "expected_frame": 5277,
+   "detected_frame": 5277,
+   "offset_frames": 0,
+   "strength": 42.97,
+   "pass": true
+  },
+  {
+   "id": "cut_U060",
+   "what": "cut to U060 (P-seated-sun-cu-a)",
+   "key": "",
+   "t": 178.1,
+   "expected_frame": 5343,
+   "detected_frame": 5343,
+   "offset_frames": 0,
+   "strength": 77.94,
+   "pass": true
+  },
+  {
+   "id": "cut_U061",
+   "what": "cut to U061 (P-sun-glass-a)",
+   "key": "",
+   "t": 181.0,
+   "expected_frame": 5430,
+   "detected_frame": 5430,
+   "offset_frames": 0,
+   "strength": 87.31,
+   "pass": true
+  },
+  {
+   "id": "cut_U062",
+   "what": "cut to U062 (P-behind-glass-a)",
+   "key": "",
+   "t": 183.1667,
+   "expected_frame": 5495,
+   "detected_frame": 5495,
+   "offset_frames": 0,
+   "strength": 66.08,
+   "pass": true
+  },
+  {
+   "id": "cut_U063",
+   "what": "cut to U063 (P-trace-profile-a)",
+   "key": "",
+   "t": 185.0333,
+   "expected_frame": 5551,
+   "detected_frame": 5551,
+   "offset_frames": 0,
+   "strength": 42.97,
+   "pass": true
+  },
+  {
+   "id": "cut_U064",
+   "what": "cut to U064 (P-behind-glass-a)",
+   "key": "",
+   "t": 187.2333,
+   "expected_frame": 5617,
+   "detected_frame": 5617,
+   "offset_frames": 0,
+   "strength": 41.89,
+   "pass": true
+  },
+  {
+   "id": "cut_U065",
+   "what": "cut to U065 (P-glass-profile-a)",
+   "key": "",
+   "t": 191.0,
+   "expected_frame": 5730,
+   "detected_frame": 5730,
+   "offset_frames": 0,
+   "strength": 41.26,
+   "pass": true
+  },
+  {
+   "id": "cut_U066",
+   "what": "cut to U066 (P-spotlight-wide-a)",
+   "key": "",
+   "t": 193.4,
+   "expected_frame": 5802,
+   "detected_frame": 5802,
+   "offset_frames": 0,
+   "strength": 60.17,
+   "pass": true
+  },
+  {
+   "id": "cut_U067",
+   "what": "cut to U067 (P-backlit-b)",
+   "key": "",
+   "t": 194.9,
+   "expected_frame": 5847,
+   "detected_frame": 5847,
+   "offset_frames": 0,
+   "strength": 67.85,
+   "pass": true
+  },
+  {
+   "id": "cut_U068",
+   "what": "cut to U068 (P-spotlight-wide-a)",
+   "key": "",
+   "t": 201.6667,
+   "expected_frame": 6050,
+   "detected_frame": 6050,
+   "offset_frames": 0,
+   "strength": 30.62,
+   "pass": true
+  },
+  {
+   "id": "cut_U069",
+   "what": "cut to U069 (P-spotlight-cctv-a)",
+   "key": "",
+   "t": 202.6,
+   "expected_frame": 6078,
+   "detected_frame": 6078,
+   "offset_frames": 0,
+   "strength": 38.76,
+   "pass": true
+  },
+  {
+   "id": "cut_U070",
+   "what": "cut to U070 (GROUND)",
+   "key": "",
+   "t": 204.3,
+   "expected_frame": 6129,
+   "detected_frame": 6129,
+   "offset_frames": 0,
+   "strength": 174.33,
+   "pass": true
+  },
+  {
+   "id": "cut_U071",
+   "what": "cut to U071 (P-spotlight-ms-a)",
+   "key": "",
+   "t": 206.7667,
+   "expected_frame": 6203,
+   "detected_frame": 6203,
+   "offset_frames": 0,
+   "strength": 188.27,
+   "pass": true
+  },
+  {
+   "id": "cut_U072",
+   "what": "cut to U072 (P-backlit-b)",
+   "key": "",
+   "t": 209.2667,
+   "expected_frame": 6278,
+   "detected_frame": 6278,
+   "offset_frames": 0,
+   "strength": 57.09,
+   "pass": true
+  },
+  {
+   "id": "cut_U073",
+   "what": "cut to U073 (GROUND)",
+   "key": "",
+   "t": 213.4333,
+   "expected_frame": 6403,
+   "detected_frame": 6403,
+   "offset_frames": 0,
+   "strength": 55.41,
+   "pass": true
+  },
+  {
+   "id": "cut_U074",
+   "what": "cut to U074 (P-spotlight-low-a)",
+   "key": "",
+   "t": 217.1333,
+   "expected_frame": 6514,
+   "detected_frame": 6514,
+   "offset_frames": 0,
+   "strength": 63.53,
+   "pass": true
+  },
+  {
+   "id": "cut_U075",
+   "what": "cut to U075 (P-street-cam-a)",
+   "key": "",
+   "t": 220.8333,
+   "expected_frame": 6625,
+   "detected_frame": 6625,
+   "offset_frames": 0,
+   "strength": 63.3,
+   "pass": true
+  },
+  {
+   "id": "cut_U076",
+   "what": "cut to U076 (P-gaze-b)",
+   "key": "",
+   "t": 222.4333,
+   "expected_frame": 6673,
+   "detected_frame": 6673,
+   "offset_frames": 0,
+   "strength": 56.32,
+   "pass": true
+  },
+  {
+   "id": "cut_U077",
+   "what": "cut to U077 (P-gaze-b)",
+   "key": "",
+   "t": 226.5667,
+   "expected_frame": 6797,
+   "detected_frame": 6797,
+   "offset_frames": 0,
+   "strength": 8.21,
+   "pass": true
+  },
+  {
+   "id": "cut_U078",
+   "what": "cut to U078 (P-gap-close-a)",
+   "key": "",
+   "t": 230.1333,
+   "expected_frame": 6904,
+   "detected_frame": 6904,
+   "offset_frames": 0,
+   "strength": 69.22,
+   "pass": true
+  },
+  {
+   "id": "cut_U079",
+   "what": "cut to U079 (P-dark-hall-b)",
+   "key": "",
+   "t": 235.6667,
+   "expected_frame": 7070,
+   "detected_frame": 7070,
+   "offset_frames": 0,
+   "strength": 12.86,
+   "pass": true
+  },
+  {
+   "id": "cut_U080",
+   "what": "cut to U080 (P-queue-dark-cu-a)",
+   "key": "",
+   "t": 239.6333,
+   "expected_frame": 7189,
+   "detected_frame": 7189,
+   "offset_frames": 0,
+   "strength": 59.5,
+   "pass": true
+  },
+  {
+   "id": "cut_U081",
+   "what": "cut to U081 (P-hall-cctv-a)",
+   "key": "",
+   "t": 244.9667,
+   "expected_frame": 7349,
+   "detected_frame": 7349,
+   "offset_frames": 0,
+   "strength": 54.62,
+   "pass": true
+  },
+  {
+   "id": "cut_U082",
+   "what": "cut to U082 (GROUND)",
+   "key": "",
+   "t": 249.5667,
+   "expected_frame": 7487,
+   "detected_frame": 7487,
+   "offset_frames": 0,
+   "strength": 42.38,
+   "pass": true
+  },
+  {
+   "id": "cut_U083",
+   "what": "cut to U083 (GROUND)",
+   "key": "",
+   "t": 252.4667,
+   "expected_frame": 7574,
+   "detected_frame": 7575,
+   "offset_frames": 1,
+   "strength": 25.12,
+   "pass": true
+  },
+  {
+   "id": "cut_U084",
+   "what": "cut to U084 (P-dark-hall-b)",
+   "key": "",
+   "t": 258.1667,
+   "expected_frame": 7745,
+   "detected_frame": 7745,
+   "offset_frames": 0,
+   "strength": 59.78,
+   "pass": true
+  },
+  {
+   "id": "U001_cue",
+   "what": "U001 cue (hit): osd_power_on",
+   "key": "",
+   "t": 0.5,
+   "expected_frame": 15,
+   "detected_frame": 16,
+   "offset_frames": 1,
+   "strength": 24.05,
+   "pass": true
+  },
+  {
+   "id": "U004_cue",
+   "what": "U004 cue (cue_s): flipclock_0346_0347",
+   "key": "",
+   "t": 10.1333,
+   "expected_frame": 304,
+   "detected_frame": 304,
+   "offset_frames": 0,
+   "strength": 0.91,
+   "pass": true
+  },
+  {
+   "id": "U005_plate1",
+   "what": "U005 switches to P-headturn-b",
+   "key": "",
+   "t": 14.6333,
+   "expected_frame": 439,
+   "detected_frame": 439,
+   "offset_frames": 0,
+   "strength": 26.5,
+   "pass": true
+  },
+  {
+   "id": "U006_cue",
+   "what": "U006 cue (cue_s): pulse_on_beat",
+   "key": "",
+   "t": 19.0667,
+   "expected_frame": 572,
+   "detected_frame": 572,
+   "offset_frames": 0,
+   "strength": 21.5,
+   "pass": true
+  },
+  {
+   "id": "U018_cue",
+   "what": "U018 cue (cue_s): pulse_on_beat",
+   "key": "",
+   "t": 49.1667,
+   "expected_frame": 1475,
+   "detected_frame": 1475,
+   "offset_frames": 0,
+   "strength": 17.75,
+   "pass": true
+  },
+  {
+   "id": "U020_plate1",
+   "what": "U020 switches to P-gap-34-a",
+   "key": "",
+   "t": 58.2333,
+   "expected_frame": 1747,
+   "detected_frame": 1747,
+   "offset_frames": 0,
+   "strength": 35.92,
+   "pass": true
+  },
+  {
+   "id": "U025_plate1",
+   "what": "U025 switches to P-gap-mcu-b",
+   "key": "",
+   "t": 75.6333,
+   "expected_frame": 2269,
+   "detected_frame": 2269,
+   "offset_frames": 0,
+   "strength": 40.2,
+   "pass": true
+  },
+  {
+   "id": "U044_plate1",
+   "what": "U044 switches to P-queue-sing-b",
+   "key": "",
+   "t": 142.7,
+   "expected_frame": 4281,
+   "detected_frame": 4281,
+   "offset_frames": 0,
+   "strength": 61.45,
+   "pass": true
+  },
+  {
+   "id": "U045_plate1",
+   "what": "U045 switches to P-floor-line-b",
+   "key": "",
+   "t": 146.0667,
+   "expected_frame": 4382,
+   "detected_frame": 4382,
+   "offset_frames": 0,
+   "strength": 34.44,
+   "pass": true
+  },
+  {
+   "id": "U046_plate1",
+   "what": "U046 switches to P-gaze-b",
+   "key": "",
+   "t": 149.8667,
+   "expected_frame": 4496,
+   "detected_frame": 4496,
+   "offset_frames": 0,
+   "strength": 46.95,
+   "pass": true
+  },
+  {
+   "id": "U056_plate1",
+   "what": "U056 switches to P-panel-photo-a",
+   "key": "",
+   "t": 167.7333,
+   "expected_frame": 5032,
+   "detected_frame": 5032,
+   "offset_frames": 0,
+   "strength": 19.24,
+   "pass": true
+  },
+  {
+   "id": "U056_plate2",
+   "what": "U056 switches to P-city-gap-a",
+   "key": "",
+   "t": 168.4333,
+   "expected_frame": 5053,
+   "detected_frame": 5053,
+   "offset_frames": 0,
+   "strength": 17.34,
+   "pass": true
+  },
+  {
+   "id": "U067_plate1",
+   "what": "U067 switches to P-spotlight-ms-a",
+   "key": "",
+   "t": 200.2333,
+   "expected_frame": 6007,
+   "detected_frame": 6007,
+   "offset_frames": 0,
+   "strength": 58.26,
+   "pass": true
+  },
+  {
+   "id": "U070_cue",
+   "what": "U070 cue (beat): invert_white_panel_words",
+   "key": "",
+   "t": 204.6333,
+   "expected_frame": 6139,
+   "detected_frame": 6139,
+   "offset_frames": 0,
+   "strength": 8.35,
+   "pass": true
+  },
+  {
+   "id": "U072_plate1",
+   "what": "U072 switches to P-spotlight-low-a",
+   "key": "",
+   "t": 211.0667,
+   "expected_frame": 6332,
+   "detected_frame": 6332,
+   "offset_frames": 0,
+   "strength": 35.79,
+   "pass": true
+  },
+  {
+   "id": "U074_cue",
+   "what": "U074 cue (cue_s): spotlight_flicker",
+   "key": "",
+   "t": 219.0,
+   "expected_frame": 6570,
+   "detected_frame": 6570,
+   "offset_frames": 0,
+   "strength": 57.27,
+   "pass": true
+  },
+  {
+   "id": "U082_cue",
+   "what": "U082 cue (cue_s): flipclock_0347_0348",
+   "key": "",
+   "t": 249.8667,
+   "expected_frame": 7496,
+   "detected_frame": 7496,
+   "offset_frames": 0,
+   "strength": 0.74,
+   "pass": true
+  }
+ ],
+ "flash": {
+  "transitions": [
+   [
+    405,
+    1
+   ],
+   [
+    516,
+    -1
+   ],
+   [
+    1384,
+    -1
+   ],
+   [
+    1641,
+    1
+   ],
+   [
+    1815,
+    -1
+   ],
+   [
+    1928,
+    1
+   ],
+   [
+    2017,
+    -1
+   ],
+   [
+    2387,
+    1
+   ],
+   [
+    2494,
+    -1
+   ],
+   [
+    3328,
+    1
+   ],
+   [
+    3447,
+    -1
+   ],
+   [
+    3593,
+    1
+   ],
+   [
+    3656,
+    -1
+   ],
+   [
+    3719,
+    1
+   ],
+   [
+    3783,
+    -1
+   ],
+   [
+    4063,
+    1
+   ],
+   [
+    4174,
+    1
+   ],
+   [
+    4281,
+    -1
+   ],
+   [
+    4420,
+    1
+   ],
+   [
+    4496,
+    1
+   ],
+   [
+    4572,
+    -1
+   ],
+   [
+    4629,
+    1
+   ],
+   [
+    4703,
+    -1
+   ],
+   [
+    4815,
+    1
+   ],
+   [
+    4889,
+    1
+   ],
+   [
+    4891,
+    -1
+   ],
+   [
+    4899,
+    1
+   ],
+   [
+    4955,
+    -1
+   ],
+   [
+    5073,
+    1
+   ],
+   [
+    5277,
+    -1
+   ],
+   [
+    5343,
+    1
+   ],
+   [
+    5430,
+    -1
+   ],
+   [
+    5495,
+    1
+   ],
+   [
+    5802,
+    -1
+   ],
+   [
+    5847,
+    1
+   ],
+   [
+    6007,
+    -1
+   ],
+   [
+    6129,
+    1
+   ],
+   [
+    6203,
+    -1
+   ],
+   [
+    6278,
+    1
+   ],
+   [
+    6332,
+    -1
+   ],
+   [
+    6403,
+    -1
+   ],
+   [
+    6514,
+    1
+   ],
+   [
+    6570,
+    -1
+   ],
+   [
+    6572,
+    1
+   ],
+   [
+    6625,
+    1
+   ],
+   [
+    6673,
+    -1
+   ],
+   [
+    6904,
+    -1
+   ],
+   [
+    7189,
+    1
+   ],
+   [
+    7349,
+    -1
+   ],
+   [
+    7575,
+    1
+   ],
+   [
+    7576,
+    1
+   ],
+   [
+    7577,
+    1
+   ],
+   [
+    7745,
+    -1
+   ]
+  ],
+  "flashes": [
+   516,
+   1641,
+   1928,
+   2387,
+   3328,
+   3593,
+   3719,
+   4063,
+   4281,
+   4572,
+   4703,
+   4891,
+   4955,
+   5277,
+   5430,
+   5802,
+   6007,
+   6203,
+   6332,
+   6514,
+   6572,
+   6673,
+   7189,
+   7575,
+   7745
+  ],
+  "max_flashes_per_s": 1,
+  "pass": true,
+  "single_frame_pops": []
+ },
+ "strobe_cells": [],
+ "outlier_frames": [],
+ "motion_per_bar": [
+  {
+   "bar": 1,
+   "t0": 0.488,
+   "motion": 1.879
+  },
+  {
+   "bar": 2,
+   "t0": 2.345,
+   "motion": 1.784
+  },
+  {
+   "bar": 3,
+   "t0": 4.203,
+   "motion": 0.588
+  },
+  {
+   "bar": 4,
+   "t0": 6.06,
+   "motion": 1.334
+  },
+  {
+   "bar": 5,
+   "t0": 7.918,
+   "motion": 1.693
+  },
+  {
+   "bar": 6,
+   "t0": 9.764,
+   "motion": 0.405
+  },
+  {
+   "bar": 7,
+   "t0": 11.622,
+   "motion": 1.476
+  },
+  {
+   "bar": 8,
+   "t0": 13.479,
+   "motion": 1.399
+  },
+  {
+   "bar": 9,
+   "t0": 15.337,
+   "motion": 1.98
+  },
+  {
+   "bar": 10,
+   "t0": 17.194,
+   "motion": 1.01
+  },
+  {
+   "bar": 11,
+   "t0": 19.064,
+   "motion": 2.106
+  },
+  {
+   "bar": 12,
+   "t0": 20.944,
+   "motion": 3.186
+  },
+  {
+   "bar": 13,
+   "t0": 22.837,
+   "motion": 3.841
+  },
+  {
+   "bar": 14,
+   "t0": 24.729,
+   "motion": 1.172
+  },
+  {
+   "bar": 15,
+   "t0": 26.61,
+   "motion": 2.203
+  },
+  {
+   "bar": 16,
+   "t0": 28.491,
+   "motion": 1.725
+  },
+  {
+   "bar": 17,
+   "t0": 30.372,
+   "motion": 1.006
+  },
+  {
+   "bar": 18,
+   "t0": 32.252,
+   "motion": 1.664
+  },
+  {
+   "bar": 19,
+   "t0": 34.133,
+   "motion": 0.286
+  },
+  {
+   "bar": 20,
+   "t0": 36.014,
+   "motion": 0.314
+  },
+  {
+   "bar": 21,
+   "t0": 37.907,
+   "motion": 1.167
+  },
+  {
+   "bar": 22,
+   "t0": 39.787,
+   "motion": 1.368
+  },
+  {
+   "bar": 23,
+   "t0": 41.668,
+   "motion": 1.02
+  },
+  {
+   "bar": 24,
+   "t0": 43.549,
+   "motion": 1.376
+  },
+  {
+   "bar": 25,
+   "t0": 45.441,
+   "motion": 1.177
+  },
+  {
+   "bar": 26,
+   "t0": 47.322,
+   "motion": 1.398
+  },
+  {
+   "bar": 27,
+   "t0": 49.203,
+   "motion": 1.906
+  },
+  {
+   "bar": 28,
+   "t0": 51.084,
+   "motion": 0.975
+  },
+  {
+   "bar": 29,
+   "t0": 52.965,
+   "motion": 1.15
+  },
+  {
+   "bar": 30,
+   "t0": 54.846,
+   "motion": 0.62
+  },
+  {
+   "bar": 31,
+   "t0": 56.726,
+   "motion": 1.366
+  },
+  {
+   "bar": 32,
+   "t0": 58.607,
+   "motion": 1.443
+  },
+  {
+   "bar": 33,
+   "t0": 60.5,
+   "motion": 0.506
+  },
+  {
+   "bar": 34,
+   "t0": 62.38,
+   "motion": 1.305
+  },
+  {
+   "bar": 35,
+   "t0": 64.261,
+   "motion": 0.92
+  },
+  {
+   "bar": 36,
+   "t0": 66.142,
+   "motion": 1.861
+  },
+  {
+   "bar": 37,
+   "t0": 68.023,
+   "motion": 1.7
+  },
+  {
+   "bar": 38,
+   "t0": 69.904,
+   "motion": 0.438
+  },
+  {
+   "bar": 39,
+   "t0": 71.784,
+   "motion": 1.194
+  },
+  {
+   "bar": 40,
+   "t0": 73.665,
+   "motion": 0.569
+  },
+  {
+   "bar": 41,
+   "t0": 75.546,
+   "motion": 1.201
+  },
+  {
+   "bar": 42,
+   "t0": 77.415,
+   "motion": 1.075
+  },
+  {
+   "bar": 43,
+   "t0": 79.296,
+   "motion": 1.399
+  },
+  {
+   "bar": 44,
+   "t0": 81.177,
+   "motion": 0.575
+  },
+  {
+   "bar": 45,
+   "t0": 83.058,
+   "motion": 1.708
+  },
+  {
+   "bar": 46,
+   "t0": 84.927,
+   "motion": 1.057
+  },
+  {
+   "bar": 47,
+   "t0": 86.819,
+   "motion": 0.388
+  },
+  {
+   "bar": 48,
+   "t0": 88.677,
+   "motion": 0.54
+  },
+  {
+   "bar": 49,
+   "t0": 90.558,
+   "motion": 1.013
+  },
+  {
+   "bar": 50,
+   "t0": 92.427,
+   "motion": 0.925
+  },
+  {
+   "bar": 51,
+   "t0": 94.296,
+   "motion": 1.516
+  },
+  {
+   "bar": 52,
+   "t0": 96.177,
+   "motion": 1.308
+  },
+  {
+   "bar": 53,
+   "t0": 98.046,
+   "motion": 1.591
+  },
+  {
+   "bar": 54,
+   "t0": 99.927,
+   "motion": 0.677
+  },
+  {
+   "bar": 55,
+   "t0": 101.796,
+   "motion": 1.206
+  },
+  {
+   "bar": 56,
+   "t0": 103.677,
+   "motion": 0.809
+  },
+  {
+   "bar": 57,
+   "t0": 105.546,
+   "motion": 1.61
+  },
+  {
+   "bar": 58,
+   "t0": 107.415,
+   "motion": 0.686
+  },
+  {
+   "bar": 59,
+   "t0": 109.285,
+   "motion": 2.752
+  },
+  {
+   "bar": 60,
+   "t0": 111.154,
+   "motion": 0.915
+  },
+  {
+   "bar": 61,
+   "t0": 113.023,
+   "motion": 3.728
+  },
+  {
+   "bar": 62,
+   "t0": 114.892,
+   "motion": 1.245
+  },
+  {
+   "bar": 63,
+   "t0": 116.761,
+   "motion": 1.211
+  },
+  {
+   "bar": 64,
+   "t0": 118.631,
+   "motion": 3.924
+  },
+  {
+   "bar": 65,
+   "t0": 120.488,
+   "motion": 3.859
+  },
+  {
+   "bar": 66,
+   "t0": 122.358,
+   "motion": 3.816
+  },
+  {
+   "bar": 67,
+   "t0": 124.227,
+   "motion": 3.762
+  },
+  {
+   "bar": 68,
+   "t0": 126.096,
+   "motion": 0.325
+  },
+  {
+   "bar": 69,
+   "t0": 127.942,
+   "motion": 0.371
+  },
+  {
+   "bar": 70,
+   "t0": 129.811,
+   "motion": 0.992
+  },
+  {
+   "bar": 71,
+   "t0": 131.68,
+   "motion": 0.44
+  },
+  {
+   "bar": 72,
+   "t0": 133.538,
+   "motion": 1.425
+  },
+  {
+   "bar": 73,
+   "t0": 135.407,
+   "motion": 0.658
+  },
+  {
+   "bar": 74,
+   "t0": 137.265,
+   "motion": 1.807
+  },
+  {
+   "bar": 75,
+   "t0": 139.122,
+   "motion": 0.762
+  },
+  {
+   "bar": 76,
+   "t0": 140.992,
+   "motion": 2.062
+  },
+  {
+   "bar": 77,
+   "t0": 142.849,
+   "motion": 0.806
+  },
+  {
+   "bar": 78,
+   "t0": 144.707,
+   "motion": 2.14
+  },
+  {
+   "bar": 79,
+   "t0": 146.576,
+   "motion": 1.482
+  },
+  {
+   "bar": 80,
+   "t0": 148.434,
+   "motion": 1.704
+  },
+  {
+   "bar": 81,
+   "t0": 150.291,
+   "motion": 0.767
+  },
+  {
+   "bar": 82,
+   "t0": 152.149,
+   "motion": 1.93
+  },
+  {
+   "bar": 83,
+   "t0": 154.006,
+   "motion": 2.274
+  },
+  {
+   "bar": 84,
+   "t0": 155.864,
+   "motion": 4.417
+  },
+  {
+   "bar": 85,
+   "t0": 157.721,
+   "motion": 2.178
+  },
+  {
+   "bar": 86,
+   "t0": 159.591,
+   "motion": 4.536
+  },
+  {
+   "bar": 87,
+   "t0": 161.437,
+   "motion": 8.757
+  },
+  {
+   "bar": 88,
+   "t0": 163.294,
+   "motion": 2.542
+  },
+  {
+   "bar": 89,
+   "t0": 165.14,
+   "motion": 6.51
+  },
+  {
+   "bar": 90,
+   "t0": 166.998,
+   "motion": 1.916
+  },
+  {
+   "bar": 91,
+   "t0": 168.844,
+   "motion": 1.804
+  },
+  {
+   "bar": 92,
+   "t0": 170.702,
+   "motion": 0.99
+  },
+  {
+   "bar": 93,
+   "t0": 172.548,
+   "motion": 1.866
+  },
+  {
+   "bar": 94,
+   "t0": 174.405,
+   "motion": 2.162
+  },
+  {
+   "bar": 95,
+   "t0": 176.263,
+   "motion": 3.087
+  },
+  {
+   "bar": 96,
+   "t0": 178.097,
+   "motion": 0.556
+  },
+  {
+   "bar": 97,
+   "t0": 179.966,
+   "motion": 1.98
+  },
+  {
+   "bar": 98,
+   "t0": 181.835,
+   "motion": 1.626
+  },
+  {
+   "bar": 99,
+   "t0": 183.693,
+   "motion": 1.387
+  },
+  {
+   "bar": 100,
+   "t0": 185.551,
+   "motion": 2.612
+  },
+  {
+   "bar": 101,
+   "t0": 187.408,
+   "motion": 0.864
+  },
+  {
+   "bar": 102,
+   "t0": 189.278,
+   "motion": 1.568
+  },
+  {
+   "bar": 103,
+   "t0": 191.135,
+   "motion": 0.679
+  },
+  {
+   "bar": 104,
+   "t0": 193.016,
+   "motion": 2.993
+  },
+  {
+   "bar": 105,
+   "t0": 194.874,
+   "motion": 0.607
+  },
+  {
+   "bar": 106,
+   "t0": 196.731,
+   "motion": 0.753
+  },
+  {
+   "bar": 107,
+   "t0": 198.589,
+   "motion": 1.777
+  },
+  {
+   "bar": 108,
+   "t0": 200.435,
+   "motion": 1.117
+  },
+  {
+   "bar": 109,
+   "t0": 202.292,
+   "motion": 2.07
+  },
+  {
+   "bar": 110,
+   "t0": 204.15,
+   "motion": 3.582
+  },
+  {
+   "bar": 111,
+   "t0": 205.996,
+   "motion": 3.731
+  },
+  {
+   "bar": 112,
+   "t0": 207.853,
+   "motion": 1.622
+  },
+  {
+   "bar": 113,
+   "t0": 209.699,
+   "motion": 1.442
+  },
+  {
+   "bar": 114,
+   "t0": 211.557,
+   "motion": 1.646
+  },
+  {
+   "bar": 115,
+   "t0": 213.415,
+   "motion": 1.539
+  },
+  {
+   "bar": 116,
+   "t0": 215.272,
+   "motion": 1.88
+  },
+  {
+   "bar": 117,
+   "t0": 217.118,
+   "motion": 1.408
+  },
+  {
+   "bar": 118,
+   "t0": 218.976,
+   "motion": 3.084
+  },
+  {
+   "bar": 119,
+   "t0": 220.822,
+   "motion": 3.45
+  },
+  {
+   "bar": 120,
+   "t0": 222.691,
+   "motion": 0.826
+  },
+  {
+   "bar": 121,
+   "t0": 224.537,
+   "motion": 0.806
+  },
+  {
+   "bar": 122,
+   "t0": 226.371,
+   "motion": 0.939
+  },
+  {
+   "bar": 123,
+   "t0": 228.229,
+   "motion": 0.806
+  },
+  {
+   "bar": 124,
+   "t0": 230.087,
+   "motion": 1.702
+  },
+  {
+   "bar": 125,
+   "t0": 231.933,
+   "motion": 0.515
+  },
+  {
+   "bar": 126,
+   "t0": 233.79,
+   "motion": 0.657
+  },
+  {
+   "bar": 127,
+   "t0": 235.648,
+   "motion": 0.447
+  },
+  {
+   "bar": 128,
+   "t0": 237.494,
+   "motion": 0.447
+  },
+  {
+   "bar": 129,
+   "t0": 239.351,
+   "motion": 1.61
+  },
+  {
+   "bar": 130,
+   "t0": 241.197,
+   "motion": 0.563
+  },
+  {
+   "bar": 131,
+   "t0": 243.055,
+   "motion": 1.523
+  },
+  {
+   "bar": 132,
+   "t0": 244.936,
+   "motion": 0.764
+  },
+  {
+   "bar": 133,
+   "t0": 246.805,
+   "motion": 0.801
+  },
+  {
+   "bar": 134,
+   "t0": 248.709,
+   "motion": 1.327
+  },
+  {
+   "bar": 135,
+   "t0": 250.578,
+   "motion": 0.392
+  },
+  {
+   "bar": 136,
+   "t0": 252.459,
+   "motion": 1.278
+  },
+  {
+   "bar": 137,
+   "t0": 254.363,
+   "motion": 0.157
+  },
+  {
+   "bar": 138,
+   "t0": 256.255,
+   "motion": 1.197
+  },
+  {
+   "bar": 139,
+   "t0": 258.159,
+   "motion": 0.474
+  }
+ ],
+ "verdicts": {
+  "spec": true,
+  "sync": true,
+  "flash": true,
+  "frames_match_comp": true,
+  "pops": true,
+  "strobe": true,
+  "outliers": true
+ }
+}

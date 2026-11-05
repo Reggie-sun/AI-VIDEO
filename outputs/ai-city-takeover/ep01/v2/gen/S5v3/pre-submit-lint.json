@@ -1,0 +1,25 @@
+{
+  "unit": "S5v3",
+  "checks": {
+    "exact_image_order": true,
+    "audio_binding": true,
+    "every_input_in_user_preview": true,
+    "chinese_body_only": true,
+    "directed_behaviour_in_text": true,
+    "ai_label_preserved": true,
+    "bound_output": true,
+    "operator_ceiling_matches_preview": true
+  },
+  "pass": true,
+  "request_hash": "2454594be1dd001f939241bb24f37c534b5260a5d5180f388b8ce5bb21332620",
+  "continuity": "hard cut on downbeat 6 ('It looked around'); the reaction should land right after the cut so the far red window (motion-kit) reads as what she sees",
+  "handoff": "S4 pulse stops at the glass -> S5 IRIS notices a far light and locks on -> S6 server room pause",
+  "axis_action_camera": "profile facing frame-left toward the window; locked camera; she notices and locks on, slight lean, held breath",
+  "prompt_fit": "pure Chinese body 473 chars; performance still bound as expression-only reference; all inputs in preview-approval-v3.json",
+  "budget": {
+    "operator_ceiling_CRD": 250,
+    "v3_ceiling_CRD": 1850,
+    "expected_cost_CRD": 198
+  },
+  "new_calls": 0
+}

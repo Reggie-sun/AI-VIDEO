@@ -1,0 +1,37 @@
+[
+  {
+    "kind": "imported",
+    "reference": "outputs/ai-city-takeover/ep01/lyrics-v1.md",
+    "content_hash": "0489e1606ed8a9337a3345dfc244ca9eb3c5cf857c33d74c6c0e6e3c8d8416a3"
+  },
+  {
+    "kind": "imported",
+    "reference": "outputs/ai-city-takeover/series/BIBLE.md",
+    "content_hash": "73bafc509866ee32063feca204dd22e4ed49d4734a301461905d1dbf31d312b5"
+  },
+  {
+    "kind": "imported",
+    "reference": "outputs/ai-city-takeover/series/casting/raw/CF-a.png",
+    "content_hash": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb"
+  },
+  {
+    "kind": "imported",
+    "reference": "outputs/ai-city-takeover/ep01/reference-package/A01-v1.png",
+    "content_hash": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087"
+  },
+  {
+    "kind": "imported",
+    "reference": "outputs/ai-city-takeover/ep01/reference-package/A02-v1.png",
+    "content_hash": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039"
+  },
+  {
+    "kind": "imported",
+    "reference": "outputs/ai-city-takeover/ep01/reference-package/A03-v1.png",
+    "content_hash": "24e5bb452e90e1c9566ad914ac11213cfaecb9596131db6a1b8b5f585199ca0f"
+  },
+  {
+    "kind": "user_input",
+    "reference": "outputs/ai-city-takeover/ep01/production-input/reference-approval.txt",
+    "content_hash": "a2b86dc6a00a87de7721f3c5fb016a0b0fc0239d398403825c27dbfb9308e26e"
+  }
+]

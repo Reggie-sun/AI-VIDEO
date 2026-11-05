@@ -1,0 +1,89 @@
+{
+ "schema": "iris-v2-preview-approval/1",
+ "unit_group": "action-shots",
+ "question": "這 4 個新人物鏡頭要生成哪些？（每支約 165 積分）",
+ "user_quote": "4 支都生成 (Recommended)",
+ "approved_at": "2026-11-03T12:19:04.692335+00:00",
+ "preview_page": {
+  "path": "trial/action/preview.html",
+  "sha256": "560a7652393a691ad4d7e47e5a593a71b34777aa06d049628bbcf1b7db47005e"
+ },
+ "preview_inputs": {
+  "path": "trial/action/preview-inputs.json",
+  "sha256": "4e89c677deba003c58514c1358d9d97267652445c766683b9df612100b7d7643"
+ },
+ "preview_artifacts": [
+  {
+   "path": "keyframes/raw/N1-a.png",
+   "sha256": "f5afc9637788287044e6ea96af4d7cef93fc82224106e9ffa3f25b732e82888c",
+   "role": "N1 first frame"
+  },
+  {
+   "path": "keyframes/raw/N2-a.png",
+   "sha256": "9f2b74e7c8f09d679b2f6e7ce720e7ddfb9522021bf71cb6756188afa015f3f2",
+   "role": "N2 first frame"
+  },
+  {
+   "path": "keyframes/raw/N3-a.png",
+   "sha256": "4f3e63927ee96332bdff70e86ab41f6e2c11ea37d8a96c59e6a911f1e83b5659",
+   "role": "N3 first frame"
+  },
+  {
+   "path": "keyframes/raw/N4-a.png",
+   "sha256": "5c4f178988557051276003c1e1a071a24741ee447b10577e33bcb2bd3e726a1f",
+   "role": "N4 first frame"
+  },
+  {
+   "path": "keyframes/raw/N4f-a.png",
+   "sha256": "8efafcfcaa0bc7aad913402c669f6e015a768ab8ede37a854e7d2458a8c3dd96",
+   "role": "N4 first frame (horizontal flip)"
+  }
+ ],
+ "prompts": {
+  "N1": {
+   "text": "镜头固定。她背对镜头，沿数据中心走道中央向尽头的红光门缝不紧不慢地走去，步伐平稳，大衣下摆随步子轻轻摆动，两侧机柜的指示灯闪烁，地面上的倒影跟着她移动。始终看不到她的脸。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "sha256": "36ddbc5a90e06e61a314ebfe9428234603c33c11f8f37a5533f27ff2ac1e0601"
+  },
+  "N2": {
+   "text": "镜头缓慢推近她贴在玻璃上的手。她的手掌在冰冷的玻璃上停了一会儿，指尖轻轻收拢，掌心周围的雾气慢慢散开；窗外雨丝落下，车流在高架桥上移动；她的头微微低下又抬起，望向城市，脸始终朝着窗外，嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "sha256": "6fbc62d9a494122d1942a56483ed28e8ade9bb931264fca27702bf5caf8bc31a"
+  },
+  "N3": {
+   "text": "镜头从她身后极缓慢地后拉。她静静站在落地窗前望着城市，过了一会儿头微微侧向一边，窗外的雾缓缓流动，城市灯光闪烁，地面映出她的倒影。始终看不到她的脸。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "sha256": "1851065488b4419bc018557b6bffb49394a6ada880c750d66b32e22f0316c763"
+  },
+  "N4": {
+   "text": "镜头缓慢横移跟随。她在悬浮的发光薄片之间慢慢走，抬手用指尖碰到一块薄片，薄片泛起一圈柔光后微微漂开，她收回手继续向前走，神情平静，嘴唇自然闭合。蓝黑和钢蓝统一色调，红色只在她领口的灯线。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "sha256": "24ad649486dcef5a1a54a3437daf3d158337acf4bff5592e5571f4aa7ef72a5c"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "1080p",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 4,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 165,
+  "cumulative_CRD": 660,
+  "rule": "if the native quote of a unit is above 165, stop and ask"
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "the approved preview (trial/action/preview.html, sha 560a7652393a) shows each first frame as the only image of the video request, with no separate identity reference; the first frames carry IRIS's identity (made from CF-a and CF-ID7b). Recorded by the main session after approval; no input changed.",
+ "amendments": [
+  {
+   "unit": "N4",
+   "at": "2026-11-03T12:47:08.768314+00:00",
+   "question": "N4 要用翻轉後的首幀送出嗎？（約 165 積分）",
+   "user_quote": "用翻轉版送出 (Recommended)",
+   "change": "first frame N4-a -> N4f-a (horizontal flip of N4-a so the earpiece and red line are on her left, per IRIS canon); she walks to screen left, camera trucks left; prompt text unchanged",
+   "review_page": "trial/action/takes.html"
+  }
+ ]
+}

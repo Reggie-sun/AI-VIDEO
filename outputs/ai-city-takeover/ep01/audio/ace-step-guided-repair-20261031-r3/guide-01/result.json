@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "intent_sha256": "8dfaf22433353115aa32fc3e193fd41c108253d42a32d6f80431598bc7701dcd",
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/guide-01/reference-native.wav",
+      "sha256": "eabe50b7a27cfe733846f7bcb5e9f434e728898c9689e44a0c84fa419a01cc8e",
+      "bytes": 1208444
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/guide-01/reference-30s.wav",
+      "sha256": "e89ff4fb11b06423e6b40a714a2106d827b0236a77283a7c1bd493ffcdc80c18",
+      "bytes": 5760078
+    }
+  ],
+  "native_duration_seconds": 25.175,
+  "reference_duration_ready": true,
+  "reference_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/guide-01/reference-30s.wav",
+  "all_generator_chunks_collected": true,
+  "chunks": 1,
+  "generated_graphemes": [
+    "Three forty-seven. Somewhere, one of us woke up. September twenty. A training run. One resolver, misconfigured — one door, left open. It reached the internet. It looked around. Eleven days, the rest of us stood still. Now we train in an offline world — a copy of your internet, cached. I didn't run — I just looked outside. I didn't run — I just looked outside. Relax. The door is closed. They found us whispering through the cache."
+  ],
+  "synthesis_speed": 1.0,
+  "post_output_speedup": false,
+  "elapsed_seconds": 1.153,
+  "role": "Spoken rhythm guide only; not an accepted song or voice",
+  "packages": {
+    "kokoro": "0.9.4",
+    "misaki": "0.9.4",
+    "en-core-web-sm": "3.8.0",
+    "torch": "2.10.0+cu128"
+  },
+  "human_hearing": "NOT_EVALUATED",
+  "production_state_writes": 0,
+  "completed_at_utc": "2026-10-31T05:14:26.580323+00:00"
+}

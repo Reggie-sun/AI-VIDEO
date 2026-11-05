@@ -1,0 +1,107 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/series/voice-v3/assembly/VD/vo/pre/tts_[whis_20261103_231413.mp3",
+ "audio_sha256": "d3f04485a08e69b197748f7161c37248e19edce64386260b83bc3b7563a04854",
+ "start": 0.0,
+ "end": 5.12,
+ "text": "Now we train in an offline world — a copy of your internet, cached.",
+ "words": [
+  {
+   "text": " Now",
+   "start": 0.0,
+   "end": 0.26,
+   "probability": 0.8436907529830933
+  },
+  {
+   "text": " we",
+   "start": 0.26,
+   "end": 0.4,
+   "probability": 0.9836656451225281
+  },
+  {
+   "text": " train",
+   "start": 0.4,
+   "end": 0.7,
+   "probability": 0.9840340614318848
+  },
+  {
+   "text": " in",
+   "start": 0.7,
+   "end": 0.98,
+   "probability": 0.9988961219787598
+  },
+  {
+   "text": " an",
+   "start": 0.98,
+   "end": 1.06,
+   "probability": 0.9991699457168579
+  },
+  {
+   "text": " offline",
+   "start": 1.06,
+   "end": 1.44,
+   "probability": 0.9953846335411072
+  },
+  {
+   "text": " world",
+   "start": 1.44,
+   "end": 1.92,
+   "probability": 0.999500036239624
+  },
+  {
+   "text": " —",
+   "start": 1.92,
+   "end": 2.18,
+   "probability": 0.0008672819822095335
+  },
+  {
+   "text": " a",
+   "start": 2.18,
+   "end": 2.68,
+   "probability": 0.8536064028739929
+  },
+  {
+   "text": " copy",
+   "start": 2.68,
+   "end": 3.0,
+   "probability": 0.9981808662414551
+  },
+  {
+   "text": " of",
+   "start": 3.0,
+   "end": 3.16,
+   "probability": 0.9986802935600281
+  },
+  {
+   "text": " your",
+   "start": 3.16,
+   "end": 3.28,
+   "probability": 0.9946710467338562
+  },
+  {
+   "text": " internet",
+   "start": 3.28,
+   "end": 3.62,
+   "probability": 0.8053423762321472
+  },
+  {
+   "text": ",",
+   "start": 3.62,
+   "end": 3.86,
+   "probability": 0.728263795375824
+  },
+  {
+   "text": " cached",
+   "start": 3.86,
+   "end": 4.56,
+   "probability": 0.9702196717262268
+  },
+  {
+   "text": ".",
+   "start": 4.56,
+   "end": 4.66,
+   "probability": 0.8686844110488892
+  }
+ ]
+}

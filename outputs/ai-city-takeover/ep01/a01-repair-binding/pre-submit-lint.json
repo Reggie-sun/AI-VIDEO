@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "two_exact_references": true,
+    "side_pose_source_removed": true,
+    "native_reference_roles": true,
+    "same_identity_details": true,
+    "new_user_label_rule": true,
+    "no_side_back_or_wide_start": true,
+    "quiet_observation": true,
+    "axis_and_handoff": true,
+    "chinese_native_prompt": true,
+    "bound_output": true,
+    "native_cost_bound": true
+  },
+  "request_hash": "788f66d9d2f6659bb4092bffd8cd08f6afc89ad1c1ac3317ffbacd7f10c98e4a",
+  "prior_known_paid_calls": 1,
+  "new_calls_so_far": 0,
+  "cumulative_attempt_ceiling": 2
+}

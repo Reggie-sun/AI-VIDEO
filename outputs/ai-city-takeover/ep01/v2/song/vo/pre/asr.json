@@ -1,0 +1,89 @@
+{
+ "mode": "transcribe",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song/vo/pre/tts_[whis_20261102_005242.mp3",
+ "audio_sha256": "9d131e90c3ed2b1c33fa335a9b485fb78795a23675ed1ed291728b2d50199775",
+ "start": 0.0,
+ "end": 4.88,
+ "text": "Now we train in an offline world. A copy of your internet, cached.",
+ "words": [
+  {
+   "text": " Now",
+   "start": 0.0,
+   "end": 0.22,
+   "probability": 0.6844136714935303
+  },
+  {
+   "text": " we",
+   "start": 0.22,
+   "end": 0.4,
+   "probability": 0.9616830348968506
+  },
+  {
+   "text": " train",
+   "start": 0.4,
+   "end": 0.7,
+   "probability": 0.9788213968276978
+  },
+  {
+   "text": " in",
+   "start": 0.7,
+   "end": 0.98,
+   "probability": 0.9976692795753479
+  },
+  {
+   "text": " an",
+   "start": 0.98,
+   "end": 1.06,
+   "probability": 0.9969590902328491
+  },
+  {
+   "text": " offline",
+   "start": 1.06,
+   "end": 1.44,
+   "probability": 0.9895463585853577
+  },
+  {
+   "text": " world.",
+   "start": 1.44,
+   "end": 1.92,
+   "probability": 0.9983800649642944
+  },
+  {
+   "text": " A",
+   "start": 2.1,
+   "end": 2.62,
+   "probability": 0.9772307276725769
+  },
+  {
+   "text": " copy",
+   "start": 2.62,
+   "end": 2.92,
+   "probability": 0.9933913946151733
+  },
+  {
+   "text": " of",
+   "start": 2.92,
+   "end": 3.1,
+   "probability": 0.9991331696510315
+  },
+  {
+   "text": " your",
+   "start": 3.1,
+   "end": 3.24,
+   "probability": 0.9955254197120667
+  },
+  {
+   "text": " internet,",
+   "start": 3.24,
+   "end": 3.58,
+   "probability": 0.9084863066673279
+  },
+  {
+   "text": " cached.",
+   "start": 3.86,
+   "end": 4.54,
+   "probability": 0.9633442759513855
+  }
+ ]
+}

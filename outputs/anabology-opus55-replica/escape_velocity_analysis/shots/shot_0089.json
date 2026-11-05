@@ -1,0 +1,1428 @@
+{
+  "shot_id": "S0089",
+  "start_frame": 4016,
+  "end_frame": 4099,
+  "duration_frames": 84,
+  "start_time": 167.3333,
+  "end_time": 170.8333,
+  "duration_s": 3.5,
+  "start_tc": "00:02:47:08",
+  "end_tc": "00:02:50:19",
+  "boundary_in_id": "B2-020",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    4016,
+    4016
+  ],
+  "boundary_out_id": "B2-021",
+  "boundary_out_type": "shape_wipe",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 4016,
+      "end_frame": 4018,
+      "event": "FEEL橙底",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4016,
+        4018
+      ],
+      "description": "FEEL橙底",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4019,
+      "end_frame": 4021,
+      "event": "FEEL混色；心电图出现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4019,
+        4021
+      ],
+      "description": "FEEL混色；心电图出现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4022,
+      "end_frame": 4024,
+      "event": "THE",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4022,
+        4024
+      ],
+      "description": "THE",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4025,
+      "end_frame": 4027,
+      "event": "脸部细网格显现",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4025,
+        4027
+      ],
+      "description": "脸部细网格显现",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4031,
+      "end_frame": 4033,
+      "event": "AGI,",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4031,
+        4033
+      ],
+      "description": "AGI,",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4058,
+      "end_frame": 4060,
+      "event": "FEEL橙底",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4058,
+        4060
+      ],
+      "description": "FEEL橙底",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4067,
+      "end_frame": 4069,
+      "event": "IT",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4067,
+        4069
+      ],
+      "description": "IT",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4076,
+      "end_frame": 4078,
+      "event": "COMING；心电波橙色",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4076,
+        4078
+      ],
+      "description": "COMING；心电波橙色",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4088,
+      "end_frame": 4090,
+      "event": "能力曲线右侧抬升",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4088,
+        4090
+      ],
+      "description": "能力曲线右侧抬升",
+      "type": "visual_change"
+    },
+    {
+      "frame": 4097,
+      "end_frame": 4099,
+      "event": "右下曲面窗露下镜",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        4097,
+        4099
+      ],
+      "description": "右下曲面窗露下镜",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比。面部细白网格线逐步显出，左上FEEL、THE、AGI、FEEL、IT、COMING依次替换，左下心电图随之转为能力上升曲线。",
+  "reference_frames": [
+    {
+      "frame": 4016,
+      "path": "keyframes/S0089_f04016.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4037,
+      "path": "keyframes/S0089_f04037.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4058,
+      "path": "keyframes/S0089_f04058.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4079,
+      "path": "keyframes/S0089_f04079.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4099,
+      "path": "keyframes/S0089_f04099.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 4057,
+      "path": "work/full_batch/04057.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    }
+  ],
+  "composition": {
+    "shot_size": "extreme close-up",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.17,
+      "y": 0,
+      "w": 0.63,
+      "h": 0.93,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比。面部细白网格线逐步显出，左上FEEL、THE、AGI、FEEL、IT、COMING依次替换，左下心电图随之转为能力上升曲线。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0068, \"pan_y_frac_per_s\": -0.0167, \"zoom_per_s\": 0.0441, \"median_flow_frac_per_s\": 0.0646, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[112.6, 121.2, 133.9]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#CBD2D6",
+        "fraction": 0.337,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#12100B",
+        "fraction": 0.25,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#7B453B",
+        "fraction": 0.164,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#46312A",
+        "fraction": 0.115,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#B26555",
+        "fraction": 0.077,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#92949B",
+        "fraction": 0.057,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[112.6, 121.2, 133.9]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "06",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0089-E01",
+      "shot_id": "S0089",
+      "type": "background_media",
+      "description": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比。面部细白网格线逐步显出，左上FEEL、THE、AGI、FEEL、IT、COMING依次替换，左下心电图随之转为能力上升曲线。",
+      "start_frame": 4016,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比。面部细白网格线逐步显出，左上FEEL、THE、AGI、FEEL、IT、COMING依次替换，左下心电图随之转为能力上升曲线。"
+      },
+      "motion": {
+        "path": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比。面部细白网格线逐步显出，左上FEEL、THE、AGI、FEEL、IT、COMING依次替换，左下心电图随之转为能力上升曲线。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4016–4099；入口按密采事件区间±2帧。",
+        "exit": "4099为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4016,
+          "state": "FEEL橙底"
+        },
+        {
+          "frame": 4019,
+          "state": "FEEL混色；心电图出现"
+        },
+        {
+          "frame": 4022,
+          "state": "THE"
+        },
+        {
+          "frame": 4025,
+          "state": "脸部细网格显现"
+        },
+        {
+          "frame": 4031,
+          "state": "AGI,"
+        },
+        {
+          "frame": 4058,
+          "state": "FEEL橙底"
+        },
+        {
+          "frame": 4067,
+          "state": "IT"
+        },
+        {
+          "frame": 4076,
+          "state": "COMING；心电波橙色"
+        },
+        {
+          "frame": 4088,
+          "state": "能力曲线右侧抬升"
+        },
+        {
+          "frame": 4097,
+          "state": "右下曲面窗露下镜"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4016,
+        4037,
+        4058,
+        4079,
+        4099
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0089-E02",
+      "shot_id": "S0089",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 4016,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0.17,
+        "y": 0,
+        "w": 0.63,
+        "h": 0.93,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比。面部细白网格线逐步显出，左上FEEL、THE、AGI、FEEL、IT、COMING依次替换，左下心电图随之转为能力上升曲线。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4016–4099；入口按密采事件区间±2帧。",
+        "exit": "4099为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4016,
+          "state": "FEEL橙底"
+        },
+        {
+          "frame": 4019,
+          "state": "FEEL混色；心电图出现"
+        },
+        {
+          "frame": 4022,
+          "state": "THE"
+        },
+        {
+          "frame": 4025,
+          "state": "脸部细网格显现"
+        },
+        {
+          "frame": 4031,
+          "state": "AGI,"
+        },
+        {
+          "frame": 4058,
+          "state": "FEEL橙底"
+        },
+        {
+          "frame": 4067,
+          "state": "IT"
+        },
+        {
+          "frame": 4076,
+          "state": "COMING；心电波橙色"
+        },
+        {
+          "frame": 4088,
+          "state": "能力曲线右侧抬升"
+        },
+        {
+          "frame": 4097,
+          "state": "右下曲面窗露下镜"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4016,
+        4037,
+        4058,
+        4079,
+        4099
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0089-E03",
+      "shot_id": "S0089",
+      "type": "hud_chart",
+      "description": "左下白心电卡x0.04 y0.62 w0.31 h0.24，HR132.5BPM，4077后波线变橙并转向右上。",
+      "start_frame": 4019,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.62,
+        "w": 0.31,
+        "h": 0.24,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左下白心电卡x0.04 y0.62 w0.31 h0.24，HR132.5BPM，4077后波线变橙并转向右上。"
+      },
+      "motion": {
+        "path": "左下白心电卡x0.04 y0.62 w0.31 h0.24，HR132.5BPM，4077后波线变橙并转向右上。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4019–4099；入口按密采事件区间±2帧。",
+        "exit": "4099为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4019,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.62,
+            "w": 0.31,
+            "h": 0.24,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4099,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4037,
+        4058,
+        4079,
+        4099
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "FEEL · HEART MONITOR → CAPABILITY · FEEL IT COMING FAST | HR 132.5 BPM = TEMPO → HR 134.2 BPM = TEMPO | ×20.9 / BEAT",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0089-E04",
+      "shot_id": "S0089",
+      "type": "deco_graphic",
+      "description": "面部白色弧线网格沿脸颊口鼻叠加，约4027起逐渐显出。",
+      "start_frame": 4025,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0.27,
+        "y": 0.1,
+        "w": 0.4,
+        "h": 0.72,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "面部白色弧线网格沿脸颊口鼻叠加，约4027起逐渐显出。"
+      },
+      "motion": {
+        "path": "面部白色弧线网格沿脸颊口鼻叠加，约4027起逐渐显出。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4025–4099；入口按密采事件区间±2帧。",
+        "exit": "4099为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4025,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.27,
+            "y": 0.1,
+            "w": 0.4,
+            "h": 0.72,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4099,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4037,
+        4058,
+        4079,
+        4099
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0089-E05",
+      "shot_id": "S0089",
+      "type": "text_title",
+      "description": "FEEL4016、THE4023、AGI4030、FEEL4059、IT4067、COMING4077附近；首帧橙底后黑白对比。",
+      "start_frame": 4016,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0.03,
+        "y": 0.2,
+        "w": 0.32,
+        "h": 0.4,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "FEEL4016、THE4023、AGI4030、FEEL4059、IT4067、COMING4077附近；首帧橙底后黑白对比。"
+      },
+      "motion": {
+        "path": "FEEL4016、THE4023、AGI4030、FEEL4059、IT4067、COMING4077附近；首帧橙底后黑白对比。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4016–4099；入口按密采事件区间±2帧。",
+        "exit": "4099为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4016,
+          "text": "FEEL",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 4022,
+          "text": "THE",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 4031,
+          "text": "AGI,",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 4058,
+          "text": "FEEL",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 4067,
+          "text": "IT",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 4076,
+          "text": "COMING",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4016,
+        4037,
+        4058,
+        4079,
+        4099
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "FEEL → THE → AGI, → FEEL → IT → COMING",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 185 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0089-E06",
+      "shot_id": "S0089",
+      "type": "transition_graphic",
+      "description": "4099右下斜弧形窗向上推开，露出后镜少女身体。",
+      "start_frame": 4097,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 60,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "unknown",
+        "details": "4099右下斜弧形窗向上推开，露出后镜少女身体。"
+      },
+      "motion": {
+        "path": "4099右下斜弧形窗向上推开，露出后镜少女身体。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围4097–4099；入口按密采事件区间±2帧。",
+        "exit": "4099为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 4097,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4099,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4099
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0089-E07",
+      "shot_id": "S0089",
+      "type": "text_lyric",
+      "description": "底部逐词歌词随大字切换，保持Feel the AGI, feel it coming；大字是额外独立排版。",
+      "start_frame": 4016,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0.037,
+        "y": 0.888,
+        "w": 0.4,
+        "h": 0.04,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底部逐词歌词随大字切换，保持Feel the AGI, feel it coming；大字是额外独立排版。"
+      },
+      "motion": {
+        "path": "底部逐词歌词随大字切换，保持Feel the AGI, feel it coming；大字是额外独立排版。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "4016起±2帧，参见逐3帧密采",
+        "exit": "4099末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 4016,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.037,
+            "y": 0.888,
+            "w": 0.4,
+            "h": 0.04,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4099,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4016,
+        4037,
+        4058,
+        4079,
+        4099,
+        4057
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "Feel the AGI, feel it coming",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    },
+    {
+      "element_id": "S0089-E08",
+      "shot_id": "S0089",
+      "type": "text_label",
+      "description": "右侧白色表演遥测小卡依行打字，指出闭眼与后仰角。",
+      "start_frame": 4037,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0.62,
+        "y": 0.167,
+        "w": 0.096,
+        "h": 0.067,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "右侧白色表演遥测小卡依行打字，指出闭眼与后仰角。"
+      },
+      "motion": {
+        "path": "右侧白色表演遥测小卡依行打字，指出闭眼与后仰角。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "4037起±2帧，参见逐3帧密采",
+        "exit": "4099末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 4037,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.62,
+            "y": 0.167,
+            "w": 0.096,
+            "h": 0.067,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4099,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4037,
+        4058,
+        4079,
+        4099,
+        4057
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "EYES · CLOSED 0.98 | HEAD · BACK 18° | V…",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "lyric cap approx 40px; HUD mono approx 10–15px; visual_estimate",
+          "alignment": "left"
+        }
+      }
+    },
+    {
+      "element_id": "S0089-E09",
+      "shot_id": "S0089",
+      "type": "hud_panel",
+      "description": "左上攀升速度卡跨镜延续，7.1→6.3MO，倍率2.5→2.8。",
+      "start_frame": 4016,
+      "end_frame": 4099,
+      "bounding_box": {
+        "x": 0.032,
+        "y": 0.091,
+        "w": 0.19,
+        "h": 0.102,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "左上攀升速度卡跨镜延续，7.1→6.3MO，倍率2.5→2.8。"
+      },
+      "motion": {
+        "path": "左上攀升速度卡跨镜延续，7.1→6.3MO，倍率2.5→2.8。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "4016起±2帧，参见逐3帧密采",
+        "exit": "4099末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 4016,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.032,
+            "y": 0.091,
+            "w": 0.19,
+            "h": 0.102,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 4099,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        4016,
+        4037,
+        4058,
+        4079,
+        4099,
+        4057
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "REQUIRED CLIMB RATE | 1 CLASS / 07.1 MO ×2.5 → 06.3 MO ×2.8 | CHORUS 1 · 18 MO | NOW · 6 MO",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "see observed frame; panel mono approx 10–15px",
+          "alignment": "left"
+        }
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0089-A03",
+      "target_element_ids": [
+        "S0089-E03"
+      ],
+      "description": "左下白心电卡x0.04 y0.62 w0.31 h0.24，HR132.5BPM，4077后波线变橙并转向右上。",
+      "start_frame": 4019,
+      "end_frame": 4099,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0089-A04",
+      "target_element_ids": [
+        "S0089-E04"
+      ],
+      "description": "面部白色弧线网格沿脸颊口鼻叠加，约4027起逐渐显出。",
+      "start_frame": 4025,
+      "end_frame": 4099,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0089-A05",
+      "target_element_ids": [
+        "S0089-E05"
+      ],
+      "description": "FEEL4016、THE4023、AGI4030、FEEL4059、IT4067、COMING4077附近；首帧橙底后黑白对比。",
+      "start_frame": 4016,
+      "end_frame": 4099,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0089-A06",
+      "target_element_ids": [
+        "S0089-E06"
+      ],
+      "description": "4099右下斜弧形窗向上推开，露出后镜少女身体。",
+      "start_frame": 4097,
+      "end_frame": 4099,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AW0281",
+      "relation": "vocal_word_candidate (unknown) at frame 4016–4022; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4016
+    },
+    {
+      "audio_event_id": "AH01643",
+      "relation": "band_onset_candidate (unknown) at frame 4016; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4016
+    },
+    {
+      "audio_event_id": "AB0370",
+      "relation": "beat_candidate (unknown) at frame 4016; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4016
+    },
+    {
+      "audio_event_id": "AH01644",
+      "relation": "band_onset_candidate (unknown) at frame 4016; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4016
+    },
+    {
+      "audio_event_id": "AH01645",
+      "relation": "band_onset_candidate (unknown) at frame 4016; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4016
+    },
+    {
+      "audio_event_id": "AH01646",
+      "relation": "band_onset_candidate (unknown) at frame 4017; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4017
+    },
+    {
+      "audio_event_id": "AW0282",
+      "relation": "vocal_word_candidate (unknown) at frame 4022–4024; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4022
+    },
+    {
+      "audio_event_id": "AH01647",
+      "relation": "band_onset_candidate (unknown) at frame 4027; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4027
+    },
+    {
+      "audio_event_id": "AB0371",
+      "relation": "beat_candidate (unknown) at frame 4027; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4027
+    },
+    {
+      "audio_event_id": "AH01648",
+      "relation": "band_onset_candidate (unknown) at frame 4027; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4027
+    },
+    {
+      "audio_event_id": "AH01649",
+      "relation": "band_onset_candidate (unknown) at frame 4027; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4027
+    },
+    {
+      "audio_event_id": "AH01650",
+      "relation": "band_onset_candidate (unknown) at frame 4028; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4028
+    },
+    {
+      "audio_event_id": "AW0283",
+      "relation": "vocal_word_candidate (unknown) at frame 4030; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4030
+    },
+    {
+      "audio_event_id": "AH01651",
+      "relation": "band_onset_candidate (unknown) at frame 4032; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4032
+    },
+    {
+      "audio_event_id": "AW0284",
+      "relation": "vocal_word_candidate (unknown) at frame 4037; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4037
+    },
+    {
+      "audio_event_id": "AH01652",
+      "relation": "band_onset_candidate (unknown) at frame 4038; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4038
+    },
+    {
+      "audio_event_id": "AH01653",
+      "relation": "band_onset_candidate (unknown) at frame 4038; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4038
+    },
+    {
+      "audio_event_id": "AB0372",
+      "relation": "beat_candidate (unknown) at frame 4038; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4038
+    },
+    {
+      "audio_event_id": "AH01654",
+      "relation": "band_onset_candidate (unknown) at frame 4038; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4038
+    },
+    {
+      "audio_event_id": "AH01655",
+      "relation": "band_onset_candidate (unknown) at frame 4038; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4038
+    },
+    {
+      "audio_event_id": "AW0285",
+      "relation": "vocal_word_candidate (unknown) at frame 4040; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4040
+    },
+    {
+      "audio_event_id": "AH01656",
+      "relation": "band_onset_candidate (unknown) at frame 4043; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4043
+    },
+    {
+      "audio_event_id": "AH01657",
+      "relation": "band_onset_candidate (unknown) at frame 4043; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4043
+    },
+    {
+      "audio_event_id": "AH01658",
+      "relation": "band_onset_candidate (unknown) at frame 4049; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4049
+    },
+    {
+      "audio_event_id": "AB0373",
+      "relation": "beat_candidate (unknown) at frame 4049; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4049
+    },
+    {
+      "audio_event_id": "AH01659",
+      "relation": "band_onset_candidate (unknown) at frame 4049; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4049
+    },
+    {
+      "audio_event_id": "AH01660",
+      "relation": "band_onset_candidate (unknown) at frame 4049; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4049
+    },
+    {
+      "audio_event_id": "AH01661",
+      "relation": "band_onset_candidate (unknown) at frame 4049; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4049
+    },
+    {
+      "audio_event_id": "AH01662",
+      "relation": "band_onset_candidate (unknown) at frame 4049; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4049
+    },
+    {
+      "audio_event_id": "AH01663",
+      "relation": "band_onset_candidate (unknown) at frame 4054; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4054
+    },
+    {
+      "audio_event_id": "AH01664",
+      "relation": "band_onset_candidate (unknown) at frame 4054; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4054
+    },
+    {
+      "audio_event_id": "AH01665",
+      "relation": "band_onset_candidate (unknown) at frame 4054; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4054
+    },
+    {
+      "audio_event_id": "AW0286",
+      "relation": "vocal_word_candidate (unknown) at frame 4059–4064; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4059
+    },
+    {
+      "audio_event_id": "AB0374",
+      "relation": "beat_candidate (unknown) at frame 4059; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4059
+    },
+    {
+      "audio_event_id": "AH01666",
+      "relation": "band_onset_candidate (unknown) at frame 4059; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4059
+    },
+    {
+      "audio_event_id": "AH01667",
+      "relation": "band_onset_candidate (unknown) at frame 4059; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4059
+    },
+    {
+      "audio_event_id": "AH01668",
+      "relation": "band_onset_candidate (unknown) at frame 4060; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4060
+    },
+    {
+      "audio_event_id": "AH01669",
+      "relation": "band_onset_candidate (unknown) at frame 4060; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4060
+    },
+    {
+      "audio_event_id": "AX0278",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 4062–4076; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 4062
+    },
+    {
+      "audio_event_id": "AH01670",
+      "relation": "band_onset_candidate (unknown) at frame 4065; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4065
+    },
+    {
+      "audio_event_id": "AW0287",
+      "relation": "vocal_word_candidate (unknown) at frame 4066–4070; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4066
+    },
+    {
+      "audio_event_id": "AB0375",
+      "relation": "beat_candidate (unknown) at frame 4070; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4070
+    },
+    {
+      "audio_event_id": "AH01671",
+      "relation": "band_onset_candidate (unknown) at frame 4070; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4070
+    },
+    {
+      "audio_event_id": "AH01672",
+      "relation": "band_onset_candidate (unknown) at frame 4070; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4070
+    },
+    {
+      "audio_event_id": "AH01673",
+      "relation": "band_onset_candidate (unknown) at frame 4070; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4070
+    },
+    {
+      "audio_event_id": "AH01674",
+      "relation": "band_onset_candidate (unknown) at frame 4070; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4070
+    },
+    {
+      "audio_event_id": "AH01675",
+      "relation": "band_onset_candidate (unknown) at frame 4071; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4071
+    },
+    {
+      "audio_event_id": "AW0288",
+      "relation": "vocal_word_candidate (unknown) at frame 4075–4086; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4075
+    },
+    {
+      "audio_event_id": "AB0376",
+      "relation": "beat_candidate (unknown) at frame 4081; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4081
+    },
+    {
+      "audio_event_id": "AH01676",
+      "relation": "band_onset_candidate (unknown) at frame 4081; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4081
+    },
+    {
+      "audio_event_id": "AH01677",
+      "relation": "band_onset_candidate (unknown) at frame 4081; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4081
+    },
+    {
+      "audio_event_id": "AH01678",
+      "relation": "band_onset_candidate (unknown) at frame 4081; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4081
+    },
+    {
+      "audio_event_id": "AH01679",
+      "relation": "band_onset_candidate (unknown) at frame 4081; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4081
+    },
+    {
+      "audio_event_id": "AH01680",
+      "relation": "band_onset_candidate (unknown) at frame 4081; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4081
+    },
+    {
+      "audio_event_id": "AH01681",
+      "relation": "band_onset_candidate (unknown) at frame 4086; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4086
+    },
+    {
+      "audio_event_id": "AH01682",
+      "relation": "band_onset_candidate (unknown) at frame 4086; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4086
+    },
+    {
+      "audio_event_id": "AH01683",
+      "relation": "band_onset_candidate (unknown) at frame 4086; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4086
+    },
+    {
+      "audio_event_id": "AW0289",
+      "relation": "vocal_word_candidate (unknown) at frame 4091–4117; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 4091
+    },
+    {
+      "audio_event_id": "AB0377",
+      "relation": "beat_candidate (unknown) at frame 4092; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 4092
+    },
+    {
+      "audio_event_id": "AH01684",
+      "relation": "band_onset_candidate (unknown) at frame 4092; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4092
+    },
+    {
+      "audio_event_id": "AH01685",
+      "relation": "band_onset_candidate (unknown) at frame 4092; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4092
+    },
+    {
+      "audio_event_id": "AH01686",
+      "relation": "band_onset_candidate (unknown) at frame 4092; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4092
+    },
+    {
+      "audio_event_id": "AH01687",
+      "relation": "band_onset_candidate (unknown) at frame 4092; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4092
+    },
+    {
+      "audio_event_id": "AH01688",
+      "relation": "band_onset_candidate (unknown) at frame 4097; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4097
+    },
+    {
+      "audio_event_id": "AH01689",
+      "relation": "band_onset_candidate (unknown) at frame 4097; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 4097
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0089.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B2-020",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        4016,
+        4016
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "shape_wipe",
+      "boundary_id": "B2-021",
+      "description": "少女闭眼演唱大特写，淡蓝天空和飞动黑发形成对比。面部细白网格线逐步显出，左上FEEL、THE、AGI、FEEL、IT、COMING依次替换，左下心电图随之转为能力上升曲线。",
+      "span": [
+        4099,
+        4099
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "FEEL",
+    "THE",
+    "AGI,",
+    "IT",
+    "COMING",
+    "Feel the AGI, feel it coming",
+    "FACE MESH · 468 PTS 0.99"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      4057,
+      4099
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

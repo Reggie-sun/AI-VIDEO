@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "error": null,
+  "status_message": "Generation completed successfully!",
+  "label": "D",
+  "intent_sha256": "4bac0a9632ccb33639f6345d86ea9eac17344063caac8528a9158b46988dbc84",
+  "cumulative_attempt_ordinal": 4,
+  "elapsed_seconds": 4.014,
+  "peak_gpu_allocated_bytes": 7825463808,
+  "completed_at_utc": "2026-10-31T04:56:25.008310+00:00",
+  "outputs": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-repair-20261031-r2/D-standard-tags/32cdbd0c-9153-16d9-2834-df50292ab2cf.wav",
+      "sha256": "6dae68d1497ec336979bcc1e9e2c0c35a876f3234d669f730183c549e5e43af4",
+      "bytes": 5760044
+    }
+  ],
+  "human_listening": "NOT_EVALUATED",
+  "remote_generation_calls": 0,
+  "production_state_writes": 0
+}

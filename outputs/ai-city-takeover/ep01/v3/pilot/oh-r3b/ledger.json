@@ -1,0 +1,18 @@
+{
+ "ceilings": {
+  "submits": 1,
+  "credits": 165,
+  "per_take": 165,
+  "submits_per_take": 1
+ },
+ "takes": [
+  {
+   "unit": "U021",
+   "outcome": "submitted",
+   "price_observed": 24,
+   "balance_before": 61852,
+   "balance_after": 61828,
+   "booked_at": "2026-11-05T08:18:52.248344+00:00"
+  }
+ ]
+}

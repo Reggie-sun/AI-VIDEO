@@ -1,0 +1,41 @@
+{
+  "scope": "IRIS EP01 continuation; development fixture evidence only",
+  "review_target_tree": "d8f257613d350a0235fbc09bbca64f7852605962",
+  "source_test_hashes_still_match": true,
+  "main_index_preserved": true,
+  "main_index_tree": "8d3bfcd181c529fc8dedfd2082a463e0becf65e5",
+  "targeted_tests": {
+    "status": "PASS",
+    "passed": 53,
+    "scope": "frozen mixed dependency snapshot",
+    "evidence": "mixed-targeted-tests.json"
+  },
+  "independent_code_review": {
+    "status": "APPROVE",
+    "findings": 0,
+    "isolated_unit_cases_passed": 11,
+    "evidence": "code-review.json"
+  },
+  "focused_harness": {
+    "status": "FAIL",
+    "owned_projection": {
+      "failed": 37,
+      "passed": 1,
+      "preexisting_HEAD_fixture_failure": true
+    },
+    "mixed_dependencies": {
+      "failed": 3,
+      "passed": 654,
+      "skipped": 1,
+      "dependency_only_reproduction_failed": 3
+    }
+  },
+  "related": "NOT_RUN",
+  "full": "NOT_RUN",
+  "final_film_acceptance": "NOT_EVALUATED",
+  "new_paid_submissions": 0,
+  "new_media_generation": 0,
+  "commit_push": "NOT_PERFORMED",
+  "learning_assessment": "no_candidate",
+  "remaining": "Unresolved Suno verification/submission outcome; actual song, singing/lip-sync and final composition."
+}

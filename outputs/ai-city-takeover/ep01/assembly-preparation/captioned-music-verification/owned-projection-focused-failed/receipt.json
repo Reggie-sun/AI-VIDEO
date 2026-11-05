@@ -1,0 +1,183 @@
+{
+  "categories": [
+    "repair_input_admission",
+    "harness_control",
+    "documentation",
+    "production_reader",
+    "production_composition_audio",
+    "native_audio_retime",
+    "control_plane"
+  ],
+  "changed_paths": [
+    "docs/agent-primary-contract-matrix.md",
+    "src/ai_video/production/_composition_visual.py",
+    "src/ai_video/production/qualification_preview_input.py",
+    "src/ai_video/production/repair_input_admission.py",
+    "src/ai_video/production/validation.py",
+    "tests/test_caption_development_preview.py",
+    "tests/test_qualification_preview_input.py"
+  ],
+  "checks": [
+    {
+      "argv": [
+        "/home/reggie/miniconda3/bin/python",
+        "-m",
+        "scripts.docs_contract_gate",
+        "check"
+      ],
+      "check_id": "docs_contract_check",
+      "cwd": ".",
+      "description": "Verify canonical documentation metadata and repository contract coherence.",
+      "duration_ms": 167,
+      "error": null,
+      "exit_code": 0,
+      "status": "passed",
+      "stderr": {
+        "bytes": 0,
+        "path": "01-docs_contract_check.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 36,
+        "path": "01-docs_contract_check.stdout.log",
+        "sha256": "3d7130b69b320ec349f2dcc90b5cb7fb1fa1f09e9e3a22d4972efaf5b02e39ee"
+      },
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/reggie/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_repair_input_admission.py",
+        "tests/test_qualification_preview_input.py",
+        "-q",
+        "--junitxml=/tmp/ai-video-song-preview-verification-j9amrmjo/repo/.agent/harness/runs/iris-captioned-music-focused-20261030/02-repair_input_admission_tests.junit.xml"
+      ],
+      "check_id": "repair_input_admission_tests",
+      "cwd": ".",
+      "description": "Verify development-only failed-video provenance admission, qualification-trial preview input capture, no qualification, and exact bootstrap replay without Provider effects.",
+      "duration_ms": 29912,
+      "error": null,
+      "exit_code": 1,
+      "junit": {
+        "bytes": 148494,
+        "path": "02-repair_input_admission_tests.junit.xml",
+        "sha256": "3f54bdb635847e562fe5f168bceb454196c6388a3dad2391d474277d6108fd2e"
+      },
+      "status": "failed",
+      "stderr": {
+        "bytes": 0,
+        "path": "02-repair_input_admission_tests.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 143175,
+        "path": "02-repair_input_admission_tests.stdout.log",
+        "sha256": "4428ff6ff09c128d30ff209992c10085eb289f5f18ab10f72debb2294bd0e363"
+      },
+      "timed_out": false
+    },
+    {
+      "check_id": "harness_tests",
+      "reason": "blocked by failed check repair_input_admission_tests",
+      "status": "skipped"
+    },
+    {
+      "check_id": "production_reader_tests",
+      "reason": "blocked by failed check repair_input_admission_tests",
+      "status": "skipped"
+    },
+    {
+      "check_id": "production_composition_audio_tests",
+      "reason": "blocked by failed check repair_input_admission_tests",
+      "status": "skipped"
+    },
+    {
+      "check_id": "native_audio_retime_tests",
+      "reason": "blocked by failed check repair_input_admission_tests",
+      "status": "skipped"
+    }
+  ],
+  "closure_eligible": false,
+  "environment": {
+    "credential_like_environment_removed": true,
+    "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.39",
+    "pytest_guard": "scripts.harness_pytest_guard",
+    "python_executable": "/home/reggie/miniconda3/bin/python",
+    "python_socket_policy": "loopback_only_address_apis",
+    "python_version": "3.13.5",
+    "subprocess_network_isolation": false,
+    "tool_injection_environment_removed": true
+  },
+  "fallback_paths": [],
+  "finished_at": "2026-10-31T00:38:28.094602+00:00",
+  "ignored_paths": [],
+  "npm_workspace_dependency_paths": [],
+  "policy_sha256": "e258806286c62484b8ac99957e426d1b3e50961d45e71ce7c09f8b50e40d5b6d",
+  "receipt_sha256": "9843742ce6f8b3341407f983d113d279c400f8e696b1421f4c0a6749455aeb2f",
+  "run_id": "iris-captioned-music-focused-20261030",
+  "schema": "ai-video-agent-harness-run/2",
+  "scope": {
+    "changed_paths": [
+      "docs/agent-primary-contract-matrix.md",
+      "src/ai_video/production/_composition_visual.py",
+      "src/ai_video/production/qualification_preview_input.py",
+      "src/ai_video/production/repair_input_admission.py",
+      "src/ai_video/production/validation.py",
+      "tests/test_caption_development_preview.py",
+      "tests/test_qualification_preview_input.py"
+    ],
+    "closure_eligible": true,
+    "head_oid": "43c330bc9509d4e14ff91411d9cdf1b190f61810",
+    "mode": "staged"
+  },
+  "selected_check_ids": [
+    "docs_contract_check",
+    "repair_input_admission_tests",
+    "harness_tests",
+    "production_reader_tests",
+    "production_composition_audio_tests",
+    "native_audio_retime_tests"
+  ],
+  "sensitive_paths": [],
+  "source_snapshot_after": {
+    "cached_patch_sha256": "2424bf26024dc1b697facf06b519ad1c196652a830751d912fa2f0dd7ff2b580",
+    "changed_paths": [
+      "docs/agent-primary-contract-matrix.md",
+      "src/ai_video/production/_composition_visual.py",
+      "src/ai_video/production/qualification_preview_input.py",
+      "src/ai_video/production/repair_input_admission.py",
+      "src/ai_video/production/validation.py",
+      "tests/test_caption_development_preview.py",
+      "tests/test_qualification_preview_input.py"
+    ],
+    "git_head": "43c330bc9509d4e14ff91411d9cdf1b190f61810",
+    "index_tree": "d8f257613d350a0235fbc09bbca64f7852605962",
+    "mode": "staged",
+    "scope_sha256": "5ebdd8969689f36e73550f0e672cf969b9dc0715eb423b6e135a74dab9397ac7"
+  },
+  "source_snapshot_before": {
+    "cached_patch_sha256": "2424bf26024dc1b697facf06b519ad1c196652a830751d912fa2f0dd7ff2b580",
+    "changed_paths": [
+      "docs/agent-primary-contract-matrix.md",
+      "src/ai_video/production/_composition_visual.py",
+      "src/ai_video/production/qualification_preview_input.py",
+      "src/ai_video/production/repair_input_admission.py",
+      "src/ai_video/production/validation.py",
+      "tests/test_caption_development_preview.py",
+      "tests/test_qualification_preview_input.py"
+    ],
+    "git_head": "43c330bc9509d4e14ff91411d9cdf1b190f61810",
+    "index_tree": "d8f257613d350a0235fbc09bbca64f7852605962",
+    "mode": "staged",
+    "scope_sha256": "5ebdd8969689f36e73550f0e672cf969b9dc0715eb423b6e135a74dab9397ac7"
+  },
+  "started_at": "2026-10-31T00:37:57.965732+00:00",
+  "status": "failed",
+  "verification_level": "focused",
+  "workspace_cleanup_status": "passed",
+  "workspace_stable": true
+}

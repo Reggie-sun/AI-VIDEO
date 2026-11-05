@@ -1,0 +1,132 @@
+{
+ "schema": "iris-v2-post-media-gate/1",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP: video_probe, video_extract_frames, video_scene_detect, video_transcribe; audio_understand preview only)",
+ "reviewed_at": "2026-11-03",
+ "shot": "S8a",
+ "film_span_clip_s": [
+  0.922,
+  4.622
+ ],
+ "takes": {
+  "OH-A": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/OH-A/fetch/56a6de5bd25e951513864e9ff8fac50ef2608252193ce90c5926e6af8df12ba7.mp4",
+   "sha256": "56a6de5bd25e951513864e9ff8fac50ef2608252193ce90c5926e6af8df12ba7",
+   "items": {
+    "sings_visibly_both_phrases": {
+     "verdict": "FAIL",
+     "evidence": "phrase 1 opens/closes; phrase 2 opens only 2.633-2.767 and 4.000-4.083 s, small parting 2.85-3.97 s"
+    },
+    "breath_before_I_just": {
+     "verdict": "PASS",
+     "evidence": "dip 2.600-2.750 s: closed -> widest -> narrows; head lifts ~11 px"
+    },
+    "no_frown_frozen_overacting": {
+     "verdict": "FAIL",
+     "evidence": "no frown or over-acting; near-frozen face 3.033-3.967 s during the vocal"
+    },
+    "identity_matches_K7": {
+     "verdict": "FAIL",
+     "evidence": "drifts ~1.0-1.7 s: freckles mostly gone, smoothed skin, changed proportions and light; extra right-ear bud ~2.0 s"
+    },
+    "pane_background_stable": {
+     "verdict": "FAIL",
+     "evidence": "new gloved hand 1.367-5.117 s; white streak on the red pane from ~4.3 s; left pane luminance 84->150->107"
+    },
+    "camera_fixed": {
+     "verdict": "PASS",
+     "evidence": "background edges static within 1 px"
+    },
+    "no_cut_in_clip": {
+     "verdict": "PASS",
+     "evidence": "one scene"
+    },
+    "no_hands_in_frame": {
+     "verdict": "FAIL",
+     "evidence": "hand frames 34-128 (1.367-5.117 s)"
+    },
+    "no_large_head_turn_away": {
+     "verdict": "PASS",
+     "evidence": "turns toward the lens"
+    },
+    "no_long_gaze_away": {
+     "verdict": "FAIL",
+     "evidence": "eyes down or closed 0.367-1.600 s (in the film span 0.922-1.600 s)"
+    },
+    "no_large_torso_sway": {
+     "verdict": "FAIL",
+     "evidence": "collar +165 px, face +218 px over 0.60-1.80 s"
+    },
+    "no_exaggerated_mouth_or_teeth": {
+     "verdict": "PASS",
+     "evidence": "lower teeth blurred 4.033-4.083 s, not broken"
+    }
+   },
+   "result": "FAIL",
+   "visible_platform_label": "none visible; metadata AIGC Label 1, source dreamina"
+  },
+  "OH-B": {
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/OH-B/fetch/3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302.mp4",
+   "sha256": "3d64c37b94abe1efa82a566a61a33a277a98cc33aeb87ae07a5696711433a302",
+   "items": {
+    "sings_visibly_both_phrases": {
+     "verdict": "FAIL",
+     "evidence": "phrase 1 opens/closes; phrase 2 mouth fixed 2.833-3.917 s (28 frames)"
+    },
+    "breath_before_I_just": {
+     "verdict": "PASS",
+     "evidence": "closed -> widest 2.633-2.767 s -> narrows"
+    },
+    "no_frown_frozen_overacting": {
+     "verdict": "FAIL",
+     "evidence": "no frown or over-acting; mouth fixed 2.833-3.967 s, head and eyes still 3.367-3.967 s"
+    },
+    "identity_matches_K7": {
+     "verdict": "FAIL",
+     "evidence": "abrupt change 1.283-1.400 s: freckles mostly gone, smoothed, rounder face and eyes, fuller upper lip, frontal soft light"
+    },
+    "pane_background_stable": {
+     "verdict": "FAIL",
+     "evidence": "new bokeh dot from 1.433 s drifting to the end; red pane edge moves against the rest; left pane stretched 13 px"
+    },
+    "camera_fixed": {
+     "verdict": "FAIL",
+     "evidence": "all background layers shift +19..+28 px x, -24..-33 px y over 1.80-2.60 s"
+    },
+    "no_cut_in_clip": {
+     "verdict": "PASS",
+     "evidence": "one scene"
+    },
+    "no_hands_in_frame": {
+     "verdict": "PASS",
+     "evidence": "none"
+    },
+    "no_large_head_turn_away": {
+     "verdict": "PASS",
+     "evidence": "turns toward the lens"
+    },
+    "no_long_gaze_away": {
+     "verdict": "FAIL",
+     "evidence": "eyes down or closed 0.200-1.317 s (in the film span 0.922-1.317 s)"
+    },
+    "no_large_torso_sway": {
+     "verdict": "FAIL",
+     "evidence": "collar swing ~245 px in ~1.4 s; face -186 px; lean-in ~7%"
+    },
+    "no_exaggerated_mouth_or_teeth": {
+     "verdict": "FAIL",
+     "evidence": "lower teeth misaligned and broken frames 101-103 (4.033-4.100 s)"
+    }
+   },
+   "result": "FAIL",
+   "visible_platform_label": "none visible; metadata AIGC Label 1, source dreamina"
+  }
+ },
+ "advance": "none",
+ "gate": "FAIL",
+ "notes": [
+  "both takes show identity drift: drop condition 2 of trial/omnihuman/preview-approval.json; no third take",
+  "mouth timeline nearly identical in both (closed at the loudest point 1.88-2.00 s, static mid phrase 2 2.85-3.97 s)",
+  "the c6 S8a crop does not remove the defects",
+  "aesthetic verdict and any reclassification belong to the user; human listening NOT_EVALUATED"
+ ]
+}

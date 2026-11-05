@@ -1,0 +1,28 @@
+{
+ "schema": "ev-independent-review/v1",
+ "reviewer": "/root/review_analysis_delivery",
+ "target": "qa/independent_review_target.json",
+ "target_sha256": "dc8802a5f466015b573b7be1c2728d20272b68912ba094d2b5ac9d5bcee777c7",
+ "recommendation": "APPROVE_SCOPED_FIXES",
+ "original_findings": 3,
+ "unresolved_findings_in_fix_scope": 0,
+ "resolved": [
+  "complete aggregate element payload and timeline metadata drift detection; 8 failure-path tests pass",
+  "S0151 diagnostic bbox and S0152 separate angle label",
+  "S0100 source footer, S0152 leader transcription and per-frame ad-lib states"
+ ],
+ "evidence_summary": {
+  "bound_file_hashes_match": 16,
+  "shot_markdown_hashes_match": 153,
+  "shots": 153,
+  "elements": 1209,
+  "audio_candidate_events": 4242,
+  "temporal_correspondences": 4080,
+  "structural_errors": 0
+ },
+ "limits": [
+  "Read-only spotcheck of four shots plus scoped scripts; not a proof all 153 shot contents are precise",
+  "Audio listening and SFX identity NOT_EVALUATED",
+  "Overall ANALYSIS_INCOMPLETE; not human acceptance or reconstruction qualification"
+ ]
+}

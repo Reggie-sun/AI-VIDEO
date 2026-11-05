@@ -1,0 +1,48 @@
+{
+ "unit": "LSen1",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "f02ed94c5eae3d0eb06eb8d885b1d74e99d00110818a521e4d2a264fa82c2975",
+ "compiled_prompt_sha256": "fe58d95c9ed01fddb87d1797f4deb198408f3ad78e0c3436a0611e3029e5433d",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/continuity-report.json",
+  "sha256": "46c65da61c12ebcea04f6e5cbfd9215909edd2001259527982fd9344aa9cde4e",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS：A02 與 IRIS canon 五項一致；與 S7v3 實際末態（源片 5.42 s、c3 n=565）身份、大衣、左耳耳挂、左領紅線同側一致；換場是 board 既定。prompt 沒寫大衣，由底片承擔（已認可的身份豁免，request 沒帶身份表）。見 shared_findings.continuity。",
+   "handoff": "PASS：入點 S7v3 最後一幀看鏡頭、閉嘴、近景偏右，接 A02 正面近景偏右、看鏡頭，換場硬切，boundary independent。出點 (a) 接第二遍副歌 K8b，或 (b) 依 c3 決定 B 接睜開的眼，兩種都合理，接法待決（R4）。見 shared_findings.handoff。",
+   "axis_action_camera": "PASS：Medium close-up、facing the camera、eyes on the lens、Locked camera, no cuts, no head turns 與 A02 和 coverage S8a 一致；reference_to_video、不帶首幀；屏幕方向與 S7v3 末態一致（臉略偏畫左、人物偏右）。動作階段：A02 是張嘴唱歌姿態，而片頭 0.651 s 無聲，封存檢查要求閉嘴，前例 gate-S8a 在同一模式同一底片上失敗過，見 R1。",
+   "prompt_fit": "PASS：去檔尾換行後與 EV-en 逐字相同（sha256 fe58d95c9ed01fddb87d1797f4deb198408f3ad78e0c3436a0611e3029e5433d）；{{image:0}}→A02、{{audio:1}}→窗口，經 jimeng_meta_list 驗證；只送 1 圖＋1 音訊，皆在使用者預覽中；沒有多人或另一首歌的寫法；結尾有 No on-screen text。英文是使用者認可、只限本次試驗的語言例外。",
+   "lint": "PASS（continuity_report_ready 待本報告）：pre-submit-lint.json（08e23933…）10 項 true，已獨立重算；request_hash f02ed94c5eae3d0eb06eb8d885b1d74e99d00110818a521e4d2a264fa82c2975 等於 prepare-result。",
+   "gaps": [],
+   "risks": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 250,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   4,
+   800
+  ]
+ },
+ "new_calls": 0
+}

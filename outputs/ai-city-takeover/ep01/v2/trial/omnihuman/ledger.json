@@ -1,0 +1,25 @@
+{
+ "ceilings": {
+  "submits": 2,
+  "credits": 330,
+  "per_take": 165
+ },
+ "takes": [
+  {
+   "unit": "OH-A",
+   "outcome": "submitted",
+   "price_observed": 30,
+   "balance_before": 64791,
+   "balance_after": 64761,
+   "booked_at": "2026-11-03T05:42:36.118275+00:00"
+  },
+  {
+   "unit": "OH-B",
+   "outcome": "submitted",
+   "price_observed": 30,
+   "balance_before": 64761,
+   "balance_after": 64731,
+   "booked_at": "2026-11-03T05:56:48.042832+00:00"
+  }
+ ]
+}

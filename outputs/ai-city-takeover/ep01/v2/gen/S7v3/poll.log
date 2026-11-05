@@ -1,0 +1,7 @@
+06:44:11 {"state": "running", "progress_milli": 500}
+06:44:58 {"state": "running", "progress_milli": 500}
+06:45:45 {"state": "running", "progress_milli": 500}
+06:46:32 {"state": "running", "progress_milli": 500}
+06:47:20 {"state": "running", "progress_milli": 500}
+06:48:07 {"state": "succeeded", "progress_milli": 1000}
+{"artifact_path": "state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4", "sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21", "bytes": 12177812}

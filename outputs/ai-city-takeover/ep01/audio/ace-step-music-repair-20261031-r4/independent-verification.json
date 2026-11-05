@@ -1,0 +1,29 @@
+{
+  "surface": "Codex native verifier, read-only",
+  "reported_at": "2026-10-31",
+  "candidate_sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+  "fresh_full_decode": "PASS exit0 empty stderr",
+  "metadata": "30s48k stereo PCM16 5760044bytes",
+  "exact_source_editor_reproduction": "PASS all3 WAV bytes equal using in-memory writes, no disk mutation",
+  "voice_seconds": 29.523,
+  "hook_phrase_seconds": 4.314,
+  "hook_repetitions": 2,
+  "music_stem_included": "PASS linear reconstruction and30nonzero per-second windows",
+  "music_rms_per_second_range": [
+    0.04815,
+    0.099504
+  ],
+  "original_words_evidence": "Existing unprompted ASR75words; independently recomputedWER1.33%; sole347/3.47 representation difference; original I/J extras absent",
+  "ASR_rerun_by_verifier": false,
+  "speed_change": false,
+  "removed_low_energy_pause_rms": 3.63e-05,
+  "ACE_used_and_ceiling": [
+    10,
+    10
+  ],
+  "H_I_J_lineage_hashes": "PASS intent/consume/result/input/runner/predecessor hashes; ordinals8/9/10",
+  "index_and_original_brief_hashes": "UNCHANGED",
+  "human_hearing": "NOT_EVALUATED",
+  "singing_music_seams_whisper": "NOT_EVALUATED",
+  "verdict": "TechnicalPASS, songqualityPARTIAL; complete music-source audition only"
+}

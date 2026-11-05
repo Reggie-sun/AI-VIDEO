@@ -1,0 +1,17 @@
+{
+ "unit": "U021",
+ "one_use": true,
+ "issued_at": "2026-11-05T08:18:35.484239+00:00",
+ "expires_at": "2026-11-05T08:38:35.484243+00:00",
+ "fill_observed_sha256": "dd28c44b92c86cb2ad60c8c1158739a85af7a82a5dbf734a41e6b3b557f714aa",
+ "price": 24,
+ "page_audio": {
+  "shown": "00:04",
+  "seconds": 4.36,
+  "floor": "00:04",
+  "ceil": "00:05",
+  "matched": "floor"
+ },
+ "approval_sha256": "0e1bb74ec689d733e620d29a5629c3f9c5c0477cb9d65842c8d011ae5e094970",
+ "user_quote": "同意新写法 ／ 后期补画，不算 FAIL (Recommended)"
+}

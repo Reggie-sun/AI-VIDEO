@@ -1,0 +1,59 @@
+{
+ "unit": "N3",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/N3/project/state/video-generation/fetch/files/505ec46ef511acc31b87c3701933d94a11262ccb304368aa7701566027077ee4.mp4",
+ "sha256": "505ec46ef511acc31b87c3701933d94a11262ccb304368aa7701566027077ee4",
+ "verdict": "PASS",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum 相同；video_probe 5.057 s、1920x1080"
+  },
+  {
+   "id": "camera_slow_pull_back(R5)",
+   "result": "PASS",
+   "evidence": "N3_firstlast.png：人物高約 225→195 px（960 寬），左側機櫃和窗框進入畫面更多；相位相關位移只有 (0,0)→(4,-1)，平穩極緩；scene_detect 只有 1 段"
+  },
+  {
+   "id": "performance_head_tilt",
+   "result": "PASS",
+   "evidence": "N3_heads.png：約 1.0–3.5 s 頭微微側向一邊，4.5 s 後回正；身體靜止站立"
+  },
+  {
+   "id": "face_never_visible(R2)",
+   "result": "PASS",
+   "evidence": "側頭時只露出耳廓和臉頰邊緣，看不到五官；低髻和高領大衣保持"
+  },
+  {
+   "id": "collar_red_line(R1)",
+   "result": "PASS",
+   "evidence": "領口紅線和首幀 N3-a 一致，沒有變成整圈發光或跑到右前領"
+  },
+  {
+   "id": "no_mouth_movement(R8)",
+   "result": "PASS",
+   "evidence": "臉不可見；video_transcribe 沒有文字"
+  },
+  {
+   "id": "no_model_text_label_kept(R6)",
+   "result": "PASS",
+   "evidence": "11 幀抽樣沒有模型畫出的文字；中繼資料 aigc 標識保留"
+  },
+  {
+   "id": "continuity_K9e",
+   "result": "PASS",
+   "evidence": "落地窗、雾中城市、機櫃列、地面倒影和首幀一致；窗外的霧在流動"
+  },
+  {
+   "id": "usable_subspan(R7)",
+   "result": "PASS",
+   "evidence": "後拉很慢，任取 1–2.5 s 都包含側頭動作，看得出來"
+  }
+ ],
+ "usable_span": [
+  1.5,
+  4.0
+ ],
+ "notes": "S5 落點只有約 0.63 s 時，建議取 2.0–2.63 s（側頭的高峰）；後拉在這麼短的片段裡幾乎看不出來。",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

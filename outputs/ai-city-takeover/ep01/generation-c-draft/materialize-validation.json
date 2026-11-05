@@ -1,0 +1,14 @@
+{
+  "syntax_and_help_passed": true,
+  "pure_append_and_independent_bundles_valid": true,
+  "existing_iris_and_cf_records_preserved": true,
+  "a01_shot_preserved": true,
+  "a01_final_requirements_retained_on_append": true,
+  "missing_parent_gate_rejected": true,
+  "driver_config_model_valid": true,
+  "canonical_state_unchanged": true,
+  "materialize_apply_executed": false,
+  "provider_calls": 0,
+  "actual_materialization": "NOT_EVALUATED",
+  "actual_a01_gate": "NOT_EVALUATED by this script validation"
+}

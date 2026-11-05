@@ -1,0 +1,39 @@
+{
+ "schema": "ev-review-observations/v1",
+ "source_sha256": "bf3595f1f615a6bc66b8925680e28849e12eeb57ec5c7f93420a95e3fe37a40d",
+ "reviewer": "root independent visual pass",
+ "shots_midframe_seen": 153,
+ "review_sheets": [
+  "work/root_review/overview_00.jpg",
+  "work/root_review/overview_01.jpg",
+  "work/root_review/overview_02.jpg",
+  "work/root_review/overview_03.jpg",
+  "work/root_review/overview_04.jpg",
+  "work/root_review/overview_05.jpg",
+  "work/root_review/overview_06.jpg",
+  "work/root_review/overview_07.jpg",
+  "work/root_review/overview_08.jpg",
+  "work/root_review/overview_09.jpg",
+  "work/root_review/overview_10.jpg",
+  "work/root_review/overview_11.jpg",
+  "work/root_review/overview_12.jpg"
+ ],
+ "scope": "Independent one-midframe-per-shot navigation and contradiction check; not dense animation or full-resolution microtype coverage",
+ "findings": [
+  "S0001 f25 reads 24 MONTHS during flip, later 18; forwarded for correction",
+  "Actual lead is dark bob, white crop shirt, black harness; platinum casting metadata is not final appearance",
+  "Light/dark graphic inversion after S0085 and countdown S0102-S0108 require distinct state",
+  "Final care labels, San Francisco map, end hair-star and black tail observed"
+ ],
+ "audio_readback": {
+  "native_audio_input": "UNSUPPORTED: audio content omitted because you do not support audio input",
+  "audio_understand_offline_preview": {
+   "error": "invalid_media",
+   "outcome": "EVIDENCE_GAP",
+   "message": "Audio source is not a bounded regular file inside the project media root.",
+   "retryable": false
+  },
+  "remote_execution": false,
+  "perceptual_listening": "NOT_EVALUATED"
+ }
+}

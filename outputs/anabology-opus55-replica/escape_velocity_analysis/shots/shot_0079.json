@@ -1,0 +1,1467 @@
+{
+  "shot_id": "S0079",
+  "start_frame": 3485,
+  "end_frame": 3582,
+  "duration_frames": 98,
+  "start_time": 145.2083,
+  "end_time": 149.2917,
+  "duration_s": 4.0833,
+  "start_tc": "00:02:25:05",
+  "end_tc": "00:02:29:06",
+  "boundary_in_id": "B2-010",
+  "boundary_in_type": "shape_wipe",
+  "boundary_in_span": [
+    3482,
+    3487
+  ],
+  "boundary_out_id": "B2-011",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "frame": 3485,
+      "end_frame": 3487,
+      "event": "圆窗仍残留上镜",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3485,
+        3487
+      ],
+      "description": "圆窗仍残留上镜",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3488,
+      "end_frame": 3490,
+      "event": "圆擦全幅完成",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3488,
+        3490
+      ],
+      "description": "圆擦全幅完成",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3503,
+      "end_frame": 3505,
+      "event": "Look",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3503,
+        3505
+      ],
+      "description": "Look",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3509,
+      "end_frame": 3511,
+      "event": "11与THE IMMORTALS卡",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3509,
+        3511
+      ],
+      "description": "11与THE IMMORTALS卡",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3527,
+      "end_frame": 3529,
+      "event": "The",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3527,
+        3529
+      ],
+      "description": "The",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3530,
+      "end_frame": 3532,
+      "event": "Immortals与寿命轴",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3530,
+        3532
+      ],
+      "description": "Immortals与寿命轴",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3539,
+      "end_frame": 3541,
+      "event": "左座预留卡淡入",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3539,
+        3541
+      ],
+      "description": "左座预留卡淡入",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3545,
+      "end_frame": 3547,
+      "event": "3",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3545,
+        3547
+      ],
+      "description": "3",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3548,
+      "end_frame": 3550,
+      "event": "右座预留卡",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3548,
+        3550
+      ],
+      "description": "右座预留卡",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3551,
+      "end_frame": 3553,
+      "event": "seats",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3551,
+        3553
+      ],
+      "description": "seats",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3560,
+      "end_frame": 3562,
+      "event": "镜头右移推近；右卡和商品卡离开画面",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3560,
+        3562
+      ],
+      "description": "镜头右移推近；右卡和商品卡离开画面",
+      "type": "visual_change"
+    },
+    {
+      "frame": 3578,
+      "end_frame": 3580,
+      "event": "歌词淡出",
+      "timing_uncertainty_frames": 2,
+      "evidence": "step-3 whole-frame visual comparison; bound is observed interval, not exact onset",
+      "frame_range": [
+        3578,
+        3580
+      ],
+      "description": "歌词淡出",
+      "type": "visual_change"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席。她缓慢看向镜头，左右白色座位预留卡出现，左下无限寿命时间线向∞延伸，尾段近推到面部。",
+  "reference_frames": [
+    {
+      "frame": 3485,
+      "path": "keyframes/S0079_f03485.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3509,
+      "path": "keyframes/S0079_f03509.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3534,
+      "path": "keyframes/S0079_f03534.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3558,
+      "path": "keyframes/S0079_f03558.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3582,
+      "path": "keyframes/S0079_f03582.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 3533,
+      "path": "work/full_batch/03533.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    },
+    {
+      "frame": 3574,
+      "path": "work/full_batch/03574.jpg",
+      "role": "detail",
+      "note": "实际全分辨率查看；小面板另作放大裁切核读。"
+    }
+  ],
+  "composition": {
+    "shot_size": "full/long shot",
+    "subject_position": "see normalized semantic-region bbox; actual full-resolution visual estimate ±0.03",
+    "subject_bbox": {
+      "x": 0.33,
+      "y": 0.07,
+      "w": 0.33,
+      "h": 0.89,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "倾斜/低角度程度见实际reference；非恢复的相机标定",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席。她缓慢看向镜头，左右白色座位预留卡出现，左下无限寿命时间线向∞延伸，尾段近推到面部。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0043, \"pan_y_frac_per_s\": 0.0011, \"zoom_per_s\": -0.0016, \"median_flow_frac_per_s\": 0.0049, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[100.8, 109.3, 113.3]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#7A7467",
+        "fraction": 0.313,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#908B89",
+        "fraction": 0.269,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#1E1F15",
+        "fraction": 0.159,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#584E3F",
+        "fraction": 0.118,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#A8A8B1",
+        "fraction": 0.076,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#E0E0DF",
+        "fraction": 0.065,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[100.8, 109.3, 113.3]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 11 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "10→08",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0079-E01",
+      "shot_id": "S0079",
+      "type": "background_media",
+      "description": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席。她缓慢看向镜头，左右白色座位预留卡出现，左下无限寿命时间线向∞延伸，尾段近推到面部。",
+      "start_frame": 3485,
+      "end_frame": 3582,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席。她缓慢看向镜头，左右白色座位预留卡出现，左下无限寿命时间线向∞延伸，尾段近推到面部。"
+      },
+      "motion": {
+        "path": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席。她缓慢看向镜头，左右白色座位预留卡出现，左下无限寿命时间线向∞延伸，尾段近推到面部。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3485–3582；入口按密采事件区间±2帧。",
+        "exit": "3582为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3485,
+          "state": "圆窗仍残留上镜"
+        },
+        {
+          "frame": 3488,
+          "state": "圆擦全幅完成"
+        },
+        {
+          "frame": 3503,
+          "state": "Look"
+        },
+        {
+          "frame": 3509,
+          "state": "11与THE IMMORTALS卡"
+        },
+        {
+          "frame": 3527,
+          "state": "The"
+        },
+        {
+          "frame": 3530,
+          "state": "Immortals与寿命轴"
+        },
+        {
+          "frame": 3539,
+          "state": "左座预留卡淡入"
+        },
+        {
+          "frame": 3545,
+          "state": "3"
+        },
+        {
+          "frame": 3548,
+          "state": "右座预留卡"
+        },
+        {
+          "frame": 3551,
+          "state": "seats"
+        },
+        {
+          "frame": 3560,
+          "state": "镜头右移推近；右卡和商品卡离开画面"
+        },
+        {
+          "frame": 3578,
+          "state": "歌词淡出"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3485,
+        3509,
+        3534,
+        3558,
+        3582
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0079-E02",
+      "shot_id": "S0079",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 3485,
+      "end_frame": 3582,
+      "bounding_box": {
+        "x": 0.33,
+        "y": 0.07,
+        "w": 0.33,
+        "h": 0.89,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席。她缓慢看向镜头，左右白色座位预留卡出现，左下无限寿命时间线向∞延伸，尾段近推到面部。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3485–3582；入口按密采事件区间±2帧。",
+        "exit": "3582为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3485,
+          "state": "圆窗仍残留上镜"
+        },
+        {
+          "frame": 3488,
+          "state": "圆擦全幅完成"
+        },
+        {
+          "frame": 3503,
+          "state": "Look"
+        },
+        {
+          "frame": 3509,
+          "state": "11与THE IMMORTALS卡"
+        },
+        {
+          "frame": 3527,
+          "state": "The"
+        },
+        {
+          "frame": 3530,
+          "state": "Immortals与寿命轴"
+        },
+        {
+          "frame": 3539,
+          "state": "左座预留卡淡入"
+        },
+        {
+          "frame": 3545,
+          "state": "3"
+        },
+        {
+          "frame": 3548,
+          "state": "右座预留卡"
+        },
+        {
+          "frame": 3551,
+          "state": "seats"
+        },
+        {
+          "frame": 3560,
+          "state": "镜头右移推近；右卡和商品卡离开画面"
+        },
+        {
+          "frame": 3578,
+          "state": "歌词淡出"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3485,
+        3509,
+        3534,
+        3558,
+        3582
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0079-E03",
+      "shot_id": "S0079",
+      "type": "environment",
+      "description": "三个白色未来感座椅，椅头白光环，右席摆一双黑靴。",
+      "start_frame": 3485,
+      "end_frame": 3582,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "三个白色未来感座椅，椅头白光环，右席摆一双黑靴。"
+      },
+      "motion": {
+        "path": "三个白色未来感座椅，椅头白光环，右席摆一双黑靴。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3485–3582；入口按密采事件区间±2帧。",
+        "exit": "3582为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3485,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3582,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3485,
+        3509,
+        3534,
+        3558,
+        3582
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0079-E04",
+      "shot_id": "S0079",
+      "type": "tag_card",
+      "description": "右侧THE IMMORTALS吊牌白卡，SEATS3 / PRICE$1M/YR / TERM INDEFINITE / FIT FOREVER。",
+      "start_frame": 3509,
+      "end_frame": 3560,
+      "bounding_box": {
+        "x": 0.8,
+        "y": 0.51,
+        "w": 0.16,
+        "h": 0.22,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右侧THE IMMORTALS吊牌白卡，SEATS3 / PRICE$1M/YR / TERM INDEFINITE / FIT FOREVER。"
+      },
+      "motion": {
+        "path": "右侧THE IMMORTALS吊牌白卡，SEATS3 / PRICE$1M/YR / TERM INDEFINITE / FIT FOREVER。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3509–3560；入口按密采事件区间±2帧。",
+        "exit": "3560为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3509,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.8,
+            "y": 0.51,
+            "w": 0.16,
+            "h": 0.22,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3560,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3509,
+        3534,
+        3558
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "LOOK 11 / 11 | FINAL | THE IMMORTALS | SEATS 3 | PRICE $1M / YR | TERM INDEFINITE | FIT FOREVER | EV-27-1101",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        }
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0079-E05",
+      "shot_id": "S0079",
+      "type": "tag_card",
+      "description": "左席预留卡SEAT 1 OF 3，3539淡入，随镜头右移向左放大移位。",
+      "start_frame": 3539,
+      "end_frame": 3582,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.58,
+        "w": 0.16,
+        "h": 0.27,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左右席预留白卡，SEAT1 OF3及SEAT3 OF3，OPEN橙色。"
+      },
+      "motion": {
+        "path": "左右席预留白卡，SEAT1 OF3及SEAT3 OF3，OPEN橙色。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3539–3582；入口按密采事件区间±2帧。",
+        "exit": "3582为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3539,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.04,
+            "y": 0.58,
+            "w": 0.16,
+            "h": 0.27,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3582,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3558,
+        3582
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "THE IMMORTALS · RESERVED | SEAT 1 OF 3 | $1,000,000 / YR | OPEN | TERM: INDEFINITE",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        }
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0079-E06",
+      "shot_id": "S0079",
+      "type": "hud_chart",
+      "description": "左下寿命横轴BORN/NOW/∞，END橙菱形逐渐向右平移。",
+      "start_frame": 3530,
+      "end_frame": 3582,
+      "bounding_box": {
+        "x": 0.02,
+        "y": 0.71,
+        "w": 0.31,
+        "h": 0.14,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左下寿命横轴BORN/NOW/∞，END橙菱形逐渐向右平移。"
+      },
+      "motion": {
+        "path": "左下寿命横轴BORN/NOW/∞，END橙菱形逐渐向右平移。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3530–3582；入口按密采事件区间±2帧。",
+        "exit": "3582为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3530,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.02,
+            "y": 0.71,
+            "w": 0.31,
+            "h": 0.14,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3582,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3534,
+        3558,
+        3582
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "text": {
+        "content": "TERM · INDEFINITE | LEV · 1 YR / YR | BORN | NOW | END → ∞ | +0 YR → +4 YR",
+        "case": "as displayed",
+        "typography": {
+          "size_px": "headline cap-height approx 52–64; panel mono cap-height approx 10–15, visual_estimate",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "tracking": "tight headline; mono HUD",
+          "alignment": "left",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "font_status": "candidate_only"
+        }
+      }
+    },
+    {
+      "element_id": "S0079-E07",
+      "shot_id": "S0079",
+      "type": "text_title",
+      "description": "左上黑字逐词填入，The Immortals橙色短闪后黑色。",
+      "start_frame": 3503,
+      "end_frame": 3577,
+      "bounding_box": {
+        "x": 0.04,
+        "y": 0.17,
+        "w": 0.4,
+        "h": 0.17,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "左上黑字逐词填入，The Immortals橙色短闪后黑色。"
+      },
+      "motion": {
+        "path": "左上黑字逐词填入，The Immortals橙色短闪后黑色。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "已见活动范围3503–3577；入口按密采事件区间±2帧。",
+        "exit": "3577为最后活动包络；硬切或跨镜残留见transitions。"
+      },
+      "keyframes": [
+        {
+          "frame": 3503,
+          "text": "Look",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3509,
+          "text": "Look 11.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3527,
+          "text": "Look 11. The",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3530,
+          "text": "Look 11. The Immortals.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3545,
+          "text": "Look 11. The Immortals.\n3",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        },
+        {
+          "frame": 3551,
+          "text": "Look 11. The Immortals.\n3 seats.",
+          "timing_uncertainty_frames": 2,
+          "state": "新词/新标题首次见于该3帧采样区间；同一词初橙后白/黑按图可见"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3509,
+        3534,
+        3558
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "geometry为全分辨率视觉估计±0.03；alpha、原始字体及曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "Look 11. The Immortals.\n3 seats.",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "cap height approx 64 px at 1920x1080; visual_estimate",
+          "alignment": "left",
+          "tracking": "tight headline; mono HUD",
+          "stroke": "none observed",
+          "shadow": "none observed",
+          "weight": "bold headline / medium mono",
+          "line_height_px": "headline approx 58; panel approx 24–44",
+          "font_status": "candidate_only"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03
+    },
+    {
+      "element_id": "S0079-E08",
+      "shot_id": "S0079",
+      "type": "tag_card",
+      "description": "右席预留卡晚于左席约9帧淡入；SEAT 3 OF 3，随场景透视向右移出画面。",
+      "start_frame": 3548,
+      "end_frame": 3562,
+      "bounding_box": {
+        "x": 0.75,
+        "y": 0.21,
+        "w": 0.13,
+        "h": 0.12,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "右席预留卡晚于左席约9帧淡入；SEAT 3 OF 3，随场景透视向右移出画面。"
+      },
+      "motion": {
+        "path": "右席预留卡晚于左席约9帧淡入；SEAT 3 OF 3，随场景透视向右移出画面。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3548起±2帧，参见逐3帧密采",
+        "exit": "3562末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3548,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0.75,
+            "y": 0.21,
+            "w": 0.13,
+            "h": 0.12,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3562,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3558
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "THE IMMORTALS · RESERVED | SEAT 3 OF 3 | $1,000,000 / YR | OPEN | TERM: INDEFINITE",
+        "case": "as displayed",
+        "typography": {
+          "font_status": "candidate_only",
+          "size_px": "see observed frame; panel mono approx 10–15px",
+          "alignment": "left"
+        }
+      }
+    },
+    {
+      "element_id": "S0079-E09",
+      "shot_id": "S0079",
+      "type": "transition_graphic",
+      "description": "继承S78圆形窗口残留外圈与旧CASHMERE片段，3488前退出。",
+      "start_frame": 3485,
+      "end_frame": 3487,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 0.62,
+        "h": 0.86,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "继承S78圆形窗口残留外圈与旧CASHMERE片段，3488前退出。"
+      },
+      "motion": {
+        "path": "继承S78圆形窗口残留外圈与旧CASHMERE片段，3488前退出。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "3485起±2帧，参见逐3帧密采",
+        "exit": "3487末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 3485,
+          "state": "首次可见活动区间，见元素description；±2帧",
+          "bounding_box": {
+            "x": 0,
+            "y": 0,
+            "w": 0.62,
+            "h": 0.86,
+            "space": "frame_norm_top_left"
+          }
+        },
+        {
+          "frame": 3487,
+          "state": "最后活动区间；具体可变值见text.content及in_shot_events"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        3485
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0079-A03",
+      "target_element_ids": [
+        "S0079-E03"
+      ],
+      "description": "三个白色未来感座椅，椅头白光环，右席摆一双黑靴。",
+      "start_frame": 3485,
+      "end_frame": 3582,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0079-A04",
+      "target_element_ids": [
+        "S0079-E04"
+      ],
+      "description": "右侧THE IMMORTALS吊牌白卡，SEATS3 / PRICE$1M/YR / TERM INDEFINITE / FIT FOREVER。",
+      "start_frame": 3509,
+      "end_frame": 3560,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0079-A05",
+      "target_element_ids": [
+        "S0079-E05"
+      ],
+      "description": "左右席预留白卡，SEAT1 OF3及SEAT3 OF3，OPEN橙色。",
+      "start_frame": 3539,
+      "end_frame": 3582,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0079-A06",
+      "target_element_ids": [
+        "S0079-E06"
+      ],
+      "description": "左下寿命横轴BORN/NOW/∞，END橙菱形逐渐向右平移。",
+      "start_frame": 3530,
+      "end_frame": 3582,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0079-A07",
+      "target_element_ids": [
+        "S0079-E07"
+      ],
+      "description": "左上黑字逐词填入，The Immortals橙色短闪后黑色。",
+      "start_frame": 3503,
+      "end_frame": 3577,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AW0242",
+      "relation": "vocal_word_candidate (unknown) at frame 3474–3505; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3485
+    },
+    {
+      "audio_event_id": "AB0321",
+      "relation": "beat_candidate (unknown) at frame 3486; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3486
+    },
+    {
+      "audio_event_id": "AH01433",
+      "relation": "band_onset_candidate (unknown) at frame 3486; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3486
+    },
+    {
+      "audio_event_id": "AH01434",
+      "relation": "band_onset_candidate (unknown) at frame 3486; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3486
+    },
+    {
+      "audio_event_id": "AH01435",
+      "relation": "band_onset_candidate (unknown) at frame 3486; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3486
+    },
+    {
+      "audio_event_id": "AH01436",
+      "relation": "band_onset_candidate (unknown) at frame 3486; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3486
+    },
+    {
+      "audio_event_id": "AH01437",
+      "relation": "band_onset_candidate (unknown) at frame 3487; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3487
+    },
+    {
+      "audio_event_id": "AB0322",
+      "relation": "beat_candidate (unknown) at frame 3497; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3497
+    },
+    {
+      "audio_event_id": "AH01438",
+      "relation": "band_onset_candidate (unknown) at frame 3497; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3497
+    },
+    {
+      "audio_event_id": "AH01439",
+      "relation": "band_onset_candidate (unknown) at frame 3497; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3497
+    },
+    {
+      "audio_event_id": "AH01440",
+      "relation": "band_onset_candidate (unknown) at frame 3497; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3497
+    },
+    {
+      "audio_event_id": "AH01441",
+      "relation": "band_onset_candidate (unknown) at frame 3497; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3497
+    },
+    {
+      "audio_event_id": "AH01442",
+      "relation": "band_onset_candidate (unknown) at frame 3498; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3498
+    },
+    {
+      "audio_event_id": "AX0236",
+      "relation": "unmatched_ASR_word_candidate (unknown) at frame 3504–3508; Whisper token absent from monotonic match to published lyrics; could be ad-lib, alternate wording, or ASR error",
+      "frame": 3504
+    },
+    {
+      "audio_event_id": "AH01443",
+      "relation": "band_onset_candidate (unknown) at frame 3504; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3504
+    },
+    {
+      "audio_event_id": "AW0243",
+      "relation": "vocal_word_candidate (unknown) at frame 3506–3514; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3506
+    },
+    {
+      "audio_event_id": "AB0323",
+      "relation": "beat_candidate (unknown) at frame 3508; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3508
+    },
+    {
+      "audio_event_id": "AH01444",
+      "relation": "band_onset_candidate (unknown) at frame 3508; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3508
+    },
+    {
+      "audio_event_id": "AH01445",
+      "relation": "band_onset_candidate (unknown) at frame 3508; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3508
+    },
+    {
+      "audio_event_id": "AH01446",
+      "relation": "band_onset_candidate (unknown) at frame 3508; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3508
+    },
+    {
+      "audio_event_id": "AH01447",
+      "relation": "band_onset_candidate (unknown) at frame 3509; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3509
+    },
+    {
+      "audio_event_id": "AB0324",
+      "relation": "beat_candidate (unknown) at frame 3519; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3519
+    },
+    {
+      "audio_event_id": "AH01448",
+      "relation": "band_onset_candidate (unknown) at frame 3519; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3519
+    },
+    {
+      "audio_event_id": "AH01449",
+      "relation": "band_onset_candidate (unknown) at frame 3519; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3519
+    },
+    {
+      "audio_event_id": "AH01450",
+      "relation": "band_onset_candidate (unknown) at frame 3519; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3519
+    },
+    {
+      "audio_event_id": "AH01451",
+      "relation": "band_onset_candidate (unknown) at frame 3519; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3519
+    },
+    {
+      "audio_event_id": "AH01452",
+      "relation": "band_onset_candidate (unknown) at frame 3519; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3519
+    },
+    {
+      "audio_event_id": "AW0244",
+      "relation": "vocal_word_candidate (unknown) at frame 3524–3526; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3524
+    },
+    {
+      "audio_event_id": "AW0245",
+      "relation": "vocal_word_candidate (unknown) at frame 3527–3538; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3527
+    },
+    {
+      "audio_event_id": "AB0325",
+      "relation": "beat_candidate (unknown) at frame 3529; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3529
+    },
+    {
+      "audio_event_id": "AH01453",
+      "relation": "band_onset_candidate (unknown) at frame 3530; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3530
+    },
+    {
+      "audio_event_id": "AH01454",
+      "relation": "band_onset_candidate (unknown) at frame 3530; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3530
+    },
+    {
+      "audio_event_id": "AH01455",
+      "relation": "band_onset_candidate (unknown) at frame 3530; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3530
+    },
+    {
+      "audio_event_id": "AH01456",
+      "relation": "band_onset_candidate (unknown) at frame 3530; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3530
+    },
+    {
+      "audio_event_id": "AH01457",
+      "relation": "band_onset_candidate (unknown) at frame 3530; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3530
+    },
+    {
+      "audio_event_id": "AW0246",
+      "relation": "vocal_word_candidate (unknown) at frame 3539–3545; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3539
+    },
+    {
+      "audio_event_id": "AB0326",
+      "relation": "beat_candidate (unknown) at frame 3540; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3540
+    },
+    {
+      "audio_event_id": "AH01458",
+      "relation": "band_onset_candidate (unknown) at frame 3540; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3540
+    },
+    {
+      "audio_event_id": "AH01459",
+      "relation": "band_onset_candidate (unknown) at frame 3540; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3540
+    },
+    {
+      "audio_event_id": "AH01460",
+      "relation": "band_onset_candidate (unknown) at frame 3541; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3541
+    },
+    {
+      "audio_event_id": "AH01461",
+      "relation": "band_onset_candidate (unknown) at frame 3541; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3541
+    },
+    {
+      "audio_event_id": "AW0247",
+      "relation": "vocal_word_candidate (unknown) at frame 3550–3558; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 3550
+    },
+    {
+      "audio_event_id": "AB0327",
+      "relation": "beat_candidate (unknown) at frame 3551; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3551
+    },
+    {
+      "audio_event_id": "AH01462",
+      "relation": "band_onset_candidate (unknown) at frame 3551; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3551
+    },
+    {
+      "audio_event_id": "AH01463",
+      "relation": "band_onset_candidate (unknown) at frame 3551; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3551
+    },
+    {
+      "audio_event_id": "AH01464",
+      "relation": "band_onset_candidate (unknown) at frame 3551; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3551
+    },
+    {
+      "audio_event_id": "AH01465",
+      "relation": "band_onset_candidate (unknown) at frame 3552; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3552
+    },
+    {
+      "audio_event_id": "AH01466",
+      "relation": "band_onset_candidate (unknown) at frame 3557; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3557
+    },
+    {
+      "audio_event_id": "AB0328",
+      "relation": "beat_candidate (unknown) at frame 3562; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3562
+    },
+    {
+      "audio_event_id": "AH01467",
+      "relation": "band_onset_candidate (unknown) at frame 3562; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3562
+    },
+    {
+      "audio_event_id": "AH01468",
+      "relation": "band_onset_candidate (unknown) at frame 3562; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3562
+    },
+    {
+      "audio_event_id": "AH01469",
+      "relation": "band_onset_candidate (unknown) at frame 3562; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3562
+    },
+    {
+      "audio_event_id": "AH01470",
+      "relation": "band_onset_candidate (unknown) at frame 3563; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3563
+    },
+    {
+      "audio_event_id": "AH01471",
+      "relation": "band_onset_candidate (unknown) at frame 3573; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3573
+    },
+    {
+      "audio_event_id": "AB0329",
+      "relation": "beat_candidate (unknown) at frame 3573; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 3573
+    },
+    {
+      "audio_event_id": "AH01472",
+      "relation": "band_onset_candidate (unknown) at frame 3573; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3573
+    },
+    {
+      "audio_event_id": "AH01473",
+      "relation": "band_onset_candidate (unknown) at frame 3573; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3573
+    },
+    {
+      "audio_event_id": "AH01474",
+      "relation": "band_onset_candidate (unknown) at frame 3573; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3573
+    },
+    {
+      "audio_event_id": "AH01475",
+      "relation": "band_onset_candidate (unknown) at frame 3574; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 3574
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "事件首帧由3帧密采夹定，±2帧；非声画逐词听证。",
+    "隐藏字体/alpha/原始plate/shader与随机种子unknown。",
+    "可见微字受网点遮蔽，省略号表示未能辨清或尚未完成的打字段。",
+    "audio listening NOT_EVALUATED; root owns linkage."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0079.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "shape_wipe",
+      "boundary_id": "B2-010",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        3482,
+        3487
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B2-011",
+      "description": "圆形擦除完成，少女坐在白色带光环的中央座椅上，两侧相同座椅形成三席。她缓慢看向镜头，左右白色座位预留卡出现，左下无限寿命时间线向∞延伸，尾段近推到面部。",
+      "span": [
+        3582,
+        3582
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "Look 11. The Immortals. 3 seats.",
+    "THE IMMORTALS",
+    "SEAT 1 OF 3",
+    "SEAT 3 OF 3",
+    "$1,000,000 / YR",
+    "TERM: INDEFINITE"
+  ],
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。",
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      3533,
+      3574
+    ],
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "complete",
+    "second_pass_notes": "独立比较全幅step3、全分辨率与面板放大裁切；面板逐行文字和词进度分别记录；visible geometry为明示估计。"
+  }
+}

@@ -1,0 +1,24 @@
+{
+ "about": "c3 chorus edit (spec 2026-11-02 §5.3): one lip-sync take per pass, placed at the lag measured by motion-kit/tools/sync_check.py (sync = its sync.json, path relative to ep01/v2); an optional cutaway to a non-singing reused take from the vocal entry of lyric line at_line (timing/words.json, two frames early like build.py's vocal()) to the end of the pass. Lyrics stay on screen.",
+ "candidate": "A",
+ "passes": [
+  {
+   "shot": "S8a",
+   "take": "S8av3",
+   "sync": "qa/sync/S8av3/sync.json",
+   "cutaway": null
+  },
+  {
+   "shot": "S8b",
+   "take": "S8b2",
+   "sync": "qa/sync/S8b2/sync.json",
+   "cutaway": null
+  }
+ ],
+ "rendered": {
+  "render": "renders/review/c3-chorus-cand-A.mp4",
+  "sha256": "19baac2600e9d3d823a2d62c013d5fd8ba52e781e919d297f3b4e3a647ae6204",
+  "words_json_sha256": "1eb408700e104c4729d3b5386e69ba9f23da25f3f57d9a6e2749170f6422decf",
+  "note": "the reviewed render used the c2-era chorus word times and, for B, cutaway entries 20.71 / 24.12 s; at_line with the measured words gives the same cut frames (620, 722)"
+ }
+}

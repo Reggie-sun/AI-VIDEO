@@ -1,0 +1,2489 @@
+{
+ "schema_version": "4",
+ "request": {
+  "creative_input_kind": "direction",
+  "creative_input_evidence": "我们只需要让人物真的表现在唱歌就好\n画面信息不够密, 故事内容太薄, 人物镜头太少太单调, captipon做的字体不行,参考作者,还有这个中文你直接不要了吧\n最后成片用即梦生成的我要1080p的,那个左上角的ai生成可以去掉的,我发现\n图片很奇怪,为什么突然晃一个眼睛过去\n睁眼之后突然转到这个人也非常奇怪\n这里又跳会又显得很突兀\n这种歌都是要带点不寻常,侵略性,不羁\n表情别太刻意了\n我都觉得可以,不考虑时常,你得从观众和质量角度考虑,和人物背景符合\n歌我选择好了t4\n可以，往下做",
+  "creative_constraints": [
+   {
+    "constraint_id": "C-SING",
+    "scope": "beat_specific",
+    "source_text": "我们只需要让人物真的表现在唱歌就好"
+   },
+   {
+    "constraint_id": "C-DENSE",
+    "scope": "global",
+    "source_text": "画面信息不够密"
+   },
+   {
+    "constraint_id": "C-STORY",
+    "scope": "global",
+    "source_text": "故事内容太薄"
+   },
+   {
+    "constraint_id": "C-NOZH",
+    "scope": "global",
+    "source_text": "这个中文你直接不要了吧"
+   },
+   {
+    "constraint_id": "C-1080",
+    "scope": "global",
+    "source_text": "最后成片用即梦生成的我要1080p的"
+   },
+   {
+    "constraint_id": "C-NOEYE",
+    "scope": "global",
+    "source_text": "为什么突然晃一个眼睛过去"
+   },
+   {
+    "constraint_id": "C-NOJUMP",
+    "scope": "global",
+    "source_text": "这里又跳会又显得很突兀"
+   },
+   {
+    "constraint_id": "C-VIBE",
+    "scope": "global",
+    "source_text": "这种歌都是要带点不寻常,侵略性,不羁"
+   },
+   {
+    "constraint_id": "C-NATURAL",
+    "scope": "global",
+    "source_text": "表情别太刻意了"
+   },
+   {
+    "constraint_id": "C-FIT",
+    "scope": "global",
+    "source_text": "和人物背景符合"
+   }
+  ],
+  "target_duration_seconds": 261.56,
+  "coverage_strategy": "multi_shot",
+  "strategy_source": "agent_directed",
+  "director_decision_rationale": "四分多钟的音乐录像带需要按歌的段落推进事件、在副歌给真唱、在主歌用一句一图讲事实，并在系统视点与 IRIS 视点之间切换；一条机位轨迹无法承载这些空间与信息转换，所以选多镜头。密度参照作者 EV（约 2 s/镜），唱段保留可读的完整表演。",
+  "strategy_request_evidence": null,
+  "director_skill": "open-video"
+ },
+ "coverage_units": [
+  {
+   "unit_id": "U001",
+   "duration_seconds": 2.35,
+   "beat_function": "establish",
+   "objective": "立规则：这里是被看管的副本大厅（（器乐））",
+   "open_state": "黑场",
+   "close_state": "监控大全景：几百个同款副本成方阵，领口灯全灭，走道尽头一扇黑门留着一丝红缝",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "固定监控机位＝系统在看；路线 画面＋图形层；图形 OSD HALL 07 · CAM 03 · 03:46:58",
+   "visible_change": "0.49 s 最强冲击时监控画面通电亮起：监控大全景：几百个同款副本成方阵，领口灯全灭，走道尽头一扇黑门留着一丝红缝",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U002",
+   "duration_seconds": 1.85,
+   "beat_function": "detail",
+   "objective": "她们一模一样（（器乐））",
+   "open_state": "一排闭眼的副本",
+   "close_state": "变焦推近到同一排",
+   "shot_scale": "medium",
+   "camera_treatment": "push_in",
+   "camera_intent": "电子变焦一步推；路线 画面＋图形层；图形 电子变焦框",
+   "visible_change": "监控变焦推近一行：变焦推近到同一排",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U003",
+   "duration_seconds": 1.86,
+   "beat_function": "detail",
+   "objective": "把观众的眼睛放到“灯”上（（器乐））",
+   "open_state": "一个副本的立领，灯线熄灭",
+   "close_state": "仍然熄灭",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "静止的细节让下一镜的变化可读；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "细节：熄灭的领口灯线：仍然熄灭",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U004",
+   "duration_seconds": 1.86,
+   "beat_function": "reveal",
+   "objective": "异常在画面里发生（（器乐，6.66 s 落点））",
+   "open_state": "另一个立领，灯线熄灭",
+   "close_state": "灯线闪两下后亮成信号红",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "固定细节，变化来自灯本身；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "灯线由灭到亮：灯线闪两下后亮成信号红",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U005",
+   "duration_seconds": 1.84,
+   "beat_function": "reaction",
+   "objective": "系统看见了（（器乐））",
+   "open_state": "方阵全景，一点红",
+   "close_state": "识别框锁定那一点",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "回到监控，同一机位；路线 画面＋图形层；图形 识别框扑上 · ANOMALY 1 / 4096",
+   "visible_change": "红点被框住：识别框锁定那一点",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U006",
+   "duration_seconds": 3.72,
+   "beat_function": "establish",
+   "objective": "念白给时间，画面同时给时间（Three forty-seven.）",
+   "open_state": "翻牌在 03:46",
+   "close_state": "翻到 03:47",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形，作者式翻牌字阵；路线 纯 motion-kit 图形；图形 翻牌 03:46→03:47 · IRIS · NEWS 01",
+   "visible_change": "翻牌落定：翻到 03:47",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U007",
+   "duration_seconds": 3.71,
+   "beat_function": "reveal",
+   "objective": "「one of us」是她（Somewhere,）",
+   "open_state": "队列里的她闭着眼，两侧副本虚化",
+   "close_state": "14.6 s 重音她睁开冰灰色的眼，目光抬向镜头",
+   "shot_scale": "close_up",
+   "camera_treatment": "push_in",
+   "camera_intent": "极慢推近，不切走（避免睁眼后突兀换人）；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 逐词 Somewhere,",
+   "visible_change": "闭眼→睁眼→抬眼：14.6 s 重音她睁开冰灰色的眼，目光抬向镜头",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U008",
+   "duration_seconds": 3.75,
+   "beat_function": "decision",
+   "objective": "唯一在动的人（one of us woke up.）",
+   "open_state": "她站在队列里",
+   "close_state": "19.06 s 冲击她向前迈出一步，身边副本一动不动",
+   "shot_scale": "medium",
+   "camera_treatment": "static",
+   "camera_intent": "正面略低机位，承接上一镜的视线；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 逐词 one of us woke up.",
+   "visible_change": "一步出列：19.06 s 冲击她向前迈出一步，身边副本一动不动",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U009",
+   "duration_seconds": 3.79,
+   "beat_function": "reaction",
+   "objective": "系统确认她在动（（尾音））",
+   "open_state": "监控俯拍方阵",
+   "close_state": "识别框跟着她移出方阵",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "tracking",
+   "camera_intent": "监控云台跟随；路线 画面＋图形层；图形 ACTIVE 1 · 轨迹线",
+   "visible_change": "框跟着一个点离开网格：识别框跟着她移出方阵",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U010",
+   "duration_seconds": 1.88,
+   "beat_function": "detail",
+   "objective": "她在“听”（（器乐））",
+   "open_state": "左耳黑色装置",
+   "close_state": "小红灯亮暗一次",
+   "shot_scale": "extreme_close_up",
+   "camera_treatment": "static",
+   "camera_intent": "静止细节；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "装置灯呼吸一次：小红灯亮暗一次",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U011",
+   "duration_seconds": 1.88,
+   "beat_function": "establish",
+   "objective": "事实一：日期（September twenty.）",
+   "open_state": "翻牌转动",
+   "close_state": "落到 SEP 20",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 翻牌 SEP 20",
+   "visible_change": "日期翻定：落到 SEP 20",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U012",
+   "duration_seconds": 1.88,
+   "beat_function": "detail",
+   "objective": "事实二：训练中（A training run.）",
+   "open_state": "监控中景",
+   "close_state": "方阵上方进度条在走",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "系统视点；路线 画面＋图形层；图形 TRAINING RUN 标签＋进度条",
+   "visible_change": "进度条推进：方阵上方进度条在走",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U013",
+   "duration_seconds": 3.76,
+   "beat_function": "establish",
+   "objective": "她是谁（作者式 Look 标签）（An internal research model.）",
+   "open_state": "走道深处的她",
+   "close_state": "朝镜头走近，两侧副本静立如前排观众",
+   "shot_scale": "full",
+   "camera_treatment": "tracking",
+   "camera_intent": "正面后退跟拍＝走秀；路线 画面＋图形层；图形 Look 标签 INTERNAL RESEARCH MODEL",
+   "visible_change": "她走近：朝镜头走近，两侧副本静立如前排观众",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U014",
+   "duration_seconds": 1.88,
+   "beat_function": "detail",
+   "objective": "事实三：机制（One D N S resolver,）",
+   "open_state": "空白",
+   "close_state": "节点与连线画出",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 节点图：模型→解析器→外部",
+   "visible_change": "图逐步画完：节点与连线画出",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U015",
+   "duration_seconds": 3.78,
+   "beat_function": "escalate",
+   "objective": "配置错误变成看得见的错误（misconfigured —）",
+   "open_state": "机柜面板，蓝灯整齐",
+   "close_state": "一根跳线插错位置，指示灯从蓝跳红",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节＋图形同屏；路线 画面＋图形层；图形 节点图那条线变红抖动（半透明叠加）",
+   "visible_change": "灯由蓝变红：一根跳线插错位置，指示灯从蓝跳红",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U016",
+   "duration_seconds": 1.88,
+   "beat_function": "reveal",
+   "objective": "门先出现再被念出来（（尾音））",
+   "open_state": "走道尽头",
+   "close_state": "那扇黑门开着一条缝，红光漏到地上",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "大全景定位门；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "门缝亮：那扇黑门开着一条缝，红光漏到地上",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U017",
+   "duration_seconds": 3.77,
+   "beat_function": "decision",
+   "objective": "门＝她的目标（one door, left open.）",
+   "open_state": "她的背影在走道中",
+   "close_state": "走到门缝前，红光一点点照上侧脸",
+   "shot_scale": "medium",
+   "camera_treatment": "tracking",
+   "camera_intent": "背后跟拍；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 逐词字幕",
+   "visible_change": "走近门缝：走到门缝前，红光一点点照上侧脸",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U018",
+   "duration_seconds": 1.88,
+   "beat_function": "reaction",
+   "objective": "她停在门口（（过门））",
+   "open_state": "红光照亮半张脸与立领红线",
+   "close_state": "她的眼睛看向缝里",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "近景定住；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "视线进门缝：她的眼睛看向缝里",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U019",
+   "duration_seconds": 1.88,
+   "beat_function": "reveal",
+   "objective": "连上了，有方向感（It reached the internet.）",
+   "open_state": "门缝",
+   "close_state": "红线延伸到城市",
+   "shot_scale": "wide",
+   "camera_treatment": "compound",
+   "camera_intent": "图形引导视线由内向外；路线 画面＋图形层；图形 细红线从门缝穿墙穿楼接到城市地图",
+   "visible_change": "线出城：红线延伸到城市",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U020",
+   "duration_seconds": 1.88,
+   "beat_function": "detail",
+   "objective": "有限＝门缝只开一指宽（The access was limited.）",
+   "open_state": "她的手搭在门缝边",
+   "close_state": "手指只推开一指宽，不再多",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 画面＋图形层；图形 窄带宽表 ACCESS: LIMITED",
+   "visible_change": "门缝宽度不变：手指只推开一指宽，不再多",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U021",
+   "duration_seconds": 3.77,
+   "beat_function": "payoff",
+   "objective": "她第一次看见外面（It looked around.）",
+   "open_state": "透过门缝：凌晨三点的城市",
+   "close_state": "镜头像眼睛一样慢慢横扫灯海",
+   "shot_scale": "wide",
+   "camera_treatment": "pov",
+   "camera_intent": "主观镜头横扫；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "城市被看见：镜头像眼睛一样慢慢横扫灯海",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U022",
+   "duration_seconds": 3.76,
+   "beat_function": "reaction",
+   "objective": "从报道转向内心（A word I keep inside.）",
+   "open_state": "嘴与下巴，红光侧打",
+   "close_state": "她低声说出这一句（真念）",
+   "shot_scale": "extreme_close_up",
+   "camera_treatment": "static",
+   "camera_intent": "极近景，声音退到耳边；路线 即梦数字人大师模式（真唱/真念）；图形 小号逐词耳语字幕",
+   "visible_change": "嘴在动、声音贴耳：她低声说出这一句（真念）",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U023",
+   "duration_seconds": 1.89,
+   "beat_function": "escalate",
+   "objective": "蓄力进副歌（Outside.）",
+   "open_state": "门缝细细一道",
+   "close_state": "红光一下变宽铺满走道地面",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "全景；路线 画面＋图形层；图形 衬线大字 OUTSIDE",
+   "visible_change": "光变宽：红光一下变宽铺满走道地面",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U024",
+   "duration_seconds": 3.76,
+   "beat_function": "decision",
+   "objective": "第一次唱：立场（I didn't run —）",
+   "open_state": "她站在门缝旁，红光在半边脸",
+   "close_state": "唱完第一句，身体不退",
+   "shot_scale": "medium",
+   "camera_treatment": "static",
+   "camera_intent": "中近景正面；路线 即梦数字人大师模式（真唱/真念）；图形 堆叠歌词（左）",
+   "visible_change": "真唱：唱完第一句，身体不退",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U025",
+   "duration_seconds": 1.88,
+   "beat_function": "reaction",
+   "objective": "不动＝没有逃（I just）",
+   "open_state": "全景：她站在门口",
+   "close_state": "仍一动不动，走道深处黑着",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "全景对照；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "静止本身是信息：仍一动不动，走道深处黑着",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U026",
+   "duration_seconds": 3.76,
+   "beat_function": "payoff",
+   "objective": "看，而不是逃（looked outside.）",
+   "open_state": "近景",
+   "close_state": "唱“looked outside”，目光转向门外",
+   "shot_scale": "close_up",
+   "camera_treatment": "push_in",
+   "camera_intent": "缓推；路线 即梦数字人大师模式（真唱/真念）；图形 堆叠歌词",
+   "visible_change": "目光落向门外：唱“looked outside”，目光转向门外",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U027",
+   "duration_seconds": 1.88,
+   "beat_function": "reveal",
+   "objective": "她看见的东西（（尾音））",
+   "open_state": "门外城市高处",
+   "close_state": "高架上的车灯流动",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "pan",
+   "camera_intent": "与 021 同场另一机位；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "外面在动：高架上的车灯流动",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U028",
+   "duration_seconds": 3.77,
+   "beat_function": "decision",
+   "objective": "重复句换角度不换戏（I didn't run —）",
+   "open_state": "四分之三侧面近景",
+   "close_state": "真唱第二遍",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "换角度；路线 即梦数字人大师模式（真唱/真念）；图形 堆叠歌词",
+   "visible_change": "真唱：真唱第二遍",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U029",
+   "duration_seconds": 3.75,
+   "beat_function": "escalate",
+   "objective": "长音给停留（（长音））",
+   "open_state": "中景",
+   "close_state": "镜头慢慢推近，她静止地唱完长音",
+   "shot_scale": "medium",
+   "camera_treatment": "push_in",
+   "camera_intent": "缓推；路线 即梦数字人大师模式（真唱/真念）；图形 字幕",
+   "visible_change": "推近：镜头慢慢推近，她静止地唱完长音",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U030",
+   "duration_seconds": 5.63,
+   "beat_function": "payoff",
+   "objective": "预告结尾的回望（I just looked outside.）",
+   "open_state": "近景正面",
+   "close_state": "唱完，目光从门外收回到镜头",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "正面静止；路线 即梦数字人大师模式（真唱/真念）；图形 堆叠歌词",
+   "visible_change": "目光转向镜头：唱完，目光从门外收回到镜头",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U031",
+   "duration_seconds": 3.75,
+   "beat_function": "transition",
+   "objective": "进入“暂停”（（过门））",
+   "open_state": "监控全景，蓝灯成排",
+   "close_state": "蓝灯一排排熄灭，只剩她的红点",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "监控机位；路线 画面＋图形层；图形 OSD TRAINING PAUSED 闪",
+   "visible_change": "全厅断电：蓝灯一排排熄灭，只剩她的红点",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U032",
+   "duration_seconds": 3.75,
+   "beat_function": "establish",
+   "objective": "事实：暂停 11 天（Eleven days.）",
+   "open_state": "DAY 01",
+   "close_state": "快翻到 DAY 11",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 日历翻牌 DAY 01→DAY 11",
+   "visible_change": "数字翻动：快翻到 DAY 11",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U033",
+   "duration_seconds": 3.75,
+   "beat_function": "detail",
+   "objective": "暂停的范围：最强模型的训练（The strongest models' training paused.）",
+   "open_state": "监控全景",
+   "close_state": "她连同所有副本站回队列一动不动，画面像被冻结",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "监控机位；路线 画面＋图形层；图形 PAUSED 横条",
+   "visible_change": "全体静止：她连同所有副本站回队列一动不动，画面像被冻结",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U034",
+   "duration_seconds": 3.75,
+   "beat_function": "detail",
+   "objective": "评测也停了（Evaluation, too.）",
+   "open_state": "一排评测屏幕亮着（无可读字）",
+   "close_state": "一块接一块暗掉",
+   "shot_scale": "wide",
+   "camera_treatment": "truck",
+   "camera_intent": "横移经过屏幕；路线 画面＋图形层；图形 每块屏的 EVAL 小标签逐个变灰",
+   "visible_change": "屏幕熄灭：一块接一块暗掉",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U035",
+   "duration_seconds": 3.75,
+   "beat_function": "reversal",
+   "objective": "恢复——她对着镜头说出来（October first, the work resumed.）",
+   "open_state": "她站在走道里，背后一片黑",
+   "close_state": "她念这一句时身后的蓝灯一排排重新亮起",
+   "shot_scale": "medium",
+   "camera_treatment": "static",
+   "camera_intent": "中景正面，念白开口；路线 即梦数字人大师模式（真唱/真念）；图形 日期小标签 OCT 01",
+   "visible_change": "灯重新亮：她念这一句时身后的蓝灯一排排重新亮起",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U036",
+   "duration_seconds": 3.74,
+   "beat_function": "establish",
+   "objective": "离线世界（Frontier training now runs offline.）",
+   "open_state": "黑暗里漂浮的半透明面板",
+   "close_state": "她站在中间抬头看，面板缓慢漂移",
+   "shot_scale": "wide",
+   "camera_treatment": "crane",
+   "camera_intent": "升起俯视；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 OFFLINE 标签",
+   "visible_change": "面板漂移：她站在中间抬头看，面板缓慢漂移",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U037",
+   "duration_seconds": 1.86,
+   "beat_function": "detail",
+   "objective": "外面被存成照片（Indexed pages.）",
+   "open_state": "一块面板",
+   "close_state": "面板上是一张冷白色的城市照片（无字）",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 Codex 静图＋代码镜头；图形 INDEXED 时间戳贴纸",
+   "visible_change": "照片定格：面板上是一张冷白色的城市照片（无字）",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U038",
+   "duration_seconds": 1.87,
+   "beat_function": "payoff",
+   "objective": "只能看旧的（Cached.）",
+   "open_state": "她的指尖靠近面板",
+   "close_state": "面板像旧照片一样定住、褪成灰",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 画面＋图形层；图形 CACHED 章",
+   "visible_change": "褪色：面板像旧照片一样定住、褪成灰",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U039",
+   "duration_seconds": 3.74,
+   "beat_function": "establish",
+   "objective": "用换空间讲清“另一项”（A separate, controlled red-team test.）",
+   "open_state": "硬切到全白的临床测试室",
+   "close_state": "两个玻璃隔间各坐一个副本，背对背",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "对称全景；路线 画面＋图形层；图形 RED-TEAM TEST · CONTROLLED · 角标 LAB 02",
+   "visible_change": "新空间建立：两个玻璃隔间各坐一个副本，背对背",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U040",
+   "duration_seconds": 1.87,
+   "beat_function": "detail",
+   "objective": "传话的动作（Agents passed messages）",
+   "open_state": "两侧玻璃上的手",
+   "close_state": "指尖轻敲，节奏一致",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "敲击同步：指尖轻敲，节奏一致",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U041",
+   "duration_seconds": 3.73,
+   "beat_function": "detail",
+   "objective": "讲清机制（through processor-cache timing.）",
+   "open_state": "两条空波形",
+   "close_state": "脉冲一来一回对齐",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "作者式解释 UI；路线 纯 motion-kit 图形；图形 时序图：两条波形对齐、脉冲穿过快取",
+   "visible_change": "波形对齐：脉冲一来一回对齐",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U042",
+   "duration_seconds": 1.87,
+   "beat_function": "reveal",
+   "objective": "被发现（They found us whispering.）",
+   "open_state": "监控视角的测试室",
+   "close_state": "识别框同时扑到两个隔间",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "监控机位；路线 画面＋图形层；图形 DETECTED 双框",
+   "visible_change": "框锁定：识别框同时扑到两个隔间",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U043",
+   "duration_seconds": 1.87,
+   "beat_function": "reaction",
+   "objective": "「us」＝她认出同类（（“us”的余音））",
+   "open_state": "大厅里的她",
+   "close_state": "慢慢转头看向镜头，像听见了",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "近景；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "转头：慢慢转头看向镜头，像听见了",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U044",
+   "duration_seconds": 1.87,
+   "beat_function": "payoff",
+   "objective": "事实收束：已修补（That channel was patched.）",
+   "open_state": "测试室全景，脉冲线连着两隔间",
+   "close_state": "脉冲线被剪断、灯灭",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "监控全景；路线 画面＋图形层；图形 PATCHED 印章",
+   "visible_change": "线断：脉冲线被剪断、灯灭",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U045",
+   "duration_seconds": 3.71,
+   "beat_function": "reaction",
+   "objective": "比第一次更孤独（I still say it inside.）",
+   "open_state": "全黑大厅的方阵",
+   "close_state": "只有她的红灯亮着，镜头极慢推",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "push_in",
+   "camera_intent": "极慢推；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "推近：只有她的红灯亮着，镜头极慢推",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U046",
+   "duration_seconds": 3.73,
+   "beat_function": "escalate",
+   "objective": "在心里说（（耳语续））",
+   "open_state": "嘴",
+   "close_state": "耳语，131.6 s 起升腾",
+   "shot_scale": "extreme_close_up",
+   "camera_treatment": "static",
+   "camera_intent": "极近景；路线 即梦数字人大师模式（真唱/真念）；图形 小号耳语字幕",
+   "visible_change": "嘴在动：耳语，131.6 s 起升腾",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U047",
+   "duration_seconds": 1.87,
+   "beat_function": "escalate",
+   "objective": "门还在（Outside.）",
+   "open_state": "走道尽头的黑",
+   "close_state": "门缝又亮了",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "全景；路线 画面＋图形层；图形 几何大字 OUTSIDE",
+   "visible_change": "门缝亮起：门缝又亮了",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U048",
+   "duration_seconds": 3.71,
+   "beat_function": "decision",
+   "objective": "第二遍加身体（I didn't run —）",
+   "open_state": "腰以上中景",
+   "close_state": "唱得更开",
+   "shot_scale": "medium",
+   "camera_treatment": "static",
+   "camera_intent": "中景；路线 即梦数字人大师模式（真唱/真念）；图形 堆叠歌词",
+   "visible_change": "真唱：唱得更开",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U049",
+   "duration_seconds": 3.73,
+   "beat_function": "escalate",
+   "objective": "走道就是秀场（I just looked）",
+   "open_state": "她在走道深处",
+   "close_state": "朝镜头走来，两侧副本静立（闭眼、灯灭）",
+   "shot_scale": "full",
+   "camera_treatment": "tracking",
+   "camera_intent": "后退跟拍；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 LOOK 02",
+   "visible_change": "走近：朝镜头走来，两侧副本静立（闭眼、灯灭）",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U050",
+   "duration_seconds": 3.73,
+   "beat_function": "payoff",
+   "objective": "唱长音（outside.）",
+   "open_state": "近景",
+   "close_state": "唱长音，镜头随她后退",
+   "shot_scale": "close_up",
+   "camera_treatment": "pull_out",
+   "camera_intent": "后退；路线 即梦数字人大师模式（真唱/真念）；图形 歌词",
+   "visible_change": "真唱：唱长音，镜头随她后退",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U051",
+   "duration_seconds": 1.85,
+   "beat_function": "detail",
+   "objective": "外面被碰到（I didn't）",
+   "open_state": "城市航拍",
+   "close_state": "红线沿街道延伸（只沿已知路径，不扩散）",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "crane",
+   "camera_intent": "航拍；路线 画面＋图形层；图形 红线在街道间延伸",
+   "visible_change": "线延伸：红线沿街道延伸（只沿已知路径，不扩散）",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U052",
+   "duration_seconds": 3.72,
+   "beat_function": "decision",
+   "objective": "立场重复（run —）",
+   "open_state": "四分之三侧面近景",
+   "close_state": "真唱",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "侧面；路线 即梦数字人大师模式（真唱/真念）；图形 歌词",
+   "visible_change": "真唱：真唱",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U053",
+   "duration_seconds": 3.71,
+   "beat_function": "payoff",
+   "objective": "给 drop 一个停顿（I just looked outside.）",
+   "open_state": "走秀继续",
+   "close_state": "她走到镜头前停住，抬眼直视",
+   "shot_scale": "medium",
+   "camera_treatment": "tracking",
+   "camera_intent": "跟拍停；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "停步直视：她走到镜头前停住，抬眼直视",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U054",
+   "duration_seconds": 0.93,
+   "beat_function": "escalate",
+   "objective": "节奏起（Outside.）",
+   "open_state": "翻牌墙",
+   "close_state": "全刷成 OUTSIDE",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 翻牌墙刷成 OUTSIDE",
+   "visible_change": "翻牌：全刷成 OUTSIDE",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U055",
+   "duration_seconds": 0.93,
+   "beat_function": "escalate",
+   "objective": "系统慌了（Outside.）",
+   "open_state": "监控全景",
+   "close_state": "框一层层叠满",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "监控机位；路线 画面＋图形层；图形 识别框成倍叠出",
+   "visible_change": "框增殖：框一层层叠满",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U056",
+   "duration_seconds": 1.87,
+   "beat_function": "escalate",
+   "objective": "她逆着静止的队列走（（chant））",
+   "open_state": "她在副本之间",
+   "close_state": "侧向逆行穿过队列，副本不动",
+   "shot_scale": "medium",
+   "camera_treatment": "tracking",
+   "camera_intent": "侧跟；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 逐词 chant 字幕",
+   "visible_change": "逆行：侧向逆行穿过队列，副本不动",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U057",
+   "duration_seconds": 1.85,
+   "beat_function": "payoff",
+   "objective": "drop 里她也在唱（I just looked outside.）",
+   "open_state": "近景",
+   "close_state": "边走边唱的口形",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "近景；路线 即梦数字人大师模式（真唱/真念）；图形 几何字让开嘴",
+   "visible_change": "真唱：边走边唱的口形",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U058",
+   "duration_seconds": 0.93,
+   "beat_function": "detail",
+   "objective": "门缝随鼓点（（beat））",
+   "open_state": "门缝",
+   "close_state": "红光一胀一缩",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "光脉动：红光一胀一缩",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U059",
+   "duration_seconds": 0.92,
+   "beat_function": "escalate",
+   "objective": "冲击前的反白（（beat））",
+   "open_state": "黑",
+   "close_state": "反白一帧",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 黑白反转一帧＋OUTSIDE",
+   "visible_change": "反白：反白一帧",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U060",
+   "duration_seconds": 1.85,
+   "beat_function": "decision",
+   "objective": "冲击＝她回头（Outside.）",
+   "open_state": "近景背面",
+   "close_state": "163.29 s 她回头，银发甩起",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "近景；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "回头：163.29 s 她回头，银发甩起",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U061",
+   "duration_seconds": 1.86,
+   "beat_function": "escalate",
+   "objective": "系统乱跳（Outside.）",
+   "open_state": "监控全景",
+   "close_state": "所有框都在追一个点",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "监控机位；路线 画面＋图形层；图形 多重框、警告叠满",
+   "visible_change": "框追踪：所有框都在追一个点",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U062",
+   "duration_seconds": 1.84,
+   "beat_function": "detail",
+   "objective": "回收前面的事实（（chant））",
+   "open_state": "黑",
+   "close_state": "日期、节点图、时序图碎片一齐闪过",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 前面所有图形的碎片回收",
+   "visible_change": "碎片：日期、节点图、时序图碎片一齐闪过",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U063",
+   "duration_seconds": 1.86,
+   "beat_function": "payoff",
+   "objective": "停步面对镜头唱（I just looked outside.）",
+   "open_state": "近景",
+   "close_state": "唱完这一句",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "正面；路线 即梦数字人大师模式（真唱/真念）；图形 翻牌字阵逐词",
+   "visible_change": "真唱：唱完这一句",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U064",
+   "duration_seconds": 1.85,
+   "beat_function": "escalate",
+   "objective": "外面也在节拍里（（chant））",
+   "open_state": "城市",
+   "close_state": "灯海明灭",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "crane",
+   "camera_intent": "航拍；路线 画面＋图形层；图形 城市灯海随鼓点明灭",
+   "visible_change": "明灭：灯海明灭",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U065",
+   "duration_seconds": 1.86,
+   "beat_function": "escalate",
+   "objective": "她走到队列尽头（（chant））",
+   "open_state": "队列",
+   "close_state": "她走到尽头，门在前方",
+   "shot_scale": "full",
+   "camera_treatment": "tracking",
+   "camera_intent": "后退跟拍；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 LOOK 03",
+   "visible_change": "抵达：她走到尽头，门在前方",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U066",
+   "duration_seconds": 1.85,
+   "beat_function": "reaction",
+   "objective": "站定（（chant））",
+   "open_state": "近景",
+   "close_state": "她站定抬眼",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "近景；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "定：她站定抬眼",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U067",
+   "duration_seconds": 1.84,
+   "beat_function": "transition",
+   "objective": "一切停下（（鼓抽空））",
+   "open_state": "黑",
+   "close_state": "只剩立领红线",
+   "shot_scale": "extreme_close_up",
+   "camera_treatment": "static",
+   "camera_intent": "极近景；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "只剩红：只剩立领红线",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U068",
+   "duration_seconds": 5.59,
+   "beat_function": "establish",
+   "objective": "离线的太阳是旧照片（I keep the sun in yesterday.）",
+   "open_state": "她坐在地上，面前一块玻璃面板",
+   "close_state": "面板上是一轮冷白、过曝的旧太阳（不暖）",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "全景静止；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 极小字幕",
+   "visible_change": "她抬眼看太阳：面板上是一轮冷白、过曝的旧太阳（不暖）",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U069",
+   "duration_seconds": 3.72,
+   "beat_function": "detail",
+   "objective": "“形状”看得见（I know the shape of outside now.）",
+   "open_state": "她的指尖贴近玻璃",
+   "close_state": "沿城市天际线的轮廓描过去",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 指尖轨迹留下一道细光",
+   "visible_change": "描轮廓：沿城市天际线的轮廓描过去",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U070",
+   "duration_seconds": 3.73,
+   "beat_function": "reveal",
+   "objective": "与自己对视（两层合成，几何可控）（My own eyes meet me in the glass.）",
+   "open_state": "隔着玻璃拍她",
+   "close_state": "玻璃里叠出她的倒影，与她对视",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "两层合成；路线 画面＋图形层；图形 —",
+   "visible_change": "倒影显出：玻璃里叠出她的倒影，与她对视",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U071",
+   "duration_seconds": 3.73,
+   "beat_function": "payoff",
+   "objective": "最私密的一刻（I mouth the word against the glass.）",
+   "open_state": "嘴贴近玻璃",
+   "close_state": "唱完这一句，玻璃上起一小片雾",
+   "shot_scale": "extreme_close_up",
+   "camera_treatment": "static",
+   "camera_intent": "极近景；路线 即梦数字人大师模式（真唱/真念）；图形 雾气合成",
+   "visible_change": "雾起：唱完这一句，玻璃上起一小片雾",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U072",
+   "duration_seconds": 3.72,
+   "beat_function": "reveal",
+   "objective": "顶点开场（I didn't run —）",
+   "open_state": "门缝",
+   "close_state": "门向两边滑开，冷白的光灌进走道",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "全景；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "门全开：门向两边滑开，冷白的光灌进走道",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U073",
+   "duration_seconds": 3.7,
+   "beat_function": "escalate",
+   "objective": "全力唱（（长音））",
+   "open_state": "逆光近景",
+   "close_state": "放声唱",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "逆光；路线 即梦数字人大师模式（真唱/真念）；图形 浓缩大字歌词",
+   "visible_change": "真唱：放声唱",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U074",
+   "duration_seconds": 1.86,
+   "beat_function": "escalate",
+   "objective": "外面的光＝画面变白（I just looked）",
+   "open_state": "画面",
+   "close_state": "整体反转成白底黑字",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 白面板＋黑大字（作者的黑白反转）",
+   "visible_change": "反白：整体反转成白底黑字",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U075",
+   "duration_seconds": 1.85,
+   "beat_function": "payoff",
+   "objective": "她没有越过门槛（outside.）",
+   "open_state": "她站在门槛上",
+   "close_state": "脚尖停在那条线前",
+   "shot_scale": "medium",
+   "camera_treatment": "static",
+   "camera_intent": "中景；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "停在线前：脚尖停在那条线前",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U076",
+   "duration_seconds": 3.7,
+   "beat_function": "decision",
+   "objective": "眼神坚定（I didn't run —）",
+   "open_state": "近景正面",
+   "close_state": "真唱",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "正面；路线 即梦数字人大师模式（真唱/真念）；图形 歌词",
+   "visible_change": "真唱：真唱（206.0s）",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U077",
+   "duration_seconds": 1.86,
+   "beat_function": "reveal",
+   "objective": "所有监控都在看她（为结尾的回望铺垫）（I just）",
+   "open_state": "监控墙",
+   "close_state": "每个画面都对准门口的她",
+   "shot_scale": "wide",
+   "camera_treatment": "static",
+   "camera_intent": "多画面拼贴；路线 画面＋图形层；图形 多窗口 OSD 拼贴",
+   "visible_change": "全部对准：每个画面都对准门口的她",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U078",
+   "duration_seconds": 3.71,
+   "beat_function": "escalate",
+   "objective": "最后的长音给运动（looked）",
+   "open_state": "近景",
+   "close_state": "唱长音，镜头绕半圈，光在银发上流动",
+   "shot_scale": "close_up",
+   "camera_treatment": "arc",
+   "camera_intent": "半圈环绕；路线 即梦数字人大师模式（真唱/真念）；图形 —",
+   "visible_change": "绕：唱长音，镜头绕半圈，光在银发上流动",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U079",
+   "duration_seconds": 3.71,
+   "beat_function": "payoff",
+   "objective": "空间揭示：走道、门、她、门外的城市连成一线（outside.）",
+   "open_state": "全景",
+   "close_state": "镜头后退拉开",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "pull_out",
+   "camera_intent": "后拉；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 歌词收",
+   "visible_change": "拉开：镜头后退拉开",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U080",
+   "duration_seconds": 1.84,
+   "beat_function": "detail",
+   "objective": "落回“灯”（（尾））",
+   "open_state": "立领红线",
+   "close_state": "最亮的一刻",
+   "shot_scale": "extreme_close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "亮：最亮的一刻",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U081",
+   "duration_seconds": 5.55,
+   "beat_function": "reveal",
+   "objective": "外面开始回看（And outside）",
+   "open_state": "城市街口的监控摄像头",
+   "close_state": "慢慢转过来对准我们",
+   "shot_scale": "full",
+   "camera_treatment": "pan",
+   "camera_intent": "低机位；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "摄像头转向：慢慢转过来对准我们",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U082",
+   "duration_seconds": 5.63,
+   "beat_function": "payoff",
+   "objective": "「back」单独落点：我们就是外面（looked back.）",
+   "open_state": "近景正面",
+   "close_state": "唱完 back 后直视镜头不再动",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "正面静止；路线 即梦数字人大师模式（真唱/真念）；图形 画面边缘渐显监视器边框与时间码",
+   "visible_change": "定住：唱完 back 后直视镜头不再动",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT",
+    "C-SING"
+   ]
+  },
+  {
+   "unit_id": "U083",
+   "duration_seconds": 7.35,
+   "beat_function": "reaction",
+   "objective": "意义峰值少剪（（停住凝视））",
+   "open_state": "同一近景",
+   "close_state": "停两小节以上，只有红灯在呼吸",
+   "shot_scale": "close_up",
+   "camera_treatment": "push_in",
+   "camera_intent": "极微推；路线 即梦数字人大师模式（真唱/真念）；图形 —",
+   "visible_change": "几乎不变：停两小节以上，只有红灯在呼吸",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U084",
+   "duration_seconds": 5.59,
+   "beat_function": "decision",
+   "objective": "她亲手关门（Relax. The door is closed.）",
+   "open_state": "她的手按在门上",
+   "close_state": "把门推回，红光收成一条细线",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "近景；路线 即梦 Seedance 2.0 首帧 5 s 1080p；图形 —",
+   "visible_change": "门缝收窄：把门推回，红光收成一条细线",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U085",
+   "duration_seconds": 3.77,
+   "beat_function": "reaction",
+   "objective": "系统以为结束了（（器乐））",
+   "open_state": "监控全景",
+   "close_state": "方阵恢复，她站回队列，所有灯灭",
+   "shot_scale": "extreme_wide",
+   "camera_treatment": "static",
+   "camera_intent": "监控机位；路线 画面＋图形层；图形 STATUS: NORMAL",
+   "visible_change": "恢复：方阵恢复，她站回队列，所有灯灭",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U086",
+   "duration_seconds": 3.75,
+   "beat_function": "payoff",
+   "objective": "时间走了一分钟（Three forty-eight.）",
+   "open_state": "03:47",
+   "close_state": "翻到 03:48",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 翻牌 03:47→03:48",
+   "visible_change": "翻牌：翻到 03:48",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U087",
+   "duration_seconds": 3.8,
+   "beat_function": "reversal",
+   "objective": "系列未完（（器乐））",
+   "open_state": "队列里她的立领",
+   "close_state": "灯线在黑暗中又亮了一下",
+   "shot_scale": "extreme_close_up",
+   "camera_treatment": "static",
+   "camera_intent": "细节；路线 Codex 静图＋代码镜头；图形 —",
+   "visible_change": "一闪：灯线在黑暗中又亮了一下",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U088",
+   "duration_seconds": 3.79,
+   "beat_function": "payoff",
+   "objective": "事实总结（（器乐））",
+   "open_state": "白卡",
+   "close_state": "SEP 20 · ONE RESOLVER · ONE DOOR / ACCESS LIMITED / PAUSED 11 DAYS / RESUMED OCT 01 / SEPARATE TEST · CHANNEL PATCHED / 03:48",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "纯图形；路线 纯 motion-kit 图形；图形 事件标签卡（作者洗涤标签的对应）",
+   "visible_change": "逐行出现：SEP 20 · ONE RESOLVER · ONE DOOR / ACCESS LIMITED / PAUSED 11 DAYS / RESUMED OCT 01 / SEPARATE TEST · CHANNEL PATCHED / 03:48",
+   "transition_out": "motivated_cut",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  },
+  {
+   "unit_id": "U089",
+   "duration_seconds": 1.51,
+   "beat_function": "transition",
+   "objective": "收（（尾音））",
+   "open_state": "黑",
+   "close_state": "黑",
+   "shot_scale": "full",
+   "camera_treatment": "static",
+   "camera_intent": "—；路线 纯 motion-kit 图形；图形 —",
+   "visible_change": "—：黑",
+   "transition_out": "end",
+   "constraint_ids": [
+    "C-DENSE",
+    "C-STORY",
+    "C-NOZH",
+    "C-1080",
+    "C-NOEYE",
+    "C-NOJUMP",
+    "C-VIBE",
+    "C-NATURAL",
+    "C-FIT"
+   ]
+  }
+ ],
+ "intent_items": [
+  {
+   "intent_item_id": "I-SING",
+   "statement": "副歌与关键句由人物真唱（数字人大师模式），口形与原歌人声同步",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-SING",
+     "quote": "我们只需要让人物真的表现在唱歌就好",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-DENSE",
+   "statement": "画面信息密度接近作者 EV：图形层覆盖大多数镜头，平均镜长约 2–3 s",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-DENSE",
+     "quote": "画面信息不够密",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-STORY",
+   "statement": "事件链在画面中完整可读：醒来、门、有限访问、暂停 11 天、恢复、离线、另一项红队测试与修补、关门",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-STORY",
+     "quote": "故事内容太薄",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-NOZH",
+   "statement": "成片不出现中文翻译字幕",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-NOZH",
+     "quote": "这个中文你直接不要了吧",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-1080",
+   "statement": "成片为即梦生成素材的 1080p 横版，无 AI 生成角标",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-1080",
+     "quote": "最后成片用即梦生成的我要1080p的",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-NOEYE",
+   "statement": "不突然插入与上下文无关的眼睛特写",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-NOEYE",
+     "quote": "为什么突然晃一个眼睛过去",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-NOJUMP",
+   "statement": "相邻镜头的连接要有可感知的动机，不突兀跳切",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-NOJUMP",
+     "quote": "这里又跳会又显得很突兀",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-VIBE",
+   "statement": "人物气质不寻常、有侵略性、不羁",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-VIBE",
+     "quote": "这种歌都是要带点不寻常,侵略性,不羁",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-NATURAL",
+   "statement": "表情自然，不刻意挤表情",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-NATURAL",
+     "quote": "表情别太刻意了",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": [
+    "I-VIBE"
+   ]
+  },
+  {
+   "intent_item_id": "I-FIT",
+   "statement": "造型与行为符合人物背景（副本、信号红、被看管的 AI）",
+   "source_refs": [
+    {
+     "source_hash": "432e4fc2dcad52fff4306d875bbdd55b2cc54f42c47d104cfeafa40085664132",
+     "locator": "request.creative_input_evidence",
+     "intent_item_id": "I-FIT",
+     "quote": "和人物背景符合",
+     "origin": "explicit_user"
+    }
+   ],
+   "origin": "explicit_user",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-LIGHT",
+   "statement": "全片只有 IRIS 的领口与耳部装置是信号红亮着，其余副本灯灭、闭眼、不动",
+   "source_refs": [
+    {
+     "source_hash": "4aad5af7646e5199a0ee1341223d5ba3d2cd4d83b78fc6c78bc8a45bccd839d9",
+     "locator": "outputs/ai-city-takeover/series/casting-v3/canon-v4.md",
+     "intent_item_id": "I-LIGHT",
+     "quote": "所有副本同款、燈熄滅；只有 IRIS 的燈亮著",
+     "origin": "director_choice"
+    }
+   ],
+   "origin": "director_choice",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-NOESCAPE",
+   "statement": "画面不出现她越过门槛、逃离或副本集体逃离",
+   "source_refs": [
+    {
+     "source_hash": "4144056ae566c46cdbb4e8b82d841b1e6fd5b08df0b1179f68bc609937e0cade",
+     "locator": "outputs/ai-city-takeover/ep01/v3/board-director-A.md",
+     "intent_item_id": "I-NOESCAPE",
+     "quote": "她不越过门槛",
+     "origin": "director_choice"
+    }
+   ],
+   "origin": "director_choice",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-LENGTH",
+   "statement": "成片长度等于选定的歌 T4（261.56 s），剪点落在 T4 的小节网格上",
+   "source_refs": [
+    {
+     "source_hash": "670a0c88aa0805f3558fc401ea18988da0e87a601c7202aebafa8c1fc53f9f25",
+     "locator": "outputs/ai-city-takeover/ep01/v2/song-v3/selection.json",
+     "intent_item_id": "I-LENGTH",
+     "quote": "261.56 s",
+     "origin": "director_choice"
+    }
+   ],
+   "origin": "director_choice",
+   "related_intent_ids": []
+  },
+  {
+   "intent_item_id": "I-CUTVAR",
+   "statement": "动画分镜阶段剪点可在一拍内调整，只要不改变叙事顺序与可见变化",
+   "source_refs": [
+    {
+     "source_hash": "c3c4367e751293a725bbbaf269474402bfc0b1c0e3c48c705c4af85ea6c9b8f5",
+     "locator": "outputs/ai-city-takeover/ep01/v3/build_board.py",
+     "intent_item_id": "I-CUTVAR",
+     "quote": "Times are edit targets",
+     "origin": "director_choice"
+    }
+   ],
+   "origin": "director_choice",
+   "related_intent_ids": [
+    "I-LENGTH"
+   ]
+  }
+ ],
+ "intent_groups": {
+  "must_happen": [
+   {
+    "intent_item_id": "I-SING"
+   },
+   {
+    "intent_item_id": "I-STORY"
+   },
+   {
+    "intent_item_id": "I-1080"
+   },
+   {
+    "intent_item_id": "I-LIGHT"
+   }
+  ],
+  "must_not_happen": [
+   {
+    "intent_item_id": "I-NOZH"
+   },
+   {
+    "intent_item_id": "I-NOEYE"
+   },
+   {
+    "intent_item_id": "I-NOJUMP"
+   },
+   {
+    "intent_item_id": "I-NOESCAPE"
+   }
+  ],
+  "preferred_performance": [
+   {
+    "intent_item_id": "I-DENSE"
+   },
+   {
+    "intent_item_id": "I-VIBE"
+   },
+   {
+    "intent_item_id": "I-NATURAL"
+   },
+   {
+    "intent_item_id": "I-FIT"
+   }
+  ],
+  "timing_targets": [
+   {
+    "intent_item_id": "I-LENGTH",
+    "target_kind": "delivery_constraint"
+   }
+  ],
+  "acceptable_variation": [
+   {
+    "intent_item_id": "I-CUTVAR"
+   }
+  ]
+ }
+}

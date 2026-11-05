@@ -1,0 +1,31 @@
+{
+ "schema": "iris-ep01-song-result/1",
+ "take": 1,
+ "file": "music__20261102_002507.mp3",
+ "sha256": "f07d1f948ad61310b4fe25830bfb6d9fb860498ee242a38be9819935dae2ec1b",
+ "song_id_for_inpainting": "9IWJUxax8CJKmqQF9nBt",
+ "probe": {
+  "codec": "mp3",
+  "sample_rate": 48000,
+  "channels": 2,
+  "duration": 30.482167,
+  "bit_rate": 192011
+ },
+ "beatmap": {
+  "bpm": 126.05,
+  "beats": 65,
+  "downbeats_follow_plan_bars": true,
+  "section_impacts_s": [
+   3.843,
+   15.29,
+   19.087
+  ]
+ },
+ "vocals": "FAIL: unprompted Whisper large-v3 hears no speech in full/verse/chorus/outro spans (no_speech 0.62-0.83, only 'Thank you'/'you' hallucinations); 1-4 kHz energy share 0.3-5%",
+ "likely_cause": "plan put 'singing', 'melodic vocals' (spoken chunks) and 'spoken word', 'whisper' (chorus) in negative_styles; together they suppressed every vocal",
+ "outro_thinning": "not observed (bar RMS keeps rising to the end)",
+ "account_character_count_after": 1162,
+ "billing": "character_count unchanged right after generation; actual music charge pending confirmation",
+ "verdict": "REJECTED (technical: no intelligible vocal)",
+ "account_character_count_after_both_takes": 1924
+}

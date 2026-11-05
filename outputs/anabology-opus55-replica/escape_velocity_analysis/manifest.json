@@ -1,0 +1,45 @@
+{
+  "schema": "ev-manifest/v1",
+  "source_video": {
+    "path_from_repo_root": "outputs/anabology-opus55-replica/source/2103533196721704960.mp4",
+    "sha256": "bf3595f1f615a6bc66b8925680e28849e12eeb57ec5c7f93420a95e3fe37a40d",
+    "size_bytes": 353320898,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "duration_s": 306.481,
+    "bit_rate": 9222650,
+    "video": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "24/1",
+      "avg_frame_rate": "58832/2451",
+      "fps": 24.0,
+      "pix_fmt": "yuv420p",
+      "color_space": null,
+      "color_range": null,
+      "color_transfer": null,
+      "color_primaries": null,
+      "nb_frames_reported": "7354",
+      "nb_frames_decoded": 7353,
+      "pts_count": 7353
+    },
+    "audio": [
+      {
+        "codec": "aac",
+        "sample_rate": 44100,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bit_rate": "128008",
+        "duration_s": 306.480181
+      }
+    ]
+  },
+  "lowres_cache": {
+    "file": "work/lowres_rgb.npy",
+    "width": 192,
+    "height": 108,
+    "frames": 7353
+  },
+  "frame_index_convention": "frame_index is 0-based; time = frame_index / fps; shot end_frame is inclusive."
+}

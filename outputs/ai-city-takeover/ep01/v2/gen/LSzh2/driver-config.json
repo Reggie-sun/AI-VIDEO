@@ -1,0 +1,359 @@
+{
+  "schema_version": "jimeng-feedback-driver/1",
+  "row": {
+    "shot": {
+      "shot_id": "ep01v2-s8a",
+      "scene_id": "balcony",
+      "storyboard_beat_id": "chorus-1",
+      "intent": "{{image:0}}中的她演唱{{audio:1}}。她的口型严格对准{{audio:1}}，每个字都准时：\"I didn't run — I just looked outside. I\"。中近景：{{image:0}}中的女人，深色头发向后梳成低发髻，左耳戴黑色耳挂，左领口一条细细的红色灯线，站在夜雨中的玻璃阳台上，面向镜头，冷静地唱，眼睛看着镜头，长音时头微微倾斜。背后是冷蓝色的城市灯光。镜头固定，不切镜，不转头。画面中没有任何文字。",
+      "dialogue": "",
+      "narration": "",
+      "duration_policy": {
+        "mode": "fixed",
+        "seconds": 6.0,
+        "minimum_seconds": null,
+        "maximum_seconds": null
+      },
+      "character_ids": [
+        "IRIS"
+      ],
+      "continuity_constraints": [
+        "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+        "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持（由底片A02与prompt外型描述承担）",
+        "歌词期间嘴在唱、无声处闭合；对嘴准确度由同步量测与使用者看叠歌审看片判定（试验计划第4、5节，付费前封存）",
+        "摄影机完全固定，全程不推近、不移动、不摇镜，不切镜",
+        "保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。"
+      ],
+      "visual_strategy": "generated_video",
+      "required_asset_roles": [
+        {
+          "role": "primary_visual",
+          "asset_ids": [],
+          "allowed_asset_types": [
+            "video"
+          ]
+        },
+        {
+          "role": "reference",
+          "asset_ids": [
+            "iris-ls-1-a02"
+          ],
+          "allowed_asset_types": [
+            "image"
+          ]
+        }
+      ],
+      "motion_directives": [],
+      "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+      "hybrid_layers": [],
+      "composition_directives": [],
+      "review_policy": {
+        "required_checks": []
+      }
+    },
+    "generation": {
+      "references": [
+        {
+          "role": "scene_reference",
+          "asset_id": "iris-ls-1-a02"
+        },
+        {
+          "role": "reference_audio",
+          "asset_id": "iris-ls-vocal"
+        }
+      ],
+      "generation_intent": {
+        "reference_planning": {
+          "contract_version": "shot-reference-intent/1",
+          "facets": [
+            "dialogue",
+            "stable"
+          ],
+          "structure": "continuous",
+          "segment_ids": [],
+          "events": [
+            {
+              "event_id": "open-composition",
+              "kind": "composition",
+              "visual_state": "面向镜头",
+              "purpose": "冷静地唱，眼睛看着镜头",
+              "phase": "start",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "review_only",
+              "priority": "preferred"
+            },
+            {
+              "event_id": "close-composition",
+              "kind": "composition",
+              "visual_state": "镜头固定，不切镜，不转头。",
+              "purpose": "长音时头微微倾斜",
+              "phase": "end",
+              "segment_id": null,
+              "at_seconds": null,
+              "after_event_ids": [],
+              "control": "review_only",
+              "priority": "preferred"
+            }
+          ],
+          "anchors": [
+            {
+              "anchor_id": "balcony",
+              "role": "scene_environment",
+              "purpose": "中近景",
+              "owner_id": "balcony",
+              "priority": "required"
+            }
+          ],
+          "selections": [
+            {
+              "need_id": "balcony",
+              "asset_id": "iris-ls-1-a02"
+            }
+          ],
+          "natural_generation": [
+            "背后是冷蓝色的城市灯光。"
+          ],
+          "director_coverage": {
+            "coverage_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d",
+            "unit_id": "S8a"
+          },
+          "preview_approval": {
+            "approval_hash": "186d69ed29958b1f61771f70abdd49733908bfee6cfa16441b3d898ac7f4344b"
+          },
+          "identity_waivers": [
+            {
+              "character_id": "IRIS",
+              "reason": "EV做法：身份由已认可的底片A02与prompt里的外型描述承担；使用者认可的参考包只有底片与人声窗口"
+            }
+          ]
+        },
+        "open_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "A02起始画面：她在雨夜玻璃阳台上正面近景看着镜头",
+          "state_hash": null,
+          "required_change": false
+        },
+        "close_state": {
+          "kind": "typed_text",
+          "state_ref": null,
+          "state_text": "唱完这一句，仍看着镜头，构图不变",
+          "state_hash": null,
+          "required_change": false
+        },
+        "identity_continuity": {
+          "character_ids": [],
+          "preservation": "unspecified",
+          "allowed_variation": []
+        },
+        "scene_continuity": {
+          "scene_id": "balcony",
+          "time_of_day": "同一凌晨",
+          "mood": "冷静、克制",
+          "state_constraints": [
+            "A02起始画面：她在雨夜玻璃阳台上正面近景看着镜头",
+            "不新增人物、设备、文字或界面"
+          ]
+        },
+        "space_continuity": {
+          "subject_position": "她站在玻璃阳台原位",
+          "screen_direction": "保持参考图方向",
+          "entrance_state": null,
+          "exit_state": null,
+          "crossing_policy": "不换位、不翻轴"
+        },
+        "axis_continuity": {
+          "camera_axis": "参考图原机位视轴",
+          "framing_continuity": "A02正面近景，人物在画面中央偏右，城市在左侧",
+          "crossing_policy": "不翻轴、不环绕"
+        },
+        "subject_action": {
+          "start_state": "正面近景看着镜头",
+          "progression": "对着镜头冷静地唱，长音时头微微倾斜",
+          "endpoint": {
+            "state_ref": null,
+            "state_text": "唱完后仍看着镜头",
+            "state_hash": null,
+            "required_change": false
+          }
+        },
+        "motion_envelope": {
+          "onset": "平滑开始",
+          "peak": "长音时头微微倾斜",
+          "settle": "摄影机始终静止",
+          "direction": "摄影机不移动",
+          "amplitude_class": "很小"
+        },
+        "pacing": {
+          "cadence": "五秒连续原速",
+          "tempo_class": "正常原速",
+          "shot_duration_seconds": 5.0
+        },
+        "camera_intent": {
+          "movement": "摄影机完全固定，全程不推近、不移动、不摇镜",
+          "stability": "完全静止的固定机位",
+          "framing_intent": "A02正面近景，人物在画面中央偏右，城市在左侧",
+          "expression_strength": "semantic_prompt_allowed"
+        },
+        "camera_endpoint": {
+          "start_framing": "A02原始正面近景",
+          "end_framing": "与起始相同的正面近景",
+          "position_lock": false,
+          "orientation_lock": false
+        },
+        "performance_intent": {
+          "trigger": "副歌响起",
+          "visible_response": "对着镜头冷静地唱，长音时头微微倾斜",
+          "gaze_target": "镜头",
+          "body_behavior": "长音时头微微倾斜",
+          "hand_behavior": "双手不入画或保持静止，不操作任何设备",
+          "terminal_performance_state": "唱完这一句仍看着镜头",
+          "character_directions": [
+            {
+              "character_id": "IRIS",
+              "screen_identity": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+              "role": "principal",
+              "visibility": "visible",
+              "offscreen_reason": null,
+              "beats": [
+                {
+                  "phase": "throughout",
+                  "trigger": "副歌响起",
+                  "emotion": "冷静而投入",
+                  "intensity": "subtle",
+                  "facial_expression": "冷静地唱，眼睛看着镜头",
+                  "gaze_target": "镜头",
+                  "breathing": "自然平稳",
+                  "body_behavior": "长音时头微微倾斜"
+                }
+              ]
+            }
+          ]
+        },
+        "visual_treatment": {
+          "medium_look": "真人电影摄影",
+          "palette": "蓝黑钢蓝，红色只在指定位置",
+          "material_treatment": "自然材质与真实光影",
+          "prohibited_visual_drift": [
+            "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+            "改变参考图的场景与光线"
+          ]
+        },
+        "lighting_intent": {
+          "motivated_source": "雨夜城市冷光",
+          "direction": "参考图方向",
+          "exposure_priority": "保留暗部细节",
+          "continuity_state": "同一凌晨冷光"
+        },
+        "ambience_intent": {
+          "environment_bed": "极轻的雨声",
+          "foley_cues": [],
+          "explicitly_silent": false
+        },
+        "dialogue_intent": {
+          "mode": "dialogue",
+          "language": "en",
+          "speaker_id": "IRIS",
+          "verbatim_text": "I didn't run — I just looked outside. I",
+          "start_seconds": 0.63,
+          "end_seconds": 5.0,
+          "on_screen": true,
+          "response_obligation": "对着镜头唱出这一句，嘴型与参考音频逐音节同步",
+          "lip_sync_required": true
+        },
+        "music_intent": {
+          "mode": "none",
+          "instrumentation": null,
+          "tempo_rhythm": null,
+          "dynamics": null
+        },
+        "primary_camera_motion": {
+          "movement_kind": "locked",
+          "direction": "none",
+          "amplitude_class": "subtle",
+          "speed_class": "very_slow",
+          "start_motion_state": "stationary",
+          "end_motion_state": "settled"
+        },
+        "camera_subject_relation": {
+          "subject_id": "IRIS",
+          "relation_kind": "maintain_offset",
+          "start_relation": "A02原始正面近景",
+          "end_relation": "与起始相同的正面近景"
+        }
+      },
+      "intent_evidence": {
+        "character_action_required": true,
+        "state_change_required": false,
+        "subject_motion_directive_present": true
+      },
+      "output_need": {
+        "timing_mode": "content_driven",
+        "duration_seconds": 5,
+        "geometry_policy": "adaptive",
+        "aspect_ratio": "16:9",
+        "container_mime": "video/mp4"
+      },
+      "audio_need": "optional",
+      "quality_need": {
+        "objective_tier": "preview"
+      }
+    },
+    "composition": {
+      "muted": true,
+      "source_audio_policy": "MUTE",
+      "source_audio_reason": "成片使用已认可歌曲 v2 独立音轨"
+    },
+    "boundary": {
+      "independent": true,
+      "reason": "按分镜 v2.1 由最终剪辑切接；不要求复制前镜终态"
+    }
+  },
+  "routing_policy": {
+    "identity": {
+      "policy_id": "iris-v2-lszh2-qualification",
+      "policy_version": "1",
+      "policy_sha256": "e1793992d5be9a91429a46aed9311c3e3c37cc502d9f3a509907e0e577e716a7"
+    },
+    "local_resources_available": false,
+    "remote_authorized": true,
+    "budget_authorized": true,
+    "execution_purpose": "qualification"
+  },
+  "decision_policy": {
+    "policy_id": "generation-decision",
+    "version": "3",
+    "repeated_failure_threshold": 3,
+    "max_resamples": 0,
+    "allow_bounded_exploration": true
+  },
+  "execution_limits": {
+    "task_id": "iris-v2-lszh2-source-001",
+    "generation_forbidden": false,
+    "allowed_remote_candidates": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1"
+    ],
+    "paid_submit_ceiling": 1,
+    "paid_submits_used": 0,
+    "local_batch_limit": 1,
+    "local_batch_used": 0,
+    "local_total_limit": null,
+    "local_total_used": 0,
+    "local_resource_available": false,
+    "batch_review_evidence_hash": null
+  },
+  "jimeng_profile": {
+    "model_id": "seedance_2.0_vip",
+    "account_sha256": "72af2f312b64012199e6eb0453d72b268e08bc104629637afcc59d36f50e3bbe",
+    "project_id": "829df260-5a63-4f0d-8265-8353dc693b3b",
+    "node_id": "node_wr3xr898vj",
+    "duration_seconds": 5,
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "benefit_amount": 5,
+    "benefit_type": "seedance_20_pro_1080p_output",
+    "credit_upper_bound": 250
+  }
+}

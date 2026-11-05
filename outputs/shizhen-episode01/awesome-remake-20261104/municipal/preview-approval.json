@@ -1,0 +1,15 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "db5561bdaab553e6db10cf3cbe547a6185e9615acf07c1abe9971c9d29b18456",
+  "unit_ids": [
+    "municipal"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/shizhen-episode01/awesome-remake-20261104/refs/storyboard-v2.png",
+      "sha256": "1509083877457f82b02f8ef471353ade303c21b997c913f0d6640c812c76c177",
+      "role": "reference_image"
+    }
+  ],
+  "user_quote": "那你再用这个做出来视频我看看"
+}

@@ -1,0 +1,78 @@
+{
+  "artifact_id": "iris-v2-s5-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "bdf613a1d4aaf0d7c54c33507d1b0d854435ea71b15b302baac3083de1cb9ac2",
+  "creation_receipt_id": "iris-v2-S5-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/8903bb6faa1ef5057dfcd359dfe7e4b4fba808db072928739df1a35eb38607e3.json",
+      "content_hash": "8903bb6faa1ef5057dfcd359dfe7e4b4fba808db072928739df1a35eb38607e3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json",
+      "content_hash": "ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/b93d3c027f745b58b6325848d75cc6f9dacd3bce0b939cc01ea1f5a0ff7d8b83.json",
+      "content_hash": "b93d3c027f745b58b6325848d75cc6f9dacd3bce0b939cc01ea1f5a0ff7d8b83"
+    }
+  ],
+  "shot_id": "ep01v2-s5",
+  "scene_id": "window",
+  "storyboard_beat_id": "looked",
+  "intent": "真人电影摄影，横幅十六比九，连续六秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性站在高层室内的落地窗前，侧面朝向画面左侧的窗外；第二张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第二张图的背景。\n她平静地望着窗外雾中的城市，像一个安静的旁观者；视线缓慢落在远处的某一点，嘴唇自然闭合，只有自然呼吸和一两次轻微眨眼。她不转身、不说话、不抬手。窗外远处高架上的车灯缓慢流动。\n摄影机固定在原位，极缓慢地微微推近，末段平滑收稳。玻璃干净透明，没有她的倒影。室内很暗，窗外冷光勾出她的侧脸轮廓。蓝黑与钢蓝冷色，红色只在她左领口的细灯线。\n保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。只有极轻的环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "她平静地望向窗外远处，嘴唇自然闭合，不转身、不说话、不抬手",
+    "摄影机固定在原位，极缓慢微微推近，末段平滑收稳；玻璃上没有倒影",
+    "保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v2-s5-window",
+        "iris-cf-details"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

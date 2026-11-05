@@ -1,0 +1,47 @@
+{
+  "schema": "iris-v2-post-media-gate/1",
+  "unit": "S1v3",
+  "shot_id": "ep01v2-s1",
+  "attempt_id": "iris-s1v3-source-001",
+  "artifact_path": "outputs/ai-city-takeover/ep01/v2/gen/S1v3/project/state/video-generation/fetch/files/4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5.mp4",
+  "artifact_sha256": "4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5",
+  "intent": "v3: the eye opens on 'woke' (native first/last frame K1a -> K1c, identity sheet waived by the user)",
+  "source_audio_policy": "MUTE (final film uses the approved song v2)",
+  "evidence": {
+    "mcp_video_probe": "1920x1080, 6.08 s, 145 frames, h264, aac stereo; dreamina AIGC metadata",
+    "mcp_video_extract_frames": "7 frames at 1 s steps -> qa/gate-S1v3/mcp-frame-*.jpg, mcp-sheet.jpg",
+    "mcp_video_review": "scene_count 1, unique_frame_ratio 1.0, issues []",
+    "frames": "eye-sixth-second.jpg (6 fps), first-mid-last.jpg, quarter-second-sheet.jpg",
+    "camera_drift": "qa/frame_drift.py: scale within -0.05%..0, shift <= 3.6 px",
+    "light": "three smooth city-light sweeps (about 0.8-1.3 s, 2.9-3.8 s, 4.6-5.0 s), mean luminance +12 of 255 over 0.3-0.4 s, max frame difference 5.4; no hard flash"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "eye-opens",
+      "verdict": "PASS",
+      "reason": "closed with small lid and lash movement to about 2.4 s; the lid lifts from about 2.4 s, half open at 2.83 s, fully open and focused by about 3.3 s; stays open to the end"
+    },
+    {
+      "requirement_id": "same-view",
+      "verdict": "PASS",
+      "reason": "locked macro framing from the K1a state to the K1c state"
+    },
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "same eye, brow, freckles and skin texture as K1a and K1c; red reflection under the lower lid kept"
+    },
+    {
+      "requirement_id": "no-new-graphics",
+      "verdict": "PASS",
+      "reason": "platform AI生成 mark kept at top-left; nothing added"
+    }
+  ],
+  "edit_note": "with in-point 0.0 the opening spans master 2.4-3.3 s, half open on 'woke' (2.83 s); cut to S2 on the beat at about 3.34 s",
+  "verdict": "PASS",
+  "all_required_observed_pass": true,
+  "not_evaluated": [
+    "human 1.0x viewing in the assembled film"
+  ],
+  "authority": "Agent per-shot gate on the exact fetched MP4; not Manifest acceptance, activation or final acceptance"
+}

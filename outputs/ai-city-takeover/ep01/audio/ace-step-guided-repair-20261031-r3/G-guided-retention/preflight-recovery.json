@@ -1,0 +1,7 @@
+{
+  "prior_preparation_error": "Local Path conversion in preparation helper failed before intent creation",
+  "prior_launch_error": "Missing intent failed before imports/consume/generation",
+  "known_no_generation_effect": true,
+  "consume_existed_before_recovery": false,
+  "original_series_and_prior_results_unchanged": true
+}

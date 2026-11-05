@@ -1,0 +1,235 @@
+{
+  "repo_id": "ACE-Step/Ace-Step1.5",
+  "revision": "19671f406d603126926c1b7e2adc169acbcade22",
+  "download_started_at_utc": "2026-10-31T02:59:20.549904+00:00",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "size": 1740,
+      "sha256": null,
+      "git_blob_id": "a8d4cbb214bda0ce6b6e4453c02ca1a826b9f08a",
+      "actual_sha256": "0a013ab5b4ca453b13b3a7b68978a2d5364eb956d2bac03d4e63225f274a6d68",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/added_tokens.json",
+      "size": 707,
+      "sha256": null,
+      "git_blob_id": "b54f9135e44c1e81047e8d05cb027af8bc039eed",
+      "actual_sha256": "c0284b582e14987fbd3d5a2cb2bd139084371ed9acbae488829a1c900833c680",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/chat_template.jinja",
+      "size": 4116,
+      "sha256": null,
+      "git_blob_id": "699ff8df401fe4788525e9c1f9b86a99eadd6230",
+      "actual_sha256": "87a2728cb8dc9fe424d624542f6060ec05a1d285ebbec578bb078900e33396b5",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/config.json",
+      "size": 1359,
+      "sha256": null,
+      "git_blob_id": "21bd712c76114dc22587c6eeb84ab64186c9d245",
+      "actual_sha256": "bb23c1607cfe059a58d8f0196cf1cebb52082b1056b8e358a579da80a5759420",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/merges.txt",
+      "size": 1671853,
+      "sha256": null,
+      "git_blob_id": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7",
+      "actual_sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/model.safetensors",
+      "size": 1191586416,
+      "sha256": "0437e45c94563b09e13cb7a64478fc406947a93cb34a7e05870fc8dcd48e23fd",
+      "git_blob_id": "9116264a405846ebfe4e95556b63b1ca07c892a0",
+      "actual_sha256": "0437e45c94563b09e13cb7a64478fc406947a93cb34a7e05870fc8dcd48e23fd",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/special_tokens_map.json",
+      "size": 613,
+      "sha256": null,
+      "git_blob_id": "ac23c0aaa2434523c494330aeb79c58395378103",
+      "actual_sha256": "76862e765266b85aa9459767e33cbaf13970f327a0e88d1c65846c2ddd3a1ecd",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/tokenizer.json",
+      "size": 11423705,
+      "sha256": "def76fb086971c7867b829c23a26261e38d9d74e02139253b38aeb9df8b4b50a",
+      "git_blob_id": "18a4abbf4a408dc534006a455544dcc195f356d2",
+      "actual_sha256": "def76fb086971c7867b829c23a26261e38d9d74e02139253b38aeb9df8b4b50a",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/tokenizer_config.json",
+      "size": 5404,
+      "sha256": null,
+      "git_blob_id": "ddaf69808214a44fdd26d3785b66c1367c78277a",
+      "actual_sha256": "443bfa629eb16387a12edbf92a76f6a6f10b2af3b53d87ba1550adfcf45f7fa0",
+      "verified": true
+    },
+    {
+      "path": "Qwen3-Embedding-0.6B/vocab.json",
+      "size": 2776833,
+      "sha256": null,
+      "git_blob_id": "4783fe10ac3adce15ac8f358ef5462739852c569",
+      "actual_sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "verified": true
+    },
+    {
+      "path": "README.md",
+      "size": 5496,
+      "sha256": null,
+      "git_blob_id": "a3115cec283fbdc2d500aa50fdffac3c87e6689a",
+      "actual_sha256": "69d69b89e313706b93b420b13aa6232259b207a1cd19b0b70358d166e8e451a0",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/added_tokens.json",
+      "size": 2217787,
+      "sha256": null,
+      "git_blob_id": "584075018edeacd6dcc031b3e2cbbf90836eba41",
+      "actual_sha256": "db08b66a515fb5d6acca0b3492d25bb44e0deda6241fc1113ac0679d40558c48",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/chat_template.jinja",
+      "size": 4168,
+      "sha256": null,
+      "git_blob_id": "01be9b307daa2d425f7c168c9fb145a286e0afb4",
+      "actual_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/config.json",
+      "size": 1385,
+      "sha256": null,
+      "git_blob_id": "1325891e0f2cb06ea22906f9c89047d09d0dac1f",
+      "actual_sha256": "73515ca4bfd86a5b56f28bf680311d1911e159c85d7f7ceb2188e310007c9010",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/merges.txt",
+      "size": 1671853,
+      "sha256": null,
+      "git_blob_id": "31349551d90c7606f325fe0f11bbb8bd5fa0d7c7",
+      "actual_sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/model.safetensors",
+      "size": 3708521528,
+      "sha256": "f161689da73e5ecefa28ff780d51c2d92a00f056d021d7933c779ed5c6cd7db8",
+      "git_blob_id": "24177a84e9d1da125ef1a6c87493f07c2fb3565c",
+      "actual_sha256": "f161689da73e5ecefa28ff780d51c2d92a00f056d021d7933c779ed5c6cd7db8",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/special_tokens_map.json",
+      "size": 1824199,
+      "sha256": null,
+      "git_blob_id": "aa26266349a0f38be608e07138c9047356309551",
+      "actual_sha256": "76e233bfc357b0b03d7b6e6ba8e799244f358552575a7cdadb78d3d19106b298",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/tokenizer.json",
+      "size": 24321939,
+      "sha256": "35af56c3f5cb3ea2cc578aa28a8937770981d504f183ac5c8c38baf4bbd4af4d",
+      "git_blob_id": "9ddbbfa4ab39a70635bbde85a4cb422afeae7d88",
+      "actual_sha256": "35af56c3f5cb3ea2cc578aa28a8937770981d504f183ac5c8c38baf4bbd4af4d",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/tokenizer_config.json",
+      "size": 14072925,
+      "sha256": "6cd70cdd89425971794f5235562edcc608b0629a6c4686ae51a8b8c8b8ba5e95",
+      "git_blob_id": "b24427adb48675a5389bd54813b4e63f1b7127f8",
+      "actual_sha256": "6cd70cdd89425971794f5235562edcc608b0629a6c4686ae51a8b8c8b8ba5e95",
+      "verified": true
+    },
+    {
+      "path": "acestep-5Hz-lm-1.7B/vocab.json",
+      "size": 2776833,
+      "sha256": null,
+      "git_blob_id": "4783fe10ac3adce15ac8f358ef5462739852c569",
+      "actual_sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "verified": true
+    },
+    {
+      "path": "acestep-v15-turbo/config.json",
+      "size": 1968,
+      "sha256": null,
+      "git_blob_id": "6a0b5c09a654614302947fd1d7041f7ed0764d8c",
+      "actual_sha256": "74745ff704ea49164c3d2d1c99fc0670f3fc635a869f0aec2d1311e6a52d400a",
+      "verified": true
+    },
+    {
+      "path": "acestep-v15-turbo/configuration_acestep_v15.py",
+      "size": 13130,
+      "sha256": null,
+      "git_blob_id": "965a1b73afb1c89d0959c7d80691e487fdfde505",
+      "actual_sha256": "b89870c5c7a7ce060eb0bcdbb5ffc86b0b1a324ca325a26be552ea1b42496dc5",
+      "verified": true
+    },
+    {
+      "path": "acestep-v15-turbo/model.safetensors",
+      "size": 4787825604,
+      "sha256": "3f6e0797fad420a39bd33979eb6e840e30989e34a3794e843d23b60ec6e422d7",
+      "git_blob_id": "dd5858cb03b6587350e2c4abc4fd55c0ae7dc39b",
+      "actual_sha256": "3f6e0797fad420a39bd33979eb6e840e30989e34a3794e843d23b60ec6e422d7",
+      "verified": true
+    },
+    {
+      "path": "acestep-v15-turbo/modeling_acestep_v15_turbo.py",
+      "size": 96036,
+      "sha256": null,
+      "git_blob_id": "fa1162a5a01cc45c7959f3c531e2a8272ca05104",
+      "actual_sha256": "c1ab0dd547124fee7ada449b2b86eae8201dc7d15889932643bbb67e3c982444",
+      "verified": true
+    },
+    {
+      "path": "acestep-v15-turbo/silence_latent.pt",
+      "size": 3841215,
+      "sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b",
+      "git_blob_id": "6b1e0f254e47f4f23ec505313d05e1d9fd09ae3e",
+      "actual_sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b",
+      "verified": true
+    },
+    {
+      "path": "config.json",
+      "size": 1968,
+      "sha256": null,
+      "git_blob_id": "6a0b5c09a654614302947fd1d7041f7ed0764d8c",
+      "actual_sha256": "74745ff704ea49164c3d2d1c99fc0670f3fc635a869f0aec2d1311e6a52d400a",
+      "verified": true
+    },
+    {
+      "path": "vae/config.json",
+      "size": 425,
+      "sha256": null,
+      "git_blob_id": "f49eb7b261dde15ed29c0fa1e790251dcecbd280",
+      "actual_sha256": "14e019904df567f26df750317a70e2bd08f9f8f3c40ff4a24c97d1cd3f20ccd2",
+      "verified": true
+    },
+    {
+      "path": "vae/diffusion_pytorch_model.safetensors",
+      "size": 337431388,
+      "sha256": "da17edb604c40deaf09e9b24974e590d1ca83a374070e5d0884cfa4bed9a99b0",
+      "git_blob_id": "1b5eb1b18009ae7ad96c3bda6412517b68ec2bc2",
+      "actual_sha256": "da17edb604c40deaf09e9b24974e590d1ca83a374070e5d0884cfa4bed9a99b0",
+      "verified": true
+    }
+  ],
+  "credential_use": false,
+  "source": "official Hugging Face public model repository",
+  "download_completed_at_utc": "2026-10-31T03:04:48.265487+00:00",
+  "all_files_verified": true
+}

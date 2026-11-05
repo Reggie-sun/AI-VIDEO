@@ -1,0 +1,26 @@
+[
+  {
+    "asset_id": "iris-c-v2-s1-eye",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/K1a-a.png",
+    "sha256": "a1b3319973ed8ba508c6ccc686f91d35f76367781178d27a81fbbd829aadf996",
+    "size_bytes": 1997741,
+    "width": 1672,
+    "height": 941,
+    "role": "approved K1a: start frame, closed left eye macro",
+    "need_id": "eye-macro",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-cf-details",
+    "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+    "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+    "size_bytes": 1843560,
+    "width": 1672,
+    "height": 941,
+    "role": "approved front IRIS identity: face, left-ear device and fine red left-collar line",
+    "need_id": "identity",
+    "anchor_role": "identity",
+    "selected_for_provider": true
+  }
+]

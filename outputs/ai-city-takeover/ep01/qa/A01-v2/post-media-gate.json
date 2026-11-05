@@ -1,0 +1,147 @@
+{
+  "shot_id": "ep01-intro",
+  "attempt_id": "iris-ep01-a01-two-reference-repair-002",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/a01-first-frame-repair/project/state/video-generation/fetch/files/850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c.mp4",
+  "artifact_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+  "verdict": "PASS",
+  "proof": "analyzer",
+  "all_required_observed_pass": true,
+  "required_findings": [
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "已对照真实A01/ID7b与全部145个PTS脸部帧、正常速度全片及首中尾全幅。同一女性脸部、浅肤雀斑、灰蓝眼、深棕后梳低髻、解剖左耳黑色耳挂、左领细红线与炭黑高领大衣保持；未见换脸、装置换侧或明显面部/服装形变。此为可见身份特征的analyzer判断，不是人类审美验收。",
+      "evidence_refs": [
+        "faces-000-048.jpg",
+        "faces-049-097.jpg",
+        "faces-098-144.jpg",
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json"
+      ],
+      "proof": "analyzer",
+      "evidence_ref": "observer-verification/observations.json"
+    },
+    {
+      "requirement_id": "quiet-observer",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "按当前exact sealed observable裁决：全145帧保持认可图的正面嘴唇自然静置，不出现连续说话/演唱口型；约1.333–1.500秒和4.800–5.050秒有轻微自然眨眼，全幅与正常速度读回未见转身、抬手或其他意图性动作。胸肩/衣领有极小非刚性位移，整体是安静观察的自然微动作状态。本observable未单列必须可见的呼吸幅度、次数或独立起落事件，不能额外建立深呼吸检测门槛。",
+      "subfindings": [
+        {
+          "check": "relaxed_static_lips_no_speech_articulation",
+          "verdict": "PASS"
+        },
+        {
+          "check": "light_natural_blinks",
+          "verdict": "PASS",
+          "approx_spans_millis": [
+            [
+              1333,
+              1500
+            ],
+            [
+              4800,
+              5050
+            ]
+          ]
+        },
+        {
+          "check": "quiet_rest_with_only_natural_micro_movement",
+          "verdict": "PASS"
+        },
+        {
+          "check": "no_turn_or_hand_raise_or_new_intentional_action",
+          "verdict": "PASS"
+        }
+      ],
+      "evidence_refs": [
+        "faces-000-048.jpg",
+        "faces-049-097.jpg",
+        "faces-098-144.jpg",
+        "normal-speed-playback.json",
+        "motion-measurements.json"
+      ],
+      "unclaimed_auxiliary_inference": "不判断实际生理呼吸或风的物理成因；它们未被封存为独立检测事件。",
+      "proof": "analyzer",
+      "evidence_ref": "observer-verification/observations.json"
+    },
+    {
+      "requirement_id": "camera-space",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "按当前multimodal profile的语义景别裁决：以同一正面平视头胸中近景、相同右侧人物/左侧雾城负空间和身体姿态开始，全片无侧身露背、翻轴或拉远；只见极小正向图像尺度变化，末段运动收稳。手工标尺约3-4%的初始尺寸变化没有造成景别或screen关系改变；此profile未封存数值尺寸锁定或零像素配准，不能将诊断测量新增为否决门槛。",
+      "subfindings": [
+        {
+          "check": "same_frontal_head_chest_shot_and_screen_relation",
+          "verdict": "PASS"
+        },
+        {
+          "check": "subject_size_preserved_at_sealed_semantic_framing_level",
+          "verdict": "PASS",
+          "measurement_context": "No numeric/zero-pixel size lock was sealed; manual measures remain diagnostic."
+        },
+        {
+          "check": "no_profile_back_axis_flip_or_pullout",
+          "verdict": "PASS"
+        },
+        {
+          "check": "very_small_forward_image_motion_and_end_settle",
+          "verdict": "PASS",
+          "limit": "2D image/background evidence; physical3D dolly not claimed."
+        }
+      ],
+      "evidence_refs": [
+        "framing-measurements.json",
+        "framing-reference-vs-v2-grid.jpg",
+        "eye-position-grid.jpg",
+        "motion-measurements.json",
+        "normal-speed-playback.json"
+      ],
+      "proof": "analyzer",
+      "evidence_ref": "observer-verification/observations.json"
+    },
+    {
+      "requirement_id": "visual",
+      "verdict": "PASS",
+      "span_millis": [
+        0,
+        6000
+      ],
+      "reason": "真人摄影质感、同一蓝黑钢蓝雾城阳台、黑衣及细红领灯保持；只见已获用户允许的平台AI生成标识，未见新增剧情字幕、片名或新闻图形。未沿用旧版禁止全部文字的规则。",
+      "evidence_refs": [
+        "full-0.00.jpg",
+        "full-3.00.jpg",
+        "full-5.95.jpg",
+        "normal-speed-playback.json"
+      ],
+      "proof": "analyzer",
+      "evidence_ref": "observer-verification/observations.json"
+    }
+  ],
+  "observer_observations_sha256": "667fa77bf5d672434cf8e2da3b77e8c1a8f04e96b4fd01d10ee38cccbbbe7780",
+  "scope_correction": {
+    "path": "observer-verification/scope-correction.json",
+    "sha256": "d7685a712d13b0d0f1d25cd8d7cd4e3d13accc2763c819ce523de17133bfe926",
+    "criteria_unchanged": true
+  },
+  "human_acceptance": "NOT_EVALUATED",
+  "audio_semantics_or_listening": "NOT_EVALUATED",
+  "production_activation": false,
+  "provider_qualification_promotion": false,
+  "next_shot_preparation_allowed": true,
+  "next_shot_submit_authorized": false,
+  "next_shot_requires": "Its own exact preview, budget, intent and one-use permit.",
+  "new_provider_calls": 0
+}

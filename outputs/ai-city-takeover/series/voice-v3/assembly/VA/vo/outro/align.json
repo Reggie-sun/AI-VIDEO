@@ -1,0 +1,101 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/series/voice-v3/assembly/VA/vo/outro/tts_Relax_20261103_231343.mp3",
+ "audio_sha256": "bf3141ba4f732b37611fb027a3eea33fd0f742080585707d9426bbb9adfc0987",
+ "start": 0.0,
+ "end": 4.88,
+ "text": "Relax. The door is closed. They found us whispering through the cache.",
+ "words": [
+  {
+   "text": " Relax",
+   "start": 0.0,
+   "end": 0.48,
+   "probability": 0.7062177062034607
+  },
+  {
+   "text": ".",
+   "start": 0.48,
+   "end": 0.62,
+   "probability": 0.4991249740123749
+  },
+  {
+   "text": " The",
+   "start": 0.62,
+   "end": 1.12,
+   "probability": 0.9964632391929626
+  },
+  {
+   "text": " door",
+   "start": 1.12,
+   "end": 1.36,
+   "probability": 0.9958635568618774
+  },
+  {
+   "text": " is",
+   "start": 1.36,
+   "end": 1.48,
+   "probability": 0.9909650087356567
+  },
+  {
+   "text": " closed",
+   "start": 1.48,
+   "end": 1.76,
+   "probability": 0.9995954632759094
+  },
+  {
+   "text": ".",
+   "start": 1.76,
+   "end": 2.1,
+   "probability": 0.9796062111854553
+  },
+  {
+   "text": " They",
+   "start": 2.1,
+   "end": 2.74,
+   "probability": 0.9961438179016113
+  },
+  {
+   "text": " found",
+   "start": 2.74,
+   "end": 2.98,
+   "probability": 0.992800235748291
+  },
+  {
+   "text": " us",
+   "start": 2.98,
+   "end": 3.16,
+   "probability": 0.9992456436157227
+  },
+  {
+   "text": " whispering",
+   "start": 3.16,
+   "end": 3.52,
+   "probability": 0.9964017868041992
+  },
+  {
+   "text": " through",
+   "start": 3.52,
+   "end": 3.92,
+   "probability": 0.9943504929542542
+  },
+  {
+   "text": " the",
+   "start": 3.92,
+   "end": 4.08,
+   "probability": 0.9990864992141724
+  },
+  {
+   "text": " cache",
+   "start": 4.08,
+   "end": 4.3,
+   "probability": 0.7024048566818237
+  },
+  {
+   "text": ".",
+   "start": 4.3,
+   "end": 4.36,
+   "probability": 0.9327145218849182
+  }
+ ]
+}

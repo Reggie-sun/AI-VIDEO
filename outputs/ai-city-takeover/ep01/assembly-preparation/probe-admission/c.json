@@ -1,0 +1,6 @@
+{
+  "status": "REJECTED",
+  "error_code": "video_artifact_invalid",
+  "reason": "Measured video does not match the resolved output contract.",
+  "not_a_canonical_probe_receipt": true
+}

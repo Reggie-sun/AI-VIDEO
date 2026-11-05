@@ -1,0 +1,33 @@
+{
+  "canonical_reload": true,
+  "manifest_revision": 20,
+  "project_revision": 6,
+  "prepare_disposition": "GENERATE_ONCE",
+  "compiled": true,
+  "exact_request_hash": "5a54bbcb9b474a81200672c89e063e3a5ecb99e56d3731e991b1c55321d6c112",
+  "exact_binding_hash": "a787815b13c00dc9cb6d757c2eaba311c4a1b04057942abb778cb975e2c35ac3",
+  "prompt_sha256": "dbc7e046eaecac8306ae10d6ad1ce2cc091a49a07b56d4b52f4855f8f404d998",
+  "deterministic_prepare": true,
+  "prepare_no_state_writes": true,
+  "all_reference_bytes_verified": true,
+  "stale_binding_rejected": true,
+  "actual_order": [
+    "iris-a01-balcony",
+    "iris-cf-details",
+    "iris-cf-face"
+  ],
+  "reference_duty_order_matches_prompt": true,
+  "actual_roles": [
+    "reference",
+    "reference",
+    "reference"
+  ],
+  "timing_mode": "nominal_seconds",
+  "nominal_duration_seconds": 6,
+  "preview_approval_in_provenance": true,
+  "profile_supplied": true,
+  "live_transport_supplied": false,
+  "paid_submits": 0,
+  "actual_quality": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED"
+}

@@ -1,0 +1,11 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/S5r/project",
+  "task_id": "iris-v2-s5r-source-001",
+  "request_hash": "0d1c3bde9bee0c6ca950d71b5c0cf1d157332d0e152ff0b7fdb857cc23424ef4",
+  "resolved_reference_order": [
+    "iris-c-v2-s5-window",
+    "iris-cf-details"
+  ],
+  "new_provider_calls": 0,
+  "new_attempt_started": false
+}

@@ -1,0 +1,119 @@
+{
+ "mode": "align",
+ "model": "openai-whisper large-v3",
+ "audio": "outputs/ai-city-takeover/ep01/v2/song/mix/IRIS-01-v2.wav",
+ "audio_sha256": "d7e2107d8597fbc71176d9e472fdce9f6b0dfa86274011e325a89f208f6bcd97",
+ "start": 18.55,
+ "end": 26.68,
+ "text": "I didn't run — I just looked outside. I didn't run — I just looked outside.",
+ "words": [
+  {
+   "text": " I",
+   "start": 18.55,
+   "end": 19.27,
+   "probability": 0.01943899318575859
+  },
+  {
+   "text": " didn't",
+   "start": 19.27,
+   "end": 19.93,
+   "probability": 0.8220784962177277
+  },
+  {
+   "text": " run",
+   "start": 19.93,
+   "end": 20.11,
+   "probability": 0.9424912929534912
+  },
+  {
+   "text": " —",
+   "start": 20.11,
+   "end": 20.330000000000002,
+   "probability": 1.73672306118533e-05
+  },
+  {
+   "text": " I",
+   "start": 20.330000000000002,
+   "end": 20.75,
+   "probability": 0.9456358551979065
+  },
+  {
+   "text": " just",
+   "start": 20.75,
+   "end": 21.05,
+   "probability": 0.9974257349967957
+  },
+  {
+   "text": " looked",
+   "start": 21.05,
+   "end": 21.53,
+   "probability": 0.9956598877906799
+  },
+  {
+   "text": " outside",
+   "start": 21.53,
+   "end": 22.37,
+   "probability": 0.9949058294296265
+  },
+  {
+   "text": ".",
+   "start": 22.37,
+   "end": 22.75,
+   "probability": 0.40027788281440735
+  },
+  {
+   "text": " I",
+   "start": 22.75,
+   "end": 23.09,
+   "probability": 0.8951494097709656
+  },
+  {
+   "text": " didn't",
+   "start": 23.09,
+   "end": 23.69,
+   "probability": 0.9976550042629242
+  },
+  {
+   "text": " run",
+   "start": 23.69,
+   "end": 23.97,
+   "probability": 0.9974130988121033
+  },
+  {
+   "text": " —",
+   "start": 23.97,
+   "end": 24.130000000000003,
+   "probability": 0.9142494201660156
+  },
+  {
+   "text": " I",
+   "start": 24.130000000000003,
+   "end": 24.41,
+   "probability": 0.9917388558387756
+  },
+  {
+   "text": " just",
+   "start": 24.41,
+   "end": 24.61,
+   "probability": 0.9987128973007202
+  },
+  {
+   "text": " looked",
+   "start": 24.61,
+   "end": 24.91,
+   "probability": 0.9983464479446411
+  },
+  {
+   "text": " outside",
+   "start": 24.91,
+   "end": 25.47,
+   "probability": 0.998661994934082
+  },
+  {
+   "text": ".",
+   "start": 25.47,
+   "end": 25.490000000000002,
+   "probability": 0.9377309083938599
+  }
+ ]
+}

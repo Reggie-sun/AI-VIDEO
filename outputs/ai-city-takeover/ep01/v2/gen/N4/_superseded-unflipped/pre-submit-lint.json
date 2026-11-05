@@ -1,0 +1,40 @@
+{
+ "unit": "N4",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": false
+ },
+ "pass": false,
+ "request_hash": "6b74489b7a8ce662158bfb07384bd977faa770da405e058911fa35a428719b43",
+ "compiled_prompt_sha256": "24ad649486dcef5a1a54a3437daf3d158337acf4bff5592e5571f4aa7ef72a5c",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/action/continuity-report.json",
+  "sha256": "0af3fc1e681decd974c28b7faade05c92dcdcd8502d5117f0889856b8c8dbabf",
+  "unit": {
+   "verdict": "not_ready",
+   "continuity": "FAIL：N4-a 中她面向畫右，鏡頭看到的是她右側；裁切放大（N4-a 約 x880–1180、y200–400）看到耳挂在右耳，近側（右）領口有紅燈線。這與身份設定「左耳黑色耳挂、左领极细红灯线」相反，也和 CF-ID3（右側朝鏡頭時右耳空、紅線只在遠側露一點）、K7（耳挂和紅線都在她左側）、c11 S7 實際畫面（14.9、16.5、18.7 s）不一致。空間（漂浮發光薄片、黑底、冷白地面光斑）、大衣、髮髻則與 K7 和 S7 一致。",
+   "handoff": "PASS：插入 S7 的玻璃面板空間（14.8–18.87 s，與 I4、I5 同類插入），同一空間、同樣光線，從近景切遠景的理由清楚；她收回手繼續走的結尾是乾淨的出點。",
+   "axis_action_camera": "PASS：她向畫右走，鏡頭向右橫移跟拍（設定 truck_right），動作是走、抬起遠側的左手、指尖碰到薄片、薄片發光漂開、收回手、繼續走，看得懂；S7 是正面近景，沒有方向衝突。prompt 沒寫橫移方向，見 R5。",
+   "prompt_fit": "PASS：與認可文字逐字相同（approval sha 24ad6494…）；寫了「嘴唇自然闭合」「神情平静」，沒有唱歌字句；設定的字句都在 prompt 裡。側臉露出嘴唇，見 R8。",
+   "lint": "PASS（只差本報告）：lint.py N4 只有 continuity_report_ready 未過；request_hash 6b74489b…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   4,
+   660
+  ]
+ },
+ "new_calls": 0
+}

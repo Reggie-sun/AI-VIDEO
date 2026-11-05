@@ -1,0 +1,181 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/OH-A/fetch/56a6de5bd25e951513864e9ff8fac50ef2608252193ce90c5926e6af8df12ba7.mp4",
+ "take_sha256": "56a6de5bd25e951513864e9ff8fac50ef2608252193ce90c5926e6af8df12ba7",
+ "window": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/window-17.97-22.97.wav",
+ "window_sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+ "song_t0": 17.97,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": 0.0251,
+ "ncc": 0.9988,
+ "copy": true,
+ "threshold": {
+  "null90": 0.644,
+  "matched_med": 0.9987,
+  "thr": 0.7859,
+  "strong_frames": 360
+ },
+ "frames": {
+  "total": 507,
+  "active": 360,
+  "matched": 360,
+  "matched_of_active": 1.0
+ },
+ "divergence": {
+  "frame": null,
+  "rule": "none",
+  "last_match": 500,
+  "clip_s": null,
+  "song_s": null
+ },
+ "synced_until": {
+  "clip_s": 4.958,
+  "song_s": 22.903
+ },
+ "spans": [
+  {
+   "clip_s": [
+    0.77,
+    5.0
+   ],
+   "song_s": [
+    18.715,
+    22.945
+   ]
+  }
+ ],
+ "envelope": {
+  "lag_s": 0.025,
+  "ncc": 0.997,
+  "windows": [
+   {
+    "clip_t0": 0.0,
+    "clip_t1": 1.5,
+    "lag_s": 0.025,
+    "ncc": 0.996
+   },
+   {
+    "clip_t0": 0.25,
+    "clip_t1": 1.75,
+    "lag_s": 0.025,
+    "ncc": 0.997
+   },
+   {
+    "clip_t0": 0.5,
+    "clip_t1": 2.0,
+    "lag_s": 0.025,
+    "ncc": 0.997
+   },
+   {
+    "clip_t0": 0.75,
+    "clip_t1": 2.25,
+    "lag_s": 0.025,
+    "ncc": 0.997
+   },
+   {
+    "clip_t0": 1.0,
+    "clip_t1": 2.5,
+    "lag_s": 0.025,
+    "ncc": 0.997
+   },
+   {
+    "clip_t0": 1.25,
+    "clip_t1": 2.75,
+    "lag_s": 0.025,
+    "ncc": 0.996
+   },
+   {
+    "clip_t0": 1.5,
+    "clip_t1": 3.0,
+    "lag_s": 0.025,
+    "ncc": 0.996
+   },
+   {
+    "clip_t0": 1.75,
+    "clip_t1": 3.25,
+    "lag_s": 0.025,
+    "ncc": 0.995
+   },
+   {
+    "clip_t0": 2.0,
+    "clip_t1": 3.5,
+    "lag_s": 0.025,
+    "ncc": 0.994
+   },
+   {
+    "clip_t0": 2.25,
+    "clip_t1": 3.75,
+    "lag_s": 0.025,
+    "ncc": 0.993
+   },
+   {
+    "clip_t0": 2.5,
+    "clip_t1": 4.0,
+    "lag_s": 0.025,
+    "ncc": 0.993
+   },
+   {
+    "clip_t0": 2.75,
+    "clip_t1": 4.25,
+    "lag_s": 0.025,
+    "ncc": 0.993
+   },
+   {
+    "clip_t0": 3.0,
+    "clip_t1": 4.5,
+    "lag_s": 0.025,
+    "ncc": 0.994
+   },
+   {
+    "clip_t0": 3.25,
+    "clip_t1": 4.75,
+    "lag_s": 0.025,
+    "ncc": 0.995
+   },
+   {
+    "clip_t0": 3.5,
+    "clip_t1": 5.0,
+    "lag_s": 0.025,
+    "ncc": 0.996
+   }
+  ],
+  "max_dev_s": 0.0,
+  "steady": true,
+  "segments": [
+   {
+    "clip_s": [
+     0.625,
+     4.375
+    ],
+    "lag_s": 0.025,
+    "windows": 15,
+    "min_ncc": 0.993
+   }
+  ]
+ },
+ "placement": {
+  "lag_s": 0.0251,
+  "method": "tool 15 waveform lag (copy)",
+  "song_t_of_clip0": 17.9449,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "OH-A",
+ "reviews": [
+  {
+   "kind": "placement",
+   "lag_s": 0.0251,
+   "path": "outputs/ai-city-takeover/ep01/v2/trial/omnihuman/OH-A/sync/OH-A/review-OH-A-56a6de5bd25e-placement-lag+0.025.mp4",
+   "sha256": "f28e947412ea76f0f590fd1f6c2b6787db574494af5f88c688a7adc4965928fc"
+  }
+ ]
+}

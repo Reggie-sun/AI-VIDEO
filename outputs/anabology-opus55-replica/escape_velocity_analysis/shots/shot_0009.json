@@ -1,0 +1,691 @@
+{
+  "shot_id": "S0009",
+  "start_frame": 204,
+  "end_frame": 225,
+  "start_time": 8.5,
+  "end_time": 9.4167,
+  "duration_frames": 22,
+  "duration_s": 0.9167,
+  "start_tc": "00:00:08:12",
+  "end_tc": "00:00:09:09",
+  "boundary_in_id": "B0-008",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 204,
+      "path": "keyframes/S0009_f00204.jpg",
+      "role": "first",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 209,
+      "path": "keyframes/S0009_f00209.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 215,
+      "path": "keyframes/S0009_f00215.jpg",
+      "role": "middle",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 220,
+      "path": "keyframes/S0009_f00220.jpg",
+      "role": "key_change",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 225,
+      "path": "keyframes/S0009_f00225.jpg",
+      "role": "last",
+      "note": "视觉核对：filmstrip及首/中/末关键帧；细节/逐帧参数见 uncertainties"
+    },
+    {
+      "frame": 214,
+      "path": "work/full_batch/00214.jpg",
+      "role": "detail",
+      "note": "已查看1920×1080原分辨率帧；源绑定见work/full_batch/index.json"
+    },
+    {
+      "frame": 225,
+      "path": "work/full_batch/00225.jpg",
+      "role": "detail",
+      "note": "原分辨率细字与bbox复核；本轮实际观看"
+    }
+  ],
+  "scene_type": "environment_plate",
+  "narrative_role": "以摄影层与独立信息层推进序章、服装展示和机器观众主题",
+  "subject": "黑色大厅正中一辆白车正对镜头",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "摄影、常驻界面与分时进入的独立信息叠层"
+  },
+  "scene_description": "黑色大厅正中一辆白车正对镜头，前灯在潮湿地面形成竖向白反射。两边是黑色观众或座位与小型发光屏幕，右侧有独立红灯，高处后墙开口透入蓝光。车框逐渐出现，末尾左上出现 Ladies.。",
+  "composition": {
+    "shot_size": "远景/全身或信息图",
+    "subject_position": "见subject_bbox；视觉估计",
+    "subject_bbox": {
+      "x": 0.42,
+      "y": 0.4,
+      "w": 0.13,
+      "h": 0.19,
+      "space": "frame_norm_top_left"
+    },
+    "subject_screen_fraction": null,
+    "camera_angle": "腰部插镜近水平；汽车大远景略俯；其他平视，实际焦距未知",
+    "layers": {
+      "foreground": "独立文字/检测框，及近处主体",
+      "midground": "人物、汽车或无摄影层的统计图",
+      "background": "详见scene_description"
+    },
+    "empty_field_for_type": "避开脸部；具体图形bbox见elements"
+  },
+  "camera": {
+    "movement": "画面变化及观测流量分开记录，无法仅凭光流确认真实相机",
+    "direction": "见 measured_motion",
+    "speed_profile": "未拟合；逐帧曲线尚未量化",
+    "dof_focus": "主体清楚，远处灯光离焦；图形层始终清晰",
+    "parallax_kind": "unknown",
+    "evidence": "首/中/末与filmstrip已检查；光流观测 {'pan_x_frac_per_s': 0.0007, 'pan_y_frac_per_s': 0.0048, 'zoom_per_s': 0.0303, 'median_flow_frac_per_s': 0.0067, 'pairs_measured': 16}",
+    "measured_motion": {
+      "pan_x_frac_per_s": 0.0007,
+      "pan_y_frac_per_s": 0.0048,
+      "zoom_per_s": 0.0303,
+      "median_flow_frac_per_s": 0.0067,
+      "pairs_measured": 16
+    }
+  },
+  "lighting": {
+    "key_direction": "视觉估计：冷蓝环境照明；红色点光或侧光见描述",
+    "quality": "低照度深阴影、反光表面与高亮屏幕；图形层自发光",
+    "effects": [
+      "可见彩色网点/细颗粒"
+    ],
+    "temporal_change": "见逐镜描述，精确亮度变化使用shot_stats luma"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#050A09",
+        "fraction": 0.62,
+        "method": "measured_kmeans",
+        "role": "measured cluster 0"
+      },
+      {
+        "hex": "#121C23",
+        "fraction": 0.183,
+        "method": "measured_kmeans",
+        "role": "measured cluster 1"
+      },
+      {
+        "hex": "#233244",
+        "fraction": 0.135,
+        "method": "measured_kmeans",
+        "role": "measured cluster 2"
+      },
+      {
+        "hex": "#4B5D74",
+        "fraction": 0.036,
+        "method": "measured_kmeans",
+        "role": "measured cluster 3"
+      },
+      {
+        "hex": "#7E879F",
+        "fraction": 0.017,
+        "method": "measured_kmeans",
+        "role": "measured cluster 4"
+      },
+      {
+        "hex": "#CBD1DF",
+        "fraction": 0.009,
+        "method": "measured_kmeans",
+        "role": "measured cluster 5"
+      }
+    ],
+    "contrast": "亮度首中末 [20.8, 21.7, 22.7]",
+    "grain_halftone": "可见重复细网点覆盖摄影层；精确频率参照全片halftone_pitch.json",
+    "temporal_change": "未逐帧拟合"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 00 / 11",
+    "G-TITLE-TAG": "ESCAPE VELOCITY · SS27",
+    "G-MONTHS-COUNTER": "18 MONTHS TO ESCAPE（S0001开头在底部大板内滚动）",
+    "G-FLAP-BOARD": "S0001随机字符锁定；S0002保持；S0003收缩退出；后续小控件",
+    "G-TICKER": "下沿持续左滚；条目与速度由visual_system登记，逐帧可见窗口随源时间变化",
+    "G-CORNER-MARKS": "四角浅色细十字保持",
+    "G-AUDIO-SPECTRUM": "右上细白音量条保持且高度变化",
+    "G-LEFT-RULER": "左缘刻度与y540橙指针保持",
+    "G-TIMECODE": {
+      "first": "00:00:08:12",
+      "last": "00:00:09:09",
+      "format": "MM:SS:FF"
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0009-E01",
+      "shot_id": "S0009",
+      "type": "background_media",
+      "description": "黑色大厅正中一辆白车正对镜头，前灯在潮湿地面形成竖向白反射。两边是黑色观众或座位与小型发光屏幕，右侧有独立红灯，高处后墙开口透入蓝光。车框逐渐出现，末尾左上出现 Ladies.。",
+      "start_frame": 204,
+      "end_frame": 225,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "摄影层内随镜头/人物运动",
+        "easing": "unknown",
+        "entrance": "f204首次可见；起显过程以已记录密集keyframes为准",
+        "exit": "f225保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 204,
+          "observed_state": "黑色大厅正中一辆白车正对镜头，前灯在潮湿地面形成竖向白反射。两边是黑色观众或座位与小型发光屏幕，右侧有独立红灯，高处后墙开口透入蓝光。车框逐渐出现，末尾左上出现 Ladies.。"
+        },
+        {
+          "frame": 225,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        204,
+        209,
+        215,
+        220,
+        225
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0009-E02",
+      "shot_id": "S0009",
+      "type": "prop",
+      "description": "中央正对镜头的车与明亮车头灯",
+      "start_frame": 204,
+      "end_frame": 225,
+      "bounding_box": {
+        "x": 0.42,
+        "y": 0.4,
+        "w": 0.13,
+        "h": 0.19,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "摄影层内随镜头/人物运动",
+        "easing": "unknown",
+        "entrance": "f204首次可见；起显过程以已记录密集keyframes为准",
+        "exit": "f225保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 204,
+          "observed_state": "中央正对镜头的车与明亮车头灯"
+        },
+        {
+          "frame": 225,
+          "observed_state": "最后可见包络，非动画终值测量"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        204,
+        209,
+        215,
+        220,
+        225
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照"
+    },
+    {
+      "element_id": "S0009-E03",
+      "shot_id": "S0009",
+      "type": "hud_bracket",
+      "description": "车体四角白色识别框，位置见归一化边框",
+      "start_frame": 207,
+      "end_frame": 225,
+      "bounding_box": {
+        "x": 0.43072916666666666,
+        "y": 0.41574074074074074,
+        "w": 0.12708333333333333,
+        "h": 0.19074074074074074,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 10,
+      "appearance": {
+        "color_hex": "#FFFFFF",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定或跟随主体；位置见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f207首次可见；起显过程以已记录密集keyframes为准",
+        "exit": "f225保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 207,
+          "description": "车框白线首次可见"
+        },
+        {
+          "frame": 208,
+          "description": "标题与边框稳定"
+        },
+        {
+          "frame": 225,
+          "description": "车框保持"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        209,
+        215,
+        220,
+        225
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "full_resolution_text_observation": {
+        "frame": 214,
+        "content": "WAYMO · DOOR OPEN / 0.96",
+        "status": "OBSERVED",
+        "note": "该帧实际可读字，箭头、省略号或[typing]为观测备注，不冒充全镜文本"
+      },
+      "text": {
+        "content": "WAYMO · DOOR OPEN / 0.96",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 11,
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0009-E04",
+      "shot_id": "S0009",
+      "type": "text_caption",
+      "description": "左上首个问候词，位置见归一化边框",
+      "start_frame": 224,
+      "end_frame": 225,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.18333333333333332,
+        "w": 0.10416666666666667,
+        "h": 0.044444444444444446,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_estimate",
+      "z_index": 20,
+      "appearance": {
+        "color_hex": "#D97757",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定或跟随主体；位置见bbox，变化见keyframes",
+        "easing": "unknown",
+        "entrance": "f224首次可见；起显过程以已记录密集keyframes为准",
+        "exit": "f225保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 224,
+          "opacity": "faint onset",
+          "text": "Ladies."
+        },
+        {
+          "frame": 225,
+          "opacity": "readable orange",
+          "text": "Ladies."
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        225
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "Ladies.",
+        "transcription_status": "可读主字；小字待核",
+        "typography": {
+          "font_status": "candidate_only",
+          "visual_family": "凝缩无衬线/小型monospace；Look00为斜体衬线",
+          "font_candidates": [],
+          "cap_height_px": 40,
+          "tracking": "normal",
+          "alignment": "left",
+          "line_height_px": 18,
+          "weight": "bold",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0009-E05",
+      "shot_id": "S0009",
+      "type": "text_label",
+      "description": "上方来宾清单表头，细横线下将出现席位统计",
+      "start_frame": 214,
+      "end_frame": 225,
+      "bounding_box": {
+        "x": 0.0375,
+        "y": 0.13703703703703704,
+        "w": 0.32864583333333336,
+        "h": 0.03148148148148148,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#D97757",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f214首次采样可见",
+        "exit": "f225保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 214,
+          "observed_state": "左侧GUE和右侧SHA"
+        },
+        {
+          "frame": 225,
+          "observed_state": "镜尾左行FRONT RO仍打字，右行SHARE OF SEATS完整"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        225
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "GUEST LIST · SHOW 01 · FRONT RO\nSHARE OF SEATS",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 14,
+          "line_height_px": 22.400000000000002,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0009-E06",
+      "shot_id": "S0009",
+      "type": "hud_gauge",
+      "description": "Ladies右侧的零席位细灰横条与0%",
+      "start_frame": 225,
+      "end_frame": 225,
+      "bounding_box": {
+        "x": 0.20885416666666667,
+        "y": 0.19907407407407407,
+        "w": 0.18854166666666666,
+        "h": 0.016666666666666666,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#D97757",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f225首次采样可见",
+        "exit": "f225保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 225,
+          "observed_state": "灰条和0%首见"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        225
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "0 %",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 18,
+          "line_height_px": 28.8,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    },
+    {
+      "element_id": "S0009-E07",
+      "shot_id": "S0009",
+      "type": "hud_marker",
+      "description": "车框右下的虚线指示与出口路径打字",
+      "start_frame": 224,
+      "end_frame": 225,
+      "bounding_box": {
+        "x": 0.5578125,
+        "y": 0.5277777777777778,
+        "w": 0.07552083333333333,
+        "h": 0.08333333333333333,
+        "space": "frame_norm_top_left"
+      },
+      "bbox_method": "visual_pixel_estimate_from_fullres",
+      "z_index": 30,
+      "appearance": {
+        "color_hex": "#D97757",
+        "opacity": null,
+        "blend_mode": "unknown",
+        "details": "颜色为视觉估计；底层原色见测量palette"
+      },
+      "motion": {
+        "path": "固定在给定bbox，字符按keyframes分阶段显现",
+        "easing": "stepped typewriter",
+        "entrance": "f224首次采样可见",
+        "exit": "f225保持或随镜头切离；无独立退场，除非keyframes另述"
+      },
+      "keyframes": [
+        {
+          "frame": 224,
+          "observed_state": "虚线朝右下延伸"
+        },
+        {
+          "frame": 225,
+          "observed_state": "EXIT→CATW仍在打字"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        225
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "原始素材/图形源代码、字体identity和精确插值未知；给定几何为复核后的视觉像素估计。"
+      ],
+      "reconstruction_hint": "按独立layer实现并以参考帧对照",
+      "text": {
+        "content": "EXIT → CATW",
+        "case": "as_displayed",
+        "transcription_status": "OBSERVED_FULLRES",
+        "typography": {
+          "font_status": "unknown",
+          "visual_family": "monospaced sans",
+          "cap_height_px": 12,
+          "line_height_px": 19.200000000000003,
+          "tracking": "normal monospaced",
+          "alignment": "left",
+          "weight": "medium",
+          "method": "visual_estimate",
+          "confidence": 0.74
+        }
+      }
+    }
+  ],
+  "animations": [],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B0-008",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B0-009",
+      "description": "沿用Phase A边界，首末画面核对；转场精确区间见boundaries_all.json",
+      "recommended_technique": "基于边界切换底层媒体；图形层时间独立"
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AB0020",
+      "relation": "beat_candidate (unknown) at frame 207; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 207
+    },
+    {
+      "audio_event_id": "AB0021",
+      "relation": "beat_candidate (unknown) at frame 218; Interpolated/extrapolated DP grid without nearby measured kick; not a confirmed audible beat",
+      "frame": 218
+    },
+    {
+      "audio_event_id": "AW0001",
+      "relation": "vocal_word_candidate (unknown) at frame 224–232; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 224
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "graphics",
+        "technique": "自定义JS Canvas + WebGL印刷后期",
+        "evidence_level": "confirmed",
+        "rationale": "作者公开制作记录确认全片渲染体系，不能据此确认逐镜具体实现参数",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1/B3/B5"
+        ]
+      },
+      {
+        "layer": "base footage",
+        "technique": "Midjourney/Seedance或2.5D；本镜头映射未确认",
+        "evidence_level": "unknown",
+        "rationale": "视觉不能独立证明具体模型与镜头映射",
+        "source_refs": []
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme/",
+      "note": "本地source_docs/FINDINGS.md及readme.md"
+    }
+  ],
+  "confidence": 0.65,
+  "uncertainties": [
+    "视觉几何为原分辨率视觉像素估计，误差约±4–12px；非程序源坐标。",
+    "密集采样时点精度见keyframes；真实插值函数和字体identity未知。",
+    "摄影层是否独立抠像与图形原始shader无法从成片唯一反推。",
+    "音频事件待主会话整合。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "依照底层摄影、独立图形元素、常驻界面、印刷网点的顺序重建；先以关键帧校准位置，再补逐词时序。此阶段只记录，未实现复刻。",
+    "dependencies": [
+      "visual_system.json",
+      "contactsheets/S0009.jpg"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "精细文字时间、遮挡与相邻图形连续性需要进一步测量",
+    "alternatives": "摄影层先用静帧验证构图，运动模型仅在后续用户批准复刻阶段选择"
+  },
+  "fine_review": {
+    "status": "DETAILED_VISUAL_REVIEW",
+    "full_resolution_frames_viewed": [
+      214,
+      225
+    ],
+    "finding": "原分辨率复核细小标签与初稿主元素；具体可读字附在各元素full_resolution_text_observation",
+    "remaining": "原始字体、shader、不可辨半翻字符保持unknown；音频由主会话整合。",
+    "dense_ranges_viewed": [
+      [
+        204,
+        225,
+        1
+      ]
+    ],
+    "closure": "逐帧/2帧时间复核及本轮fullres逐层查缺；新增遗漏表头、深度标尺、零席位条、出口虚线；bbox与text.content逐元素核对"
+  }
+}

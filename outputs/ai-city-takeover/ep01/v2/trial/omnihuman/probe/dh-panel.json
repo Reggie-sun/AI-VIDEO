@@ -1,0 +1,24 @@
+{
+ "text": "数字人\n快速模式\n上传音频",
+ "controls": [
+  "数字人\n快速模式\n上传音频",
+  "数字人",
+  "快速模式",
+  "上传音频"
+ ],
+ "inputs": [
+  {
+   "tag": "INPUT",
+   "type": "text",
+   "accept": null,
+   "placeholder": null
+  },
+  {
+   "tag": "INPUT",
+   "type": "text",
+   "accept": null,
+   "placeholder": null
+  }
+ ],
+ "read_at": "2026-11-03T04:58:42.105Z"
+}

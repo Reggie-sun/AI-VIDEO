@@ -1,0 +1,58 @@
+{
+ "schema": "iris-v2-preview-approval/1",
+ "unit_group": "omnihuman-trial",
+ "question": "看過預覽後，這個數字人試驗（2 次、約 330 積分上限）要怎麼做？",
+ "user_quote": "你寫程式自動操作",
+ "approved_at": "2026-11-03T04:56:32.059896+00:00",
+ "preview_page": {
+  "path": "trial/omnihuman/preview.html",
+  "sha256": "92a8103e3283756867c1ed3be56af753aac91e718845a6680f5845558b85e586"
+ },
+ "preview_inputs": {
+  "path": "trial/omnihuman/preview-inputs.json",
+  "sha256": "6429b865d037b0382cc1cbe0c81da5da56e41b478a28493dbe04828c1ffe0aad"
+ },
+ "preview_artifacts": [
+  {
+   "path": "keyframes/raw/K7-a.png",
+   "sha256": "881537a1b4d4c1ca6ca68f8280d8df783108ceac710c8b544fc7439bcec40f09",
+   "role": "singer image"
+  },
+  {
+   "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7",
+   "role": "uploaded vocal"
+  }
+ ],
+ "takes": {
+  "OH-A": {
+   "action_prompt": null,
+   "why": "control: no action description"
+  },
+  "OH-B": {
+   "action_prompt": "镜头固定特写。她冷静但投入地对着镜头唱歌，嘴随歌词自然张合，乐句之间轻轻换气，肩膀随呼吸微微起伏，头随乐句轻轻点动，眉头舒展，眼神始终看着镜头。",
+   "action_prompt_sha256": "c2ab14038f4d267c32e25cba8cb5071ab459abbf5abf4bffed1aed6e027eac99",
+   "why": "pure Chinese, positive, actions only (official template: camera + mood + speaking state + actions); 冷静但活着 as the user chose for v3"
+  }
+ },
+ "mode": "即梦 数字人 · 大师模式 · 1080P · single subject (not 生动模式, which crops to 1:1)",
+ "budget": {
+  "generations": 2,
+  "retries": 0,
+  "operator_ceiling_per_take_CRD": 165,
+  "cumulative_CRD": 330,
+  "rule": "the approved bound is about 330 credits for both takes; if the UI price of one take is above 165, stop and ask"
+ },
+ "scope": "new browser automation for the Jimeng 数字人 page (read-only probe first, then the two submits under one-use permits, ledger and continuity report); no other provider, no new account",
+ "accept": [
+  "both phrases visibly open and close",
+  "a breath is visible before 'I just'",
+  "no frown, no frozen face, no over-acting",
+  "identity matches K7, pane background stable",
+  "per-shot gate first, then the user watches it with the song"
+ ],
+ "drop": [
+  "K7 refused by the entry review: stop, no preprocessing to get past it",
+  "both takes repeat the frown / weak expression / frozen face, or show exaggerated mouth, broken teeth or identity drift: drop the route, no third take"
+ ]
+}

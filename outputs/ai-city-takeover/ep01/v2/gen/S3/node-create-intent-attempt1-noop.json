@@ -1,0 +1,12 @@
+{
+  "operation": "add_one_empty_video_node",
+  "via": "canvas left toolbar 视频 button",
+  "prior_node_ids": [
+    "node_nxqx68czn9",
+    "node_c33q9smf0f",
+    "node_vdk8wx4zs5"
+  ],
+  "created_at": "2026-11-02T07:00:33.629Z",
+  "generation_POSTs": 0,
+  "outcome": "no click happened: the toolbar locator matched nothing (timeout); canvas unchanged"
+}

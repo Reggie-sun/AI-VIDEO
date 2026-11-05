@@ -1,0 +1,32 @@
+{
+  "unit": "S1",
+  "checks": {
+    "exact_reference_K1a_then_ID7b": true,
+    "reference_role_reference": true,
+    "reference_duties_in_text": true,
+    "chinese_body_only": true,
+    "eye_stays_closed": true,
+    "locked_camera_no_push": true,
+    "keep_first_frame_macro": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "independent_final_audio": true,
+    "bound_output": true,
+    "operator_ceiling_matches_preview": true,
+    "previous_gate_pass": true
+  },
+  "pass": true,
+  "request_hash": "0961504fdd61648bd89b01406093ad18fbbafecdc91474b8b320b2250e07f44d",
+  "continuity": "opening shot of the film; hard cut to S2 (A01-v2, eyes open) on 'woke'",
+  "handoff": "S1 closed eye before waking -> S2 open-eyed IRIS: the cut itself is the awakening; 03:47 slams in by motion-kit on beat 1",
+  "axis_action_camera": "macro of the left eye, eye stays closed; only faint eye movement under the lid, lash flutter, passing city light; locked camera",
+  "prompt_fit": "pure Chinese body 350 chars, two references with named duties (start frame; identity only, no background or composition)",
+  "budget": {
+    "v2_submits_before": 4,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 1000,
+    "v2_ceiling_CRD": 2500,
+    "observed_cost_per_6s_CRD": 198
+  },
+  "new_calls": 0
+}

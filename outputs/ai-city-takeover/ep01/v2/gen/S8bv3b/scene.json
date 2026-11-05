@@ -1,0 +1,60 @@
+{
+  "artifact_id": "iris-v2-s8bv3b-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "f7d28195639d766803340bc2e7a71c584a47c5145e52ea451532a18c88828588",
+  "creation_receipt_id": "iris-v2-S8bv3b-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/d4619055c2f1ef4f4eeb8a400dec3616c7238d431544c0dd7f4e3f03e8f1196e.json",
+      "content_hash": "d4619055c2f1ef4f4eeb8a400dec3616c7238d431544c0dd7f4e3f03e8f1196e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7c28eaf14406ca7fb4ae6656abd90ffb827343e213a32babd0b3ecfcc7d3ec09.json",
+      "content_hash": "7c28eaf14406ca7fb4ae6656abd90ffb827343e213a32babd0b3ecfcc7d3ec09"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/b6484338b8275b1178d0bc86b9ff7c694af464c56940c2b02292aef86a2337af.json",
+      "content_hash": "b6484338b8275b1178d0bc86b9ff7c694af464c56940c2b02292aef86a2337af"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json",
+      "content_hash": "ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/2f3e50ee3d27d030693a221574a5a0d4e61a6705fdf12061167752d0d4a8aed9.json",
+      "content_hash": "2f3e50ee3d27d030693a221574a5a0d4e61a6705fdf12061167752d0d4a8aed9"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/690a37e8aa3fc31360419c72333fd281a863968b802494bef8ab93e37535e7c6.json",
+      "content_hash": "690a37e8aa3fc31360419c72333fd281a863968b802494bef8ab93e37535e7c6"
+    }
+  ],
+  "scene_id": "balcony",
+  "location": "雨夜高层建筑的玻璃阳台",
+  "time": "凌晨",
+  "mood": "冷静、克制",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左领红光位置一致",
+    "蓝黑/钢蓝，红为唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v3-s8b-1-balcony",
+    "iris-c-v3-s8b-2-singing",
+    "iris-c-v3-s8b-3-after"
+  ]
+}

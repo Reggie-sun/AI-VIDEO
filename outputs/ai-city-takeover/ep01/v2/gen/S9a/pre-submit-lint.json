@@ -1,0 +1,33 @@
+{
+  "unit": "S9a",
+  "checks": {
+    "native_endpoints_K4_K9e": true,
+    "frame_conditioned_mode": true,
+    "no_reference_markers": true,
+    "endpoint_duties_in_text": true,
+    "chinese_body_only": true,
+    "no_person": true,
+    "door_closes_light_out": true,
+    "locked_camera": true,
+    "ai_label_preserved": true,
+    "no_new_text_graphics": true,
+    "independent_final_audio": true,
+    "bound_output": true,
+    "operator_ceiling_matches_preview": true,
+    "previous_gate_pass": true
+  },
+  "pass": true,
+  "request_hash": "48b78ff90aa28dc16d1a5ce99991dc993d6f964d51f0eaf86fa476325c681633",
+  "continuity": "hard cut on the spoken 'Relax'; same rack door as S4 (K4), now closing; no carried motion from S8b",
+  "handoff": "S8b chorus ends -> S9a the door that was 'left open' shuts and the red light goes out on 'closed'; S9b moves to the CPU cache test",
+  "axis_action_camera": "locked camera on the K4 view; the half-open black rack door swings shut, the gap narrows to nothing, red light and floor reflection go out; nobody in frame",
+  "prompt_fit": "pure Chinese body 320 chars; native first/last frame roles, no reference markers; K9e is K4's exact view with the door shut (compatibility evidence sealed in the row)",
+  "budget": {
+    "v2_submits_before": 5,
+    "operator_ceiling_CRD": 250,
+    "v2_ceiling_CRD_used_before": 1250,
+    "v2_ceiling_CRD": 2500,
+    "observed_cost_per_6s_CRD": 198
+  },
+  "new_calls": 0
+}

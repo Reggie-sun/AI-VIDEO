@@ -1,0 +1,27 @@
+{
+ "unit": "LSen1",
+ "take": "outputs/ai-city-takeover/ep01/v2/gen/LSen1/project/state/video-generation/fetch/files/93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d.mp4",
+ "take_sha256": "93c52d27192bf0a7113cd95144f6b868724479b93b6506b80daf3c8e3f96cf0d",
+ "mouth_box": [
+  996,
+  404,
+  269,
+  210
+ ],
+ "onsets_clip_s": {
+  "I": 0.63,
+  "didn't": 1.31,
+  "run": 1.53,
+  "I (just)": 2.75,
+  "just": 2.94,
+  "looked": 3.44,
+  "outside": 3.94,
+  "I (pass 2)": 4.64
+ },
+ "sync": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/LSen1/sync/LSen1/sync.json",
+ "lipsync": "outputs/ai-city-takeover/ep01/v2/trial/lipsync-ev/LSen1/lipsync",
+ "review_ref_master": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/review/trial-LSen1-93c52d27192b-ref-master.mp4",
+  "sha256": "21700bfc89b4dafe49fc5944293b39abe2e8361942b2e6396a65cb0719f14edd"
+ }
+}

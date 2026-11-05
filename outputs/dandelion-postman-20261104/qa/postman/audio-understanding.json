@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"error\": \"audio_extraction_failed\",\n  \"outcome\": \"EVIDENCE_GAP\",\n  \"message\": \"A complete bounded source audio track could not be decoded.\",\n  \"retryable\": false,\n  \"production_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

@@ -1,0 +1,34 @@
+{
+  "kind": "iris-approved-two-reference-source-provenance/1",
+  "approved_output": {
+    "id": "A01",
+    "path": "outputs/ai-city-takeover/ep01/reference-package/A01-v1.png",
+    "sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087",
+    "width": 1672,
+    "height": 941,
+    "prompt_sha256": "0ea67d183fd0d84e3106efd7e385f81c7839ca213e10e0e9d771df54042b5d2a",
+    "actual_image_inputs": [
+      {
+        "path": "outputs/ai-city-takeover/series/casting/raw/CF-a.png",
+        "sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb"
+      },
+      {
+        "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+        "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+      }
+    ]
+  },
+  "generation_intent_sha256": "d232bdebbe9bdcfd0f19c7603b2584253c3b33177bc1ea3efb1709380fa61914",
+  "original_a01_prompt": {
+    "text": "照片级真实的电影镜头，横版十六比九。严格保持两张参考图片中的同一位原创新女性人物身份：二十七八岁，欧美面孔，苍白皮肤和极淡雀斑，浅灰蓝眼，深棕色头发后梳贴头、脑后低髻；左耳为同一枚黑色耳挂装置；炭黑色哑光技术风长大衣和高立领，左侧领口内嵌同一道极细红色指示灯线。参考图只控制人物骨相、肤质、发型、服装、耳挂和红光位置，不继承影棚背景、原图构图或嘴形。蓝黑和钢蓝统一色调，红色是唯一暖色，不出现其他暖光。自然皮肤和真实衣料纹理，保留暗部细节；不要额外添加胶片颗粒、扫描线、印刷半调、色差，后期会统一处理。没有任何文字、字幕、标志、水印、图表、边框或悬浮界面。本镜为开场主镜。人物站在凌晨雨后城市高处的真实玻璃阳台，镜头正面平视拍胸像，人物位于画面右侧三分之一，脸向镜头，眼神安静而清醒，嘴自然闭合。左侧约四成画面留给深蓝黑色虚焦的城市、雾和少量冷白道路灯光，留白具有真实空间而不是纯色板。能认出她左耳装置和左领口极细红光。背景有远处高架和湿玻璃的克制反射。中长焦、电影景深，脸清晰、背景柔和，不要广角脸部变形。画面沉静、精密、略有压迫感，无夸张表情。",
+    "sha256": "0ea67d183fd0d84e3106efd7e385f81c7839ca213e10e0e9d771df54042b5d2a"
+  },
+  "direct_provider_payload_image_ids": [
+    "iris-a01-first-frame-repair-balcony",
+    "iris-cf-details"
+  ],
+  "canonical_identity_evidence_only": [
+    "iris-cf-face"
+  ],
+  "selected_strategy": "multimodal-two-reference; directly selected ID7b includes complete approved IRIS face and devices, not merely a detail reference"
+}

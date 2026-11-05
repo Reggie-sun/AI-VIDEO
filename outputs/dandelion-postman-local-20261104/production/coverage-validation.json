@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "schema_version": "4",
+  "director_preflight_request": true,
+  "creative_input_kind": "direction",
+  "coverage_strategy": "single_take",
+  "strategy_source": "agent_directed",
+  "coverage_unit_count": 1,
+  "planned_duration_seconds": 12.0,
+  "intent_group_counts": {
+    "acceptable_variation": 0,
+    "must_happen": 2,
+    "must_not_happen": 0,
+    "preferred_performance": 0,
+    "timing_targets": 0
+  },
+  "qa_admission_required": true,
+  "director_intent_is_not_acceptance": true
+}

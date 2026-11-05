@@ -1,0 +1,54 @@
+{
+ "unit": "ST3",
+ "mp4": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v2/gen/ST3/project/state/video-generation/fetch/files/0b19fa820c9dc94e9ae590e011a22c34521e099be4c226d93db37d7602562a0d.mp4",
+ "sha256": "0b19fa820c9dc94e9ae590e011a22c34521e099be4c226d93db37d7602562a0d",
+ "verdict": "FAIL",
+ "items": [
+  {
+   "id": "identity_sha",
+   "result": "PASS",
+   "evidence": "sha256sum与给定值一致"
+  },
+  {
+   "id": "no_hard_cut",
+   "result": "PASS",
+   "evidence": "帧差中位数1.17，最大2.77(f80，GOP关键帧)"
+  },
+  {
+   "id": "camera_very_slow_push_in",
+   "result": "FAIL",
+   "evidence": "方向是向前推近，但到5s人脸约放大2.7倍（2.49s约1.4倍），2.5s后加速，从中景推成特写，不是‘极缓慢’"
+  },
+  {
+   "id": "back_rows_still_copies",
+   "result": "PASS",
+   "evidence": "后排副本全程闭眼、原位不动；没有耳挂和红线，属首帧设定"
+  },
+  {
+   "id": "no_mouth_movement",
+   "result": "FAIL",
+   "evidence": "中心放大：0-2.49s嘴唇闭合；2.99s起微张，3.48-4.98s开口变大"
+  },
+  {
+   "id": "identity_canon_earpiece_redline",
+   "result": "PASS",
+   "evidence": "耳挂在她左耳（画面右侧），1.0-3.0s可见；红线是她左领的一条细段，到4.98s仍未成圈"
+  },
+  {
+   "id": "no_model_text",
+   "result": "PASS",
+   "evidence": "未见文字"
+  },
+  {
+   "id": "watermark_corners",
+   "result": "PASS",
+   "evidence": "四角无水印"
+  }
+ ],
+ "usable_span": [
+  0.0,
+  2.5
+ ],
+ "notes": "可用段内推镜仍约1.4倍",
+ "reviewed_by": "shot-gate-reviewer (video-analysis MCP)"
+}

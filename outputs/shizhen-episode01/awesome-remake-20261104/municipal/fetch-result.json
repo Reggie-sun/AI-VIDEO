@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "action": "fetch",
+  "artifact_path": "state/video-generation/fetch/files/4df6946ac1e7b0bc47a6038d1814cea3aa6f3c1cc907b0183d7bced480458e4d.mp4",
+  "sha256": "4df6946ac1e7b0bc47a6038d1814cea3aa6f3c1cc907b0183d7bced480458e4d",
+  "bytes": 20288751,
+  "quality": "NOT_EVALUATED",
+  "activation": "not_performed"
+}

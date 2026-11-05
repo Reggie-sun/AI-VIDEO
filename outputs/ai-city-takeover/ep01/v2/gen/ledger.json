@@ -1,0 +1,83 @@
+{
+ "schema": "iris-v2-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "S3",
+   "attempt_id": "iris-v2-s3-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T07:05:02.345209+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S5",
+   "attempt_id": "iris-v2-s5-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T07:14:34.202841+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S5r",
+   "attempt_id": "iris-v2-s5r-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T07:28:35.266242+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S7",
+   "attempt_id": "iris-v2-s7-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T07:34:46.489250+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S1",
+   "attempt_id": "iris-v2-s1-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T07:40:56.990055+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S9a",
+   "attempt_id": "iris-v2-s9a-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T07:47:10.469301+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S8a",
+   "attempt_id": "iris-v2-s8a-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T07:55:47.254666+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S8ar",
+   "attempt_id": "iris-v2-s8ar-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T08:11:07.586786+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S8b",
+   "attempt_id": "iris-v2-s8b-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T08:33:44.436397+00:00",
+   "outcome": "known_no_effect",
+   "evidence": "gen/S8b/project/state/paid-provider/submits/343681b7e8df10195c6a6eae135f799919a2d366cbae4e8b4047b813047d02e2.json: reference upload failed before the generation request; no external effect, no charge"
+  },
+  {
+   "unit": "S8b2",
+   "attempt_id": "iris-v2-s8b2-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T08:36:03.195020+00:00",
+   "outcome": "submitted"
+  },
+  {
+   "unit": "S8br",
+   "attempt_id": "iris-v2-s8br-source-001",
+   "operator_ceiling": 250,
+   "intent_at": "2026-11-02T08:46:22.173433+00:00",
+   "outcome": "submitted"
+  }
+ ]
+}

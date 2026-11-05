@@ -1,0 +1,40 @@
+{
+ "unit": "ST6",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "ea74991a2782bf0e9b92ba523561fb572504ef92bfe50e7abd48d15096203c80",
+ "compiled_prompt_sha256": "c2de5d75f514ce8405e5af2be2d5abdfdd62a10229706cdfcde142ce8106f98a",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v2/trial/story/continuity-report.json",
+  "sha256": "230814b2dab63866c43cb584cad969bd8c39ae84d76270eddfc551577fc660ec",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS: ST6-a（d1c3c600…）里她面朝画面左侧，左耳戴耳挂，近侧领口有红线（分段，见 R8），后梳低髻，炭黑高领长大衣；机位和机房角落与 ST2、c13 S9a 相同；门扇是右侧那块面板向左推上，与 ST2 门开的方向一致。",
+   "handoff": "PASS: 放在 S9a「the door is closed」处，结尾红光完全熄灭，接得上 c13 在 28.2 s 门关上、没有红光的画面；开头门缝已很窄，与 S9a 开头门开得更大之间是可以接受的省略。",
+   "axis_action_camera": "PASS: 规格是 LOCKED，与 S4、S9a 机位相同；她朝左推门，屏幕方向与 ST2 一致；推门、红光渐窄到熄灭、垂眼看门缝，动作顺序可读。",
+   "prompt_fit": "PASS: compiled 与 approval prompts.ST6 逐字相同（c2de5d75…），只有一张首帧绑定，没有音频参考；嘴唇闭合。",
+   "lint": "PASS（本报告这一项除外）: failed=[continuity_report_ready]，其余 10 项都为 true；request_hash ea74991a…"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 165,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   6,
+   990
+  ]
+ },
+ "new_calls": 0
+}

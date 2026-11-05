@@ -1,0 +1,79 @@
+{
+  "scope": "reference artwork only; not Registry or runtime preview_approval",
+  "recorded_at": "2026-10-30T22:23:53.965926+00:00",
+  "user_decision": {
+    "exact_quote": "三张都认可，继续镜头制作",
+    "source": "current conversation structured user reply",
+    "covers": [
+      "A01-v1.png",
+      "A02-v1.png",
+      "A03-v1.png"
+    ]
+  },
+  "images": [
+    {
+      "id": "A01",
+      "path": "outputs/ai-city-takeover/ep01/reference-package/A01-v1.png",
+      "sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087",
+      "width": 1672,
+      "height": 941,
+      "prompt_sha256": "0ea67d183fd0d84e3106efd7e385f81c7839ca213e10e0e9d771df54042b5d2a",
+      "actual_image_inputs": [
+        {
+          "path": "outputs/ai-city-takeover/series/casting/raw/CF-a.png",
+          "sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb"
+        },
+        {
+          "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+          "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "path": "outputs/ai-city-takeover/ep01/reference-package/A02-v1.png",
+      "sha256": "f5898169c65ecd4c393a1147794841579f6323970e74cfea256c1f66d6c51039",
+      "width": 1672,
+      "height": 941,
+      "prompt_sha256": "84ff3ae7935827b0da6b1877959692d163fd3c42594d2df5e7574289c91b1f43",
+      "actual_image_inputs": [
+        {
+          "path": "outputs/ai-city-takeover/series/casting/raw/CF-a.png",
+          "sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb"
+        },
+        {
+          "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+          "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+        },
+        {
+          "path": "outputs/ai-city-takeover/ep01/reference-package/A01-v1.png",
+          "sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087"
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "path": "outputs/ai-city-takeover/ep01/reference-package/A03-v1.png",
+      "sha256": "24e5bb452e90e1c9566ad914ac11213cfaecb9596131db6a1b8b5f585199ca0f",
+      "width": 1672,
+      "height": 941,
+      "prompt_sha256": "b41917410c1e08c39e78578924896c4272df0b9642cc4c951d64dd78f787fff8",
+      "actual_image_inputs": [
+        {
+          "path": "outputs/ai-city-takeover/series/casting/raw/CF-a.png",
+          "sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb"
+        },
+        {
+          "path": "outputs/ai-city-takeover/series/identity-cf/raw/CF-ID7b-a.png",
+          "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+        }
+      ]
+    }
+  ],
+  "observations": {
+    "A01": "identity/left-ear device/left-collar red light and opening negative space visibly preserved; closed mouth means voiceover",
+    "A02": "same balcony environment actually used as third input; static restrained open-mouth reference, not lip-sync evidence",
+    "A03": "viewer sees monitor back; use for character observation, separate editorial graphics rather than compositing onto its back"
+  },
+  "paid_video_submissions": 0
+}

@@ -1,0 +1,37 @@
+{
+  "selected_strategy": "multimodal-two-reference: A01 scene + ID7b full identity; exclude CF-a side/back",
+  "administrative_directory_name_is_not_provider_mode": true,
+  "project_revision": 4,
+  "manifest_revision": 13,
+  "actual_reference_order": [
+    "iris-a01-first-frame-repair-balcony",
+    "iris-cf-details"
+  ],
+  "actual_sha256": [
+    "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087",
+    "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea"
+  ],
+  "actual_provider_mode": "reference_to_video",
+  "cf_a_in_payload": false,
+  "cf_id7b_in_payload": true,
+  "canonical_character_exactly_preserved": true,
+  "identity_qa_exactly_preserved": true,
+  "natural_lips_new_rule_explicit": true,
+  "platform_ai_mark_retained": true,
+  "first_frame_claimed": false,
+  "deterministic_prepare": true,
+  "prepare_no_state_writes": true,
+  "all_payload_bytes_verified": true,
+  "stale_binding_rejected": true,
+  "prior_attempts": 1,
+  "prior_credits": 198,
+  "cumulative_attempt_ceiling": 2,
+  "cumulative_credit_ceiling": 500,
+  "new_unit_max_submits": 1,
+  "request_hash": "788f66d9d2f6659bb4092bffd8cd08f6afc89ad1c1ac3317ffbacd7f10c98e4a",
+  "execution_binding_hash": "61af6a94fff0455deae7974b01f493881a8453b308718991767e72618ed0fb68",
+  "prompt_sha256": "9ac5d20a7b6f30a03a6331e4fa35c9e5eec88ec8884e6b3a4009397fb53785ff",
+  "provider_calls": 0,
+  "actual_repair_quality": "NOT_EVALUATED",
+  "old_camera_space_fail_preserved": true
+}

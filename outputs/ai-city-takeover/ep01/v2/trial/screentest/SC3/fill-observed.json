@@ -1,0 +1,178 @@
+{
+ "unit": "SC3",
+ "observed_at": "2026-11-04T03:37:09.593Z",
+ "tab": "https://jimeng.jianying.com/ai-tool/home#omnihuman-SC3",
+ "generation_POSTs": 0,
+ "inputs": [
+  {
+   "path": "trial/screentest/C3-closeup.png",
+   "sha256": "907ff1b0d575cfbe192c6b3a273c266f188a4b28baf2492f0e10c2feeebc1947"
+  },
+  {
+   "path": "trial/lipsync-ev/window-17.97-22.97.wav",
+   "sha256": "851ce8a54b3bf96f13a6c29355720d58dab6a6d4a658c33006519cd7dedda5d7"
+  }
+ ],
+ "mode_label": "大师模式",
+ "model_title": "选择模型：大师模式 by OmniHuman 1.5",
+ "price": 30,
+ "balance_text": "6.3万 超级会员",
+ "balance_precise": 63236,
+ "generate_enabled": true,
+ "rows": {
+  "speech_text": null,
+  "speech_audio": "00:05",
+  "action": "镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体随节拍轻轻摇摆，乐句之间轻轻换气，像在分享一个秘密。"
+ },
+ "resolution": null,
+ "vivid": false,
+ "image_uploaded": true,
+ "audio_uploaded": true,
+ "action_text": "镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体随节拍轻轻摇摆，乐句之间轻轻换气，像在分享一个秘密。",
+ "panel": {
+  "found": true,
+  "text": "音频原声\n\n角色说\n00:00\n/\n00:05\n\n\n\n动作描述\n镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体随节拍轻轻摇摆，乐句之间轻轻换气，像在分享一个秘密。\n\n数字人\n大师模式\n上传音频\n30",
+  "mode": "大师模式",
+  "imgs": [
+   {
+    "src": "blob:https://jimeng.jianying.com/666db8ab-783c-40f0-b3c5-233dfa5473f8",
+    "w": 48,
+    "h": 64
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/666db8ab-783c-40f0-b3c5-233dfa5473f8",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/666db8ab-783c-40f0-b3c5-233dfa5473f8",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/666db8ab-783c-40f0-b3c5-233dfa5473f8",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/666db8ab-783c-40f0-b3c5-233dfa5473f8",
+    "w": 16,
+    "h": 16
+   }
+  ],
+  "editors": [
+   {
+    "tag": "DIV",
+    "value": "角色说\n00:00\n/\n00:05\n\n\n\n动作描述\n镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体随节拍轻轻摇摆，乐句之间轻轻换气，像在分享一个秘密。",
+    "placeholder": null
+   },
+   {
+    "tag": "DIV",
+    "value": "",
+    "placeholder": null
+   }
+  ],
+  "buttons": [
+   {
+    "text": "移除 · 参考内容",
+    "x": 55,
+    "y": 12,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "移除 · 参考内容",
+    "x": 133,
+    "y": 17,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "",
+    "x": 244,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 352,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-gIRG2a"
+   },
+   {
+    "text": "",
+    "x": 244,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 352,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-gIRG2a"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 109,
+    "w": 32,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU submit-button"
+   },
+   {
+    "text": "上传音频",
+    "x": 215,
+    "y": 109,
+    "w": 84,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-default lv-btn-shape-square button-EkZazO button-E9b8NU toolbar-button-J5Ou4K"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 109,
+    "w": 32,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU submit-button"
+   }
+  ],
+  "numbers": [
+   {
+    "n": 30,
+    "x": 1128,
+    "y": 119
+   }
+  ],
+  "price": 30,
+  "size": [
+   1200,
+   158
+  ],
+  "rows": {
+   "speech_text": null,
+   "speech_audio": "00:05",
+   "action": "镜头固定近景。她调皮地歪着头，笑着对着镜头唱歌，嘴随歌词自然张合，眼睛发亮，身体随节拍轻轻摇摆，乐句之间轻轻换气，像在分享一个秘密。"
+  },
+  "resolution": null,
+  "vivid": false
+ }
+}

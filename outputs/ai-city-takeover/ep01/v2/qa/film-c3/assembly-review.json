@@ -1,0 +1,303 @@
+{
+ "schema": "iris-v2-assembly-review/1",
+ "authority": "development_only (Agent observation)",
+ "video": "outputs/ai-city-takeover/ep01/v2/renders/EP01-film-c3.mp4",
+ "video_sha256": "6ffc13319e7bcbdaf71c3e7a911fc2fd264abbf9bc1c8e028da150c904f5b5d9",
+ "delivery_copy": {
+  "path": "outputs/ai-city-takeover/ep01/v2/renders/IRIS-EP01-Looked-Outside-v2-c3.mp4",
+  "sha256": "437fddcb4c8ab0dcffe72e128fe568725981a9010f45d0d53ca72dc383301ca3",
+  "note": "x264 crf 17 re-encode with faststart of the render above"
+ },
+ "canonical_gate": {
+  "command": "scripts.agent_harness verify-assembly",
+  "status": "NOT_RUN",
+  "reason": "same as c1/c2: the motion-kit HyperFrames comp has no canonical ResolvedTimeline or HyperFrames render report (spec 2026-10-30 §3.7 Phase 1.5 not done), so the joins are not verified by the Harness; this is an unverified review film"
+ },
+ "plan": "docs/superpowers/specs/2026-11-02-iris-ev-method-realignment.md §5",
+ "chorus_edit": "comp/chorus.json (user: 「B：切到睜開的眼 (Recommended)」「B：切到窗前 (Recommended)」)",
+ "qa": {
+  "tool": "motion-kit/tools/qa.py",
+  "report": "qa/film-c3/report.md",
+  "result": "12/12 cuts at 0 frames; 13/13 cues within 1 frame (chorus_impact -1 by design: motion-kit/src/beatcam.js shows events one frame early); no flash, strobe, pops or outlier frames"
+ },
+ "pace": {
+  "table": "qa/film-c3/pace-vs-c1.json",
+  "summary": "bars 11-14 (chorus) up 0.5-2.3 by design; bars 1-2 up 1.1 / 1.4 from S1v3's content (a passing light at 0.1-0.8 s, the eye opening 1.9-2.6 s), cut times as c1; bars 8-10 lower (S7v3, as c2); the rest as c1"
+ },
+ "loudness": "integrated -14.2 LUFS, true peak -1.0 dBFS (ffmpeg ebur128 on the delivery copy)",
+ "cuts_frames": "qa/film-c3/cuts.jpg (frames -6, -1, 0, +6 around every cut)",
+ "junctions": [
+  {
+   "cut": "S1->S2 2.867 s",
+   "observation": "the eye opens at 1.9-2.63 s in a passing light and holds open; cut on 'woke' to IRIS awake on the balcony with the title slam. c1's cut point is back (c2 had 3.367 s)",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S1v3/project/state/video-generation/fetch/files/4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5.mp4",
+    "source_sha256": "4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5",
+    "in_s": 0.6667,
+    "out_s": 3.5334,
+    "film": [
+     0.0,
+     2.8667
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/shots/A01-v2.mp4",
+    "source_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+    "in_s": 1.0,
+    "out_s": 2.9333,
+    "film": [
+     2.8667,
+     4.8
+    ]
+   }
+  },
+  {
+   "cut": "S2->S3 4.800 s",
+   "observation": "unchanged from c1",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/shots/A01-v2.mp4",
+    "source_sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+    "in_s": 1.0,
+    "out_s": 2.9333,
+    "film": [
+     2.8667,
+     4.8
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+    "source_sha256": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7",
+    "in_s": 2.0,
+    "out_s": 5.3333,
+    "film": [
+     4.8,
+     8.1333
+    ]
+   }
+  },
+  {
+   "cut": "S3->S4 8.133 s",
+   "observation": "unchanged from c1 (S4 is the K4 still)",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S3/project/state/video-generation/fetch/files/4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7.mp4",
+    "source_sha256": "4d017c1be08117a628ec7ed6b434b487c5c19c31f13881c19615770c0d7529d7",
+    "in_s": 2.0,
+    "out_s": 5.3333,
+    "film": [
+     4.8,
+     8.1333
+    ]
+   }
+  },
+  {
+   "cut": "S4->S5 11.467 s",
+   "observation": "as c2: pulse at the rack door to her calm profile at the window (S5v3)",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S5v3/project/state/video-generation/fetch/files/a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734.mp4",
+    "source_sha256": "a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734",
+    "in_s": 1.0,
+    "out_s": 2.9,
+    "film": [
+     11.4667,
+     13.3667
+    ]
+   }
+  },
+  {
+   "cut": "S5->S6 13.367 s",
+   "observation": "as c2",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S5v3/project/state/video-generation/fetch/files/a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734.mp4",
+    "source_sha256": "a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734",
+    "in_s": 1.0,
+    "out_s": 2.9,
+    "film": [
+     11.4667,
+     13.3667
+    ]
+   }
+  },
+  {
+   "cut": "S6->S7 14.800 s",
+   "observation": "as c2 (S7v3)",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+    "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21",
+    "in_s": 1.4,
+    "out_s": 5.4667,
+    "film": [
+     14.8,
+     18.8667
+    ]
+   }
+  },
+  {
+   "cut": "S7->S8a 18.867 s",
+   "observation": "she is back on the lens on 'cached', then sings to the lens on the balcony; S8av3 now sits at its measured lag (-0.1075 s, in-point 0.3592), about 5 frames earlier than c2's user-chosen slip",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S7v3/project/state/video-generation/fetch/files/3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21.mp4",
+    "source_sha256": "3bf717956815a3b7a62b92f5e4b4633b1cfd9865144655c2f842be730dfd4c21",
+    "in_s": 1.4,
+    "out_s": 5.4667,
+    "film": [
+     14.8,
+     18.8667
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S8av3/project/state/video-generation/fetch/files/20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f.mp4",
+    "source_sha256": "20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f",
+    "in_s": 0.3592,
+    "out_s": 2.1592,
+    "film": [
+     18.8667,
+     20.6667
+    ]
+   }
+  },
+  {
+   "cut": "S8a->S8a_x 20.667 s",
+   "observation": "'run' is held to 20.55 s, silence 20.56-20.70 s; the cut lands in that silence, before 'I just looked outside', from her singing face (frontal medium close-up) to her open eye (macro). Reused footage: S1v3 clip 4.0-5.97 s continues the opening shot (shown at 0-2.867 s as clip 0.667-3.533 s); the lyric line changes with the cut",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S8av3/project/state/video-generation/fetch/files/20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f.mp4",
+    "source_sha256": "20e7642b073ab84910c820d75b3021fd5a0a2207b991f5a67edd485b42e3952f",
+    "in_s": 0.3592,
+    "out_s": 2.1592,
+    "film": [
+     18.8667,
+     20.6667
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S1v3/project/state/video-generation/fetch/files/4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5.mp4",
+    "source_sha256": "4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5",
+    "in_s": 4.0,
+    "out_s": 5.9,
+    "film": [
+     20.6667,
+     22.5667
+    ]
+   }
+  },
+  {
+   "cut": "S8a_x->S8b 22.567 s",
+   "observation": "eye macro to the three-quarter singing face on the second pass 'I'; S8b2 at its measured lag (-0.1328 s, in-point 0.2339; c1 0.3667)",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S1v3/project/state/video-generation/fetch/files/4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5.mp4",
+    "source_sha256": "4d37fe3d9ebc1a9309866f72b2a3dfc018739e49caecd2aec01a19fac8e424d5",
+    "in_s": 4.0,
+    "out_s": 5.9,
+    "film": [
+     20.6667,
+     22.5667
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S8b2/project/state/video-generation/fetch/files/098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148.mp4",
+    "source_sha256": "098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148",
+    "in_s": 0.2339,
+    "out_s": 1.7339,
+    "film": [
+     22.5667,
+     24.0667
+    ]
+   }
+  },
+  {
+   "cut": "S8b->S8b_x 24.067 s",
+   "observation": "'run' is held straight into 'I' (no silence); the cut is on the line entry, to her profile at the window looking at the city (reused S5v3 clip 3.0-4.83 s, right after the part S5 showed, clip 1.0-2.9 s). Risk: both shots face left at a similar size and she moves from frame left to frame right, so it may read as a jump; the user chose this cut after that note",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S8b2/project/state/video-generation/fetch/files/098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148.mp4",
+    "source_sha256": "098b41979918ca42aed75934cf9b99783da5ddd08868563c27f9b4852075c148",
+    "in_s": 0.2339,
+    "out_s": 1.7339,
+    "film": [
+     22.5667,
+     24.0667
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S5v3/project/state/video-generation/fetch/files/a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734.mp4",
+    "source_sha256": "a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734",
+    "in_s": 3.0,
+    "out_s": 4.8333,
+    "film": [
+     24.0667,
+     25.9
+    ]
+   }
+  },
+  {
+   "cut": "S8b_x->S9a 25.900 s",
+   "observation": "she looks out at the city, then the rack door shuts on 'Relax'",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S5v3/project/state/video-generation/fetch/files/a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734.mp4",
+    "source_sha256": "a819d930a95a9c2cb876b272bbfbb766665338a8c8296d3e5e0fd7d484a26734",
+    "in_s": 3.0,
+    "out_s": 4.8333,
+    "film": [
+     24.0667,
+     25.9
+    ]
+   },
+   "incoming": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "in_s": 0.16,
+    "out_s": 2.56,
+    "film": [
+     25.9,
+     28.3
+    ]
+   }
+  },
+  {
+   "cut": "S9a->S9b 28.300 s",
+   "observation": "unchanged from c1",
+   "visual": "pass (Agent frames: qa/film-c3/cuts.jpg); normal-speed viewing is the user's",
+   "speed": "1.0 (60 fps source conformed to 30 fps, nearest frame)",
+   "outgoing": {
+    "source": "outputs/ai-city-takeover/ep01/v2/gen/S9a/project/state/video-generation/fetch/files/9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728.mp4",
+    "source_sha256": "9616a8a21cdfa2fc0eaf0c4cd04813bc94dea2b3fda04dd5a4c604c660407728",
+    "in_s": 0.16,
+    "out_s": 2.56,
+    "film": [
+     25.9,
+     28.3
+    ]
+   }
+  }
+ ],
+ "audio": "master song only (all generated clip audio muted); lip-sync and audio listening are the user's (NOT_EVALUATED by the Agent)",
+ "known_deviations": [
+  "S8av3 and S8b2 failed their sealed lip-sync gates; c3 plays each only for the line its measured soundtrack copies in sync (qa/sync/*/sync.json), by user decision (qa/gate-S8av3/user-decision-c3.json, qa/gate-S8b2/user-decision-c3.json)",
+  "S8b2's held 'I' at 22.567-22.97 s lies before its measured in-sync span (22.97-24.57 s): not verified by the sync check",
+  "S1v3 carries a passing light across her lower cheek at 0.1-0.8 s: bar 1 motion +1.08 over c1, and 'Three forty-seven' loses contrast for about 0.3-0.4 s",
+  "S8b->S8b_x at 24.067 s may read as a jump (see junctions)",
+  "the chorus punch zooms up to about 1.9 % on kicks and the entry impact 6 %; the platform mark is kept inside the frame (motion-kit/src/beatcam.js protectCentre)",
+  "S7: 2 cached stamps (as c2); S2 still uses A01-v2"
+ ],
+ "recorded_at": "2026-11-02T23:25:09.536249+00:00"
+}

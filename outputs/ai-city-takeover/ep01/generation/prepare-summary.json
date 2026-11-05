@@ -1,0 +1,2618 @@
+{
+  "decision": {
+    "snapshot_hash": "2a91d49570ec26d4a0bbda38b6896e7bb6614742680d57733ce94b9047b516fd",
+    "disposition": "GENERATE_ONCE",
+    "selected_candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+    "assessments": [
+      {
+        "candidate_id": "jimeng/jimeng-seedance-2.0-vip-multimodal-v1",
+        "scope_hash": "c1e99c2fbf62a626ddba4853e27f0fac97157d01907ffd0073a99962be733ae6",
+        "fit": "unknown",
+        "compatible": true,
+        "executable": true,
+        "supported_dimensions": [],
+        "failed_dimensions": [],
+        "unknown_dimensions": [
+          "camera-space",
+          "identity",
+          "quiet-observer",
+          "visual"
+        ],
+        "evidence_hashes": [],
+        "ignored_evidence_hashes": [],
+        "sample_count": 0,
+        "pass_count": 0,
+        "fail_count": 0,
+        "not_evaluated_count": 0,
+        "runtime_failure_count": 0,
+        "unknown_outcome_count": 0,
+        "not_submitted_count": 0,
+        "reasons": [],
+        "empirical": {
+          "version": "generation-cohort/1",
+          "supported_artifacts": [],
+          "failed_artifacts": [],
+          "incomplete_artifacts": [],
+          "evidence_hashes": [],
+          "exclusions": [],
+          "failed_requirements": [],
+          "observed_success_fraction": null,
+          "interval_95": null,
+          "limitations": [
+            "observational cohort; selection and intervention confounding remain",
+            "unknown action complexity and hand/prop interaction are not matched",
+            "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+          ]
+        }
+      }
+    ],
+    "diagnosis": null,
+    "intervention": null,
+    "runtime_repair": null,
+    "routing": {
+      "decision": {
+        "target_shot_id": "ep01-intro",
+        "target_shot_revision": 6,
+        "target_shot_content_hash": "55d17c2ba7507282b73a3bd97a95ca85b1337a139347385edd391fc5ef59d908",
+        "continuity_mode": "none",
+        "semantic_continuity_state": null,
+        "required_mode": "reference_to_video",
+        "selected_mode": "reference_to_video",
+        "required_binding_roles": [
+          "reference",
+          "reference",
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "character_reference",
+            "asset_id": "iris-cf-details",
+            "asset_sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+            "source_registry_revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "canonical_owner_kind": "character",
+            "canonical_owner_id": "IRIS",
+            "canonical_owner_content_hash": "19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969",
+            "mime_type": "image/png",
+            "size_bytes": 1843560,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "character_reference",
+            "asset_id": "iris-cf-face",
+            "asset_sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb",
+            "source_registry_revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "canonical_owner_kind": "character",
+            "canonical_owner_id": "IRIS",
+            "canonical_owner_content_hash": "19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969",
+            "mime_type": "image/png",
+            "size_bytes": 1989742,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "iris-a01-balcony",
+            "asset_sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087",
+            "source_registry_revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "balcony",
+            "canonical_owner_content_hash": "e2c19805b1e0c2749ef069fc327d96f74240fa3e14ac0249cb4bfd832ea3f3d8",
+            "mime_type": "image/png",
+            "size_bytes": 1968261,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "provider_name": "jimeng",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/6a39392c7cfea97e0cae1e0085aa3adb0d967bff9203ad8da68bad4a83ab8f89.json",
+          "profile_sha256": "6a39392c7cfea97e0cae1e0085aa3adb0d967bff9203ad8da68bad4a83ab8f89"
+        },
+        "provider_capabilities_fingerprint": "a4e4fa3add6a83b868e7246155d5a8dbfd3587a89f38e79d80087e71da4616d8",
+        "selected_capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "selected_capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "requirement_hash": "1eb953fd626aa4d501c6dcaf4e194164ae11da105b4e10a893441cbc9f3a62d8",
+        "continuity_transition_policy_hash": null,
+        "previous_provider_bound_request_hash": null,
+        "continuity_provider_route_binding_hash": null,
+        "execution_kind": "remote",
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 6,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "reason_codes": [
+          "CANONICAL_REFERENCES_ENABLE_R2V"
+        ],
+        "rationale": "Bind the verified neutral requirement to the exact capability.",
+        "policy": {
+          "policy_id": "iris-a01-qualification",
+          "policy_version": "1",
+          "policy_sha256": "17e25437c16371696468f584fe52fba479b57e37a19fff4fe5a2f8206afa242e"
+        },
+        "outcome": "selected",
+        "semantic_routing_hash": "8f85cedf0f2529ca97661345e1d4edae09633af032fd43753b617a2b33b99e96",
+        "audit_decision_hash": "a23262c12df9f4f2a75a9889471b824ce091986aafb6be6e7aad4ca51385e768"
+      },
+      "provider_bound_request": {
+        "plan_hash": "12c8010152cdc0beb8bb1597b1cd75663c31cca9bb0fb724118191935f651980",
+        "requirement_hash": "1eb953fd626aa4d501c6dcaf4e194164ae11da105b4e10a893441cbc9f3a62d8",
+        "verified_projection_hash": "ee7a2aa6b009d8af7417e09175d18cecc693e36dc1fb391f3d12adcda8ea1509",
+        "target_shot_id": "ep01-intro",
+        "target_shot_revision": 6,
+        "target_shot_content_hash": "55d17c2ba7507282b73a3bd97a95ca85b1337a139347385edd391fc5ef59d908",
+        "semantic_routing_hash": "8f85cedf0f2529ca97661345e1d4edae09633af032fd43753b617a2b33b99e96",
+        "audit_decision_hash": "a23262c12df9f4f2a75a9889471b824ce091986aafb6be6e7aad4ca51385e768",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.0_vip",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-v1",
+          "profile_path": "provider-profiles/6a39392c7cfea97e0cae1e0085aa3adb0d967bff9203ad8da68bad4a83ab8f89.json",
+          "profile_sha256": "6a39392c7cfea97e0cae1e0085aa3adb0d967bff9203ad8da68bad4a83ab8f89"
+        },
+        "capability_id": "jimeng-seedance-2.0-vip-multimodal-v1",
+        "capability_fingerprint": "bf6bfc3a4be2f64b6fbb9fb89a7367a322fec37d718232094f817626bb9c2fb1",
+        "execution_kind": "remote",
+        "billing_kind": "metered",
+        "mode": "reference_to_video",
+        "binding_roles": [
+          "reference",
+          "reference",
+          "reference"
+        ],
+        "input_assets": [
+          {
+            "role": "character_reference",
+            "asset_id": "iris-cf-details",
+            "asset_sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+            "source_registry_revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "canonical_owner_kind": "character",
+            "canonical_owner_id": "IRIS",
+            "canonical_owner_content_hash": "19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969",
+            "mime_type": "image/png",
+            "size_bytes": 1843560,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "character_reference",
+            "asset_id": "iris-cf-face",
+            "asset_sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb",
+            "source_registry_revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "canonical_owner_kind": "character",
+            "canonical_owner_id": "IRIS",
+            "canonical_owner_content_hash": "19723d4353a10eaa084ab3af5a85e97a6fbc3e7f7a4849e35fbddc9d7889d969",
+            "mime_type": "image/png",
+            "size_bytes": 1989742,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene_reference",
+            "asset_id": "iris-a01-balcony",
+            "asset_sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087",
+            "source_registry_revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "balcony",
+            "canonical_owner_content_hash": "e2c19805b1e0c2749ef069fc327d96f74240fa3e14ac0249cb4bfd832ea3f3d8",
+            "mime_type": "image/png",
+            "size_bytes": 1968261,
+            "width": 1672,
+            "height": 941,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 6,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "lifecycle": {
+          "generation_id": "canvas-generation-731e575aa1ff7e0353b19ffbe38597ef",
+          "target_asset_role": "primary_visual",
+          "base_project": {
+            "path": "state/projects/project.6.fe12542c424ea15061959b582ab700fe18009632bed05ca9583354f8c08a7007.yaml",
+            "revision": 6,
+            "content_hash": "fe12542c424ea15061959b582ab700fe18009632bed05ca9583354f8c08a7007",
+            "file_sha256": "19b766d17919bc6d0d168bdb3d94d3413c386a5cf11193cb7c999b20d782cbd8"
+          },
+          "base_registry": {
+            "path": "assets/registry.be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e.json",
+            "revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "content_hash": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+            "file_sha256": "2aeacf50273930c6a263bc2fdeeef47ad2d27c33eb8f80b6a965f8e02b5964c9"
+          },
+          "base_dependency_graph": {
+            "revision_id": "879ff3194a82cffd58d50918a51709f3758d97a9fc5dda52f5a4638229666d0f",
+            "content_hash": "879ff3194a82cffd58d50918a51709f3758d97a9fc5dda52f5a4638229666d0f",
+            "path": "state/dependency_graph.879ff3194a82cffd58d50918a51709f3758d97a9fc5dda52f5a4638229666d0f.json",
+            "file_sha256": "3dd73839d03fec62d7884e4e99724153da3e22c85011c77e27bb105e3c616b82"
+          },
+          "input_artifact_ids": [
+            "iris-a01-shot",
+            "iris-a01-scene",
+            "iris-a01-character",
+            "iris-cf-face",
+            "iris-cf-details",
+            "iris-a01-balcony"
+          ],
+          "output_asset_id": "canvas-video-731e575aa1ff7e0353b19ffbe38597ef",
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false
+        },
+        "compiler_contract": {
+          "compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+          "compiler_version": "1",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49"
+        },
+        "expression_strength": "semantic_prompt_allowed",
+        "generation_recipe": {
+          "contract_version": "generation-recipe/1",
+          "seed": {
+            "kind": "uncontrolled",
+            "value": null
+          },
+          "profile_sha256": "6a39392c7cfea97e0cae1e0085aa3adb0d967bff9203ad8da68bad4a83ab8f89",
+          "compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+          "requirement_hash": "1eb953fd626aa4d501c6dcaf4e194164ae11da105b4e10a893441cbc9f3a62d8",
+          "rubric_hash": "618d13fdfb00c4294372c4284b33b5f49a2ca564006eca2e991dff50024fc872",
+          "acceptance_policy": {
+            "domain_id": "iris-source",
+            "profile_id": "iris-a01-raw",
+            "profile_version": "1",
+            "profile_content_hash": "618d13fdfb00c4294372c4284b33b5f49a2ca564006eca2e991dff50024fc872",
+            "profile_payload": {
+              "content_hash": "618d13fdfb00c4294372c4284b33b5f49a2ca564006eca2e991dff50024fc872",
+              "domain_id": "iris-source",
+              "generation_requirements": [
+                {
+                  "dimension": "identity",
+                  "intent_paths": [
+                    "generation_intent.identity_continuity.preservation",
+                    "generation_intent.identity_continuity.character_ids.0",
+                    "generation_intent.identity_continuity.allowed_variation.0"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+                  "native_text": [
+                    "同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.preservation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.character_ids.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.identity_continuity.allowed_variation.0"
+                      }
+                    ],
+                    "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188"
+                  },
+                  "observable": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "identity",
+                  "semantics": {
+                    "category": "narrative_critical",
+                    "hard_basis": {
+                      "kind": "approved_narrative",
+                      "locator": "row.shot.continuity_constraints",
+                      "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责",
+                      "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                    },
+                    "intent_role": "must_happen",
+                    "source_refs": [
+                      {
+                        "intent_item_id": "identity",
+                        "locator": "row.shot.continuity_constraints",
+                        "origin": "director_choice",
+                        "quote": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+                        "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                      }
+                    ],
+                    "version": "requirement-semantics/1"
+                  },
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足，不由静态参考或工具成功代签"
+                },
+                {
+                  "dimension": "quiet-observer",
+                  "intent_paths": [
+                    "generation_intent.subject_action.progression",
+                    "generation_intent.subject_action.start_state",
+                    "generation_intent.subject_action.endpoint.state_text",
+                    "generation_intent.subject_action.endpoint.required_change",
+                    "generation_intent.motion_envelope.onset",
+                    "generation_intent.motion_envelope.peak",
+                    "generation_intent.motion_envelope.settle",
+                    "generation_intent.motion_envelope.direction",
+                    "generation_intent.motion_envelope.amplitude_class",
+                    "generation_intent.pacing.cadence",
+                    "generation_intent.pacing.tempo_class",
+                    "generation_intent.pacing.shot_duration_seconds",
+                    "generation_intent.performance_intent.trigger",
+                    "generation_intent.performance_intent.visible_response",
+                    "generation_intent.performance_intent.gaze_target",
+                    "generation_intent.performance_intent.body_behavior",
+                    "generation_intent.performance_intent.hand_behavior",
+                    "generation_intent.performance_intent.terminal_performance_state",
+                    "generation_intent.performance_intent.character_directions.0.character_id",
+                    "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "generation_intent.performance_intent.character_directions.0.role",
+                    "generation_intent.performance_intent.character_directions.0.visibility",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "generation_intent.ambience_intent.environment_bed",
+                    "generation_intent.ambience_intent.explicitly_silent",
+                    "generation_intent.dialogue_intent.mode",
+                    "generation_intent.dialogue_intent.lip_sync_required",
+                    "generation_intent.music_intent.mode"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+                  "native_text": [
+                    "她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.progression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.start_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.subject_action.endpoint.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.onset"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.peak"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.settle"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.motion_envelope.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.cadence"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.tempo_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.pacing.shot_duration_seconds"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.visible_response"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.body_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.hand_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.character_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.visibility"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.environment_bed"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.ambience_intent.explicitly_silent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.mode"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.dialogue_intent.lip_sync_required"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.music_intent.mode"
+                      }
+                    ],
+                    "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188"
+                  },
+                  "observable": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "quiet-observer",
+                  "semantics": {
+                    "category": "narrative_critical",
+                    "hard_basis": {
+                      "kind": "approved_narrative",
+                      "locator": "row.shot.continuity_constraints",
+                      "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责",
+                      "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                    },
+                    "intent_role": "must_happen",
+                    "source_refs": [
+                      {
+                        "intent_item_id": "quiet-observer",
+                        "locator": "row.shot.continuity_constraints",
+                        "origin": "director_choice",
+                        "quote": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+                        "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                      }
+                    ],
+                    "version": "requirement-semantics/1"
+                  },
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足，不由静态参考或工具成功代签"
+                },
+                {
+                  "dimension": "camera-space",
+                  "intent_paths": [
+                    "generation_intent.camera_intent.movement",
+                    "generation_intent.reference_planning.events.0.event_id",
+                    "generation_intent.reference_planning.events.0.kind",
+                    "generation_intent.reference_planning.events.0.visual_state",
+                    "generation_intent.reference_planning.events.0.purpose",
+                    "generation_intent.reference_planning.events.0.phase",
+                    "generation_intent.reference_planning.events.0.control",
+                    "generation_intent.reference_planning.events.0.priority",
+                    "generation_intent.reference_planning.events.1.event_id",
+                    "generation_intent.reference_planning.events.1.kind",
+                    "generation_intent.reference_planning.events.1.visual_state",
+                    "generation_intent.reference_planning.events.1.purpose",
+                    "generation_intent.reference_planning.events.1.phase",
+                    "generation_intent.reference_planning.events.1.control",
+                    "generation_intent.reference_planning.events.1.priority",
+                    "generation_intent.space_continuity.subject_position",
+                    "generation_intent.space_continuity.screen_direction",
+                    "generation_intent.space_continuity.crossing_policy",
+                    "generation_intent.axis_continuity.camera_axis",
+                    "generation_intent.axis_continuity.framing_continuity",
+                    "generation_intent.axis_continuity.crossing_policy",
+                    "generation_intent.camera_intent.stability",
+                    "generation_intent.camera_intent.framing_intent",
+                    "generation_intent.camera_intent.expression_strength",
+                    "generation_intent.camera_endpoint.start_framing",
+                    "generation_intent.camera_endpoint.end_framing",
+                    "generation_intent.camera_endpoint.position_lock",
+                    "generation_intent.camera_endpoint.orientation_lock",
+                    "generation_intent.primary_camera_motion.movement_kind",
+                    "generation_intent.primary_camera_motion.direction",
+                    "generation_intent.primary_camera_motion.amplitude_class",
+                    "generation_intent.primary_camera_motion.speed_class",
+                    "generation_intent.primary_camera_motion.start_motion_state",
+                    "generation_intent.primary_camera_motion.end_motion_state",
+                    "generation_intent.camera_subject_relation.subject_id",
+                    "generation_intent.camera_subject_relation.relation_kind",
+                    "generation_intent.camera_subject_relation.start_relation",
+                    "generation_intent.camera_subject_relation.end_relation"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+                  "native_text": [
+                    "她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.movement"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.0.event_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.0.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.0.visual_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.0.purpose"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.0.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.0.control"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.0.priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.1.event_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.1.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.1.visual_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.1.purpose"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.1.phase"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.1.control"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.events.1.priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.subject_position"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.screen_direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.space_continuity.crossing_policy"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.camera_axis"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.framing_continuity"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.axis_continuity.crossing_policy"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.stability"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.framing_intent"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_intent.expression_strength"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.start_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.end_framing"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.position_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_endpoint.orientation_lock"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.movement_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.amplitude_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.speed_class"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.start_motion_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.subject_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.relation_kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.start_relation"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.camera_subject_relation.end_relation"
+                      }
+                    ],
+                    "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188"
+                  },
+                  "observable": "摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "camera-space",
+                  "semantics": {
+                    "category": "narrative_critical",
+                    "hard_basis": {
+                      "kind": "approved_narrative",
+                      "locator": "row.shot.continuity_constraints",
+                      "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责",
+                      "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                    },
+                    "intent_role": "must_happen",
+                    "source_refs": [
+                      {
+                        "intent_item_id": "camera-space",
+                        "locator": "row.shot.continuity_constraints",
+                        "origin": "director_choice",
+                        "quote": "摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳",
+                        "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                      }
+                    ],
+                    "version": "requirement-semantics/1"
+                  },
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足，不由静态参考或工具成功代签"
+                },
+                {
+                  "dimension": "visual",
+                  "intent_paths": [
+                    "generation_intent.visual_treatment.medium_look",
+                    "generation_intent.reference_planning.contract_version",
+                    "generation_intent.reference_planning.facets.0",
+                    "generation_intent.reference_planning.facets.1",
+                    "generation_intent.reference_planning.facets.2",
+                    "generation_intent.reference_planning.structure",
+                    "generation_intent.reference_planning.anchors.0.anchor_id",
+                    "generation_intent.reference_planning.anchors.0.role",
+                    "generation_intent.reference_planning.anchors.0.purpose",
+                    "generation_intent.reference_planning.anchors.0.owner_id",
+                    "generation_intent.reference_planning.anchors.0.priority",
+                    "generation_intent.reference_planning.anchors.1.anchor_id",
+                    "generation_intent.reference_planning.anchors.1.role",
+                    "generation_intent.reference_planning.anchors.1.purpose",
+                    "generation_intent.reference_planning.anchors.1.owner_id",
+                    "generation_intent.reference_planning.anchors.1.priority",
+                    "generation_intent.reference_planning.anchors.2.anchor_id",
+                    "generation_intent.reference_planning.anchors.2.role",
+                    "generation_intent.reference_planning.anchors.2.purpose",
+                    "generation_intent.reference_planning.anchors.2.owner_id",
+                    "generation_intent.reference_planning.anchors.2.priority",
+                    "generation_intent.reference_planning.selections.0.need_id",
+                    "generation_intent.reference_planning.selections.0.asset_id",
+                    "generation_intent.reference_planning.selections.1.need_id",
+                    "generation_intent.reference_planning.selections.1.asset_id",
+                    "generation_intent.reference_planning.selections.2.need_id",
+                    "generation_intent.reference_planning.selections.2.asset_id",
+                    "generation_intent.reference_planning.natural_generation.0",
+                    "generation_intent.reference_planning.director_coverage.coverage_hash",
+                    "generation_intent.reference_planning.director_coverage.unit_id",
+                    "generation_intent.reference_planning.preview_approval.approval_hash",
+                    "generation_intent.open_state.kind",
+                    "generation_intent.open_state.state_text",
+                    "generation_intent.open_state.required_change",
+                    "generation_intent.close_state.kind",
+                    "generation_intent.close_state.state_text",
+                    "generation_intent.close_state.required_change",
+                    "generation_intent.scene_continuity.scene_id",
+                    "generation_intent.scene_continuity.time_of_day",
+                    "generation_intent.scene_continuity.mood",
+                    "generation_intent.scene_continuity.state_constraints.0",
+                    "generation_intent.scene_continuity.state_constraints.1",
+                    "generation_intent.visual_treatment.palette",
+                    "generation_intent.visual_treatment.material_treatment",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                    "generation_intent.visual_treatment.prohibited_visual_drift.2",
+                    "generation_intent.lighting_intent.motivated_source",
+                    "generation_intent.lighting_intent.direction",
+                    "generation_intent.lighting_intent.exposure_priority",
+                    "generation_intent.lighting_intent.continuity_state"
+                  ],
+                  "level": "acceptance",
+                  "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+                  "native_text": [
+                    "同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。"
+                  ],
+                  "native_text_mapping": {
+                    "bindings": [
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.medium_look"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.contract_version"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.facets.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.facets.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.facets.2"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.structure"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.0.anchor_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.0.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.0.purpose"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.0.owner_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.0.priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.1.anchor_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.1.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.1.purpose"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.1.owner_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.1.priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.2.anchor_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.2.role"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.2.purpose"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.2.owner_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.anchors.2.priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.selections.0.need_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.selections.0.asset_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.selections.1.need_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.selections.1.asset_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.selections.2.need_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.selections.2.asset_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.natural_generation.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.director_coverage.coverage_hash"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.director_coverage.unit_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.reference_planning.preview_approval.approval_hash"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.open_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.kind"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.state_text"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.close_state.required_change"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.scene_id"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.time_of_day"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.mood"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.scene_continuity.state_constraints.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.palette"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.material_treatment"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.2"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.motivated_source"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.direction"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.exposure_priority"
+                      },
+                      {
+                        "fragment_indices": [
+                          0
+                        ],
+                        "intent_path": "generation_intent.lighting_intent.continuity_state"
+                      }
+                    ],
+                    "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188"
+                  },
+                  "observable": "真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线，不新增文字、屏幕或人物",
+                  "production_owner": "shot_authoring",
+                  "proof": "analyzer",
+                  "requirement_id": "visual",
+                  "semantics": {
+                    "category": "narrative_critical",
+                    "hard_basis": {
+                      "kind": "approved_narrative",
+                      "locator": "row.shot.continuity_constraints",
+                      "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责",
+                      "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                    },
+                    "intent_role": "must_happen",
+                    "source_refs": [
+                      {
+                        "intent_item_id": "visual",
+                        "locator": "row.shot.continuity_constraints",
+                        "origin": "director_choice",
+                        "quote": "真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线，不新增文字、屏幕或人物",
+                        "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5"
+                      }
+                    ],
+                    "version": "requirement-semantics/1"
+                  },
+                  "stage": "raw_generation",
+                  "tolerance": "逐项满足，不由静态参考或工具成功代签"
+                }
+              ],
+              "measurement_contract_version": "iris-exact-mp4-review/1",
+              "profile_id": "iris-a01-raw",
+              "profile_version": "1",
+              "required_requirement_ids": [
+                "identity",
+                "quiet-observer",
+                "camera-space",
+                "visual"
+              ],
+              "requirement_semantics_version": "requirement-semantics/1"
+            },
+            "measurement_contract_version": "iris-exact-mp4-review/1",
+            "required_requirement_ids": [
+              "identity",
+              "quiet-observer",
+              "camera-space",
+              "visual"
+            ]
+          },
+          "expressions": [
+            {
+              "requirement_id": "camera-space",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "camera-space",
+              "observable": "摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳",
+              "tolerance": "逐项满足，不由静态参考或工具成功代签",
+              "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.camera_intent.movement",
+                "generation_intent.reference_planning.events.0.event_id",
+                "generation_intent.reference_planning.events.0.kind",
+                "generation_intent.reference_planning.events.0.visual_state",
+                "generation_intent.reference_planning.events.0.purpose",
+                "generation_intent.reference_planning.events.0.phase",
+                "generation_intent.reference_planning.events.0.control",
+                "generation_intent.reference_planning.events.0.priority",
+                "generation_intent.reference_planning.events.1.event_id",
+                "generation_intent.reference_planning.events.1.kind",
+                "generation_intent.reference_planning.events.1.visual_state",
+                "generation_intent.reference_planning.events.1.purpose",
+                "generation_intent.reference_planning.events.1.phase",
+                "generation_intent.reference_planning.events.1.control",
+                "generation_intent.reference_planning.events.1.priority",
+                "generation_intent.space_continuity.subject_position",
+                "generation_intent.space_continuity.screen_direction",
+                "generation_intent.space_continuity.crossing_policy",
+                "generation_intent.axis_continuity.camera_axis",
+                "generation_intent.axis_continuity.framing_continuity",
+                "generation_intent.axis_continuity.crossing_policy",
+                "generation_intent.camera_intent.stability",
+                "generation_intent.camera_intent.framing_intent",
+                "generation_intent.camera_intent.expression_strength",
+                "generation_intent.camera_endpoint.start_framing",
+                "generation_intent.camera_endpoint.end_framing",
+                "generation_intent.camera_endpoint.position_lock",
+                "generation_intent.camera_endpoint.orientation_lock",
+                "generation_intent.primary_camera_motion.movement_kind",
+                "generation_intent.primary_camera_motion.direction",
+                "generation_intent.primary_camera_motion.amplitude_class",
+                "generation_intent.primary_camera_motion.speed_class",
+                "generation_intent.primary_camera_motion.start_motion_state",
+                "generation_intent.primary_camera_motion.end_motion_state",
+                "generation_intent.camera_subject_relation.subject_id",
+                "generation_intent.camera_subject_relation.relation_kind",
+                "generation_intent.camera_subject_relation.start_relation",
+                "generation_intent.camera_subject_relation.end_relation"
+              ],
+              "native_text": [
+                "她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。"
+              ],
+              "production_owner": "shot_authoring",
+              "semantics": {
+                "version": "requirement-semantics/1",
+                "category": "narrative_critical",
+                "intent_role": "must_happen",
+                "source_refs": [
+                  {
+                    "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                    "locator": "row.shot.continuity_constraints",
+                    "intent_item_id": "camera-space",
+                    "quote": "摄影机沿原视轴极缓慢微幅推近，保持人物在右侧与左侧雾城负空间，不翻轴、不环绕、不突然变焦，末段平滑收稳",
+                    "origin": "director_choice"
+                  }
+                ],
+                "hard_basis": {
+                  "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                  "locator": "row.shot.continuity_constraints",
+                  "kind": "approved_narrative",
+                  "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责"
+                },
+                "derived_from": []
+              },
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.camera_intent.movement",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.0.event_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.0.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.0.visual_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.0.purpose",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.0.phase",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.0.control",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.0.priority",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.1.event_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.1.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.1.visual_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.1.purpose",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.1.phase",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.1.control",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.events.1.priority",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.subject_position",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.screen_direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.space_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.camera_axis",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.framing_continuity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.axis_continuity.crossing_policy",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.stability",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.framing_intent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_intent.expression_strength",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.start_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.end_framing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.position_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_endpoint.orientation_lock",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.movement_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.speed_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.start_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.subject_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.relation_kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.start_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.camera_subject_relation.end_relation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "identity",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "identity",
+              "observable": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+              "tolerance": "逐项满足，不由静态参考或工具成功代签",
+              "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.identity_continuity.preservation",
+                "generation_intent.identity_continuity.character_ids.0",
+                "generation_intent.identity_continuity.allowed_variation.0"
+              ],
+              "native_text": [
+                "同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。"
+              ],
+              "production_owner": "shot_authoring",
+              "semantics": {
+                "version": "requirement-semantics/1",
+                "category": "narrative_critical",
+                "intent_role": "must_happen",
+                "source_refs": [
+                  {
+                    "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                    "locator": "row.shot.continuity_constraints",
+                    "intent_item_id": "identity",
+                    "quote": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+                    "origin": "director_choice"
+                  }
+                ],
+                "hard_basis": {
+                  "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                  "locator": "row.shot.continuity_constraints",
+                  "kind": "approved_narrative",
+                  "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责"
+                },
+                "derived_from": []
+              },
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.identity_continuity.preservation",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.identity_continuity.character_ids.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.identity_continuity.allowed_variation.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "quiet-observer",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "quiet-observer",
+              "observable": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+              "tolerance": "逐项满足，不由静态参考或工具成功代签",
+              "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.subject_action.progression",
+                "generation_intent.subject_action.start_state",
+                "generation_intent.subject_action.endpoint.state_text",
+                "generation_intent.subject_action.endpoint.required_change",
+                "generation_intent.motion_envelope.onset",
+                "generation_intent.motion_envelope.peak",
+                "generation_intent.motion_envelope.settle",
+                "generation_intent.motion_envelope.direction",
+                "generation_intent.motion_envelope.amplitude_class",
+                "generation_intent.pacing.cadence",
+                "generation_intent.pacing.tempo_class",
+                "generation_intent.pacing.shot_duration_seconds",
+                "generation_intent.performance_intent.trigger",
+                "generation_intent.performance_intent.visible_response",
+                "generation_intent.performance_intent.gaze_target",
+                "generation_intent.performance_intent.body_behavior",
+                "generation_intent.performance_intent.hand_behavior",
+                "generation_intent.performance_intent.terminal_performance_state",
+                "generation_intent.performance_intent.character_directions.0.character_id",
+                "generation_intent.performance_intent.character_directions.0.screen_identity",
+                "generation_intent.performance_intent.character_directions.0.role",
+                "generation_intent.performance_intent.character_directions.0.visibility",
+                "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                "generation_intent.ambience_intent.environment_bed",
+                "generation_intent.ambience_intent.explicitly_silent",
+                "generation_intent.dialogue_intent.mode",
+                "generation_intent.dialogue_intent.lip_sync_required",
+                "generation_intent.music_intent.mode"
+              ],
+              "native_text": [
+                "她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。"
+              ],
+              "production_owner": "shot_authoring",
+              "semantics": {
+                "version": "requirement-semantics/1",
+                "category": "narrative_critical",
+                "intent_role": "must_happen",
+                "source_refs": [
+                  {
+                    "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                    "locator": "row.shot.continuity_constraints",
+                    "intent_item_id": "quiet-observer",
+                    "quote": "平静闭口观察，仅自然呼吸、轻微自然眨眼和衣领边缘极轻风动；不说话、不唱歌、不转身、不抬手",
+                    "origin": "director_choice"
+                  }
+                ],
+                "hard_basis": {
+                  "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                  "locator": "row.shot.continuity_constraints",
+                  "kind": "approved_narrative",
+                  "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责"
+                },
+                "derived_from": []
+              },
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.subject_action.progression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.start_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.subject_action.endpoint.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.onset",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.peak",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.settle",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.motion_envelope.amplitude_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.cadence",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.tempo_class",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.pacing.shot_duration_seconds",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.visible_response",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.hand_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.character_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.screen_identity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.visibility",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.environment_bed",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.ambience_intent.explicitly_silent",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.dialogue_intent.lip_sync_required",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.music_intent.mode",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "requirement_id": "visual",
+              "level": "acceptance",
+              "stage": "raw_generation",
+              "dimension": "visual",
+              "observable": "真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线，不新增文字、屏幕或人物",
+              "tolerance": "逐项满足，不由静态参考或工具成功代签",
+              "measurement": "对exact MP4正常速度审看及project-local video-analysis逐项取证",
+              "proof": "analyzer",
+              "intent_paths": [
+                "generation_intent.visual_treatment.medium_look",
+                "generation_intent.reference_planning.contract_version",
+                "generation_intent.reference_planning.facets.0",
+                "generation_intent.reference_planning.facets.1",
+                "generation_intent.reference_planning.facets.2",
+                "generation_intent.reference_planning.structure",
+                "generation_intent.reference_planning.anchors.0.anchor_id",
+                "generation_intent.reference_planning.anchors.0.role",
+                "generation_intent.reference_planning.anchors.0.purpose",
+                "generation_intent.reference_planning.anchors.0.owner_id",
+                "generation_intent.reference_planning.anchors.0.priority",
+                "generation_intent.reference_planning.anchors.1.anchor_id",
+                "generation_intent.reference_planning.anchors.1.role",
+                "generation_intent.reference_planning.anchors.1.purpose",
+                "generation_intent.reference_planning.anchors.1.owner_id",
+                "generation_intent.reference_planning.anchors.1.priority",
+                "generation_intent.reference_planning.anchors.2.anchor_id",
+                "generation_intent.reference_planning.anchors.2.role",
+                "generation_intent.reference_planning.anchors.2.purpose",
+                "generation_intent.reference_planning.anchors.2.owner_id",
+                "generation_intent.reference_planning.anchors.2.priority",
+                "generation_intent.reference_planning.selections.0.need_id",
+                "generation_intent.reference_planning.selections.0.asset_id",
+                "generation_intent.reference_planning.selections.1.need_id",
+                "generation_intent.reference_planning.selections.1.asset_id",
+                "generation_intent.reference_planning.selections.2.need_id",
+                "generation_intent.reference_planning.selections.2.asset_id",
+                "generation_intent.reference_planning.natural_generation.0",
+                "generation_intent.reference_planning.director_coverage.coverage_hash",
+                "generation_intent.reference_planning.director_coverage.unit_id",
+                "generation_intent.reference_planning.preview_approval.approval_hash",
+                "generation_intent.open_state.kind",
+                "generation_intent.open_state.state_text",
+                "generation_intent.open_state.required_change",
+                "generation_intent.close_state.kind",
+                "generation_intent.close_state.state_text",
+                "generation_intent.close_state.required_change",
+                "generation_intent.scene_continuity.scene_id",
+                "generation_intent.scene_continuity.time_of_day",
+                "generation_intent.scene_continuity.mood",
+                "generation_intent.scene_continuity.state_constraints.0",
+                "generation_intent.scene_continuity.state_constraints.1",
+                "generation_intent.visual_treatment.palette",
+                "generation_intent.visual_treatment.material_treatment",
+                "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                "generation_intent.visual_treatment.prohibited_visual_drift.2",
+                "generation_intent.lighting_intent.motivated_source",
+                "generation_intent.lighting_intent.direction",
+                "generation_intent.lighting_intent.exposure_priority",
+                "generation_intent.lighting_intent.continuity_state"
+              ],
+              "native_text": [
+                "同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。"
+              ],
+              "production_owner": "shot_authoring",
+              "semantics": {
+                "version": "requirement-semantics/1",
+                "category": "narrative_critical",
+                "intent_role": "must_happen",
+                "source_refs": [
+                  {
+                    "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                    "locator": "row.shot.continuity_constraints",
+                    "intent_item_id": "visual",
+                    "quote": "真人电影摄影，蓝黑和钢蓝，红色仅限原左领极细灯线，不新增文字、屏幕或人物",
+                    "origin": "director_choice"
+                  }
+                ],
+                "hard_basis": {
+                  "source_hash": "41d33d2ad5f158c266313401d27a4ff7dde23b8c66797f6b968d792ca06193c5",
+                  "locator": "row.shot.continuity_constraints",
+                  "kind": "approved_narrative",
+                  "necessity": "保持用户已认可的同一人物与阳台镜头，不新增场景或表演职责"
+                },
+                "derived_from": []
+              },
+              "native_text_mapping": {
+                "contract_version": "native-text-mapping/1",
+                "intent_sha256": "9445db60f1dff68c61a66668632a0c63c6f685779d36822fe5fcdf06a5199188",
+                "bindings": [
+                  {
+                    "intent_path": "generation_intent.visual_treatment.medium_look",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.contract_version",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.facets.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.facets.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.facets.2",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.structure",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.0.anchor_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.0.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.0.purpose",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.0.owner_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.0.priority",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.1.anchor_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.1.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.1.purpose",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.1.owner_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.1.priority",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.2.anchor_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.2.role",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.2.purpose",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.2.owner_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.anchors.2.priority",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.selections.0.need_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.selections.0.asset_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.selections.1.need_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.selections.1.asset_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.selections.2.need_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.selections.2.asset_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.natural_generation.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.director_coverage.coverage_hash",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.director_coverage.unit_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.reference_planning.preview_approval.approval_hash",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.open_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.kind",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.state_text",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.close_state.required_change",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.scene_id",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.time_of_day",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.mood",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.scene_continuity.state_constraints.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.palette",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.material_treatment",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.2",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.motivated_source",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.direction",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.exposure_priority",
+                    "fragment_indices": [
+                      0
+                    ]
+                  },
+                  {
+                    "intent_path": "generation_intent.lighting_intent.continuity_state",
+                    "fragment_indices": [
+                      0
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "editorial_operations": [],
+          "comparison": null
+        },
+        "provider_bound_request_hash": "4c510a095d30d6a26d95a08ada05c1af1f7391abe53b90275ddef4b54315f256"
+      }
+    },
+    "rationale": [
+      "jimeng/jimeng-seedance-2.0-vip-multimodal-v1: unknown; one bounded attempt, no quality guarantee",
+      "evidence and policy affect audit identity, not unrelated media semantics"
+    ],
+    "revalidate_requirements": [
+      "camera-space",
+      "identity",
+      "quiet-observer",
+      "visual"
+    ]
+  },
+  "compilation": {
+    "outcome": "compiled",
+    "requirement_hash": "1eb953fd626aa4d501c6dcaf4e194164ae11da105b4e10a893441cbc9f3a62d8",
+    "provider_bound_request_hash": "4c510a095d30d6a26d95a08ada05c1af1f7391abe53b90275ddef4b54315f256",
+    "adapter_compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+    "adapter_compiler_version": "1",
+    "adapter_compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+    "provider_native_prompt": "真人电影摄影，横幅十六比九，连续六秒。以第一张已认可阳台图作为场景、光线、构图与起始人物姿态的主要参考；第二张只锁定左耳黑色耳挂和左领极细红色灯线，第三张只锁定同一女性的面貌，不继承身份图背景。\n同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。\n她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。\n保持原阳台和同一雾城，不新增屏幕、文字、字幕、标志或界面。只允许轻微环境风声，不生成对白、旁白、演唱或音乐；成片使用独立音轨，本源片原生声音在剪辑中静音。\n参考素材1 {{image:0}}\n参考素材2 {{image:1}}\n参考素材3 {{image:2}}",
+    "request": {
+      "generation_id": "canvas-generation-731e575aa1ff7e0353b19ffbe38597ef",
+      "provider_name": "jimeng",
+      "provider_kind": "jimeng",
+      "model_id": "seedance_2.0_vip",
+      "provider_profile": {
+        "profile_id": "jimeng",
+        "profile_version": "canvas-seedance-2.0-vip-v1",
+        "profile_path": "provider-profiles/6a39392c7cfea97e0cae1e0085aa3adb0d967bff9203ad8da68bad4a83ab8f89.json",
+        "profile_sha256": "6a39392c7cfea97e0cae1e0085aa3adb0d967bff9203ad8da68bad4a83ab8f89"
+      },
+      "requirement_hash": "1eb953fd626aa4d501c6dcaf4e194164ae11da105b4e10a893441cbc9f3a62d8",
+      "provider_bound_request_hash": "4c510a095d30d6a26d95a08ada05c1af1f7391abe53b90275ddef4b54315f256",
+      "adapter_compiler_id": "jimeng-seedance-2.0-vip-video-compiler",
+      "adapter_compiler_version": "1",
+      "adapter_compiler_hash": "13d0de329ace301aa901554648d2330be77f7b3b5777e874b77b5cb311ecff49",
+      "execution_stack_hash": null,
+      "target_shot_id": "ep01-intro",
+      "target_shot_revision": 6,
+      "target_shot_content_hash": "55d17c2ba7507282b73a3bd97a95ca85b1337a139347385edd391fc5ef59d908",
+      "target_asset_role": "primary_visual",
+      "target_visual_strategy": "generated_video",
+      "mode": "reference_to_video",
+      "prompt_text": "真人电影摄影，横幅十六比九，连续六秒。以第一张已认可阳台图作为场景、光线、构图与起始人物姿态的主要参考；第二张只锁定左耳黑色耳挂和左领极细红色灯线，第三张只锁定同一女性的面貌，不继承身份图背景。\n同一位浅肤色、极淡雀斑、浅灰蓝眼、深棕后梳低髻的年轻女性，穿炭黑高领长大衣，站在原玻璃阳台右侧，左侧雾城负空间保留。蓝黑与钢蓝冷色，红色仅为原左领极细灯线，保持原图自然皮肤、衣料和雾城层次。\n她平静闭口观察，眼神保持原方向，只出现自然呼吸和一次轻微自然眨眼，衣领边缘被微风极轻拂动；不说话、不唱歌、不做口型、不转身、不抬手、不增加其他人物。摄影机沿原视轴极缓慢微幅推近，保持人物在画面右侧及原观察侧，不翻轴、不环绕、不突然变焦。末段平滑收稳，人物仍闭口，服装、耳挂和灯线位置不变。全镜连续原速，不切镜、不叠化、不冻结。\n保持原阳台和同一雾城，不新增屏幕、文字、字幕、标志或界面。只允许轻微环境风声，不生成对白、旁白、演唱或音乐；成片使用独立音轨，本源片原生声音在剪辑中静音。\n参考素材1 {{image:0}}\n参考素材2 {{image:1}}\n参考素材3 {{image:2}}",
+      "negative_prompt_text": "",
+      "image_bindings": [
+        {
+          "role": "reference",
+          "asset_id": "iris-a01-balcony",
+          "asset_sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 1968261
+        },
+        {
+          "role": "reference",
+          "asset_id": "iris-cf-details",
+          "asset_sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 1843560
+        },
+        {
+          "role": "reference",
+          "asset_id": "iris-cf-face",
+          "asset_sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 1989742
+        }
+      ],
+      "c4_multi_anchor_binding": null,
+      "continuity_binding": null,
+      "hard_cut_keyframe_binding": null,
+      "seal_terminal_frame": false,
+      "media_bindings": [],
+      "output_requirement": {
+        "timing_mode": "nominal_seconds",
+        "duration_seconds": 6,
+        "frame_count": null,
+        "dimension_mode": "adaptive",
+        "width": null,
+        "height": null,
+        "resolution_label": "1080p",
+        "ratio": "16:9",
+        "fps": null,
+        "container": "mp4",
+        "mime_type": "video/mp4",
+        "native_audio": true
+      },
+      "seed": null,
+      "base_project": {
+        "path": "state/projects/project.6.fe12542c424ea15061959b582ab700fe18009632bed05ca9583354f8c08a7007.yaml",
+        "revision": 6,
+        "content_hash": "fe12542c424ea15061959b582ab700fe18009632bed05ca9583354f8c08a7007",
+        "file_sha256": "19b766d17919bc6d0d168bdb3d94d3413c386a5cf11193cb7c999b20d782cbd8"
+      },
+      "base_registry": {
+        "path": "assets/registry.be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e.json",
+        "revision_id": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+        "content_hash": "be1cf3ba5afaf0d9cac9e83db2e041d20516832806216135e8504a285549b43e",
+        "file_sha256": "2aeacf50273930c6a263bc2fdeeef47ad2d27c33eb8f80b6a965f8e02b5964c9"
+      },
+      "base_dependency_graph": {
+        "revision_id": "879ff3194a82cffd58d50918a51709f3758d97a9fc5dda52f5a4638229666d0f",
+        "content_hash": "879ff3194a82cffd58d50918a51709f3758d97a9fc5dda52f5a4638229666d0f",
+        "path": "state/dependency_graph.879ff3194a82cffd58d50918a51709f3758d97a9fc5dda52f5a4638229666d0f.json",
+        "file_sha256": "3dd73839d03fec62d7884e4e99724153da3e22c85011c77e27bb105e3c616b82"
+      },
+      "input_artifact_ids": [
+        "iris-a01-shot",
+        "iris-a01-scene",
+        "iris-a01-character",
+        "iris-cf-face",
+        "iris-cf-details",
+        "iris-a01-balcony"
+      ],
+      "output_asset_id": "canvas-video-731e575aa1ff7e0353b19ffbe38597ef",
+      "request_input_hash": "193f75aed3aa53a15c9f113e815572f26f2b63aa5c683c756f539d39822f408f"
+    },
+    "payload_projection_hash": "eddc007738c62cafdd1d95700b487cc29cc9875d070b429ef1aba17077d220ff",
+    "compiled_request_hash": "05742aa832225c64dcdce848f79b52945f0348b2aa138d1e5e43010c05035c85"
+  },
+  "executable": true,
+  "preview": {
+    "provider_preview": {
+      "resolved_generation_hash": "5a54bbcb9b474a81200672c89e063e3a5ecb99e56d3731e991b1c55321d6c112",
+      "execution_kind": "remote",
+      "billing_kind": "metered",
+      "estimated_cost_upper_bound_microunits": 250000000,
+      "currency": "CRD",
+      "destination": "https://jimeng.jianying.com",
+      "egress_item_ids": [
+        "prompt",
+        "iris-a01-balcony",
+        "iris-cf-details",
+        "iris-cf-face"
+      ],
+      "preview_fingerprint": "b5b41361ee6d56bef215e7f69896dd729a4baa64b18edeeb3a90a09310f6b098"
+    },
+    "egress_items": [
+      {
+        "item_id": "prompt",
+        "sha256": "dbc7e046eaecac8306ae10d6ad1ce2cc091a49a07b56d4b52f4855f8f404d998",
+        "size_bytes": 1377,
+        "mime_type": "text/plain",
+        "purpose": "prompt"
+      },
+      {
+        "item_id": "iris-a01-balcony",
+        "sha256": "0faefb4770ee7809a541af4150724dd2d188d9c7689a12f41d41ded3e4752087",
+        "size_bytes": 1968261,
+        "mime_type": "image/png",
+        "purpose": "reference"
+      },
+      {
+        "item_id": "iris-cf-details",
+        "sha256": "e19d9473c40c19d4834554055298351e1bdea3f856a6de76b057b575fcb563ea",
+        "size_bytes": 1843560,
+        "mime_type": "image/png",
+        "purpose": "reference"
+      },
+      {
+        "item_id": "iris-cf-face",
+        "sha256": "6333c39cb6b4b17e97a5a26ff8e27ab8582c514d6c9d974cd0975c79355663cb",
+        "size_bytes": 1989742,
+        "mime_type": "image/png",
+        "purpose": "reference"
+      }
+    ]
+  }
+}

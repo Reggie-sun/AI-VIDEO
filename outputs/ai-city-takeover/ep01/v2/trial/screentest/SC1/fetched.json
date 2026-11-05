@@ -1,0 +1,19 @@
+{
+ "unit": "SC1",
+ "file": "trial/screentest/SC1/fetch/4636266f591ceba0b7588db98d4a2a50c15213973f0ecd02a841a09527a4a7cf.mp4",
+ "sha256": "4636266f591ceba0b7588db98d4a2a50c15213973f0ecd02a841a09527a4a7cf",
+ "bytes": 14640501,
+ "suggested_name": "jimeng-2026-11-03-2283-镜头固定近景。她带着挑衅的冷笑对着镜头唱歌，嘴随歌词自然张合，下巴微微抬起，一侧....mp4",
+ "page_video": {
+  "w": 720,
+  "h": 960,
+  "dur": 5.16,
+  "box": [
+   566,
+   152,
+   504,
+   283.5
+  ]
+ },
+ "fetched_at": "2026-11-04T03:38:24.222Z"
+}

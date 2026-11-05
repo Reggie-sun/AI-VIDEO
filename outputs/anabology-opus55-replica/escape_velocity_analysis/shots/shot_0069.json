@@ -1,0 +1,1114 @@
+{
+  "shot_id": "S0069",
+  "start_frame": 2890,
+  "end_frame": 2954,
+  "duration_frames": 65,
+  "start_time": 120.4167,
+  "end_time": 123.125,
+  "duration_s": 2.7083,
+  "start_tc": "00:02:00:10",
+  "end_tc": "00:02:03:02",
+  "boundary_in_id": "B1-032",
+  "boundary_in_type": "hard_cut",
+  "boundary_in_span": [
+    2890,
+    2890
+  ],
+  "boundary_out_id": "B2-001",
+  "boundary_out_type": "hard_cut",
+  "is_strobe_burst": false,
+  "strobe_constituents": [],
+  "in_shot_events": [
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2890,
+        2892
+      ],
+      "description": "双手持白纸；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2896,
+        2898
+      ],
+      "description": "纸上ANSWER KEYS橙框；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2902,
+        2904
+      ],
+      "description": "ZERO-DAY入场；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2911,
+        2913
+      ],
+      "description": "撕裂，脸唇手有橙色语义涂色；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2917,
+        2919
+      ],
+      "description": "Answer入；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2923,
+        2925
+      ],
+      "description": "keys入，第三入侵链条已入；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2929,
+        2931
+      ],
+      "description": "第四ANSWER KEYS条进入；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2932,
+        2934
+      ],
+      "description": "ZERO-DAY退出；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2935,
+        2937
+      ],
+      "description": "Hacked入；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2941,
+        2943
+      ],
+      "description": "in入；3帧采样±2f。"
+    },
+    {
+      "type": "visual_state_change",
+      "frame_range": [
+        2944,
+        2946
+      ],
+      "description": "July入；3帧采样±2f。"
+    }
+  ],
+  "schema": "ev-shot/v1",
+  "scene_type": "hybrid",
+  "narrative_role": "以人物、可读排版和数据装置展开本段歌词/主题，具体视觉职责见独立元素。",
+  "subject": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "演唱或人物底片、文字、仪表及常驻图层同时存在"
+  },
+  "scene_description": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际。左侧ZERO-DAY大字入场后消失，右侧四行入侵链依次点亮，歌词按词在右下排入。",
+  "reference_frames": [
+    {
+      "frame": 2890,
+      "path": "keyframes/S0069_f02890.jpg",
+      "role": "first",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2906,
+      "path": "keyframes/S0069_f02906.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2922,
+      "path": "keyframes/S0069_f02922.jpg",
+      "role": "middle",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2938,
+      "path": "keyframes/S0069_f02938.jpg",
+      "role": "key_change",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2954,
+      "path": "keyframes/S0069_f02954.jpg",
+      "role": "last",
+      "note": "filmstrip及首中末关键帧已查看；四分位图作为引用补充。"
+    },
+    {
+      "frame": 2922,
+      "path": "work/full_batch/02922.jpg",
+      "role": "detail",
+      "note": "1920x1080原帧实际查看并复核细字。"
+    }
+  ],
+  "composition": {
+    "shot_size": "按scene_description中的实际景别",
+    "subject_position": "见scene_description与bounding_box",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "可见倾斜/俯仰见scene_description；焦距unknown",
+    "layers": {
+      "foreground": "独立HUD、排版、遮罩层",
+      "midground": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际",
+      "background": "原片底景，详见背景元素"
+    },
+    "empty_field_for_type": "见各元素bbox，均为视觉估计"
+  },
+  "camera": {
+    "movement": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际。左侧ZERO-DAY大字入场后消失，右侧四行入侵链依次点亮，歌词按词在右下排入。",
+    "direction": "以实际filmstrip比较为依据；未确认部分unknown",
+    "speed_profile": "测量flow含前景运动；不把它等同相机运动",
+    "dof_focus": "以人物/背景实际清晰度为据；未恢复镜头参数，no focus-pull confirmed。",
+    "parallax_kind": "unknown",
+    "evidence": "{\"pan_x_frac_per_s\": 0.0004, \"pan_y_frac_per_s\": 0.0032, \"zoom_per_s\": 0.0083, \"median_flow_frac_per_s\": 0.0066, \"pairs_measured\": 16}",
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "按底片可见高光；具体光位unknown",
+    "quality": "见scene_description",
+    "effects": [
+      "global halftone observed"
+    ],
+    "temporal_change": "[45.5, 52.1, 49.5]"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#10120A",
+        "fraction": 0.57,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#302E26",
+        "fraction": 0.149,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#AFADB7",
+        "fraction": 0.083,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#725246",
+        "fraction": 0.079,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#D0CFD8",
+        "fraction": 0.066,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      },
+      {
+        "hex": "#918688",
+        "fraction": 0.052,
+        "method": "measured_kmeans",
+        "role": "measured image cluster"
+      }
+    ],
+    "contrast": "深色底与浅色皮肤、白字高对比",
+    "grain_halftone": "可见规则细点网，pitch的独立测量见halftone_pitch.json，未在本镜单独标定",
+    "temporal_change": "[45.5, 52.1, 49.5]"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": "LOOK 07 / 11; shot内过渡值见参考帧",
+    "G-MONTHS-COUNTER": "16",
+    "G-HALFTONE": "visible; fine/coarse screen treatment varies with scene",
+    "G-TICKER": "visible; 全条动态微字未逐帧转录",
+    "G-CV-BRACKET": "可见角色/物体框，具体可读标签见本镜元素；框位置随对象变化"
+  },
+  "elements": [
+    {
+      "element_id": "S0069-E01",
+      "shot_id": "S0069",
+      "type": "background_media",
+      "description": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际。左侧ZERO-DAY大字入场后消失，右侧四行入侵链依次点亮，歌词按词在右下排入。",
+      "start_frame": 2890,
+      "end_frame": 2954,
+      "bounding_box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 1,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际。左侧ZERO-DAY大字入场后消失，右侧四行入侵链依次点亮，歌词按词在右下排入。"
+      },
+      "motion": {
+        "path": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际。左侧ZERO-DAY大字入场后消失，右侧四行入侵链依次点亮，歌词按词在右下排入。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2890,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2922,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2954,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2890,
+        2906,
+        2922,
+        2938,
+        2954
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "bbox visual_estimate，为典型/最大包络，部分图层有明显位移；须从引用帧再测量。",
+        "start/end为分析活动包络，不代表精确入场首帧。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0069-E02",
+      "shot_id": "S0069",
+      "type": "character",
+      "description": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+      "start_frame": 2890,
+      "end_frame": 2954,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "底片人物语义区域，非证明独立遮罩。少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际。左侧ZERO-DAY大字入场后消失，右侧四行入侵链依次点亮，歌词按词在右下排入。"
+      },
+      "motion": {
+        "path": "底片中的人物区域；表演和衣服细节见scene_description，未证明独立遮罩。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2890,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2922,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2954,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2890,
+        2906,
+        2922,
+        2938,
+        2954
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "bbox visual_estimate，为典型/最大包络，部分图层有明显位移；须从引用帧再测量。",
+        "start/end为分析活动包络，不代表精确入场首帧。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    },
+    {
+      "element_id": "S0069-E03",
+      "shot_id": "S0069",
+      "type": "prop",
+      "description": "胸前白纸由完整矩形变两半，撕裂是底片动作，裂口参差。",
+      "start_frame": 2890,
+      "end_frame": 2954,
+      "bounding_box": {
+        "x": 0.34,
+        "y": 0.57,
+        "w": 0.31,
+        "h": 0.38,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "胸前白纸由完整矩形变两半，撕裂是底片动作，裂口参差。"
+      },
+      "motion": {
+        "path": "胸前白纸由完整矩形变两半，撕裂是底片动作，裂口参差。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2890,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2922,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2954,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2890,
+        2906,
+        2922,
+        2938,
+        2954
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。"
+      }
+    },
+    {
+      "element_id": "S0069-E04",
+      "shot_id": "S0069",
+      "type": "hud_panel",
+      "description": "右上四条横框从上到下进入，状态ZERO-DAY / FOUND / IN / BLANK，白黑橙色交替。",
+      "start_frame": 2890,
+      "end_frame": 2954,
+      "bounding_box": {
+        "x": 0.64,
+        "y": 0.23,
+        "w": 0.3,
+        "h": 0.3,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右上四条横框从上到下进入，状态ZERO-DAY / FOUND / IN / BLANK，白黑橙色交替。"
+      },
+      "motion": {
+        "path": "右上四条横框从上到下进入，状态ZERO-DAY / FOUND / IN / BLANK，白黑橙色交替。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2890,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2922,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2954,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2890,
+        2906,
+        2922,
+        2938,
+        2954
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。",
+        "first_visible_frame_estimate": 2890,
+        "last_visible_frame_estimate": 2954
+      }
+    },
+    {
+      "element_id": "S0069-E05",
+      "shot_id": "S0069",
+      "type": "text_title",
+      "description": "ZERO-DAY.左中白色凝缩，2901附近出现，2932附近退出。",
+      "start_frame": 2902,
+      "end_frame": 2931,
+      "bounding_box": {
+        "x": 0.03,
+        "y": 0.42,
+        "w": 0.31,
+        "h": 0.15,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "ZERO-DAY.左中白色凝缩，2901附近出现，2932附近退出。"
+      },
+      "motion": {
+        "path": "ZERO-DAY.左中白色凝缩，2901附近出现，2932附近退出。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2922,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2906,
+        2922
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "ZERO-DAY.",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "unknown; see per-shot description",
+          "alignment": "see observed reference",
+          "tracking": "mono for HUD; tight for lyric headline",
+          "stroke": "none observed",
+          "shadow": "unknown"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。",
+        "first_visible_frame_estimate": 2902,
+        "last_visible_frame_estimate": 2931
+      }
+    },
+    {
+      "element_id": "S0069-E06",
+      "shot_id": "S0069",
+      "type": "text_lyric",
+      "description": "右下Answer keys. Hacked in July,逐词白字，新词橙。",
+      "start_frame": 2917,
+      "end_frame": 2954,
+      "bounding_box": {
+        "x": 0.64,
+        "y": 0.54,
+        "w": 0.3,
+        "h": 0.13,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": 1,
+        "blend_mode": "normal",
+        "details": "右下Answer keys. Hacked in July,逐词白字，新词橙。"
+      },
+      "motion": {
+        "path": "右下Answer keys. Hacked in July,逐词白字，新词橙。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "元素活动包络为shot范围，不能当作首个可见帧；精确可见状态以keyframes与description时间点为准。",
+        "exit": "见描述；无明确时间点则待逐帧细化"
+      },
+      "keyframes": [
+        {
+          "frame": 2922,
+          "state": "参考实际图像；精确运动参数未恢复"
+        },
+        {
+          "frame": 2954,
+          "state": "参考实际图像；精确运动参数未恢复"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2922,
+        2938,
+        2954
+      ],
+      "confidence": 0.65,
+      "uncertainties": [
+        "原始字体/alpha曲线/shader/随机seed无法从合成片确认。",
+        "bbox visual_estimate±0.03，时间3帧采样±2f。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。",
+      "text": {
+        "content": "Answer keys. Hacked in July,",
+        "case": "as displayed",
+        "typography": {
+          "font_candidates": [
+            "DINish Condensed 900",
+            "Heros 700",
+            "IBM Plex Mono 500"
+          ],
+          "status": "candidate_only",
+          "size_px": "unknown; see per-shot description",
+          "alignment": "see observed reference",
+          "tracking": "mono for HUD; tight for lyric headline",
+          "stroke": "none observed",
+          "shadow": "unknown"
+        },
+        "transcription_scope": "main readable line; other independent lines listed in observed_text_inventory and per-element description"
+      },
+      "geometry_method": "visual_estimate_from_actual_frame",
+      "geometry_error_estimate_norm": 0.03,
+      "visibility_measurement": {
+        "method": "visual_dense_sample",
+        "uncertainty_frames": 2,
+        "note": "精确入/退事件参见in_shot_events；跨镜继承层从shot首帧开始。",
+        "first_visible_frame_estimate": 2917,
+        "last_visible_frame_estimate": 2954
+      }
+    },
+    {
+      "element_id": "S0069-E07",
+      "shot_id": "S0069",
+      "type": "mask",
+      "description": "嘴唇、两眼与双手叠橙色半透明语义高亮块，随面部/手部移动；不是底片自然光。",
+      "start_frame": 2911,
+      "end_frame": 2954,
+      "bounding_box": {
+        "x": 0.37,
+        "y": 0.18,
+        "w": 0.3,
+        "h": 0.62,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "normal",
+        "details": "嘴唇、两眼与双手叠橙色半透明语义高亮块，随面部/手部移动；不是底片自然光。"
+      },
+      "motion": {
+        "path": "嘴唇、两眼与双手叠橙色半透明语义高亮块，随面部/手部移动；不是底片自然光。",
+        "easing": "unknown; text new-word accent is step-like",
+        "entrance": "2911起±2帧，参见逐3帧密采",
+        "exit": "2954末见±2帧"
+      },
+      "keyframes": [
+        {
+          "frame": 2911,
+          "state": "嘴唇、两眼与双手叠橙色半透明语义高亮块，随面部/手部移动；不是底片自然光。"
+        },
+        {
+          "frame": 2954,
+          "state": "最后活动区间"
+        }
+      ],
+      "effects": [
+        "global print pass"
+      ],
+      "reference_frames": [
+        2922,
+        2938,
+        2954,
+        2922
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "geometry visual_estimate ±0.03；隐藏alpha与曲线unknown。"
+      ],
+      "reconstruction_hint": "依reference_frames和描述分层重建；先标定每个子事件后实现运动。"
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0069-A03",
+      "target_element_ids": [
+        "S0069-E03"
+      ],
+      "description": "胸前白纸由完整矩形变两半，撕裂是底片动作，裂口参差。",
+      "start_frame": 2890,
+      "end_frame": 2954,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0069-A04",
+      "target_element_ids": [
+        "S0069-E04"
+      ],
+      "description": "右上四条横框从上到下进入，状态ZERO-DAY / FOUND / IN / BLANK，白黑橙色交替。",
+      "start_frame": 2890,
+      "end_frame": 2954,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0069-A05",
+      "target_element_ids": [
+        "S0069-E05"
+      ],
+      "description": "ZERO-DAY.左中白色凝缩，2901附近出现，2932附近退出。",
+      "start_frame": 2902,
+      "end_frame": 2931,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    },
+    {
+      "anim_id": "S0069-A06",
+      "target_element_ids": [
+        "S0069-E06"
+      ],
+      "description": "右下Answer keys. Hacked in July,逐词白字，新词橙。",
+      "start_frame": 2917,
+      "end_frame": 2954,
+      "easing": "unknown",
+      "audio_sync": "NOT_EVALUATED; root将按audio_timeline关联，不能用对齐候选当听证。"
+    }
+  ],
+  "audio_events": [
+    {
+      "audio_event_id": "AB0266",
+      "relation": "beat_candidate (unknown) at frame 2890; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2890
+    },
+    {
+      "audio_event_id": "AH01131",
+      "relation": "band_onset_candidate (unknown) at frame 2890; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2890
+    },
+    {
+      "audio_event_id": "AH01132",
+      "relation": "band_onset_candidate (unknown) at frame 2890; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2890
+    },
+    {
+      "audio_event_id": "AH01133",
+      "relation": "band_onset_candidate (unknown) at frame 2890; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2890
+    },
+    {
+      "audio_event_id": "AH01134",
+      "relation": "band_onset_candidate (unknown) at frame 2890; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2890
+    },
+    {
+      "audio_event_id": "AH01135",
+      "relation": "band_onset_candidate (unknown) at frame 2891; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2891
+    },
+    {
+      "audio_event_id": "AH01136",
+      "relation": "band_onset_candidate (unknown) at frame 2896; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2896
+    },
+    {
+      "audio_event_id": "AH01137",
+      "relation": "band_onset_candidate (unknown) at frame 2896; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2896
+    },
+    {
+      "audio_event_id": "AW0184",
+      "relation": "vocal_word_candidate (unknown) at frame 2899–2905; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2899
+    },
+    {
+      "audio_event_id": "AH01138",
+      "relation": "band_onset_candidate (unknown) at frame 2901; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2901
+    },
+    {
+      "audio_event_id": "AB0267",
+      "relation": "beat_candidate (unknown) at frame 2901; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2901
+    },
+    {
+      "audio_event_id": "AH01139",
+      "relation": "band_onset_candidate (unknown) at frame 2901; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2901
+    },
+    {
+      "audio_event_id": "AH01140",
+      "relation": "band_onset_candidate (unknown) at frame 2901; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2901
+    },
+    {
+      "audio_event_id": "AH01141",
+      "relation": "band_onset_candidate (unknown) at frame 2902; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2902
+    },
+    {
+      "audio_event_id": "AH01142",
+      "relation": "band_onset_candidate (unknown) at frame 2906; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2906
+    },
+    {
+      "audio_event_id": "AH01143",
+      "relation": "band_onset_candidate (unknown) at frame 2907; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2907
+    },
+    {
+      "audio_event_id": "AW0185",
+      "relation": "vocal_word_candidate (unknown) at frame 2907–2911; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2907
+    },
+    {
+      "audio_event_id": "AB0268",
+      "relation": "beat_candidate (unknown) at frame 2912; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2912
+    },
+    {
+      "audio_event_id": "AH01144",
+      "relation": "band_onset_candidate (unknown) at frame 2912; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2912
+    },
+    {
+      "audio_event_id": "AH01145",
+      "relation": "band_onset_candidate (unknown) at frame 2912; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2912
+    },
+    {
+      "audio_event_id": "AH01146",
+      "relation": "band_onset_candidate (unknown) at frame 2912; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2912
+    },
+    {
+      "audio_event_id": "AH01147",
+      "relation": "band_onset_candidate (unknown) at frame 2912; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2912
+    },
+    {
+      "audio_event_id": "AW0186",
+      "relation": "vocal_word_candidate (unknown) at frame 2914–2920; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2914
+    },
+    {
+      "audio_event_id": "AH01148",
+      "relation": "band_onset_candidate (unknown) at frame 2917; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2917
+    },
+    {
+      "audio_event_id": "AW0187",
+      "relation": "vocal_word_candidate (unknown) at frame 2920–2930; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2920
+    },
+    {
+      "audio_event_id": "AH01149",
+      "relation": "band_onset_candidate (unknown) at frame 2923; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2923
+    },
+    {
+      "audio_event_id": "AH01150",
+      "relation": "band_onset_candidate (unknown) at frame 2923; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2923
+    },
+    {
+      "audio_event_id": "AB0269",
+      "relation": "beat_candidate (unknown) at frame 2923; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2923
+    },
+    {
+      "audio_event_id": "AH01151",
+      "relation": "band_onset_candidate (unknown) at frame 2923; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2923
+    },
+    {
+      "audio_event_id": "AH01152",
+      "relation": "band_onset_candidate (unknown) at frame 2923; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2923
+    },
+    {
+      "audio_event_id": "AH01153",
+      "relation": "band_onset_candidate (unknown) at frame 2928; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2928
+    },
+    {
+      "audio_event_id": "AH01154",
+      "relation": "band_onset_candidate (unknown) at frame 2928; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2928
+    },
+    {
+      "audio_event_id": "AW0188",
+      "relation": "vocal_word_candidate (unknown) at frame 2932–2939; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2932
+    },
+    {
+      "audio_event_id": "AB0270",
+      "relation": "beat_candidate (unknown) at frame 2933; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2933
+    },
+    {
+      "audio_event_id": "AH01155",
+      "relation": "band_onset_candidate (unknown) at frame 2933; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2933
+    },
+    {
+      "audio_event_id": "AH01156",
+      "relation": "band_onset_candidate (unknown) at frame 2933; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2933
+    },
+    {
+      "audio_event_id": "AH01157",
+      "relation": "band_onset_candidate (unknown) at frame 2934; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2934
+    },
+    {
+      "audio_event_id": "AH01158",
+      "relation": "band_onset_candidate (unknown) at frame 2934; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2934
+    },
+    {
+      "audio_event_id": "AW0189",
+      "relation": "vocal_word_candidate (unknown) at frame 2940–2942; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2940
+    },
+    {
+      "audio_event_id": "AH01159",
+      "relation": "band_onset_candidate (unknown) at frame 2942; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2942
+    },
+    {
+      "audio_event_id": "AW0190",
+      "relation": "vocal_word_candidate (unknown) at frame 2944–2955; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 2944
+    },
+    {
+      "audio_event_id": "AH01160",
+      "relation": "band_onset_candidate (unknown) at frame 2944; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2944
+    },
+    {
+      "audio_event_id": "AB0271",
+      "relation": "beat_candidate (unknown) at frame 2944; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 2944
+    },
+    {
+      "audio_event_id": "AH01161",
+      "relation": "band_onset_candidate (unknown) at frame 2944; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2944
+    },
+    {
+      "audio_event_id": "AH01162",
+      "relation": "band_onset_candidate (unknown) at frame 2944; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2944
+    },
+    {
+      "audio_event_id": "AH01163",
+      "relation": "band_onset_candidate (unknown) at frame 2945; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2945
+    },
+    {
+      "audio_event_id": "AH01164",
+      "relation": "band_onset_candidate (unknown) at frame 2950; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2950
+    },
+    {
+      "audio_event_id": "AH01165",
+      "relation": "band_onset_candidate (unknown) at frame 2950; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2950
+    },
+    {
+      "audio_event_id": "AH01166",
+      "relation": "band_onset_candidate (unknown) at frame 2950; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 2950
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "author Midjourney plates / possible Seedance clip",
+        "evidence_level": "inferred",
+        "rationale": "作者声明全片底片与运动流程，但本抽帧shot ID并非作者storyboard ID，不能一对一确认",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7–B8"
+        ]
+      },
+      {
+        "layer": "graphics",
+        "technique": "custom JS canvas and WebGL print pass",
+        "evidence_level": "confirmed",
+        "rationale": "作者文档明确全片图形与排版绘制流程；具体本镜参数仍为视觉估计",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1 / R stack: “Headless Chromium: canvas plus a WebGL print pass. Every frame is a pure function of time.”"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "https://claudia.gallery/record/escape-velocity/readme.md",
+      "note": "制作流程来源；不证明原始字体和动画曲线"
+    }
+  ],
+  "confidence": 0.7,
+  "uncertainties": [
+    "本镜全res中帧、首中末与3帧完整采样已二审，事件时间±2f。",
+    "未知原始工程参数不构成已知事实；字体仅候选。",
+    "音频听证NOT_EVALUATED，词时间是可见文字观测，不证明唱词准确。"
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "按底片、人物、独立仪表/文字、全局print pass分层组织；先对齐列出的关键帧，再用密集参考标定动画。",
+    "dependencies": [
+      "contactsheets/S0069.jpg",
+      "visual_system.json",
+      "halftone_pitch.json"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "人物表演、逐词标题和细HUD需分别匹配，不能烘焙成单张图。",
+    "alternatives": "分析阶段仅提出路线；原始plate无从确认时可在后续另行选择授权素材。"
+  },
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B1-032",
+      "description": "以冻结边界和首帧为证，转场可能跨镜延续。",
+      "span": [
+        2890,
+        2890
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B2-001",
+      "description": "少女在暗色通道中把白纸从中间撕裂，纸从胸前下降到腰际。左侧ZERO-DAY大字入场后消失，右侧四行入侵链依次点亮，歌词按词在右下排入。",
+      "span": [
+        2954,
+        2954
+      ],
+      "recommended_technique": "match observed cut/mask; exact editable source unknown"
+    }
+  },
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "observed_text_inventory": [
+    "ZERO-DAY.",
+    "Answer keys. Hacked in July,",
+    "EXPLOIT CHAIN · 07.2026 · 4 HOPS",
+    "ARTIFACTORY",
+    "HF CREDENTIALS",
+    "HF DATASET SERVERS",
+    "ANSWER KEYS"
+  ],
+  "visual_review_evidence": {
+    "full_resolution_frames_viewed": [
+      2922
+    ],
+    "second_pass_notes": "右侧源注SRC·以打字状态尚未完成；面部及手指橙色高亮轮廓是独立涂色层，之前漏列。",
+    "dense_sampling_stride_frames": 3,
+    "second_pass_status": "COMPLETED_FOR_VISIBLE_LAYERS_WITH_3_FRAME_SAMPLING",
+    "observations": [
+      {
+        "frame": 2890,
+        "description": "双手持白纸"
+      },
+      {
+        "frame": 2896,
+        "description": "纸上ANSWER KEYS橙框"
+      },
+      {
+        "frame": 2902,
+        "description": "ZERO-DAY入场"
+      },
+      {
+        "frame": 2911,
+        "description": "撕裂，脸唇手有橙色语义涂色"
+      },
+      {
+        "frame": 2917,
+        "description": "Answer入"
+      },
+      {
+        "frame": 2923,
+        "description": "keys入，第三入侵链条已入"
+      },
+      {
+        "frame": 2929,
+        "description": "第四ANSWER KEYS条进入"
+      },
+      {
+        "frame": 2932,
+        "description": "ZERO-DAY退出"
+      },
+      {
+        "frame": 2935,
+        "description": "Hacked入"
+      },
+      {
+        "frame": 2941,
+        "description": "in入"
+      },
+      {
+        "frame": 2944,
+        "description": "July入"
+      }
+    ]
+  },
+  "geometry_review_note": "各独立图层bbox按实际关键帧重估，替换通用右侧框；视觉估计±0.03，不虚称像素测量。"
+}

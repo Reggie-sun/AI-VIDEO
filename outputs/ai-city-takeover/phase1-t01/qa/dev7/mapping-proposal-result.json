@@ -1,0 +1,64 @@
+{
+  "status": "BLOCKED_BY_UNCOMMITTED_SHARED_GATE_DEPENDENCY",
+  "main_policy_modified": false,
+  "main_index_modified": false,
+  "proposal_only": true,
+  "proposal_policy_sha256": "d98be1221f1b399f405b2dd2cc8d61365969fe5bfbac7988c7468c401b67b11f",
+  "proposal_index_tree": "1ab50873bf9f02a1d3757fe44c97d18c3dcc20ea",
+  "checks": {
+    "iris-mapping-focused-r3-20261030": {
+      "status": "passed",
+      "verification_level": "focused",
+      "snapshot_tree": null,
+      "passed_checks": [
+        "docs_contract_check",
+        "motionkit_runtime_tests",
+        "motionkit_tool_tests",
+        "harness_tests"
+      ],
+      "failed_checks": [],
+      "receipt_copy": "outputs/ai-city-takeover/phase1-t01/qa/dev7/mapping-proposal-focused-r3/receipt.json"
+    },
+    "iris-mapping-related-r4-20261030": {
+      "status": "failed",
+      "verification_level": "related",
+      "snapshot_tree": null,
+      "passed_checks": [
+        "scope_diff_check",
+        "docs_contract_check",
+        "agent_rules_check",
+        "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
+        "motionkit_runtime_tests",
+        "motionkit_tool_tests",
+        "task_architecture_gate",
+        "harness_tests"
+      ],
+      "failed_checks": [
+        "agent_rule_invariants"
+      ],
+      "receipt_copy": "outputs/ai-city-takeover/phase1-t01/qa/dev7/mapping-proposal-related-r4/receipt.json"
+    }
+  },
+  "baseline_failure": "agent_rule_invariants: test_close_retains_exact_request_history_budget_and_replays_without_writes",
+  "current_working_tree_diagnostic": {
+    "argv": [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_production_video_unsubmitted.py::test_close_retains_exact_request_history_budget_and_replays_without_writes",
+      "-q"
+    ],
+    "observed": "1 passed in 4.92s",
+    "scope": "diagnostic only; working tree includes other session staged migration; not immutable completion proof"
+  },
+  "full_level_executed_for_proposal": false,
+  "full_stop_reason": "Related prerequisite failed; no full continuation after failure.",
+  "recovery": "Other session commits shared gate/policy/test migration first; then apply and verify task-owned mapping without mixing its uncommitted code. Same-file policy write requires user decision while another owner remains active.",
+  "apply_incremental_proposal_when_authorized": [
+    "git",
+    "apply",
+    "--unidiff-zero",
+    "outputs/ai-city-takeover/phase1-t01/qa/dev7/proposed-harness-mapping.patch"
+  ]
+}

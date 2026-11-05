@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v2-st3-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v2/keyframes/raw/ST3-a.png",
+    "sha256": "3691c59e234d68dc317880652de361aace0cd4a74f5210341974d744b1a9f0f5",
+    "size_bytes": 1782660,
+    "width": 1672,
+    "height": 941,
+    "role": "approved ST3-a: the first frame",
+    "need_id": "still-rows",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

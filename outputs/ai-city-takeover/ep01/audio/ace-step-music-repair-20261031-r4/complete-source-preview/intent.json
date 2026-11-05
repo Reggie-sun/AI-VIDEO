@@ -1,0 +1,103 @@
+{
+  "schema": "upstream-song-source-edit/1",
+  "created_at_utc": "2026-10-31T08:59:48.238602+00:00",
+  "authority": "Development source authoring, not a final-film timeline or accepted song",
+  "source_intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/suno-ui-intent.json",
+  "sources": {
+    "speech": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-guided-repair-20261031-r3/guide-01/reference-30s.wav",
+      "sha256": "e89ff4fb11b06423e6b40a714a2106d827b0236a77283a7c1bd493ffcdc80c18"
+    },
+    "music": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/H-instrumental/9a6a6771-859c-e9c3-8cdf-b5b37c00278c.wav",
+      "sha256": "dda4ce0ed63b1c5dd4736c835d22967cd1e0b82095b822c00b869d77f81e0304",
+      "bytes": 5760044
+    },
+    "I": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/I-sung-hook/5cd3a9de-b6a9-1a49-4fcd-8aea4fa7cb96.wav",
+      "sha256": "0f202c1970655f2e6668921096b9ca0ecc15190b6a050a74e1e13aa175bcbf15",
+      "bytes": 1920044
+    },
+    "J": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/J-rhythmic-hook/18c8d67e-febf-8b54-7ad3-396ef96c09fd.wav",
+      "sha256": "73df84b0f979a5ede0082918589a65855e75154ec8ba553ecf58ee68744afd76",
+      "bytes": 1920044
+    }
+  },
+  "sample_rate": 48000,
+  "duration_seconds": 30,
+  "spoken_lead": [
+    {
+      "source": "speech",
+      "in_seconds": 0,
+      "out_seconds": 13.05
+    },
+    {
+      "source": "speech",
+      "in_seconds": 13.48,
+      "out_seconds": 16.85
+    }
+  ],
+  "sung_phrase": [
+    {
+      "source": "J",
+      "in_seconds": 0,
+      "out_seconds": 1.6
+    },
+    {
+      "source": "I",
+      "in_seconds": 3.85,
+      "out_seconds": 5.42
+    },
+    {
+      "source": "I",
+      "in_seconds": 5.69,
+      "out_seconds": 6.85
+    }
+  ],
+  "spoken_outro": [
+    {
+      "source": "speech",
+      "in_seconds": 20.8,
+      "out_seconds": 25.1
+    }
+  ],
+  "phrase_pause_seconds": 0.06,
+  "instrumental_edit": [
+    {
+      "source": "music",
+      "in_seconds": 0,
+      "out_seconds": 15.3252
+    },
+    {
+      "source": "music",
+      "in_seconds": 7.709,
+      "out_seconds": 22.7
+    }
+  ],
+  "voice_gain_db": -1.0,
+  "music_gain_db": -4.0,
+  "peak_ceiling": 0.94,
+  "runner_sha256": "7d8debabc932f62e3db08d7e7adff4cceb26b7f7e4a3dfb02e575e8bc576878c",
+  "musical_source_edit_rationale": {
+    "speech_gap": "Remove measured low-energy pause13.05-13.48 only; no word/speed editing",
+    "hook": "Take I did not run from J, I just looked from I, outside from I; remove generated extra looked, repeat complete exact original phrase twice. Edits are pending actual hearing and ASR check.",
+    "music": "Repeat4-bar instrumental section at measured beat positions to maintain a continuous bed through30s; source authoring only, no film timing claim"
+  },
+  "preserved_goal": [
+    "Every original word in original order",
+    "30s at normal speed",
+    "Real independent music bed",
+    "Female spoken verses and actually generated sung hook",
+    "Cold sparse dark electroclash/minimal techno126BPM direction"
+  ],
+  "not_evaluated": [
+    "Human song quality",
+    "Voice coherence and edit seams",
+    "Whispered pre-chorus",
+    "Final-film audiovisual matching"
+  ],
+  "paid_calls": 0,
+  "new_ACE_generations": 0,
+  "production_state_writes": 0
+}

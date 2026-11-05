@@ -1,0 +1,2186 @@
+{
+  "shot_id": "S0128",
+  "start_frame": 5708,
+  "end_frame": 5750,
+  "start_time": 237.8333,
+  "end_time": 239.625,
+  "duration_frames": 43,
+  "duration_s": 1.7917,
+  "start_tc": "00:03:57:20",
+  "end_tc": "00:03:59:14",
+  "boundary_in_id": "B3-033",
+  "schema": "ev-shot/v1",
+  "analysis_status": "DETAILED_VISUAL_REVIEW",
+  "reference_frames": [
+    {
+      "frame": 5708,
+      "path": "keyframes/S0128_f05708.jpg",
+      "role": "first",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5718,
+      "path": "keyframes/S0128_f05718.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5729,
+      "path": "keyframes/S0128_f05729.jpg",
+      "role": "middle",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5740,
+      "path": "keyframes/S0128_f05740.jpg",
+      "role": "key_change",
+      "note": "Actually opened individually in detail pass."
+    },
+    {
+      "frame": 5750,
+      "path": "keyframes/S0128_f05750.jpg",
+      "role": "last",
+      "note": "Actually opened individually in detail pass."
+    }
+  ],
+  "scene_type": "hybrid",
+  "narrative_role": "Connect the countdown, escape thesis and final collection ring-out through a concrete visual argument.",
+  "subject": "Woman flying over tilted aerial city",
+  "visual_complexity": {
+    "level": "high",
+    "rationale": "4 independently identifiable layer groups plus persistent chrome; microtext and event-level segmentation pending."
+  },
+  "scene_description": "Woman flying over tilted aerial city. High-angle diagonal full-body figure arms extended, black skirt and boots against densely packed city below. It’s then So then Over then region? type; right tree branches appear sequentially.",
+  "composition": {
+    "shot_size": "see subject description and reference filmstrip",
+    "subject_position": "Woman flying over tilted aerial city",
+    "subject_bbox": null,
+    "subject_screen_fraction": null,
+    "camera_angle": "observed angle described in scene_description; physical focal length unknown",
+    "layers": {
+      "foreground": "Text, cards and masks listed in elements",
+      "midground": "Woman flying over tilted aerial city",
+      "background": "High-angle diagonal full-body figure arms extended, black skirt and boots against densely packed city below."
+    },
+    "empty_field_for_type": "Use listed per-element bounding boxes; all visually estimated."
+  },
+  "camera": {
+    "movement": "It’s then So then Over then region? type; right tree branches appear sequentially",
+    "direction": "See observed motion description",
+    "speed_profile": "Not fitted; do not assume linear or spring easing",
+    "dof_focus": "Photographic subject in focus; exact physical optical parameters unknown",
+    "parallax_kind": "unknown",
+    "evidence": "contactsheets/S0128.jpg visually opened; measured flow in work/shot_stats.json",
+    "flow_measurements": {
+      "pan_x_frac_per_s": 0.0176,
+      "pan_y_frac_per_s": -0.0124,
+      "zoom_per_s": -0.0135,
+      "median_flow_frac_per_s": 0.0236,
+      "pairs_measured": 16
+    },
+    "estimated_zoom_start": null,
+    "estimated_zoom_end": null
+  },
+  "lighting": {
+    "key_direction": "Visible bright field/subject contrast; original key position unknown",
+    "quality": "High-angle diagonal full-body figure arms extended, black skirt and boots against densely packed city below.",
+    "effects": [
+      "Color halftone visible throughout source except final black"
+    ],
+    "temporal_change": "See motion notes; lamp parameters unknown"
+  },
+  "colors": {
+    "palette": [
+      {
+        "hex": "#1D221B",
+        "fraction": 0.288,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#EAEAE9",
+        "fraction": 0.184,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#A2A19E",
+        "fraction": 0.155,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#C7C4C0",
+        "fraction": 0.145,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#777976",
+        "fraction": 0.12,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      },
+      {
+        "hex": "#4D4D46",
+        "fraction": 0.108,
+        "method": "measured_kmeans",
+        "role": "measured dominant color cluster; spatial semantic assignment pending detail review"
+      }
+    ],
+    "contrast": "First/middle/last luma [140.3, 138.5, 138.5]",
+    "grain_halftone": "Grid of colored/black dots visible in filmstrip; pitch not measured in this pass; see halftone_pitch.json",
+    "temporal_change": "Per-shot palette is measured aggregate, not per-element color authority"
+  },
+  "persistent_layer_state": {
+    "G-LOOK-COUNTER": {
+      "state": "LOOK 04 /11",
+      "evidence_frame": 5729,
+      "method": "native source crop and five keyframes",
+      "confidence": 0.74
+    },
+    "G-TITLE-TAG": {
+      "state": "ESCAPE VELOCITY · SS27 at upperright; dark mono on light field, unchanged layout",
+      "evidence_frame": 5729
+    },
+    "G-AUDIO-SPECTRUM": {
+      "state": "Narrow varying vertical bars beneath title; no numerical amplitude readout",
+      "evidence_frame": 5729,
+      "audio_relation": "visual activity only; no audible verification in this lane"
+    },
+    "G-CORNER-MARKS": {
+      "state": "Thin registration cross marks remain at corners, subject to local contrast/transition occlusion"
+    },
+    "G-LEFT-RULER": {
+      "state": "Fine left-edge ticks and small advancing indices remain; no shot-specific ruler redesign"
+    },
+    "G-TICKER": {
+      "state": "Two bottom hairlines enclose continuous right-to-left mono ticker; no shot-specific stop observed. Repeated visible items include MAC MINIS13, NVDA▲5.3T, CURSOR+SPACEX$60B and WAYMO RECALL3,900; full string and scroll law owned globally."
+    },
+    "G-TIMECODE": {
+      "state": "Small bottom-right source timecode; timeline time=f/24",
+      "start_value": "00:03:57:20",
+      "end_value": "00:03:59:14"
+    },
+    "G-HALFTONE": {
+      "state": "Printed colored dot/line screen remains over footage; dot contrast depends on source. Exact pitch measurements owned by halftone_pitch.json."
+    },
+    "G-GRAIN": {
+      "state": "Fine paper/print noise remains in pale fields; original stochastic generator unknown"
+    },
+    "G-CV-BRACKET": {
+      "state": "Shot-specific bracket instances are indexed in elements; no separate additional global bracket should be rendered"
+    },
+    "G-STAR-CLIP": {
+      "state": "When visible on model, use the observed plate/clip silhouette and color; actual point count unverified in this batch. Any on-screen8-PT text is a label, not geometry proof."
+    },
+    "G-FLAP-BOARD": {
+      "state": "Shot-specific physical/graphic board instances are listed as elements; no extra global board beyond those instances."
+    },
+    "G-MONTHS-COUNTER": {
+      "state": "Upperright crossed00 numeric tile plus two-row black flap cells THERE IS NO / UNDERCLASS, small BOARD · FINAL ·00 MONTHS",
+      "evidence_frame": 5729
+    }
+  },
+  "elements": [
+    {
+      "element_id": "S0128-E01",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "background_media",
+      "description": "High-angle diagonal full-body figure arms extended, black skirt and boots against densely packed city below.",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1.0,
+        "h": 1.0,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 0,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "visible"
+        },
+        {
+          "frame": 5750,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5729,
+        5750
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E02",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "character",
+      "description": "Woman flying over tilted aerial city",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": null,
+      "z_index": 5,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "visible"
+        },
+        {
+          "frame": 5750,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5729,
+        5750
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E03",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_lyric",
+      "description": "It’s So Over region?",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.1,
+        "y": 0.24,
+        "w": 0.28,
+        "h": 0.22,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 20,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "text": "It’s",
+          "entrance": "two-frame opacity/tracking ramp"
+        },
+        {
+          "frame": 5719,
+          "text": "It’s So",
+          "entrance": "two-frame opacity/tracking ramp"
+        },
+        {
+          "frame": 5732,
+          "text": "It’s So Over",
+          "entrance": "two-frame opacity/tracking ramp"
+        },
+        {
+          "frame": 5740,
+          "text": "It’s So Over region?",
+          "entrance": "two-frame opacity/tracking ramp"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "It’s So Over region?",
+        "case": "as displayed; slash separates sequential states, not literal slash",
+        "typography": {
+          "description": "Heavy sans masthead or small monospace panel labels; use full-resolution crop to resolve",
+          "font_status": "unknown; candidate only",
+          "font_candidates": [
+            "DINish Condensed",
+            "Nimbus Sans Bold",
+            "IBM Plex Mono"
+          ],
+          "size_px": null,
+          "letter_spacing": "unmeasured",
+          "alignment": "left unless spatial layout shows otherwise"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E04",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "hud_chart",
+      "description": "Vertical branching checklist/tree at right",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.77,
+        "y": 0.16,
+        "w": 0.2,
+        "h": 0.54,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "visible"
+        },
+        {
+          "frame": 5750,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5729,
+        5750
+      ],
+      "confidence": 0.6,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "is_group_container": true,
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E05",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "REGION1 · IT’S SO OVER; PERMANENT UNDERCLASS / SLOPACOLYPSE / SORA GONE DARK / FORCE MAJEURE / USAGE LIMIT / HIT THE BRAKES /35% DIE / MASS PSYCHOSIS",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.7,
+        "y": 0.2,
+        "w": 0.25,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "visible"
+        },
+        {
+          "frame": 5750,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "REGION1 · IT’S SO OVER; PERMANENT UNDERCLASS / SLOPACOLYPSE / SORA GONE DARK / FORCE MAJEURE / USAGE LIMIT / HIT THE BRAKES /35% DIE / MASS PSYCHOSIS",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "is_group_container": true,
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E06",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "REGION2 · WE’RE SO BACK; LEAN PROOFS / PHAGES / ENZYMES / KIDNEYS / GOOD BOYS / LEV1YR/YR /11.2KM/S / NO UNDERCLASS",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.7,
+        "y": 0.53,
+        "w": 0.25,
+        "h": 0.25,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "visible"
+        },
+        {
+          "frame": 5750,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "REGION2 · WE’RE SO BACK; LEAN PROOFS / PHAGES / ENZYMES / KIDNEYS / GOOD BOYS / LEV1YR/YR /11.2KM/S / NO UNDERCLASS",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "is_group_container": true,
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E07",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "← FINAL and IT’S SO OVER ·72 winner label",
+      "start_frame": 5738,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.62,
+        "y": 0.34,
+        "w": 0.11,
+        "h": 0.19,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5738–5740; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5738,
+          "state": "central branch connects"
+        },
+        {
+          "frame": 5740,
+          "text": "← FINAL"
+        },
+        {
+          "frame": 5744,
+          "text": "IT’S SO OVER ·72"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "← FINAL and IT’S SO OVER ·72 winner label",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5738,
+          5740
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E08",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "THE AI APOCALYPSE BRACKET types below lyric",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.11,
+        "y": 0.45,
+        "w": 0.21,
+        "h": 0.025,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "visible"
+        },
+        {
+          "frame": 5750,
+          "state": "last visible sample"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.73,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "THE AI APOCALYPSE BRACKET types below lyric",
+        "typography": {
+          "description": "Mono microtext or sans caption",
+          "font_status": "unknown",
+          "method": "visual_estimate"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E09",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 1: outlined node with independently typed label PERMANENT UNDERCLASS",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.23,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5711,
+          "text": "PERMANENT UNDERCLASS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "PERMANENT UNDERCLASS",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E10",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 2: outlined node with independently typed label SLOPACOLYPSE",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.252,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5711,
+          "text": "SLOPACOLYPSE"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "SLOPACOLYPSE",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E11",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 3: outlined node with independently typed label SORA GONE DARK",
+      "start_frame": 5709,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.274,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5709–5711; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5709,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5712,
+          "text": "SORA GONE DARK"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5709,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "SORA GONE DARK",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5709,
+          5711
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E12",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 4: outlined node with independently typed label FORCE MAJEURE",
+      "start_frame": 5710,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.29600000000000004,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5710–5712; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5710,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5713,
+          "text": "FORCE MAJEURE"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5710,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "FORCE MAJEURE",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5710,
+          5712
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E13",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 5: outlined node with independently typed label USAGE LIMIT",
+      "start_frame": 5711,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.318,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5711–5713; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5711,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5714,
+          "text": "USAGE LIMIT"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5711,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "USAGE LIMIT",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5711,
+          5713
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E14",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 6: outlined node with independently typed label HIT THE BRAKES",
+      "start_frame": 5712,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.33999999999999997,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5712–5714; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5712,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5715,
+          "text": "HIT THE BRAKES"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5712,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "HIT THE BRAKES",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5712,
+          5714
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E15",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 7: outlined node with independently typed label 35% DIE",
+      "start_frame": 5713,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.362,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5713–5715; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5713,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5716,
+          "text": "35% DIE"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5713,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "35% DIE",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5713,
+          5715
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E16",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 1 leaf 8: outlined node with independently typed label MASS PSYCHOSIS",
+      "start_frame": 5714,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.384,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5714–5716; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5714,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5717,
+          "text": "MASS PSYCHOSIS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5714,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "MASS PSYCHOSIS",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5714,
+          5716
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E17",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 1: outlined node with independently typed label LEAN PROOFS",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.59,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5711,
+          "text": "LEAN PROOFS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LEAN PROOFS",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E18",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 2: outlined node with independently typed label PHAGES",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.612,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5708–5710; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5708,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5711,
+          "text": "PHAGES"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5708,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "PHAGES",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5708,
+          5710
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E19",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 3: outlined node with independently typed label ENZYMES",
+      "start_frame": 5709,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.634,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5709–5711; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5709,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5712,
+          "text": "ENZYMES"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5709,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "ENZYMES",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5709,
+          5711
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E20",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 4: outlined node with independently typed label KIDNEYS",
+      "start_frame": 5710,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.6559999999999999,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5710–5712; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5710,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5713,
+          "text": "KIDNEYS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5710,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "KIDNEYS",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5710,
+          5712
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E21",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 5: outlined node with independently typed label GOOD BOYS",
+      "start_frame": 5711,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.6779999999999999,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5711–5713; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5711,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5714,
+          "text": "GOOD BOYS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5711,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "GOOD BOYS",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5711,
+          5713
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E22",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 6: outlined node with independently typed label LEV 1YR/YR",
+      "start_frame": 5712,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.7,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5712–5714; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5712,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5715,
+          "text": "LEV 1YR/YR"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5712,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "LEV 1YR/YR",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5712,
+          5714
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E23",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 7: outlined node with independently typed label 11.2 KM/S",
+      "start_frame": 5713,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.722,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5713–5715; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5713,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5716,
+          "text": "11.2 KM/S"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5713,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "11.2 KM/S",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5713,
+          5715
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    },
+    {
+      "element_id": "S0128-E24",
+      "shot_id": "S0128",
+      "asset_id": null,
+      "type": "text_label",
+      "description": "Region 2 leaf 8: outlined node with independently typed label NO UNDERCLASS",
+      "start_frame": 5714,
+      "end_frame": 5750,
+      "bounding_box": {
+        "x": 0.78,
+        "y": 0.744,
+        "w": 0.11,
+        "h": 0.022,
+        "space": "frame_norm_top_left"
+      },
+      "z_index": 30,
+      "appearance": {
+        "color_hex": null,
+        "opacity": null,
+        "blend_mode": "unknown; normal composite suggested",
+        "details": "Geometry is a visual estimate from filmstrip; not measured from full-resolution pixels."
+      },
+      "motion": {
+        "path": "It’s then So then Over then region? type; right tree branches appear sequentially",
+        "easing": "unknown; observed step changes only where explicitly noted",
+        "entrance": "Observed within f5714–5716; inherited state when at shot start.",
+        "exit": "Last visibility f5748–5750; shot cut when at shot end."
+      },
+      "keyframes": [
+        {
+          "frame": 5714,
+          "state": "border and partial label"
+        },
+        {
+          "frame": 5717,
+          "text": "NO UNDERCLASS"
+        }
+      ],
+      "effects": [],
+      "reference_frames": [
+        5714,
+        5750
+      ],
+      "confidence": 0.74,
+      "uncertainties": [
+        "Spatial bounds and cap heights are visual estimates; original font, shader and source decomposition unknown."
+      ],
+      "reconstruction_hint": "Use the listed filmstrip and original reference frames before implementation.",
+      "text": {
+        "content": "NO UNDERCLASS",
+        "case": "as displayed",
+        "typography": {
+          "description": "Black monospaced labels, estimated cap height 10–16px at source resolution; normal tracking; no shadow",
+          "method": "visual_estimate",
+          "font_status": "unknown",
+          "alignment": "left",
+          "color_hex": "#171715"
+        }
+      },
+      "visibility_evidence": {
+        "entry_bounds": [
+          5714,
+          5716
+        ],
+        "exit_bounds": [
+          5748,
+          5750
+        ],
+        "confidence": 0.74,
+        "method": "Full keyframe comparison and listed dense samples; transition opacity/subpixel boundaries bounded within two frames."
+      }
+    }
+  ],
+  "animations": [
+    {
+      "anim_id": "S0128-A01",
+      "target_element_ids": [
+        "S0128-E02",
+        "S0128-E03",
+        "S0128-E04"
+      ],
+      "description": "It’s then So then Over then region? type; right tree branches appear sequentially",
+      "start_frame": 5708,
+      "end_frame": 5750,
+      "easing": "Unfitted; use per-frame comparison before reconstruction",
+      "audio_sync": "Not listened in this visual pass; root links audio separately"
+    }
+  ],
+  "in_shot_events": [],
+  "transitions": {
+    "in": {
+      "type": "hard_cut",
+      "boundary_id": "B3-033",
+      "span": [
+        5708,
+        5708
+      ],
+      "description": "Inherited Phase A boundary; filmstrip has been opened but adjacent full-resolution boundary pair not reviewed.",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    },
+    "out": {
+      "type": "hard_cut",
+      "boundary_id": "B3-034",
+      "span": [
+        5750,
+        5750
+      ],
+      "description": "It’s then So then Over then region? type; right tree branches appear sequentially",
+      "driver": "Unknown unless mask/graphic explicitly described",
+      "recommended_technique": "Composite matching listed layers; use exact adjacent frames to determine transition window."
+    }
+  },
+  "audio_events": [
+    {
+      "audio_event_id": "AW0368",
+      "relation": "vocal_word_candidate (unknown) at frame 5704–5716; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5708
+    },
+    {
+      "audio_event_id": "AB0527",
+      "relation": "beat_candidate (unknown) at frame 5708; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5708
+    },
+    {
+      "audio_event_id": "AH02407",
+      "relation": "band_onset_candidate (unknown) at frame 5708; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5708
+    },
+    {
+      "audio_event_id": "AH02408",
+      "relation": "band_onset_candidate (unknown) at frame 5708; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5708
+    },
+    {
+      "audio_event_id": "AH02409",
+      "relation": "band_onset_candidate (unknown) at frame 5708; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5708
+    },
+    {
+      "audio_event_id": "AH02410",
+      "relation": "band_onset_candidate (unknown) at frame 5708; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5708
+    },
+    {
+      "audio_event_id": "AH02411",
+      "relation": "band_onset_candidate (unknown) at frame 5709; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5709
+    },
+    {
+      "audio_event_id": "AH02412",
+      "relation": "band_onset_candidate (unknown) at frame 5714; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5714
+    },
+    {
+      "audio_event_id": "AW0369",
+      "relation": "vocal_word_candidate (unknown) at frame 5718–5721; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5718
+    },
+    {
+      "audio_event_id": "AH02413",
+      "relation": "band_onset_candidate (unknown) at frame 5719; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5719
+    },
+    {
+      "audio_event_id": "AB0528",
+      "relation": "beat_candidate (unknown) at frame 5719; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5719
+    },
+    {
+      "audio_event_id": "AH02414",
+      "relation": "band_onset_candidate (unknown) at frame 5719; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5719
+    },
+    {
+      "audio_event_id": "AH02415",
+      "relation": "band_onset_candidate (unknown) at frame 5719; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5719
+    },
+    {
+      "audio_event_id": "AH02416",
+      "relation": "band_onset_candidate (unknown) at frame 5724; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5724
+    },
+    {
+      "audio_event_id": "AH02417",
+      "relation": "band_onset_candidate (unknown) at frame 5724; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5724
+    },
+    {
+      "audio_event_id": "AB0529",
+      "relation": "beat_candidate (unknown) at frame 5729; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5729
+    },
+    {
+      "audio_event_id": "AH02418",
+      "relation": "band_onset_candidate (unknown) at frame 5729; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5729
+    },
+    {
+      "audio_event_id": "AH02419",
+      "relation": "band_onset_candidate (unknown) at frame 5729; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5729
+    },
+    {
+      "audio_event_id": "AH02420",
+      "relation": "band_onset_candidate (unknown) at frame 5729; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5729
+    },
+    {
+      "audio_event_id": "AH02421",
+      "relation": "band_onset_candidate (unknown) at frame 5730; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5730
+    },
+    {
+      "audio_event_id": "AW0370",
+      "relation": "vocal_word_candidate (unknown) at frame 5731–5738; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5731
+    },
+    {
+      "audio_event_id": "AH02422",
+      "relation": "band_onset_candidate (unknown) at frame 5735; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5735
+    },
+    {
+      "audio_event_id": "AH02423",
+      "relation": "band_onset_candidate (unknown) at frame 5735; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5735
+    },
+    {
+      "audio_event_id": "AH02424",
+      "relation": "band_onset_candidate (unknown) at frame 5735; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5735
+    },
+    {
+      "audio_event_id": "AH02425",
+      "relation": "band_onset_candidate (unknown) at frame 5740; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5740
+    },
+    {
+      "audio_event_id": "AH02426",
+      "relation": "band_onset_candidate (unknown) at frame 5740; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5740
+    },
+    {
+      "audio_event_id": "AH02427",
+      "relation": "band_onset_candidate (unknown) at frame 5740; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5740
+    },
+    {
+      "audio_event_id": "AB0530",
+      "relation": "beat_candidate (unknown) at frame 5740; librosa DP grid; drum-stem kick support within 30ms",
+      "frame": 5740
+    },
+    {
+      "audio_event_id": "AH02428",
+      "relation": "band_onset_candidate (unknown) at frame 5740; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5740
+    },
+    {
+      "audio_event_id": "AW0371",
+      "relation": "vocal_word_candidate (unknown) at frame 5741–5751; Local MMS_FA known-lyric alignment cross-checked against local Whisper large-v3; not listening-confirmed",
+      "frame": 5741
+    },
+    {
+      "audio_event_id": "AH02429",
+      "relation": "band_onset_candidate (unknown) at frame 5741; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5741
+    },
+    {
+      "audio_event_id": "AH02430",
+      "relation": "band_onset_candidate (unknown) at frame 5745; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5745
+    },
+    {
+      "audio_event_id": "AH02431",
+      "relation": "band_onset_candidate (unknown) at frame 5747; htdemucs drums stem, positive spectral flux (dB) per band, adaptive median+MAD peak picking",
+      "frame": 5747
+    }
+  ],
+  "production_hypothesis": {
+    "layers": [
+      {
+        "layer": "base footage",
+        "technique": "Unknown per-shot plate/video identity; Midjourney/Seedance film-level pipeline only",
+        "evidence_level": "unknown",
+        "rationale": "No exact media identity mapping verified in this pass",
+        "source_refs": [
+          "source_docs/FINDINGS.md B7/B8"
+        ]
+      },
+      {
+        "layer": "type/HUD",
+        "technique": "Custom JavaScript canvas overlay",
+        "evidence_level": "confirmed",
+        "rationale": "Author states every word, title bar, split-flap and label is drawn in code; per-shot source code unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B2/B5"
+        ]
+      },
+      {
+        "layer": "print pass",
+        "technique": "Color halftone and line screens with grain/dither",
+        "evidence_level": "confirmed",
+        "rationale": "Film-specific documented print pass; shader values unavailable",
+        "source_refs": [
+          "source_docs/FINDINGS.md B1"
+        ]
+      }
+    ]
+  },
+  "source_references": [
+    {
+      "kind": "author_url",
+      "ref": "source_docs/FINDINGS.md",
+      "note": "Film-level technology only; exact shot/clip mapping remains unknown."
+    },
+    {
+      "kind": "inference_only",
+      "ref": "contactsheets/S0128.jpg",
+      "note": "Actually inspected filmstrip in this pass."
+    }
+  ],
+  "confidence": 0.74,
+  "uncertainties": [
+    "Original font, shader, lens, exact easing and authored layer decomposition remain unknown.",
+    "Spatial bounds and type sizes are visual estimates from source pixels."
+  ],
+  "reconstruction_notes": {
+    "recommended_method": "Start from independently inspected source footage and reference frames. Separate the individually listed type, panel, mask and counter layers, then implement them as deterministic Canvas 2D/WebGL overlays before a shared print pass. Resolve pending detail measurements first.",
+    "dependencies": [
+      "contactsheets/S0128.jpg",
+      "keyframes/S0128_f05708.jpg",
+      "keyframes/S0128_f05718.jpg",
+      "keyframes/S0128_f05729.jpg",
+      "keyframes/S0128_f05740.jpg",
+      "keyframes/S0128_f05750.jpg",
+      "visual_system.json",
+      "source_docs/FINDINGS.md"
+    ],
+    "difficulty": 4,
+    "difficulty_notes": "Exact microtype, layer choreography, generated performance and print texture need detailed review.",
+    "alternatives": "For later authorized reconstruction: use photographed plate with crop animation if video identity cannot be established; not executed here."
+  },
+  "detail_review": {
+    "filmstrip_opened": true,
+    "frames_actually_opened": [
+      5708,
+      5718,
+      5729,
+      5740,
+      5750
+    ],
+    "second_pass_status": "PASS_WITH_PARAMETER_UNKNOWNS",
+    "dense_sheets": [
+      "work/full_codex_103_153/region128.jpg",
+      "work/full_codex_103_153/bracket128.jpg",
+      "work/full_codex_103_153/final128.jpg"
+    ],
+    "detail_crops": [
+      "work/full_codex_103_153/detail5748_full_batch.png"
+    ],
+    "fullres_frames_actually_opened": [
+      5729
+    ],
+    "method": "All five individual keyframes, full-resolution detail, dense 1–4-frame event review, then second visual inventory and visibility review.",
+    "chrome_check": "work/full_codex_103_153/chromestates.jpg plus lowchrome.jpg; unreadable digits remain unknown, not sequence inference."
+  }
+}

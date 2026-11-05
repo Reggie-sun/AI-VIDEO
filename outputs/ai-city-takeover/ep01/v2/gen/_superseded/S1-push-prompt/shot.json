@@ -1,0 +1,78 @@
+{
+  "artifact_id": "iris-v2-s1-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "15249bf3842f3e8e2b0e00ba9c943730f96546bce1306824059b4bba21e6d7f4",
+  "creation_receipt_id": "iris-v2-S1-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/101349875fe008a36dd1087c74b2aa96bfbc06305027dac2abcf9dec8d9fb83f.json",
+      "content_hash": "101349875fe008a36dd1087c74b2aa96bfbc06305027dac2abcf9dec8d9fb83f"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3.json",
+      "content_hash": "ebd12909e30fb012ef4885402174ac4c9ea3ecf9919ad5011b044a7ac20125b3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d.json",
+      "content_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/13c4cb67b96f1a8f64e0c041cfe09d8eec5e7ec510d370bd322de8c6cf19b4a8.json",
+      "content_hash": "13c4cb67b96f1a8f64e0c041cfe09d8eec5e7ec510d370bd322de8c6cf19b4a8"
+    }
+  ],
+  "shot_id": "ep01v2-s1",
+  "scene_id": "eye-macro",
+  "storyboard_beat_id": "sleeping",
+  "intent": "真人电影微距摄影，横幅十六比九，连续六秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性左眼的极近特写，眼睛闭着；第二张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第二张图的背景与构图。\n她的左眼始终闭着，不睁开；眼睑下的眼球有极轻微的移动，睫毛偶尔轻轻颤动，像在醒来之前。窗外冷蓝色的城市光缓慢掠过眼睑和皮肤，下眼睑上一点细细的红色反光保持微弱。\n摄影机几乎不动，只极缓慢地微微推近，末段平滑收稳。真实皮肤纹理、细小汗毛和极淡雀斑清晰，微距浅景深。蓝黑与钢蓝冷色，红色只在下眼睑那一点微弱反光。\n保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。只有极轻的环境声，不生成对白、旁白、演唱或音乐；成片使用独立音轨。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+    "左眼始终闭着不睁开，只有眼球与睫毛的极轻微动作",
+    "摄影机几乎不动，只极缓慢微微推近，末段平滑收稳",
+    "保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v2-s1-eye",
+        "iris-cf-details"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

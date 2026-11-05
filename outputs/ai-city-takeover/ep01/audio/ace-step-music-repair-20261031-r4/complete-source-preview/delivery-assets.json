@@ -1,0 +1,26 @@
+{
+  "created_at_utc": "2026-10-31T09:01:05.977598+00:00",
+  "source": {
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.wav",
+    "sha256": "9e007d2a8d0b8a5a826c5ce1e77e4e2c3729059eece57edb03ba727be79522d8",
+    "bytes": 5760044
+  },
+  "encoder_path": "/home/reggie/miniconda3/lib/python3.13/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2",
+  "files": [
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.mp3",
+      "sha256": "e973480eabe65318d34d55c2e488434fc702b3fc7069b5caa73df9aae2dd6c11",
+      "bytes": 663404,
+      "full_decode": "PASS"
+    },
+    {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/audio/ace-step-music-repair-20261031-r4/complete-source-preview/IRIS-01-Music-and-Hook-preview.opus",
+      "sha256": "a1644d570a340f27b7399e2437ea95c423ba6bdbdda6be695bf586532f4e6dc1",
+      "bytes": 519412,
+      "full_decode": "PASS"
+    }
+  ],
+  "encoding_only": true,
+  "source_speed_change": false,
+  "music_quality": "NOT_EVALUATED"
+}

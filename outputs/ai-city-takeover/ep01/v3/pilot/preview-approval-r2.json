@@ -1,0 +1,85 @@
+{
+ "kind": "user-preview-approval/1",
+ "coverage_hash": "87679931317d23743265d7a208b2114836a5bc87c77dae81b4ce06e92ebb83ba",
+ "unit_ids": [
+  "U020",
+  "U021",
+  "U022",
+  "U023",
+  "U025",
+  "U027"
+ ],
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-face-shut-b.png",
+   "sha256": "1eb6555ae7c7f378eb79cf2b021c6258096c470cb711fa3a0772a0518a436169",
+   "role": "U020 still; U027 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U020.wav",
+   "sha256": "2ad08570d6f15567ec292f2135918fdc621b725ab2f1f74286607d000e583552",
+   "role": "U020 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-shut-b.png",
+   "sha256": "ffe0c323ef57309e72002e93811472d54490865b81b35f4a5afe96e809ef5bdf",
+   "role": "U021 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U021.wav",
+   "sha256": "b74a2cdb1581e01a6676091c7010a1380ef05b725e679fe41de26bba158d077e",
+   "role": "U021 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-34-shut-b.png",
+   "sha256": "df5cc9f24b0ae079517e63440f5ee06df61fdcaf3e8a8868c8e9e6e322f11733",
+   "role": "U022 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U022.wav",
+   "sha256": "cf6e1128cd21da9af38eda200b06a6a4232814ea86aab4420fe22b0d3806b385",
+   "role": "U022 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-gap-mcu-turn-shut-b.png",
+   "sha256": "652bc76d732d5af9b4c4e91cf8dbcf169821e3d5b5589980da069ce7b321b721",
+   "role": "U025 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U025.wav",
+   "sha256": "47d8219c76ecc0834e9808b40f57235afc41de33837c130cd841b9957c856314",
+   "role": "U025 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/audio/U027.wav",
+   "sha256": "ea5e90b1918aa1d6c2c8c19895e4acbd120abc41cd196cd6674c9bd64092ae41",
+   "role": "U027 vocal"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview.html",
+   "sha256": "61ae3176fd06a3a4f8543cdd02784fb0808f159ecbd4236954476ed0457e597c",
+   "role": "package page reviewed at checkpoint B"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs.json",
+   "sha256": "41ea7116768910f8bdb84fefca47f6060d732067561f1e0a2b6702a0dd5ad2a0",
+   "role": "package inputs approved at checkpoint B"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/pilot/preview-inputs-r2.json",
+   "sha256": "37e27128eff57c90b8861194914b3d3964e6cf27b4cb136caef110d4f84ae720",
+   "role": "package revision r2: the two action-text rewrites the user approved"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/plates/raw/P-city-gap-a.png",
+   "sha256": "61248d1238a7cef119676bd84244548cba615b83cf96866a00a3637dd4597426",
+   "role": "U023 first frame"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v3/renders/IRIS-EP01-v3-animatic-a2-review.mp4",
+   "sha256": "91ebc2a38be95b20fa779afbb6283d421457436880594ecfa54136c0c3fb5f50",
+   "role": "animatic a2 the user watched"
+  }
+ ],
+ "user_quote": "认可，进入试拍 ／ 同意这两处改写"
+}

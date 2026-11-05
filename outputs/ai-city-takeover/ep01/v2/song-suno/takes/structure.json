@@ -1,0 +1,344 @@
+{
+ "T1": {
+  "dur": 212.36,
+  "last_word_end": 180.2,
+  "sections": [
+   [
+    "Intro",
+    4.1
+   ],
+   [
+    "Verse 1",
+    17.5
+   ],
+   [
+    "Pre-Chorus",
+    38.8
+   ],
+   [
+    "Chorus",
+    49.1
+   ],
+   [
+    "Verse 2",
+    62.8
+   ],
+   [
+    "Pre-Chorus",
+    89.4
+   ],
+   [
+    "Chorus",
+    94.2
+   ],
+   [
+    "Drop",
+    107.3
+   ],
+   [
+    "Bridge",
+    122.6
+   ],
+   [
+    "Final Chorus",
+    138.9
+   ],
+   [
+    "Coda",
+    164.0
+   ],
+   [
+    "Outro",
+    174.5
+   ]
+  ],
+  "missing": [
+   "End"
+  ]
+ },
+ "T2": {
+  "dur": 247.2,
+  "last_word_end": 230.5,
+  "sections": [
+   [
+    "Intro",
+    9.0
+   ],
+   [
+    "Verse 1",
+    23.9
+   ],
+   [
+    "Pre-Chorus",
+    51.6
+   ],
+   [
+    "Chorus",
+    67.7
+   ],
+   [
+    "Verse 2",
+    84.8
+   ],
+   [
+    "Pre-Chorus",
+    123.5
+   ],
+   [
+    "Chorus",
+    139.7
+   ],
+   [
+    "Drop",
+    155.9
+   ],
+   [
+    "Bridge",
+    169.0
+   ],
+   [
+    "Final Chorus",
+    185.1
+   ],
+   [
+    "Coda",
+    203.9
+   ],
+   [
+    "Outro",
+    218.7
+   ]
+  ],
+  "missing": [
+   "End"
+  ]
+ },
+ "T3": {
+  "dur": 247.2,
+  "last_word_end": 229.8,
+  "sections": [
+   [
+    "Intro",
+    13.8
+   ],
+   [
+    "Verse 1",
+    29.2
+   ],
+   [
+    "Pre-Chorus",
+    54.6
+   ],
+   [
+    "Chorus",
+    63.3
+   ],
+   [
+    "Verse 2",
+    97.8
+   ],
+   [
+    "Pre-Chorus",
+    129.8
+   ],
+   [
+    "Chorus",
+    138.1
+   ],
+   [
+    "Drop",
+    158.4
+   ],
+   [
+    "Bridge",
+    173.2
+   ],
+   [
+    "Final Chorus",
+    190.2
+   ],
+   [
+    "Coda",
+    204.7
+   ],
+   [
+    "Outro",
+    215.1
+   ]
+  ],
+  "missing": [
+   "End"
+  ]
+ },
+ "T4": {
+  "dur": 261.56,
+  "last_word_end": 250.7,
+  "sections": [
+   [
+    "Intro",
+    9.9
+   ],
+   [
+    "Verse 1",
+    27.3
+   ],
+   [
+    "Pre-Chorus",
+    54.6
+   ],
+   [
+    "Chorus",
+    61.3
+   ],
+   [
+    "Verse 2",
+    89.6
+   ],
+   [
+    "Pre-Chorus",
+    127.7
+   ],
+   [
+    "Chorus",
+    136.2
+   ],
+   [
+    "Drop",
+    156.8
+   ],
+   [
+    "Bridge",
+    178.8
+   ],
+   [
+    "Final Chorus",
+    195.6
+   ],
+   [
+    "Coda",
+    222.4
+   ],
+   [
+    "Outro",
+    239.8
+   ]
+  ],
+  "missing": [
+   "End"
+  ]
+ },
+ "T5": {
+  "dur": 243.16,
+  "last_word_end": 230.1,
+  "sections": [
+   [
+    "Intro",
+    3.8
+   ],
+   [
+    "Verse 1",
+    22.0
+   ],
+   [
+    "Pre-Chorus",
+    47.0
+   ],
+   [
+    "Chorus",
+    57.8
+   ],
+   [
+    "Verse 2",
+    78.4
+   ],
+   [
+    "Pre-Chorus",
+    112.2
+   ],
+   [
+    "Chorus",
+    121.6
+   ],
+   [
+    "Drop",
+    141.7
+   ],
+   [
+    "Bridge",
+    156.3
+   ],
+   [
+    "Final Chorus",
+    174.1
+   ],
+   [
+    "Coda",
+    203.4
+   ],
+   [
+    "Outro",
+    218.4
+   ]
+  ],
+  "missing": [
+   "End"
+  ]
+ },
+ "T6": {
+  "dur": 235.56,
+  "last_word_end": 227.2,
+  "sections": [
+   [
+    "Intro",
+    9.7
+   ],
+   [
+    "Verse 1",
+    23.9
+   ],
+   [
+    "Pre-Chorus",
+    47.0
+   ],
+   [
+    "Chorus",
+    55.7
+   ],
+   [
+    "Verse 2",
+    76.1
+   ],
+   [
+    "Pre-Chorus",
+    113.9
+   ],
+   [
+    "Chorus",
+    123.1
+   ],
+   [
+    "Drop",
+    136.2
+   ],
+   [
+    "Bridge",
+    153.1
+   ],
+   [
+    "Final Chorus",
+    181.8
+   ],
+   [
+    "Coda",
+    204.6
+   ],
+   [
+    "Outro",
+    214.8
+   ]
+  ],
+  "missing": [
+   "End"
+  ]
+ }
+}

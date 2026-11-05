@@ -1,0 +1,2039 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="37" skipped="0" tests="38" time="28.855" timestamp="2026-10-30T20:37:58.329861-04:00" hostname="reggie-MS-7D48"><testcase classname="tests.test_repair_input_admission" name="test_admit_exact_failure_is_unbound_and_replay_adds_no_writes" time="0.675"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_admit_exact_failure_is_un0')
+
+    def test_admit_exact_failure_is_unbound_and_replay_adds_no_writes(tmp_path):
+        from ai_video.production.repair_input_admission import verify_repair_input
+        from ai_video.production.generation_rejection import GenerationQualityRejectionReceipt
+    
+&gt;       source, target, writer, args = _inputs(tmp_path)
+                                       ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_legacy_preview_scopes_still_reject_independent_p4_tracks[muted_visual_preview]" time="0.652"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_legacy_preview_scopes_sti0')
+scope = 'muted_visual_preview'
+
+    @pytest.mark.parametrize("scope", ["muted_visual_preview", "retimed_av_preview"])
+    def test_legacy_preview_scopes_still_reject_independent_p4_tracks(tmp_path, scope):
+        from ai_video.production._composition_visual import resolve_preview_layer_ids
+        from ai_video.production.composition_contracts import AudioTrackSpec, CompositionLayerSpec, CompositionSpec
+    
+&gt;       source, target, writer, args = _inputs(tmp_path)
+                                       ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_legacy_preview_scopes_still_reject_independent_p4_tracks[retimed_av_preview]" time="0.654"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_legacy_preview_scopes_sti1')
+scope = 'retimed_av_preview'
+
+    @pytest.mark.parametrize("scope", ["muted_visual_preview", "retimed_av_preview"])
+    def test_legacy_preview_scopes_still_reject_independent_p4_tracks(tmp_path, scope):
+        from ai_video.production._composition_visual import resolve_preview_layer_ids
+        from ai_video.production.composition_contracts import AudioTrackSpec, CompositionLayerSpec, CompositionSpec
+    
+&gt;       source, target, writer, args = _inputs(tmp_path)
+                                       ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_replacement_preview_rejects_retiming_and_native_audio" time="0.001" /><testcase classname="tests.test_repair_input_admission" name="test_invalid_source_rejected_before_any_target_write[running]" time="0.646"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_invalid_source_rejected_b0')
+invalid = 'running'
+
+    @pytest.mark.parametrize("invalid", ["running", "sha", "overlap"])
+    def test_invalid_source_rejected_before_any_target_write(tmp_path, invalid):
+&gt;       source, target, writer, args = _inputs(tmp_path, close=invalid != "running")
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_invalid_source_rejected_before_any_target_write[sha]" time="0.640"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_invalid_source_rejected_b1')
+invalid = 'sha'
+
+    @pytest.mark.parametrize("invalid", ["running", "sha", "overlap"])
+    def test_invalid_source_rejected_before_any_target_write(tmp_path, invalid):
+&gt;       source, target, writer, args = _inputs(tmp_path, close=invalid != "running")
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_invalid_source_rejected_before_any_target_write[overlap]" time="0.659"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_invalid_source_rejected_b2')
+invalid = 'overlap'
+
+    @pytest.mark.parametrize("invalid", ["running", "sha", "overlap"])
+    def test_invalid_source_rejected_before_any_target_write(tmp_path, invalid):
+&gt;       source, target, writer, args = _inputs(tmp_path, close=invalid != "running")
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_strict_reader_rejects_tampered_admission_receipt" time="0.652"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_strict_reader_rejects_tam0')
+
+    def test_strict_reader_rejects_tampered_admission_receipt(tmp_path):
+        from ai_video.production.repair_input_admission import repair_input_receipt_path
+    
+&gt;       _, target, writer, args = _inputs(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:207: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_development_input_cannot_be_bound_as_production_visual" time="0.657"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_development_input_cannot_0')
+
+    def test_development_input_cannot_be_bound_as_production_visual(tmp_path):
+        from ai_video.production.models import AssetRoleRequirement, AssetType, VisualStrategy
+        from ai_video.production.validation import validate_shot_strategy
+    
+&gt;       _, target, writer, args = _inputs(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:221: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_admission_cannot_be_claimed_by_another_project" time="0.650"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_admission_cannot_be_claim0')
+
+    def test_admission_cannot_be_claimed_by_another_project(tmp_path):
+        from ai_video.production.validation import validate_project_references
+    
+&gt;       _, target, writer, args = _inputs(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:236: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_import_marker_cannot_be_removed_to_skip_provenance" time="0.641"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_import_marker_cannot_be_r0')
+
+    def test_import_marker_cannot_be_removed_to_skip_provenance(tmp_path):
+        from ai_video.production.models import ToolIdentity
+        from ai_video.production.registry import _verify_asset
+    
+&gt;       _, target, writer, args = _inputs(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:248: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_resealed_capture_cannot_hide_inner_identity_mismatch[qa_hash]" time="0.652"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_resealed_capture_cannot_h0')
+corruption = 'qa_hash'
+
+    @pytest.mark.parametrize("corruption", ["qa_hash", "request_id", "fetch_size"])
+    def test_resealed_capture_cannot_hide_inner_identity_mismatch(tmp_path, corruption):
+        from ai_video.production.hashing import canonical_sha256
+        from ai_video.production.repair_input_admission import verify_repair_input, RepairInputAdmissionReceipt
+    
+&gt;       _, target, writer, args = _inputs(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_resealed_capture_cannot_hide_inner_identity_mismatch[request_id]" time="0.651"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_resealed_capture_cannot_h1')
+corruption = 'request_id'
+
+    @pytest.mark.parametrize("corruption", ["qa_hash", "request_id", "fetch_size"])
+    def test_resealed_capture_cannot_hide_inner_identity_mismatch(tmp_path, corruption):
+        from ai_video.production.hashing import canonical_sha256
+        from ai_video.production.repair_input_admission import verify_repair_input, RepairInputAdmissionReceipt
+    
+&gt;       _, target, writer, args = _inputs(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_resealed_capture_cannot_hide_inner_identity_mismatch[fetch_size]" time="0.651"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_resealed_capture_cannot_h2')
+corruption = 'fetch_size'
+
+    @pytest.mark.parametrize("corruption", ["qa_hash", "request_id", "fetch_size"])
+    def test_resealed_capture_cannot_hide_inner_identity_mismatch(tmp_path, corruption):
+        from ai_video.production.hashing import canonical_sha256
+        from ai_video.production.repair_input_admission import verify_repair_input, RepairInputAdmissionReceipt
+    
+&gt;       _, target, writer, args = _inputs(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_abandoned_failure_is_available_only_for_its_sealed_muted_preview" time="0.663"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_abandoned_failure_is_avai0')
+
+    def test_abandoned_failure_is_available_only_for_its_sealed_muted_preview(tmp_path):
+        from ai_video.production.composition_contracts import CompositionLayerSpec
+        from ai_video.production.repair_input_admission import (
+            RepairPreviewUse,
+            allows_repair_preview_layer,
+            verify_repair_input,
+        )
+    
+&gt;       source, target, writer, args = _inputs(tmp_path, close=True, abandon=True)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:306: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:29: in _inputs
+    committer, experience, manifest, attempt = _fetched_mixed_failure(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:116: in _fetched_mixed_failure
+    committer, original, _, _ = _fetched_experience(tmp_path, verdict="NOT_EVALUATED")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_preview_capture_requires_closed_known_failure_and_exact_probe" time="0.662"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_preview_capture_requires_0')
+
+    def test_preview_capture_requires_closed_known_failure_and_exact_probe(tmp_path):
+&gt;       source, _, writer, args = _inputs(tmp_path, close=False)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:387: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_replacement_audio_preview_resolves_p4_without_qualifying_failed_media" time="0.663"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_replacement_audio_preview0')
+
+    def test_replacement_audio_preview_resolves_p4_without_qualifying_failed_media(tmp_path):
+        from ai_video.production.audio import AudioKind
+        from ai_video.production.composition import resolve_composition
+        from ai_video.production.composition_contracts import AudioTrackSpec, CompositionLayerSpec, CompositionSpec
+        from ai_video.production.registry import registry_semantic_sha256
+        from ai_video.production.repair_input_admission import verify_repair_input, require_production_render_sources
+        from ai_video.production.state_commit import PreparedArtifact, prepare_audio_registry_commit
+        from ai_video.production.models import DurationPolicy, VisualStrategy, AssetRoleRequirement, AssetType, ResolvedTimeline
+        from production_project_factory import _make_audio_asset
+    
+&gt;       source, target, writer, args = _inputs(tmp_path)
+                                       ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:405: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_replacement_audio_preview_allows_only_static_shot_narration" time="0.664"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_replacement_audio_preview1')
+
+    def test_replacement_audio_preview_allows_only_static_shot_narration(tmp_path):
+        from ai_video.production.audio import AudioKind
+        from ai_video.production.composition import resolve_composition
+        from ai_video.production.composition_contracts import (
+            AudioTrackSpec,
+            CompositionLayerSpec,
+            CompositionSpec,
+        )
+        from ai_video.production.models import (
+            AssetRoleRequirement,
+            AssetType,
+            ResolvedTimeline,
+            VisualStrategy,
+        )
+        from ai_video.production.registry import registry_semantic_sha256
+        from ai_video.production.repair_input_admission import verify_repair_input
+        from ai_video.production.state_commit import (
+            PreparedArtifact,
+            prepare_audio_registry_commit,
+        )
+        from production_project_factory import (
+            _make_audio_asset,
+            _ref,
+            write_and_load_two_shot_project,
+        )
+    
+&gt;       source, target, writer, args = _inputs(tmp_path)
+                                       ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_native_av_preview_v3_reopens_exact_audio_and_stays_unbound" time="0.652"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_native_av_preview_v3_reop0')
+
+    def test_native_av_preview_v3_reopens_exact_audio_and_stays_unbound(tmp_path):
+        from types import SimpleNamespace
+    
+        from ai_video.production.composition_contracts import CompositionLayerSpec
+        from ai_video.production.repair_input_admission import (
+            RepairAudioPreviewInputAdmissionReceipt,
+            allows_repair_preview_layer,
+            require_production_render_sources,
+            verify_repair_input,
+        )
+        from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
+    
+&gt;       source, target, writer, args = _inputs(tmp_path, close=True, abandon=True)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:835: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:29: in _inputs
+    committer, experience, manifest, attempt = _fetched_mixed_failure(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:116: in _fetched_mixed_failure
+    committer, original, _, _ = _fetched_experience(tmp_path, verdict="NOT_EVALUATED")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_native_av_preview_v3_rejects_missing_stream_and_v2_cannot_carry_map2" time="0.645"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_native_av_preview_v3_reje0')
+
+    def test_native_av_preview_v3_rejects_missing_stream_and_v2_cannot_carry_map2(tmp_path):
+        from pydantic import ValidationError
+    
+        from ai_video.production.repair_input_admission import RepairPreviewUse
+        from ai_video.production.video_artifact import VideoProbeReceipt
+        from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
+        from ai_video.production.hashing import canonical_sha256
+    
+&gt;       source, target, writer, args = _inputs(tmp_path, close=True, abandon=True)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:910: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:29: in _inputs
+    committer, experience, manifest, attempt = _fetched_mixed_failure(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:116: in _fetched_mixed_failure
+    committer, original, _, _ = _fetched_experience(tmp_path, verdict="NOT_EVALUATED")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_legacy_repair_input_remains_unusable_for_retimed_preview" time="0.651"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_legacy_repair_input_remai0')
+
+    def test_legacy_repair_input_remains_unusable_for_retimed_preview(tmp_path):
+        from ai_video.production.composition_contracts import CompositionLayerSpec
+        from ai_video.production.repair_input_admission import allows_repair_preview_layer
+    
+&gt;       source, target, writer, args = _inputs(tmp_path)
+                                       ^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:950: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:31: in _inputs
+    committer, experience, manifest, attempt = _fetched_experience(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_repair_input_admission" name="test_preview_probe_or_source_byte_tampering_is_rejected" time="0.669"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_preview_probe_or_source_b0')
+
+    def test_preview_probe_or_source_byte_tampering_is_rejected(tmp_path):
+        from ai_video.production.repair_input_admission import repair_input_receipt_path
+    
+&gt;       source, target, writer, args = _inputs(tmp_path, close=True, abandon=True)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_repair_input_admission.py:971: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_repair_input_admission.py:29: in _inputs
+    committer, experience, manifest, attempt = _fetched_mixed_failure(source)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:116: in _fetched_mixed_failure
+    committer, original, _, _ = _fetched_experience(tmp_path, verdict="NOT_EVALUATED")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_exact_paid_trial_capture_strict_reopens_and_cannot_promote" time="0.694"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_exact_paid_trial_capture_0')
+
+    def test_exact_paid_trial_capture_strict_reopens_and_cannot_promote(tmp_path):
+        from types import SimpleNamespace
+        from ai_video.production.project import load_production_project
+        from ai_video.production.repair_input_admission import verify_repair_input, require_production_render_sources
+&gt;       writer,arguments,artifacts=_qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qualification_preview_input.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_qualification_capture_rejects_changed_exact_bytes" time="0.654"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_qualification_capture_rej0')
+
+    def test_qualification_capture_rejects_changed_exact_bytes(tmp_path):
+&gt;       writer,arguments,_=_qualification_bundle(tmp_path)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qualification_preview_input.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_production_fetch_cannot_be_relabelled_as_qualification_preview" time="0.649"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_production_fetch_cannot_b0')
+
+    def test_production_fetch_cannot_be_relabelled_as_qualification_preview(tmp_path):
+        source=tmp_path/'source';source.mkdir()
+&gt;       _, experience, _, _=_fetched_experience(source, verdict='PASS')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qualification_preview_input.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_generation_quality_rejection.py:54: in _fetched_experience
+    _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_generation_history_import_receipt.py:58: in _legacy_source
+    _, provider, request, binding, paid_preview, committer = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_qualification_preview_public_resolution_stays_unaccepted[False]" time="0.656"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_qualifica0')
+generated = False
+
+    @pytest.mark.parametrize('generated', [False, True])
+    def test_captioned_music_qualification_preview_public_resolution_stays_unaccepted(tmp_path, generated):
+        from ai_video.production.composition import resolve_composition
+        from ai_video.production.repair_input_admission import require_production_render_sources, verify_repair_input
+&gt;       loaded, spec, arguments, before = _captioned_music_preview(tmp_path,
+            generated=generated, bilingual=generated)
+
+tests/test_qualification_preview_input.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_qualification_preview_public_resolution_stays_unaccepted[True]" time="0.646"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_qualifica1')
+generated = True
+
+    @pytest.mark.parametrize('generated', [False, True])
+    def test_captioned_music_qualification_preview_public_resolution_stays_unaccepted(tmp_path, generated):
+        from ai_video.production.composition import resolve_composition
+        from ai_video.production.repair_input_admission import require_production_render_sources, verify_repair_input
+&gt;       loaded, spec, arguments, before = _captioned_music_preview(tmp_path,
+            generated=generated, bilingual=generated)
+
+tests/test_qualification_preview_input.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_song_captions_without_explicit_qualification_binding_are_rejected" time="0.642"><failure message="AssertionError: Regex pattern did not match.&#10; Regex: 'script hash is invalid'&#10; Input: 'Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]'">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_song_captions_without_exp0')
+
+    def test_song_captions_without_explicit_qualification_binding_are_rejected(tmp_path):
+        with pytest.raises(AiVideoError, match='script hash is invalid'):
+&gt;           _captioned_music_preview(tmp_path, opt_in=False)
+
+tests/test_qualification_preview_input.py:276: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_song_captions_without_exp0')
+
+    def test_song_captions_without_explicit_qualification_binding_are_rejected(tmp_path):
+&gt;       with pytest.raises(AiVideoError, match='script hash is invalid'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'script hash is invalid'
+E        Input: 'Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]'
+
+tests/test_qualification_preview_input.py:275: AssertionError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_conflicting_captioned_music_captures_do_not_authorize_reader" time="0.647"><failure message="AssertionError: Regex pattern did not match.&#10; Regex: 'script hash is invalid'&#10; Input: 'Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]'">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_conflicting_captioned_mus0')
+
+    def test_conflicting_captioned_music_captures_do_not_authorize_reader(tmp_path):
+        with pytest.raises(AiVideoError, match='script hash is invalid'):
+&gt;           _captioned_music_preview(tmp_path, conflict=True)
+
+tests/test_qualification_preview_input.py:281: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_conflicting_captioned_mus0')
+
+    def test_conflicting_captioned_music_captures_do_not_authorize_reader(tmp_path):
+&gt;       with pytest.raises(AiVideoError, match='script hash is invalid'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'script hash is invalid'
+E        Input: 'Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]'
+
+tests/test_qualification_preview_input.py:280: AssertionError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_unconsumed_captioned_music_capture_is_reopenable_but_not_resolvable" time="0.644"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_unconsumed_captioned_musi0')
+
+    def test_unconsumed_captioned_music_capture_is_reopenable_but_not_resolvable(tmp_path):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path, pending=True)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qualification_preview_input.py:286: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_unused_capture_cannot_launder_song_captions_into_production" time="0.645"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_unused_capture_cannot_lau0')
+
+    def test_unused_capture_cannot_launder_song_captions_into_production(tmp_path):
+        from ai_video.production.composition import resolve_composition
+        from ai_video.production.composition_contracts import CompositionLayerSpec
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path, ordinary_target=True)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_qualification_preview_input.py:294: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_public_resolution_rejects_unsealed_changes[changed_song_sha]" time="0.638"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_public_re0')
+failure = 'changed_song_sha'
+
+    @pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
+        'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
+    def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path,
+            duration_samples=95_999 if failure == 'short_song' else 96_000)
+
+tests/test_qualification_preview_input.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_public_resolution_rejects_unsealed_changes[extra_track]" time="0.644"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_public_re1')
+failure = 'extra_track'
+
+    @pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
+        'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
+    def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path,
+            duration_samples=95_999 if failure == 'short_song' else 96_000)
+
+tests/test_qualification_preview_input.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_public_resolution_rejects_unsealed_changes[wrong_caption_track]" time="0.643"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_public_re2')
+failure = 'wrong_caption_track'
+
+    @pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
+        'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
+    def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path,
+            duration_samples=95_999 if failure == 'short_song' else 96_000)
+
+tests/test_qualification_preview_input.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_public_resolution_rejects_unsealed_changes[shot_caption]" time="0.652"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_public_re3')
+failure = 'shot_caption'
+
+    @pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
+        'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
+    def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path,
+            duration_samples=95_999 if failure == 'short_song' else 96_000)
+
+tests/test_qualification_preview_input.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_public_resolution_rejects_unsealed_changes[keep_native_audio]" time="0.662"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_public_re4')
+failure = 'keep_native_audio'
+
+    @pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
+        'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
+    def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path,
+            duration_samples=95_999 if failure == 'short_song' else 96_000)
+
+tests/test_qualification_preview_input.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_public_resolution_rejects_unsealed_changes[retimed_visual]" time="0.654"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_public_re5')
+failure = 'retimed_visual'
+
+    @pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
+        'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
+    def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path,
+            duration_samples=95_999 if failure == 'short_song' else 96_000)
+
+tests/test_qualification_preview_input.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase><testcase classname="tests.test_qualification_preview_input" name="test_captioned_music_public_resolution_rejects_unsealed_changes[short_song]" time="0.668"><failure message="ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]">tmp_path = PosixPath('/tmp/pytest-of-reggie/pytest-2098/test_captioned_music_public_re6')
+failure = 'short_song'
+
+    @pytest.mark.parametrize('failure', ['changed_song_sha', 'extra_track', 'wrong_caption_track',
+        'shot_caption', 'keep_native_audio', 'retimed_visual', 'short_song'])
+    def test_captioned_music_public_resolution_rejects_unsealed_changes(tmp_path, failure):
+        from ai_video.production.composition import resolve_composition
+&gt;       loaded, spec, _, _ = _captioned_music_preview(tmp_path,
+            duration_samples=95_999 if failure == 'short_song' else 96_000)
+
+tests/test_qualification_preview_input.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_qualification_preview_input.py:121: in _captioned_music_preview
+    writer, arguments, artifacts = _qualification_bundle(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_qualification_preview_input.py:20: in _qualification_bundle
+    _,_,committer,attempt_id=make_fetched_qualification_trial(source)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:759: in make_fetched_qualification_trial
+    inputs, provider, _, binding, request = _qualification_execution(root)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_jimeng_qualification_trial.py:104: in _qualification_execution
+    inputs, provider, _, production_binding, _, _ = _runtime(
+tests/test_production_generated_video_e2e.py:660: in _runtime
+    prepare_generation_execution(
+tests/production_generation_execution_factory.py:709: in prepare_generation_execution
+    binding = GenerationDecisionExecutionBinding.create(
+src/ai_video/production/generation_execution.py:456: in create
+    require_reference_authoring(projection.requirement, project=source_project,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+requirement = ProviderNeutralVideoRequirement(contract_version='provider-neutral-video-requirement/1', requirement_id='video-require...mercial_execution_class=None, product_fidelity_requirement=None, approved_commercial_source=None, source_strategy=None)
+
+    def require_reference_authoring(requirement, *, project=None, commercial_binding=_UNCOMPILED) -&gt; None:
+        """Structural obligations always; exact evidence whenever its owner input is supplied.
+    
+        Before compilation the commercial binding is unknown; at execution-binding
+        creation an ecommerce requirement must already be bound to its AdCreativePlan.
+        """
+        ecommerce = is_ecommerce_requirement(requirement, commercial_binding)
+        intent = requirement.generation_intent
+        issues = list(reference_authoring_issues(intent, ecommerce=ecommerce))
+        if ecommerce:
+            if commercial_binding is None:
+                issues.append("commercial_binding.ad_creative_plan_hash")
+        elif not issues and project is not None:
+            planning = intent.reference_planning
+            issues.extend(director_coverage_evidence_issues(planning.director_coverage, project))
+            if not issues:
+                issues.extend(preview_approval_evidence_issues(planning.preview_approval,
+                                                               planning.director_coverage, project))
+        if issues:
+&gt;           raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Author Director reference planning before new generation: " + ", ".join(issues))
+E           ai_video.errors.AiVideoError: Author Director reference planning before new generation: generation_intent.identity_continuity.character_ids[hero]
+
+src/ai_video/production/reference_authoring.py:167: AiVideoError</failure></testcase></testsuite></testsuites>

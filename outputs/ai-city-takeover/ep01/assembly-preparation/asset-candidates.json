@@ -1,0 +1,242 @@
+[
+  {
+    "asset_id": "iris-assembly-dns",
+    "asset_type": "video",
+    "artifact_path": "assets/files/2f15da162ed6db67f13d6a5e93b29a6d37f4d6925ae3aee074d56a8270120b03.mp4",
+    "sha256": "2f15da162ed6db67f13d6a5e93b29a6d37f4d6925ae3aee074d56a8270120b03",
+    "size_bytes": 113338,
+    "mime_type": "video/mp4",
+    "duration_seconds": 4.0,
+    "width": 1920,
+    "height": 1080,
+    "source_kind": "imported",
+    "tool": {
+      "name": "iris-local-source-preparation",
+      "version": "1"
+    },
+    "input_artifact_ids": [],
+    "input_fingerprint": "a3e12ae0995c67075f5272557e01c552f071c10e084a9b304333822ced147fb7",
+    "creation_receipt_id": "iris-source-preparation:a3e12ae0995c67075f5272557e01c552f071c10e084a9b304333822ced147fb7",
+    "usage_license": "User-authorized project source; platform ownership or adoption is not inferred.",
+    "egress": {
+      "remote": false,
+      "destination": null,
+      "authorization_receipt_id": null
+    },
+    "cost_receipt_id": null,
+    "video_metadata": {
+      "container_name": "mp4",
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "fps_numerator": 30,
+      "fps_denominator": 1,
+      "duration_milliseconds": 4000,
+      "frame_count": 120,
+      "probe_receipt_id": "local-measurement:a3e12ae0995c67075f5272557e01c552f071c10e084a9b304333822ced147fb7",
+      "request_receipt_fingerprint": "a3e12ae0995c67075f5272557e01c552f071c10e084a9b304333822ced147fb7",
+      "resolved_generation_hash": "a3e12ae0995c67075f5272557e01c552f071c10e084a9b304333822ced147fb7",
+      "provenance_receipt_id": "a3e12ae0995c67075f5272557e01c552f071c10e084a9b304333822ced147fb7"
+    }
+  },
+  {
+    "asset_id": "iris-assembly-pause",
+    "asset_type": "video",
+    "artifact_path": "assets/files/af43f9a3d842398d043f098e219f4a0d3d4780daba9f79651535ef92171b7f1f.mp4",
+    "sha256": "af43f9a3d842398d043f098e219f4a0d3d4780daba9f79651535ef92171b7f1f",
+    "size_bytes": 131584,
+    "mime_type": "video/mp4",
+    "duration_seconds": 4.0,
+    "width": 1920,
+    "height": 1080,
+    "source_kind": "imported",
+    "tool": {
+      "name": "iris-local-source-preparation",
+      "version": "1"
+    },
+    "input_artifact_ids": [],
+    "input_fingerprint": "b1483f02aeba67a4b4a0d84f9df52f928eba35a33d5019ca335fc6706c77c6ac",
+    "creation_receipt_id": "iris-source-preparation:b1483f02aeba67a4b4a0d84f9df52f928eba35a33d5019ca335fc6706c77c6ac",
+    "usage_license": "User-authorized project source; platform ownership or adoption is not inferred.",
+    "egress": {
+      "remote": false,
+      "destination": null,
+      "authorization_receipt_id": null
+    },
+    "cost_receipt_id": null,
+    "video_metadata": {
+      "container_name": "mp4",
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "fps_numerator": 30,
+      "fps_denominator": 1,
+      "duration_milliseconds": 4000,
+      "frame_count": 120,
+      "probe_receipt_id": "local-measurement:b1483f02aeba67a4b4a0d84f9df52f928eba35a33d5019ca335fc6706c77c6ac",
+      "request_receipt_fingerprint": "b1483f02aeba67a4b4a0d84f9df52f928eba35a33d5019ca335fc6706c77c6ac",
+      "resolved_generation_hash": "b1483f02aeba67a4b4a0d84f9df52f928eba35a33d5019ca335fc6706c77c6ac",
+      "provenance_receipt_id": "b1483f02aeba67a4b4a0d84f9df52f928eba35a33d5019ca335fc6706c77c6ac"
+    }
+  },
+  {
+    "asset_id": "iris-assembly-web-cache",
+    "asset_type": "video",
+    "artifact_path": "assets/files/54c190609411845492cf876ecec389e7496619866c7097dc550a5bed56baf172.mp4",
+    "sha256": "54c190609411845492cf876ecec389e7496619866c7097dc550a5bed56baf172",
+    "size_bytes": 154192,
+    "mime_type": "video/mp4",
+    "duration_seconds": 4.0,
+    "width": 1920,
+    "height": 1080,
+    "source_kind": "imported",
+    "tool": {
+      "name": "iris-local-source-preparation",
+      "version": "1"
+    },
+    "input_artifact_ids": [],
+    "input_fingerprint": "469e19d265dff0c23d6264e4ff665cf253acd443b6d945b8156e6098450fb339",
+    "creation_receipt_id": "iris-source-preparation:469e19d265dff0c23d6264e4ff665cf253acd443b6d945b8156e6098450fb339",
+    "usage_license": "User-authorized project source; platform ownership or adoption is not inferred.",
+    "egress": {
+      "remote": false,
+      "destination": null,
+      "authorization_receipt_id": null
+    },
+    "cost_receipt_id": null,
+    "video_metadata": {
+      "container_name": "mp4",
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "fps_numerator": 30,
+      "fps_denominator": 1,
+      "duration_milliseconds": 4000,
+      "frame_count": 120,
+      "probe_receipt_id": "local-measurement:469e19d265dff0c23d6264e4ff665cf253acd443b6d945b8156e6098450fb339",
+      "request_receipt_fingerprint": "469e19d265dff0c23d6264e4ff665cf253acd443b6d945b8156e6098450fb339",
+      "resolved_generation_hash": "469e19d265dff0c23d6264e4ff665cf253acd443b6d945b8156e6098450fb339",
+      "provenance_receipt_id": "469e19d265dff0c23d6264e4ff665cf253acd443b6d945b8156e6098450fb339"
+    }
+  },
+  {
+    "asset_id": "iris-assembly-cpu-cache",
+    "asset_type": "video",
+    "artifact_path": "assets/files/dbf491acd79334df6df01e3c530c0f65bf7c0d658a0d92deed994860cb1497cb.mp4",
+    "sha256": "dbf491acd79334df6df01e3c530c0f65bf7c0d658a0d92deed994860cb1497cb",
+    "size_bytes": 118712,
+    "mime_type": "video/mp4",
+    "duration_seconds": 4.0,
+    "width": 1920,
+    "height": 1080,
+    "source_kind": "imported",
+    "tool": {
+      "name": "iris-local-source-preparation",
+      "version": "1"
+    },
+    "input_artifact_ids": [],
+    "input_fingerprint": "e612b3b04fdec0614ffda325df62a823bdd6a04772924cdce29db6955ba765d2",
+    "creation_receipt_id": "iris-source-preparation:e612b3b04fdec0614ffda325df62a823bdd6a04772924cdce29db6955ba765d2",
+    "usage_license": "User-authorized project source; platform ownership or adoption is not inferred.",
+    "egress": {
+      "remote": false,
+      "destination": null,
+      "authorization_receipt_id": null
+    },
+    "cost_receipt_id": null,
+    "video_metadata": {
+      "container_name": "mp4",
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "fps_numerator": 30,
+      "fps_denominator": 1,
+      "duration_milliseconds": 4000,
+      "frame_count": 120,
+      "probe_receipt_id": "local-measurement:e612b3b04fdec0614ffda325df62a823bdd6a04772924cdce29db6955ba765d2",
+      "request_receipt_fingerprint": "e612b3b04fdec0614ffda325df62a823bdd6a04772924cdce29db6955ba765d2",
+      "resolved_generation_hash": "e612b3b04fdec0614ffda325df62a823bdd6a04772924cdce29db6955ba765d2",
+      "provenance_receipt_id": "e612b3b04fdec0614ffda325df62a823bdd6a04772924cdce29db6955ba765d2"
+    }
+  },
+  {
+    "asset_id": "iris-assembly-a01-v2",
+    "asset_type": "video",
+    "artifact_path": "assets/files/850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c.mp4",
+    "sha256": "850b3807757e570dc59c2a6af96fcf930d8689322408e11f1be81db2c5adae1c",
+    "size_bytes": 15395561,
+    "mime_type": "video/mp4",
+    "duration_seconds": 6.017,
+    "width": 1920,
+    "height": 1080,
+    "source_kind": "imported",
+    "tool": {
+      "name": "iris-local-source-preparation",
+      "version": "1"
+    },
+    "input_artifact_ids": [],
+    "input_fingerprint": "d749dca791cfa3eddaa3f733600260301f25242e74fdccdfc74dbe911694ae93",
+    "creation_receipt_id": "iris-source-preparation:d749dca791cfa3eddaa3f733600260301f25242e74fdccdfc74dbe911694ae93",
+    "usage_license": "User-authorized project source; platform ownership or adoption is not inferred.",
+    "egress": {
+      "remote": false,
+      "destination": null,
+      "authorization_receipt_id": null
+    },
+    "cost_receipt_id": null,
+    "video_metadata": {
+      "container_name": "mp4",
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "fps_numerator": 8700,
+      "fps_denominator": 361,
+      "duration_milliseconds": 6017,
+      "frame_count": 145,
+      "probe_receipt_id": "980b1dd21965efa57ee6d39f0fa8c2ea0a4f9ad14089637aa4e9575d7363dfc0",
+      "request_receipt_fingerprint": "788f66d9d2f6659bb4092bffd8cd08f6afc89ad1c1ac3317ffbacd7f10c98e4a",
+      "resolved_generation_hash": "788f66d9d2f6659bb4092bffd8cd08f6afc89ad1c1ac3317ffbacd7f10c98e4a",
+      "provenance_receipt_id": "d749dca791cfa3eddaa3f733600260301f25242e74fdccdfc74dbe911694ae93"
+    }
+  },
+  {
+    "asset_id": "iris-assembly-c",
+    "asset_type": "video",
+    "artifact_path": "assets/files/974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15.mp4",
+    "sha256": "974e83c050dd7cc079e6dabdf2ea3b168629d02fffc02cf8163c7881c4968f15",
+    "size_bytes": 12706989,
+    "mime_type": "video/mp4",
+    "duration_seconds": 6.017,
+    "width": 1920,
+    "height": 1080,
+    "source_kind": "imported",
+    "tool": {
+      "name": "iris-local-source-preparation",
+      "version": "1"
+    },
+    "input_artifact_ids": [],
+    "input_fingerprint": "427ceb08502745da93050748f5a3e4487dcf478d6617f90645c2daa7e6ccba8e",
+    "creation_receipt_id": "iris-source-preparation:427ceb08502745da93050748f5a3e4487dcf478d6617f90645c2daa7e6ccba8e",
+    "usage_license": "User-authorized project source; platform ownership or adoption is not inferred.",
+    "egress": {
+      "remote": false,
+      "destination": null,
+      "authorization_receipt_id": null
+    },
+    "cost_receipt_id": null,
+    "video_metadata": {
+      "container_name": "mp4",
+      "codec_name": "h264",
+      "width": 1920,
+      "height": 1080,
+      "fps_numerator": 8700,
+      "fps_denominator": 361,
+      "duration_milliseconds": 6017,
+      "frame_count": 145,
+      "probe_receipt_id": "3f83c960cc9c2280bf8769cb9a5dfa3002d317263daa0015e826a60cfaa59327",
+      "request_receipt_fingerprint": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+      "resolved_generation_hash": "0d608e46b507a9558cafa16a6dfcd66dab5d26ba629234dfeb30c2841fa7f64d",
+      "provenance_receipt_id": "427ceb08502745da93050748f5a3e4487dcf478d6617f90645c2daa7e6ccba8e"
+    }
+  }
+]

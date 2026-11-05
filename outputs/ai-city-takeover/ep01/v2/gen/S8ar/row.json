@@ -1,0 +1,327 @@
+{
+  "shot": {
+    "shot_id": "ep01v2-s8a",
+    "scene_id": "balcony",
+    "storyboard_beat_id": "chorus-1",
+    "intent": "真人电影摄影，横幅十六比九，连续五秒。第一张图是这个镜头的起始画面、构图与光线：同一位女性站在雨夜高层建筑的玻璃阳台上，正面近景看着镜头；第二张图只控制她的面貌、左耳黑色耳挂与左领口极细红线，不继承第二张图的背景。\n音频是她自己演唱的一句歌，从第一帧就开始唱。她对着镜头轻声演唱，嘴型与音频的每一个音节严格同步：有声音时张口唱，声音停顿时嘴型随之收小；音频结束后双唇完全合拢，不再动。她神情冷静克制，眼神平稳地看着镜头，只有唱歌的嘴型、呼吸和自然眨眼；头部几乎不动，不点头、不摆头、不抬手。\n摄影机完全固定在三脚架上，全程不推近、不拉远、不移动、不摇镜，保持第一张图的景别与人物位置。细雨在玻璃栏杆上缓慢滑落，背后城市灯光虚化。蓝黑与钢蓝冷色，红色只在她左领口的细灯线。牙齿和下巴自然稳定，不变形。\n保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。声音只跟随参考音频里的演唱，不新增其他人声、旁白、乐器或音乐；成片使用独立音轨。",
+    "dialogue": "",
+    "narration": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 6.0,
+      "minimum_seconds": null,
+      "maximum_seconds": null
+    },
+    "character_ids": [
+      "IRIS"
+    ],
+    "continuity_constraints": [
+      "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+      "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+      "嘴型与参考音频逐音节同步：开口时机在正负两帧内，实测停顿处嘴型收小，音频前后嘴唇闭合，无声处没有多余嘴动，牙齿与下巴不变形",
+      "摄影机完全固定，全程不推近、不移动、不摇镜，保持第一张图的景别与人物位置",
+      "保留平台正常人工智能生成标识，不删除、不遮挡它；不新增字幕、片名、文字、图形或界面。"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "reference",
+        "asset_ids": [
+          "iris-c-v2-s8a-balcony",
+          "iris-cf-details"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ],
+    "motion_directives": [],
+    "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+    "hybrid_layers": [],
+    "composition_directives": [],
+    "review_policy": {
+      "required_checks": []
+    }
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "scene_reference",
+        "asset_id": "iris-c-v2-s8a-balcony"
+      },
+      {
+        "role": "character_reference",
+        "asset_id": "iris-cf-details",
+        "owner_id": "IRIS"
+      },
+      {
+        "role": "reference_audio",
+        "asset_id": "iris-c-v2-s8a-vocal"
+      }
+    ],
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "dialogue",
+          "identity_consistency",
+          "stable"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [
+          {
+            "event_id": "open-composition",
+            "kind": "composition",
+            "visual_state": "正面近景看着镜头",
+            "purpose": "她神情冷静克制",
+            "phase": "start",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "close-composition",
+            "kind": "composition",
+            "visual_state": "音频结束后双唇完全合拢",
+            "purpose": "保持第一张图的景别与人物位置",
+            "phase": "end",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          }
+        ],
+        "anchors": [
+          {
+            "anchor_id": "balcony",
+            "role": "scene_environment",
+            "purpose": "这个镜头的起始画面、构图与光线",
+            "owner_id": "balcony",
+            "priority": "required"
+          },
+          {
+            "anchor_id": "identity",
+            "role": "identity",
+            "purpose": "只控制她的面貌、左耳黑色耳挂与左领口极细红线",
+            "owner_id": "IRIS",
+            "priority": "required"
+          }
+        ],
+        "selections": [
+          {
+            "need_id": "balcony",
+            "asset_id": "iris-c-v2-s8a-balcony"
+          },
+          {
+            "need_id": "identity",
+            "asset_id": "iris-cf-details"
+          }
+        ],
+        "natural_generation": [
+          "只有唱歌的嘴型、呼吸和自然眨眼"
+        ],
+        "director_coverage": {
+          "coverage_hash": "826753fad2a751df53856705c3d22911d6046856ff40afcc32ee355aead4f47d",
+          "unit_id": "S8a"
+        },
+        "preview_approval": {
+          "approval_hash": "1343541a5c788280c4b167a25558cb41314fc103354827726a31e67f43ee4310"
+        }
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "A02起始画面：她在雨夜玻璃阳台上正面近景看着镜头，第一帧就开口唱",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "唱完这一句，双唇完全合拢，仍平静看着镜头，构图不变",
+        "state_hash": null,
+        "required_change": false
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "IRIS"
+        ],
+        "preservation": "exact",
+        "allowed_variation": [
+          "微小透视变化与自然呼吸、眨眼"
+        ]
+      },
+      "scene_continuity": {
+        "scene_id": "balcony",
+        "time_of_day": "同一凌晨",
+        "mood": "冷静、克制",
+        "state_constraints": [
+          "A02起始画面：她在雨夜玻璃阳台上正面近景看着镜头，第一帧就开口唱",
+          "不新增人物、设备、文字或界面"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "她站在玻璃阳台原位",
+        "screen_direction": "保持参考图方向",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不换位、不翻轴"
+      },
+      "axis_continuity": {
+        "camera_axis": "参考图原机位视轴",
+        "framing_continuity": "A02正面近景，人物在画面中央偏右，城市在左侧",
+        "crossing_policy": "不翻轴、不环绕"
+      },
+      "subject_action": {
+        "start_state": "正面近景看着镜头，第一帧就开口唱",
+        "progression": "对着镜头轻声演唱，嘴型与音频逐音节同步",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "唱完后双唇完全合拢，仍看着镜头",
+          "state_hash": null,
+          "required_change": false
+        }
+      },
+      "motion_envelope": {
+        "onset": "平滑开始",
+        "peak": "唱到长音时嘴型张开最大",
+        "settle": "摄影机始终静止",
+        "direction": "摄影机不移动",
+        "amplitude_class": "很小"
+      },
+      "pacing": {
+        "cadence": "五秒连续原速",
+        "tempo_class": "正常原速",
+        "shot_duration_seconds": 5.0
+      },
+      "camera_intent": {
+        "movement": "摄影机完全固定，全程不推近、不移动、不摇镜",
+        "stability": "完全静止的固定机位",
+        "framing_intent": "A02正面近景，人物在画面中央偏右，城市在左侧",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "A02原始正面近景",
+        "end_framing": "与起始相同的正面近景",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "副歌响起",
+        "visible_response": "对着镜头轻声演唱，嘴型与音频逐音节同步",
+        "gaze_target": "镜头",
+        "body_behavior": "头部几乎不动，只有呼吸",
+        "hand_behavior": "双手不入画或保持静止，不操作任何设备",
+        "terminal_performance_state": "唱完后双唇完全合拢，仍平静看着镜头",
+        "character_directions": [
+          {
+            "character_id": "IRIS",
+            "screen_identity": "同一女性面貌、左耳黑色耳挂、左领极细红灯线、炭黑高领大衣与后梳低髻完整保持",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "副歌响起",
+                "emotion": "冷静克制",
+                "intensity": "subtle",
+                "facial_expression": "唱歌的嘴型，神情平静",
+                "gaze_target": "镜头",
+                "breathing": "自然平稳",
+                "body_behavior": "头部几乎不动，只有呼吸"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "真人电影摄影",
+        "palette": "蓝黑钢蓝，红色只在指定位置",
+        "material_treatment": "自然材质与真实光影",
+        "prohibited_visual_drift": [
+          "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+          "改变参考图的场景与光线"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "雨夜城市冷光",
+        "direction": "参考图方向",
+        "exposure_priority": "保留暗部细节",
+        "continuity_state": "同一凌晨冷光"
+      },
+      "ambience_intent": {
+        "environment_bed": "极轻的雨声",
+        "foley_cues": [],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "dialogue",
+        "language": "en",
+        "speaker_id": "IRIS",
+        "verbatim_text": "I didn't run — I just looked outside.",
+        "start_seconds": 0.0,
+        "end_seconds": 4.3,
+        "on_screen": true,
+        "response_obligation": "对着镜头唱出这一句，嘴型与参考音频逐音节同步",
+        "lip_sync_required": true
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "IRIS",
+        "relation_kind": "maintain_offset",
+        "start_relation": "A02原始正面近景",
+        "end_relation": "与起始相同的正面近景"
+      }
+    },
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": false,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 5,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "optional",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": true,
+    "source_audio_policy": "MUTE",
+    "source_audio_reason": "成片使用已认可歌曲 v2 独立音轨"
+  },
+  "boundary": {
+    "independent": true,
+    "reason": "按分镜 v2.1 由最终剪辑切接；不要求复制前镜终态"
+  }
+}
