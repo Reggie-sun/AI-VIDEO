@@ -69,3 +69,7 @@ Date: 2026-11-04
 - 积分：报价 360 CRD，实际结算待确认。当前 attempt 已停止，没有自动重抽。
 
 `distill-ai-video-learning`: no_candidate。本次是单次生成，加上一组准备期的程序门禁发现，没有受控的多实验对照。
+
+## User Salvage Decision
+
+用户原速听过母带后选择"声音可以，剪辑保住"，记录在 `master-references-v1/qa/user-decision-salvage.json`。母带声音作为对白母版；画面只用 0–4.5 秒（D1）和写字段约 20.6–23.8 秒（D5）。Gate FAIL 保留，不改写。下一步是组装：市政片 → D1 → D2r1/D3/D4r1 → D5 → D6 → B6，加字幕，走 HyperFrames + `verify-assembly`。D4 的呼救声和 D6 的时钟仍未处理。

@@ -1,0 +1,15 @@
+{
+  "kind": "human-decision",
+  "date": "2026-11-05T02:50:08.070134+00:00",
+  "shot": "M1",
+  "media_sha256": "9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0",
+  "user_quote": "声音可以，剪辑保住",
+  "question": "请先原速听一遍母带的声音，然后选怎么处理（选项说明：母带画面只取 0–4.5 秒(D1)和写字段(D5)，叠化、麦克风消失、点名动作都落在会被现场镜头盖住的段落；不再花积分）",
+  "scope": "用户认可母带声音（七句对白、声线、语气）可作为对白母版；画面只允许使用 0–4.5s(D1) 与写字段约 20.6–23.8s(D5)。Gate 的 camera/space/action FAIL 保留不改写，仅说明这些段落不进入成片。",
+  "not_covered": [
+    "组装后成片的原速声画认可",
+    "D5 写字段中麦克风缺失是否可见的复核",
+    "Final Acceptance"
+  ],
+  "gate_record": "qa/post-media-gate.json (verdict FAIL retained)"
+}
