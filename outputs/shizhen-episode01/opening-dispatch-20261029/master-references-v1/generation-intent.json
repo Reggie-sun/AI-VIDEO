@@ -292,7 +292,7 @@
   {
    "id": "K4-rollcall-r1",
    "status": "KNOWN_OUTPUT",
-   "verdict": "CANDIDATE_WITH_ISSUES",
+   "verdict": "SUPERSEDED_BY_K4-rollcall-r2",
    "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K4-rollcall-r1.zh.txt",
    "prompt_sha256": "af1c97424c398542f717aefdf29a174f9758027eec79d7ebdb3f7451eec7eb2e",
    "inputs": [
@@ -328,6 +328,26 @@
    "height": 941,
    "parent_observation": "16:9（1672×941）；手指停在键盘上方；同一人、同衣服、同房间；推近景别成立",
    "repair_of": "repair of K2-D1-typed-r1 aspect/hands"
+  },
+  {
+   "id": "K4-rollcall-r2",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "SELECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K4-rollcall-r2.zh.txt",
+   "prompt_sha256": "e19309beb6916950a6c2feda2ed09f746701ee6a001476f2b27ee58e4fe5c698",
+   "inputs": [
+    {
+     "role": "参考一 编辑底图",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K1-D1-listen-v1.png",
+     "sha256": "3952c9f69588034dae29dadfc6c0845ddc0ef8ec8ea6b9c862e40fa52fca8f54"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-r2.png",
+   "sha256": "a790c1929c3c516eff56c009915d86d24b551a9b07f011784ac0a8881a1715a1",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "她坐在原位不再探身；麦克风连底座已拉到面前、连线从扬声器一侧拖来、扬声器绿灯在原位；右手食指按键、对麦克风开口；神情基本平静但眉略紧；目光落在麦克风/显示器方向而非扬声器；键盘被略挤向右侧（小的布局变化）",
+   "repair_of": "K4-rollcall-v1/r1 via K1 base"
   }
  ],
  "selected_package": {
@@ -338,7 +358,7 @@
    "K1-D1-listen-v1",
    "K2-D1-typed-r2",
    "K3-D5-tally-v1",
-   "K4-rollcall-r1(有问题待用户裁决)"
+   "K4-rollcall-r2"
   ],
   "style_frames": [
    "MC01-normal.png(已认可市政)"
@@ -359,5 +379,17 @@
   "auto_retry": 0,
   "unknown_outcome_rule": "STOP",
   "calls_used": 2
+ },
+ "k4_repair_unit": {
+  "user_instruction": "修 K4 后再认可",
+  "max_calls": 2,
+  "planned": [
+   "K4-rollcall-r2 (edit of K1: she pulls mic in front of her, keeps ENV/K1/K2 continuity)"
+  ],
+  "auto_retry": 0,
+  "unknown_outcome_rule": "STOP",
+  "decision": "不改环境图：环境挪麦克风会破坏K1/K2连续性；改为人物把麦克风拉到面前",
+  "calls_used": 1,
+  "closed": true
  }
 }
