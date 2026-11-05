@@ -1,0 +1,3 @@
+{"root": "runs/shizhen-opening-dispatch-20261104/M1-r7", "status": "ABANDONED_AFTER_CONTINUITY_REVIEW_BLOCKING",
+ "reason": "continuity-supervisor BLOCKING: PROP appearance conflict, L1 keyboard under J-cut, 28s overrun, push-to-talk logic, end framing vs L6 lip sync, K4 selection, coverage not updated. Fixed in coverage v6 + 30s + 5 inputs; same empty node reused with a new 30s profile (old profile kept as profile-28s-superseded.json).",
+ "generation_POSTs": 0, "paid_reservations": 0, "replacement_root": "runs/shizhen-opening-dispatch-20261104/M1-r8"}

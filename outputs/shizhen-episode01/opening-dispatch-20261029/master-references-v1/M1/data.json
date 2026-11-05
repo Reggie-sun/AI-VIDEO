@@ -1,0 +1,295 @@
+{
+  "objective": "失帧冷开场调度对讲版对白母带：记录台接报、计数与站台点名",
+  "images": [
+    {
+      "asset_id": "M1-env",
+      "node_id": "M1-env-node",
+      "resource_id": "M1-env-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/M1/reference-M1-env-source.json",
+        "record_sha256": "d1631c5479ef5db78052cbddb41355bdace08e7b8752f9ad685ae0e50babb4d8",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    },
+    {
+      "asset_id": "M1-identity",
+      "node_id": "M1-identity-node",
+      "resource_id": "M1-identity-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/M1/reference-M1-identity-source.json",
+        "record_sha256": "83ca0260d8958aa79389638cd61621e97e0068ae335c084a3d3380b5bd46d371",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    },
+    {
+      "asset_id": "M1-k1",
+      "node_id": "M1-k1-node",
+      "resource_id": "M1-k1-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K1-D1-listen-v1.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/M1/reference-M1-k1-source.json",
+        "record_sha256": "d5ea5d25f4bb7872f568578ab632c1b5f1989683b14ff1aaa05eeb701b72ca50",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    },
+    {
+      "asset_id": "M1-k2",
+      "node_id": "M1-k2-node",
+      "resource_id": "M1-k2-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K2-D1-typed-r2.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/M1/reference-M1-k2-source.json",
+        "record_sha256": "a62a5832ac71a53d1c6c3037f352e7e3e6c06f1f824953c211285864aeaee9d3",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    },
+    {
+      "asset_id": "M1-k4",
+      "node_id": "M1-k4-node",
+      "resource_id": "M1-k4-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-r2.png",
+      "usage_license": "Original fictional reference generated for authorized Shizhen opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/M1/reference-M1-k4-source.json",
+        "record_sha256": "e9cb96e475fd949717f9c86e759234a7526162ea08a4f16f977c2c945d9db467",
+        "tool": {
+          "name": "codex-generated-image",
+          "version": "codex-cli-0.166.0"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "dong-wenhui",
+      "name": "董文慧",
+      "identity": "夜间应急文字记录员",
+      "appearance_bible": "以身份参考为脸；灰褐连帽外套、深灰内搭、低马尾",
+      "reference_asset_ids": [
+        "M1-identity"
+      ]
+    }
+  ],
+  "scene_images": [
+    "M1-env",
+    "M1-k1",
+    "M1-k2",
+    "M1-k4"
+  ],
+  "observations": {
+    "identity": "董文慧与身份参考一致，灰褐连帽外套、低马尾，没有新增人物或换脸",
+    "action": "听完第一句才打字、在记录本写下一行笔停住、拉麦克风按键问话后松键、听回答时看扬声器",
+    "camera": "一个连续镜头从中景缓慢推近到中近景（脸、双手、记录本），不切镜、不越轴；问话时脸在画内",
+    "performance": "平静克制，不惊慌；问话平淡",
+    "space": "同一记录台与物件位置，扬声器在桌面左角",
+    "sound": "七句对白完整且顺序正确：转报为扬声器音质男声，她是室内干声；第一句时没有键盘声；“暂无报告”在片尾前说完；无配乐",
+    "art": "真人摄影质感、雨夜灯光连续，无慢动作、闪屏、字幕或屏幕文字"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.scene_continuity.state_constraints.3",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.foley_cues.1",
+      "generation_intent.ambience_intent.foley_cues.2",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.language",
+      "generation_intent.dialogue_intent.turns.0.speaker_id",
+      "generation_intent.dialogue_intent.turns.0.verbatim_text",
+      "generation_intent.dialogue_intent.turns.0.on_screen",
+      "generation_intent.dialogue_intent.turns.0.response_obligation",
+      "generation_intent.dialogue_intent.turns.0.lip_sync_required",
+      "generation_intent.dialogue_intent.turns.1.speaker_id",
+      "generation_intent.dialogue_intent.turns.1.verbatim_text",
+      "generation_intent.dialogue_intent.turns.1.on_screen",
+      "generation_intent.dialogue_intent.turns.1.response_obligation",
+      "generation_intent.dialogue_intent.turns.1.lip_sync_required",
+      "generation_intent.dialogue_intent.turns.2.speaker_id",
+      "generation_intent.dialogue_intent.turns.2.verbatim_text",
+      "generation_intent.dialogue_intent.turns.2.on_screen",
+      "generation_intent.dialogue_intent.turns.2.response_obligation",
+      "generation_intent.dialogue_intent.turns.2.lip_sync_required",
+      "generation_intent.dialogue_intent.turns.3.speaker_id",
+      "generation_intent.dialogue_intent.turns.3.verbatim_text",
+      "generation_intent.dialogue_intent.turns.3.on_screen",
+      "generation_intent.dialogue_intent.turns.3.response_obligation",
+      "generation_intent.dialogue_intent.turns.3.lip_sync_required",
+      "generation_intent.dialogue_intent.turns.4.speaker_id",
+      "generation_intent.dialogue_intent.turns.4.verbatim_text",
+      "generation_intent.dialogue_intent.turns.4.on_screen",
+      "generation_intent.dialogue_intent.turns.4.response_obligation",
+      "generation_intent.dialogue_intent.turns.4.lip_sync_required",
+      "generation_intent.dialogue_intent.turns.5.speaker_id",
+      "generation_intent.dialogue_intent.turns.5.verbatim_text",
+      "generation_intent.dialogue_intent.turns.5.on_screen",
+      "generation_intent.dialogue_intent.turns.5.response_obligation",
+      "generation_intent.dialogue_intent.turns.5.lip_sync_required",
+      "generation_intent.dialogue_intent.turns.6.speaker_id",
+      "generation_intent.dialogue_intent.turns.6.verbatim_text",
+      "generation_intent.dialogue_intent.turns.6.on_screen",
+      "generation_intent.dialogue_intent.turns.6.response_obligation",
+      "generation_intent.dialogue_intent.turns.6.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state",
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "参考素材1{{image:0}}负责记录室的布局、光线，以及扬声器、鹅颈麦克风和记录本的样子；参考素材2{{image:1}}只负责董文慧的长相，不取它的灰色背景、打底衫和四格排版；参考素材3{{image:2}}和参考素材4{{image:3}}是镜头开始与推近后的状态，负责她这一夜的灰褐连帽外套、低马尾与站位，参考素材4只取景别和姿态；鹅颈麦克风始终立在扬声器旁，不要消失；参考素材5{{image:4}}只示意她把麦克风拉到面前按键的动作，不取它的景别。",
+      "深夜雨天，旧办公室里的应急记录台，真人实拍质感。二十八岁的董文慧独自值班，不戴耳机。桌面左角的黑色扬声器亮着绿灯，传出值班转报员带扬声器音质的中年男声，语气平淡。"
+    ],
+    "action": [
+      "一个连续镜头，从中景，缓慢推近到她的脸和双手，把各处的报告收到记录台：扬声器说“检修口报，电闸断了，绞盘还在收”，她静静听完才开始打字；扬声器又说“七号楼报，下了三层，还在原来那层”，她停顿一下继续打字；“急诊说，系统里她已经死了，人还躺着”，她手指停在键盘上方；“人民路有人喊救命，在七楼，七楼早就封了”。每句说完留一秒多，只有键盘声和雨声。",
+      "镜头停在中近景，她的脸、双手和桌上的记录本都在画内，让异常的数量累积起来：她拿起笔在纸本上写下潦草的一行，低声自语“记上，第十四起”，笔停住。",
+      "她把麦克风拉到面前，按住按键，平静地问“三号站台？”，随即松开按键；停一下，扬声器回答“暂无报告”。她看着扬声器不动，让点名和回答落在同一个画面里。"
+    ],
+    "camera": [
+      "一个连续镜头，从中景，缓慢推近到她的脸和双手，把各处的报告收到记录台：扬声器说“检修口报，电闸断了，绞盘还在收”，她静静听完才开始打字；扬声器又说“七号楼报，下了三层，还在原来那层”，她停顿一下继续打字；“急诊说，系统里她已经死了，人还躺着”，她手指停在键盘上方；“人民路有人喊救命，在七楼，七楼早就封了”。每句说完留一秒多，只有键盘声和雨声。",
+      "镜头停在中近景，她的脸、双手和桌上的记录本都在画内，让异常的数量累积起来：她拿起笔在纸本上写下潦草的一行，低声自语“记上，第十四起”，笔停住。",
+      "她把麦克风拉到面前，按住按键，平静地问“三号站台？”，随即松开按键；停一下，扬声器回答“暂无报告”。她看着扬声器不动，让点名和回答落在同一个画面里。"
+    ],
+    "performance": [
+      "一个连续镜头，从中景，缓慢推近到她的脸和双手，把各处的报告收到记录台：扬声器说“检修口报，电闸断了，绞盘还在收”，她静静听完才开始打字；扬声器又说“七号楼报，下了三层，还在原来那层”，她停顿一下继续打字；“急诊说，系统里她已经死了，人还躺着”，她手指停在键盘上方；“人民路有人喊救命，在七楼，七楼早就封了”。每句说完留一秒多，只有键盘声和雨声。",
+      "镜头停在中近景，她的脸、双手和桌上的记录本都在画内，让异常的数量累积起来：她拿起笔在纸本上写下潦草的一行，低声自语“记上，第十四起”，笔停住。",
+      "她把麦克风拉到面前，按住按键，平静地问“三号站台？”，随即松开按键；停一下，扬声器回答“暂无报告”。她看着扬声器不动，让点名和回答落在同一个画面里。"
+    ],
+    "space": [
+      "参考素材1{{image:0}}负责记录室的布局、光线，以及扬声器、鹅颈麦克风和记录本的样子；参考素材2{{image:1}}只负责董文慧的长相，不取它的灰色背景、打底衫和四格排版；参考素材3{{image:2}}和参考素材4{{image:3}}是镜头开始与推近后的状态，负责她这一夜的灰褐连帽外套、低马尾与站位，参考素材4只取景别和姿态；鹅颈麦克风始终立在扬声器旁，不要消失；参考素材5{{image:4}}只示意她把麦克风拉到面前按键的动作，不取它的景别。",
+      "她把麦克风拉到面前，按住按键，平静地问“三号站台？”，随即松开按键；停一下，扬声器回答“暂无报告”。她看着扬声器不动，让点名和回答落在同一个画面里。"
+    ],
+    "sound": [
+      "深夜雨天，旧办公室里的应急记录台，真人实拍质感。二十八岁的董文慧独自值班，不戴耳机。桌面左角的黑色扬声器亮着绿灯，传出值班转报员带扬声器音质的中年男声，语气平淡。",
+      "一个连续镜头，从中景，缓慢推近到她的脸和双手，把各处的报告收到记录台：扬声器说“检修口报，电闸断了，绞盘还在收”，她静静听完才开始打字；扬声器又说“七号楼报，下了三层，还在原来那层”，她停顿一下继续打字；“急诊说，系统里她已经死了，人还躺着”，她手指停在键盘上方；“人民路有人喊救命，在七楼，七楼早就封了”。每句说完留一秒多，只有键盘声和雨声。",
+      "镜头停在中近景，她的脸、双手和桌上的记录本都在画内，让异常的数量累积起来：她拿起笔在纸本上写下潦草的一行，低声自语“记上，第十四起”，笔停住。",
+      "她把麦克风拉到面前，按住按键，平静地问“三号站台？”，随即松开按键；停一下，扬声器回答“暂无报告”。她看着扬声器不动，让点名和回答落在同一个画面里。",
+      "她说话是室内干声，不经扬声器。无配乐，不慢动作，不出现字幕、屏幕文字或可读字符。"
+    ],
+    "art": [
+      "深夜雨天，旧办公室里的应急记录台，真人实拍质感。二十八岁的董文慧独自值班，不戴耳机。桌面左角的黑色扬声器亮着绿灯，传出值班转报员带扬声器音质的中年男声，语气平淡。",
+      "她说话是室内干声，不经扬声器。无配乐，不慢动作，不出现字幕、屏幕文字或可读字符。"
+    ]
+  },
+  "intent_sha256": "f2d53e226c1d82cbe26a6509c0b9b4a5805a036063322b0452be7e3bc911390f",
+  "coverage": {
+    "path": "outputs/shizhen-episode01/opening-dispatch-20261029/director-coverage.v6.json",
+    "sha256": "980bd46499fc52eb99a642eb30fb260b6b11e1b834d20b273bba0bdf7e4d202c",
+    "coverage_hash": "147c19b04463575d81f892e2ceef202830e0d20ba13b62dbb1bc25f175c44fe0",
+    "unit_id": "D1-record-desk"
+  },
+  "preview_approval": {
+    "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/M1/preview-approval.json",
+    "approval_hash": "cb73bb8b88614ed2459c93ea8ab580941e79c3eecfb1b63e07311ea15d754bdd"
+  },
+  "scene": {
+    "scene_id": "record-desk",
+    "location": "夜间应急记录室",
+    "mood": "报告一件件累积"
+  }
+}

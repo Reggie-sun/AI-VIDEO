@@ -1,0 +1,8 @@
+{
+  "r9_attempt": "shizhen-dispatch-master-M1-preview-001",
+  "r9_root": "runs/shizhen-opening-dispatch-20261104/M1-r9",
+  "outcome": "failed / paid phase known_no_effect (reference upload did not complete; generation was not submitted)",
+  "diagnosis": "Transport swallows worker error. Direct worker uploads of all five exact input images afterwards returned storage_id (identity 20.0s, others 3.7-5.8s); treated as transient browser/upload failure on the newly opened canvas tab",
+  "credits_consumed": 0,
+  "recorded_at": "2026-11-05T02:06:07.282606+00:00"
+}

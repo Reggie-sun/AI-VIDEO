@@ -1,0 +1,3 @@
+{"root": "runs/shizhen-opening-dispatch-20261104/M1", "status": "ABANDONED_BEFORE_PREPARE",
+ "reason": "Scene.visual_reference_asset_ids listed only M1-env; canvas_feedback_context rejected the other five scene_reference inputs before any prepare/start/submit",
+ "generation_POSTs": 0, "paid_reservations": 0, "replacement_root": "runs/shizhen-opening-dispatch-20261104/M1-r2"}

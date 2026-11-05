@@ -1,0 +1,11 @@
+{
+  "exact_inputs": true,
+  "exact_authored_prompt": true,
+  "pure_chinese_body": true,
+  "no_captions_or_music": true,
+  "all_turns_verbatim": true,
+  "duration": true,
+  "480p": true,
+  "native_audio": true,
+  "five_bound_markers": true
+}

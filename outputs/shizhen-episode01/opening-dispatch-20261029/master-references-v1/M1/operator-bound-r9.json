@@ -1,0 +1,16 @@
+{
+  "authority": "current-task-parent-bounded-operator",
+  "authorization_quote": "认可，开始生成",
+  "scope": "One M1 dispatch dialogue master 480p Seedance 2.5 preview; no activation",
+  "issued_at": "2026-11-05T02:00:00.233526+00:00",
+  "expires_at": "2026-11-05T05:00:00.233526+00:00",
+  "max_submit_count": 1,
+  "automatic_retries": 0,
+  "dispatch_unit_ceiling": {
+    "dialogue_master": 1,
+    "prior_dispatch_paid_submits": 6
+  },
+  "per_call_credit_upper_bound": 1500,
+  "quote_credits": 360,
+  "quote_evidence": "native-readonly.json"
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+  "sha256": "053c3678caccf082a341be4c2c888d92a957d77d545009d0133e300fe477f0b7",
+  "size_bytes": 2003180,
+  "width": 1671,
+  "height": 941,
+  "reference_role": "reference",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "semantic_review": "Static review by Parent; user approved the preview package 2026-11-04; not video acceptance",
+  "prompt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/ENV-desk-room-r1.zh.txt",
+  "prompt_sha256": "f7cfa630948ac57ec1ce5b35d5d4e84389fcf9cf476298857f3d3094a31d95db"
+}

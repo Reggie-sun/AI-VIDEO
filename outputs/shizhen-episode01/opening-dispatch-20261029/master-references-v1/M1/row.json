@@ -1,0 +1,408 @@
+{
+  "shot": {
+    "shot_id": "M1",
+    "scene_id": "record-desk",
+    "storyboard_beat_id": "D1-record-desk",
+    "intent": "参考素材1{{image:0}}负责记录室的布局、光线，以及扬声器、鹅颈麦克风和记录本的样子；参考素材2{{image:1}}只负责董文慧的长相，不取它的灰色背景、打底衫和四格排版；参考素材3{{image:2}}和参考素材4{{image:3}}是镜头开始与推近后的状态，负责她这一夜的灰褐连帽外套、低马尾与站位，参考素材4只取景别和姿态；鹅颈麦克风始终立在扬声器旁，不要消失；参考素材5{{image:4}}只示意她把麦克风拉到面前按键的动作，不取它的景别。\n深夜雨天，旧办公室里的应急记录台，真人实拍质感。二十八岁的董文慧独自值班，不戴耳机。桌面左角的黑色扬声器亮着绿灯，传出值班转报员带扬声器音质的中年男声，语气平淡。\n一个连续镜头，从中景，缓慢推近到她的脸和双手，把各处的报告收到记录台：扬声器说“检修口报，电闸断了，绞盘还在收”，她静静听完才开始打字；扬声器又说“七号楼报，下了三层，还在原来那层”，她停顿一下继续打字；“急诊说，系统里她已经死了，人还躺着”，她手指停在键盘上方；“人民路有人喊救命，在七楼，七楼早就封了”。每句说完留一秒多，只有键盘声和雨声。\n镜头停在中近景，她的脸、双手和桌上的记录本都在画内，让异常的数量累积起来：她拿起笔在纸本上写下潦草的一行，低声自语“记上，第十四起”，笔停住。\n她把麦克风拉到面前，按住按键，平静地问“三号站台？”，随即松开按键；停一下，扬声器回答“暂无报告”。她看着扬声器不动，让点名和回答落在同一个画面里。\n她说话是室内干声，不经扬声器。无配乐，不慢动作，不出现字幕、屏幕文字或可读字符。",
+    "dialogue": "检修口报，电闸断了，绞盘还在收；七号楼报，下了三层，还在原来那层；急诊说，系统里她已经死了，人还躺着；人民路有人喊救命，在七楼，七楼早就封了；记上，第十四起；三号站台？；暂无报告",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 30
+    },
+    "character_ids": [
+      "dong-wenhui"
+    ],
+    "continuity_constraints": [
+      "同一记录台、物件位置与灯光",
+      "转报声只从扬声器传出",
+      "无字幕、屏幕文字与配乐"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "调度对讲版 v5 对白母带：一次生成全部七句对白及 D1、D5 记录台画面"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "scene_reference",
+        "asset_id": "M1-env"
+      },
+      {
+        "role": "character_reference",
+        "asset_id": "M1-identity",
+        "owner_id": "dong-wenhui"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "M1-k1"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "M1-k2"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "M1-k4"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "dialogue",
+          "identity_consistency",
+          "slow_camera"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [
+          {
+            "event_id": "desk-push",
+            "kind": "composition",
+            "visual_state": "中景，缓慢推近到她的脸和双手",
+            "purpose": "把各处的报告收到记录台",
+            "phase": "start",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "model_guidance",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "desk-typed",
+            "kind": "performance",
+            "visual_state": "她手指停在键盘上方",
+            "purpose": "她停顿一下继续打字",
+            "phase": "interior",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "model_guidance",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "tally-line",
+            "kind": "composition",
+            "visual_state": "镜头停在中近景，她的脸、双手和桌上的记录本都在画内",
+            "purpose": "让异常的数量累积起来",
+            "phase": "interior",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [
+              "desk-typed"
+            ],
+            "control": "review_only",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "rollcall-ask",
+            "kind": "performance",
+            "visual_state": "按住按键，平静地问",
+            "purpose": "停一下，扬声器回答",
+            "phase": "interior",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [
+              "tally-line"
+            ],
+            "control": "model_guidance",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "rollcall-wait",
+            "kind": "composition",
+            "visual_state": "她看着扬声器不动",
+            "purpose": "让点名和回答落在同一个画面里",
+            "phase": "end",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          }
+        ],
+        "anchors": [
+          {
+            "anchor_id": "dong-identity",
+            "role": "identity",
+            "purpose": "董文慧的长相",
+            "owner_id": "dong-wenhui",
+            "priority": "required"
+          },
+          {
+            "anchor_id": "desk-room",
+            "role": "scene_environment",
+            "purpose": "记录室的布局、光线",
+            "owner_id": "record-desk",
+            "priority": "required"
+          }
+        ],
+        "selections": [
+          {
+            "need_id": "dong-identity",
+            "asset_id": "M1-identity"
+          },
+          {
+            "need_id": "desk-room",
+            "asset_id": "M1-env"
+          },
+          {
+            "need_id": "desk-push",
+            "asset_id": "M1-k1"
+          },
+          {
+            "need_id": "desk-typed",
+            "asset_id": "M1-k2"
+          },
+          {
+            "need_id": "rollcall-ask",
+            "asset_id": "M1-k4"
+          }
+        ],
+        "natural_generation": [],
+        "director_coverage": {
+          "coverage_hash": "147c19b04463575d81f892e2ceef202830e0d20ba13b62dbb1bc25f175c44fe0",
+          "unit_id": "D1-record-desk"
+        },
+        "preview_approval": {
+          "approval_hash": "cb73bb8b88614ed2459c93ea8ab580941e79c3eecfb1b63e07311ea15d754bdd"
+        }
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "深夜雨天的应急记录台，扬声器亮着绿灯，董文慧坐在桌后，双手放在键盘上。",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "她已松开麦克风按键，看着扬声器不动；记录本上多了新的一行。",
+        "state_hash": null,
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "dong-wenhui"
+        ],
+        "preservation": "exact",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "record-desk",
+        "time_of_day": "雨夜",
+        "mood": "报告一件件累积，语气越平淡越不安",
+        "state_constraints": [
+          "同一记录台与物件位置",
+          "扬声器绿灯常亮",
+          "她不戴耳机",
+          "不出现字幕、屏幕文字或可读字符"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "她坐在显示器右侧的椅子上，扬声器在桌面左角",
+        "screen_direction": "机位在桌子正前方略偏左",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不越轴"
+      },
+      "axis_continuity": {
+        "camera_axis": "桌子正前方略偏左",
+        "framing_continuity": "同一机位连续推近",
+        "crossing_policy": "不越轴"
+      },
+      "subject_action": {
+        "start_state": "深夜雨天的应急记录台，扬声器亮着绿灯，董文慧坐在桌后，双手放在键盘上。",
+        "progression": "一个连续镜头，从中景，缓慢推近到她的脸和双手，把各处的报告收到记录台：扬声器说“检修口报，电闸断了，绞盘还在收”，她静静听完才开始打字；扬声器又说“七号楼报，下了三层，还在原来那层”，她停顿一下继续打字；“急诊说，系统里她已经死了，人还躺着”，她手指停在键盘上方；“人民路有人喊救命，在七楼，七楼早就封了”。每句说完留一秒多，只有键盘声和雨声。",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "她已松开麦克风按键，看着扬声器不动；记录本上多了新的一行。",
+          "state_hash": null,
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "扬声器报第一起",
+        "peak": "写下第十四起",
+        "settle": "问三号站台后等回答",
+        "direction": "原地",
+        "amplitude_class": "正常实时动作"
+      },
+      "pacing": {
+        "cadence": "每句报告后留一秒多只听键盘和雨声",
+        "tempo_class": "自然原速",
+        "shot_duration_seconds": 30.0
+      },
+      "camera_intent": {
+        "movement": "一个连续镜头，从中景缓慢推近",
+        "stability": "稳定",
+        "framing_intent": "从中景推近到中近景：她的脸、双手、记录本与麦克风",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "中景，她和桌面",
+        "end_framing": "中近景，她的脸、双手、记录本与麦克风",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "扬声器一条条报来异常",
+        "visible_response": "她听完才记，不惊慌",
+        "gaze_target": "显示器与扬声器",
+        "body_behavior": "坐着工作，最后把麦克风拉到面前",
+        "hand_behavior": "打字、写字、按麦克风键",
+        "terminal_performance_state": "看着扬声器不动",
+        "character_directions": [
+          {
+            "character_id": "dong-wenhui",
+            "screen_identity": "穿灰褐连帽外套、低马尾的董文慧",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "扬声器传来的报告",
+                "emotion": "克制、专注，越平淡越不安",
+                "intensity": "subtle",
+                "facial_expression": "平静，眉头放松",
+                "gaze_target": "显示器，问话时看扬声器",
+                "breathing": "自然平稳",
+                "body_behavior": "听完第一句才打字，写字后笔停住，按麦克风键平静问话后松键"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "正常速度的真人摄影质感",
+        "palette": "雨夜冷蓝与台灯暖黄",
+        "material_treatment": "旧金属桌面、纸张、塑料扬声器与真实衣物",
+        "prohibited_visual_drift": [
+          "慢动作、闪屏、黑屏、鬼影",
+          "字幕、屏幕文字或可读字符"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "台灯与显示器",
+        "direction": "台灯暖光在右，屏幕冷光照脸",
+        "exposure_priority": "她的脸、手和扬声器绿灯可读",
+        "continuity_state": "灯光不变"
+      },
+      "ambience_intent": {
+        "environment_bed": "窗外雨声、室内安静",
+        "foley_cues": [
+          "键盘声",
+          "写字声",
+          "麦克风按键声"
+        ],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "conversation",
+        "language": "zh",
+        "turns": [
+          {
+            "speaker_id": "dispatch-relay",
+            "verbatim_text": "检修口报，电闸断了，绞盘还在收",
+            "on_screen": false,
+            "response_obligation": "她静静听完才开始打字",
+            "lip_sync_required": false
+          },
+          {
+            "speaker_id": "dispatch-relay",
+            "verbatim_text": "七号楼报，下了三层，还在原来那层",
+            "on_screen": false,
+            "response_obligation": "她停顿一下继续打字",
+            "lip_sync_required": false
+          },
+          {
+            "speaker_id": "dispatch-relay",
+            "verbatim_text": "急诊说，系统里她已经死了，人还躺着",
+            "on_screen": false,
+            "response_obligation": "她手指停在键盘上方",
+            "lip_sync_required": false
+          },
+          {
+            "speaker_id": "dispatch-relay",
+            "verbatim_text": "人民路有人喊救命，在七楼，七楼早就封了",
+            "on_screen": false,
+            "response_obligation": "镜头停在中近景，她写下新的一行",
+            "lip_sync_required": false
+          },
+          {
+            "speaker_id": "dong-wenhui",
+            "verbatim_text": "记上，第十四起",
+            "on_screen": true,
+            "response_obligation": "笔停住，她把麦克风拉到面前",
+            "lip_sync_required": true
+          },
+          {
+            "speaker_id": "dong-wenhui",
+            "verbatim_text": "三号站台？",
+            "on_screen": true,
+            "response_obligation": "随即松开按键，停一下等回答",
+            "lip_sync_required": true
+          },
+          {
+            "speaker_id": "dispatch-relay",
+            "verbatim_text": "暂无报告",
+            "on_screen": false,
+            "response_obligation": "她看着扬声器不动",
+            "lip_sync_required": false
+          }
+        ]
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "dolly_in",
+        "direction": "forward",
+        "amplitude_class": "subtle",
+        "speed_class": "slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "dong-wenhui",
+        "relation_kind": "reveal",
+        "start_relation": "中景",
+        "end_relation": "她的脸和双手"
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 30,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  }
+}

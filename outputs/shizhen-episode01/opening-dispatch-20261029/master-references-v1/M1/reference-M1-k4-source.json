@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-r2.png",
+  "sha256": "a790c1929c3c516eff56c009915d86d24b551a9b07f011784ac0a8881a1715a1",
+  "size_bytes": 1969913,
+  "width": 1672,
+  "height": 941,
+  "reference_role": "reference",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "semantic_review": "Static review by Parent; user approved the preview package 2026-11-04; not video acceptance",
+  "prompt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K4-rollcall-r2.zh.txt",
+  "prompt_sha256": "e19309beb6916950a6c2feda2ed09f746701ee6a001476f2b27ee58e4fe5c698"
+}

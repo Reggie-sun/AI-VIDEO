@@ -1,0 +1,3 @@
+{"root": "runs/shizhen-opening-dispatch-20261104/M1-r5", "status": "ABANDONED_AT_PREPARE_PLAN_BLOCKED",
+ "reason": "PERFORMANCE_BEATS_REQUIRED (only one performance event); also anchor/event purposes not verbatim in prompt. Added a second performance event and aligned purposes with the prompt text; prompt unchanged.",
+ "generation_POSTs": 0, "paid_reservations": 0, "replacement_root": "runs/shizhen-opening-dispatch-20261104/M1-r6"}

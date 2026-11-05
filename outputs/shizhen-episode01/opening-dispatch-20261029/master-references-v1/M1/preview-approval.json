@@ -1,0 +1,57 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "147c19b04463575d81f892e2ceef202830e0d20ba13b62dbb1bc25f175c44fe0",
+  "unit_ids": [
+    "D1-record-desk",
+    "D5-tally",
+    "D6-station-no-report"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+      "sha256": "053c3678caccf082a341be4c2c888d92a957d77d545009d0133e300fe477f0b7",
+      "role": "scene_reference"
+    },
+    {
+      "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+      "role": "character_reference"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K1-D1-listen-v1.png",
+      "sha256": "3952c9f69588034dae29dadfc6c0845ddc0ef8ec8ea6b9c862e40fa52fca8f54",
+      "role": "scene_reference"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K2-D1-typed-r2.png",
+      "sha256": "76baf2806709415d603234ab658e734162e5a8af9478f04f6a775cfb2f77edb8",
+      "role": "scene_reference"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-r2.png",
+      "sha256": "a790c1929c3c516eff56c009915d86d24b551a9b07f011784ac0a8881a1715a1",
+      "role": "scene_reference"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K3-D5-tally-v1.png",
+      "sha256": "18a27260a2b9d8260511b8be67dd9739457b9f4ca9ef93d3da00ded35a074b1d",
+      "role": "D5 特写关键帧（一镜到底后仅预览）"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/PROP-speaker-notebook-v1.png",
+      "sha256": "50828548b64e4496e8e828f89feb1539a818c5601969b2945538c7ea5ffac3ac",
+      "role": "道具特写（外观与场景图冲突，仅预览）"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+      "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868",
+      "role": "造型参考（仅预览）"
+    },
+    {
+      "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+      "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+      "role": "风格帧（仅预览）"
+    }
+  ],
+  "user_quote": "先别管声音,就说开场的referces给我看下 / 可以 / 生图修图的额度调高可以10次 / 修 K4 后再认可 / seedacne2.5最多放30张,对了直接用seedance生成声音 / 认可，开始生成 / 改一镜到底"
+}

@@ -1,5 +1,5 @@
 {
- "status": "DRAFT_NOT_SUBMITTED",
+ "status": "SUPERSEDED_BY_M1_ROW",
  "selected_route": {
   "model": "seedance_2.5",
   "mode": "multimodal (全能参考)",
@@ -107,5 +107,6 @@
   "canonical bootstrap/prepare（reference_planning、director_coverage、identity）",
   "continuity-supervisor 连续性报告",
   "Budget/egress/permit 一次提交"
- ]
+ ],
+ "superseded_note": "2026-11-04 用户改一镜到底；当前送模方案见 M1/row.json、M1/prepare.json（30 秒、5 张图、continuous）"
 }

@@ -1,0 +1,3 @@
+{"root": "runs/shizhen-opening-dispatch-20261104/M1-r4", "status": "ABANDONED_AT_PREPARE_PLAN_BLOCKED",
+ "reason": "reference_planning.structure=multi_shot raised MULTI_SHOT_NATIVE_CONTROL_UNDECLARED, which the planner treats as blocking. User chose 改一镜到底: continuous take, K3 removed from model inputs (kept in approved preview).",
+ "generation_POSTs": 0, "paid_reservations": 0, "replacement_root": "runs/shizhen-opening-dispatch-20261104/M1-r5"}

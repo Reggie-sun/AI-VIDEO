@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+  "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+  "size_bytes": 2396145,
+  "width": 1536,
+  "height": 1024,
+  "reference_role": "reference",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "semantic_review": "Static review by Parent; user approved the preview package 2026-11-04; not video acceptance",
+  "prompt_path": "referces/shizhen/character-packs-20261027/dong-wenhui/prompts/identity-v1.txt",
+  "prompt_sha256": "d757cb4c9c60e92eced434ca5ed8fdd1c8bf6dbd371dc5f0a4b17f655c5c57ae"
+}

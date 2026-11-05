@@ -39,3 +39,33 @@ Date: 2026-11-04
 - 验证范围：PNG 的 SHA 与尺寸已记录；审看页 13 张图经 8883 服务 HTTP 读取全部返回 200；无工程代码变更，因此未运行 Harness。
 
 `record-ai-video-session`: recorded。`distill-ai-video-learning`: no_candidate。本次是单次静态参考准备，没有受控的多实验证据。
+
+## Master Generation (Seedance 2.5, 480p, 30 s)
+
+用户认可参考包与方案（"认可，开始生成"）。随后本地准备发现，当前运行时把 `reference_planning.structure=multi_shot` 的 `MULTI_SHOT_NATIVE_CONTROL_UNDECLARED` 当作阻断，用户改选"改一镜到底"。导演覆盖升为 `outputs/shizhen-episode01/opening-dispatch-20261029/director-coverage.v6.json`，分镜 `DISPATCH-SHOTBOARD.v5.md` 末尾新增 v6 一节。
+
+- 调用器在单元目录下：`build_master.py`、`bootstrap_master.py`、`execute_master.py`、`jimeng_master.cjs`（沿用 scenes-v1 的模式，经 committer、`GenerationFeedbackOrchestrator`、`VideoGenerationService`、Paid Gate 与一次性 permit 执行）。
+- 准备阶段陆续发现并修正以下问题，每次换新 root：
+  - Scene 未登记全部 scene_reference 图；
+  - 缺少显式 selections；
+  - 画外转报员被列入 Shot Characters；
+  - multi_shot 被规划器阻断；
+  - `PERFORMANCE_BEATS_REQUIRED`；
+  - anchor/event 的 purpose 未逐字出现在提示词中；
+  - 编译器按 asset_id 字母序绑定图片，与提示词编号不符（由任务 lint 拦下）。
+  
+  每个被放弃的 root 都在 `M1/abandoned-root-*.json` 留有记录，生成请求均为 0。
+- `continuity-supervisor` 共审查三轮。第一轮给出 7 个阻断项：PROP 外观冲突、J-cut 下有键盘声、28 秒超时、按键逻辑倒置、终点景别与口型冲突、K4 绑错事件、一镜到底未写回 owner。第二轮只剩 1 个：K2 缺鹅颈麦克风。第三轮无阻断。最终送模 5 张图（ENV-r1、identity-v1、K1、K2-r2、K4-r2），时长 30 秒；PROP 与 K3 只作预览。
+- 提交：M1-r9、M1-r10 两次都在参考图上传时失败，状态为 `known_no_effect`（未提交生成、不扣费）。之后同样 5 张图经 canonical transport 上传全部成功；两次失败期间共享浏览器里另一个会话开着约 15 个即梦标签页，疑似资源争用，根因未证实。诊断见 `M1/r9-upload-failure-diagnosis.json`、`M1/r10-upload-failure-diagnosis.json`。M1-r11 作为最后一个有界单元，提交被受理，查询后成功并已取回。
+- 成片：`runs/shizhen-opening-dispatch-20261104/M1-r11/state/video-generation/fetch/files/9a776d41….mp4`，24,348,614 字节，854×480，30.08 秒，721 帧，AAC 双声道。审看页为 `master-references-v1/review/index.html`。
+- 逐镜 Gate（`shot-gate-reviewer` 子代理，经 project-local video-analysis MCP）判为 **FAIL**，记录在 `master-references-v1/qa/post-media-gate.json`：
+  - camera FAIL：7.9–8.5 秒出现交叉溶接，不是一条连续镜头；
+  - space FAIL：鹅颈麦克风在 8.5–24.3 秒消失；
+  - action FAIL：没有可见的按键再松开；
+  - identity、art PASS；
+  - performance、sound NOT_EVALUATED：audio_understand 返回 `runtime_required`。
+  
+  Whisper 时间戳显示七段对白顺序完整，"暂无报告"在 29.86 秒结束。溶接后的构图接近 K2，K2 本身没有麦克风，这只是待验证的假设。
+- 积分：报价 360 CRD，实际结算待确认。当前 attempt 已停止，没有自动重抽。
+
+`distill-ai-video-learning`: no_candidate。本次是单次生成，加上一组准备期的程序门禁发现，没有受控的多实验对照。

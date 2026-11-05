@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/PROP-speaker-notebook-v1.png",
+  "sha256": "50828548b64e4496e8e828f89feb1539a818c5601969b2945538c7ea5ffac3ac",
+  "size_bytes": 2155855,
+  "width": 1672,
+  "height": 941,
+  "reference_role": "reference",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "semantic_review": "Static review by Parent; user approved the preview package 2026-11-04; not video acceptance",
+  "prompt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/PROP-speaker-notebook.zh.txt",
+  "prompt_sha256": "0667c3e0bad2b602da6b2fab4cd33bc30a1aa29667ec35c6c29dfbc6d75486a8"
+}

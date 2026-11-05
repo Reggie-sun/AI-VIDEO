@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K3-D5-tally-v1.png",
+  "sha256": "18a27260a2b9d8260511b8be67dd9739457b9f4ca9ef93d3da00ded35a074b1d",
+  "size_bytes": 1998000,
+  "width": 1672,
+  "height": 941,
+  "reference_role": "reference",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "semantic_review": "Static review by Parent; user approved the preview package 2026-11-04; not video acceptance",
+  "prompt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K3-D5-tally.zh.txt",
+  "prompt_sha256": "72a889a1e5b46b8616cf639ffa750c6eee8f71522f375b8f0583de2ce8ff6a39"
+}

@@ -1,0 +1,3 @@
+{"root": "runs/shizhen-opening-dispatch-20261104/M1-r6", "status": "ABANDONED_AT_LOCAL_LINT",
+ "reason": "Compiler binds images sorted by asset_id (env, identity, k1, k2, k4, prop); authored prompt numbered identity first. Task lint exact_inputs=false stopped prepare before any start/submit. Prompt numbering and input list now follow actual binding order.",
+ "generation_POSTs": 0, "paid_reservations": 0, "replacement_root": "runs/shizhen-opening-dispatch-20261104/M1-r7"}

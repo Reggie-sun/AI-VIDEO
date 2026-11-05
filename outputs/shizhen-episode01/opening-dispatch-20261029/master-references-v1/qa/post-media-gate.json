@@ -1,0 +1,80 @@
+{
+  "schema": "per-shot-post-media-gate/agent-record",
+  "shot": "M1",
+  "attempt": "shizhen-dispatch-master-M1-preview-001",
+  "root": "runs/shizhen-opening-dispatch-20261104/M1-r11",
+  "media": {
+    "path": "runs/shizhen-opening-dispatch-20261104/M1-r11/state/video-generation/fetch/files/9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0.mp4",
+    "sha256": "9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0",
+    "bytes": 24348614,
+    "width": 854,
+    "height": 480,
+    "duration_s": 30.08,
+    "frames": 721
+  },
+  "reviewer": "shot-gate-reviewer subagent (read-only); video-analysis MCP video_probe/scene_detect/transcribe/extract_frames; audio_understand runtime_required KNOWN_NO_EFFECT",
+  "items": {
+    "identity": {
+      "verdict": "PASS",
+      "evidence": "face crops 1/12/19/22/26/29.5s match identity-v1; same hoodie; single person"
+    },
+    "action": {
+      "verdict": "FAIL",
+      "evidence": "no visible press-then-release at 25.0-26.5s (holds mic stem/head); hands stay near mic base during answer 27-29.9s; speaker out of frame from ~18s so 'looks at speaker' not shown. Achieved: listens before typing (keys from ~3.75s), fingers hover 12.4-14.6s, writes 21-23.5s, pen stops 23.8s, pulls mic 24-25.5s"
+    },
+    "camera": {
+      "verdict": "FAIL",
+      "evidence": "cross-dissolve 7.9-8.5s (double image of lamp/face/notebook) then closer framing: not one continuous push; slight pull-back 23.4-24.4s; face in frame at question 25.7-26.6s"
+    },
+    "performance": {
+      "verdict": "NOT_EVALUATED",
+      "evidence": "visually calm; tone needs listening, audio operator unavailable"
+    },
+    "space": {
+      "verdict": "FAIL",
+      "evidence": "gooseneck mic missing 8.5-24.3s, reappears behind monitor right, not beside speaker; speaker moves from desk corner to front-left of monitor base after dissolve"
+    },
+    "sound": {
+      "verdict": "NOT_EVALUATED",
+      "evidence": "audio_understand runtime_required; Whisper timing only: 7 segments in order, L7 ends 29.86s (0.22s before end)"
+    },
+    "art": {
+      "verdict": "PASS",
+      "evidence": "photoreal, rain night light continuous, no captions/screen text/readable chars"
+    }
+  },
+  "whisper_timing_s": {
+    "L1": [
+      0.0,
+      3.32
+    ],
+    "L2": [
+      4.54,
+      7.96
+    ],
+    "L3": [
+      9.46,
+      12.88
+    ],
+    "L4": [
+      14.16,
+      17.96
+    ],
+    "L5": [
+      20.62,
+      22.44
+    ],
+    "L6": [
+      25.7,
+      26.64
+    ],
+    "L7": [
+      28.38,
+      29.86
+    ]
+  },
+  "diagnosis_hypothesis": "post-dissolve framing closely matches K2 (raw/K2-D1-typed-r2.png), which lacks the gooseneck mic and has the speaker in front of the monitor base; causal link unverified",
+  "verdict": "FAIL",
+  "next": "STOP current attempt; no automatic regeneration; human 1.0x listening and user decision required",
+  "credits": "quote 360 CRD; actual settlement 待确认"
+}

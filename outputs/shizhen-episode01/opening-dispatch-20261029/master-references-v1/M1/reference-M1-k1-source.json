@@ -1,0 +1,14 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "source_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K1-D1-listen-v1.png",
+  "sha256": "3952c9f69588034dae29dadfc6c0845ddc0ef8ec8ea6b9c862e40fa52fca8f54",
+  "size_bytes": 2054687,
+  "width": 1672,
+  "height": 941,
+  "reference_role": "reference",
+  "platform_admission": "NOT_EVALUATED",
+  "generator": "codex exec built-in image_gen (one call)",
+  "semantic_review": "Static review by Parent; user approved the preview package 2026-11-04; not video acceptance",
+  "prompt_path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K1-D1-listen.zh.txt",
+  "prompt_sha256": "97671a714c5c99058b18fcb8138bb64526abd1809093ef254e1313f25e3064ec"
+}
