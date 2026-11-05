@@ -1,0 +1,363 @@
+{
+ "purpose": "v5 记录台对白母带（D1/D5/点名尾段）预览参考包；用户认可后才封存 preview_approval 并进入生成",
+ "user_instruction": [
+  "先别管声音,就说开场的referces给我看下",
+  "可以（同意为 v5 记录台母带做参考包，预览认可后再生成）"
+ ],
+ "date": "2026-11-04",
+ "provider": "codex exec (codex-cli 0.166.0) built-in image_gen",
+ "bounded_unit": {
+  "max_calls": 8,
+  "planned_calls": 6,
+  "repair_reserve": 2,
+  "auto_retry": 0,
+  "unknown_outcome_rule": "STOP; no retry or fallback",
+  "video_calls": 0,
+  "calls_used": 8,
+  "closed": true,
+  "calls_used_total": 10
+ },
+ "actual_model_id": "NOT_EXPOSED",
+ "actual_billing": "NOT_EXPOSED",
+ "anchors": {
+  "identity": {
+   "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+   "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+   "duty": "董文慧脸型、五官、发际线、年龄感；不继承灰底、打底衫、四宫格排版"
+  },
+  "costume": {
+   "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+   "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868",
+   "duty": "宏观开场同夜造型：灰褐连帽外套、深灰内搭、深灰裤、低马尾；不继承楼梯场景、动作与构图"
+  },
+  "style": {
+   "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+   "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed",
+   "duty": "已认可市政片的雨夜写实质感与冷暖光色；不继承内容、构图与 AI生成 水印"
+  }
+ },
+ "planned": [
+  {
+   "id": "ENV-desk-room",
+   "duty": "scene_environment：记录台空间、物件布局与光位",
+   "refs": [
+    "style"
+   ]
+  },
+  {
+   "id": "PROP-speaker-notebook",
+   "duty": "product_object：桌面扬声器（绿灯）与纸本记录本细节",
+   "refs": [
+    "style"
+   ]
+  },
+  {
+   "id": "K1-D1-listen",
+   "duty": "temporal_keyframe：D1 起态，扬声器亮着、她在听并打字",
+   "refs": [
+    "identity",
+    "costume",
+    "ENV-desk-room"
+   ]
+  },
+  {
+   "id": "K2-D1-typed",
+   "duty": "temporal_keyframe：D1 末态（轻推后），敲完这条，屏幕光在手与脸上",
+   "refs": [
+    "identity",
+    "costume",
+    "ENV-desk-room"
+   ]
+  },
+  {
+   "id": "K3-D5-tally",
+   "duty": "temporal_keyframe：D5 记录本上多写一行、笔停住（字迹不可读）",
+   "refs": [
+    "identity",
+    "costume",
+    "PROP-speaker-notebook"
+   ]
+  },
+  {
+   "id": "K4-rollcall",
+   "duty": "temporal_keyframe：点名尾段，按麦克风键问三号站台、看着扬声器等回答",
+   "refs": [
+    "identity",
+    "costume",
+    "ENV-desk-room"
+   ]
+  }
+ ],
+ "calls": [
+  {
+   "id": "ENV-desk-room-v1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "REJECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/ENV-desk-room.zh.txt",
+   "prompt_sha256": "2ed14ec7288b1539bbc2eeddfbf861b7f7222f7296b14d63fea1b75c9644f4d6",
+   "inputs": [
+    {
+     "role": "参考一 质感",
+     "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+     "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-v1.png",
+   "sha256": "2159e2ebea5fc5ea6b1262163afeb72e5b1c1b7ebdddbb48435795c247fb7276",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "布局、物件与光位成立；桌面满是水珠与锈水渍，室内桌面像淋湿，会带入后续关键帧；鹅颈麦克风底座为多键",
+   "repair_of": null
+  },
+  {
+   "id": "PROP-speaker-notebook-v1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "SELECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/PROP-speaker-notebook.zh.txt",
+   "prompt_sha256": "0667c3e0bad2b602da6b2fab4cd33bc30a1aa29667ec35c6c29dfbc6d75486a8",
+   "inputs": [
+    {
+     "role": "参考一 质感",
+     "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+     "sha256": "a2cef0e9ff42796e09e72105bb04ea336149b4551a20dc767ffdd3179910eeed"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/PROP-speaker-notebook-v1.png",
+   "sha256": "50828548b64e4496e8e828f89feb1539a818c5601969b2945538c7ea5ffac3ac",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "扬声器绿灯、单键鹅颈麦克风、手写不可读笔迹、签字笔均成立；无可读文字",
+   "repair_of": null
+  },
+  {
+   "id": "ENV-desk-room-r1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "SELECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/ENV-desk-room-r1.zh.txt",
+   "prompt_sha256": "f7cfa630948ac57ec1ce5b35d5d4e84389fcf9cf476298857f3d3094a31d95db",
+   "inputs": [
+    {
+     "role": "参考一 编辑底图",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-v1.png",
+     "sha256": "2159e2ebea5fc5ea6b1262163afeb72e5b1c1b7ebdddbb48435795c247fb7276"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+   "sha256": "053c3678caccf082a341be4c2c888d92a957d77d545009d0133e300fe477f0b7",
+   "width": 1671,
+   "height": 941,
+   "parent_observation": "桌面已干燥、麦克风底座改单键，其余布局保留；宽1671（未暗中缩放）",
+   "repair_of": "repair of ENV-desk-room-v1"
+  },
+  {
+   "id": "K1-D1-listen-v1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "SELECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K1-D1-listen.zh.txt",
+   "prompt_sha256": "97671a714c5c99058b18fcb8138bb64526abd1809093ef254e1313f25e3064ec",
+   "inputs": [
+    {
+     "role": "参考一 身份",
+     "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+     "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    },
+    {
+     "role": "参考二 造型",
+     "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+     "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868"
+    },
+    {
+     "role": "参考三 场景",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+     "sha256": "053c3678caccf082a341be4c2c888d92a957d77d545009d0133e300fe477f0b7"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K1-D1-listen-v1.png",
+   "sha256": "3952c9f69588034dae29dadfc6c0845ddc0ef8ec8ea6b9c862e40fa52fca8f54",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "同一房间与物件位置；灰褐连帽外套、低马尾；双手在键盘、望向显示器方向；身份与参考一相近（静态判断）",
+   "repair_of": null
+  },
+  {
+   "id": "K2-D1-typed-v1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "REJECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K2-D1-typed.zh.txt",
+   "prompt_sha256": "5cf949f185fb73e8a993589cdc6dda1ce7dfa1b10af07c8b8180e4a156b49dd9",
+   "inputs": [
+    {
+     "role": "参考一 身份",
+     "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+     "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    },
+    {
+     "role": "参考二 造型",
+     "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+     "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868"
+    },
+    {
+     "role": "参考三 场景",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+     "sha256": "053c3678caccf082a341be4c2c888d92a957d77d545009d0133e300fe477f0b7"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K2-D1-typed-v1.png",
+   "sha256": "81b5f3f92294a073299738d1c100dcd75d3af53899711a47589beda6d15d3d10",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "空间漂移：台灯形制、桌面材质、显示器全部改变，机位换到她左侧；面部偏成熟",
+   "repair_of": null
+  },
+  {
+   "id": "K3-D5-tally-v1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "SELECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K3-D5-tally.zh.txt",
+   "prompt_sha256": "72a889a1e5b46b8616cf639ffa750c6eee8f71522f375b8f0583de2ce8ff6a39",
+   "inputs": [
+    {
+     "role": "参考一 身份",
+     "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+     "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    },
+    {
+     "role": "参考二 袖口",
+     "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+     "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868"
+    },
+    {
+     "role": "参考三 道具",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/PROP-speaker-notebook-v1.png",
+     "sha256": "50828548b64e4496e8e828f89feb1539a818c5601969b2945538c7ea5ffac3ac"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K3-D5-tally-v1.png",
+   "sha256": "18a27260a2b9d8260511b8be67dd9739457b9f4ca9ef93d3da00ded35a074b1d",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "右手握笔停在新一行末尾、左手按纸；笔迹不可读；灰褐袖口与扬声器绿灯可见；桌面略有反光",
+   "repair_of": null
+  },
+  {
+   "id": "K4-rollcall-v1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "CANDIDATE_WITH_ISSUES",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K4-rollcall.zh.txt",
+   "prompt_sha256": "69def889815603f9fdb242a5d48e8b5230c85e5134f258f31ae289d605c61d88",
+   "inputs": [
+    {
+     "role": "参考一 身份",
+     "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+     "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+    },
+    {
+     "role": "参考二 造型",
+     "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+     "sha256": "31438f17398fc7f2743cfcc7670a0cd4f08db563b83be1af8234352e88fe2868"
+    },
+    {
+     "role": "参考三 场景",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+     "sha256": "053c3678caccf082a341be4c2c888d92a957d77d545009d0133e300fe477f0b7"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-v1.png",
+   "sha256": "c8473a5a778fdfdd5cd54f223111594434243655dcc565c80e64067589262b25",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "空间一致；用右手（画面左）按麦克风键、对麦克风开口，物理上自然；但表情惊慌、身体从显示器后探出，和“平静而专注、越平淡越不安”不符；额度已用完未修",
+   "repair_of": null
+  },
+  {
+   "id": "K2-D1-typed-r1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "SUPERSEDED_BY_K2-D1-typed-r2",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K2-D1-typed-r1.zh.txt",
+   "prompt_sha256": "0bd1e772a0d81dfc581733a94e3d3238bedb6fe3d9f64f2122ddde3ddc178b2e",
+   "inputs": [
+    {
+     "role": "参考一 编辑底图",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K1-D1-listen-v1.png",
+     "sha256": "3952c9f69588034dae29dadfc6c0845ddc0ef8ec8ea6b9c862e40fa52fca8f54"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K2-D1-typed-r1.png",
+   "sha256": "ef32f8431a3be139edcdfc3fdfb3b9d9b1a8e81b72d36f0baa98d7f844e259fa",
+   "width": 1536,
+   "height": 1024,
+   "parent_observation": "以K1推近，同一人、同衣服、同房间；手指搭在键上而非停在键上方；输出为1536×1024（3:2）非16:9，未裁切",
+   "repair_of": "repair of K2-D1-typed-v1"
+  },
+  {
+   "id": "K4-rollcall-r1",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "CANDIDATE_WITH_ISSUES",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K4-rollcall-r1.zh.txt",
+   "prompt_sha256": "af1c97424c398542f717aefdf29a174f9758027eec79d7ebdb3f7451eec7eb2e",
+   "inputs": [
+    {
+     "role": "参考一 编辑底图",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-v1.png",
+     "sha256": "c8473a5a778fdfdd5cd54f223111594434243655dcc565c80e64067589262b25"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-r1.png",
+   "sha256": "84fb7eead50525cd56c8401e8284936e144e23ac5014eaf1eb39ae9a75d83e0d",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "表情已较平静（眼不再睁大、眉放松）；但身体仍从显示器左侧探出，没有坐回——根因是场景里麦克风在显示器左边、座位在右边，布局本身逼她探身；目光偏向麦克风而非扬声器",
+   "repair_of": "repair of K4-rollcall-v1"
+  },
+  {
+   "id": "K2-D1-typed-r2",
+   "status": "KNOWN_OUTPUT",
+   "verdict": "SELECTED",
+   "prompt": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/prompts/K2-D1-typed-r2.zh.txt",
+   "prompt_sha256": "99dcbc0f3bf4842f119b485387b3034e869fe95c47275ba5fa8611ea6f762bc3",
+   "inputs": [
+    {
+     "role": "参考一 编辑底图",
+     "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K2-D1-typed-r1.png",
+     "sha256": "ef32f8431a3be139edcdfc3fdfb3b9d9b1a8e81b72d36f0baa98d7f844e259fa"
+    }
+   ],
+   "output": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K2-D1-typed-r2.png",
+   "sha256": "76baf2806709415d603234ab658e734162e5a8af9478f04f6a775cfb2f77edb8",
+   "width": 1672,
+   "height": 941,
+   "parent_observation": "16:9（1672×941）；手指停在键盘上方；同一人、同衣服、同房间；推近景别成立",
+   "repair_of": "repair of K2-D1-typed-r1 aspect/hands"
+  }
+ ],
+ "selected_package": {
+  "identity": "identity-v1(既有)",
+  "environment": "ENV-desk-room-r1",
+  "prop": "PROP-speaker-notebook-v1",
+  "keyframes": [
+   "K1-D1-listen-v1",
+   "K2-D1-typed-r2",
+   "K3-D5-tally-v1",
+   "K4-rollcall-r1(有问题待用户裁决)"
+  ],
+  "style_frames": [
+   "MC01-normal.png(已认可市政)"
+  ],
+  "model_input_selection": "NOT_DECIDED：所选Seedance 2.5模式与图数上限尚未核对；全部图先作预览",
+  "human_preview_approval": "PENDING"
+ },
+ "bounded_unit_continuation": {
+  "user_instruction": "生图修图的额度调高可以10次",
+  "previous_max_calls": 8,
+  "previous_calls_used": 8,
+  "new_max_calls_total": 10,
+  "calls_added": 2,
+  "planned": [
+   "K4-rollcall-r1",
+   "K2-D1-typed-r2"
+  ],
+  "auto_retry": 0,
+  "unknown_outcome_rule": "STOP",
+  "calls_used": 2
+ }
+}
