@@ -1,0 +1,111 @@
+{
+ "status": "DRAFT_NOT_SUBMITTED",
+ "selected_route": {
+  "model": "seedance_2.5",
+  "mode": "multimodal (全能参考)",
+  "surface": "Jimeng browser transport",
+  "duration_seconds": 28,
+  "resolution": "480p (2.5 先试片，认可后才1080p)",
+  "aspect_ratio": "16:9",
+  "native_audio": true,
+  "capability_check": "src/ai_video/production/jimeng_models.py & seedance_capabilities.py: 2.5 max 30s, max_reference_images 30; 用户确认最多30张",
+  "current_profile_readback": "NOT_EVALUATED（未读取当前画布实时配置）"
+ },
+ "coverage": "同一地点一次生成三个机位（multi_shot，不是一镜到底）：镜头一中景推近 L1–L4（约21秒，中段画面剪辑时被现场镜头替换，只用其声音）；镜头二记录本特写 L5（约3秒）；镜头三中近景点名 L6/L7（约4秒）",
+ "timing_rationale": "L2–L4 音频要铺在 D2(5s)/D3(5.5s)/D4(6s) 下，所以每句后留约两秒；总计约28秒",
+ "dialogue": [
+  "L1 扬声器：检修口报，电闸断了，绞盘还在收",
+  "L2 扬声器：七号楼报，下了三层，还在原来那层",
+  "L3 扬声器：急诊说，系统里她已经死了，人还躺着",
+  "L4 扬声器：人民路有人喊救命，在七楼，七楼早就封了",
+  "L5 董文慧：记上，第十四起",
+  "L6 董文慧：三号站台？",
+  "L7 扬声器：暂无报告"
+ ],
+ "model_inputs": [
+  {
+   "index": 0,
+   "path": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+   "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458",
+   "role": "identity",
+   "transfers": "董文慧长相",
+   "must_not_transfer": "不继承灰底、打底衫、四格排版"
+  },
+  {
+   "index": 1,
+   "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/ENV-desk-room-r1.png",
+   "sha256": "053c3678caccf082a341be4c2c888d92a957d77d545009d0133e300fe477f0b7",
+   "role": "scene_environment",
+   "transfers": "记录室布局、物件位置、光线",
+   "must_not_transfer": "不继承空椅子状态"
+  },
+  {
+   "index": 2,
+   "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/PROP-speaker-notebook-v1.png",
+   "sha256": "50828548b64e4496e8e828f89feb1539a818c5601969b2945538c7ea5ffac3ac",
+   "role": "product_object",
+   "transfers": "扬声器、单键麦克风、记录本外观",
+   "must_not_transfer": "不继承无人特写构图"
+  },
+  {
+   "index": 3,
+   "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K1-D1-listen-v1.png",
+   "sha256": "3952c9f69588034dae29dadfc6c0845ddc0ef8ec8ea6b9c862e40fa52fca8f54",
+   "role": "temporal_keyframe",
+   "transfers": "镜头一起态：中景、边听边打字；外套与站位",
+   "must_not_transfer": "不当首帧硬锁"
+  },
+  {
+   "index": 4,
+   "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K2-D1-typed-r2.png",
+   "sha256": "76baf2806709415d603234ab658e734162e5a8af9478f04f6a775cfb2f77edb8",
+   "role": "temporal_keyframe",
+   "transfers": "镜头一推近后：手停在键盘上方",
+   "must_not_transfer": ""
+  },
+  {
+   "index": 5,
+   "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K3-D5-tally-v1.png",
+   "sha256": "18a27260a2b9d8260511b8be67dd9739457b9f4ca9ef93d3da00ded35a074b1d",
+   "role": "temporal_keyframe",
+   "transfers": "镜头二：记录本特写、笔停住",
+   "must_not_transfer": "笔迹不可读"
+  },
+  {
+   "index": 6,
+   "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/raw/K4-rollcall-r2.png",
+   "sha256": "a790c1929c3c516eff56c009915d86d24b551a9b07f011784ac0a8881a1715a1",
+   "role": "temporal_keyframe",
+   "transfers": "镜头三：麦克风拉到面前按键问话",
+   "must_not_transfer": "目光应落到扬声器（参考图偏麦克风）"
+  }
+ ],
+ "preview_only": [
+  {
+   "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC03-descent-side-v2.png",
+   "why": "造型已由K1–K4承载；楼梯场景易迁移"
+  },
+  {
+   "path": "referces/shizhen/macro-opening-20261027/full-opening-references-20261027/MC01-normal.png",
+   "why": "带“AI生成”水印，风格已由K图承载"
+  }
+ ],
+ "prompt": {
+  "path": "outputs/shizhen-episode01/opening-dispatch-20261029/master-references-v1/authoring/master-native-prompt.draft.zh.txt",
+  "sha256": "92765916e5e7953b133ec70af2f733eccc0c6acd7ed9d06fa700b7db7b74958f",
+  "chars": 561,
+  "chars_without_markers": 506
+ },
+ "authoring_warnings": [
+  "官方建议中文≤500字，当前去掉引用后约500字",
+  "台词节奏与停顿不保证精确，需逐镜Gate与听审",
+  "转报员声线由模型自行生成，未经试听；董文慧声线同理",
+  "镜头二她嘴不入画，“记上，第十四起”为画内低声"
+ ],
+ "pending_before_submit": [
+  "用户明确认可参考包与本方案并封存 preview_approval",
+  "canonical bootstrap/prepare（reference_planning、director_coverage、identity）",
+  "continuity-supervisor 连续性报告",
+  "Budget/egress/permit 一次提交"
+ ]
+}
