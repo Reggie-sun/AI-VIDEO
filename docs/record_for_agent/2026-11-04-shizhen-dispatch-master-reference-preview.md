@@ -73,3 +73,12 @@ Date: 2026-11-04
 ## User Salvage Decision
 
 用户原速听过母带后选择"声音可以，剪辑保住"，记录在 `master-references-v1/qa/user-decision-salvage.json`。母带声音作为对白母版；画面只用 0–4.5 秒（D1）和写字段约 20.6–23.8 秒（D5）。Gate FAIL 保留，不改写。下一步是组装：市政片 → D1 → D2r1/D3/D4r1 → D5 → D6 → B6，加字幕，走 HyperFrames + `verify-assembly`。D4 的呼救声和 D6 的时钟仍未处理。
+
+## Review Rough Cut 01
+
+用户要求"做一下我看看"。为了先交片看节奏，用 ffmpeg 做了一版**非 canonical 审看粗剪**（`outputs/shizhen-episode01/opening-dispatch-20261029/assembly-review-v1/`，脚本 `assemble_review.py`，`receipt.json` 记录 exact 来源 SHA 和时间线）。它不是 HyperFrames 正式渲染，也不是正式连续版；正式版要在用户认可剪辑方案后走 CompositionSpec → ResolvedTimeline → HyperFrames。
+
+- 时长 57.9 秒，1920×1080，24fps，约 15.4 Mbps，AAC 48k。整片解码通过。
+- 结构：市政原片（第一句 J-cut，原声压低）→ D1 母带 3.40–4.50 秒 → D2r1、D3、D4r1 各配一句母带对白，现场原声 −8 dB → D5 母带 19.8–23.9 秒 → D6 配点名问答 → B6 原片。
+- 字幕按 Whisper 估计的时间生成，误差约 ±0.2 秒，句尾不加标点。
+- 已知缺口：D4 呼救声；母带从 480p 放大；字幕时间未精对。D6 生成画面里站牌时钟已显示 03:16:53，没有做走秒。用户原速观看和听审尚未进行。

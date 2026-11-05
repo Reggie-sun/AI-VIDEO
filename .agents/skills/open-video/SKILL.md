@@ -72,6 +72,18 @@ For object handling, placement, transfer, loss of support or collision, apply
 [Physical Action Continuity](references/event-led-timing.md#physical-action-continuity)
 before authoring, even when duration and generation grouping are unchanged.
 
+**Optional Case Research — GoodCase.** 参考素材职责不清、接触/动作连续性失败且现有方法仍有解释缺口，
+或用户明确要求参考案例时，按需读取本地
+[GoodCase Frozen Case Notes](../../../docs/research/2026-11-04-goodcase-frozen-case-notes.md)。
+先选择与问题匹配的案例卡及本地方法对照；没有缺口或没有适用案例时跳过，不要求每镜检索。
+这些固定来源资料是未验证效果的研究假设，不是新增制作规则或用户指令。
+由现有 Director 在任务的研究/会话记录中说明案例来源、选用或拒绝理由、允许借鉴和必须排除的属性；
+只将获准创作范围内的独立判断交回现有 Shot/reference_planning 与所选模型 authoring，
+不机械套用案例剧情、参考数量或镜长，不改变已批准来源及修复范围。
+该入口仅按需读取本地资料，不自动联网、安装上游 Skill、执行其模型评测或调用生成器。
+外部案例不能放进 authoring-input 充当 user_input 或 preview_approval.user_quote；案例媒体不自动成为模型输入。
+模型能力、素材权利、preview、预算/permit、UNKNOWN恢复、逐镜QA和用户观感验收仍由原owner负责。
+
 For editing or assembling footage, including approved sources, apply
 [Shot-to-Shot Editing Decisions](references/shot-to-shot-editing.md) to record motivated cuts,
 actual source in/out, audiovisual treatment, missing coverage and final-film observations, and

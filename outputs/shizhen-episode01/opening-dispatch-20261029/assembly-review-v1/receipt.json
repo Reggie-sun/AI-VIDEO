@@ -1,0 +1,232 @@
+{
+  "kind": "review-rough-cut/ffmpeg (non-canonical; not HyperFrames, not Production)",
+  "sources": {
+    "municipal": {
+      "path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-edit-v4/失帧-市政异常-1080p-剪辑修订04.mp4",
+      "sha256": "b3d5a404eaf19453081309754ad11b997725d81130973a991530a78ff663f05d"
+    },
+    "master": {
+      "path": "runs/shizhen-opening-dispatch-20261104/M1-r11/state/video-generation/fetch/files/9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0.mp4",
+      "sha256": "9a776d418aff76d3da97c9e37677780e5c39931b852028ed7def612b186d2fa0"
+    },
+    "D2r1": {
+      "path": "runs/shizhen-opening-dispatch-20261030/D2r1/state/video-generation/fetch/files/5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a.mp4",
+      "sha256": "5946ddfe72ebac4e5dbf088f34022d24f574d36870db6fa60bcd7ab78ce6af1a"
+    },
+    "D3": {
+      "path": "runs/shizhen-opening-dispatch-20261030/D3/state/video-generation/fetch/files/b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f.mp4",
+      "sha256": "b312bba5ba817919f045fc4266469a77e93eb5b901d967332256210f76ccf85f"
+    },
+    "D4r1": {
+      "path": "runs/shizhen-opening-dispatch-20261030/D4r1/state/video-generation/fetch/files/f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67.mp4",
+      "sha256": "f9eb9fefe358566f1c97881bdfad84a3f730534198b0b9c0f7b2c1f1900acb67"
+    },
+    "D6": {
+      "path": "runs/shizhen-opening-dispatch-20261030/D6/state/video-generation/fetch/files/30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa.mp4",
+      "sha256": "30808fbb724021960159a3419be9b99dfc09dc898136f97c564bdcc8e607acaa"
+    },
+    "B6": {
+      "path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+      "sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a"
+    }
+  },
+  "picture": [
+    [
+      "municipal",
+      0.0,
+      6.833
+    ],
+    [
+      "master",
+      3.4,
+      4.5
+    ],
+    [
+      "D2r1",
+      0.0,
+      6.0
+    ],
+    [
+      "D3",
+      0.0,
+      6.0
+    ],
+    [
+      "D4r1",
+      0.0,
+      7.0
+    ],
+    [
+      "master",
+      19.8,
+      23.9
+    ],
+    [
+      "D6",
+      0.0,
+      5.0
+    ],
+    [
+      "B6",
+      0.0,
+      21.875
+    ]
+  ],
+  "segment_starts": {
+    "MUN": 0.0,
+    "D1": 6.833,
+    "D2": 7.933,
+    "D3": 13.933,
+    "D4": 19.933,
+    "D5": 26.933,
+    "D6": 31.033,
+    "B6": 36.033
+  },
+  "audio": [
+    [
+      "municipal",
+      0.0,
+      6.833,
+      0.0,
+      null
+    ],
+    [
+      "master",
+      0.0,
+      3.45,
+      3.25,
+      0
+    ],
+    [
+      "master",
+      3.4,
+      4.5,
+      6.833,
+      0
+    ],
+    [
+      "D2r1",
+      0.0,
+      6.0,
+      7.933,
+      -8
+    ],
+    [
+      "master",
+      4.45,
+      8.1,
+      8.333,
+      0
+    ],
+    [
+      "D3",
+      0.0,
+      6.0,
+      13.933,
+      -8
+    ],
+    [
+      "master",
+      9.35,
+      13.0,
+      14.333,
+      0
+    ],
+    [
+      "D4r1",
+      0.0,
+      7.0,
+      19.933,
+      -8
+    ],
+    [
+      "master",
+      14.05,
+      18.1,
+      20.333,
+      0
+    ],
+    [
+      "master",
+      19.8,
+      23.9,
+      26.933,
+      0
+    ],
+    [
+      "D6",
+      0.0,
+      5.0,
+      31.033,
+      -6
+    ],
+    [
+      "master",
+      25.5,
+      26.8,
+      31.333000000000002,
+      0
+    ],
+    [
+      "master",
+      28.2,
+      30.0,
+      33.433,
+      0
+    ],
+    [
+      "B6",
+      0.0,
+      21.875,
+      36.033,
+      0
+    ]
+  ],
+  "subtitles": [
+    [
+      "检修口报，电闸断了，绞盘还在收",
+      3.25,
+      6.57
+    ],
+    [
+      "七号楼报，下了三层，还在原来那层",
+      8.423,
+      11.843
+    ],
+    [
+      "急诊说，系统里她已经死了，人还躺着",
+      14.443000000000001,
+      17.863
+    ],
+    [
+      "人民路有人喊救命，在七楼，七楼早就封了",
+      20.442999999999998,
+      24.243
+    ],
+    [
+      "记上，第十四起",
+      27.753,
+      29.573
+    ],
+    [
+      "三号站台",
+      31.533,
+      32.473
+    ],
+    [
+      "暂无报告",
+      33.613,
+      35.093
+    ]
+  ],
+  "total_seconds": 57.908,
+  "output": "outputs/shizhen-episode01/opening-dispatch-20261029/assembly-review-v1/失帧-调度对讲开场-审看粗剪01.mp4",
+  "output_sha256": "eee3c9443da42a93df87dd7fdf37b899a60efd6af74c557f93754ce92bd54076",
+  "known_gaps": [
+    "D4 木板后呼救声未做",
+    "D6 站牌时钟未补",
+    "字幕时间来自 Whisper 估计（±0.2s）",
+    "母带 480p 放大到 1080p",
+    "正式连续版须走 CompositionSpec→ResolvedTimeline→HyperFrames"
+  ]
+}
