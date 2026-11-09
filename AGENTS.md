@@ -2,7 +2,7 @@
 
 本文件是仓库根本规则（constitution），每次会话都加载，只放授权、安全、唯一归属（owner）与完成标准；程序可检查的约束归 Harness，细节见下文链接，用到再读。
 
-本文件对 Codex 与 Claude Code 通用：「主会话」（Parent）指直接与用户对话的 Agent，「子代理」指它派出的 Agent，「编排层」指全局 workflow 工具（Codex 为 OMX，Claude Code 为 OMC）。默认中文；path、command、API、schema、Skill 名保持原文。
+本文件对 Codex 与 Claude Code 通用：「主会话」（Parent）指直接与用户对话的 Agent（团队制作中指当前登记的制片 Agent），「子代理」指它派出的 Agent，「编排层」指全局 workflow 工具（Codex 为 OMX，Claude Code 为 OMC）。默认中文；path、command、API、schema、Skill 名保持原文。
 
 ## Runtime Truth Sources
 

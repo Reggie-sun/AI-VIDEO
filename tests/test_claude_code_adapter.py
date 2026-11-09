@@ -196,6 +196,57 @@ def test_claude_md_maps_codex_workflow_terms_to_claude_runtime() -> None:
         assert retired not in text
 
 
+def test_resident_specialist_drafting_routes_through_main_session() -> None:
+    # 常驻专业岗不是主会话也不是子代理：规则正文只在 matrix，AGENTS/adapter 只留定义与指针；
+    # 写入槽交接例外按 v9 §4.1/§4.6，测试跟随该契约，不锁死已撤回的「一律归主会话」措辞。
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    matrix = (ROOT / "docs" / "agent-primary-contract-matrix.md").read_text(encoding="utf-8")
+    assert "团队制作中指当前登记的制片 Agent" in agents
+    rows = [line for line in matrix.splitlines() if line.startswith("| Resident Specialist Drafting |")]
+    assert len(rows) == 1
+    cells = rows[0].split("|")
+    assert len(cells) == 7  # 5 列，正文不得含裸 `|`
+    owner, invariants, forbidden = cells[2], cells[3], cells[4]
+    # 按单元格断言：Forbidden 的「未经……」不能替 Invariants 的正向句过关。
+    for term in (
+        "导入、激活（Registry、Manifest、`ProductionStateCommitter`）",
+        "commit/push 归当时唯一写入者（默认制片 Agent）",
+        "付费/远程/账号类提交与既有台账归当前登记的制片 Agent",
+    ):
+        assert term in owner, term
+    for term in (
+        "不是主会话",
+        "无法确认即视为身份未知",
+        "只有一个写入者",
+        "经 7 项材料交接取得写入槽，原持有者停止写入",
+        "持槽者只经 canonical owner 执行交接中列明的项目内操作",
+        "导入、激活（Registry、Manifest、`ProductionStateCommitter`）",
+        "草稿转为创作意图始终经主会话导入并由用户批准，持槽不改变",
+        "commit/push 另须用户本人对该操作的授权",
+        "付费/远程/账号类提交与既有台账始终归制片 Agent",
+        "不带来付费、生产或 commit/push 授权",
+        "质检与评析报告是 advisory，不代替逐 Shot Gate、HUMAN review、P6 或 Final Acceptance",
+    ):
+        assert term in invariants, term
+    for term in (
+        "未经 7 项材料交接取得写入槽即写项目路径",
+        "持槽执行交接未列明的操作",
+        "专业岗提交 Provider/付费/远程/账号类调用或操作既有台账",
+        "未经用户本人授权由专业岗 commit/push",
+        "未经导入与用户批准把草稿当已批准意图",
+        "多写入者并发",
+        "主会话经 `omc ask` 或外部 CLI 调用专业岗",
+    ):
+        assert term in forbidden, term
+    adapter = CLAUDE_MD.read_text(encoding="utf-8").splitlines()
+    creative = [line for line in adapter if "创作主线（导演" in line]
+    dispatch = [line for line in adapter if line.startswith("- 派发规则")]
+    assert len(creative) == 1 and len(dispatch) == 1
+    assert "matrix「Resident Specialist Drafting」经主会话导入、用户批准后才成为创作意图" in creative[0]
+    assert "常驻专业岗未持写入槽时同样只产出草稿" in dispatch[0]
+    assert "matrix「Resident Specialist Drafting」" in dispatch[0]
+
+
 AGENTS_DIR = ROOT / ".claude" / "agents"
 # 领域专职角色：只承担适合冷启动隔离的独立检查与重工具/重检索工作；创作主线留在主会话。
 # 只产出建议与草稿；付费提交、Production state 与 commit/push 归主会话。
