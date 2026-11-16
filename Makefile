@@ -7,7 +7,7 @@ LEVEL ?= related
 .PHONY: frontend harness-inspect harness-verify harness-verify-range harness-receipt harness-audit harness-repository harness-test harness-focused harness-related harness-full
 
 frontend:
-	cd provider-console && npm run dev -- --host 127.0.0.1
+	cd provider-console && CHOKIDAR_USEPOLLING="$${CHOKIDAR_USEPOLLING:-1}" CHOKIDAR_INTERVAL="$${CHOKIDAR_INTERVAL:-500}" npm run dev -- --host 127.0.0.1
 
 harness-inspect:
 	python scripts/agent_harness.py inspect --level "$(LEVEL)"
