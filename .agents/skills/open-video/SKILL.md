@@ -1,6 +1,6 @@
 ---
 name: open-video
-description: "Use the pinned awesome-seedance production workflow as the default creative method for AI-VIDEO Director review of selected source plans, or Director design when raw creative input for new creation or authorized optimization—missing, vague direction, concept, script, reference-led brief, or draft prompt—needs approved Shots and ordered coverage; guidance is advisory and must return to AI-VIDEO contracts. Also trigger for 拼接、剪辑、连续审看, including joining already-approved Shots: judge adjacent cuts and assembled footage for narrative, performance, pacing and audiovisual continuity; single-Shot approval does not replace assembled-film review."
+description: "Use the pinned awesome-seedance production workflow as the default creative method for AI-VIDEO Director review of selected source plans, or Director design when raw creative input for new creation or authorized optimization—missing, vague direction, concept, script, reference-led brief, or draft prompt—needs approved Shots and ordered coverage; guidance is advisory and must return to AI-VIDEO contracts. Also trigger for 拼接、剪辑、连续审看, including joining already-approved Shots: judge adjacent cuts and assembled footage for narrative, performance, pacing and audiovisual continuity; single-Shot approval does not replace assembled-film review. Not for Provider selection or technical prompt adaptation alone, and not a replacement for the per-Shot post-media Gate."
 ---
 
 # open-video — Awesome Seedance Creative Workflow

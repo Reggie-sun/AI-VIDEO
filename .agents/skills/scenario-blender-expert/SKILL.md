@@ -1,6 +1,6 @@
 ---
 name: scenario-blender-expert
-description: "Use when doing any 3D work in Blender through Python or an MCP bridge, headless or in a live session: modeling, sculpting a character or head, retopology, UV unwrapping, baking, texturing, rigging, animating, previs, geometry nodes, lighting and rendering, grease pencil, or finishing an AI-generated mesh into a production asset. Also when a bpy script fails on Blender 5.x API changes, a brush or sculpt operator fails or crashes headless, or a result has to be judged like a professional 3D artist would."
+description: "Use for the shared execution protocol before every Blender task, and for general modeling, materials, lighting, rendering or bpy/MCP API diagnosis. Load additional blockout, animation, rigging or previs skills only for the corresponding task. Not for video Provider selection, submission or media acceptance."
 license: MIT
 ---
 

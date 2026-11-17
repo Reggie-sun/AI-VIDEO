@@ -1,10 +1,6 @@
 ---
 name: h3-video
-description: >
-  MiniMax H3 local video authoring for AI-VIDEO: official 3-field prompts, T2V/I2V/FL2VA mode
-  choice, validated local settings, local ComfyUI lifecycle via scripts/comfyui_supervisor.py,
-  and the mandatory per-Shot post-media Gate. Use when a selected route is H3 / MiniMax H3.
-  Triggers: H3, MiniMax H3, T2V, I2V, FL2VA.
+description: "Use only after MiniMax H3 is selected for an approved AI-VIDEO Shot: adapt prompts, local settings and mode choice to H3. Generic T2V, I2V or FL2VA terms do not select this Provider. Not for Seedance, Vidu, original story design or provider-neutral single-Shot quality review."
 ---
 
 # H3 Video Authoring

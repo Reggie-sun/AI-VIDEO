@@ -183,7 +183,7 @@ learning evaluation。Trivial/unfinished 明确 no_record；无合格学习 evid
 ## Agent Workflow Operations
 
 ### Workflow Selection
-Agent workflow owner 为全局 OMX `~/.codex/AGENTS.md` 及当前安装的 OMX Skills。明确有界任务直接 understand → execute → verify → report；需要规划时用 `$plan`，明确要求自主编排时用 `$autopilot`，持续多目标用 `$ultragoal`，确有多 lane 协调价值时用 `$team`；调用前读对应 Skill。旧 Superpowers 自动 planning 与 SUBAGENTS profile/review 路由退役；Harness 保留测试、exact snapshot 和 receipt 职责，paid/credential/recovery/QA gates 保留。
+Agent workflow 归全局 OMX `~/.codex/AGENTS.md` 与已安装 Skills；[角色映射](../../docs/skill-agent-routing.md)说明跨 CLI 职责与加载边界。有界任务直接 understand → execute → verify → report；规划用 `$plan`，显式自主编排用 `$autopilot`，持续多目标用 `$ultragoal`，多 lane 协调用 `$team`；先读 Skill。旧 Superpowers/SUBAGENTS 自动路由退役；Harness 保留 exact snapshot、测试、receipt，paid/credential/recovery/QA gates 不变。
 
 ### Cognition Tools
 结构关系使用 CodeGraph；职责/语义确有缺口才加 AOCI，简单局部任务禁止机械调用。源码/LSP/tests/runtime 与 canonical contracts 是事实，AOCI 永远 advisory；不符时修正索引，不能覆盖源码。正式认知归 `aoci.txt`、`aoci.meta.txt`、`aoci.code.txt`，语义由模型基于当前 source/contract evidence 编写；状态、维护顺序和安全停点遵从项目 MCP 的 `aoci_rules`、实时 Guide、工具返回及官方文档。稳定后按官方流程维护，不把未对齐索引称为完整认知。

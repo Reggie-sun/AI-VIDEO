@@ -1,6 +1,6 @@
 ---
 name: seedance-authoring
-description: Use when an approved AI-VIDEO Shot needs authorized Seedance 2.0/2.5 version-selection advice, prompt and reference authoring, or creative repair; compare duration and reference needs, then consume an exact selected version, mode and surface without owning runtime dispatch or production state.
+description: "Use when an approved AI-VIDEO Shot and already selected Seedance Provider need prompt and reference authoring, 2.0/2.5 version-selection advice or technical repair. Consume the exact selected version, mode and surface. Generic T2V or I2V terms do not select this Provider; not for H3, Vidu, new story design or single-Shot Gate review."
 ---
 
 # Seedance Authoring

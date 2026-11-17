@@ -1,6 +1,6 @@
 ---
 name: vidu-authoring
-description: Adapt an approved script or Shot to a selected Vidu model or whole-ad service, preserving speaker dialogue, speech-free action beats and reference roles; diagnose narration drift before another call.
+description: "Use only after a Vidu model or whole-ad service is selected to adapt an approved script or Shot, preserving dialogue, speech-free beats and reference roles, or diagnose narration drift. Generic T2V or I2V terms do not select this Provider. Not for H3, Seedance, new story design or single-Shot Gate review."
 ---
 
 # Vidu Authoring

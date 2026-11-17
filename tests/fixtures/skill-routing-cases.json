@@ -1,0 +1,422 @@
+[
+  {
+    "id": "h3-i2v",
+    "input": "已有 approved Shot，明确选定 MiniMax H3；仅适配 I2V prompt，不生成媒体。",
+    "expected_skills": [
+      "h3-video"
+    ],
+    "forbidden_skills": [
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "已选 Provider，技术适配不重新创作。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "h3-t2v",
+    "input": "已有 approved Shot，明确选定 MiniMax H3；仅适配 T2V prompt，不生成媒体。",
+    "expected_skills": [
+      "h3-video"
+    ],
+    "forbidden_skills": [
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "已选 Provider，技术适配不重新创作。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "seedance-i2v",
+    "input": "已有 approved Shot，明确选定 Seedance 2.0；仅适配 I2V prompt，不生成媒体。",
+    "expected_skills": [
+      "seedance-authoring"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "vidu-authoring"
+    ],
+    "rationale": "已选 Provider，技术适配不重新创作。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "seedance-t2v",
+    "input": "已有 approved Shot，明确选定 Seedance 2.0；仅适配 T2V prompt，不生成媒体。",
+    "expected_skills": [
+      "seedance-authoring"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "vidu-authoring"
+    ],
+    "rationale": "已选 Provider，技术适配不重新创作。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "vidu-i2v",
+    "input": "已有 approved Shot，明确选定 Vidu Q3；仅适配 I2V prompt，不生成媒体。",
+    "expected_skills": [
+      "vidu-authoring"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring"
+    ],
+    "rationale": "已选 Provider，技术适配不重新创作。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "vidu-t2v",
+    "input": "已有 approved Shot，明确选定 Vidu Q3；仅适配 T2V prompt，不生成媒体。",
+    "expected_skills": [
+      "vidu-authoring"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring"
+    ],
+    "rationale": "已选 Provider，技术适配不重新创作。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "generic-i2v",
+    "input": "只解释 I2V 这个术语；尚未选择 Provider，不设计镜头。",
+    "expected_skills": [],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "通用术语不是 Provider 选择。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "generic-t2v",
+    "input": "只解释 T2V 这个术语；尚未选择 Provider，不设计镜头。",
+    "expected_skills": [],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "通用术语不是 Provider 选择。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "generic-fl2va",
+    "input": "只解释 FL2VA 这个术语；尚未选择 Provider，不设计镜头。",
+    "expected_skills": [],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "通用术语不是 Provider 选择。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "blender-blockout",
+    "input": "在已有本地 Blender 场景仅做 blockout 草稿；不生成视频。",
+    "expected_skills": [
+      "scenario-blender-expert",
+      "scenario-blender-blockout"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring",
+      "scenario-blender-animation",
+      "scenario-blender-rigging",
+      "scenario-blender-previs-storyboard"
+    ],
+    "rationale": "执行 Blender 任务时读取 canonical expert protocol 与所需专项；不要求启动预载，也不加载无关专项。",
+    "expected_roles": {
+      "claude": "blender-artist",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "blender-animation",
+    "input": "在已有本地 Blender 场景仅做 animation 草稿；不生成视频。",
+    "expected_skills": [
+      "scenario-blender-expert",
+      "scenario-blender-animation"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring",
+      "scenario-blender-blockout",
+      "scenario-blender-rigging",
+      "scenario-blender-previs-storyboard"
+    ],
+    "rationale": "执行 Blender 任务时读取 canonical expert protocol 与所需专项；不要求启动预载，也不加载无关专项。",
+    "expected_roles": {
+      "claude": "blender-artist",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "blender-rigging",
+    "input": "在已有本地 Blender 场景仅做 rigging 草稿；不生成视频。",
+    "expected_skills": [
+      "scenario-blender-expert",
+      "scenario-blender-rigging"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring",
+      "scenario-blender-blockout",
+      "scenario-blender-animation",
+      "scenario-blender-previs-storyboard"
+    ],
+    "rationale": "执行 Blender 任务时读取 canonical expert protocol 与所需专项；不要求启动预载，也不加载无关专项。",
+    "expected_roles": {
+      "claude": "blender-artist",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "blender-previs",
+    "input": "在已有本地 Blender 场景仅做 previs 草稿；不生成视频。",
+    "expected_skills": [
+      "scenario-blender-expert",
+      "scenario-blender-previs-storyboard"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring",
+      "scenario-blender-blockout",
+      "scenario-blender-animation",
+      "scenario-blender-rigging"
+    ],
+    "rationale": "执行 Blender 任务时读取 canonical expert protocol 与所需专项；不要求启动预载，也不加载无关专项。",
+    "expected_roles": {
+      "claude": "blender-artist",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "blender-combined",
+    "input": "为已有 Blender 角色绑定骨骼并制作走路动画草稿。",
+    "expected_skills": [
+      "scenario-blender-expert",
+      "scenario-blender-rigging",
+      "scenario-blender-animation"
+    ],
+    "forbidden_skills": [
+      "scenario-blender-blockout",
+      "scenario-blender-previs-storyboard",
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "执行 Blender 任务时读取 canonical expert protocol 与所需专项；不要求启动预载，也不加载无关专项。",
+    "expected_roles": {
+      "claude": "blender-artist",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "ad-package",
+    "input": "整理已批准商品广告的 SKU 事实和交付 package，不写剧本或新 Hook。",
+    "expected_skills": [
+      "ecommerce-ad-workflow"
+    ],
+    "forbidden_skills": [
+      "drama-authoring",
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "广告事实和 package 属电商 workflow。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "ad-hooks",
+    "input": "现有广告 package 已批准，只提出三个产品广告 Hook 角度。",
+    "expected_skills": [
+      "ad-creative"
+    ],
+    "forbidden_skills": [
+      "drama-authoring",
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "仅补广告创意角度。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "drama-script",
+    "input": "仅为新的非广告短剧写人物关系与剧本，不安排镜头。",
+    "expected_skills": [
+      "drama-authoring"
+    ],
+    "forbidden_skills": [
+      "ecommerce-ad-workflow",
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "剧情 authoring；未到 Provider 技术适配。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "coverage",
+    "input": "把已批准剧本拆成镜头 coverage，尚未选 Provider。",
+    "expected_skills": [
+      "open-video"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "镜头覆盖归 Director，名称 Seedance 不代表选 Provider。",
+    "expected_roles": {
+      "claude": "parent",
+      "codex": "parent"
+    }
+  },
+  {
+    "id": "shot-review",
+    "input": "审查已落盘 Seedance exact MP4，按封存 rubric 做逐镜 Gate，不修改 prompt。",
+    "expected_skills": [],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "通用 Gate 读 playbook 与 video-analysis，不加载 H3 authoring。",
+    "expected_roles": {
+      "claude": "shot-gate-reviewer",
+      "codex": "verifier"
+    }
+  },
+  {
+    "id": "memory-retrieve",
+    "input": "只查历史连续性失败经验，返回来源与日期，不写记录。",
+    "expected_skills": [
+      "retrieve-ai-video-memory"
+    ],
+    "forbidden_skills": [
+      "record-ai-video-session",
+      "distill-ai-video-learning",
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "检索模式不预载记录和提炼。",
+    "expected_roles": {
+      "claude": "memory-keeper",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "memory-record",
+    "input": "根据给定已验证 checkpoint 写 session record，并完成自动 learning 评估。",
+    "expected_skills": [
+      "record-ai-video-session",
+      "distill-ai-video-learning"
+    ],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "记录结束必须评估 learning；无需无条件检索。",
+    "expected_roles": {
+      "claude": "memory-keeper",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "memory-distill",
+    "input": "从两个明确提供的真实实验提炼候选 Learning Claim，先按技能检索反证。",
+    "expected_skills": [
+      "distill-ai-video-learning",
+      "retrieve-ai-video-memory"
+    ],
+    "forbidden_skills": [
+      "record-ai-video-session",
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "提炼要求检索证据；不自动写新 session record。",
+    "expected_roles": {
+      "claude": "memory-keeper",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "simple-code",
+    "input": "修正一个独立 Python helper 的变量拼写，行为不变，无历史架构问题。",
+    "expected_skills": [],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring",
+      "retrieve-ai-video-memory",
+      "open-video"
+    ],
+    "rationale": "简单代码修正无需媒体或 memory Skill。",
+    "expected_roles": {
+      "claude": "oh-my-claudecode:executor",
+      "codex": "executor"
+    }
+  },
+  {
+    "id": "provider-negation",
+    "input": "本次不要 H3、Seedance 或 Vidu；只解释一个 Python 类型错误。",
+    "expected_skills": [],
+    "forbidden_skills": [
+      "h3-video",
+      "seedance-authoring",
+      "vidu-authoring"
+    ],
+    "rationale": "出现 Provider 名称但明确排除，不自动选择。",
+    "expected_roles": {
+      "claude": "oh-my-claudecode:executor",
+      "codex": "executor"
+    }
+  }
+]

@@ -1,6 +1,6 @@
 ---
 name: scenario-blender-rigging
-description: 'Use when rigging a character, creature or prop in Blender through Python: "rig this character", Rigify metarig fitting or generation errors, automatic weights or "Bone Heat Weighting failed", weight painting fixes, clothes that do not follow, IK/FK switch, foot roll, twist bones, drivers and custom properties, corrective shape keys, a stylized face rig, a mechanical or hard-surface rig, or testing how a rig deforms.'
+description: "Use for Blender skeletons, Rigify, skin weights, IK/FK, drivers, corrective shapes or deformation diagnosis. Not for static blockout or animation timing on a working rig; load animation only when motion authoring is required. Does not select or submit a video Provider."
 license: MIT
 ---
 

@@ -1,0 +1,503 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-11-16",
+  "scope": "Jimeng only; per-attempt provenance required",
+  "live_media_review": "NOT_EVALUATED",
+  "cases": [
+    {
+      "id": "shizhen-s03-cg-hover",
+      "channel": "jimeng",
+      "model": "seedance_2.5",
+      "mode": "first_frame",
+      "shot": "S03",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-26-shizhen-s03-witness-and-live-action-override.md",
+        "exists": true,
+        "sha256": "ae3b4871b1e42a67ed964777a5126b7c5d95eef41ccf35e7b82d05b5ddfccffa"
+      },
+      "goal": "消失后扫码枪立即失去支撑落台，主角反应",
+      "finding": "f122–129无支撑悬停，5PASS/2FAIL/1NE",
+      "timecode": "5.083s–约5.4s",
+      "repair": "试剪删123..129，随后真人方向覆盖CG；未验收",
+      "user_feedback": "旧10秒迟缓反应被否决；后续明确改真人",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "FAIL",
+      "media": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2/state/video-generation/fetch/files/9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003.mp4",
+        "exists": true,
+        "sha256": "9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003"
+      },
+      "prompt": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/native-prompt.txt",
+        "exists": true,
+        "sha256": "867186d21e528535c1cd7ec797f99c6e269a1349f6049719deffb86ba9accaa9"
+      },
+      "references": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/S03-revision-02/sealed-authored-target.json",
+        "exists": true,
+        "sha256": "2742dcbf6c8151367cb592cea3031eebe6407fac6f2a99d0e4ea851ec2c845f6",
+        "field": "sealed authoring inputs; binding NOT_EVALUATED"
+      },
+      "prompt_binding": "文件存在不独立证明实际submit绑定；需重开canonical request/dispatch",
+      "repair_acceptance": "NOT_EVALUATED",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": false,
+      "media_role": "original_attempt",
+      "original_failure_media": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/trial-S03-v2/state/video-generation/fetch/files/9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003.mp4",
+        "exists": true,
+        "sha256": "9e2bf4f22a797e9bb9caed12ab0beaf47cef6289940a96feb49ebbc17d837003"
+      },
+      "source_models": [],
+      "input_availability": "FILE_PRESENT_BINDING_NOT_EVALUATED",
+      "owner": "open-video + QA",
+      "preserved_intent": "保留消失、即时落枪、同框受惊及近景求证；剪7帧仅试剪，真人改风格另获用户要求",
+      "verification_scope": "原FAIL帧序列与raw SHA；不评估剪辑自然度"
+    },
+    {
+      "id": "shizhen-s03-004-hover",
+      "channel": "jimeng",
+      "model": "seedance_2.5",
+      "mode": "first_frame",
+      "shot": "S03-004",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-26-shizhen-s03-witness-and-live-action-override.md",
+        "exists": true,
+        "sha256": "ae3b4871b1e42a67ed964777a5126b7c5d95eef41ccf35e7b82d05b5ddfccffa"
+      },
+      "goal": "瓶放稳→退手→移枪→人消失→立即落台",
+      "finding": "瓶支撑改善但枪6.019/7.023仍悬停",
+      "timecode": "6.019s,7.023s; 7.75–8s落台",
+      "repair": "同首帧加强动作文字未解决；后续005同时换模型/参考/时长",
+      "user_feedback": "要求重做不自然、过慢扫码与掉枪",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "FAIL",
+      "media": {
+        "path": "outputs/shizhen-episode01/失帧-第一集-S03-真人重生成004-原声-20秒.mp4",
+        "exists": true,
+        "sha256": "4255225065ff4c9a34932d14f94472fb64719533a0cedf7a4f8143fa46b1c353"
+      },
+      "prompt": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S03-repair-004/native-prompt.txt",
+        "exists": true,
+        "sha256": "540274167efbe8ee121405e7787e31d5a5b9bb202552b2905af6e259c1161e35"
+      },
+      "references": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S03-repair-004/sealed-authored-target.json",
+        "exists": true,
+        "sha256": "2ea6bb54b8f1fd9ec78f4279ccb269f77044f2da5553b4462afe37da65d201ad"
+      },
+      "prompt_binding": "文件存在不独立证明实际submit绑定；需重开canonical request/dispatch",
+      "repair_acceptance": "NOT_EVALUATED",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": false,
+      "media_role": "original_attempt",
+      "original_failure_media": {
+        "path": "outputs/shizhen-episode01/失帧-第一集-S03-真人重生成004-原声-20秒.mp4",
+        "exists": true,
+        "sha256": "4255225065ff4c9a34932d14f94472fb64719533a0cedf7a4f8143fa46b1c353"
+      },
+      "source_models": [],
+      "input_availability": "FILE_PRESENT_BINDING_NOT_EVALUATED",
+      "owner": "open-video + scenario-seedance-storyboard + seedance-authoring",
+      "preserved_intent": "保留同首帧/20秒/2.5及原QA，只修改支撑转换、退手和落点动作；不得删掉即时下落要求",
+      "verification_scope": "瓶改善与枪悬停分别记录，文字强化不当修复PASS"
+    },
+    {
+      "id": "shizhen-s03-005-state-refs",
+      "channel": "jimeng",
+      "model": "seedance_2.0_vip",
+      "mode": "multimodal",
+      "shot": "S03-005",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-26-shizhen-s03-witness-and-live-action-override.md",
+        "exists": true,
+        "sha256": "ae3b4871b1e42a67ed964777a5126b7c5d95eef41ccf35e7b82d05b5ddfccffa"
+      },
+      "goal": "保留扫码消失落枪和即时反应完整因果",
+      "finding": "3.716667人在，3.75人消失枪接触台面；全部8项仍NE",
+      "timecode": "3.716667s–4s",
+      "repair": "增加ready/landed/reaction状态图；无隔离变量，不能归因",
+      "user_feedback": "PENDING",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "NOT_EVALUATED",
+      "media": {
+        "path": "outputs/shizhen-episode01/失帧-第一集-S03-Seedance2.0-重做005-原声-13秒.mp4",
+        "exists": true,
+        "sha256": "51bf0aaea2deaa8f02fb2a8f3f4f2666a8cd6304e5f9f80f5598fd7eab87368f"
+      },
+      "prompt": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S03-seedance20-005/native-prompt.txt",
+        "exists": true,
+        "sha256": "540f4efab26385b498cf9dd4babf31af61c7bce8da84283272d28a83b7aa7c85"
+      },
+      "references": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S03-seedance20-005/reference-preparation-review.json",
+        "exists": true,
+        "sha256": "f86f5a49a530b5a95539ef8ff38e2ed4fba608e72f05574898c01ac9071a4a96"
+      },
+      "prompt_binding": "文件存在不独立证明实际submit绑定；需重开canonical request/dispatch",
+      "repair_acceptance": "NOT_EVALUATED",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": false,
+      "media_role": "original_attempt",
+      "original_failure_media": null,
+      "source_models": [],
+      "input_availability": "FILE_PRESENT_BINDING_NOT_EVALUATED",
+      "owner": "open-video + scenario-seedance-storyboard + seedance-authoring + QA",
+      "preserved_intent": "仍为扫码→人消失→枪落台→即时反应；用户明确改2.0，时长/图像/文字同时变化；不可归因单变量",
+      "verification_scope": "局部PTS接触观察，完整原速物理与声音未证明"
+    },
+    {
+      "id": "shizhen-duplicate-scan",
+      "channel": "jimeng",
+      "model": "NOT_APPLICABLE_COMPOSITION",
+      "mode": "composition_of_distinct_sources",
+      "shot": "S01-S03",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-26-shizhen-s03-witness-and-live-action-override.md",
+        "exists": true,
+        "sha256": "ae3b4871b1e42a67ed964777a5126b7c5d95eef41ccf35e7b82d05b5ddfccffa"
+      },
+      "goal": "连续剧情只扫码一次",
+      "finding": "36.25秒版21/24秒重复扫码",
+      "timecode": "约21s及24s",
+      "repair": "裁掉20.875–23.25，同窗声画保留后一次；33.875秒版未人工接受",
+      "user_feedback": "明确指出重复扫码并要求剪辑",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "FAIL",
+      "media": {
+        "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02-S03-去重复扫码-1080p-33.875秒-原声.mp4",
+        "exists": true,
+        "sha256": "45fb4e45f815bbe00f42165429dd5f19335e2dbf60ef4206710e09755308f233"
+      },
+      "prompt": null,
+      "references": {
+        "path": "runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/join-S01-S02-S03-005/delivery-receipt.json",
+        "exists": true,
+        "sha256": "33a6d19b94e1345c4896e5d1634ee3c6602ae9d03903dfd8be5e8bf84cea589e"
+      },
+      "prompt_binding": "composition无单一native prompt；各源request待核验",
+      "repair_acceptance": "NOT_EVALUATED",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": true,
+      "media_role": "repaired_composition",
+      "original_failure_media": {
+        "path": "outputs/shizhen-episode01/失帧-第一集-S01-S02-S03-真人连续版-1080p-36.25秒-原声.mp4",
+        "exists": true,
+        "sha256": "fbc9b34f583dabb6d86b21a2f1412243ddfea717cb83cf98fd4afdfb5c2d3e9a"
+      },
+      "source_models": [
+        {
+          "shot": "S01-007",
+          "model": "seedance_2.5",
+          "binding": "historical record; exact request binding NOT_EVALUATED"
+        },
+        {
+          "shot": "S02-002",
+          "model": "seedance_2.5",
+          "binding": "historical record; exact request binding NOT_EVALUATED"
+        },
+        {
+          "shot": "S03-005",
+          "model": "seedance_2.0_vip",
+          "binding": "historical record; exact request binding NOT_EVALUATED"
+        }
+      ],
+      "input_availability": "NOT_EVALUATED",
+      "attribution": "接点剪辑错误；不归因任一单模型",
+      "owner": "open-video + Continuity + ResolvedTimeline",
+      "preserved_intent": "删旧S02尾部2.375秒重复扫码；保留S03完整放瓶/扫码/消失/落枪/反应，声画同窗",
+      "verification_scope": "原重复事件与剪后不同identity；不推导剪后用户认可"
+    },
+    {
+      "id": "jieshi-mini-cg",
+      "channel": "jimeng",
+      "model": "seedance_2.0_mini",
+      "mode": "reference",
+      "shot": "S01",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-26-jieshi-jimeng-mini-upload-stop.md",
+        "exists": true,
+        "sha256": "57e41ce10c56aff34e627954d30a6acb48c28ed68a87e868618a99f755fed9a9"
+      },
+      "goal": "同构图人物抬手而玻璃不出现手部倒影",
+      "finding": "修复上传后CG成功出片，手倒影仍出现",
+      "timecode": "NOT_EVALUATED",
+      "repair": "先两次KNOWN_NO_EFFECT，exact上传域修复后出片；真人方向覆盖CG",
+      "user_feedback": "明确要真人，CG不能算完成",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "FAIL",
+      "media": {
+        "path": "runs/jieshi-jimeng-mini-20261026/Jieshi-Mini-720p-4s.mp4",
+        "exists": true,
+        "sha256": "4ceae93db54b4ff4839d490b22ed99800186649ea31c551675ca1b86da1d7dae"
+      },
+      "prompt": {
+        "path": ".codex/tmp/jieshi-jimeng-mini-20261026/fixed-compiled-request.json",
+        "exists": true,
+        "sha256": "9277b43ea66145045fa10c47a77c3c69f70f9476a2e541e825e554e4ab358d6c",
+        "field": "prompt_text",
+        "text_sha256": "926f94197319b3fb9624156d18544414d5e26fef70730ed7a28b1d0efa77d8e5"
+      },
+      "references": {
+        "path": ".codex/tmp/jieshi-jimeng-mini-20261026/fixed-compiled-request.json",
+        "exists": true,
+        "sha256": "9277b43ea66145045fa10c47a77c3c69f70f9476a2e541e825e554e4ab358d6c",
+        "field": "image_bindings",
+        "binding_sha256": "28750582e1e2f7993b5930ec3452bef5eb96ed1245176b67409487f85c9dcc5f"
+      },
+      "prompt_binding": "当前compiled request字段已核验；dispatch与media关联仍需canonical owner重开，不由路径推断",
+      "repair_acceptance": "NOT_EVALUATED",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": false,
+      "media_role": "original_attempt",
+      "original_failure_media": {
+        "path": "runs/jieshi-jimeng-mini-20261026/Jieshi-Mini-720p-4s.mp4",
+        "exists": true,
+        "sha256": "4ceae93db54b4ff4839d490b22ed99800186649ea31c551675ca1b86da1d7dae"
+      },
+      "source_models": [],
+      "input_availability": "NOT_EVALUATED",
+      "request_identity": {
+        "generation_id": "canvas-generation-repair-7b06f733d8c89add701c7b4b1322cd14",
+        "model_id": "seedance_2.0_mini",
+        "mode": "reference_to_video",
+        "request_input_hash": "f42c2d09914cdd595b03dd73ebc5fbf42b2d5b1d8a183a624ff756d3e0fc975e"
+      },
+      "owner": "Provider recovery + seedance-authoring + QA",
+      "preserved_intent": "保留447字历史视觉意图但改为2180字符参考模式表达；与Ark首帧不构成同输入对照；用户真人目标未达",
+      "verification_scope": "上传故障修复与模型质量分开，CG倒影仍失败"
+    },
+    {
+      "id": "jieshi-mini-realperson",
+      "channel": "jimeng",
+      "model": "seedance_2.0_mini",
+      "mode": "reference",
+      "shot": "S01-realperson",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-26-jieshi-jimeng-mini-upload-stop.md",
+        "exists": true,
+        "sha256": "57e41ce10c56aff34e627954d30a6acb48c28ed68a87e868618a99f755fed9a9"
+      },
+      "goal": "复用已记录八人真人资产仅测试",
+      "finding": "SUCCEEDED/fetched，不是质量PASS",
+      "timecode": "NOT_EVALUATED",
+      "repair": "复用1202字符旧prompt/真人图，无新生图；按用户要求未QA",
+      "user_feedback": "仅测试、不追加检查",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "NOT_EVALUATED",
+      "media": {
+        "path": "runs/jieshi-jimeng-mini-realperson-20261026/Jieshi-Realperson-Mini-720p-4s.mp4",
+        "exists": true,
+        "sha256": "942ace78310e62cb2060530194e28ada6ce0daebb6b445d920233673eeefca39"
+      },
+      "prompt": {
+        "path": ".codex/tmp/jieshi-jimeng-mini-realperson-20261026/compiled-request.json",
+        "exists": true,
+        "sha256": "0150b2d923636309b6d45a064e17790b29c87d65cfe6fe3109bdc22e8182a734",
+        "field": "prompt_text",
+        "text_sha256": "d1a8fdfffa7e09c8973115754b1876aa197d8b9f8a25fb0c8ffd9278525c7a7d"
+      },
+      "references": {
+        "path": ".codex/tmp/jieshi-jimeng-mini-realperson-20261026/compiled-request.json",
+        "exists": true,
+        "sha256": "0150b2d923636309b6d45a064e17790b29c87d65cfe6fe3109bdc22e8182a734",
+        "field": "image_bindings",
+        "binding_sha256": "9f4480aea6db25c32ea4eb789f9962436783c1f1171a26826da4d458f5e57199"
+      },
+      "prompt_binding": "当前compiled request字段已核验；dispatch与media关联仍需canonical owner重开，不由路径推断",
+      "repair_acceptance": "NOT_EVALUATED",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": false,
+      "media_role": "original_attempt",
+      "original_failure_media": null,
+      "source_models": [],
+      "input_availability": "NOT_EVALUATED",
+      "request_identity": {
+        "generation_id": "canvas-generation-5278fa2fb7d60e599d5e8fa37fc230be",
+        "model_id": "seedance_2.0_mini",
+        "mode": "reference_to_video",
+        "request_input_hash": "5a5696f89b1a9dc3cab22745d3d683e6b831ad045b5ced345388610394229994"
+      },
+      "owner": "seedance-authoring + Provider + QA",
+      "preserved_intent": "按用户复用真人资产仅测试，未重新生图；图像/文本/模式与旧Ark不同，不能作审核通用规则",
+      "verification_scope": "fetch成功；依用户限制未做质量QA"
+    },
+    {
+      "id": "yanshengyuan-junction",
+      "channel": "jimeng",
+      "model": "seedance_2.0_vip",
+      "mode": "first_last_frame (bridge mode3)",
+      "shot": "S01-S02B-S02",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-25-yanshengyuan-seedance20-two-shot.md",
+        "exists": true,
+        "sha256": "356538c1186c37bd34185a7ccc50656fc926bf75c23f93cfd14c71fc74106338"
+      },
+      "goal": "保留拿瓶因果、完整商品名对白和真实包装",
+      "finding": "4秒桥段视觉五PASS，但43秒连续版7秒后卡顿重叠被用户否定",
+      "timecode": "连续版约7s后",
+      "repair": "删重复桥段、源窗修剪至38秒并去重复笑；声音/全片接受仍NE",
+      "user_feedback": "7秒后仍卡顿/重叠；后来改三条夸张新片",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "FAIL",
+      "media": {
+        "path": "/home/reggie/电商/颜生源/广告试片/2026-10-25-护肤拍大片/颜生源-护肤拍大片-38秒-剪辑审片版.mp4",
+        "exists": true,
+        "sha256": "41d15585f9bce809d45841b1489b10834e1c445d7a16d0c327cd6b007000a613"
+      },
+      "prompt": null,
+      "references": {
+        "path": "runs/yanshengyuan-blockbuster-seedance20-20261025-001/continuation/cut-repair-001/bridge-002/delivery-receipt.json",
+        "exists": true,
+        "sha256": "eada8d557cd678beea3fce66ba46305399b917c59a0e0850d40ef7b1c837286b"
+      },
+      "prompt_binding": "composition无单一native prompt；bridge/source requests未全部重开",
+      "repair_acceptance": "NOT_EVALUATED",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": true,
+      "media_role": "repaired_composition",
+      "original_failure_media": {
+        "path": "/home/reggie/电商/颜生源/广告试片/2026-10-25-护肤拍大片/颜生源-护肤拍大片-43秒-首尾帧衔接审片版.mp4",
+        "exists": true,
+        "sha256": "1d5b69c7b579bebee9dad4888a68f403b9f3b71d05a9f0877bd6c7eb3daf96c2"
+      },
+      "source_models": [
+        {
+          "shot": "S01/S02B/S02/S03/S04",
+          "model": "seedance_2.0_vip",
+          "binding": "historical record; per-source binding NOT_EVALUATED"
+        }
+      ],
+      "input_availability": "NOT_EVALUATED",
+      "owner": "open-video + Continuity + ResolvedTimeline",
+      "preserved_intent": "完整商品名对白/产品近景保留；删4秒重复桥段、去重复笑；38秒片不自动接受，后续夸张新方向另记",
+      "verification_scope": "旧43秒用户拒绝与新38秒技术输出分开，听感NE"
+    },
+    {
+      "id": "yanshengyuan-two-shot-limited-acceptance",
+      "channel": "jimeng",
+      "model": "seedance_2.0_vip",
+      "mode": "multimodal",
+      "shot": "S01/S02",
+      "record": {
+        "path": "docs/record_for_agent/2026-10-25-yanshengyuan-seedance20-two-shot.md",
+        "exists": true,
+        "sha256": "356538c1186c37bd34185a7ccc50656fc926bf75c23f93cfd14c71fc74106338"
+      },
+      "goal": "前两镜及S02完整商品名原声确认",
+      "finding": "用户回答可以；接受两片并确认被询问S02原声，旧音频operator UNKNOWN保留",
+      "timecode": "S02全片8秒；非全广告",
+      "repair": "非新修复样本；后续连续片失败不抹掉单镜有限认可",
+      "user_feedback": "可以；scope为两片与S02原声，不含未来/全片",
+      "engineering": "历史记录中的技术执行不等于质量验收",
+      "agent_observation": "NOT_EVALUATED",
+      "media": {
+        "path": "/home/reggie/电商/颜生源/广告试片/2026-10-25-护肤拍大片/Shot02-产品出场-Seedance2.0.mp4",
+        "exists": true,
+        "sha256": "8a9d3b27d7b7e571419e8c1851ab3eefe392d01f3df546d354280dc4b520bde4"
+      },
+      "prompt": null,
+      "references": null,
+      "prompt_binding": "S01/S02原始native prompt/reference绑定本轮未重开；桥段delivery receipt不属于本例输入",
+      "repair_acceptance": "NOT_APPLICABLE",
+      "generalization": "SINGLE_CASE; 无受控A/B，不推广为版本优劣或成功率",
+      "offline_assertions": [
+        "channel/model/mode不得混合",
+        "保留原失败及后续supersession",
+        "技术PASS不得替代媒体或用户认可"
+      ],
+      "requires_live_validation": true,
+      "historical_result_source": "record 中明确记录；本次未重新审媒体",
+      "learning_status": "CASE_ONLY_NO_CANDIDATE",
+      "is_composition": false,
+      "media_role": "original_accepted_S02",
+      "original_failure_media": null,
+      "source_models": [],
+      "input_availability": "NOT_EVALUATED",
+      "human_evidence": {
+        "path": "runs/yanshengyuan-blockbuster-seedance20-20261025-001/two-shot-human-feedback.json",
+        "exists": true,
+        "sha256": "9de17262e82e18c12862a3799b791ffc3371f27742bbec698307ef004bab0765"
+      },
+      "human_acceptance": "ACCEPTED_BOUNDED_TWO_CLIPS_AND_S02_AUDIO",
+      "owner": "QA human evidence + record-ai-video-session",
+      "preserved_intent": "保留S01/S02原bytes与完整商品名原声；不扩大用户可以到未来镜头/全广告",
+      "verification_scope": "human feedback exact SHA仅绑定两片与S02音频确认；旧audio UNKNOWN保留"
+    }
+  ],
+  "excluded": [
+    {
+      "record": "docs/record_for_agent/2026-10-21-jieshi-seedance-20-fast-comparison.md",
+      "reason": "Ark API/TOS，非即梦；不纳入Fast效果证据"
+    },
+    {
+      "record": "docs/record_for_agent/2026-09-28-jimeng-canvas-method-comparison.md",
+      "reason": "当前composer不证明历史submit，未下载hash原MP4；仅参考职责方法观察"
+    }
+  ],
+  "learning_claim_audit": "现有Learning目录无即梦专属已确认claim；H3/Vidu效果排除，HyperFrames caption的Ark样例不作为即梦效果。",
+  "version_coverage": {
+    "seedance_2.0_vip": "bounded cases",
+    "seedance_2.5": "bounded cases",
+    "seedance_2.0_mini": "bounded cases",
+    "seedance_2.0_fast": "NOT_EVALUATED: no verified Jimeng sample; Ark pair excluded"
+  }
+}

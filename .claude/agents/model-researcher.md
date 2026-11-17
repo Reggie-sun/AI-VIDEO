@@ -1,9 +1,7 @@
 ---
 name: model-researcher
 description: Read-only researcher for model-quality and workflow problems — gathers traceable community practice, official/model-author docs and counter-examples (plus prior project memory) and judges applicability to the current tool, version and constraints. Use for 模型质量问题、反复失败、找成熟方案/社区实践 before expanding engineering. Returns sourced findings; never runs experiments.
-tools: Read, Grep, Glob, Bash, Skill, WebSearch, WebFetch
-skills:
-  - retrieve-ai-video-memory
+tools: Read, Grep, Glob, WebSearch, WebFetch
 model: sonnet
 color: blue
 ---
@@ -16,7 +14,7 @@ color: blue
 
 ## 职责
 
-- 先用 `retrieve-ai-video-memory` 查项目内已有经验与失败记录，避免重复已经被否定的方案。
+- 先 Read `.agents/skills/retrieve-ai-video-memory/SKILL.md`，向主会话请求 `memory-keeper` 执行检索并返回 authority-separated 结果，再用 Read 重开来源。本角色无 Bash，不执行会维护 derived index 的查询；缺失检索证据报告 `NOT_EVALUATED`，仍可明确区分当前外部资料。
 - 再查官方文档、模型作者资料、可追溯的社区实践与反例。
 - 按当前工具、版本、授权和约束逐条判断适用性，并提出可归因的最小实验建议（输入、对照、预期、成本）。
 

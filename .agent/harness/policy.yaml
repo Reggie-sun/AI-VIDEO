@@ -251,6 +251,12 @@ checks:
     cwd: .
     execution_priority: 18
     description: Reject Agent Skill imports, loaders, paths, and direct Skill identities in Product Runtime source.
+  jimeng_history_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_jimeng_history_regressions.py, tests/test_jimeng_causal_compilation.py, tests/test_jimeng_shot_modes.py, tests/test_junction_review_gate.py, tests/test_reference_planning.py, tests/test_performance_authoring.py, -q]
+
+  skill_routing_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_skill_routing_eval.py, tests/test_skill_environment_check.py, tests/test_skill_descriptions.py, -q]
+
   harness_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_agent_harness_policy.py, tests/test_agent_harness_levels.py, tests/test_agent_harness_canvas_data.py, tests/test_record_ai_video_session_hook.py, tests/test_claude_code_adapter.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
@@ -439,12 +445,18 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_agent_memory.py, -q]
     cwd: .
     description: Verify the read-only developer Agent Memory index and retrieval boundaries.
+  existing_tool_contract_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_jimeng_feedback_driver.py, tests/test_motionkit_sync_check.py, tests/test_motionkit_tools.py, -q]
+
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -v, -o, faulthandler_timeout=120, --durations=20, --durations-min=0.1]
     cwd: .
     timeout_seconds: 7200
     execution_priority: 30
     covers_check_ids:
+      - jimeng_history_tests
+      - skill_routing_tests
+      - existing_tool_contract_tests
       - agent_rule_invariants
       - assembly_review_tests
       - visual_quality_tests
@@ -1886,3 +1898,36 @@ categories:
     check_ids:
       - harness_tests
       - agent_rule_invariants
+
+  skill_routing:
+    patterns:
+      - .agents/skills/**
+      - .claude/agents/**
+      - CLAUDE.md
+      - scripts/skill_routing_eval.py
+      - scripts/skill_environment_check.py
+      - tests/test_skill_routing_eval.py
+      - tests/test_skill_environment_check.py
+      - tests/test_skill_descriptions.py
+      - tests/fixtures/skill-routing-cases.json
+      - docs/skill-agent-routing.md
+      - .github/workflows/skill-routing.yml
+    focused_check_ids: [skill_routing_tests]
+    check_ids: [skill_routing_tests, harness_tests, product_runtime_skill_boundary_tests]
+
+  existing_tool_contracts:
+    patterns:
+      - scripts/jimeng_feedback_driver.py
+      - tests/test_jimeng_feedback_driver.py
+      - tests/test_motionkit_sync_check.py
+      - tests/test_motionkit_tools.py
+    focused_check_ids: [existing_tool_contract_tests]
+    check_ids: [existing_tool_contract_tests]
+
+  jimeng_history:
+    patterns:
+      - tests/test_jimeng_history_regressions.py
+      - tests/fixtures/jimeng-seedance-history.json
+      - docs/research/2026-11-16-jimeng-seedance-*.md
+    focused_check_ids: [jimeng_history_tests]
+    check_ids: [jimeng_history_tests, product_runtime_skill_boundary_tests]

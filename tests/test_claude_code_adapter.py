@@ -313,3 +313,47 @@ def test_claude_md_routes_every_role_agent() -> None:
     assert len(lines) == 1
     for name in ROLE_AGENTS:
         assert f"`{name}`" in lines[0], name
+
+
+def test_role_skills_are_loaded_on_demand_not_unconditionally_injected() -> None:
+    for name in ROLE_AGENTS:
+        meta = _agent_frontmatter(AGENTS_DIR / f"{name}.md")
+        assert not meta.get("skills"), name
+    blender = (AGENTS_DIR / "blender-artist.md").read_text()
+    for domain in ("blockout", "previs-storyboard", "animation", "rigging"):
+        assert f"scenario-blender-{domain}" in blender
+    memory = (AGENTS_DIR / "memory-keeper.md").read_text()
+    for skill in ("retrieve-ai-video-memory", "record-ai-video-session", "distill-ai-video-learning"):
+        assert skill in memory
+
+
+def test_observer_agents_exclude_shell_and_skill_tool_expansion() -> None:
+    observers = {"harness-reviewer", "continuity-supervisor", "shot-gate-reviewer", "model-researcher"}
+    for name in observers:
+        tools = set(_agent_tools(_agent_frontmatter(AGENTS_DIR / f"{name}.md")))
+        assert not tools & (WRITE_TOOL_NAMES | {"Bash", "Skill", "Agent"}), name
+        assert "Read" in tools
+    runner = _agent_frontmatter(AGENTS_DIR / "harness-runner.md")
+    assert "Bash" in _agent_tools(runner)  # Tests can write validation artifacts.
+    assert "不是强制只读沙箱" in (AGENTS_DIR / "harness-runner.md").read_text()
+
+
+def test_shared_role_mapping_preserves_dispatch_and_evidence_boundaries() -> None:
+    mapping = (ROOT / "docs/skill-agent-routing.md").read_text()
+    for name in ROLE_AGENTS | {"harness-reviewer"}:
+        assert f"`{name}`" in mapping
+    for token in ("NOT_EVALUATED", "exact", "Codex", "Claude", "Production", "父"):
+        assert token in mapping
+    assert "docs/skill-agent-routing.md" in CLAUDE_MD.read_text()
+
+
+def test_observer_media_tools_are_explicit_local_evidence_only() -> None:
+    allowed = {"mcp__video-analysis__" + name for name in (
+        "video_probe", "video_extract_frames", "video_transcribe", "video_scene_detect",
+    )}
+    for role in ("continuity-supervisor", "shot-gate-reviewer"):
+        tools = set(_agent_tools(_agent_frontmatter(AGENTS_DIR / f"{role}.md")))
+        assert tools == {"Read", "Grep", "Glob"} | allowed
+        assert not any("*" in tool or "optimization" in tool for tool in tools)
+        assert "mcp__video-analysis__audio_understand" not in tools
+        assert "mcp__video-analysis__video_analyze" not in tools

@@ -1,9 +1,7 @@
 ---
 name: continuity-supervisor
 description: Read-only script supervisor (场记) that prepares the pre-submit continuity report for a Shot — continuity with accepted prior state, handoff, axis/action/camera position, prompt fit and lint evidence. Use before any live or paid preview/permit/POST and when checking 跨镜连续性、轴线、交接、末态承接. Reports gaps; never edits or submits.
-tools: Read, Grep, Glob, Bash, Skill, mcp__video-analysis__*
-skills:
-  - open-video
+tools: Read, Grep, Glob, mcp__video-analysis__video_probe, mcp__video-analysis__video_extract_frames, mcp__video-analysis__video_transcribe, mcp__video-analysis__video_scene_detect
 model: opus
 color: blue
 ---
@@ -24,7 +22,7 @@ color: blue
 2. 交接：本镜开头是否承接上一镜末态，cut/ellipsis/reset 语义是否明确。
 3. 轴线、动作、机位：180 度线、屏幕方向、动作阶段与机位是否可读、合理。
 4. prompt 适配：exact prompt 与参考是否表达了已批准 Shot，没有多加或遗漏。
-5. lint：适用的 validator 或 lint 结果。
+5. lint：适用的 validator 或 lint 结果。需要执行时向主会话请求授权执行 lane 的 exact-input 输出；本角色无 Bash，不执行 validator。缺失或过期即 `NOT_EVALUATED`。
 
 ## 产出
 
@@ -33,3 +31,5 @@ color: blue
 ## 边界
 
 - 只读：不改文件，不提交，不判断好不好看。修复建议交给对应角色。
+
+- MCP 仅允许明确列出的本地 probe、抽帧、转写与 scene detect；转写须已有本地模型，不下载模型。音频理解需要远程能力时由主会话经已授权 canonical 执行 lane 取证；本角色没有 `audio_understand`、`video_analyze` 或 optimization 工具，缺必要音频证据仍为 `NOT_EVALUATED`。

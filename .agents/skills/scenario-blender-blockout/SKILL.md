@@ -1,6 +1,6 @@
 ---
 name: scenario-blender-blockout
-description: "Use when a text brief or a reference image must become a Blender blockout whose playblast guides a render-to-real video pass (a video model that takes a reference clip, such as Seedance, or the Render Video lane of the Scenario Blender Plugin): graybox or previs built for a video model, color-coded proxies at metric scale from rough to detailed, density levels from a simple shot to an expert scene with crowds, traffic and many cuts, proxy figures, a camera locked to the timeline, rail or tracking camera rigs, lens per shot, framing and occlusion checks, a playblast, a hand-off sheet for the video prompt. Also when a render-to-real pass renders the proxies as boxes, reads one figure as two people, swaps a car's front and rear, drifts at the end, or the guide camera pops on a cut."
+description: "Use for Blender proxy geometry, metric graybox and reference-clip blockouts for approved coverage, with cameras, framing checks and hand-off sheets. Not for standalone character animation, skeletal rigging or story/shot design; use the matching animation, rigging or previs skill only when that task is required. Does not select or submit a video Provider."
 license: MIT
 ---
 

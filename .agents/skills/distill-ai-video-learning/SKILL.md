@@ -1,6 +1,6 @@
 ---
 name: distill-ai-video-learning
-description: Use automatically after a stable AI-VIDEO evidence record to distill repeated real experiments into a scoped advisory Learning Claim, require exact user confirmation before adoption, and route confirmed action to the existing Skill, Provider Policy, Preflight, Contract, or Gate owner.
+description: "Use automatically after a stable AI-VIDEO evidence record to distill repeated real experiments into a scoped advisory Learning Claim, require exact user confirmation before adoption, and route confirmed action to the existing Skill, Provider Policy, Preflight, Contract, or Gate owner. Not for retrieval-only tasks or session recording alone; those use their dedicated memory skills."
 ---
 
 # Distill AI-VIDEO Learning

@@ -1,6 +1,6 @@
 ---
 name: retrieve-ai-video-memory
-description: Retrieve authority-separated AI-VIDEO project docs, experience, research, deferred decisions, or historical specs before substantial work involving production quality, Provider/model behavior, continuity, repeated failures, recovery, or prior architecture decisions. Use when project evidence would improve the task; do not use for trivial edits or as a substitute for current code search.
+description: "Retrieve authority-separated AI-VIDEO project docs, experience, research, deferred decisions, or historical specs before substantial work involving production quality, Provider/model behavior, continuity, repeated failures, recovery, or prior architecture decisions. Use when project evidence would improve the task; do not use for trivial edits or as a substitute for current code search. Does not write session records or distill Learning Claims."
 ---
 
 # Retrieve AI-VIDEO Memory
