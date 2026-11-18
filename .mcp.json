@@ -103,6 +103,27 @@
         "XAUTHORITY": "/run/user/1000/gdm/Xauthority",
         "XDG_RUNTIME_DIR": "/run/user/1000"
       }
+    },
+    "agentcut": {
+      "type": "stdio",
+      "command": "/home/reggie/.nvm/versions/node/v22.21.0/bin/node",
+      "args": [
+        "/home/reggie/.npm/_npx/64c16334b8e61aaf/node_modules/agentcut/dist/index.js"
+      ],
+      "env": {
+        "AGENTCUT_WORKSPACE": "/home/reggie/Agentcut",
+        "AGENTCUT_PORT": "32118"
+      }
+    },
+    "scriptforge": {
+      "type": "stdio",
+      "command": "/home/reggie/.local/share/weekly-copy-mcp/runtime/.venv/bin/skillport-mcp",
+      "args": [],
+      "env": {
+        "SKILLPORT_SKILLS_DIR": "/home/reggie/.local/share/weekly-copy-mcp/skills",
+        "SKILLPORT_DB_PATH": "/home/reggie/.cache/weekly-copy-mcp/AI-VIDEO/index",
+        "SKILLPORT_EMBEDDING_PROVIDER": "none"
+      }
     }
   }
 }
