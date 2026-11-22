@@ -38,6 +38,8 @@
 
 原生 Prompt 的唯一模型适配 owner 为 `jimeng_prompt.compile_jimeng_native_prompt`：首次编译与共享 causal-state 重编译复用同一完整文法，不再把含参考 marker 的文本与纯 remote prose 比较。完整文本（包含标记）按 JavaScript UTF-16 长度服从 `JimengModelSpec`，不沿用其他 Provider 的 5000 字符默认值、不截断。
 
+新生成的适配器编译和预览会核对编号镜头行中明确的输出区间。支持 `镜头 16 | 第二单元·计划00:17.6–00:20.5 |` 与 `Shot 16, [17.6–20.5 seconds]` 等形式，起点与终点须落在请求时长内。例中的 18 秒请求会在上传素材及提交之前被拒绝，诊断显示行号、超界时间与请求时长。对白中的时钟和正文中的源素材时间保留原文。历史请求的精确重开、轮询、下载与 recovery 沿已封存的请求和任务证据读取。
+
 Canvas 对 storyboard 中非首镜的新 planning request 要求明确 `boundary`：连续关系走已有 materialized sequence handoff 与 accepted-source owner；独立切镜显式写 `{"independent": true}`，不能同时声明连续性约束。缺失边界在 planning 前拒绝，不再默认为独立生成；非连续切镜不会被强制改成首尾帧。素材绑定仍不保证手部动作或空间连续，必须比较 exact 前镜末态、当前开场与正常速度剪接结果。
 
 `jimeng_models.py` 是各型号有界映射声明；2026-10-22 原生已加载 config、reference constraints 和只读 validator / commerce 查询的脱敏投影见 `tests/fixtures/generated_video/jimeng-native-models-20261022.json`。直接 `generation_specs` 读取当时不可用，实际证据来自网页初始化的 native stores；只读准入仅代表该时点账号状态，报价不代替下一次提交时的 fresh quote 或 operator bound。

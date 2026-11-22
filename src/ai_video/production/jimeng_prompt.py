@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import hashlib
+import re
+from decimal import Decimal
 from typing import Any
 
 from ai_video.production.jimeng_models import (
@@ -21,10 +23,48 @@ _NATIVE_TRIM_CHARACTERS = (
     "\u2007\u2008\u2009\u200a\u202f\u205f\u3000\ufeff\n\r\u2028\u2029"
 )
 
+_SECONDS = r"[0-9]{1,3}(?:\.[0-9]+)?"
+_CLOCK = r"[0-9]{1,2}[:：][0-5][0-9](?:\.[0-9]+)?"
+_SECONDS_UNIT = r"(?:秒|s(?:ec(?:onds?)?)?\b)"
+_RANGE_SEPARATOR = r"[ \t]*[-–—~～至到][ \t]*"
+_SHOT_TIME_RANGE = re.compile(
+    rf"""
+    ^[ \t]*(?:(?:[#]{{1,6}}|[-+*])[ \t]+)?(?:\*\*)?
+    (?:镜头[ \t]*(?:[0-9]{{1,4}}|[零〇一二三四五六七八九十百千]{{1,8}})|shot[ \t]+[0-9]{{1,4}})
+    (?=[ \t|｜:：,，(（\[【*])[ \t]*(?:\*\*)?[ \t]*[|｜:：,，]?[ \t]*[(（\[【]?[ \t]*
+    (?:(?:[^|｜:：]*[·・][ \t]*)?计划[ \t]*)?
+    (?:
+        (?P<start_clock>{_CLOCK}){_RANGE_SEPARATOR}(?P<end_clock>{_CLOCK})(?![0-9.:：])
+        | (?P<start_seconds>{_SECONDS})[ \t]*{_SECONDS_UNIT}?{_RANGE_SEPARATOR}
+        (?P<end_seconds>{_SECONDS})[ \t]*{_SECONDS_UNIT}
+    )
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
 
 def normalize_jimeng_prompt_text(text: str) -> str:
     """Match the native client's ECMAScript trim without changing internal text."""
     return text.strip(_NATIVE_TRIM_CHARACTERS)
+
+
+def find_shot_timing_overrun(text: str, duration_seconds: int) -> tuple[int, Decimal] | None:
+    """Read only explicit ranges in numbered output-shot headers."""
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        # Collapse whitespace for the match to avoid backtracking across
+        # adjacent optional separators when a heading has column padding.
+        match = _SHOT_TIME_RANGE.match(" ".join(line.split()))
+        if match is None:
+            continue
+        for endpoint in ("start", "end"):
+            timecode = match[f"{endpoint}_clock"] or match[f"{endpoint}_seconds"]
+            first_component, colon, seconds_component = timecode.replace("：", ":").partition(":")
+            seconds = Decimal(seconds_component if colon else first_component)
+            if colon and int(first_component):
+                seconds += 60 * int(first_component)
+            if seconds > duration_seconds:
+                return line_number, seconds
+    return None
 
 
 def _unsupported(provider_bound: Any, reason: str) -> Any:

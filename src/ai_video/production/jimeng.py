@@ -21,6 +21,7 @@ from ai_video.production.jimeng_contracts import (
 from ai_video.production.jimeng_models import (
     JIMENG_INPUT_MODE_SPECS, JIMENG_MODEL_SPECS,
 )
+from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt, find_shot_timing_overrun
 from ai_video.production.minimax_h3 import _consume_permit, _permit_is_valid
 from ai_video.production.paid_provider import (
     JimengAcceptedEffectProof, PaidProviderCallPreview, PaidProviderEgressItem,
@@ -197,8 +198,6 @@ class JimengVideoProvider:
                 reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
                 unsupported_field_paths=("target_shot.preserved_source_expression",),
             )
-        from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
-
         native = compile_jimeng_native_prompt(
             compiler_id=self._profile.compiler_id,
             compiler_version=provider_bound.compiler_contract.compiler_version,
@@ -215,6 +214,20 @@ class JimengVideoProvider:
             native_prompt=native,
         )
         if compiled.outcome == "compiled":
+            duration_seconds = self._profile.duration_seconds
+            overrun = find_shot_timing_overrun(compiled.request.prompt_text, duration_seconds)
+            if overrun is not None:
+                line_number, timecode_seconds = overrun
+                return ProviderRequirementUnsupported(
+                    requirement_hash=requirement.requirement_hash,
+                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                    selected_capability_id=provider_bound.capability_id,
+                    reason=ProviderRequirementUnsupportedReason.OUTPUT_UNSUPPORTED,
+                    unsupported_field_paths=(
+                        f"native_prompt.shot_timing[line={line_number},timecode_seconds={timecode_seconds},"
+                        f"requested_seconds={duration_seconds}]",
+                    ),
+                )
             try:
                 self.resolve(compiled.request)
             except AiVideoError as error:
@@ -317,11 +330,19 @@ class JimengVideoProvider:
         return tuple(items)
 
     def preview(self, request):
+        egress_items = self.egress_items(request)
+        duration_seconds = self._profile.duration_seconds
+        overrun = find_shot_timing_overrun(request.prompt_text, duration_seconds)
+        if overrun is not None:
+            line_number, timecode_seconds = overrun
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                f"Jimeng prompt shot range on line {line_number} reaches {timecode_seconds}s, "
+                f"beyond the requested {duration_seconds}s.")
         return VideoGenerationPreview.create(
             resolved=request,
             estimated_cost_upper_bound_microunits=self._profile.credit_upper_bound * 1_000_000,
             currency="CRD", destination=JIMENG_ORIGIN,
-            egress_item_ids=tuple(x.item_id for x in self.egress_items(request)),
+            egress_item_ids=tuple(x.item_id for x in egress_items),
         )
 
     def _save_canvas(self, intent: JimengDispatchIntent) -> JimengCanvasSnapshot:

@@ -37,21 +37,23 @@ def _leaf_paths(value, prefix="generation_intent"):
 
 
 def _fixture(monkeypatch, *, missing_path=None, stale_hash=False, fragment=None, text=TEXT,
-             compiler_version="1"):
+             compiler_version="1", duration_seconds=6):
     original = setup()[0]._profile
-    profile = JimengProfile.model_validate({**original.model_dump(), "duration_seconds": 6, "benefit_amount": 6})
+    profile = JimengProfile.model_validate({**original.model_dump(),
+        "duration_seconds": duration_seconds, "benefit_amount": duration_seconds})
     provider = JimengVideoProvider(profile=profile, transport=FakeBrowser(),
         reference_resolver=lambda _: pytest.fail("offline compile must not upload or read media"),
         committer=FakeCommitter(), now=lambda: NOW)
     context = _context(continuity=ContinuityMode.NONE, shot_intent=text)
     intent = _complete_intent()
-    intent = intent.model_copy(update={"pacing": intent.pacing.model_copy(update={"shot_duration_seconds": 6}),
+    intent = intent.model_copy(update={"pacing": intent.pacing.model_copy(
+        update={"shot_duration_seconds": duration_seconds}),
         # The dolly-in names what it reveals in the QA-owned Chinese text itself.
         "reference_planning": fixture_reference_planning(intent=intent, events=(CAMERA_REVEAL,))})
     projection = _reseal_projection(_identity_reference_projection(context),
         contract_version="provider-neutral-video-requirement/4", continuity_mode="none",
         generation_intent=intent, audio_need=AudioNeed.REQUIRED,
-        output_need=OutputNeed(timing_mode="content_driven", duration_seconds=6,
+        output_need=OutputNeed(timing_mode="content_driven", duration_seconds=duration_seconds,
             geometry_policy="adaptive", aspect_ratio="16:9", container_mime="video/mp4"))
     declared = provider.capabilities()
     monkeypatch.setattr(provider, "capabilities", lambda: VideoProviderCapabilities.create(
@@ -94,6 +96,68 @@ def test_final_chinese_shot_text_is_the_exact_native_request(monkeypatch):
     assert result.request.prompt_text.count("{{image:0}}") == 1
     assert result.request.image_bindings[0].asset_sha256 == requirement.asset_evidence[0].asset_sha256
     assert provider.resolve(result.request).prompt_text == TEXT
+    assert provider._transport.uploads == []
+
+
+@pytest.mark.parametrize("header", [
+    "镜头 16 | 第二单元·计划00:17.6–00:20.5 | S3 室内客厅 | 近景",
+    "## Shot 16 (17.6–20.5s) | close-up",
+    "Shot 16, [17.6-20.5 seconds]: Close-up.",
+    "镜头十六｜房间篇·第五单元·计划00：17.6至00：20.5｜近景",
+    "镜头 16 | 00:20.5–00:17.6 | 近景",
+])
+def test_authored_shot_schedule_cannot_exceed_requested_duration(monkeypatch, header):
+    provider, bound, requirement = _fixture(monkeypatch, text=f"{TEXT}\n{header}",
+        duration_seconds=18, compiler_version="2")
+    result = provider.compile_request(bound, requirement)
+    assert result.outcome == "unsupported"
+    assert result.unsupported_field_paths == (
+        "native_prompt.shot_timing[line=2,timecode_seconds=20.5,requested_seconds=18]",
+    )
+    assert provider._transport.uploads == []
+
+
+def test_authored_shot_schedule_allows_boundary_and_ignores_other_times(monkeypatch):
+    text = (
+        f"{TEXT}\n镜头 01 | 第一单元·计划00:00–00:10 | 给出角色反应。"
+        "\n镜头 02 | 第一单元·计划00:10–00:18 | 收束动作。"
+        "\nShot 3, [16-18 seconds]: Close-up."
+        f"\n镜头 03{' ' * 64}| 参考原视频 00:18–00:20.5 的站位，焦距 50–85mm。"
+        "\n台词：‘现在是00:20’，钟面的时间从00:18–00:20.5变化。"
+    )
+    provider, bound, requirement = _fixture(monkeypatch, text=text,
+        duration_seconds=18, compiler_version="2")
+    result = provider.compile_request(bound, requirement)
+    assert result.outcome == "compiled", result
+    assert result.request.prompt_text == text
+
+
+def test_out_of_bounds_historical_prompt_can_reopen_but_cannot_preview_or_submit(monkeypatch):
+    from ai_video.errors import AiVideoError, ErrorCode
+    from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
+    from ai_video.production.video_compiler import compile_provider_video_request
+
+    text = f"{TEXT}\n镜头 16 | 第二单元·计划00:17.6–00:20.5 | 近景"
+    provider, bound, requirement = _fixture(monkeypatch, text=text,
+        duration_seconds=18, compiler_version="2")
+    contract = bound.compiler_contract
+    native = compile_jimeng_native_prompt(compiler_id=contract.compiler_id,
+        compiler_version=contract.compiler_version, requirement=requirement, provider_bound=bound)
+    historical = compile_provider_video_request(provider_bound=bound, requirement=requirement,
+        compiler_id=contract.compiler_id, compiler_version=contract.compiler_version,
+        capabilities=provider.capabilities(), native_prompt=native)
+    assert historical.outcome == "compiled"
+    resolved = provider.resolve(historical.request)
+    assert resolved.prompt_text == text
+    with pytest.raises(AiVideoError) as preview_error:
+        provider.preview(resolved)
+    with pytest.raises(AiVideoError) as submit_error:
+        provider.submit(resolved, None, None, None, None)
+    for error in (preview_error.value, submit_error.value):
+        assert error.code is ErrorCode.VIDEO_REQUEST_INVALID
+        assert error.retryable is False
+        assert "line 2" in error.user_message
+        assert "20.5s" in error.user_message and "18s" in error.user_message
     assert provider._transport.uploads == []
 
 
