@@ -873,24 +873,32 @@ def test_new_high_fan_out_is_reviewer_information(tmp_path: Path):
     assert not result.has_errors
 
 
-def test_sequence_reopen_exception_preserves_other_production_dependency_blocks(tmp_path: Path):
+def test_sequence_reopen_allows_shared_preflight_and_blocks_upper_layer_imports(tmp_path: Path):
     repository_root = Path(__file__).resolve().parents[1]
     shutil.copyfile(repository_root / "architecture_gate.toml", tmp_path / "architecture_gate.toml")
     _write_module(tmp_path, "src/ai_video/production/_sequence_source.py", [
+        "from ai_video.production.generation_preflight.readiness import require_current_video_plan",
         "import ai_video.planning.video_planner",
         "import ai_video.quality_gates.shot_readiness_gate",
     ])
-    _write_module(tmp_path, "src/ai_video/production/service.py", [
+    _write_module(tmp_path, "src/ai_video/production/generation_preflight/readiness.py", [
         "import ai_video.planning.video_planner",
+        "import ai_video.quality_gates.shot_readiness_gate",
     ])
     update_baseline(tmp_path)
 
     result = check_architecture(tmp_path)
 
-    blocked = {(item.path, item.measurements["line"]) for item in result.findings if item.code == "ARCH103"}
+    blocked = {
+        (item.path, item.measurements["line"])
+        for item in result.findings
+        if item.code == "ARCH103"
+    }
     assert blocked == {
         ("src/ai_video/production/_sequence_source.py", 2),
-        ("src/ai_video/production/service.py", 1),
+        ("src/ai_video/production/_sequence_source.py", 3),
+        ("src/ai_video/production/generation_preflight/readiness.py", 1),
+        ("src/ai_video/production/generation_preflight/readiness.py", 2),
     }
 
 

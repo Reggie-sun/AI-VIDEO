@@ -181,11 +181,11 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle, provider
             destination_execution_stack=routing.destination_execution_stack, lifecycle=lifecycle,
             destination_route=routing.destination_route, project=loaded,
             source_request_content_hash=seed_hash)
-        # ARCH103's exact read-only exception reuses the Planning owner; hashes
-        # alone cannot prove that this projection was derived from the seed.
-        from ai_video.planning.video_planner import (
-            VideoPlanner, VideoPlanningRequest, require_current_video_plan,
-        )
+        # Reuse the canonical derivation: hashes alone do not prove that the
+        # prior projection came from this seed.
+        from ai_video.production.generation_preflight.models import VideoPlanningRequest
+        from ai_video.production.generation_preflight.planner import VideoPlanner
+        from ai_video.production.generation_preflight.readiness import require_current_video_plan
         seed = VideoPlanningRequest.create(**{
             **{name: value for name, value in routing.destination_planning_request.items()
                if name not in {"request_content_hash", "previous_shot_state", "continuity_transition_policy"}},
@@ -205,8 +205,9 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle, provider
     if loaded.qa_policy is None or policy.qa_policy_hash != loaded.qa_policy.content_hash:
         raise ValueError("sequence QA policy is stale")
     if provider_bound is not None:
-        # Reuse this owner's existing exact read-only Planning exception.
-        from ai_video.planning.video_planner import VideoPlanner, VideoPlanningRequest, require_current_video_plan
+        from ai_video.production.generation_preflight.models import VideoPlanningRequest
+        from ai_video.production.generation_preflight.planner import VideoPlanner
+        from ai_video.production.generation_preflight.readiness import require_current_video_plan
 
         seed_hash = _sequence_planning_seed_hash(routing, requirement)
         request = VideoPlanningRequest.model_validate(routing.destination_planning_request)

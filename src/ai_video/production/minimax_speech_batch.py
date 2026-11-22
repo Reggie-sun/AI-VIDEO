@@ -91,39 +91,51 @@ def prepare_minimax_speech_test_project(
     root: Path, batch: MiniMaxSpeechTestBatch, *, title: str = "MiniMax Speech test",
 ) -> None:
     """Create an independent, provenance-bound audio experiment, never copy a ledger."""
+    prepare_standalone_voice_project(
+        root, project_id=batch.batch_id, objective=batch.model_dump_json(),
+        source_reference=batch.source_reference, creation_receipt_id=batch.policy_id,
+        language=batch.language, title=title, development=True,
+    )
+
+
+def prepare_standalone_voice_project(
+    root: Path, *, project_id: str, objective: str, source_reference: str,
+    creation_receipt_id: str, language: str, title: str, development: bool = False,
+) -> None:
+    """Bootstrap voice-only state through the canonical committer."""
     root = Path(root).resolve()
     if (root / "project.yaml").exists():
         loaded = load_production_project(root / "project.yaml")
-        if (loaded.project.project_id != batch.batch_id
-                or loaded.brief.objective != batch.model_dump_json()):
+        if loaded.project.project_id != project_id or loaded.brief.objective != objective:
             raise _invalid("Existing speech project does not match the exact batch.")
         return
     if root.exists() and any(root.iterdir()):
         raise _invalid("Speech test bootstrap requires an empty destination.")
-    provenance = (SourceReference(kind="user_input", reference=batch.source_reference),)
+    provenance = (SourceReference(kind="user_input", reference=source_reference),)
+    purpose = "Speech test" if development else "Standalone narration"
 
     def artifact(cls, name, **values):
-        return seal_artifact(cls(artifact_id=f"{batch.batch_id}-{name}", revision=1,
-                                 content_hash="0" * 64, creation_receipt_id=batch.policy_id,
+        return seal_artifact(cls(artifact_id=f"{project_id}-{name}", revision=1,
+                                 content_hash="0" * 64, creation_receipt_id=creation_receipt_id,
                                  source_provenance=provenance, **values))
 
     brief = artifact(ProductionBrief, "brief", title=title,
-                     objective=batch.model_dump_json(), audience="Development",
-                     format="Standalone WAV test", language=batch.language,
+                     objective=objective, audience="Development" if development else "Editorial",
+                     format="Standalone WAV test" if development else "Standalone WAV", language=language,
                      constraints=("No source project recovery or video acceptance",))
-    story = artifact(Story, "story", language=batch.language, logline="Speech test",
-                     synopsis="Independent dialogue evaluation",
-                     beats=(StoryBeat(beat_id="test", summary="Evaluate generated speech"),))
-    scene = artifact(Scene, "scene", scene_id="test", location="Audio test",
+    story = artifact(Story, "story", language=language, logline=purpose,
+                     synopsis="Independent dialogue evaluation" if development else "Independent narration assets",
+                     beats=(StoryBeat(beat_id="test", summary="Evaluate generated speech" if development else purpose),))
+    scene = artifact(Scene, "scene", scene_id="test", location="Audio test" if development else "Audio-only",
                      time="Unspecified", mood="Unspecified")
     shot = artifact(Shot, "shot", shot_id="test", scene_id="test", storyboard_beat_id="test",
-                    intent="Audio-only development test; no visual generation",
+                    intent="Audio-only development test; no visual generation" if development else "Audio-only narration",
                     duration_policy=DurationPolicy(mode="fixed", seconds=3),
                     visual_strategy=VisualStrategy.STATIC_IMAGE,
                     required_asset_roles=(AssetRoleRequirement(role="test_canvas",
                         asset_ids=("test-canvas",), allowed_asset_types=(AssetType.IMAGE,)),))
     storyboard = artifact(Storyboard, "storyboard", beats=(StoryboardBeat(
-        beat_id="test", scene_id="test", shot_ids=("test",), narrative_intent="Speech test"),))
+        beat_id="test", scene_id="test", shot_ids=("test",), narrative_intent=purpose),))
     prepared = []
 
     def ref(value):
@@ -136,8 +148,8 @@ def prepare_minimax_speech_test_project(
 
     refs = ProjectArtifactRefs(brief=ref(brief), story=ref(story), characters=(),
                                scenes=(ref(scene),), shots=(ref(shot),), storyboard=ref(storyboard))
-    project = artifact(ProductionProject, "project", project_id=batch.batch_id,
-                       title="Independent " + title, default_language=batch.language,
+    project = artifact(ProductionProject, "project", project_id=project_id,
+                       title="Independent " + title, default_language=language,
                        delivery_profile=DeliveryProfile(width=1280, height=720, fps=24),
                        renderer_policy=RendererPolicy(), artifacts=refs)
     # A fixed one-pixel canvas satisfies the existing Project visual contract;
@@ -152,22 +164,22 @@ def prepare_minimax_speech_test_project(
         width=1, height=1, source_kind=AssetSourceKind.DERIVED,
         tool=ToolIdentity(name="speech-test-canvas", version="1"),
         input_artifact_ids=(brief.artifact_id,), input_fingerprint=brief.content_hash,
-        creation_receipt_id=batch.policy_id, usage_license="project-authored-test-canvas")
+        creation_receipt_id=creation_receipt_id, usage_license="project-authored-test-canvas")
     registry = AssetRegistrySnapshot(schema_version="2.0", revision_id="0" * 64,
                                      content_hash="0" * 64, assets=(canvas_record,))
     digest = registry_semantic_sha256(registry)
     registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
     root.mkdir(parents=True, exist_ok=True)
     ProductionStateCommitter(root).bootstrap_initial_state(
-        attempt_id=f"{batch.batch_id}-bootstrap", project=project,
+        attempt_id=f"{project_id}-bootstrap", project=project,
         registry=registry, artifacts=tuple(prepared))
 
 
-def _prepare_test_graph(root):
+def prepare_standalone_voice_graph(root: Path) -> None:
     loaded = load_production_project(root / "project.yaml")
     if loaded.dependency_graph is not None:
         return
-    # This standalone test has no composition/render consumers. Use the existing
+    # A voice-only workspace has no composition/render consumers. Use the existing
     # authoring projection; registered WAV provenance is verified by the voice reader.
     projection = build_authoring_dependency_projection(loaded)
     graph = build_dependency_graph(projection.nodes, projection.edges)
@@ -183,7 +195,7 @@ def _prepare_test_graph(root):
         transition=transition, expected_desired_fingerprints=desired)
 
 
-def _prepare_test_transition(root, request):
+def prepare_standalone_voice_transition(root, request):
     base = load_production_project(root / "project.yaml")
     artifacts = {a.relative_path: a for a in request.artifacts}
     project = ProductionProject.model_validate(yaml.safe_load(artifacts[request.next_project.path].payload))
@@ -206,7 +218,7 @@ def run_minimax_speech_batch(
     """
     prepare_minimax_speech_test_project(root, batch)
     root = Path(root).resolve(strict=True)
-    _prepare_test_graph(root)
+    prepare_standalone_voice_graph(root)
     policy = MiniMaxSpeechProviderPolicy(
         provider_enabled=True, credential_reference_kind="secret_store",
         credential_reference_id=batch.credential_reference_id, retention_mode="provider_standard",
@@ -273,7 +285,7 @@ def run_minimax_speech_batch(
             root, paid_provider_authorizer=authorize, paid_provider_clock=clock,
             voice_candidate_preparer=make_voice_candidate_preparer(root, toolchain))
         committer.generate_voice_asset(request, provider, authorization, paid_preview=paid,
-            dependency_transition_preparer=lambda candidate: _prepare_test_transition(root, candidate))
+            dependency_transition_preparer=lambda candidate: prepare_standalone_voice_transition(root, candidate))
         reopened = load_production_project(root / "project.yaml")
         outputs.append(reopened.asset_paths[f"voice-{attempt_id}"])
     return tuple(outputs)

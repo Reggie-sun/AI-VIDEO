@@ -969,7 +969,7 @@ def test_result_hash_and_projection_seal_tampering_fail_closed(
     projection = valid.verified_generation_requirement
     assert projection is not None
     gate_module = importlib.import_module(
-        "ai_video.quality_gates.shot_readiness_gate"
+        "ai_video.production.generation_preflight.readiness"
     )
     monkeypatch.setattr(
         gate_module,
@@ -1039,6 +1039,12 @@ def test_continuity_handoff_preserves_exact_transition_policy() -> None:
 
 def test_readiness_import_and_single_owner_boundaries() -> None:
     quality_root = Path("src/ai_video/quality_gates")
+    preflight_root = Path("src/ai_video/production/generation_preflight")
+    readiness_paths = (
+        *quality_root.rglob("*.py"),
+        preflight_root / "readiness.py",
+        preflight_root / "readiness_models.py",
+    )
     forbidden_prefixes = (
         "ai_video.production.shot_router",
         "ai_video.production.video_generation",
@@ -1058,7 +1064,7 @@ def test_readiness_import_and_single_owner_boundaries() -> None:
         "requests",
         "keyring",
     )
-    for path in quality_root.glob("*.py"):
+    for path in readiness_paths:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
             modules: tuple[str, ...] = ()
@@ -1072,20 +1078,55 @@ def test_readiness_import_and_single_owner_boundaries() -> None:
                     for prefix in forbidden_prefixes
                 ), f"{path}:{node.lineno} forbidden readiness import {module}"
 
-    production_sources = tuple(Path("src/ai_video/production").glob("*.py"))
+    production_sources = tuple(Path("src/ai_video/production").rglob("*.py"))
     assert all(
         "ai_video.quality_gates" not in path.read_text(encoding="utf-8")
         for path in production_sources
     )
-    planning_source = Path(
-        "src/ai_video/planning/video_planner.py"
-    ).read_text(encoding="utf-8")
-    assert "plan_hint" not in planning_source
-    assert planning_source.count(
-        "def _verify_current_generation_requirement_projection("
-    ) == 1
+    planning_paths = (
+        *Path("src/ai_video/planning").rglob("*.py"),
+        *preflight_root.rglob("*.py"),
+        *quality_root.rglob("*.py"),
+    )
+    verifier_owners = [
+        path
+        for path in planning_paths
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8")))
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_verify_current_generation_requirement_projection"
+    ]
+    assert verifier_owners == [preflight_root / "planner.py"]
+    for path in (preflight_root / "planner.py", Path("src/ai_video/planning/video_planner.py")):
+        assert "plan_hint" not in path.read_text(encoding="utf-8")
     integration_examples = tuple(Path("docs").rglob("*.md"))
     assert all(
         "plan_hint=" not in path.read_text(encoding="utf-8")
         for path in integration_examples
     )
+
+
+def test_readiness_apis_share_the_preflight_implementation() -> None:
+    from ai_video.production.generation_preflight import readiness, readiness_models
+    from ai_video.quality_gates import shot_readiness_gate
+
+    api = _gate_api()
+    assert (
+        api.ShotReadinessGate
+        is shot_readiness_gate.ShotReadinessGate
+        is readiness.ShotReadinessGate
+    )
+    assert api.ShotReadinessRequest is readiness_models.ShotReadinessRequest
+    assert api.ShotReadinessResult is readiness_models.ShotReadinessResult
+    assert api.require_ready is shot_readiness_gate.require_ready is readiness.require_ready
+    for name in (
+        "PlanEligibilityOutcome",
+        "PlanEligibilityPayload",
+        "ReadinessCheckStatus",
+        "ReadinessReason",
+        "ReadinessStatus",
+        "RequestPlanBindingOutcome",
+        "RequestPlanBindingPayload",
+        "RequiredAssetReadinessOutcome",
+        "RequiredAssetReadinessPayload",
+    ):
+        assert getattr(shot_readiness_gate, name) is getattr(readiness_models, name)

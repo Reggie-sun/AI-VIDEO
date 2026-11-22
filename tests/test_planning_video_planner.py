@@ -1717,7 +1717,10 @@ def test_t9_review_policy_and_asset_binding_each_change_request_identity():
 
 
 def test_t10_planning_import_boundary_and_no_runtime_skill_calls():
-    planning_root = Path("src/ai_video/planning")
+    planning_paths = (
+        *Path("src/ai_video/planning").rglob("*.py"),
+        *Path("src/ai_video/production/generation_preflight").rglob("*.py"),
+    )
     forbidden_prefixes = (
         "ai_video.production.state_commit",
         "ai_video.production.registry",
@@ -1737,7 +1740,7 @@ def test_t10_planning_import_boundary_and_no_runtime_skill_calls():
     )
     skill_tokens = {"higgsfield", "hell_grind", "video_shotcraft", "skills"}
 
-    for path in planning_root.glob("*.py"):
+    for path in planning_paths:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
             modules: tuple[str, ...] = ()
@@ -1755,18 +1758,10 @@ def test_t10_planning_import_boundary_and_no_runtime_skill_calls():
                 assert module not in skill_tokens
 
 
-def test_t10_production_does_not_reverse_import_planning_outside_sequence_proof_reopen():
-    for path in Path("src/ai_video/production").glob("*.py"):
+def test_t10_production_does_not_reverse_import_planning():
+    for path in Path("src/ai_video/production").rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
-            if (path.name == "_sequence_source.py" and isinstance(node, ast.ImportFrom)
-                    and node.module == "ai_video.planning.video_planner"
-                    and {alias.name for alias in node.names} == {
-                        "VideoPlanner", "VideoPlanningRequest", "require_current_video_plan"}):
-                reopen = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
-                              and n.name == "require_sequence_source")
-                assert node in tuple(ast.walk(reopen))
-                continue
             if isinstance(node, ast.Import):
                 modules = tuple(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom) and node.module:
@@ -1776,6 +1771,24 @@ def test_t10_production_does_not_reverse_import_planning_outside_sequence_proof_
             assert all(
                 not module.startswith("ai_video.planning") for module in modules
             ), f"{path}:{node.lineno} Production reverse-imports planning"
+
+
+def test_planner_apis_share_the_preflight_implementation():
+    from ai_video.planning import video_planner
+    from ai_video.production.generation_preflight import models, planner, projection, readiness
+
+    assert planning.VideoPlanner is video_planner.VideoPlanner is planner.VideoPlanner
+    assert planning.VideoPlanningRequest is models.VideoPlanningRequest
+    assert planning.VideoGenerationPlan is models.VideoGenerationPlan
+    assert (
+        video_planner.verify_current_generation_requirement_projection
+        is projection.verify_current_generation_requirement_projection
+    )
+    assert (
+        planning.require_current_video_plan
+        is video_planner.require_current_video_plan
+        is readiness.require_current_video_plan
+    )
 
 
 def test_t11_previous_state_helper_uses_explicit_continuity_evidence():

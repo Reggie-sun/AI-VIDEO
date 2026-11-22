@@ -9,6 +9,10 @@ learning_eligibility: ineligible
 Date: 2026-10-04
 Updated: 2026-10-05
 
+## Supersession Notice — 2026-11-21
+
+本记录中的 `ARCH103` 到期例外已被 [Planning Preflight Boundary Repair](../superpowers/specs/2026-11-21-planning-preflight-boundary.md) 取代。当前序列读回、公开 Planner 和 Readiness 入口共享 `production/generation_preflight/` 内的同一实现。下文保留旧例外的来由、伪造投影复现和当时验证结果。
+
 ## Purpose And Research Baseline
 
 审查起点为 `main` 的 `fc72e35c2fc43a059b8b77e22635dc2fc262670e`，包含

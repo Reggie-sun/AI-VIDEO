@@ -27,7 +27,7 @@ from ai_video.production.project import load_production_project
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.voice_candidate import make_voice_candidate_preparer
 from ai_video.production.minimax_speech_batch import (
-    prepare_minimax_speech_test_project, _prepare_test_graph, _prepare_test_transition,
+    prepare_minimax_speech_test_project, prepare_standalone_voice_graph, prepare_standalone_voice_transition,
 )
 
 
@@ -93,7 +93,7 @@ def run_elevenlabs_speech_batch(
     """
     prepare_minimax_speech_test_project(root, batch, title="ElevenLabs Speech test")
     root = Path(root).resolve(strict=True)
-    _prepare_test_graph(root)
+    prepare_standalone_voice_graph(root)
     policy = ElevenLabsProviderPolicy(
         provider_enabled=True, enable_logging=True, zero_retention_entitled=False,
         credential_reference_kind="secret_store", credential_reference_id="ELEVENLABS_API_KEY",
@@ -160,7 +160,7 @@ def run_elevenlabs_speech_batch(
             root, paid_provider_authorizer=authorize, paid_provider_clock=clock,
             voice_candidate_preparer=make_voice_candidate_preparer(root, toolchain))
         committer.generate_voice_asset(request, provider, authorization, paid_preview=paid,
-            dependency_transition_preparer=lambda candidate: _prepare_test_transition(root, candidate))
+            dependency_transition_preparer=lambda candidate: prepare_standalone_voice_transition(root, candidate))
         reopened = load_production_project(root / "project.yaml")
         outputs.append(reopened.asset_paths[f"voice-{attempt_id}"])
     return tuple(outputs)

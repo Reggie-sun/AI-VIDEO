@@ -1,0 +1,103 @@
+{
+  "jobs": [
+    {
+      "project": "giftcard-jp-replica",
+      "name": "日区苹果礼品卡教程",
+      "cover": {
+        "title": "日区苹果礼品卡",
+        "sub": "购买·兑换·使用",
+        "chip": "全流程手把手",
+        "notes": [
+          "46.53元 买 1000日元礼品卡",
+          "兑换后直接订阅 ChatGPT Go"
+        ],
+        "shots": [
+          [
+            "assets/footage/B_red2.mp4",
+            10.5,
+            5,
+            [
+              1420,
+              150
+            ]
+          ],
+          [
+            "assets/footage/A_red2.mp4",
+            147.3,
+            -6,
+            [
+              1030,
+              210
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "project": "giftcard-jp-part1",
+      "name": "日区苹果礼品卡-上-购买与兑换",
+      "cover": {
+        "title": "日区苹果礼品卡",
+        "sub": "购买·兑换",
+        "chip": "全流程手把手",
+        "notes": [
+          "46.53元 买 1000日元礼品卡",
+          "App Store 兑换成账户余额"
+        ],
+        "shots": [
+          [
+            "assets/footage/A_red2.mp4",
+            120.0,
+            5,
+            [
+              1420,
+              150
+            ]
+          ],
+          [
+            "assets/footage/A_red2.mp4",
+            147.3,
+            -6,
+            [
+              1030,
+              210
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "project": "giftcard-jp-part2",
+      "name": "日区苹果礼品卡-下-余额订阅ChatGPT-Go",
+      "cover": {
+        "title": "礼品卡余额",
+        "sub": "订阅 ChatGPT Go",
+        "chip": "手把手教程",
+        "notes": [
+          "日区 App Store 每月1400日元",
+          "余额直接付款 不用信用卡"
+        ],
+        "shots": [
+          [
+            "assets/footage/B_red2.mp4",
+            74.0,
+            5,
+            [
+              1420,
+              150
+            ]
+          ],
+          [
+            "assets/footage/B_red2.mp4",
+            10.5,
+            -6,
+            [
+              1030,
+              210
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

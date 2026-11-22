@@ -17,6 +17,7 @@ Codex 使用现有 OMX 原生角色，不要求把 Claude frontmatter 翻译成�
 | 检索 / 记录 / 提炼 | `memory-keeper` | `executor` | 当前阶段分别读取 retrieve / record / distill；稳定记录后自动评估 learning，不启动时全载 |
 | Harness 验证 | `harness-runner` | `verifier` | 执行 exact snapshot 与 level 的 Harness，返回 receipt；允许本地验证 artifact 写入 |
 | 显式独立审查 | `harness-reviewer` | `code-reviewer` | 仅用户显式要求此项目 reviewer 时；读取 immutable target 与已有证据 |
+| 参考片复刻和独立客户剪辑 | 主会话 | 主会话 | 按需读取 `reference-replica`；Agentcut 工程和交付边界见 [Contract Routing Matrix](agent-primary-contract-matrix.md#development-control-surface) |
 
 主会话在 dispatch 中给出任务、selected Provider（如适用）、exact 输入/identity、允许的输出路径、验收项、当前 evidence 与 scope。Codex role 必须由实际原生角色面选择，再读取对应 `.claude/agents/<name>.md` 的职责正文作为任务材料；该文件不会自行改变 Codex tools 或 sandbox。角色不可用时按原 Gate 报 `NOT_EVALUATED`，不得伪造已执行或静默转为主会话代做。
 

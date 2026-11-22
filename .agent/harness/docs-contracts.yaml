@@ -17,26 +17,28 @@ surfaces:
     implementation_paths:
       - src/ai_video/planning/video_planner.py
       - src/ai_video/planning/_planner_models.py
+      - src/ai_video/production/generation_preflight/planner.py
+      - src/ai_video/production/generation_preflight/models.py
     test_paths:
       - tests/test_planning_video_planner.py
     harness_check_ids:
       - video_planner_tests
     assertions:
       - type: python_literal_equals
-        path: src/ai_video/planning/video_planner.py
+        path: src/ai_video/production/generation_preflight/planner.py
         symbol: VideoPlanner.CONTRACT_VERSION
         expected: video-planner/3
       - type: python_symbol_exists
-        path: src/ai_video/planning/_planner_models.py
+        path: src/ai_video/production/generation_preflight/models.py
         symbol: VideoPlanningRequest.generation_intent
       - type: python_symbol_exists
-        path: src/ai_video/planning/_planner_models.py
+        path: src/ai_video/production/generation_preflight/models.py
         symbol: VideoGenerationPlan.generation_requirement
       - type: python_symbol_absent
-        path: src/ai_video/planning/_planner_models.py
+        path: src/ai_video/production/generation_preflight/models.py
         symbol: VideoGenerationPlan.plan_hint
       - type: text_not_contains
-        path: src/ai_video/planning/video_planner.py
+        path: src/ai_video/production/generation_preflight/planner.py
         text: plan_hint=
 
   - surface_id: provider_neutral_generation_requirement
@@ -80,16 +82,18 @@ surfaces:
     implementation_paths:
       - src/ai_video/quality_gates/shot_readiness_gate.py
       - src/ai_video/quality_gates/_readiness_models.py
+      - src/ai_video/production/generation_preflight/readiness.py
+      - src/ai_video/production/generation_preflight/readiness_models.py
     test_paths:
       - tests/test_shot_readiness_gate.py
     harness_check_ids:
       - shot_readiness_gate_tests
     assertions:
       - type: python_symbol_exists
-        path: src/ai_video/quality_gates/shot_readiness_gate.py
+        path: src/ai_video/production/generation_preflight/readiness.py
         symbol: ShotReadinessGate
       - type: python_literal_equals
-        path: src/ai_video/quality_gates/_readiness_models.py
+        path: src/ai_video/production/generation_preflight/readiness_models.py
         symbol: ShotReadinessRequest.contract_version
         expected: shot-readiness-gate/1
 

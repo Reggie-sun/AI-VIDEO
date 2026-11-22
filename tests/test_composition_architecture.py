@@ -91,6 +91,11 @@ def test_proposal_is_absent_from_canonical_production_hash_owners() -> None:
     for relative in (
         "src/ai_video/planning/_planner_models.py",
         "src/ai_video/planning/video_planner.py",
+        "src/ai_video/production/generation_preflight/models.py",
+        "src/ai_video/production/generation_preflight/planner.py",
+        "src/ai_video/production/generation_preflight/projection.py",
+        "src/ai_video/production/generation_preflight/readiness.py",
+        "src/ai_video/production/generation_preflight/readiness_models.py",
         "src/ai_video/production/video_requirement.py",
         "src/ai_video/production/dependency.py",
         "src/ai_video/production/shot_router.py",

@@ -60,6 +60,8 @@ audit_patterns:
   - src/**/*.py
   - scripts/*.py
   - scripts/**/*.py
+  - scripts/replica/agentcut-scenes/**
+  - examples/reference-replica/**
   - tests/*.py
   - tests/**/*.py
   - tests/test_*.py
@@ -257,6 +259,10 @@ checks:
   skill_routing_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_skill_routing_eval.py, tests/test_skill_environment_check.py, tests/test_skill_descriptions.py, -q]
 
+  reference_replica_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_replica_kit.py, tests/test_reference_replica_example.py, tests/test_replica_voice.py, -q]
+    cwd: .
+    description: Verify reference-edit timing, all three pinned Agentcut layer outputs, and canonical offline narration replay.
   harness_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_agent_harness_policy.py, tests/test_agent_harness_levels.py, tests/test_agent_harness_canvas_data.py, tests/test_record_ai_video_session_hook.py, tests/test_claude_code_adapter.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
@@ -456,6 +462,7 @@ checks:
     covers_check_ids:
       - jimeng_history_tests
       - skill_routing_tests
+      - reference_replica_tests
       - existing_tool_contract_tests
       - agent_rule_invariants
       - assembly_review_tests
@@ -545,6 +552,7 @@ categories:
       - src/ai_video/production/preview_approval.py
       - src/ai_video/production/director_coverage.py
       - src/ai_video/planning/_reference_planning.py
+      - src/ai_video/production/generation_preflight/reference_planning.py
       - tests/test_reference_planning.py
       - tests/test_reference_planning_integration.py
       - docs/shot-reference-planning.md
@@ -1591,6 +1599,7 @@ categories:
   video_planning:
     patterns:
       - src/ai_video/planning/**
+      - src/ai_video/production/generation_preflight/**
       - src/ai_video/production/_sequence_source.py
       - tests/fixtures/planning_factory.py
       - tests/test_planning_video_planner.py
@@ -1605,6 +1614,9 @@ categories:
     patterns:
       - src/ai_video/quality_gates/**
       - src/ai_video/planning/_asset_readiness.py
+      - src/ai_video/production/generation_preflight/asset_readiness.py
+      - src/ai_video/production/generation_preflight/projection.py
+      - src/ai_video/production/generation_preflight/readiness*.py
       - tests/test_shot_readiness_gate.py
     focused_check_ids: [shot_readiness_gate_tests]
     check_ids:
@@ -1811,6 +1823,23 @@ categories:
     check_ids:
       - elevenlabs_speech_tests
       - minimax_speech_batch_tests
+      - mcp_tests
+      - task_architecture_gate
+  reference_replica:
+    patterns:
+      - scripts/replica/**
+      - examples/reference-replica/**
+      - .agents/skills/reference-replica/**
+      - .claude/skills/reference-replica
+      - docs/minimax-speech.md
+      - tests/test_replica_kit.py
+      - tests/test_reference_replica_example.py
+      - tests/test_replica_voice.py
+    focused_check_ids: [reference_replica_tests, task_architecture_gate]
+    check_ids:
+      - reference_replica_tests
+      - minimax_speech_batch_tests
+      - elevenlabs_speech_tests
       - mcp_tests
       - task_architecture_gate
   minimax_speech_batch:

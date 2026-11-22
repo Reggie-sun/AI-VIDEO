@@ -61,10 +61,10 @@ class _HttpTransport:
                 body=response.read(6 * 1024 * 1024 + 1))
 
 
-def _toolchain():
+def _toolchain(*, ffmpeg=None, ffprobe=None):
     values = {}
-    for name in ("ffmpeg", "ffprobe"):
-        found = shutil.which(name)
+    for name, explicit in (("ffmpeg", ffmpeg), ("ffprobe", ffprobe)):
+        found = shutil.which(str(explicit) if explicit is not None else name)
         if found is None:
             raise RuntimeError(f"Required audio tool is unavailable: {name}")
         path = Path(found).resolve(strict=True)
@@ -73,6 +73,13 @@ def _toolchain():
         values[name + "_path"] = path
         values[name] = ToolIdentity(name=name, version=version)
     return AudioProbeToolchain(**values)
+
+
+def minimax_speech_capabilities(reference_id, *, ffmpeg=None, ffprobe=None):
+    """Construct the existing transport, lazy credential and probe capabilities."""
+    if reference_id not in ("MINIMAX_SPEECH_CN_API_KEY", "MINIMAX_SPEECH_API_KEY"):
+        raise ValueError("MiniMax Speech credential reference is invalid.")
+    return _HttpTransport(), _SecretServiceCredential(reference_id), _toolchain(ffmpeg=ffmpeg, ffprobe=ffprobe)
 
 
 def main():

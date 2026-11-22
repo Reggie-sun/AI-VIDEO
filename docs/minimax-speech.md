@@ -36,6 +36,22 @@ python -m scripts.minimax_speech_batch \
 
 `preview()` 的 supported flags 只验证 adapter 参数。上述授权变化不代表官方免费资格或实际扣费证明。正式接回 S03 仍需处理原 lifecycle、P4 timeline/mixer 与验收；不能 direct mux 或将生成音频伪装成普通导入。环境声单独作为明确的 P4 track，最终音质、口型与自然度仍需验收。
 
+## Standalone Client Narration
+
+`scripts.replica.tts_run` 的客户口播执行由可信 operator 注入 `VoiceOperator`。受信的
+`--runtime module:function` 接收 `episode_id` 和独立 `voice_root`，返回 `policy`、`pricing`、
+`egress_receipt_id` 和 `authorize(exact_paid_preview, approved_plan_sha256)`。operator 据批准整稿、
+使用许可、音色和授权 scope 签发 exact `PaidProviderAuthorizationDecision` 或拒绝。
+金额为 operator 预配置的正数上限，计费模式为现有 `remote_metered`，预留、累计预算、
+一次性 permit、intent 和 recovery 皆归 `ProductionStateCommitter` 与 Paid Provider Gate。
+`.env` 和 Secret Service 仍由同一个 MiniMax supplier 获取，调用端只持有 capability。
+
+每期保留同一个配音目录，内部 `voice-state/` 经 standalone Voice bootstrap 和 Registry 管理。
+完整计划 hash 供授权核对，组号、实际读法和规范化声音参数共同确定 take identity。
+已提交且结果未知时保留当前状态和账本；成功只能重开 exact WAV，缺失须从原状态恢复。
+本入口的 canonically registered WAV 可由独立编辑工具用于交付。对应工作步骤见
+[Reference Replica](../.agents/skills/reference-replica/SKILL.md#narration-and-timing)。
+
 ## Verification
 
 国内接入的验证与当前凭证阻断见[国内接入记录](record_for_agent/2026-09-12-minimax-speech-domestic.md)。国内使用独立 Secret Service reference `MINIMAX_SPEECH_CN_API_KEY`（本机配置方式见 playbook），不复用旧引用。CLI 省略 `--region` 等同 `cn`；重开旧国际批次需显式 `--region international`。Python batch 省略 `region` 保留历史国际语义与序列化/hash；`region="cn"` 才是国内。跨 region 复用既有 root 会在 submit 前拒绝；改 region 不能解除旧 unknown，也不授权自动重试。
