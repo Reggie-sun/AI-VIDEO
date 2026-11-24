@@ -1,0 +1,72 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-mo07-r6-1-MO07",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/opening/review-s014r6/index.html）>",
+ "user_quote": "<使用者原话，逐字（2026-11-21：按页面拍 r6 (Recommended)）>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/opening/review-s014r6/index.html",
+  "sha256": "f7e18d362a92da2f54b3d0ec3c011bce5cf0df21b9ef07a7e7789b8b32713fbd"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s014-r6-seedance.md",
+  "sha256": "6dc08d72d16b88478d94b8a1f6b76417d6f5febaf14790c99f69d3a14dbbfdc0"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1c.png",
+   "sha256": "ae34b54393afe1df4e15f35326de17752734af1f3661b2c4a307adec89f74374",
+   "role": "MO07 first frame"
+  }
+ ],
+ "prompts": {
+  "MO07": {
+   "text": "长焦全身远景，镜头固定不动。她已经停在走秀台尽头，不再往前走，先低头用右手按住身前腰链上震动的黑色寻呼机，然后松开手，站在原地一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，背对镜头朝画面右侧走开，越走越远。寻呼机和工牌一直挂在她身前的腰链上，背对镜头时看不见。她始终完整在画面里，头顶不出画。两侧的值班工程师一直低头盯着自己腿上的笔记本电脑，全程不抬头，身体保持不动。她腰间的寻呼机不亮任何红灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "7543c057158eb1526b8e8143fbb6bc1eb194fe256c62cd4d601c95c4f17afa37"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p014-w1c.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S14r4/a.png 逐字节相同；只把 p014-w1b 的两侧观众改为低头，她和服装不变，使用者认可「用 a 拍」）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo07-r6-1-source-001",
+  "policy_id": "iris-mo07-r6-1-source-001",
+  "reservation_id": "iris-mo07-r6-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO07-r6-1",
+   "sd-MO07-r6-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO07-r6-1"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r5-1/preview-approval.json",
+  "sha256": "8ce3572eaf64873520cadecb41c73fbb065b05d6c17da58b419368c0762f940b",
+  "reason": "s014 重拍 r6：r5 两条 Gate 失败，背过身后寻呼机被挪到后腰、工牌消失、3.69 s 手不在寻呼机上；首帧 p014-w1c 不变，按寻呼机移到转身前（右手、身前），写明寻呼机和工牌留在身前；s014c 改作插入镜头；r5 approval 与 sd-MO07-r5-1/r5-2 产物保留"
+ },
+ "_template_notes": [
+  "本文件是 r6-1 的模板；写成 sd-MO07-r6-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。",
+  "r6-2：unit_group 末尾 r6-1→r6-2；bound_ids 三个 id 中 -r6-1- → -r6-2-；takes.this_take → sd-MO07-r6-2（takes.folders 保持 [r6-1, r6-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r6-<n> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh MO07 5 first_frame 400"
+ ]
+}

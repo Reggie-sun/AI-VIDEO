@@ -1,0 +1,51 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-digital-human",
+ "question": "检查点 5 页面：http://127.0.0.1:8769/pilot/method/\n\n花钱前先照作者的做法，在一个镜头上找到“她真的在唱”的方法。选的是 s012（副歌 1）：她凑到值班工程师脸前唱 hold on tight / I'm the reason you're awake。\n\n同一张首帧、同一段只有她声音的人声，两条路线各拍一条：\n- A：即梦数字人（大师模式）。\n- B：Seedance 2.0 全能参考，一张图加一段人声，是作者唱段用的方法。\n\n首帧改成了闭嘴起始，因为 v3 试过张嘴首帧，遇到静音嘴会卡在张开的样子。\n\n费用：各一次、不重试，合计上限 365 积分。v3 数字人一条 4.4 秒花了 24 积分。\n\n页面上有首帧、人声和原曲，也有两条 prompt 的原文。可以拍吗？",
+ "user_quote": "积分随便用，我现在积分很多。画质最高",
+ "user_followup": "2.5也可以用（本条仍用 2.0 VIP：≤15 s 预设 2.0，且 4k 只有 2.0 VIP 支援）",
+ "approved_at": "2026-11-17T22:56:54+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/index.html",
+  "sha256": "9477f016602abeb85d63d4fac76b6eef85c21f8ebd64754ea44a3075fea097bd"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/preview-inputs.json",
+  "sha256": "8bb261d67e212a418ded7ab9c5ab97237b3bb1d925870e2dc4fdd19c640da7af"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012.png",
+   "sha256": "5c5323ace6605783c58a029b275e67b21523ed6f1f74d63a87f6de4ad5d5f0d2",
+   "role": "SG03 still"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+   "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559",
+   "role": "SG03 vocal"
+  }
+ ],
+ "takes": {
+  "SG03": {
+   "image": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012.png",
+    "sha256": "5c5323ace6605783c58a029b275e67b21523ed6f1f74d63a87f6de4ad5d5f0d2"
+   },
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+    "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559",
+    "seconds": 5.99
+   },
+   "action_prompt": "镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。",
+   "action_prompt_sha256": "fadfdbbec51a021b5471eb64e902e71ff716c9b14600d9114977ce5ff82bd5fb"
+  }
+ },
+ "mode": "即梦 数字人 · 大师模式（OmniHuman 1.5）· single subject",
+ "quality": "页面可选的最高画质（使用者「画质最高」）",
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_take_CRD": 300,
+  "cumulative_CRD": 300
+ }
+}

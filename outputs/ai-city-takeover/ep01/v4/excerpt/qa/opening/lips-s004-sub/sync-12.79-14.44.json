@@ -1,0 +1,73 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "/tmp/op/lipsub/take.wav",
+ "take_sha256": "2b722736abc38870f435ed20d0f5c3375d304c69093ab706dce7028888c7a62e",
+ "window": "/tmp/op/lipsub/win.wav",
+ "window_sha256": "524531f6135f186da98545ce3fec75178ddc63acf71979e6044c7a028b3deb94",
+ "song_t0": 12.7917,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": -0.0001,
+ "ncc": 0.5108,
+ "copy": true,
+ "threshold": {
+  "null90": 0.3322,
+  "matched_med": 0.7956,
+  "thr": 0.5176,
+  "strong_frames": 66
+ },
+ "frames": {
+  "total": 166,
+  "active": 164,
+  "matched": 135,
+  "matched_of_active": 0.823
+ },
+ "divergence": {
+  "frame": null,
+  "rule": "none",
+  "last_match": 158,
+  "clip_s": null,
+  "song_s": null
+ },
+ "synced_until": {
+  "clip_s": 1.538,
+  "song_s": 14.33
+ },
+ "spans": [
+  {
+   "clip_s": [
+    0.0,
+    1.58
+   ],
+   "song_s": [
+    12.792,
+    14.372
+   ]
+  }
+ ],
+ "envelope": {
+  "lag_s": 1.08,
+  "ncc": 0.832,
+  "windows": [],
+  "max_dev_s": null,
+  "steady": false,
+  "segments": []
+ },
+ "placement": {
+  "lag_s": -0.0001,
+  "method": "tool 15 waveform lag (copy)",
+  "song_t_of_clip0": 12.7918,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "sub",
+ "reviews": []
+}

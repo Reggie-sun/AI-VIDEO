@@ -1,0 +1,50 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>IRIS EP01 s024 首帧重做车厢（P024R）</title><style>body{background:#111;color:#ddd;font:14px/1.5 sans-serif;margin:20px}img{width:100%;display:block}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}figure{margin:0}figure.rec{outline:3px solid #6c6}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #555;padding:3px 6px;font-size:12px;vertical-align:top}h2{margin-top:32px;border-top:1px solid #444;padding-top:12px}code{color:#9cf;font-size:11px}.ok{color:#6c6}.warn{color:#fc6}.note{color:#f99}</style></head><body>
+<h1>IRIS EP01 s024（SG09）首帧：按 p025/p026 重做车厢（仅静图，未提交任何视频生成）</h1>
+<p>裁决：「重做 p024 的车厢 (Recommended)」。分镜写 s024/s025/s026 是同一节车厢；旧 p024 是圆形吊环、横排高背座椅、戴兜帽的乘客，p025/p026 是三角拉手、沿车窗的纵向长凳。本轮只换车厢和乘客，她的脸、造型 B、站在过道里的位置不变；抓拉手的手改成与 p025 一致的右手（画面左侧），左手插在裤袋里，闭嘴。</p>
+<p>工具：<code>motion-kit/tools/codex_plate.py --edit-base board/plates/p024-b1.png --ref board/plates/p025-b1.png --ref board/plates/p026-b1.png</code>，同一提示词跑 3 次。提示词：<code>excerpt/flash/design/S15-30/P024R/prompts.md</code>（## P024R），运行记录：<code>P024R/runs.md</code>。旧图与 board 文件均未覆盖。绿框 = 推荐。好不好看由你判，下表只是我的核对。</p>
+
+<h2>旧 p024 | 候选 a / b / c | p025 | p026</h2>
+<div class=g>
+<figure><a href="../../../board/plates/p024-b1.png" target="_blank"><img src="../../../board/plates/p024-b1.png"></a><figcaption>旧 p024（不改）<br><code>board/plates/p024-b1.png</code><br><small>sha256 fb72578fa039a84a…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S15-30/P024R/a.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/P024R/a.png"></a><figcaption>a<br><code>excerpt/flash/design/S15-30/P024R/a.png</code><br><small>sha256 4f928857ee038cf0…（1671×941）</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S15-30/P024R/b.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/P024R/b.png"></a><figcaption><b>b（推荐）</b><br><code>excerpt/flash/design/S15-30/P024R/b.png</code><br><small>sha256 d13da23ff4ecb4079a855d78ce19fe7c786eec9fbe38bec04700c5b7765b738f（1672×941）</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S15-30/P024R/c.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/P024R/c.png"></a><figcaption>c<br><code>excerpt/flash/design/S15-30/P024R/c.png</code><br><small>sha256 e667e1de358a4b32…（1671×941）</small></figcaption></figure>
+<figure><a href="../../../board/plates/p025-b1.png" target="_blank"><img src="../../../board/plates/p025-b1.png"></a><figcaption>p025（车厢参考，不改）<br><code>board/plates/p025-b1.png</code></figcaption></figure>
+<figure><a href="../../../board/plates/p026-b1.png" target="_blank"><img src="../../../board/plates/p026-b1.png"></a><figcaption>p026（车厢参考，不改）<br><code>board/plates/p026-b1.png</code></figcaption></figure>
+</div>
+
+<h2>局部放大（原图 1672 宽，裁切后放大到 420 高）</h2>
+<p>脸：参考 P016/b、P017/a（s015–s018 推荐件裁出）| 旧 p024 | a | b | c</p><img src="zoom-face.jpg">
+<p>抓拉手的右手：p025 | a | b | c</p><img src="zoom-hand.jpg">
+<p>插袋的左手：a | b | c</p><img src="zoom-pocket.jpg">
+<p>画面右侧（开场工程师 + 笔记本电脑）：a | b | c | p025</p><img src="zoom-right.jpg">
+<p>画面左侧乘客与电脑：a | b | c</p><img src="zoom-left.jpg">
+<p>右侧车窗（查倒影）：a | b | c</p><img src="zoom-window.jpg">
+
+<h2>自检表</h2>
+<table>
+<tr><th>项</th><th>a</th><th>b</th><th>c</th><th>方法</th></tr>
+<tr><td>拉手是三角形、无圆形吊环</td><td class=ok>是</td><td class=ok>是</td><td class=ok>是</td><td>全图目检</td></tr>
+<tr><td>纵向长凳、乘客背靠车窗面对面</td><td class=ok>是</td><td class=ok>是</td><td class=ok>是</td><td>全图目检，对照 p025</td></tr>
+<tr><td>不锈钢车厢壁、黑车窗、两条纵向冷白灯带、灰地面</td><td class=ok>与 p025/p026 一致</td><td class=ok>与 p025/p026 一致</td><td class=ok>与 p025/p026 一致</td><td>并排目检；整体比 p025 略暗（沿用旧 p024 的影调）</td></tr>
+<tr><td>乘客：打瞌睡、有笔记本电脑、不戴兜帽</td><td class=ok>是；乘客与 p025 同一批人（眼镜男、戴耳机挂工牌的人、开场工程师）</td><td class=ok>是；同 a</td><td class=ok>是；同 a</td><td>放大目检</td></tr>
+<tr><td>开场工程师（卷发、胡子、牛仔夹克）</td><td>在画面右侧睡着；电脑夹在他和邻座之间</td><td class=ok>在画面右侧睡着，<b>电脑放在他自己膝上</b>（正好接 s025 电脑从他膝上滑下）</td><td>在画面右侧睡着；电脑在邻座膝上</td><td>放大目检，对照 s025 动作</td></tr>
+<tr><td>脸不变（统一开场脸）</td><td class=ok>是（脸区灰度平均差 11.0）</td><td class=ok>是（7.6，最接近旧图）</td><td class=ok>是（10.1）</td><td>与旧 p024、P016/b、P017/a 并排放大；脸区 280×280 灰度平均绝对差</td></tr>
+<tr><td>嘴闭合</td><td class=ok>是</td><td class=ok>是</td><td class=ok>是</td><td>放大目检</td></tr>
+<tr><td>造型 B（黑双排扣、白高领、阔腿裤）</td><td class=ok>是</td><td class=ok>是</td><td class=ok>是</td><td>目检</td></tr>
+<tr><td>右手（画面左）握三角拉手，与 p025 同手</td><td class=ok>是，握法与 p025 一致</td><td class=ok>是</td><td class=ok>是</td><td>放大目检</td></tr>
+<tr><td>手指数</td><td class=ok>右手 4 指 + 拇指；左手在袋内只露白袖口</td><td class=ok>同 a</td><td class=ok>同 a</td><td>放大逐指数</td></tr>
+<tr><td>耳挂在左耳（画面右）、小红灯</td><td class=ok>是</td><td class=ok>是</td><td class=ok>是</td><td>放大目检</td></tr>
+<tr><td>其他红色</td><td class=ok>无（红像素只在耳挂处）</td><td class=ok>无</td><td class=ok>无</td><td>像素检测：R&gt;110 且 R&gt;1.8G、R&gt;1.8B，三张都只有 9–13 个像素且全在耳挂（≈x1062,y214）。<span class=warn>另：挂工牌乘客胸袋里有两三颗暗灰粉色笔帽小点（约 RGB 80,65,70，饱和度低，读不出红），p025 同一人同一位置也有，属于继承</span></td></tr>
+<tr><td>文字、字母、标志</td><td class=ok>无</td><td class=ok>无</td><td class=ok>无</td><td>电脑外壳、工牌、车门、顶板放大目检；工牌是空白的</td></tr>
+<tr><td>车窗里有她的倒影</td><td class=ok>无</td><td class=ok>无</td><td class=ok>无</td><td>放大目检，车窗是暗的</td></tr>
+<tr><td>输出尺寸</td><td class=warn>1671×941（比 board 窄 1px）</td><td class=ok>1672×941</td><td class=warn>1671×941</td><td>PNG 头</td></tr>
+</table>
+
+<h2>推荐：b</h2>
+<p><code>excerpt/flash/design/S15-30/P024R/b.png</code><br>sha256 <code>d13da23ff4ecb4079a855d78ce19fe7c786eec9fbe38bec04700c5b7765b738f</code></p>
+<p>理由：三张车厢都与 p025/p026 对上了，她的脸、造型、站位也都没变；b 的脸与旧图差得最少，开场工程师膝上放着自己的电脑，接 s025「电脑从他膝上滑下、她接住」最顺，尺寸也与 board 完全一致。a 和 c 的电脑放在别人膝上，接 s025 时电脑的主人对不上。</p>
+<p class=note>未做的事：没有替换 <code>board/plates/p024-b1.png</code>，没有改 board/shots.json，没有提交 s024 视频生成，也没有提交 commit。要把 b 用作 s024 首帧，需要你认可后由主会话处理。</p>
+</body></html>

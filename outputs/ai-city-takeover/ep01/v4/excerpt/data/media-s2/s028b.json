@@ -1,0 +1,56 @@
+{
+ "shot": "s028b",
+ "t0": 121.1617,
+ "t1": 122.0557,
+ "why": "'pager blew': the lit pager on her waist (3x crop of the take, before the reverse walk); insert -> D",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO13-n-1/MO13/project/state/video-generation/fetch/files/47c40d7a1b9a60c02cd432e5262b2bec2f557e5401b84e7cd9f71ac8af5499a6.mp4",
+ "clip_sha256": "47c40d7a1b9a60c02cd432e5262b2bec2f557e5401b84e7cd9f71ac8af5499a6",
+ "pictures": 145,
+ "frames": 21,
+ "first": {
+  "f": 1486,
+  "t": 121.1667,
+  "clip_t": 1.205,
+  "idx": 29
+ },
+ "last": {
+  "f": 1506,
+  "t": 122.0,
+  "clip_t": 2.0383,
+  "idx": 49
+ },
+ "crop": [
+  0.66,
+  0.6,
+  3.0
+ ],
+ "speed": 1.0,
+ "knots": null,
+ "repeats": 0,
+ "skips": 0,
+ "map": [
+  29,
+  30,
+  31,
+  32,
+  33,
+  34,
+  35,
+  36,
+  37,
+  38,
+  39,
+  40,
+  41,
+  42,
+  43,
+  44,
+  45,
+  46,
+  47,
+  48,
+  49
+ ],
+ "orange_px_max": 0,
+ "pager_red": null
+}

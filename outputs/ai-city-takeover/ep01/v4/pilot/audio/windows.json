@@ -1,0 +1,262 @@
+{
+ "source": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+ "source_sha256": "4c7c36a0d1ce9dc1bf31d23bae198f37a596774fd32ffa08a7178d29d3637878",
+ "format": "pcm_s16le mono at the stem rate; floor((L+R+1)/2) downmix; no fade (v3 pilot method)",
+ "windows": {
+  "SG03": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+   "song_window": [
+    44.9422,
+    50.933
+   ],
+   "plays": [
+    44.9422,
+    50.933
+   ],
+   "samples": 264194,
+   "sample_rate_hz": 44100,
+   "seconds": 5.99,
+   "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559"
+  },
+  "SG02": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG02.wav",
+   "song_window": [
+    29.529,
+    33.529
+   ],
+   "plays": [
+    29.7448,
+    33.4367
+   ],
+   "samples": 176400,
+   "sample_rate_hz": 44100,
+   "seconds": 4.0,
+   "sha256": "27b5e6f657bc255125aee11d4885def24281c554f6e8d409121ccb915118c733"
+  },
+  "SG04": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG04.wav",
+   "song_window": [
+    50.933,
+    55.0777
+   ],
+   "plays": [
+    50.933,
+    55.0777
+   ],
+   "samples": 182782,
+   "sample_rate_hz": 44100,
+   "seconds": 4.14,
+   "sha256": "055dd8719d0d773173c351b1d7e9d25ca6f3760957e4b6f3071195a1055afd91"
+  },
+  "SG03C": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03C.wav",
+   "song_window": [
+    46.93,
+    50.93
+   ],
+   "plays": [
+    48.1698,
+    50.933
+   ],
+   "samples": 176400,
+   "sample_rate_hz": 44100,
+   "seconds": 4.0,
+   "sha256": "4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09"
+  },
+  "SG01": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG01.wav",
+   "song_window": [
+    11.15,
+    16.9041
+   ],
+   "plays": [
+    11.4242,
+    16.9041
+   ],
+   "samples": 253756,
+   "sample_rate_hz": 44100,
+   "seconds": 5.75,
+   "sha256": "1a821e13899132e0415e06d7a70e1e48ba9dd18b39dc3d5e4b712832815ebb58"
+  },
+  "SG05": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05.wav",
+   "song_window": [
+    59.157,
+    65.666
+   ],
+   "plays": [
+    59.2341,
+    65.666
+   ],
+   "samples": 287047,
+   "sample_rate_hz": 44100,
+   "seconds": 6.51,
+   "sha256": "848c964e0e8262ece595d4de0d640de0ddefe49c63ddcf471b3937d36b1adca0"
+  },
+  "SG06": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG06.wav",
+   "song_window": [
+    65.666,
+    71.1808
+   ],
+   "plays": [
+    65.666,
+    71.1808
+   ],
+   "samples": 243202,
+   "sample_rate_hz": 44100,
+   "seconds": 5.51,
+   "sha256": "13e67197524e8fb79bdec74725b6710df33dcadd0b7f83d7f384f86a71c68cb1"
+  },
+  "SG07": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG07.wav",
+   "song_window": [
+    71.1808,
+    78.9827
+   ],
+   "plays": [
+    71.1808,
+    78.9827
+   ],
+   "samples": 344064,
+   "sample_rate_hz": 44100,
+   "seconds": 7.8,
+   "sha256": "95e8b29ecb421ccaf057c447b9b7d8be1ed4f4d2a671bd991e45a0d61580d697"
+  },
+  "SG08": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG08.wav",
+   "song_window": [
+    94.507,
+    101.448
+   ],
+   "plays": [
+    95.0393,
+    101.448
+   ],
+   "samples": 306098,
+   "sample_rate_hz": 44100,
+   "seconds": 6.94,
+   "sha256": "e56666227990e6fe0463d3ee0d668dda53423aeb43dd25c6417600962e2d8ec7"
+  },
+  "SG09": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG09.wav",
+   "song_window": [
+    103.183,
+    107.183
+   ],
+   "plays": [
+    103.294,
+    106.9511
+   ],
+   "samples": 176400,
+   "sample_rate_hz": 44100,
+   "seconds": 4.0,
+   "sha256": "0e15e4286ad2f7a5fb2bd3b8390cd41c501262540ebd4c0d07ef88cd9b672939"
+  },
+  "SG10": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG10.wav",
+   "song_window": [
+    109.7027,
+    116.123
+   ],
+   "plays": [
+    110.6199,
+    116.123
+   ],
+   "samples": 283135,
+   "sample_rate_hz": 44100,
+   "seconds": 6.42,
+   "sha256": "1f1ff6544d88b1c6167bb0ced95457e287c56f51f11b557f06d2f7b6a56f6d0a"
+  },
+  "SG11": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG11.wav",
+   "song_window": [
+    125.7244,
+    131.2392
+   ],
+   "plays": [
+    125.7244,
+    131.2392
+   ],
+   "samples": 243203,
+   "sample_rate_hz": 44100,
+   "seconds": 5.51,
+   "sha256": "7b556199a076a35a674c1f12ec8a5fec42c1ec1521c47c16688819fb2d8e6699"
+  },
+  "SG05m": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05m.wav",
+   "song_window": [
+    58.7,
+    65.666
+   ],
+   "plays": [
+    59.2341,
+    65.666
+   ],
+   "samples": 307201,
+   "sample_rate_hz": 44100,
+   "seconds": 6.97,
+   "sha256": "85f247e588704eac72e2feec01b621911a84d290a3b873ba05322b840eb02b4c"
+  },
+  "SG06m": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG06m.wav",
+   "song_window": [
+    65.517,
+    71.1808
+   ],
+   "plays": [
+    65.666,
+    71.1808
+   ],
+   "samples": 249773,
+   "sample_rate_hz": 44100,
+   "seconds": 5.66,
+   "sha256": "9bd0c1e889f18d480074b5969e8ca3e9e1eece7d22e08276504ce81912b4a624"
+  },
+  "SG09m": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG09m.wav",
+   "song_window": [
+    102.64,
+    107.183
+   ],
+   "plays": [
+    103.294,
+    106.9511
+   ],
+   "samples": 200346,
+   "sample_rate_hz": 44100,
+   "seconds": 4.54,
+   "sha256": "dcb86f37c0bf42aa78af7687548cf29366150abd1f1406254bac163d0b251501"
+  },
+  "SG10m": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG10m.wav",
+   "song_window": [
+    109.56,
+    116.123
+   ],
+   "plays": [
+    110.6199,
+    116.123
+   ],
+   "samples": 289428,
+   "sample_rate_hz": 44100,
+   "seconds": 6.56,
+   "sha256": "aae6bec70aaf8d1062a7552fbfb8115e92e9818f6ff0bc52e26b0dc49a971900"
+  },
+  "SG11m": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG11m.wav",
+   "song_window": [
+    125.608,
+    131.2392
+   ],
+   "plays": [
+    125.7244,
+    131.2392
+   ],
+   "samples": 248336,
+   "sample_rate_hz": 44100,
+   "seconds": 5.63,
+   "sha256": "e53fe70efaf330d3153bebca43f3bdcc9a0118e32eb3241ad78fd75945725dc8"
+  }
+ }
+}

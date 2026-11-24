@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo10-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "70d13c859c476e07253d590501ddc877d252a5ba42e01bbf55c51b6949b3062f",
+  "creation_receipt_id": "iris-v4-MO10-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/993b893631add225699df6acec786f9f66ac74f7d5e243f4d56c5cc63d454073.json",
+      "content_hash": "993b893631add225699df6acec786f9f66ac74f7d5e243f4d56c5cc63d454073"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a1887ded0d8c384912953a9282bbbc90583768ed88492ee897ff20e2bf7135a8.json",
+      "content_hash": "a1887ded0d8c384912953a9282bbbc90583768ed88492ee897ff20e2bf7135a8"
+    }
+  ],
+  "shot_id": "ep01v4-mo10",
+  "scene_id": "hotel-ballroom-stage",
+  "storyboard_beat_id": "mo10",
+  "intent": "镜头固定不动。她身后桁架上的大块黑幕一下子整片落下，梯子上的工人松开手，人仍站在梯子上；她不回头，伸手把身边那块空白白板连同架子一起往前推倒，牌面朝下扣在地毯上；白板背面是素黑色的板，没有任何字；黑幕落下后，后面是同样的黑色墙面，没有屏幕。面无表情。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤完整保持；没有立领灯线（由认可的首帧承担）",
+    "身后桁架上的大块黑幕一下子整片落下，梯子上的工人松开手、人仍站在梯子上；她不回头，把身边那块空白白板连同架子一起往前推倒，牌面朝下扣在地毯上；白板背面素黑无字，黑幕后是同样的黑色墙面；不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo10-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

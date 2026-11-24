@@ -6,6 +6,10 @@ learning_eligibility: ineligible
 
 # IRIS EP01 v3《Looked Outside》全长分镜与动画分镜 a1 检查点记录
 
+## Supersession Notice — 2026-11-17
+
+下文“下一步是检查点 B（审 a1 与试拍参考包）”“a2 与试拍包修订待做”“歌曲选定 T4”等当前方向已被取代：使用者 2026-11-16 不满意并要求照作者方法重做，a2 停做，分镜 v2、a1/a2、T4 不再沿用，EP01 改走 `ep01/v4`，已通过检查点 1–4。见 [v4 重做记录](2026-11-17-iris-ep01-v4-restart-author-method-storyboard-checkpoint.md)。本记录的量测、SHA、工具与离线生成车道事实仍作历史证据有效；它只是部分被取代，保持可检索。
+
 Date: 2026-11-04（本机 PST，UTC−8；下文时间均为本机时间，取自文件 mtime 或 `logs/` 记载）
 
 ## Purpose

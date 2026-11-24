@@ -1,0 +1,33 @@
+{
+  "schema_version": "2.0",
+  "revision_id": "a2804ccdcc9ed810013a672f68294f2bb94c316161ad7da84150e318cee1e018",
+  "content_hash": "a2804ccdcc9ed810013a672f68294f2bb94c316161ad7da84150e318cee1e018",
+  "assets": [
+    {
+      "asset_id": "iris-c-v4-mo05-first-frame",
+      "asset_type": "image",
+      "artifact_path": "assets/files/a46b48ce8ce9d7217f9ca5bb06dedcfae4134f145cca7d04732fc6b10c808a23.png",
+      "sha256": "a46b48ce8ce9d7217f9ca5bb06dedcfae4134f145cca7d04732fc6b10c808a23",
+      "size_bytes": 2253478,
+      "mime_type": "image/png",
+      "duration_seconds": null,
+      "width": 1672,
+      "height": 941,
+      "source_kind": "imported",
+      "tool": {
+        "name": "approved-local-source-import",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "dc06ced815ebbc8a2e8cfbb01166cf383d794eaf2e51d2d5a876558f5ea2b870",
+      "creation_receipt_id": "iris-v4-local-import:a46b48ce8ce9d7217f9ca5bb06dedcfae4134f145cca7d04732fc6b10c808a23",
+      "usage_license": "User-authorized project reference; no platform ownership claim.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-23",
+ "written_by": "主会话据 continuity-supervisor 背影版报告转写（内容各项 PASS，仅缺 lint）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO12-p-1/preview-approval.json",
+   "sha256": "5cca59ae9a62342c74e25a1927de4d45088a0c6dbe350d1d64743fff14b74287"
+  }
+ },
+ "units": {
+  "MO12": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；egress prompt ab424431…、首帧 942eac10… 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "全程背对不回头不转身、越走越小不出画、不朝镜头斜走；机位固定；电脑合着背面朝内无标志；帽衫电脑无图形文字、无站牌字；除左耳灯无红色；背后无包无挂件；人群跟在后面、无人回头看镜头、无分身重影"
+  }
+ }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo21-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p009-w1.png",
+    "sha256": "451f67af1297cfcfc63229c06cc5129c063c7d8966682ed6932ed45b429ecc73",
+    "size_bytes": 2309756,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p009-w1.png: the first frame",
+    "need_id": "folsom-bus-shelter",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

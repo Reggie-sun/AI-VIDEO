@@ -1,0 +1,51 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-sg03c-b-SG03C",
+ "question": "http://127.0.0.1:8769/excerpt/flash/closeup.html ／ 底片由 D1-b 换成 D2-b（p012c-w1b）：场记拦下 D1-b 露右肩、斜挎带方向与 SG03-w1 相反；D2 露左肩、斜挎带右肩到左胯，与 SG03-w1 连续；clip prompt 与人声不变",
+ "user_quote": "没有我只是让你自己判断",
+ "approved_at": "2026-11-19T12:38:16+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/closeup.html",
+  "sha256": "524a988254a82eeccc9da70e56f3cbff0480c1fdb97736b54ff134719e007ecf"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012c-w1b.png",
+   "sha256": "dca4dab5e8ee17f1a11e2918436138338e03995105117dfd6c71cfdf48c4cb3d",
+   "role": "SG03C reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03C.wav",
+   "sha256": "4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09",
+   "role": "SG03C vocal"
+  }
+ ],
+ "prompts": {
+  "SG03C": {
+   "text": "{{image:0}}中的她闭着眼睛唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，前排笔记本屏幕的光照着她的脸，嘴前没有任何遮挡。镜头全程锁定，一镜到底。",
+   "sha256": "5798f92846e0b0ef7cea1a277183c8794aa5a4f456c9c43e5bb80b71e495823c"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p012c-w1b.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/D2-b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03C/preview-approval.json",
+  "sha256": "6888a845cf7c7cf499d4e77d7b856390195fe57cf317a1291b3d549bec14e0be"
+ }
+}

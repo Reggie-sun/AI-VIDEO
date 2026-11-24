@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg03c-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "d5199beb3b61d20e6cfc1a13065d7fb16a9ad04f37cee205cfa9b4386a20b711",
+  "creation_receipt_id": "iris-v4-SG03C-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/284d3c8ee4bb6b1577303e1f5cb98f338233af659e3dbd0f5fba59cc13b50254.json",
+      "content_hash": "284d3c8ee4bb6b1577303e1f5cb98f338233af659e3dbd0f5fba59cc13b50254"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4ee43fc0cc034461d6a455ae312db937e572fdba0eea508b19918cefa8c9e0e3.json",
+      "content_hash": "4ee43fc0cc034461d6a455ae312db937e572fdba0eea508b19918cefa8c9e0e3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ef2c89b8fbca2869adf995dbf8269d0b70d793df5af89b2121991c2c2dedeaf3.json",
+      "content_hash": "ef2c89b8fbca2869adf995dbf8269d0b70d793df5af89b2121991c2c2dedeaf3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7e14610a1aaf7b7032ceaa7b1984c98596abfbd1f094675dd0c25456e56a7d74.json",
+      "content_hash": "7e14610a1aaf7b7032ceaa7b1984c98596abfbd1f094675dd0c25456e56a7d74"
+    }
+  ],
+  "scene_id": "runway-front-row-closeup",
+  "location": "地下停车场改成的秀场前排，值班工程师面前",
+  "time": "深夜",
+  "mood": "投入、几乎忘我",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg03c-reference"
+  ]
+}

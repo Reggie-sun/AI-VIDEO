@@ -1,0 +1,46 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-round1-MO06-w1b",
+ "question": "http://127.0.0.1:8769/excerpt/flash/shoulder.html ／ 原认可：outputs/ai-city-takeover/ep01/v4/pilot/sd-MO06-w1/preview-approval.json（「s011 选 1，s012 选 1，开拍」）；问题：s011 首帧露右肩与前后镜头不一致，s011 怎么办？",
+ "user_quote": "改用 s011-2 (Recommended)",
+ "approved_at": "2026-11-19T04:10:36+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/shoulder.html",
+  "sha256": "d3477101793b3577dadbba81768a150118f6e7f42d40b00f0c16904c418391bd"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p011-w1b.png",
+   "sha256": "d262a4ecf248c186953a7a9bb78c4ad51f67eac1cd1c699721bca371039a3f6c",
+   "role": "MO06 first frame"
+  }
+ ],
+ "prompts": {
+  "MO06": {
+   "text": "镜头固定，低机位，从侧前方拍。地下停车场改成的秀场，她沿着湿的水泥走秀台大步向前走，抬起的那只靴子落地，重心越过支撑脚，长的那只袖子随后摆回；面无表情，带着一点好奇看着前方；两边前排的值班工程师一个接一个站起来。",
+   "sha256": "16d83c7635fc7bf85418986b1f79753f020d0133964916d6be35c8b207d673cf"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 600,
+  "cumulative_CRD": 600
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p011-w1b.png，与使用者选中的 V11a-2.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO06-w1/preview-approval.json",
+  "sha256": "ed99cb01d858d0925903ecdff4c41ea272dfa0b7120b45bcc05fdfaf376d3c63"
+ }
+}

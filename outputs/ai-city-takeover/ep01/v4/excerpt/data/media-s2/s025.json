@@ -1,0 +1,64 @@
+{
+ "shot": "s025",
+ "t0": 106.4983,
+ "t1": 110.6199,
+ "why": "still from 106.50 (covers 'Ev-'); the train jolts on the 108.81 downbeat (shake + smear envelope), otherwise still",
+ "still": "outputs/ai-city-takeover/ep01/v4/board/plates/p025-b1.png",
+ "still_sha256": "57f05856e73109b5556e4c24682f0ef37f989a9e3cc03cda0e1bfe6e9ae46476",
+ "frames": 99,
+ "pictures": 99,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.04,
+   1.04
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "jolt": 108.8087
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 16
+ },
+ "log": [
+  {
+   "k": 55,
+   "zoom": 1.04,
+   "shake": [
+    0.0,
+    -30.0
+   ],
+   "smear": 0.0
+  },
+  {
+   "k": 56,
+   "zoom": 1.04,
+   "shake": [
+    22.0,
+    14.0
+   ],
+   "smear": 1.0
+  },
+  {
+   "k": 57,
+   "zoom": 1.04,
+   "shake": [
+    -9.0,
+    -6.0
+   ],
+   "smear": 0.45
+  },
+  {
+   "k": 58,
+   "zoom": 1.04,
+   "shake": [
+    3.0,
+    2.0
+   ],
+   "smear": 0.0
+  }
+ ]
+}

@@ -1,0 +1,3 @@
+{"schema":"iris-v4-post-media-gate/1","unit":"MO07","take_sha256":"9a08bc46eebb59fc0d430cdd07044f4a754c4bc48afd9bc835179b5167ea256d","reviewer":"shot-gate-reviewer","verdict":"FAIL",
+ "items":{"camera_locked":"PASS (<=5 px; apparent motion is her walking)","four_actions":"FAIL (turn/sleeve/exit right happen; pager press absent, she presses a black item on left hip)","strap":"PASS","sleeve":"PASS","red_only_left_ear":"FAIL (red indicator on left-hip item at ~2.50 s)","logo":"PASS (no more legible than plate)"},
+ "clean_subsegments_clip_s":[[0.0,2.25],[3.0,5.057]],"spent_CRD_observed":400,"note":"MO07-s-1 not submitted (reference upload incomplete, no effect). Edit mock at excerpt/review/mo07-s/ pending user decision."}

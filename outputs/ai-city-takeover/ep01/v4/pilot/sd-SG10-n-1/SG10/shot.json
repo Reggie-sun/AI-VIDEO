@@ -1,0 +1,77 @@
+{
+  "artifact_id": "iris-v4-sg10-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "cc5b582a10c8c15273b31095103c88a0d91893c8ddf8797e8d701dfa2d334333",
+  "creation_receipt_id": "iris-v4-SG10-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4a7afa33d24ac2de4ad41da015636e67a4b3425cdff8bc76be0b969a0b825b4e.json",
+      "content_hash": "4a7afa33d24ac2de4ad41da015636e67a4b3425cdff8bc76be0b969a0b825b4e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/56d7191d16345ab11ac2af1f23fb1f41a011098e6535fea7858847f6c3dc8b53.json",
+      "content_hash": "56d7191d16345ab11ac2af1f23fb1f41a011098e6535fea7858847f6c3dc8b53"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c.json",
+      "content_hash": "7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/b1b0452b83740edeeb744443ef0cd3f0670fbf864b23e9ba401c520c624fd397.json",
+      "content_hash": "b1b0452b83740edeeb744443ef0cd3f0670fbf864b23e9ba401c520c624fd397"
+    }
+  ],
+  "shot_id": "ep01v4-sg10",
+  "scene_id": "night-train-door-seat",
+  "storyboard_beat_id": "sg10",
+  "intent": "{{image:0}}中的她坐在睡着的值班工程师身边，脸的四分之三朝向镜头，侧过来对着他唱，口型与{{audio:1}}里的人声逐字精确同步。中近景，镜头固定不动。唱到一半时他猛地睁开眼睛；随后她从他松开的手里抽回黑色寻呼机，别回自己身前的腰带上。嘴前没有任何遮挡。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤完整保持；没有立领灯线（由认可的参考图承担）",
+    "歌词期间嘴在唱、与参考人声逐字同步，无声处嘴唇闭合；对嘴准确度由片段自带音轨与参考人声的对齐量测和使用者审看判定",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，一镜到底；值班工程师是开头那位（深蓝色工装夹克），不新增人物",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v4-sg10-reference"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

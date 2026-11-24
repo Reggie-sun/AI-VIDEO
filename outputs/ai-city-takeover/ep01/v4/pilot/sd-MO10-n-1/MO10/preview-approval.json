@@ -1,0 +1,18 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011",
+  "unit_ids": [
+    "MO10"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p020-b1.png",
+      "sha256": "7e6c124eabb1c32eb2a2924ee809ad1baead4998423d6c0e07ae3a103973f65d",
+      "role": "MO10 first frame"
+    }
+  ],
+  "user_quote": "照页面改 (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+ "unit": "SG03",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "3c3e02403fabca3cdb1b178182f8c300ed851dbaa0ddbd1e470439e51089cd35",
+ "compiled_prompt_sha256": "b219295c3d8757124350034d9b42e2ebac1f632201f5c161eeb0fa48d4e1ee13",
+ "approval_sha256": "d72cdf16565d98aeb10d00d6e36836b54f45ccfef73ad6d5c06b895b9dc57df7",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03/continuity-report.json",
+  "sha256": "8175d01d20e806056bf14d8afdef3eed85ae7655ac62a8d49e8b29b000d4a55f",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS：脸与 F1-a 锚点一致；耳挂、小红灯、立领红线在画面右侧且亮着；造型 L1 与 p011/p013 一致；红色只在讯号灯（场记报告逐项）。",
+   "handoff": "PASS（按设计）：44.9422 s 由 MO06「走到走秀台中段」硬切到前排凑近；50.933 s 硬切到 s013，她在右他在左，衔接得上。",
+   "axis_action_camera": "PASS：180 度线同侧无越轴；动作顺序 合嘴→唱→直起身 对应人声片内 0–0.68 静音、0.68–5.43 唱、5.43–5.99 收尾；生成锁定机位，4% 推近留剪辑。",
+   "prompt_fit": "PASS：编译 prompt 与认可原文逐字相同（sha b219295c…），参考包只有底图与人声；与分镜的差异只有锁定机位与闭嘴起始，预览页已列明。",
+   "lint": "由主会话运行 lint.py 取证（见 SG03/pre-submit-lint.json）。",
+   "risks": [
+    "认可文本「他还攥着椅子扶手」而 p012 折叠椅无扶手：可能凭空加扶手或第三只手；Gate 专查。主会话决定不为方法试验改认可文本。",
+    "tight 与 I'm 之间 0.71 s 无声：Gate 单测句间是否合嘴。",
+    "awake 结束到片尾只 0.56 s，直起身可能做不完或提前。",
+    "自带音轨可能提前（v2 LSen1 约 0.8 s）：Gate 先用 sync_check.py 量 lag。",
+    "全能参考非首帧：核对左右侧、领线亮灭、无镜像。",
+    "p011→p012 场景与群演的既有差异（检查点 4 已过），拼接审看时提出。",
+    "4k 价格无记录：上限 1000，实付以前后精确余额为准。"
+   ],
+   "full_report_note": "场记完整报告见本轮对话；本文件为主会话依其结论落盘。"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 1000,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   1000
+  ]
+ },
+ "new_calls": 0
+}

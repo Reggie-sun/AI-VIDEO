@@ -1,0 +1,18 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "cd72220d54b3bb69f4aa1f3bf03d064f03479d0a757017453d5ad3148e4007fd",
+  "unit_ids": [
+    "MO09"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p019-w1.png",
+      "sha256": "395553d2b87342c0274a5bd6e66f3bfee2b926b630d788dbe52a7b1f0f4eac07",
+      "role": "MO09 first frame"
+    }
+  ],
+  "user_quote": "改成「头顶始终不出画」 (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

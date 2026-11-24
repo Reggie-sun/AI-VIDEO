@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-21",
+ "written_by": "主会话据提交准备子代理的连续性要点转写（首帧与已认可 MO07-s-2 相同，仅 prompt 改观众与红灯）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r3-1/preview-approval.json",
+   "sha256": "a2087627be5e7c231b026605dae8e2ea3804959b67d134d811ef3677941c53d1"
+  }
+ },
+ "units": {
+  "MO07": {
+   "verdict": "ready",
+   "continuity": "首帧 p014-w1b 与已认可 s014 相同；前接 s013（工程师视线 MCU），新机位硬切",
+   "handoff": "结尾她朝画面右侧走开、手按寻呼机，接 s014c 寻呼机特写（10:02 后期点亮）",
+   "axis_action_camera": "长焦全身远景固定；旋身后朝画面右侧走",
+   "prompt_fit": "PASS；与 s-2 只差观众静止与寻呼机不亮红灯",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "观众全程低头看笔记本不抬头不动；寻呼机不亮红灯、除耳挂外无红色；斜挎带右肩→左胯；干脆旋身、甩袖成圆；头顶不出画；镜头固定；无文字"
+  }
+ }
+}

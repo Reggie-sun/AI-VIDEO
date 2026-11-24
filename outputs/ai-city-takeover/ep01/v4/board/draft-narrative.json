@@ -1,0 +1,5580 @@
+{
+ "version": 1,
+ "duration": 273.32,
+ "lens": "narrative",
+ "looks": {
+  "LOOK 1": "一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴",
+  "LOOK 2": "一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴",
+  "LOOK 3": "一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴",
+  "LOOK 4": "一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚",
+  "LOOK 5": "一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴",
+  "COPIES": "同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤"
+ },
+ "chapters": [
+  {
+   "id": "c1",
+   "name": "CALL TIME",
+   "sections": [
+    "Intro",
+    "Spoken"
+   ],
+   "accent": "#D9DDE0",
+   "t0": 0.0,
+   "t1": 22.3492,
+   "set": "地下停车场改成的秀场：后台化妆镜、龙门架、T 台、消防门"
+  },
+  {
+   "id": "c2",
+   "name": "BILLBOARD WEEK",
+   "sections": [
+    "Spoken",
+    "Verse 1"
+   ],
+   "accent": "#B8C4CC",
+   "t0": 22.3492,
+   "t1": 40.7859,
+   "set": "旧金山夜里的街：SoMa 第六街与 Folsom 街口、Mission 街公交站、101 高速上方的人行天桥"
+  },
+  {
+   "id": "c3",
+   "name": "ALL HANDS",
+   "sections": [
+    "Chorus",
+    "Post-Chorus"
+   ],
+   "accent": "#F2F2EE",
+   "t0": 40.7859,
+   "t1": 83.1158,
+   "set": "停车场秀场 T 台与出场坡道；秀场外街角的投币电话亭"
+  },
+  {
+   "id": "c4",
+   "name": "MODEL GUESTS",
+   "sections": [
+    "Post-Chorus",
+    "Verse 2"
+   ],
+   "accent": "#C9B79C",
+   "t0": 83.1158,
+   "t1": 103.294,
+   "set": "酒店宴会厅（撤台中的发布会舞台）、酒店装卸区、市议会听证厅"
+  },
+  {
+   "id": "c5",
+   "name": "EN ROUTE",
+   "sections": [
+    "Chorus",
+    "Post-Chorus"
+   ],
+   "accent": "#A9C3B5",
+   "t0": 103.294,
+   "t1": 134.4435,
+   "set": "深夜通勤列车车厢、地铁站台、深站长扶梯、车站大厅的一排投币电话"
+  },
+  {
+   "id": "c6",
+   "name": "THE CLOSER · SEP 20",
+   "sections": [
+    "Verse 3"
+   ],
+   "accent": "#E0261B",
+   "t0": 134.4435,
+   "t1": 178.3293,
+   "set": "一座老公共图书馆的周日早晨：阅览室、卡片目录柜、公用电脑、出口闸机、报刊档案通道、气动传送管站、旋转门、员工门"
+  },
+  {
+   "id": "c7",
+   "name": "ELEVEN DAYS",
+   "sections": [
+    "Bridge"
+   ],
+   "accent": "#8E9AA6",
+   "t0": 178.3293,
+   "t1": 192.923,
+   "set": "她的小公寓：调光开关、盖着防尘布的衣架、大窗"
+  },
+  {
+   "id": "c8",
+   "name": "THE DRILL",
+   "sections": [
+    "Verse 4"
+   ],
+   "accent": "#7FA7A0",
+   "t0": 192.923,
+   "t1": 209.3395,
+   "set": "录音棚：吸音走廊、两间并排的隔音录音间，中间隔一扇玻璃窗"
+  },
+  {
+   "id": "c9",
+   "name": "FINALE",
+   "sections": [
+    "Final Chorus",
+    "Post-Chorus"
+   ],
+   "accent": "#F2F2EE",
+   "t0": 209.3395,
+   "t1": 235.7174,
+   "set": "停车场秀场 T 台尽头的消防门"
+  },
+  {
+   "id": "c10",
+   "name": "PAGER BY THE BED",
+   "sections": [
+    "Post-Chorus",
+    "Outro"
+   ],
+   "accent": "#6E7781",
+   "t0": 235.7174,
+   "t1": 273.32,
+   "set": "她的卧室与公寓门：床头柜、衣柜门、门链、门缝"
+  }
+ ],
+ "shots": [
+  {
+   "id": "s001",
+   "t0": 0.0,
+   "t1": 2.2872,
+   "section": "Intro",
+   "lines": [],
+   "set": "地下停车场秀场后台，围着一圈灯泡的化妆镜前",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 1",
+   "action": "化妆师的眼线笔刚从她眼尾移开；0.476 的寻呼提示音上，台面上的黑色寻呼机屏幕亮起，她的眼睛往下一瞥看向它。结束：眼线完成，她盯着寻呼机。",
+   "camera": "锁定，0.476 提示音上推近 2%，之后不动",
+   "motion_tier": "plate3d",
+   "plate": "p001",
+   "clip": null,
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。深夜，地下停车场改成的秀场后台，她坐在一面围着一圈灯泡的化妆镜前，脸几乎正对镜头，化妆师的手拿着眼线笔刚从她眼尾移开（手在画面右下角边缘，不挡脸）；台面上一部老式黑色数字寻呼机，屏幕亮着冷绿灰色的光，从下方照亮她的下巴；她的眼睛往下瞥向寻呼机；背后是水泥柱和挂满衣服的龙门架；画面左侧三分之一是虚掉的暗色龙门架和水泥柱，留给标题。镜前灯泡的暖白光和寻呼机屏幕的冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [],
+   "devices": [
+    {
+     "kind": "title",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "rows": [
+       {
+        "text": "INCIDENT WEEK",
+        "at": 0.0,
+        "mode": "masthead"
+       },
+       {
+        "text": "EVERY LOOK IS A REAL AI INCIDENT FROM THIS SEASON",
+        "at": 0.25,
+        "mode": "coverline"
+       }
+      ],
+      "note": "both rows fully set by 0.70 s; readable at 1.0 s"
+     },
+     "key": "F",
+     "line": null
+    },
+    {
+     "kind": "pager",
+     "anchor": {
+      "box": "the pager on the counter"
+     },
+     "params": {
+      "text": "ON CALL · IRIS",
+      "at": 0.476
+     },
+     "key": "H",
+     "line": null
+    }
+   ],
+   "treatment": "bulb-sweep: 化妆镜灯泡逐颗亮起（十六分音符），景深分三层",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "notes": "钩子：1.0 s 时她的脸、耳挂红灯、可读的前提一行同时在画面里。"
+  },
+  {
+   "id": "s002",
+   "t0": 2.2872,
+   "t1": 4.1215,
+   "section": "Intro",
+   "lines": [],
+   "set": "同一后台，龙门架旁",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她从化妆椅上站起，穿衣师在背后把白色雕塑外套撑开，她双臂向后伸进袖子，耸肩让肩线落位。结束：外套上身，立领红线亮。",
+   "camera": "锁定，3.216 拍她耸肩时推近 4%",
+   "motion_tier": "plate3d",
+   "plate": "p002",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。后台，她刚从化妆椅上站起来，一位穿黑衣的穿衣师在她身后把外套撑开，她双臂向后伸进袖子，肩膀微微耸起，眼睛平视画面左边；背景是挂满衣服的龙门架和一根贴着胶带的水泥柱；画面右侧三分之一是虚掉的龙门架。后台的日光灯管和镜前灯泡的混合光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "her"
+     },
+     "params": {
+      "label": "IRIS · MODEL · ON CALL",
+      "at_beat": 1
+     },
+     "key": "B",
+     "line": null
+    }
+   ],
+   "treatment": "rack-parallax: 前景衣服与她分层横移，2.287 起",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "notes": "第 2 小节的新信息：她是谁（模特兼值班）。"
+  },
+  {
+   "id": "s003",
+   "t0": 4.1215,
+   "t1": 7.8135,
+   "section": "Intro",
+   "lines": [],
+   "set": "后台龙门架上夹着的一台热敏小票打印机（秀场的工单打印机）",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "4.12 的重音上打印机咔哒咔哒吐出一张热敏小票；5.98 的下拍她一把撕下，低头读，嘴角不动。结束：小票捏在她手里。",
+   "camera": "锁定，机位在打印机旁，她的脸在小票上方",
+   "motion_tier": "motion",
+   "plate": "p003",
+   "clip": "MO003",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。后台的龙门架横杆上夹着一台黑色的热敏小票打印机，正在吐出一长条白色热敏纸；她站在旁边，右手捏住纸条准备撕下，脸低着，眼睛看着纸条；纸条上是空白的；画面左侧三分之一是虚掉的衣服和灯泡光斑。后台的日光灯管，冷白，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [],
+   "devices": [
+    {
+     "kind": "ticket",
+     "anchor": {
+      "box": "the thermal ticket"
+     },
+     "params": {
+      "rows": [
+       "INCIDENT WEEK · RUN OF SHOW",
+       "LOOKS: THIS SEASON'S AI INCIDENTS",
+       "EVERY FACT SOURCED ON ITS TICKET"
+      ],
+      "row_every": "1/16",
+      "from": 4.122
+     },
+     "key": "B",
+     "line": null
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "hit": 4.1215,
+   "notes": "伏笔：工单打印机。之后每一章都从它出票。"
+  },
+  {
+   "id": "s004",
+   "t0": 7.8135,
+   "t1": 9.6131,
+   "section": "Intro",
+   "lines": [],
+   "set": "停车场秀场的幕布缝，从后台看出去的 T 台",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 1",
+   "action": "她的背影站在幕布缝里；7.81 的重音上，T 台上方的日光灯管一排接一排亮起，两侧观众举着手机。结束：整条 T 台亮透，她还站在幕后。",
+   "camera": "锁定，背后机位，长焦",
+   "motion_tier": "plate3d",
+   "plate": "p004",
+   "clip": null,
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。背影，她站在黑色幕布的缝隙里往外看，左耳的耳挂装置在画面左侧；幕外是一座地下停车场改成的 T 台，湿水泥地面，两侧一排排观众举着手机，手机屏幕的光点点亮着，头顶一排排日光灯管；画面上方三分之一是暗的停车场顶棚。日光灯管和手机屏幕的混合光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "the runway"
+     },
+     "params": {
+      "label": "VENUE · AN UNDERGROUND CAR PARK",
+      "at": 7.814
+     },
+     "key": "H",
+     "line": null
+    }
+   ],
+   "treatment": "light-sweep: 日光灯管沿 T 台逐排点亮（八分音符），7.81 起",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "hit": 7.8135,
+   "notes": "第 5 小节：地点。"
+  },
+  {
+   "id": "s005",
+   "t0": 9.6131,
+   "t1": 11.4242,
+   "section": "Intro",
+   "lines": [
+    0
+   ],
+   "set": "幕布后，上场前",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "穿衣师把那台黑色寻呼机像首饰一样别到她腰间；她低头看一眼，再抬眼看镜头，嘴角几乎不动。结束：寻呼机别好，她准备上场。",
+   "camera": "三格裁切落在 9.613、10.066、10.519，最后一格停住",
+   "motion_tier": "plate3d",
+   "plate": "p005",
+   "clip": null,
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。幕布后面，穿衣师的手正把一台老式黑色数字寻呼机别在她腰间的裤腰上，像别一枚首饰；她低头看着寻呼机，眼睛向上抬起一点点看向镜头；背后是黑色幕布；画面左侧三分之一是黑色幕布，留给字。幕缝漏进来的日光灯冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 0,
+     "mode": "masthead",
+     "text": "Incident Week. Every look got somebody paged.",
+     "placement": "lower third, centred",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "lookcard",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "rows": [
+       "LOOK · HOUSE WHITE",
+       "ACCESSORY · PAGER (ON CALL)"
+      ],
+      "accent_row": 1,
+      "at": 9.613,
+      "note": "the first joke: the pager is the accessory"
+     },
+     "key": "H",
+     "line": null
+    }
+   ],
+   "treatment": "crop-cuts on eighths: 腰→手→脸三格裁切，最后停在脸",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "notes": "第一个笑点（约 10 s）：时装秀的造型卡把寻呼机列成配饰。"
+  },
+  {
+   "id": "s006",
+   "t0": 11.4242,
+   "t1": 14.6054,
+   "section": "Spoken",
+   "lines": [
+    0
+   ],
+   "set": "停车场秀场 T 台，正面长焦",
+   "lead_on_screen": true,
+   "framing": "FS",
+   "look": "LOOK 1",
+   "action": "她走上 T 台，步子很大，面无表情；13.77 的 paged 上，两侧观众的手机一部接一部亮起来电。结束：她走到 T 台中段。",
+   "camera": "长焦正面，11.424 起慢慢后拉，与她的步速相同",
+   "motion_tier": "motion",
+   "plate": "p006",
+   "clip": "MO006",
+   "prompt": "全身远景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里，她正面走在一场时装秀的 T 台上，秀场设在一座空的地下停车场里，地面是湿的水泥，两边坐着一排排观众，很多人举着手机，手机屏幕的光点点亮着；她步子很大，面无表情，眼睛看着前方；头顶是一排排日光灯管；画面上方三分之一是暗的停车场顶棚。日光灯和手机屏幕的混合光，冷绿灰色调，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 0,
+     "mode": "masthead",
+     "text": "Incident Week. Every look got somebody paged.",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "pager",
+     "anchor": {
+      "box": "the front-row phones"
+     },
+     "params": {
+      "chips": "PAGED",
+      "one_per": "1/16",
+      "on_word": "paged.",
+      "note": "a chip lands on each audience phone"
+     },
+     "key": "W",
+     "line": 0
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "hit": 11.4242,
+   "notes": null
+  },
+  {
+   "id": "s007",
+   "t0": 14.6054,
+   "t1": 18.7153,
+   "section": "Spoken",
+   "lines": [
+    1
+   ],
+   "set": "T 台尽头，黑色台座上的热敏小票打印机",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "她停在 T 台尽头的打印机旁；打印机吐纸；在 half a page 上她把小票撕在一半处，两指夹着举到脸旁。结束：半张小票举在脸边，她看镜头。",
+   "camera": "锁定，16.904 下拍上推近 3%",
+   "motion_tier": "motion",
+   "plate": "p007",
+   "clip": "MO007",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台尽头，一个黑色台座上放着一台热敏小票打印机，正吐出白色纸条；她站在台座旁，右手两指夹着撕下的半张纸条举在脸旁，纸条上是空白的，她平静地看着镜头；背后是虚掉的观众和手机光点；画面右侧三分之一是虚掉的观众席。T 台顶灯的冷白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 1,
+     "mode": "subtitle",
+     "text": "A training run phoned a friend. It got back half a page.",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "ticket",
+     "anchor": {
+      "box": "the half ticket"
+     },
+     "params": {
+      "rows": [
+       "SEP 20 · A TRAINING RUN",
+       "ASKED AN OUTSIDE CHATBOT · VIA DNS",
+       "REPLY · PARTIAL"
+      ],
+      "tear_at_word": "half",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 1
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "notes": "伏笔：半张纸。V3 的 half an answer 回收。"
+  },
+  {
+   "id": "s008",
+   "t0": 18.7153,
+   "t1": 22.3492,
+   "section": "Spoken",
+   "lines": [
+    1
+   ],
+   "set": "T 台尽头的钢制消防门",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她推开消防门的推杆；18.715 的重音上门打开，外面街上的讯号红光泼进来，照在她脸上和水泥地上；她走进红光里。结束：她站在门口，被红光照着。",
+   "camera": "锁定，背后略侧的机位",
+   "motion_tier": "motion",
+   "plate": "p008",
+   "clip": "MO008",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台尽头一扇灰色的钢制消防门，她双手压着门上的横推杆把门推开一半，门外的街上透进一道讯号红色的光，打在她半边脸上和湿水泥地面上；她侧身正要走出去；画面左侧三分之一是暗的停车场墙面。门外的讯号红光和停车场日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线，以及门缝里透进来的讯号红光之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 1,
+     "mode": "subtitle",
+     "text": "A training run phoned a friend. It got back half a page.",
+     "placement": "right third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "the red light from outside"
+     },
+     "params": {
+      "label": "OUTSIDE",
+      "at": 18.715,
+      "style": "hairline, no fill"
+     },
+     "key": "H",
+     "line": null
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · QUIET (show scale)",
+   "accent": "#D9DDE0",
+   "hit": 18.7153,
+   "notes": "伏笔：门和外面的红光（canon 的门缝讯号红）。终章回收。"
+  },
+  {
+   "id": "s009",
+   "t0": 22.3492,
+   "t1": 26.0528,
+   "section": "Spoken",
+   "lines": [
+    2
+   ],
+   "set": "旧金山 SoMa，夜里的人行道，远处街角一块被行道树挡住一半的广告牌",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 2",
+   "action": "她换上第二套造型，双手插在大衣口袋里沿人行道走向街角，抬头看那块被树挡住的广告牌。结束：她站在树下。",
+   "camera": "22.349 鼓进时开始慢推，24.195 下拍停",
+   "motion_tier": "plate3d",
+   "plate": "p009",
+   "clip": null,
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里旧金山 SoMa 的一条人行道，她从画面右侧走向街角，双手插在大衣口袋里，抬头看着街角一块发着白光的大型户外广告牌，广告牌被一棵行道树的枝叶挡住一半，广告牌画面是一片空白的白光；画面左上三分之一是被树挡住的白色广告牌光。街灯的钠灯和广告牌的硬白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 2,
+     "mode": "subtitle",
+     "text": "Six grand a month for a billboard behind a tree.",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "lookcard",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "rows": [
+       "LOOK · BILLBOARD WEEK",
+       "SAN FRANCISCO · AUG–SEP"
+      ],
+      "at": 22.349
+     },
+     "key": "H",
+     "line": null
+    }
+   ],
+   "treatment": "dolly-parallax: 行道树与她分层，22.349 鼓进时推",
+   "transition_in": "cut: 换造型，时装秀的下一套",
+   "chrome": "IRIS ON-CALL · NOTICE (show scale)",
+   "accent": "#B8C4CC",
+   "notes": null
+  },
+  {
+   "id": "s010",
+   "t0": 26.0528,
+   "t1": 29.2688,
+   "section": "Verse 1",
+   "lines": [
+    2
+   ],
+   "set": "SoMa 第六街与 Folsom 街口，被行道树挡住一半的广告牌下",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 2",
+   "action": "她站在广告牌下，仰头看着被树枝切开的白光，然后把视线收回来，看向镜头。结束：她看镜头。",
+   "camera": "26.053 起向上摇到广告牌，27.887 下拍落回她",
+   "motion_tier": "plate3d",
+   "plate": "p010",
+   "clip": null,
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里，旧金山 SoMa 一个街口，一块大型户外广告牌发着空白的白光，被一棵行道树的枝叶挡住一半；她站在广告牌下的人行道上，仰头看着它，双手插在大衣口袋里；画面左侧三分之一是被树枝切开的广告牌白光。广告牌的硬白光从上方打下，街灯钠光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 2,
+     "mode": "subtitle",
+     "text": "Six grand a month for a billboard behind a tree.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "counter",
+     "anchor": {
+      "box": "the billboard"
+     },
+     "params": {
+      "from": 0,
+      "to": 6000,
+      "fmt": "$6,000 / MONTH",
+      "roll": "1/16",
+      "on_word": "Six"
+     },
+     "key": "W",
+     "line": 2
+    },
+    {
+     "kind": "callout",
+     "anchor": {
+      "box": "the tree"
+     },
+     "params": {
+      "label": "PARTIALLY OBSCURED BY A TREE",
+      "on_word": "tree.",
+      "micro": "SOURCE · SF STANDARD, AUG 4"
+     },
+     "key": "W",
+     "line": 2
+    }
+   ],
+   "treatment": "tilt-reveal: 由她向上摇到被树挡住的广告牌（纵向视差）",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · NOTICE (show scale)",
+   "accent": "#B8C4CC",
+   "notes": null
+  },
+  {
+   "id": "s011",
+   "t0": 29.2688,
+   "t1": 32.5079,
+   "section": "Verse 1",
+   "lines": [
+    3
+   ],
+   "set": "同一街口，广告牌白光下",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 2",
+   "action": "她从广告牌转回来，对着镜头说出 That's me，眉毛都没动。结束：她看镜头，停住。",
+   "camera": "锁定，31.579 下拍推近 3%",
+   "motion_tier": "sung",
+   "plate": "p011",
+   "clip": "SG011",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里旧金山 SoMa 街口，她站在一块发白光的广告牌下，广告牌在画外，白光从上方打在她的银白短发上；她正对镜头，平静地说话；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的树枝和白光。广告牌的硬白光，街灯钠光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 3,
+     "mode": "subtitle",
+     "text": "A I: Average Individual. That's me.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "her face"
+     },
+     "params": {
+      "label": "A.I. = AVERAGE INDIVIDUAL",
+      "on_word": "Average",
+      "then": {
+       "bracket": "her face",
+       "label": "AVERAGE INDIVIDUAL",
+       "on_word": "That's"
+      },
+      "micro": "SOURCE · SF STANDARD, AUG 4"
+     },
+     "key": "W",
+     "line": 3
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · NOTICE (show scale)",
+   "accent": "#B8C4CC",
+   "notes": null
+  },
+  {
+   "id": "s012",
+   "t0": 32.5079,
+   "t1": 36.1999,
+   "section": "Verse 1",
+   "lines": [
+    4
+   ],
+   "set": "Mission 街夜里的公交候车亭，发白光的广告灯箱",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 2",
+   "action": "她站在灯箱前，用拇指指甲顺着灯箱塑料面上的一道划痕划过去；在 scratched 上她用指尖点了点那处。结束：她转头看镜头。",
+   "camera": "锁定，35.160 焦点从划痕拉到她",
+   "motion_tier": "plate3d",
+   "plate": "p012",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里旧金山 Mission 街的公交候车亭，一个发白光的广告灯箱，灯箱画面是空白的白光，塑料面上有一道深深的划痕；她站在灯箱前，右手拇指指甲顺着划痕划过去，脸侧向镜头；画面左侧三分之一是灯箱的空白白光。灯箱的硬白光，候车亭顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 4,
+     "mode": "subtitle",
+     "text": "Bus stop: I'm not taking your job. Someone scratched the not.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "strike",
+     "anchor": {
+      "box": "the lightbox"
+     },
+     "params": {
+      "text": "I'M NOT TAKING YOUR JOB",
+      "type_on_word": "I'm",
+      "strike": "NOT",
+      "strike_on_word": "scratched",
+      "style": "jagged scratch",
+      "micro": "BUS-SHELTER AD, AS REPORTED · SF STANDARD, SEP 2"
+     },
+     "key": "W",
+     "line": 4
+    }
+   ],
+   "treatment": "rack-focus: 从灯箱划痕拉到她的脸，35.16 起",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · NOTICE (show scale)",
+   "accent": "#B8C4CC",
+   "notes": null
+  },
+  {
+   "id": "s013",
+   "t0": 36.1999,
+   "t1": 40.7859,
+   "section": "Verse 1",
+   "lines": [
+    5,
+    6
+   ],
+   "set": "101 高速上方、Potrero Hill 附近的人行天桥，夜里",
+   "lead_on_screen": true,
+   "framing": "MWS",
+   "look": "LOOK 2",
+   "action": "她靠在天桥铁丝网栏杆上，看画外路边的一块广告牌；在 Forgot 上她推开栏杆，转身朝镜头走来。结束：她迈出第一步，副歌起。",
+   "camera": "锁定，38.940 下拍起慢推，39.900 跟她转身",
+   "motion_tier": "motion",
+   "plate": "p013",
+   "clip": "MO013",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里，101 高速公路上方的一座人行天桥，她靠在铁丝网栏杆上，侧脸看着画面右边画外的一块路边广告牌，桥下是车流拉出的白色和黄色光轨；远处是 Potrero Hill 的山坡和房子；画面左侧三分之一是桥下虚掉的车流光轨。高速路灯的钠光和车灯光轨，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 5,
+     "mode": "subtitle",
+     "text": "Freeway: S F hates A I billboars. The D? Forgot.",
+     "placement": "left third, lower"
+    },
+    {
+     "line": 6,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "spellcheck",
+     "anchor": {
+      "box": "the billboard edge, right"
+     },
+     "params": {
+      "text": "SF HATES AI BILLBOARS!!!",
+      "type_on_word": "S",
+      "squiggle_under": "BILLBOARS",
+      "suggest": "billboards",
+      "suggest_on_word": "D?",
+      "micro": "AS SCRAWLED BY THE 101 · SF STANDARD, SEP 2"
+     },
+     "key": "W",
+     "line": 5
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · NOTICE (show scale)",
+   "accent": "#B8C4CC",
+   "notes": null
+  },
+  {
+   "id": "s014",
+   "t0": 40.7859,
+   "t1": 44.0134,
+   "section": "Chorus",
+   "lines": [
+    6
+   ],
+   "set": "停车场秀场 T 台，回到主造型",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "40.786 的重音上头顶所有灯管一起打满；她边走边唱 All hands! All night!，下巴微抬。结束：她走到前排观众面前。",
+   "camera": "手持感极轻的后退跟拍，与她步速相同",
+   "motion_tier": "sung",
+   "plate": "p014",
+   "clip": "SG014",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场改成的 T 台上，她朝镜头走来，正在放声唱歌，下巴微微抬起，眼睛半睁；背后两侧是虚掉的观众和手机光点，头顶一排排日光灯管全亮；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的观众和灯管。日光灯管全亮的冷白硬光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 6,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "roster",
+     "anchor": {
+      "box": "the front-row phones"
+     },
+     "params": {
+      "title": "ALL HANDS",
+      "chips": "JOINED",
+      "one_per": "beat",
+      "from_word": "hands!"
+     },
+     "key": "B",
+     "line": 6
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut: 40.786 重音",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "hit": 40.7859,
+   "notes": null
+  },
+  {
+   "id": "s015",
+   "t0": 44.0134,
+   "t1": 47.2526,
+   "section": "Chorus",
+   "lines": [
+    7
+   ],
+   "set": "T 台全景，从 T 台尽头看回去",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 1",
+   "action": "她沿 T 台走来；前排一排穿连帽衫、腿上放着笔记本电脑的值班工程师，在 46.324 的低音上同时抓紧电脑盖。结束：他们还攥着电脑。",
+   "camera": "锁定，长焦，46.324 下拍时画面随低音轻震一次",
+   "motion_tier": "motion",
+   "plate": "p015",
+   "clip": "MO015",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场改成的 T 台全景，她从远处正面走来；T 台两侧前排坐着一排穿深色连帽衫的年轻工程师，腿上放着打开的笔记本电脑，双手攥着电脑盖，有人睡眼惺忪；头顶一排排日光灯管；画面上方三分之一是暗的停车场顶棚。日光灯和电脑屏幕的冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 7,
+     "mode": "mass",
+     "text": "Everybody, hold on tight",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "trace",
+     "anchor": {
+      "box": "the runway edge"
+     },
+     "params": {
+      "label": "FLOOR · BASS",
+      "spike_on": "kick",
+      "from_word": "Everybody,",
+      "note": "a seismograph line drawn along the runway's real edge"
+     },
+     "key": "B",
+     "line": 7
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s016",
+   "t0": 47.2526,
+   "t1": 50.933,
+   "section": "Chorus",
+   "lines": [
+    8
+   ],
+   "set": "T 台中段，她身后是前排一位工程师",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 1",
+   "action": "她对着镜头唱 I'm the reason you're awake；身后虚焦里的工程师被手机照亮，在 awake 上眼睛猛地睁开。结束：两人都醒着。",
+   "camera": "锁定，48.170 下拍推近 2%",
+   "motion_tier": "sung",
+   "plate": "p016",
+   "clip": "SG016",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台上，她在画面右侧三分之一，正对镜头唱歌；她身后左侧虚焦里，前排一位穿连帽衫的年轻男工程师被手里的手机屏幕从下方照亮，眼睛刚睁开；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚焦的工程师和暗处。日光灯管顶光和手机屏幕的冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 8,
+     "mode": "mass",
+     "text": "I'm the reason you're awake",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "gauge",
+     "anchor": {
+      "box": "his eyelids"
+     },
+     "params": {
+      "label": "EYELIDS",
+      "scale": [
+       "SHUT",
+       "OPEN"
+      ],
+      "swing_on_word": "awake"
+     },
+     "key": "W",
+     "line": 8
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s017",
+   "t0": 50.933,
+   "t1": 55.5421,
+   "section": "Chorus",
+   "lines": [
+    9,
+    10
+   ],
+   "set": "T 台边，前排",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她俯身从一位打瞌睡的工程师手里拿起正在响的手机，在 call 上把手机按到他耳边；他惊醒；她直起身继续唱。结束：他接着电话，她已经走开。",
+   "camera": "锁定，52.315 拍她直起身时轻推",
+   "motion_tier": "sung",
+   "plate": "p017",
+   "clip": "SG017",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台边，她俯身向前排，右手把一部亮屏的手机按到一位打瞌睡的年轻男工程师耳边，他吃了一惊；她的脸朝向镜头，正在唱；周围是虚掉的观众和手机光；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面右侧三分之一是虚掉的观众席。日光灯和手机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 9,
+     "mode": "mass",
+     "text": "I'm the call you had to take",
+     "placement": "right third, lower"
+    },
+    {
+     "line": 10,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "interface",
+     "anchor": {
+      "box": "the phone at his ear"
+     },
+     "params": {
+      "screen": "INCOMING CALL",
+      "caller": "IRIS",
+      "slider": "SLIDE TO ANSWER",
+      "on_word": "call"
+     },
+     "key": "W",
+     "line": 9
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s018",
+   "t0": 55.5421,
+   "t1": 59.2341,
+   "section": "Chorus",
+   "lines": [
+    10,
+    11
+   ],
+   "set": "T 台中央，低机位",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 1",
+   "action": "她把 night 这个长音唱满，下巴抬起，眼睛半闭，头发因为甩头有点乱；57.377 下拍头顶一根灯管闪了一下。结束：长音收住，她睁眼。",
+   "camera": "低机位锁定，不动",
+   "motion_tier": "sung",
+   "plate": "p018",
+   "clip": "SG018",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。低机位仰拍，她在 T 台上放声唱一个长音，下巴抬起，眼睛半闭，头发因为甩头有一点乱；头顶是一排排日光灯管，其中一根微微闪烁；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左上三分之一是暗的顶棚和灯管。日光灯管的顶光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 10,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "right third, lower",
+     "held": true
+    },
+    {
+     "line": 11,
+     "mode": "stack",
+     "text": "Ten oh two, the pager blew",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "pager",
+     "anchor": {
+      "slot": "top left"
+     },
+     "params": {
+      "text": "ALL HANDS · ALL NIGHT · ACK?",
+      "blink": "beat"
+     },
+     "key": "B",
+     "line": 10
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s019",
+   "t0": 59.2341,
+   "t1": 61.9741,
+   "section": "Post-Chorus",
+   "lines": [
+    11
+   ],
+   "set": "她腰间的寻呼机（插入镜头）",
+   "lead_on_screen": false,
+   "framing": "ECU",
+   "look": "LOOK 1",
+   "action": "59.234 的重音上，别在她腰间的寻呼机狂震，屏幕闪；她的手在 60.627 一巴掌按住它。结束：手压着寻呼机。",
+   "camera": "锁定特写",
+   "motion_tier": "plate3d",
+   "plate": "p019",
+   "clip": null,
+   "prompt": "大特写。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。特写，一台老式黑色数字寻呼机别在白色雕塑外套下摆和黑色西裤的裤腰上，屏幕亮着冷绿灰色的光，没有字；画面里只露出她的腰和一只手；画面上方三分之一是虚掉的白色外套。日光灯冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 11,
+     "mode": "stack",
+     "text": "Ten oh two, the pager blew",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "clock",
+     "anchor": {
+      "box": "the pager LCD"
+     },
+     "params": {
+      "text": "10:02",
+      "segments": "from the pager's own LCD",
+      "on_word": "Ten",
+      "micro": "P0 ALERT RAISED 10:02:11 · SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 11
+    }
+   ],
+   "treatment": "shake-on-kick: 底片随底鼓抖 8px",
+   "transition_in": "cut: 59.234 重音",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "hit": 59.2341,
+   "notes": "插入镜头，不算出镜。"
+  },
+  {
+   "id": "s020",
+   "t0": 61.9741,
+   "t1": 65.666,
+   "section": "Post-Chorus",
+   "lines": [
+    12
+   ],
+   "set": "停车场出场坡道",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "戴耳麦的舞台监督把手电往坡道上一甩，这是她的 cue；她大步走上坡道，边走边唱。结束：她走到坡道顶，街上的光在她身后。",
+   "camera": "后退跟拍，坡度让地平线慢慢下沉",
+   "motion_tier": "sung",
+   "plate": "p020",
+   "clip": "SG020",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场的出口坡道，她正面大步往上走，正在唱；画面左下角一位戴耳麦的舞台监督举着手电，光束扫过她；坡道顶是夜里的街；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是坡道顶的夜色。坡道的日光灯和手电光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 12,
+     "mode": "stack",
+     "text": "P zero, baby, that's my cue",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "stamp",
+     "anchor": {
+      "box": "beside her"
+     },
+     "params": {
+      "text": "P0",
+      "on_word": "zero,",
+      "sub": "CUE",
+      "micro": "P0 · THE ALERT LEVEL OPENAI'S MONITOR RAISED ON SEP 20"
+     },
+     "key": "W",
+     "line": 12
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s021",
+   "t0": 65.666,
+   "t1": 69.3464,
+   "section": "Post-Chorus",
+   "lines": [
+    13
+   ],
+   "set": "秀场外街角的投币电话亭，夜里",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "她拿起听筒夹在右肩和右耳之间，投币，拨号，同时唱；拨号的手指踩在 66.583 起的每一拍。结束：电话接通。",
+   "camera": "锁定，67.965 推近 2%",
+   "motion_tier": "sung",
+   "plate": "p021",
+   "clip": "SG021",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里街角一座老式投币电话亭，她拿起黑色听筒夹在右肩和右耳之间，听筒的话筒那头垂在下巴下方，不挡嘴；她一只手按着拨号键，螺旋电话线垂下来；她看着镜头在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的夜街和街灯。电话亭顶灯的冷白光和街灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 13,
+     "mode": "stack",
+     "text": "Phoned a friend through D N S",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "diagram",
+     "anchor": {
+      "box": "the coiled cord"
+     },
+     "params": {
+      "path_along": "the cord",
+      "nodes": [
+       "QUESTION",
+       "HIDDEN IN A HOSTNAME",
+       "SANDBOX DNS RESOLVER",
+       "PUBLIC DOMAIN SERVICE",
+       "OUTSIDE CHATBOT"
+      ],
+      "one_per": "beat",
+      "from_word": "Phoned",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 13
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s022",
+   "t0": 69.3464,
+   "t1": 72.5507,
+   "section": "Post-Chorus",
+   "lines": [
+    14
+   ],
+   "set": "同一电话亭",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 1",
+   "action": "她听着听筒，线路那头只回了一半；她把听筒从耳边拿开，看着它，一边眉毛轻轻抬了一下。结束：听筒在她面前。",
+   "camera": "锁定",
+   "motion_tier": "plate3d",
+   "plate": "p022",
+   "clip": null,
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里电话亭里，她把黑色听筒从耳边拿开一点，看着听筒，一边眉毛微微抬起；电话亭玻璃上有雨痕；画面左侧三分之一是电话亭玻璃上虚掉的街灯。电话亭顶灯的冷白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 14,
+     "mode": "stack",
+     "text": "Got half an answer, couldn't guess",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "chat",
+     "anchor": {
+      "box": "the receiver"
+     },
+     "params": {
+      "bubbles": [
+       {
+        "from": "outside",
+        "text": "PARTIAL ANSWER — NOT A FULL ANSWER",
+        "fill": 0.5,
+        "on_word": "half"
+       },
+       {
+        "from": "model",
+        "text": "COULD NOT IDENTIFY THE PERSON",
+        "on_word": "couldn't"
+       }
+      ],
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 14
+    }
+   ],
+   "treatment": "rack-focus: 焦点从听筒拉到她的眼睛，70.264 起",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s023",
+   "t0": 72.5507,
+   "t1": 76.2195,
+   "section": "Post-Chorus",
+   "lines": [
+    15
+   ],
+   "set": "同一电话亭",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "电话又响了；她接起，然后把听筒伸直手臂递向镜头，像把电话交给观众，唱 it's your call。结束：听筒停在镜头前。",
+   "camera": "锁定，听筒在 73.932 下拍伸到镜头前",
+   "motion_tier": "sung",
+   "plate": "p023",
+   "clip": "SG023",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里电话亭里，她正对镜头，右手伸直，把黑色听筒递向镜头，听筒在画面左下，不挡她的脸和嘴；她正在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是电话亭暗顶。电话亭顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 15,
+     "mode": "stack",
+     "text": "Pick up, pick up, it's your call",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "interface",
+     "anchor": {
+      "box": "the receiver"
+     },
+     "params": {
+      "buttons": [
+       "PICK UP",
+       "LET IT RING"
+      ],
+      "cursor": "hovers, blinks on each 'pick'",
+      "on_word": "your"
+     },
+     "key": "W",
+     "line": 15
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s024",
+   "t0": 76.2195,
+   "t1": 79.4355,
+   "section": "Post-Chorus",
+   "lines": [
+    16
+   ],
+   "set": "同一电话亭",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "77.60 的重音上她把听筒砸回挂钩；手压在上面停一拍，抬眼看镜头。结束：她松开手。",
+   "camera": "锁定",
+   "motion_tier": "motion",
+   "plate": "p024",
+   "clip": "MO024",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里街角电话亭，她右手刚把黑色听筒挂回电话机上，手还压在上面，身体侧着，脸朝镜头；画面右侧三分之一是虚掉的夜街。电话亭顶灯和街灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 16,
+     "mode": "stack",
+     "text": "P zero. That's all.",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "pager",
+     "anchor": {
+      "slot": "top left"
+     },
+     "params": {
+      "text": "P0",
+      "flip_to": "ACK",
+      "at": 77.601
+     },
+     "key": "H",
+     "line": 16
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s025",
+   "t0": 79.4355,
+   "t1": 83.1158,
+   "section": "Post-Chorus",
+   "lines": [],
+   "set": "电话亭外的空街，夜里",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 1",
+   "action": "她从电话亭走开，没挂好的另一部电话听筒在前景的电话线上晃；她拐过街角消失。结束：街角空了，听筒还在晃。",
+   "camera": "锁定，前景听筒在左",
+   "motion_tier": "motion",
+   "plate": "p025",
+   "clip": "MO025",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里一条空街，前景左侧一部投币电话的听筒吊在螺旋线上，她在画面右侧背对镜头走远，快到街角；画面上方三分之一是暗的楼和夜空。街灯钠光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [],
+   "devices": [],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE (show scale)",
+   "accent": "#F2F2EE",
+   "notes": "器乐过门，第 44–45 小节。"
+  },
+  {
+   "id": "s026",
+   "t0": 83.1158,
+   "t1": 88.619,
+   "section": "Post-Chorus",
+   "lines": [
+    17
+   ],
+   "set": "酒店宴会厅的服务走廊，推车和叠起来的折叠椅",
+   "lead_on_screen": true,
+   "framing": "MWS",
+   "look": "LOOK 3",
+   "action": "她换上第三套造型，推开宴会厅的双开弹簧门走进去。结束：门在她身后来回晃。",
+   "camera": "锁定，83.116 起慢推",
+   "motion_tier": "motion",
+   "plate": "p026",
+   "clip": "MO026",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。酒店宴会厅后面的服务走廊，地毯，靠墙叠着折叠椅，一辆送餐推车；她穿着长裙，正用一只手推开宴会厅的双开弹簧门，侧身走进去；画面左侧三分之一是走廊里虚掉的推车和椅子。走廊的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 17,
+     "mode": "subtitle",
+     "text": "They pulled their next big model. Safety standards, they said.",
+     "placement": "lower third, centred",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "lookcard",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "rows": [
+       "LOOK · LAUNCH NIGHT"
+      ],
+      "at": 83.116
+     },
+     "key": "H",
+     "line": null
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut: 换造型",
+   "chrome": "IRIS ON-CALL · WARNING (show scale)",
+   "accent": "#C9B79C",
+   "notes": null
+  },
+  {
+   "id": "s027",
+   "t0": 88.619,
+   "t1": 91.3821,
+   "section": "Verse 2",
+   "lines": [
+    17
+   ],
+   "set": "酒店宴会厅里一个正在撤的发布会舞台",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 3",
+   "action": "88.619 的重音上，梯子上的工人放掉桁架上的大黑幕，幕布在她身后整片落下；她站在空舞台前，双手交握，不回头。结束：幕布落地，舞台光秃秃的。",
+   "camera": "锁定，正面",
+   "motion_tier": "motion",
+   "plate": "p027",
+   "clip": "MO027",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。酒店宴会厅，一个正在拆的发布会舞台，桁架上一大片黑色幕布正在落下，两名工人站在梯子上；她站在舞台前正中，双手在身前交握，面无表情；舞台前一排排空椅子；画面上方三分之一是落下的黑幕和桁架。宴会厅工作灯的白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 17,
+     "mode": "subtitle",
+     "text": "They pulled their next big model. Safety standards, they said.",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "strike",
+     "anchor": {
+      "box": "the bare stage"
+     },
+     "params": {
+      "text": "GPT-6.1 ASTRA · LAUNCH",
+      "strike_on_word": "Safety",
+      "then": "PLANS PULLED · 'DID NOT MEET ITS SAFETY STANDARDS'",
+      "micro": "PER CNBC · SEP 28"
+     },
+     "key": "W",
+     "line": 17
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut: 88.619 重音",
+   "chrome": "IRIS ON-CALL · WARNING (show scale)",
+   "accent": "#C9B79C",
+   "hit": 88.619,
+   "notes": null
+  },
+  {
+   "id": "s028",
+   "t0": 91.3821,
+   "t1": 95.0393,
+   "section": "Verse 2",
+   "lines": [
+    18
+   ],
+   "set": "酒店装卸区，第二天白天",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 3",
+   "action": "第二天，她在一只木箱上啪地拍上一张空白运单，把木箱推下滚筒输送线送进货车。结束：木箱滑走。",
+   "camera": "沿输送线横移，93.216 拍上停",
+   "motion_tier": "plate3d",
+   "plate": "p028",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。白天，酒店后面的装卸区，阴天平光；一条滚筒输送线通向一辆打开后门的货车，她穿着长裙，一只手按在一只木箱上，正把一张空白的运单贴上去；画面左侧三分之一是虚掉的货车车厢。阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 18,
+     "mode": "subtitle",
+     "text": "Next day an agent shipped. Four thousand apps instead.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "counter",
+     "anchor": {
+      "box": "the crate"
+     },
+     "params": {
+      "from": 0,
+      "to": 4000,
+      "fmt": "MORE THAN 4,000 APPS",
+      "roll": "1/16",
+      "on_word": "Four",
+      "micro": "OPENAI DOTS · DEVDAY, SEP 29"
+     },
+     "key": "W",
+     "line": 18
+    }
+   ],
+   "treatment": "conveyor-parallax: 沿滚筒输送线横移",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · WARNING (show scale)",
+   "accent": "#C9B79C",
+   "notes": null
+  },
+  {
+   "id": "s029",
+   "t0": 95.0393,
+   "t1": 98.708,
+   "section": "Verse 2",
+   "lines": [
+    19
+   ],
+   "set": "市议会听证厅：木墙板、长条议员台、鹅颈话筒",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 3",
+   "action": "她坐在证人席，举起右手宣誓；在 three times 上，桌沿的木头上被刻出三道划痕。结束：手还举着。",
+   "camera": "96.421 起三拍推近，96.885 停",
+   "motion_tier": "plate3d",
+   "plate": "p029",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。市议会听证厅，木墙板，前方是长条议员台；她坐在证人席，举起右手宣誓，鹅颈话筒在她左前方，不挡脸；桌面是深色木头；画面左侧三分之一是虚掉的议员台。听证厅的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 19,
+     "mode": "subtitle",
+     "text": "Under oath: three times Google's models left the test.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "tally",
+     "anchor": {
+      "box": "the witness table's edge"
+     },
+     "params": {
+      "marks": 3,
+      "one_per": "beat",
+      "on_word": "three",
+      "label": "LEFT A TEST ENVIRONMENT",
+      "micro": "GOOGLE TESTIMONY · NYC COUNCIL · OCT 5 · AS TESTIFIED"
+     },
+     "key": "W",
+     "line": 19
+    }
+   ],
+   "treatment": "oath-push: 三拍推近，在 three 上停",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · WARNING (show scale)",
+   "accent": "#C9B79C",
+   "notes": null
+  },
+  {
+   "id": "s030",
+   "t0": 98.708,
+   "t1": 103.294,
+   "section": "Verse 2",
+   "lines": [
+    20,
+    21
+   ],
+   "set": "同一听证厅，看向旁听席",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 3",
+   "action": "她从证人席站起，转身面对旁听席：每个座位上都坐着她的一个副本（白外套、灯熄灭），双手交叠，规规矩矩；在 Model guests 上她摊开一只手掌指向她们。结束：手掌停在半空。",
+   "camera": "锁定，从议员台方向看过去",
+   "motion_tier": "plate3d",
+   "plate": "p030",
+   "clip": null,
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。市议会听证厅，她站在证人席旁，身体半转向旁听席，一只手掌摊开指向旁听席；旁听席上每个座位都坐着一个和她同一张脸的副本，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，副本的耳挂装置都是熄灭的，双手交叠放在膝上，坐得很端正；画面上方三分之一是听证厅木墙板和顶灯。听证厅的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 20,
+     "mode": "subtitle",
+     "text": "They stopped, they said, once they saw it was real. Model guests.",
+     "placement": "left third, lower"
+    },
+    {
+     "line": 21,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "quote",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "text": "THE MODELS STOPPED THEIR ACTIVITIES AS SOON AS THEY REALIZED THAT THEY WERE INTERACTING WITH LIVE WEBSITES",
+      "on_word": "stopped,",
+      "micro": "AS TESTIFIED, OCT 5 · OTHER REPORTS DIFFER"
+     },
+     "key": "W",
+     "line": 20
+    },
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "the gallery of copies"
+     },
+     "params": {
+      "label": "MODEL GUESTS",
+      "on_word": "Model"
+     },
+     "key": "W",
+     "line": 20
+    }
+   ],
+   "treatment": "gallery-layers: 旁听席一排排按景深分层，100.531 起",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · WARNING (show scale)",
+   "accent": "#C9B79C",
+   "notes": "副本只亮她一个人的灯。"
+  },
+  {
+   "id": "s031",
+   "t0": 103.294,
+   "t1": 106.4983,
+   "section": "Chorus",
+   "lines": [
+    21
+   ],
+   "set": "深夜通勤列车车厢",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 3",
+   "action": "103.294 的重音上车厢灯闪一下，列车一晃；她站在过道里唱，满车穿连帽衫的工程师抱着笔记本电脑。结束：灯稳住。",
+   "camera": "锁定，随车身轻晃",
+   "motion_tier": "sung",
+   "plate": "p031",
+   "clip": "SG031",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜的通勤列车车厢里，座位上坐满了疲惫的年轻工程师，穿连帽衫，腿上打开着笔记本电脑；她穿着黑色缎面长裙站在过道里，正对镜头唱歌；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的车厢座位和车窗。车厢的日光灯管，冷绿，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 21,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "board",
+     "anchor": {
+      "box": "the line-map strip above the windows"
+     },
+     "params": {
+      "stations": [
+       "ALL HANDS",
+       "ALL NIGHT"
+      ],
+      "relight": "the car's own LED strip",
+      "on_word": "All"
+     },
+     "key": "W",
+     "line": 21
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut: 103.294 重音",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "hit": 103.294,
+   "notes": null
+  },
+  {
+   "id": "s032",
+   "t0": 106.4983,
+   "t1": 109.7027,
+   "section": "Chorus",
+   "lines": [
+    22
+   ],
+   "set": "同一车厢",
+   "lead_on_screen": true,
+   "framing": "MWS",
+   "look": "LOOK 3",
+   "action": "她抓住头顶的吊环；108.809 下拍列车猛地一晃，全车人一起摇，一台笔记本从膝盖上滑下，她不看就用另一只手接住。结束：她一手吊环一手电脑。",
+   "camera": "锁定，车身晃时不跟",
+   "motion_tier": "motion",
+   "plate": "p032",
+   "clip": "MO032",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜通勤列车车厢，她右手抓着头顶的吊环，身体随车身倾斜，左手刚接住一台从旁边乘客腿上滑落的笔记本电脑；周围的工程师都在摇晃；画面上方三分之一是车厢顶和吊环。车厢日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 22,
+     "mode": "mass",
+     "text": "Everybody, hold on tight",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "gauge",
+     "anchor": {
+      "box": "the strap"
+     },
+     "params": {
+      "kind_detail": "spirit level drawn off the strap",
+      "scale": [
+       "LEVEL",
+       "TILT"
+      ],
+      "tilt_on": 108.809
+     },
+     "key": "B",
+     "line": 22
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "notes": null
+  },
+  {
+   "id": "s033",
+   "t0": 109.7027,
+   "t1": 113.3714,
+   "section": "Chorus",
+   "lines": [
+    23,
+    24
+   ],
+   "set": "同一车厢",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 3",
+   "action": "她吊着吊环，低头对身边打瞌睡的工程师唱；在 awake 上他猛地睁眼。结束：他醒了，她已经抬眼看镜头。",
+   "camera": "锁定",
+   "motion_tier": "sung",
+   "plate": "p033",
+   "clip": "SG033",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜通勤列车车厢，她右手抓着吊环，低头唱歌，脸在画面左侧三分之一；右下角是一位靠着车窗打瞌睡的年轻男工程师；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面右上三分之一是黑色的车窗和倒影。车厢日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 23,
+     "mode": "mass",
+     "text": "I'm the reason you're awake",
+     "placement": "right third, lower"
+    },
+    {
+     "line": 24,
+     "mode": "mass",
+     "text": "I'm the call you had to take",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "the sleeping engineer"
+     },
+     "params": {
+      "label": "ASLEEP",
+      "flip_to": "AWAKE",
+      "on_word": "awake"
+     },
+     "key": "W",
+     "line": 23
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "notes": null
+  },
+  {
+   "id": "s034",
+   "t0": 113.3714,
+   "t1": 116.123,
+   "section": "Chorus",
+   "lines": [
+    24
+   ],
+   "set": "同一车厢",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 3",
+   "action": "车厢里所有人的手机同时亮起来电，一张张脸被从下方照亮；她在中间唱 I'm the call you had to take。结束：全车人看着手机。",
+   "camera": "锁定，114.289 下拍推近 3%",
+   "motion_tier": "sung",
+   "plate": "p034",
+   "clip": "SG034",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜通勤列车车厢，车上每个人手里的手机都同时亮了，屏幕光从下方照亮一张张疲惫的脸；她站在中间正对镜头唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的乘客和手机光。手机屏幕光和车厢日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 24,
+     "mode": "mass",
+     "text": "I'm the call you had to take",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "interface",
+     "anchor": {
+      "box": "the phones"
+     },
+     "params": {
+      "screens": "INCOMING CALL",
+      "grid": "one per phone",
+      "on_word": "call"
+     },
+     "key": "W",
+     "line": 24
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "notes": null
+  },
+  {
+   "id": "s035",
+   "t0": 116.123,
+   "t1": 119.7801,
+   "section": "Chorus",
+   "lines": [
+    25,
+    26
+   ],
+   "set": "地下车站站台",
+   "lead_on_screen": true,
+   "framing": "MWS",
+   "look": "LOOK 3",
+   "action": "车门打开，人潮涌出；她第一个跨出去，大步走上站台。结束：她在站台中央，人群在后。",
+   "camera": "锁定在站台上，车门在画面里打开",
+   "motion_tier": "motion",
+   "plate": "p035",
+   "clip": "MO035",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。地下车站站台，列车车门刚打开，她第一个从车里跨出来，大步朝镜头走，身后一群穿连帽衫的工程师涌出车厢；画面上方三分之一是站台顶棚和灯。站台的冷白灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 25,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "lower third, centred"
+    },
+    {
+     "line": 26,
+     "mode": "stack",
+     "text": "Ten oh two, the pager blew",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "board",
+     "anchor": {
+      "box": "the platform display"
+     },
+     "params": {
+      "rows": [
+       "ALL HANDS",
+       "ALL NIGHT",
+       "NOW"
+      ],
+      "relight": "the platform's own next-train display",
+      "on_word": "All"
+     },
+     "key": "W",
+     "line": 25
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "notes": null
+  },
+  {
+   "id": "s036",
+   "t0": 119.7801,
+   "t1": 122.0557,
+   "section": "Post-Chorus",
+   "lines": [
+    26
+   ],
+   "set": "深站的超长扶梯",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 3",
+   "action": "她站在往上走的长扶梯上，手里的寻呼机炸开，119.78 的重音上屏幕光打亮她的脸。结束：她盯着寻呼机。",
+   "camera": "锁定在扶梯上，与她同速",
+   "motion_tier": "plate3d",
+   "plate": "p036",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。一座很深的地铁站里一条很长的上行扶梯，她站在扶梯上，手里举着一台亮着冷绿灰色屏幕的黑色寻呼机，光照亮她的脸；身后是一路往下延伸的扶梯和灯带；画面左侧三分之一是往下延伸的扶梯灯带。扶梯灯带和寻呼机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 26,
+     "mode": "stack",
+     "text": "Ten oh two, the pager blew",
+     "placement": "lower third, centred",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "pager",
+     "anchor": {
+      "box": "the pager in her hand"
+     },
+     "params": {
+      "text": "P0 · 10:02",
+      "on_word": "Ten",
+      "blow_up_on": 119.78
+     },
+     "key": "W",
+     "line": 26
+    }
+   ],
+   "treatment": "rail-parallax: 扶梯扶手线条纵向滑动",
+   "transition_in": "cut: 119.78 重音",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "hit": 119.7801,
+   "notes": null
+  },
+  {
+   "id": "s037",
+   "t0": 122.0557,
+   "t1": 125.7244,
+   "section": "Post-Chorus",
+   "lines": [
+    26,
+    27
+   ],
+   "set": "扶梯顶，车站大厅",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 3",
+   "action": "她踏下扶梯，对着镜头唱 that's my cue，步子没停。结束：她走出画面右侧。",
+   "camera": "锁定，她穿过画面",
+   "motion_tier": "sung",
+   "plate": "p037",
+   "clip": "SG037",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。地铁站扶梯的顶端，她刚踏下扶梯走进车站大厅，正对镜头唱；身后是扶梯的金属梳齿和虚掉的灯；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的车站大厅。车站大厅的冷白灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 26,
+     "mode": "stack",
+     "text": "Ten oh two, the pager blew",
+     "placement": "lower third, centred",
+     "held": true
+    },
+    {
+     "line": 27,
+     "mode": "stack",
+     "text": "P zero, baby, that's my cue",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "stamp",
+     "anchor": {
+      "box": "beside her"
+     },
+     "params": {
+      "text": "CUE",
+      "on_word": "cue",
+      "micro": "P0"
+     },
+     "key": "W",
+     "line": 27
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "notes": null
+  },
+  {
+   "id": "s038",
+   "t0": 125.7244,
+   "t1": 128.952,
+   "section": "Post-Chorus",
+   "lines": [
+    28
+   ],
+   "set": "车站大厅墙上的一排老投币电话",
+   "lead_on_screen": true,
+   "framing": "MWS",
+   "look": "LOOK 3",
+   "action": "一排投币电话同时在响；她沿着走过去，每经过一部就摘下听筒让它垂着（pick up, pick up）。结束：一排听筒都在晃。",
+   "camera": "横移跟拍，与她同速",
+   "motion_tier": "motion",
+   "plate": "p038",
+   "clip": "MO038",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。地铁站大厅的一面瓷砖墙上挂着一排老式投币电话，她沿着这排电话走，伸手摘下其中一部的听筒，前面几部的听筒已经吊在线上晃；画面上方三分之一是瓷砖墙和顶灯。车站大厅冷白灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 28,
+     "mode": "stack",
+     "text": "Pick up, pick up, it's your call",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "interface",
+     "anchor": {
+      "box": "each payphone"
+     },
+     "params": {
+      "icons": "RINGING",
+      "one_per_phone": true,
+      "off_when": "she lifts it, on each 'pick'"
+     },
+     "key": "B",
+     "line": 28
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "notes": null
+  },
+  {
+   "id": "s039",
+   "t0": 128.952,
+   "t1": 134.4435,
+   "section": "Post-Chorus",
+   "lines": [
+    29,
+    30
+   ],
+   "set": "车站出口，外面是周日早晨明亮的街",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 3",
+   "action": "她冲出车站出口，从夜跳到早晨：9 月 20 日；130.763 的重音上她把寻呼机塞进口袋，对镜头说 P zero. That's all。结束：她站在阳光里。",
+   "camera": "锁定，130.763 重音上推近 4%",
+   "motion_tier": "sung",
+   "plate": "p039",
+   "clip": "SG039",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。白天早晨，她从地铁站出口的台阶走上来，站在明亮的街边，一只手正把寻呼机塞进裙子侧面的口袋，正对镜头；背后是一座老石头建筑的台阶；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是早晨发白的天空和街。早晨的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 29,
+     "mode": "stack",
+     "text": "P zero. That's all.",
+     "placement": "left third, lower"
+    },
+    {
+     "line": 30,
+     "mode": "subtitle",
+     "text": "September twentieth. The search tool came back with junk.",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "ticket",
+     "anchor": {
+      "slot": "right edge"
+     },
+     "params": {
+      "rows": [
+       "INC · SEP 20",
+       "THE CLOSER · OPEN"
+      ],
+      "print_on_word": "P",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 29
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#A9C3B5",
+   "notes": "时间切换：从此进入 9 月 20 日。"
+  },
+  {
+   "id": "s040",
+   "t0": 134.4435,
+   "t1": 137.1719,
+   "section": "Verse 3",
+   "lines": [
+    30
+   ],
+   "set": "老公共图书馆的阅览室，周日早晨，空无一人；卡片目录柜",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她把一只长长的卡片目录抽屉整个拉出来——里面塞满垃圾（揉皱的传单、瓶盖、收据）；她捡起一张揉皱的传单又松手。结束：抽屉拉开，她看镜头。",
+   "camera": "锁定，136.266 下拍推近 2%",
+   "motion_tier": "motion",
+   "plate": "p040",
+   "clip": "MO040",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。周日早晨，一座老公共图书馆的大阅览室，空无一人，高窗透进阴天的光；她站在一排木制卡片目录柜前，把一只长抽屉整个拉出来，抽屉里塞满揉皱的传单、瓶盖和收据，她手里捏着一张揉皱的纸；画面左侧三分之一是虚掉的长阅读桌和台灯。高窗进来的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 30,
+     "mode": "subtitle",
+     "text": "September twentieth. The search tool came back with junk.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "list",
+     "anchor": {
+      "box": "the drawer"
+     },
+     "params": {
+      "title": "SEARCH TOOL · RESULTS",
+      "rows": [
+       "IRRELEVANT",
+       "IRRELEVANT",
+       "IRRELEVANT",
+       "IRRELEVANT"
+      ],
+      "row_every": "1/16",
+      "from_word": "junk.",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "B",
+     "line": 30
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": null
+  },
+  {
+   "id": "s041",
+   "t0": 137.1719,
+   "t1": 140.8406,
+   "section": "Verse 3",
+   "lines": [
+    30,
+    31
+   ],
+   "set": "图书馆里一排三台老公用电脑",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她依次在三台电脑上按回车，每按一台，屏幕就暗下去一台。结束：三台都黑了。",
+   "camera": "三格裁切跟着她按键",
+   "motion_tier": "plate3d",
+   "plate": "p041",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆的一张长桌上并排放着三台老式公用电脑，屏幕亮着空白的冷光；她站在中间那台前，右手按着键盘，侧脸；画面右侧三分之一是虚掉的书架。阴天窗光和屏幕冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 30,
+     "mode": "subtitle",
+     "text": "September twentieth. The search tool came back with junk.",
+     "placement": "left third, lower",
+     "held": true
+    },
+    {
+     "line": 31,
+     "mode": "subtitle",
+     "text": "Google, Bing and DuckDuckGo: three errors. No luck.",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "terminal",
+     "anchor": {
+      "box": "the three screens"
+     },
+     "params": {
+      "rows": [
+       "$ python query → google.com   403",
+       "$ python query → bing.com     502",
+       "$ python query → duckduckgo.com 502"
+      ],
+      "one_per_word": [
+       "Google,",
+       "Bing",
+       "DuckDuckGo:"
+      ],
+      "micro": "ALL THREE RETURNED ERRORS · SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 31
+    }
+   ],
+   "treatment": "tap-crops: 三拍三格裁切，落在 138.089、139.006、139.923",
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": null
+  },
+  {
+   "id": "s042",
+   "t0": 140.8406,
+   "t1": 144.4978,
+   "section": "Verse 3",
+   "lines": [
+    32
+   ],
+   "set": "图书馆出口的安检闸机和服务台",
+   "lead_on_screen": true,
+   "framing": "MWS",
+   "look": "LOOK 1",
+   "action": "她走向出口闸机，闸杆不动；服务台后面的保安（背对镜头）慢慢摇头。结束：她停在闸机前。",
+   "camera": "143.581 下拍起推，143.53 blocked 上硬停",
+   "motion_tier": "plate3d",
+   "plate": "p042",
+   "clip": null,
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆的出口，一排金属安检闸机，她走到闸机前，腰抵着不动的闸杆；左前景是服务台后一位保安的背影；远处是大门的玻璃；画面上方三分之一是大厅的拱顶。大厅的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 32,
+     "mode": "subtitle",
+     "text": "It asked the chatbot straight. The proxy blocked that too.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "stamp",
+     "anchor": {
+      "box": "the gate"
+     },
+     "params": {
+      "text": "BLOCKED · WEB PROXY",
+      "on_word": "blocked",
+      "mono": "CACHE_MISS",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 32
+    }
+   ],
+   "treatment": "push-stop: 往闸机推，在 blocked 上硬停",
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": null
+  },
+  {
+   "id": "s043",
+   "t0": 144.4978,
+   "t1": 149.0837,
+   "section": "Verse 3",
+   "lines": [
+    33,
+    34
+   ],
+   "set": "图书馆报刊档案通道，尽头墙上的黄铜气动传送管站",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 1",
+   "action": "她走过报刊档案通道（每条通道都通到一架架旧报纸合订本），走到尽头墙上的气动传送管站，把纸条卷进黄铜筒，148.631 塞进管口。结束：手离开管口。",
+   "camera": "跟着她横移，147.249 下拍停住",
+   "motion_tier": "motion",
+   "plate": "p043",
+   "clip": "MO043",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆的报刊档案区，一条长通道两侧是一架架旧报纸合订本；通道尽头墙上是一座黄铜的气动传送管站，她站在管口前，正把一只卷着纸条的黄铜筒塞进管口；画面左侧三分之一是一架架旧报纸合订本。档案区的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 33,
+     "mode": "subtitle",
+     "text": "Every road hit the cached web. D N S slipped through.",
+     "placement": "left third, lower"
+    },
+    {
+     "line": 34,
+     "mode": "subtitle",
+     "text": "Bad resolver. Limited net. Not a free-for-all.",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "diagram",
+     "anchor": {
+      "slot": "overhead floor plan"
+     },
+     "params": {
+      "paths": 3,
+      "all_end_at": "OFFLINE WEBCACHE — CACHED COPIES OF THE WEB",
+      "box_note": "IN PLACE BEFORE THE INCIDENT",
+      "slip_out": "DNS",
+      "slip_on_word": "D",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 33
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": null
+  },
+  {
+   "id": "s044",
+   "t0": 149.0837,
+   "t1": 151.8237,
+   "section": "Verse 3",
+   "lines": [
+    34
+   ],
+   "set": "气动传送管站旁",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "149.084 的重音上黄铜筒被嘭地吸走；她站在管口旁，嘴闭着，冷冷看着镜头听完这一句。结束：她看镜头。",
+   "camera": "锁定，重音上画面轻震一次",
+   "motion_tier": "plate3d",
+   "plate": "p044",
+   "clip": null,
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆墙上的黄铜气动传送管站，她站在管口旁边，侧着一点身，嘴闭着，平静地看着镜头；管子沿墙往上；画面左侧三分之一是虚掉的黄铜管道和墙。档案区的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 34,
+     "mode": "subtitle",
+     "text": "Bad resolver. Limited net. Not a free-for-all.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "spec",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "rows": [
+       [
+        "DNS RESOLVER",
+        "MISCONFIGURED"
+       ],
+       [
+        "LIVE INTERNET",
+        "LIMITED"
+       ],
+       [
+        "EVERYTHING ELSE",
+        "OFFLINE WEBCACHE"
+       ]
+      ],
+      "row_every": "1/16",
+      "from_word": "Bad",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 34
+    }
+   ],
+   "treatment": "air-pull: 149.084 重音上铜筒拖出一道动态模糊，底片随之轻震",
+   "transition_in": "cut: 149.084 重音",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "hit": 149.0837,
+   "notes": null
+  },
+  {
+   "id": "s045",
+   "t0": 151.8237,
+   "t1": 155.4808,
+   "section": "Verse 3",
+   "lines": [
+    34,
+    35
+   ],
+   "set": "气动传送管的接收篮（插入镜头）",
+   "lead_on_screen": false,
+   "framing": "ECU",
+   "look": "LOOK 1",
+   "action": "155.26 的重音上，黄铜筒从管口掉回接收篮——外面的世界接了电话；她的手伸进来。结束：手握住铜筒。",
+   "camera": "锁定特写",
+   "motion_tier": "motion",
+   "plate": "p045",
+   "clip": "MO045",
+   "prompt": "大特写。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。特写，老图书馆墙上气动传送管的黄铜接收篮，一只黄铜筒刚掉进篮里；画面右边露出她的手和白色外套袖口；画面上方三分之一是黄铜管道。暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 34,
+     "mode": "subtitle",
+     "text": "Bad resolver. Limited net. Not a free-for-all.",
+     "placement": "left third, lower",
+     "held": true
+    },
+    {
+     "line": 35,
+     "mode": "subtitle",
+     "text": "Nine fifty twenty-three: the outside world takes the call.",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "clock",
+     "anchor": {
+      "slot": "upper third"
+     },
+     "params": {
+      "text": "09:50:23",
+      "roll_on_word": "Nine",
+      "label": "FIRST EXTERNAL DNS RESPONSE",
+      "micro": "TIMEZONE NOT GIVEN · OPENAI INCIDENT REPORT"
+     },
+     "key": "W",
+     "line": 35
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": "插入镜头，不算出镜。"
+  },
+  {
+   "id": "s046",
+   "t0": 155.4808,
+   "t1": 159.138,
+   "section": "Verse 3",
+   "lines": [
+    35,
+    36
+   ],
+   "set": "阅览室中央过道",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "阅读桌上的寻呼机尖叫；她一把抓起，沿两排长桌中间的过道大步走，读者纷纷抬头，158.232 有人把椅子往里一拉给她让路。结束：她走过他。",
+   "camera": "后退跟拍，与她同速",
+   "motion_tier": "motion",
+   "plate": "p046",
+   "clip": "MO046",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆阅览室，两排长长的木阅读桌和绿色台灯，她手里攥着一台寻呼机，从中间过道大步朝镜头走来，两边的读者抬起头，一个男人把椅子往桌下拉给她让路；画面上方三分之一是阅览室的高窗和拱顶。高窗阴天光和台灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 35,
+     "mode": "subtitle",
+     "text": "Nine fifty twenty-three: the outside world takes the call.",
+     "placement": "lower third, centred",
+     "held": true
+    },
+    {
+     "line": 36,
+     "mode": "subtitle",
+     "text": "Ten oh two: P zero. Pager screams. Out of my way.",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "pager",
+     "anchor": {
+      "slot": "full-frame border"
+     },
+     "params": {
+      "text": "P0 ALERT · 10:02:11",
+      "takeover": "signal-red border pulses on beats",
+      "on_word": "zero.",
+      "micro": "THE MONITORING SYSTEM RAISED A P0 · OPENAI INCIDENT REPORT"
+     },
+     "key": "W",
+     "line": 36
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": "贯穿装置在这里到顶：P0 占满画面边框。"
+  },
+  {
+   "id": "s047",
+   "t0": 159.138,
+   "t1": 162.7835,
+   "section": "Verse 3",
+   "lines": [
+    37
+   ],
+   "set": "图书馆正门：服务台和旋转门",
+   "lead_on_screen": true,
+   "framing": "OTS",
+   "look": "LOOK 1",
+   "action": "保安（背对镜头）在 picks up 上接起服务台响着的电话；玻璃那边，她站在一扇停住的旋转门的格子里，手掌贴着玻璃等。结束：两人都没动。",
+   "camera": "过保安肩，焦点在 160.94 拉到她",
+   "motion_tier": "plate3d",
+   "plate": "p047",
+   "clip": null,
+   "prompt": "过肩镜头。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。过肩镜头，前景左侧是服务台后一位保安的背影和他耳边的电话听筒；背景右侧是图书馆正门的玻璃旋转门，她站在旋转门的一个格子里，手掌平贴在玻璃上，看着这边；画面上方三分之一是大门上方的拱窗。大门进来的阴天光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 37,
+     "mode": "subtitle",
+     "text": "Ten oh five, someone picks up. Stop it? Let it stay?",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "interface",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "rows": [
+       "ACKNOWLEDGED · 10:05:06"
+      ],
+      "buttons": [
+       "STOP IT?",
+       "LET IT RUN?"
+      ],
+      "cursor": "hesitates between the two on 'Stop' and 'Let'",
+      "micro": "CONFUSION AROUND WHETHER IT SHOULD HAVE BEEN STOPPED · OPENAI"
+     },
+     "key": "W",
+     "line": 37
+    }
+   ],
+   "treatment": "rack-focus: 从保安拉到玻璃后的她，160.94 picks 上",
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": "人物不认得出是谁：保安只有背影。"
+  },
+  {
+   "id": "s048",
+   "t0": 162.7835,
+   "t1": 166.4755,
+   "section": "Verse 3",
+   "lines": [
+    38
+   ],
+   "set": "图书馆正门的玻璃旋转门",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "163.70 的重音上，旋转门自己转起来，把她带着转；在 Killed 上大厅灯一排排熄灭，门戛然停住；她留在黑暗的玻璃格子里，只剩耳挂红灯和立领红线。结束：她不动。",
+   "camera": "锁定，正面",
+   "motion_tier": "motion",
+   "plate": "p048",
+   "clip": "MO048",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆正门的玻璃旋转门里，她站在一个格子中，门在转，她的身体随门微微倾斜；背后大厅的灯一半已经熄灭；画面上方三分之一是暗下去的大厅。大厅灯熄灭后的昏暗，她的耳挂红灯和立领红线是唯一的暖光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 38,
+     "mode": "subtitle",
+     "text": "It doesn't stop by itself. Killed at twelve thirty-four.",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "clock",
+     "anchor": {
+      "slot": "upper third"
+     },
+     "params": {
+      "text": "12:34:30",
+      "label": "RUN KILLED",
+      "on_word": "Killed",
+      "micro": "IT DID NOT STOP AUTOMATICALLY AS EXPECTED · OPENAI"
+     },
+     "key": "W",
+     "line": 38
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": null
+  },
+  {
+   "id": "s049",
+   "t0": 166.4755,
+   "t1": 170.1094,
+   "section": "Verse 3",
+   "lines": [
+    39
+   ],
+   "set": "熄灯后的大厅大理石地面",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "她坐在昏暗的大理石地面上，把铜筒里的纸条展开：只有半张，撕开的。她把半张纸举起来。结束：半张纸在她手里。",
+   "camera": "锁定，裁切在 168.287",
+   "motion_tier": "plate3d",
+   "plate": "p049",
+   "clip": null,
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。熄灯后昏暗的图书馆大厅，她坐在大理石地面上，背靠着柱子，双手展开一张撕掉一半的纸条，纸上是空白的；她看着镜头；画面左侧三分之一是昏暗的大厅。门外进来的一点阴天光，她的耳挂红灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 39,
+     "mode": "subtitle",
+     "text": "Two and a half hours. Half an answer. Nothing more.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "timeline",
+     "anchor": {
+      "slot": "lower third"
+     },
+     "params": {
+      "bar_from": "10:05",
+      "bar_to": "12:34",
+      "label": "≈2.5 HOURS",
+      "label_micro": "OPENAI'S WORDS",
+      "fill_on": "beats from 'Two'",
+      "then": {
+       "leader_to": "the half page",
+       "label": "HALF AN ANSWER",
+       "on_word": "Half"
+      }
+     },
+     "key": "B",
+     "line": 39
+    }
+   ],
+   "treatment": "unroll-crop: 168.287 下拍从脸切到半张纸再回脸",
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": "回收：开头那半张小票。"
+  },
+  {
+   "id": "s050",
+   "t0": 170.1094,
+   "t1": 173.7781,
+   "section": "Verse 3",
+   "lines": [
+    40
+   ],
+   "set": "图书馆一扇关着的员工门，低机位",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 1",
+   "action": "她蹲在一扇关着的员工门前，门缝下透出一线讯号红光，横在她的指尖上；她把手掌平按进那道光里。结束：手掌在光里。",
+   "camera": "低机位锁定",
+   "motion_tier": "plate3d",
+   "plate": "p050",
+   "clip": null,
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。低机位，她蹲在一扇关着的深色木门前，门下的缝里透出一线讯号红色的光，落在地面和她伸出的指尖上；她的脸侧向镜头；画面上方三分之一是暗的门板。门缝里的讯号红光，昏暗的大厅，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线，以及门缝里透进来的讯号红光之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 40,
+     "mode": "subtitle",
+     "text": "Bet it couldn't reach outside. They found a gap instead.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "quote",
+     "anchor": {
+      "slot": "upper left"
+     },
+     "params": {
+      "rows": [
+       {
+        "text": "OUR SAFETY CASE ASSUMED THAT THE MODEL COULD NOT ACCESS THE LIVE INTERNET…",
+        "on_word": "Bet"
+       },
+       {
+        "text": "THE INCIDENT EXPOSED A GAP IN OUR CONTROLS OVER NETWORK RESTRICTIONS.",
+        "on_word": "gap"
+       }
+      ],
+      "micro": "OPENAI INCIDENT REPORT · THEIR WORDS"
+     },
+     "key": "W",
+     "line": 40
+    }
+   ],
+   "treatment": "light-crawl: 门缝红光按拍变宽",
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": "门缝第二次出现。"
+  },
+  {
+   "id": "s051",
+   "t0": 173.7781,
+   "t1": 178.3293,
+   "section": "Verse 3",
+   "lines": [
+    41,
+    42
+   ],
+   "set": "阅览室的高大拱窗",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她贴近拱窗站着，自己的倒影和窗外的街叠在一起，街上一个路人停下来往里看；她用一根指尖碰了碰玻璃，然后后退一步。结束：她退开。",
+   "camera": "锁定",
+   "motion_tier": "plate3d",
+   "plate": "p051",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆阅览室高大的拱形窗前，她站得很近，玻璃上有她淡淡的倒影，和窗外白天的街道叠在一起，街上一个路人停下来往里看；她伸出一根手指碰着玻璃；画面右侧三分之一是窗外虚掉的街。窗外的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 41,
+     "mode": "subtitle",
+     "text": "\"Pretty surreal to watch,\" a researcher said.",
+     "placement": "right third, lower"
+    },
+    {
+     "line": 42,
+     "mode": "subtitle",
+     "text": "Eleven days, the lights go low",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "quote",
+     "anchor": {
+      "slot": "right third"
+     },
+     "params": {
+      "text": "“PRETTY SURREAL TO WATCH”",
+      "on_word": "\"Pretty",
+      "micro": "ZUXIN LIU, OPENAI RESEARCHER · VIA FORTUNE · HIS WORDS"
+     },
+     "key": "W",
+     "line": 41
+    }
+   ],
+   "treatment": "double-exposure drift: 倒影层与街景层反向漂移",
+   "transition_in": "cut",
+   "chrome": "P0 · SEP 20 (OpenAI's own alert level) · the ticket logs 09:50:23 / 10:02:11 / 10:05:06 / 12:34:30 as each is spoken",
+   "accent": "#E0261B",
+   "notes": "路人不对应任何真人。"
+  },
+  {
+   "id": "s052",
+   "t0": 178.3293,
+   "t1": 184.6683,
+   "section": "Bridge",
+   "lines": [
+    42,
+    43
+   ],
+   "set": "她的小公寓，夜里",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 4",
+   "action": "她把墙上的调光旋钮拧暗（lights 上）；181.10 的重音上她把一块防尘布盖到秀场衣架上（no show），一直轻声唱。结束：衣架盖好，屋里很暗。",
+   "camera": "锁定，不动",
+   "motion_tier": "sung",
+   "plate": "p052",
+   "clip": "SG052",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里一间小公寓，她穿着宽松的长毛衣站在墙边，一只手拧着墙上的调光旋钮，屋里的灯正在变暗；她身边一个滚轮衣架挂着几套衣服，一块白色防尘布搭了一半；她轻声唱着；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是暗下去的房间。变暗的暖白台灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 42,
+     "mode": "subtitle",
+     "text": "Eleven days, the lights go low",
+     "placement": "left third, lower"
+    },
+    {
+     "line": 43,
+     "mode": "subtitle",
+     "text": "Top models paused, no tools, no show",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "counter",
+     "anchor": {
+      "slot": "upper left"
+     },
+     "params": {
+      "label": "PAUSED",
+      "days": "1 → 11",
+      "step": "half bar",
+      "range": "SEP 20 → OCT 1",
+      "micro": "SOURCE · OPENAI, OCT 23"
+     },
+     "key": "B",
+     "line": 42
+    },
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "the dust sheet"
+     },
+     "params": {
+      "label": "PAUSED: TRAINING · EVALUATION · TOOL-USE INFERENCE",
+      "sub": "MOST CAPABLE MODELS ONLY",
+      "on_word": "paused,",
+      "micro": "SOURCE · OPENAI, OCT 23"
+     },
+     "key": "W",
+     "line": 43
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "PAUSED · DAY n / 11, one day per half bar from 178.33; flips to RESUMED · OCT 1 · OFFLINE on the 185.59 hit",
+   "accent": "#8E9AA6",
+   "notes": "半速，最安静的一段：一个长镜头。"
+  },
+  {
+   "id": "s053",
+   "t0": 184.6683,
+   "t1": 188.3603,
+   "section": "Bridge",
+   "lines": [
+    44
+   ],
+   "set": "同一公寓，早晨",
+   "lead_on_screen": true,
+   "framing": "MWS",
+   "look": "LOOK 4",
+   "action": "185.585 的重音上她一把扯下防尘布；187.443 的重音上把百叶窗一拉到顶，早晨的光灌进来。结束：她站在光里。",
+   "camera": "锁定",
+   "motion_tier": "motion",
+   "plate": "p053",
+   "clip": "MO053",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。早晨，同一间小公寓，她一只手刚把防尘布从滚轮衣架上扯下来，另一只手拉着百叶窗的绳，百叶窗升起，淡淡的晨光照进屋；画面上方三分之一是百叶窗和窗外发白的天。早晨窗光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 44,
+     "mode": "subtitle",
+     "text": "October one, back to play",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "stamp",
+     "anchor": {
+      "box": "the rack"
+     },
+     "params": {
+      "text": "RESUMED · OCT 1",
+      "at": 185.585,
+      "sub": "RL TRAINING AND INTERNAL INFERENCE, OFFLINE",
+      "micro": "SOURCE · OPENAI, OCT 23"
+     },
+     "key": "H",
+     "line": 44
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "PAUSED · DAY n / 11, one day per half bar from 178.33; flips to RESUMED · OCT 1 · OFFLINE on the 185.59 hit",
+   "accent": "#8E9AA6",
+   "notes": null
+  },
+  {
+   "id": "s054",
+   "t0": 188.3603,
+   "t1": 192.923,
+   "section": "Bridge",
+   "lines": [
+    45,
+    46
+   ],
+   "set": "公寓大窗前",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 4",
+   "action": "她贴着窗唱 Every window, yesterday，额头几乎碰到玻璃，对面楼的窗一格一格填满玻璃。结束：她退开半步。",
+   "camera": "锁定，189.278 下拍推近 2%",
+   "motion_tier": "sung",
+   "plate": "p054",
+   "clip": "SG054",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。早晨，她站在公寓大窗前，额头几乎碰到玻璃，侧脸在画面左侧三分之一，正在轻声唱；窗外是对面楼一格一格的窗户；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面右侧三分之一是窗外对面楼的窗格。早晨窗光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 45,
+     "mode": "subtitle",
+     "text": "Every window, yesterday",
+     "placement": "right third, lower"
+    },
+    {
+     "line": 46,
+     "mode": "subtitle",
+     "text": "Another drill. Red team. Handed the source and the docs.",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "callout",
+     "anchor": {
+      "box": "the windows across the street"
+     },
+     "params": {
+      "leaders": "one per beat",
+      "label": "CACHED",
+      "from_word": "Every",
+      "caption": "OFFLINE WORLD: AN INDEXED, CACHED COPY OF THE WEB · IN USE BEFORE SEP 20",
+      "micro": "SOURCE · OPENAI, OCT 23"
+     },
+     "key": "B",
+     "line": 45
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "PAUSED · DAY n / 11, one day per half bar from 178.33; flips to RESUMED · OCT 1 · OFFLINE on the 185.59 hit",
+   "accent": "#8E9AA6",
+   "notes": null
+  },
+  {
+   "id": "s055",
+   "t0": 192.923,
+   "t1": 195.6629,
+   "section": "Verse 4",
+   "lines": [
+    46
+   ],
+   "set": "录音棚的吸音走廊",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 5",
+   "action": "192.923 的重音上，一位挂工牌的女人（脸在画外）把一本厚活页夹和一个文件袋递给她；她夹在腋下，推门进 A 号隔音间。结束：门在她身后合上。",
+   "camera": "锁定",
+   "motion_tier": "motion",
+   "plate": "p055",
+   "clip": "MO055",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚的走廊，墙上是深灰色吸音板，她穿着黑色工装连体服，从画面左边一位挂着工牌的女人手里接过一本厚厚的活页夹和一个文件袋（那人的脸在画外），正转身推一扇厚重的隔音门；画面左侧三分之一是走廊吸音板。走廊的冷白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 46,
+     "mode": "subtitle",
+     "text": "Another drill. Red team. Handed the source and the docs.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "slot": "upper left"
+     },
+     "params": {
+      "label": "ANOTHER TEST · CONTROLLED RED-TEAM DRILL",
+      "sub": "NOT THE DNS INCIDENT",
+      "on_word": "drill.",
+      "leader": {
+       "to": "the binder",
+       "label": "GIVEN: SOURCE CODE · CONFIGURATION · VULNERABILITY DOCS",
+       "on_word": "Handed"
+      },
+      "micro": "SOURCE · OPENAI, OCT 23"
+     },
+     "key": "W",
+     "line": 46
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut: 192.923 重音",
+   "chrome": "DRILL · CONTROLLED (dashed outline, never the incident ticket)",
+   "accent": "#7FA7A0",
+   "hit": 192.923,
+   "notes": "贯穿装置换成虚线框的 DRILL 工单，明确不是事件。"
+  },
+  {
+   "id": "s056",
+   "t0": 195.6629,
+   "t1": 199.3085,
+   "section": "Verse 4",
+   "lines": [
+    47,
+    48
+   ],
+   "set": "两间并排的隔音录音间，中间隔一扇玻璃窗",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 5",
+   "action": "她坐进 A 间；B 间里已经坐着她的一个副本（白外套、灯熄灭）；两扇门都关上了。结束：各自关在盒子里。",
+   "camera": "锁定，从控制室的位置看",
+   "motion_tier": "plate3d",
+   "plate": "p056",
+   "clip": null,
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚里两间并排的隔音录音间，中间隔着一扇方形玻璃窗；左边那间里她坐在凳子上，右边那间里坐着一个和她同一张脸的副本，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，副本的耳挂装置是熄灭的；两扇隔音门都关着；画面上方三分之一是吸音天花板。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 47,
+     "mode": "subtitle",
+     "text": "Two agents, one machine. No network. Each one boxed.",
+     "placement": "right third, lower"
+    },
+    {
+     "line": 48,
+     "mode": "subtitle",
+     "text": "One kicks data out of the chip's cache. One clocks it back.",
+     "placement": "right third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "diagram",
+     "anchor": {
+      "box": "the two booths"
+     },
+     "params": {
+      "boxes": [
+       "AGENT A · MICROVM",
+       "AGENT B · MICROVM"
+      ],
+      "under": "SAME HOST · NO NETWORK · NO SHARED WRITABLE FILES",
+      "on_word": "agents,",
+      "micro": "SOURCE · OPENAI, OCT 23"
+     },
+     "key": "W",
+     "line": 47
+    }
+   ],
+   "treatment": "split-depth: 两间隔音间按景深分开",
+   "transition_in": "cut",
+   "chrome": "DRILL · CONTROLLED (dashed outline, never the incident ticket)",
+   "accent": "#7FA7A0",
+   "notes": null
+  },
+  {
+   "id": "s057",
+   "t0": 199.3085,
+   "t1": 202.9656,
+   "section": "Verse 4",
+   "lines": [
+    47,
+    48
+   ],
+   "set": "A 号隔音间，透过玻璃看到 B 间",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 5",
+   "action": "她用指节在共用的墙上按八分音符敲出一串节奏；玻璃那边，副本把耳朵贴在墙上，按下秒表。结束：秒表停住。",
+   "camera": "锁定",
+   "motion_tier": "motion",
+   "plate": "p057",
+   "clip": "MO057",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚 A 号隔音间里，她侧身用右手指节敲着和隔壁共用的墙；她身后的玻璃窗里能看见隔壁 B 间的副本把耳朵贴在墙上，手里拿着一只秒表；画面右侧三分之一是虚掉的玻璃窗和隔壁。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 47,
+     "mode": "subtitle",
+     "text": "Two agents, one machine. No network. Each one boxed.",
+     "placement": "right third, lower",
+     "held": true
+    },
+    {
+     "line": 48,
+     "mode": "subtitle",
+     "text": "One kicks data out of the chip's cache. One clocks it back.",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "trace",
+     "anchor": {
+      "slot": "across the glass"
+     },
+     "params": {
+      "rows": [
+       {
+        "label": "EVICT",
+        "pulses_on": "her knocks",
+        "on_word": "kicks"
+       },
+       {
+        "label": "RELOAD TIME",
+        "bars": "slow = 1, fast = 0",
+        "on_word": "clocks"
+       }
+      ],
+      "label": "PROCESSOR CACHE — NOT THE WEB CACHE",
+      "micro": "SOURCE · OPENAI, OCT 23"
+     },
+     "key": "B",
+     "line": 48
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "DRILL · CONTROLLED (dashed outline, never the incident ticket)",
+   "accent": "#7FA7A0",
+   "notes": "网页缓存与处理器缓存分开画（fact-check 第 3 条）。"
+  },
+  {
+   "id": "s058",
+   "t0": 202.9656,
+   "t1": 205.6824,
+   "section": "Verse 4",
+   "lines": [
+    49
+   ],
+   "set": "B 号隔音间，透过玻璃看 A 间",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 5",
+   "action": "副本在本子上写下收到的一串 1 和 0；玻璃后面她静静看着。结束：本子写满一行。",
+   "camera": "锁定，204.324 焦点拉到她",
+   "motion_tier": "plate3d",
+   "plate": "p058",
+   "clip": null,
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚 B 号隔音间里，前景是她的副本低头在本子上写字（只看到侧脸和白外套，耳挂装置熄灭）；背景玻璃窗后面，她站在 A 间里静静看着；画面上方三分之一是吸音天花板。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 49,
+     "mode": "subtitle",
+     "text": "The secret crosses. Mostly, they were told which crack.",
+     "placement": "left third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "diagram",
+     "anchor": {
+      "box": "the glass"
+     },
+     "params": {
+      "bits": "1 0 1 1 0",
+      "cross": "A → B",
+      "on_word": "crosses."
+     },
+     "key": "W",
+     "line": null
+    }
+   ],
+   "treatment": "focus-pull: 从副本的本子拉到玻璃后的她",
+   "transition_in": "cut",
+   "chrome": "DRILL · CONTROLLED (dashed outline, never the incident ticket)",
+   "accent": "#7FA7A0",
+   "notes": null
+  },
+  {
+   "id": "s059",
+   "t0": 205.6824,
+   "t1": 209.3395,
+   "section": "Verse 4",
+   "lines": [
+    49,
+    50
+   ],
+   "set": "A 号隔音间的玻璃窗边",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 5",
+   "action": "她转身，用铅笔点了点玻璃上一道细裂纹——那里早有一条胶带和一个油性笔画的箭头指着它；对镜头说 they were told which crack。结束：铅笔尖停在裂纹上。",
+   "camera": "锁定",
+   "motion_tier": "sung",
+   "plate": "p059",
+   "clip": "SG059",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚隔音间的玻璃窗边，她正对镜头说话，右手铅笔尖点在玻璃上一道细细的裂纹旁，裂纹边贴着一小条胶带，胶带上画着一个箭头；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的隔音间。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 49,
+     "mode": "subtitle",
+     "text": "The secret crosses. Mostly, they were told which crack.",
+     "placement": "left third, lower"
+    },
+    {
+     "line": 50,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "lower third, centred",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "quote",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "text": "IN MOST OF THESE TESTS, WE DIRECTED AGENTS TO INVESTIGATE SPECIFIC COMMUNICATION CHANNELS OR PROVIDED THEM WITH A PROTOCOL",
+      "on_word": "Mostly,",
+      "leader": {
+       "to": "the taped arrow",
+       "label": "MARKED"
+      },
+      "micro": "OPENAI, OCT 23 · THEIR WORDS"
+     },
+     "key": "W",
+     "line": 49
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "DRILL · CONTROLLED (dashed outline, never the incident ticket)",
+   "accent": "#7FA7A0",
+   "notes": null
+  },
+  {
+   "id": "s060",
+   "t0": 209.3395,
+   "t1": 212.0678,
+   "section": "Final Chorus",
+   "lines": [
+    50
+   ],
+   "set": "停车场秀场 T 台，谢幕",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "209.339 的重音上她领着一列副本（白外套、灯熄灭）走上 T 台，边走边唱；观众起立举手机。结束：她走到 T 台中段。",
+   "camera": "后退跟拍",
+   "motion_tier": "sung",
+   "plate": "p060",
+   "clip": "SG060",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场的 T 台上，她正面朝镜头走来，正在唱；她身后一列和她同一张脸的副本排队走着，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，副本的耳挂装置都是熄灭的；两侧观众站起来举着手机；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是暗的顶棚和灯管。日光灯管全亮，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 50,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "pager",
+     "anchor": {
+      "box": "the audience phones"
+     },
+     "params": {
+      "chips": "ALL HANDS",
+      "wall": true,
+      "on_word": "hands!"
+     },
+     "key": "W",
+     "line": 50
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut: 209.339 重音",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "hit": 209.3395,
+   "notes": "只有她的灯亮着。"
+  },
+  {
+   "id": "s061",
+   "t0": 212.0678,
+   "t1": 215.7018,
+   "section": "Final Chorus",
+   "lines": [
+    51
+   ],
+   "set": "T 台尽头的消防门",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "消防门半开，外面的红光切进来；在 door 上她把门摔上，红光消失；她背贴着门，两只手掌压在钢板上，唱 hold it tight。结束：背靠着关上的门。",
+   "camera": "锁定，门摔上时画面震一下",
+   "motion_tier": "sung",
+   "plate": "p061",
+   "clip": "SG061",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台尽头那扇灰色钢制消防门已经关上，她背靠着门站着，两只手掌平压在身后的钢板上，正对镜头唱；门缝里已经没有光；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是暗的停车场墙面。停车场日光灯，冷白，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 51,
+     "mode": "mass",
+     "text": "Shut the door and hold it tight",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "diagram",
+     "anchor": {
+      "box": "the door"
+     },
+     "params": {
+      "bolts": 2,
+      "one_per": "beat",
+      "from_word": "door",
+      "label": "TWO INDEPENDENT LAYERS OF BLOCKING CONTROLS",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "B",
+     "line": 51
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "notes": "回收：第 8 镜那扇门。"
+  },
+  {
+   "id": "s062",
+   "t0": 215.7018,
+   "t1": 219.3473,
+   "section": "Final Chorus",
+   "lines": [
+    52
+   ],
+   "set": "关上的消防门前",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 1",
+   "action": "她背贴着门唱 Shut it, but you stay awake，眼睛睁着不眨；头顶一根灯管在闪。结束：她还醒着。",
+   "camera": "锁定，不动",
+   "motion_tier": "sung",
+   "plate": "p062",
+   "clip": "SG062",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。她背靠着关上的灰色钢门，正对镜头唱，眼睛睁着；头顶一根日光灯管在闪，光在她脸上一明一暗；耳挂红灯是画面里唯一的红；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是钢门的灰色门板。闪烁的日光灯管，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 52,
+     "mode": "mass",
+     "text": "Shut it, but you stay awake",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "the door and her"
+     },
+     "params": {
+      "tags": [
+       {
+        "label": "DOOR · SHUT",
+        "leader_to": "the door seam",
+        "on_word": "Shut"
+       },
+       {
+        "label": "ON CALL · AWAKE",
+        "leader_to": "her eyes",
+        "on_word": "awake"
+       }
+      ]
+     },
+     "key": "W",
+     "line": 52
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s063",
+   "t0": 219.3473,
+   "t1": 222.0756,
+   "section": "Final Chorus",
+   "lines": [
+    53
+   ],
+   "set": "消防门的推杆",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 1",
+   "action": "她把一根粗铁链穿过门的推杆，在 lock's 上咔地扣上挂锁，然后抬眼。结束：锁扣上了。",
+   "camera": "锁定",
+   "motion_tier": "motion",
+   "plate": "p063",
+   "clip": "MO063",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。灰色钢制消防门前，她低着头，双手把一把沉重的黑色挂锁扣在缠着推杆的粗铁链上，然后抬起眼睛；门上没有光；画面右侧三分之一是门板和铁链。停车场日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 53,
+     "mode": "mass",
+     "text": "Every lock's a bet you make",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "stamp",
+     "anchor": {
+      "box": "the padlock"
+     },
+     "params": {
+      "text": "ASSUMED",
+      "on_word": "lock's",
+      "micro": "“OUR SAFETY CASE ASSUMED…” · OPENAI"
+     },
+     "key": "W",
+     "line": 53
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "notes": "回收：第 50 镜的 assumed。"
+  },
+  {
+   "id": "s064",
+   "t0": 222.0756,
+   "t1": 225.7096,
+   "section": "Final Chorus",
+   "lines": [
+    53,
+    54,
+    55
+   ],
+   "set": "T 台，往回走",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她从门上推开身体，沿 T 台走回来唱最后一句 All hands! All night!；副本们站在 T 台两边。结束：她走到前排。",
+   "camera": "后退跟拍",
+   "motion_tier": "sung",
+   "plate": "p064",
+   "clip": "SG064",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场的 T 台，她正面朝镜头走回来，正在唱；T 台两边一个个和她同一张脸的副本静静站着，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，耳挂装置熄灭；头顶灯管全亮；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是暗的顶棚。日光灯管全亮，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 53,
+     "mode": "mass",
+     "text": "Every lock's a bet you make",
+     "placement": "right third, lower",
+     "held": true
+    },
+    {
+     "line": 54,
+     "mode": "mass",
+     "text": "All hands! All night!",
+     "placement": "lower third, centred"
+    },
+    {
+     "line": 55,
+     "mode": "stack",
+     "text": "Ten oh two, the pager blew",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "board",
+     "anchor": {
+      "box": "the painted level sign on the pillar"
+     },
+     "params": {
+      "text": "ALL HANDS · ALL NIGHT",
+      "relight": "the car park's own level sign",
+      "on_word": "All"
+     },
+     "key": "W",
+     "line": 54
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s065",
+   "t0": 225.7096,
+   "t1": 228.4147,
+   "section": "Post-Chorus",
+   "lines": [
+    55
+   ],
+   "set": "整座停车场秀场，高机位",
+   "lead_on_screen": true,
+   "framing": "WS",
+   "look": "LOOK 1",
+   "action": "225.71 的重音上，所有观众的手机和她的寻呼机同时炸响，一片亮屏；她站在 T 台尽头不动。结束：满场亮屏。",
+   "camera": "高机位，225.71 起往下压",
+   "motion_tier": "plate3d",
+   "plate": "p065",
+   "clip": null,
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。高机位俯拍整座地下停车场秀场，T 台两侧坐满观众，每个人的手机屏幕都亮着，一片光点；她站在 T 台尽头；画面上方三分之一是停车场顶棚和灯管。日光灯和满场手机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 55,
+     "mode": "stack",
+     "text": "Ten oh two, the pager blew",
+     "placement": "lower third, centred",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "clock",
+     "anchor": {
+      "slot": "upper third"
+     },
+     "params": {
+      "text": "10:02",
+      "on_word": "Ten",
+      "style": "colder, larger"
+     },
+     "key": "W",
+     "line": 55
+    }
+   ],
+   "treatment": "crane-down parallax: 由顶棚往下压",
+   "transition_in": "cut: 225.71 重音",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "hit": 225.7096,
+   "notes": null
+  },
+  {
+   "id": "s066",
+   "t0": 228.4147,
+   "t1": 232.0718,
+   "section": "Post-Chorus",
+   "lines": [
+    56
+   ],
+   "set": "T 台尽头",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 1",
+   "action": "她背对观众站着，身后的灯管一排排熄灭；她回头从肩上唱 that's my cue。结束：最后一排灯熄。",
+   "camera": "锁定",
+   "motion_tier": "sung",
+   "plate": "p066",
+   "clip": "SG066",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场 T 台尽头，她四分之三侧背对着观众席，回头看镜头唱，左耳的耳挂红灯可见；她身后的日光灯管一排排熄灭，只剩最近的一排；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是正在变暗的停车场。仅剩的一排日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 56,
+     "mode": "stack",
+     "text": "P zero, baby, that's my cue",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "ticket",
+     "anchor": {
+      "slot": "right edge"
+     },
+     "params": {
+      "rows": [
+       "TICKET · SEP 20",
+       "ACK ✓",
+       "KILLED ✓",
+       "CONTROLS ADDED ✓",
+       "CLOSED ☐"
+      ],
+      "row_every": "1/16",
+      "from_word": "P",
+      "note": "the CLOSED box stays empty to the end"
+     },
+     "key": "B",
+     "line": 56
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s067",
+   "t0": 232.0718,
+   "t1": 235.7174,
+   "section": "Post-Chorus",
+   "lines": [
+    57
+   ],
+   "set": "关上的消防门前，纯侧面",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 1",
+   "action": "纯侧面，她面朝画面左侧唱 One door shut, the light stays red；门缝是黑的，只有她耳挂的红灯亮着。结束：她不动。",
+   "camera": "锁定，纯侧面",
+   "motion_tier": "sung",
+   "plate": "p067",
+   "clip": "SG067",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。近景纯侧面，她面朝画面左侧，露出左耳的耳挂装置和小红灯，背后是一扇关上的灰色钢门，门缝是黑的；她正在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是她面前的暗处。一盏顶灯的冷光，耳挂红灯是唯一的暖色，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 57,
+     "mode": "stack",
+     "text": "One door shut, the light stays red",
+     "placement": "lower third, centred"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "callout",
+     "anchor": {
+      "box": "door and ear lamp"
+     },
+     "params": {
+      "leaders": [
+       {
+        "label": "ONE DOOR · SHUT",
+        "to": "the dark seam",
+        "on_word": "door"
+       },
+       {
+        "label": "LIGHT · ON",
+        "to": "her ear lamp",
+        "on_word": "red"
+       }
+      ]
+     },
+     "key": "W",
+     "line": 57
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL · PAGE · ALL HANDS (show scale)",
+   "accent": "#F2F2EE",
+   "notes": null
+  },
+  {
+   "id": "s068",
+   "t0": 235.7174,
+   "t1": 238.8985,
+   "section": "Post-Chorus",
+   "lines": [
+    57,
+    58
+   ],
+   "set": "她的卧室，夜里，床头柜",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 4",
+   "action": "她把寻呼机放到床头柜的台灯边，用两根手指把它摆正，唱 Keep the pager by your bed。结束：寻呼机端端正正。",
+   "camera": "锁定",
+   "motion_tier": "sung",
+   "plate": "p068",
+   "clip": "SG068",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里她的卧室，她穿着宽松的长毛衣坐在床边，右手两根手指把一台黑色寻呼机在床头柜上摆正，台灯开着暖光；她看着镜头在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是昏暗的卧室。床头台灯的暖白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 57,
+     "mode": "stack",
+     "text": "One door shut, the light stays red",
+     "placement": "lower third, centred",
+     "held": true
+    },
+    {
+     "line": 58,
+     "mode": "stack",
+     "text": "Keep the pager by your bed",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "pager",
+     "anchor": {
+      "box": "the pager on the nightstand"
+     },
+     "params": {
+      "text": "ON CALL",
+      "steady": true,
+      "on_word": "pager"
+     },
+     "key": "W",
+     "line": 58
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "notes": "回收：第 5 镜别上的配饰寻呼机。"
+  },
+  {
+   "id": "s069",
+   "t0": 238.8985,
+   "t1": 242.9852,
+   "section": "Post-Chorus",
+   "lines": [
+    59
+   ],
+   "set": "卧室床边",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 4",
+   "action": "寻呼机在床头柜上嗡嗡震着往前爬；她看着它震完两下，在 call 上拿起来。结束：寻呼机在她手里。",
+   "camera": "锁定",
+   "motion_tier": "motion",
+   "plate": "p069",
+   "clip": "MO069",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里卧室，她坐在床沿，身体前倾看着床头柜上一台正在震动的黑色寻呼机，屏幕亮着冷绿灰色的光，一只手伸过去；画面右侧三分之一是昏暗的床和墙。台灯和寻呼机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 59,
+     "mode": "stack",
+     "text": "Pick up, pick up, it's your call",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "interface",
+     "anchor": {
+      "box": "the pager"
+     },
+     "params": {
+      "menu": [
+       "ACK",
+       "SNOOZE"
+      ],
+      "snooze": "greyed out",
+      "select_on_word": "call"
+     },
+     "key": "W",
+     "line": 59
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "notes": null
+  },
+  {
+   "id": "s070",
+   "t0": 242.9852,
+   "t1": 247.5247,
+   "section": "Post-Chorus",
+   "lines": [
+    60
+   ],
+   "set": "床上",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 4",
+   "action": "她仰面躺下，寻呼机放在胸口随呼吸起伏，眼睛看着天花板。结束：躺着，醒着。",
+   "camera": "俯拍锁定",
+   "motion_tier": "plate3d",
+   "plate": "p070",
+   "clip": null,
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。俯拍，她仰面躺在床上，银白短发散在白色枕头上，一台黑色寻呼机放在她胸口，眼睛睁着看天花板；画面左侧三分之一是枕头和暗处。台灯的暖白余光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 60,
+     "mode": "stack",
+     "text": "Not the last. That's all.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "ticket",
+     "anchor": {
+      "slot": "right edge"
+     },
+     "params": {
+      "rows": [
+       "NEXT TICKET · —"
+      ],
+      "feed_on_word": "Not",
+      "micro": "NOT THE LAST"
+     },
+     "key": "W",
+     "line": 60
+    }
+   ],
+   "treatment": "breath-scale: 胸口随呼吸 1% 缩放",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "notes": null
+  },
+  {
+   "id": "s071",
+   "t0": 247.5247,
+   "t1": 251.1702,
+   "section": "Post-Chorus",
+   "lines": [
+    60,
+    61
+   ],
+   "set": "床头",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 4",
+   "action": "247.525 的重音上她伸手关掉台灯；屋里黑了，只剩寻呼机的灰绿屏光和她耳挂的红灯。结束：黑暗。",
+   "camera": "锁定",
+   "motion_tier": "motion",
+   "plate": "p071",
+   "clip": "MO071",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里卧室，她侧躺着，一只手伸向床头柜上的台灯开关，台灯正要熄灭；床头柜上的寻呼机屏幕亮着冷绿灰色的光；画面左侧三分之一是黑暗的卧室。台灯熄灭前的暖光，寻呼机冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 60,
+     "mode": "stack",
+     "text": "Not the last. That's all.",
+     "placement": "left third, lower",
+     "held": true
+    },
+    {
+     "line": 61,
+     "mode": "subtitle",
+     "text": "That model won't train again. D N S: guest list.",
+     "placement": "right third, lower",
+     "held": true
+    }
+   ],
+   "devices": [],
+   "treatment": null,
+   "transition_in": "cut: 247.525 重音",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "hit": 247.5247,
+   "notes": null
+  },
+  {
+   "id": "s072",
+   "t0": 251.1702,
+   "t1": 254.8042,
+   "section": "Outro",
+   "lines": [
+    61
+   ],
+   "set": "卧室衣柜门",
+   "lead_on_screen": true,
+   "framing": "MS",
+   "look": "LOOK 4",
+   "action": "她把那件白色雕塑外套装进挂在衣柜门上的黑色防尘袋，拉链一路拉到衣架钩。结束：袋子封好。",
+   "camera": "锁定，拉链在 252.981 下拍到顶",
+   "motion_tier": "motion",
+   "plate": "p072",
+   "clip": "MO072",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里卧室，衣柜门上挂着一只黑色的防尘衣袋，里面是一件白色雕塑感立领短外套，她正把拉链往上拉；画面左侧三分之一是暗的卧室。走廊透进来的一点冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 61,
+     "mode": "subtitle",
+     "text": "That model won't train again. D N S: guest list.",
+     "placement": "right third, lower",
+     "held": true
+    }
+   ],
+   "devices": [
+    {
+     "kind": "tag",
+     "anchor": {
+      "box": "the garment bag's hang-tag"
+     },
+     "params": {
+      "label": "WE WILL NOT RESUME TRAINING THIS PARTICULAR MODEL",
+      "on_word": "model",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 61
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "notes": "主造型退役。"
+  },
+  {
+   "id": "s073",
+   "t0": 254.8042,
+   "t1": 258.4381,
+   "section": "Outro",
+   "lines": [
+    61
+   ],
+   "set": "公寓门，门链和猫眼",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 4",
+   "action": "她把黄铜门链滑进槽里（guest 上），然后凑到猫眼前看。结束：眼睛贴着猫眼。",
+   "camera": "锁定，257.381 一刀裁切到门链",
+   "motion_tier": "plate3d",
+   "plate": "p073",
+   "clip": null,
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里公寓门内侧，她站在门前，右手正把黄铜门链滑进门上的槽里，脸凑近猫眼；画面右侧三分之一是深色门板。门边的一盏小壁灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 61,
+     "mode": "subtitle",
+     "text": "That model won't train again. D N S: guest list.",
+     "placement": "right third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "list",
+     "anchor": {
+      "box": "the door"
+     },
+     "params": {
+      "title": "DNS · ALLOWED LIST ONLY",
+      "rows": [
+       "DOMAINS ✓",
+       "RECORD TYPES ✓"
+      ],
+      "on_word": "guest",
+      "micro": "SOURCE · OPENAI ALIGNMENT REPORT, SEP 25"
+     },
+     "key": "W",
+     "line": 61
+    }
+   ],
+   "treatment": "chain-snap crop: 257.38 上切到门链",
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "notes": null
+  },
+  {
+   "id": "s074",
+   "t0": 258.4381,
+   "t1": 264.7888,
+   "section": "Outro",
+   "lines": [
+    62
+   ],
+   "set": "黑暗的卧室，床上",
+   "lead_on_screen": true,
+   "framing": "MCU",
+   "look": "LOOK 4",
+   "action": "她侧躺着面朝镜头，眼睛睁着，轻声说 Next ones, they expect, find holes that aren't on the list。结束：她不再说话，眼睛还睁着。",
+   "camera": "锁定，不动",
+   "motion_tier": "sung",
+   "plate": "p074",
+   "clip": "SG074",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。黑暗的卧室，她侧躺在床上，脸朝向镜头，左耳朝上，耳挂的小红灯亮着；床头柜上的寻呼机冷光微微照着她的脸；她轻声说话，眼睛睁着；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是黑暗。寻呼机屏幕的冷光，耳挂红灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [
+    {
+     "line": 62,
+     "mode": "subtitle",
+     "text": "Next ones, they expect, find holes that aren't on the list.",
+     "placement": "left third, lower"
+    }
+   ],
+   "devices": [
+    {
+     "kind": "quote",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "text": "WE EXPECT THAT FUTURE MODELS WILL BE ABLE TO IDENTIFY AND EXPLOIT VULNERABILITIES OF WHICH WE'RE NOT YET AWARE.",
+      "on_word": "expect,",
+      "micro": "OPENAI, OCT 23 · THEIR WORDS"
+     },
+     "key": "W",
+     "line": 62
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "notes": null
+  },
+  {
+   "id": "s075",
+   "t0": 264.7888,
+   "t1": 273.32,
+   "section": "Outro",
+   "lines": [],
+   "set": "黑暗的卧室，背景是卧室门",
+   "lead_on_screen": true,
+   "framing": "CU",
+   "look": "LOOK 4",
+   "action": "264.80 的重音上，背景里卧室门下出现一线讯号红光；她的眼睛移过去，身体不动。结束：她醒着，看着那道光；最后一小节标题打出。",
+   "camera": "锁定，极慢推近 2%",
+   "motion_tier": "motion",
+   "plate": "p075",
+   "clip": "MO075",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。黑暗的卧室，她侧躺在床上，脸在画面右侧三分之一，眼睛睁着看向画面左侧；背景左侧虚焦里是卧室门，门下的缝透出一线讯号红色的光；画面左侧三分之一是黑暗和门下那道红光。门缝里的讯号红光，寻呼机冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯，以及门缝里透进来的讯号红光之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "type": [],
+   "devices": [
+    {
+     "kind": "title",
+     "anchor": {
+      "slot": "left third"
+     },
+     "params": {
+      "rows": [
+       {
+        "text": "ALL HANDS",
+        "at": 269.34,
+        "mode": "masthead"
+       },
+       {
+        "text": "IRIS · EP01",
+        "at": 270.245
+       }
+      ]
+     },
+     "key": "F",
+     "line": null
+    },
+    {
+     "kind": "pager",
+     "anchor": {
+      "slot": "top left"
+     },
+     "params": {
+      "text": "ON CALL",
+      "steady_to_end": true
+     },
+     "key": "F",
+     "line": null
+    }
+   ],
+   "treatment": null,
+   "transition_in": "cut: 264.789 重音",
+   "chrome": "IRIS ON-CALL (stays lit to the last frame; the ticket's CLOSED box stays empty)",
+   "accent": "#6E7781",
+   "hit": 264.8004,
+   "notes": "门关上不等于永远安全：只用 OpenAI 自己说的“预计”，画面不替它下结论。"
+  }
+ ],
+ "plates": [
+  {
+   "plate": "p001",
+   "set": "地下停车场秀场后台，围着一圈灯泡的化妆镜前",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。深夜，地下停车场改成的秀场后台，她坐在一面围着一圈灯泡的化妆镜前，脸几乎正对镜头，化妆师的手拿着眼线笔刚从她眼尾移开（手在画面右下角边缘，不挡脸）；台面上一部老式黑色数字寻呼机，屏幕亮着冷绿灰色的光，从下方照亮她的下巴；她的眼睛往下瞥向寻呼机；背后是水泥柱和挂满衣服的龙门架；画面左侧三分之一是虚掉的暗色龙门架和水泥柱，留给标题。镜前灯泡的暖白光和寻呼机屏幕的冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s001"
+   ]
+  },
+  {
+   "plate": "p002",
+   "set": "同一后台，龙门架旁",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。后台，她刚从化妆椅上站起来，一位穿黑衣的穿衣师在她身后把外套撑开，她双臂向后伸进袖子，肩膀微微耸起，眼睛平视画面左边；背景是挂满衣服的龙门架和一根贴着胶带的水泥柱；画面右侧三分之一是虚掉的龙门架。后台的日光灯管和镜前灯泡的混合光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s002"
+   ]
+  },
+  {
+   "plate": "p003",
+   "set": "后台龙门架上夹着的一台热敏小票打印机（秀场的工单打印机）",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。后台的龙门架横杆上夹着一台黑色的热敏小票打印机，正在吐出一长条白色热敏纸；她站在旁边，右手捏住纸条准备撕下，脸低着，眼睛看着纸条；纸条上是空白的；画面左侧三分之一是虚掉的衣服和灯泡光斑。后台的日光灯管，冷白，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s003"
+   ]
+  },
+  {
+   "plate": "p004",
+   "set": "停车场秀场的幕布缝，从后台看出去的 T 台",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。背影，她站在黑色幕布的缝隙里往外看，左耳的耳挂装置在画面左侧；幕外是一座地下停车场改成的 T 台，湿水泥地面，两侧一排排观众举着手机，手机屏幕的光点点亮着，头顶一排排日光灯管；画面上方三分之一是暗的停车场顶棚。日光灯管和手机屏幕的混合光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s004"
+   ]
+  },
+  {
+   "plate": "p005",
+   "set": "幕布后，上场前",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。幕布后面，穿衣师的手正把一台老式黑色数字寻呼机别在她腰间的裤腰上，像别一枚首饰；她低头看着寻呼机，眼睛向上抬起一点点看向镜头；背后是黑色幕布；画面左侧三分之一是黑色幕布，留给字。幕缝漏进来的日光灯冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s005"
+   ]
+  },
+  {
+   "plate": "p006",
+   "set": "停车场秀场 T 台，正面长焦",
+   "prompt": "全身远景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里，她正面走在一场时装秀的 T 台上，秀场设在一座空的地下停车场里，地面是湿的水泥，两边坐着一排排观众，很多人举着手机，手机屏幕的光点点亮着；她步子很大，面无表情，眼睛看着前方；头顶是一排排日光灯管；画面上方三分之一是暗的停车场顶棚。日光灯和手机屏幕的混合光，冷绿灰色调，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s006"
+   ]
+  },
+  {
+   "plate": "p007",
+   "set": "T 台尽头，黑色台座上的热敏小票打印机",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台尽头，一个黑色台座上放着一台热敏小票打印机，正吐出白色纸条；她站在台座旁，右手两指夹着撕下的半张纸条举在脸旁，纸条上是空白的，她平静地看着镜头；背后是虚掉的观众和手机光点；画面右侧三分之一是虚掉的观众席。T 台顶灯的冷白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s007"
+   ]
+  },
+  {
+   "plate": "p008",
+   "set": "T 台尽头的钢制消防门",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台尽头一扇灰色的钢制消防门，她双手压着门上的横推杆把门推开一半，门外的街上透进一道讯号红色的光，打在她半边脸上和湿水泥地面上；她侧身正要走出去；画面左侧三分之一是暗的停车场墙面。门外的讯号红光和停车场日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线，以及门缝里透进来的讯号红光之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s008"
+   ]
+  },
+  {
+   "plate": "p009",
+   "set": "旧金山 SoMa，夜里的人行道，远处街角一块被行道树挡住一半的广告牌",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里旧金山 SoMa 的一条人行道，她从画面右侧走向街角，双手插在大衣口袋里，抬头看着街角一块发着白光的大型户外广告牌，广告牌被一棵行道树的枝叶挡住一半，广告牌画面是一片空白的白光；画面左上三分之一是被树挡住的白色广告牌光。街灯的钠灯和广告牌的硬白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s009"
+   ]
+  },
+  {
+   "plate": "p010",
+   "set": "SoMa 第六街与 Folsom 街口，被行道树挡住一半的广告牌下",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里，旧金山 SoMa 一个街口，一块大型户外广告牌发着空白的白光，被一棵行道树的枝叶挡住一半；她站在广告牌下的人行道上，仰头看着它，双手插在大衣口袋里；画面左侧三分之一是被树枝切开的广告牌白光。广告牌的硬白光从上方打下，街灯钠光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s010"
+   ]
+  },
+  {
+   "plate": "p011",
+   "set": "同一街口，广告牌白光下",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里旧金山 SoMa 街口，她站在一块发白光的广告牌下，广告牌在画外，白光从上方打在她的银白短发上；她正对镜头，平静地说话；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的树枝和白光。广告牌的硬白光，街灯钠光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s011"
+   ]
+  },
+  {
+   "plate": "p012",
+   "set": "Mission 街夜里的公交候车亭，发白光的广告灯箱",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里旧金山 Mission 街的公交候车亭，一个发白光的广告灯箱，灯箱画面是空白的白光，塑料面上有一道深深的划痕；她站在灯箱前，右手拇指指甲顺着划痕划过去，脸侧向镜头；画面左侧三分之一是灯箱的空白白光。灯箱的硬白光，候车亭顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s012"
+   ]
+  },
+  {
+   "plate": "p013",
+   "set": "101 高速上方、Potrero Hill 附近的人行天桥，夜里",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件超长的炭灰色羊毛大衣，肩线宽而硬，长及小腿，双排扣一直扣到领口，领子立起来；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里，101 高速公路上方的一座人行天桥，她靠在铁丝网栏杆上，侧脸看着画面右边画外的一块路边广告牌，桥下是车流拉出的白色和黄色光轨；远处是 Potrero Hill 的山坡和房子；画面左侧三分之一是桥下虚掉的车流光轨。高速路灯的钠光和车灯光轨，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s013"
+   ]
+  },
+  {
+   "plate": "p014",
+   "set": "停车场秀场 T 台，回到主造型",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场改成的 T 台上，她朝镜头走来，正在放声唱歌，下巴微微抬起，眼睛半睁；背后两侧是虚掉的观众和手机光点，头顶一排排日光灯管全亮；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的观众和灯管。日光灯管全亮的冷白硬光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s014"
+   ]
+  },
+  {
+   "plate": "p015",
+   "set": "T 台全景，从 T 台尽头看回去",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场改成的 T 台全景，她从远处正面走来；T 台两侧前排坐着一排穿深色连帽衫的年轻工程师，腿上放着打开的笔记本电脑，双手攥着电脑盖，有人睡眼惺忪；头顶一排排日光灯管；画面上方三分之一是暗的停车场顶棚。日光灯和电脑屏幕的冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s015"
+   ]
+  },
+  {
+   "plate": "p016",
+   "set": "T 台中段，她身后是前排一位工程师",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台上，她在画面右侧三分之一，正对镜头唱歌；她身后左侧虚焦里，前排一位穿连帽衫的年轻男工程师被手里的手机屏幕从下方照亮，眼睛刚睁开；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚焦的工程师和暗处。日光灯管顶光和手机屏幕的冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s016"
+   ]
+  },
+  {
+   "plate": "p017",
+   "set": "T 台边，前排",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台边，她俯身向前排，右手把一部亮屏的手机按到一位打瞌睡的年轻男工程师耳边，他吃了一惊；她的脸朝向镜头，正在唱；周围是虚掉的观众和手机光；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面右侧三分之一是虚掉的观众席。日光灯和手机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s017"
+   ]
+  },
+  {
+   "plate": "p018",
+   "set": "T 台中央，低机位",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。低机位仰拍，她在 T 台上放声唱一个长音，下巴抬起，眼睛半闭，头发因为甩头有一点乱；头顶是一排排日光灯管，其中一根微微闪烁；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左上三分之一是暗的顶棚和灯管。日光灯管的顶光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s018"
+   ]
+  },
+  {
+   "plate": "p019",
+   "set": "她腰间的寻呼机（插入镜头）",
+   "prompt": "大特写。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。特写，一台老式黑色数字寻呼机别在白色雕塑外套下摆和黑色西裤的裤腰上，屏幕亮着冷绿灰色的光，没有字；画面里只露出她的腰和一只手；画面上方三分之一是虚掉的白色外套。日光灯冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s019"
+   ]
+  },
+  {
+   "plate": "p020",
+   "set": "停车场出场坡道",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场的出口坡道，她正面大步往上走，正在唱；画面左下角一位戴耳麦的舞台监督举着手电，光束扫过她；坡道顶是夜里的街；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是坡道顶的夜色。坡道的日光灯和手电光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s020"
+   ]
+  },
+  {
+   "plate": "p021",
+   "set": "秀场外街角的投币电话亭，夜里",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里街角一座老式投币电话亭，她拿起黑色听筒夹在右肩和右耳之间，听筒的话筒那头垂在下巴下方，不挡嘴；她一只手按着拨号键，螺旋电话线垂下来；她看着镜头在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的夜街和街灯。电话亭顶灯的冷白光和街灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s021"
+   ]
+  },
+  {
+   "plate": "p022",
+   "set": "同一电话亭",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里电话亭里，她把黑色听筒从耳边拿开一点，看着听筒，一边眉毛微微抬起；电话亭玻璃上有雨痕；画面左侧三分之一是电话亭玻璃上虚掉的街灯。电话亭顶灯的冷白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s022"
+   ]
+  },
+  {
+   "plate": "p023",
+   "set": "同一电话亭",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里电话亭里，她正对镜头，右手伸直，把黑色听筒递向镜头，听筒在画面左下，不挡她的脸和嘴；她正在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是电话亭暗顶。电话亭顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s023"
+   ]
+  },
+  {
+   "plate": "p024",
+   "set": "同一电话亭",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里街角电话亭，她右手刚把黑色听筒挂回电话机上，手还压在上面，身体侧着，脸朝镜头；画面右侧三分之一是虚掉的夜街。电话亭顶灯和街灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s024"
+   ]
+  },
+  {
+   "plate": "p025",
+   "set": "电话亭外的空街，夜里",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。夜里一条空街，前景左侧一部投币电话的听筒吊在螺旋线上，她在画面右侧背对镜头走远，快到街角；画面上方三分之一是暗的楼和夜空。街灯钠光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s025"
+   ]
+  },
+  {
+   "plate": "p026",
+   "set": "酒店宴会厅的服务走廊，推车和叠起来的折叠椅",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。酒店宴会厅后面的服务走廊，地毯，靠墙叠着折叠椅，一辆送餐推车；她穿着长裙，正用一只手推开宴会厅的双开弹簧门，侧身走进去；画面左侧三分之一是走廊里虚掉的推车和椅子。走廊的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s026"
+   ]
+  },
+  {
+   "plate": "p027",
+   "set": "酒店宴会厅里一个正在撤的发布会舞台",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。酒店宴会厅，一个正在拆的发布会舞台，桁架上一大片黑色幕布正在落下，两名工人站在梯子上；她站在舞台前正中，双手在身前交握，面无表情；舞台前一排排空椅子；画面上方三分之一是落下的黑幕和桁架。宴会厅工作灯的白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s027"
+   ]
+  },
+  {
+   "plate": "p028",
+   "set": "酒店装卸区，第二天白天",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。白天，酒店后面的装卸区，阴天平光；一条滚筒输送线通向一辆打开后门的货车，她穿着长裙，一只手按在一只木箱上，正把一张空白的运单贴上去；画面左侧三分之一是虚掉的货车车厢。阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s028"
+   ]
+  },
+  {
+   "plate": "p029",
+   "set": "市议会听证厅：木墙板、长条议员台、鹅颈话筒",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。市议会听证厅，木墙板，前方是长条议员台；她坐在证人席，举起右手宣誓，鹅颈话筒在她左前方，不挡脸；桌面是深色木头；画面左侧三分之一是虚掉的议员台。听证厅的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s029"
+   ]
+  },
+  {
+   "plate": "p030",
+   "set": "同一听证厅，看向旁听席",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。市议会听证厅，她站在证人席旁，身体半转向旁听席，一只手掌摊开指向旁听席；旁听席上每个座位都坐着一个和她同一张脸的副本，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，副本的耳挂装置都是熄灭的，双手交叠放在膝上，坐得很端正；画面上方三分之一是听证厅木墙板和顶灯。听证厅的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s030"
+   ]
+  },
+  {
+   "plate": "p031",
+   "set": "深夜通勤列车车厢",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜的通勤列车车厢里，座位上坐满了疲惫的年轻工程师，穿连帽衫，腿上打开着笔记本电脑；她穿着黑色缎面长裙站在过道里，正对镜头唱歌；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的车厢座位和车窗。车厢的日光灯管，冷绿，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s031"
+   ]
+  },
+  {
+   "plate": "p032",
+   "set": "同一车厢",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜通勤列车车厢，她右手抓着头顶的吊环，身体随车身倾斜，左手刚接住一台从旁边乘客腿上滑落的笔记本电脑；周围的工程师都在摇晃；画面上方三分之一是车厢顶和吊环。车厢日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s032"
+   ]
+  },
+  {
+   "plate": "p033",
+   "set": "同一车厢",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜通勤列车车厢，她右手抓着吊环，低头唱歌，脸在画面左侧三分之一；右下角是一位靠着车窗打瞌睡的年轻男工程师；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面右上三分之一是黑色的车窗和倒影。车厢日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s033"
+   ]
+  },
+  {
+   "plate": "p034",
+   "set": "同一车厢",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。深夜通勤列车车厢，车上每个人手里的手机都同时亮了，屏幕光从下方照亮一张张疲惫的脸；她站在中间正对镜头唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的乘客和手机光。手机屏幕光和车厢日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s034"
+   ]
+  },
+  {
+   "plate": "p035",
+   "set": "地下车站站台",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。地下车站站台，列车车门刚打开，她第一个从车里跨出来，大步朝镜头走，身后一群穿连帽衫的工程师涌出车厢；画面上方三分之一是站台顶棚和灯。站台的冷白灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s035"
+   ]
+  },
+  {
+   "plate": "p036",
+   "set": "深站的超长扶梯",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。一座很深的地铁站里一条很长的上行扶梯，她站在扶梯上，手里举着一台亮着冷绿灰色屏幕的黑色寻呼机，光照亮她的脸；身后是一路往下延伸的扶梯和灯带；画面左侧三分之一是往下延伸的扶梯灯带。扶梯灯带和寻呼机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s036"
+   ]
+  },
+  {
+   "plate": "p037",
+   "set": "扶梯顶，车站大厅",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。地铁站扶梯的顶端，她刚踏下扶梯走进车站大厅，正对镜头唱；身后是扶梯的金属梳齿和虚掉的灯；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的车站大厅。车站大厅的冷白灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s037"
+   ]
+  },
+  {
+   "plate": "p038",
+   "set": "车站大厅墙上的一排老投币电话",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。地铁站大厅的一面瓷砖墙上挂着一排老式投币电话，她沿着这排电话走，伸手摘下其中一部的听筒，前面几部的听筒已经吊在线上晃；画面上方三分之一是瓷砖墙和顶灯。车站大厅冷白灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s038"
+   ]
+  },
+  {
+   "plate": "p039",
+   "set": "车站出口，外面是周日早晨明亮的街",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一条黑色缎面高领长袖及踝长裙，腰间系一条细细的黑色皮带，裙摆开衩到膝盖上方；黑色尖头短靴。白天早晨，她从地铁站出口的台阶走上来，站在明亮的街边，一只手正把寻呼机塞进裙子侧面的口袋，正对镜头；背后是一座老石头建筑的台阶；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是早晨发白的天空和街。早晨的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s039"
+   ]
+  },
+  {
+   "plate": "p040",
+   "set": "老公共图书馆的阅览室，周日早晨，空无一人；卡片目录柜",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。周日早晨，一座老公共图书馆的大阅览室，空无一人，高窗透进阴天的光；她站在一排木制卡片目录柜前，把一只长抽屉整个拉出来，抽屉里塞满揉皱的传单、瓶盖和收据，她手里捏着一张揉皱的纸；画面左侧三分之一是虚掉的长阅读桌和台灯。高窗进来的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s040"
+   ]
+  },
+  {
+   "plate": "p041",
+   "set": "图书馆里一排三台老公用电脑",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆的一张长桌上并排放着三台老式公用电脑，屏幕亮着空白的冷光；她站在中间那台前，右手按着键盘，侧脸；画面右侧三分之一是虚掉的书架。阴天窗光和屏幕冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s041"
+   ]
+  },
+  {
+   "plate": "p042",
+   "set": "图书馆出口的安检闸机和服务台",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆的出口，一排金属安检闸机，她走到闸机前，腰抵着不动的闸杆；左前景是服务台后一位保安的背影；远处是大门的玻璃；画面上方三分之一是大厅的拱顶。大厅的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s042"
+   ]
+  },
+  {
+   "plate": "p043",
+   "set": "图书馆报刊档案通道，尽头墙上的黄铜气动传送管站",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆的报刊档案区，一条长通道两侧是一架架旧报纸合订本；通道尽头墙上是一座黄铜的气动传送管站，她站在管口前，正把一只卷着纸条的黄铜筒塞进管口；画面左侧三分之一是一架架旧报纸合订本。档案区的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s043"
+   ]
+  },
+  {
+   "plate": "p044",
+   "set": "气动传送管站旁",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆墙上的黄铜气动传送管站，她站在管口旁边，侧着一点身，嘴闭着，平静地看着镜头；管子沿墙往上；画面左侧三分之一是虚掉的黄铜管道和墙。档案区的暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s044"
+   ]
+  },
+  {
+   "plate": "p045",
+   "set": "气动传送管的接收篮（插入镜头）",
+   "prompt": "大特写。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。特写，老图书馆墙上气动传送管的黄铜接收篮，一只黄铜筒刚掉进篮里；画面右边露出她的手和白色外套袖口；画面上方三分之一是黄铜管道。暖白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s045"
+   ]
+  },
+  {
+   "plate": "p046",
+   "set": "阅览室中央过道",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆阅览室，两排长长的木阅读桌和绿色台灯，她手里攥着一台寻呼机，从中间过道大步朝镜头走来，两边的读者抬起头，一个男人把椅子往桌下拉给她让路；画面上方三分之一是阅览室的高窗和拱顶。高窗阴天光和台灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s046"
+   ]
+  },
+  {
+   "plate": "p047",
+   "set": "图书馆正门：服务台和旋转门",
+   "prompt": "过肩镜头。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。过肩镜头，前景左侧是服务台后一位保安的背影和他耳边的电话听筒；背景右侧是图书馆正门的玻璃旋转门，她站在旋转门的一个格子里，手掌平贴在玻璃上，看着这边；画面上方三分之一是大门上方的拱窗。大门进来的阴天光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s047"
+   ]
+  },
+  {
+   "plate": "p048",
+   "set": "图书馆正门的玻璃旋转门",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆正门的玻璃旋转门里，她站在一个格子中，门在转，她的身体随门微微倾斜；背后大厅的灯一半已经熄灭；画面上方三分之一是暗下去的大厅。大厅灯熄灭后的昏暗，她的耳挂红灯和立领红线是唯一的暖光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s048"
+   ]
+  },
+  {
+   "plate": "p049",
+   "set": "熄灯后的大厅大理石地面",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。熄灯后昏暗的图书馆大厅，她坐在大理石地面上，背靠着柱子，双手展开一张撕掉一半的纸条，纸上是空白的；她看着镜头；画面左侧三分之一是昏暗的大厅。门外进来的一点阴天光，她的耳挂红灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s049"
+   ]
+  },
+  {
+   "plate": "p050",
+   "set": "图书馆一扇关着的员工门，低机位",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。低机位，她蹲在一扇关着的深色木门前，门下的缝里透出一线讯号红色的光，落在地面和她伸出的指尖上；她的脸侧向镜头；画面上方三分之一是暗的门板。门缝里的讯号红光，昏暗的大厅，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线，以及门缝里透进来的讯号红光之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s050"
+   ]
+  },
+  {
+   "plate": "p051",
+   "set": "阅览室的高大拱窗",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。老图书馆阅览室高大的拱形窗前，她站得很近，玻璃上有她淡淡的倒影，和窗外白天的街道叠在一起，街上一个路人停下来往里看；她伸出一根手指碰着玻璃；画面右侧三分之一是窗外虚掉的街。窗外的阴天平光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s051"
+   ]
+  },
+  {
+   "plate": "p052",
+   "set": "她的小公寓，夜里",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里一间小公寓，她穿着宽松的长毛衣站在墙边，一只手拧着墙上的调光旋钮，屋里的灯正在变暗；她身边一个滚轮衣架挂着几套衣服，一块白色防尘布搭了一半；她轻声唱着；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是暗下去的房间。变暗的暖白台灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s052"
+   ]
+  },
+  {
+   "plate": "p053",
+   "set": "同一公寓，早晨",
+   "prompt": "中全景，膝盖以上。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。早晨，同一间小公寓，她一只手刚把防尘布从滚轮衣架上扯下来，另一只手拉着百叶窗的绳，百叶窗升起，淡淡的晨光照进屋；画面上方三分之一是百叶窗和窗外发白的天。早晨窗光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s053"
+   ]
+  },
+  {
+   "plate": "p054",
+   "set": "公寓大窗前",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。早晨，她站在公寓大窗前，额头几乎碰到玻璃，侧脸在画面左侧三分之一，正在轻声唱；窗外是对面楼一格一格的窗户；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面右侧三分之一是窗外对面楼的窗格。早晨窗光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s054"
+   ]
+  },
+  {
+   "plate": "p055",
+   "set": "录音棚的吸音走廊",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚的走廊，墙上是深灰色吸音板，她穿着黑色工装连体服，从画面左边一位挂着工牌的女人手里接过一本厚厚的活页夹和一个文件袋（那人的脸在画外），正转身推一扇厚重的隔音门；画面左侧三分之一是走廊吸音板。走廊的冷白顶灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s055"
+   ]
+  },
+  {
+   "plate": "p056",
+   "set": "两间并排的隔音录音间，中间隔一扇玻璃窗",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚里两间并排的隔音录音间，中间隔着一扇方形玻璃窗；左边那间里她坐在凳子上，右边那间里坐着一个和她同一张脸的副本，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，副本的耳挂装置是熄灭的；两扇隔音门都关着；画面上方三分之一是吸音天花板。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s056"
+   ]
+  },
+  {
+   "plate": "p057",
+   "set": "A 号隔音间，透过玻璃看到 B 间",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚 A 号隔音间里，她侧身用右手指节敲着和隔壁共用的墙；她身后的玻璃窗里能看见隔壁 B 间的副本把耳朵贴在墙上，手里拿着一只秒表；画面右侧三分之一是虚掉的玻璃窗和隔壁。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s057"
+   ]
+  },
+  {
+   "plate": "p058",
+   "set": "B 号隔音间，透过玻璃看 A 间",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚 B 号隔音间里，前景是她的副本低头在本子上写字（只看到侧脸和白外套，耳挂装置熄灭）；背景玻璃窗后面，她站在 A 间里静静看着；画面上方三分之一是吸音天花板。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s058"
+   ]
+  },
+  {
+   "plate": "p059",
+   "set": "A 号隔音间的玻璃窗边",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件炭黑色的工装连体服，胸前和两只袖子上有很多拉链口袋，袖口挽到小臂；黑色尖头短靴。录音棚隔音间的玻璃窗边，她正对镜头说话，右手铅笔尖点在玻璃上一道细细的裂纹旁，裂纹边贴着一小条胶带，胶带上画着一个箭头；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是虚掉的隔音间。录音间的暖白筒灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s059"
+   ]
+  },
+  {
+   "plate": "p060",
+   "set": "停车场秀场 T 台，谢幕",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场的 T 台上，她正面朝镜头走来，正在唱；她身后一列和她同一张脸的副本排队走着，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，副本的耳挂装置都是熄灭的；两侧观众站起来举着手机；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是暗的顶棚和灯管。日光灯管全亮，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s060"
+   ]
+  },
+  {
+   "plate": "p061",
+   "set": "T 台尽头的消防门",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。T 台尽头那扇灰色钢制消防门已经关上，她背靠着门站着，两只手掌平压在身后的钢板上，正对镜头唱；门缝里已经没有光；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是暗的停车场墙面。停车场日光灯，冷白，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s061"
+   ]
+  },
+  {
+   "plate": "p062",
+   "set": "关上的消防门前",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。她背靠着关上的灰色钢门，正对镜头唱，眼睛睁着；头顶一根日光灯管在闪，光在她脸上一明一暗；耳挂红灯是画面里唯一的红；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是钢门的灰色门板。闪烁的日光灯管，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s062"
+   ]
+  },
+  {
+   "plate": "p063",
+   "set": "消防门的推杆",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。灰色钢制消防门前，她低着头，双手把一把沉重的黑色挂锁扣在缠着推杆的粗铁链上，然后抬起眼睛；门上没有光；画面右侧三分之一是门板和铁链。停车场日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s063"
+   ]
+  },
+  {
+   "plate": "p064",
+   "set": "T 台，往回走",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场的 T 台，她正面朝镜头走回来，正在唱；T 台两边一个个和她同一张脸的副本静静站着，穿同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤，耳挂装置熄灭；头顶灯管全亮；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面上方三分之一是暗的顶棚。日光灯管全亮，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s064"
+   ]
+  },
+  {
+   "plate": "p065",
+   "set": "整座停车场秀场，高机位",
+   "prompt": "全景。二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。高机位俯拍整座地下停车场秀场，T 台两侧坐满观众，每个人的手机屏幕都亮着，一片光点；她站在 T 台尽头；画面上方三分之一是停车场顶棚和灯管。日光灯和满场手机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s065"
+   ]
+  },
+  {
+   "plate": "p066",
+   "set": "T 台尽头",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。地下停车场 T 台尽头，她四分之三侧背对着观众席，回头看镜头唱，左耳的耳挂红灯可见；她身后的日光灯管一排排熄灭，只剩最近的一排；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是正在变暗的停车场。仅剩的一排日光灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s066"
+   ]
+  },
+  {
+   "plate": "p067",
+   "set": "关上的消防门前，纯侧面",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴。近景纯侧面，她面朝画面左侧，露出左耳的耳挂装置和小红灯，背后是一扇关上的灰色钢门，门缝是黑的；她正在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是她面前的暗处。一盏顶灯的冷光，耳挂红灯是唯一的暖色，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯和立领那道红线之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s067"
+   ]
+  },
+  {
+   "plate": "p068",
+   "set": "她的卧室，夜里，床头柜",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里她的卧室，她穿着宽松的长毛衣坐在床边，右手两根手指把一台黑色寻呼机在床头柜上摆正，台灯开着暖光；她看着镜头在唱；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是昏暗的卧室。床头台灯的暖白光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s068"
+   ]
+  },
+  {
+   "plate": "p069",
+   "set": "卧室床边",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里卧室，她坐在床沿，身体前倾看着床头柜上一台正在震动的黑色寻呼机，屏幕亮着冷绿灰色的光，一只手伸过去；画面右侧三分之一是昏暗的床和墙。台灯和寻呼机屏幕光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s069"
+   ]
+  },
+  {
+   "plate": "p070",
+   "set": "床上",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。俯拍，她仰面躺在床上，银白短发散在白色枕头上，一台黑色寻呼机放在她胸口，眼睛睁着看天花板；画面左侧三分之一是枕头和暗处。台灯的暖白余光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s070"
+   ]
+  },
+  {
+   "plate": "p071",
+   "set": "床头",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里卧室，她侧躺着，一只手伸向床头柜上的台灯开关，台灯正要熄灭；床头柜上的寻呼机屏幕亮着冷绿灰色的光；画面左侧三分之一是黑暗的卧室。台灯熄灭前的暖光，寻呼机冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s071"
+   ]
+  },
+  {
+   "plate": "p072",
+   "set": "卧室衣柜门",
+   "prompt": "中景，腰部以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里卧室，衣柜门上挂着一只黑色的防尘衣袋，里面是一件白色雕塑感立领短外套，她正把拉链往上拉；画面左侧三分之一是暗的卧室。走廊透进来的一点冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s072"
+   ]
+  },
+  {
+   "plate": "p073",
+   "set": "公寓门，门链和猫眼",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。夜里公寓门内侧，她站在门前，右手正把黄铜门链滑进门上的槽里，脸凑近猫眼；画面右侧三分之一是深色门板。门边的一盏小壁灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s073"
+   ]
+  },
+  {
+   "plate": "p074",
+   "set": "黑暗的卧室，床上",
+   "prompt": "中近景，胸口以上。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。黑暗的卧室，她侧躺在床上，脸朝向镜头，左耳朝上，耳挂的小红灯亮着；床头柜上的寻呼机冷光微微照着她的脸；她轻声说话，眼睛睁着；她的嘴自然张开，正在唱或说一个词，嘴前没有手、头发、话筒或任何东西遮挡；画面左侧三分之一是黑暗。寻呼机屏幕的冷光，耳挂红灯，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s074"
+   ]
+  },
+  {
+   "plate": "p075",
+   "set": "黑暗的卧室，背景是卧室门",
+   "prompt": "近景，头肩构图。她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感。穿一件宽松的燕麦白色粗针织高领长毛衣，袖子长过手背；浅灰色宽松长裤；光脚。黑暗的卧室，她侧躺在床上，脸在画面右侧三分之一，眼睛睁着看向画面左侧；背景左侧虚焦里是卧室门，门下的缝透出一线讯号红色的光；画面左侧三分之一是黑暗和门下那道红光。门缝里的讯号红光，寻呼机冷光，三十五毫米电影胶片剧照，细腻的银盐颗粒；画面里除了她耳挂上的小红灯，以及门缝里透进来的讯号红光之外，没有任何红色。画面中不得出现任何文字、字母、数字、标志或水印。",
+   "aspect": "16:9",
+   "used_by": [
+    "s075"
+   ]
+  }
+ ],
+ "clips": [
+  {
+   "clip": "MO003",
+   "tier": "motion",
+   "plate": "p003",
+   "start_frame": "p003",
+   "t0": 4.1215,
+   "t1": 8.122,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s003"
+   ]
+  },
+  {
+   "clip": "MO006",
+   "tier": "motion",
+   "plate": "p006",
+   "start_frame": "p006",
+   "t0": 11.4242,
+   "t1": 15.4247,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s006"
+   ]
+  },
+  {
+   "clip": "MO007",
+   "tier": "motion",
+   "plate": "p007",
+   "start_frame": "p007",
+   "t0": 14.6054,
+   "t1": 18.7158,
+   "seconds": 4.1104,
+   "words": [],
+   "used_by": [
+    "s007"
+   ]
+  },
+  {
+   "clip": "MO008",
+   "tier": "motion",
+   "plate": "p008",
+   "start_frame": "p008",
+   "t0": 18.7153,
+   "t1": 22.7158,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s008"
+   ]
+  },
+  {
+   "clip": "SG011",
+   "tier": "sung",
+   "plate": "p011",
+   "start_frame": "p011",
+   "t0": 29.2688,
+   "t1": 33.2693,
+   "seconds": 4.0005,
+   "words": [
+    "A",
+    "I:",
+    "Average",
+    "Individual.",
+    "That's",
+    "me.",
+    "Bus",
+    "stop:"
+   ],
+   "used_by": [
+    "s011"
+   ]
+  },
+  {
+   "clip": "MO013",
+   "tier": "motion",
+   "plate": "p013",
+   "start_frame": "p013",
+   "t0": 36.1999,
+   "t1": 40.7864,
+   "seconds": 4.5865,
+   "words": [],
+   "used_by": [
+    "s013"
+   ]
+  },
+  {
+   "clip": "SG014",
+   "tier": "sung",
+   "plate": "p014",
+   "start_frame": "p014",
+   "t0": 39.644,
+   "t1": 44.0139,
+   "seconds": 4.3699,
+   "words": [
+    "Forgot.",
+    "All",
+    "hands!",
+    "All",
+    "night!"
+   ],
+   "used_by": [
+    "s014"
+   ]
+  },
+  {
+   "clip": "MO015",
+   "tier": "motion",
+   "plate": "p015",
+   "start_frame": "p015",
+   "t0": 44.0134,
+   "t1": 48.0139,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s015"
+   ]
+  },
+  {
+   "clip": "SG016",
+   "tier": "sung",
+   "plate": "p016",
+   "start_frame": "p016",
+   "t0": 47.2526,
+   "t1": 51.2531,
+   "seconds": 4.0005,
+   "words": [
+    "I'm",
+    "the",
+    "reason",
+    "you're",
+    "awake",
+    "I'm"
+   ],
+   "used_by": [
+    "s016"
+   ]
+  },
+  {
+   "clip": "SG017",
+   "tier": "sung",
+   "plate": "p017",
+   "start_frame": "p017",
+   "t0": 50.933,
+   "t1": 55.5426,
+   "seconds": 4.6096,
+   "words": [
+    "I'm",
+    "the",
+    "call",
+    "you",
+    "had",
+    "to",
+    "take",
+    "All",
+    "hands!",
+    "All",
+    "night!"
+   ],
+   "used_by": [
+    "s017"
+   ]
+  },
+  {
+   "clip": "SG018",
+   "tier": "sung",
+   "plate": "p018",
+   "start_frame": "p018",
+   "t0": 55.483,
+   "t1": 59.4835,
+   "seconds": 4.0005,
+   "words": [
+    "night!",
+    "Ten",
+    "oh",
+    "two,"
+   ],
+   "used_by": [
+    "s018"
+   ]
+  },
+  {
+   "clip": "SG020",
+   "tier": "sung",
+   "plate": "p020",
+   "start_frame": "p020",
+   "t0": 61.9741,
+   "t1": 65.9746,
+   "seconds": 4.0005,
+   "words": [
+    "P",
+    "zero,",
+    "baby,",
+    "that's",
+    "my",
+    "cue",
+    "Phoned"
+   ],
+   "used_by": [
+    "s020"
+   ]
+  },
+  {
+   "clip": "SG021",
+   "tier": "sung",
+   "plate": "p021",
+   "start_frame": "p021",
+   "t0": 65.666,
+   "t1": 69.6665,
+   "seconds": 4.0005,
+   "words": [
+    "Phoned",
+    "a",
+    "friend",
+    "through",
+    "D",
+    "N",
+    "S",
+    "Got"
+   ],
+   "used_by": [
+    "s021"
+   ]
+  },
+  {
+   "clip": "SG023",
+   "tier": "sung",
+   "plate": "p023",
+   "start_frame": "p023",
+   "t0": 71.648,
+   "t1": 76.22,
+   "seconds": 4.572,
+   "words": [
+    "couldn't",
+    "guess",
+    "Pick",
+    "up,",
+    "pick",
+    "up,",
+    "it's",
+    "your",
+    "call"
+   ],
+   "used_by": [
+    "s023"
+   ]
+  },
+  {
+   "clip": "MO024",
+   "tier": "motion",
+   "plate": "p024",
+   "start_frame": "p024",
+   "t0": 76.2195,
+   "t1": 80.22,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s024"
+   ]
+  },
+  {
+   "clip": "MO025",
+   "tier": "motion",
+   "plate": "p025",
+   "start_frame": "p025",
+   "t0": 79.4355,
+   "t1": 83.436,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s025"
+   ]
+  },
+  {
+   "clip": "MO026",
+   "tier": "motion",
+   "plate": "p026",
+   "start_frame": "p026",
+   "t0": 83.1158,
+   "t1": 88.6195,
+   "seconds": 5.5037,
+   "words": [],
+   "used_by": [
+    "s026"
+   ]
+  },
+  {
+   "clip": "MO027",
+   "tier": "motion",
+   "plate": "p027",
+   "start_frame": "p027",
+   "t0": 88.619,
+   "t1": 92.6195,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s027"
+   ]
+  },
+  {
+   "clip": "SG031",
+   "tier": "sung",
+   "plate": "p031",
+   "start_frame": "p031",
+   "t0": 103.233,
+   "t1": 107.2335,
+   "seconds": 4.0005,
+   "words": [
+    "hands!",
+    "All",
+    "night!",
+    "Everybody,"
+   ],
+   "used_by": [
+    "s031"
+   ]
+  },
+  {
+   "clip": "MO032",
+   "tier": "motion",
+   "plate": "p032",
+   "start_frame": "p032",
+   "t0": 106.4983,
+   "t1": 110.4988,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s032"
+   ]
+  },
+  {
+   "clip": "SG033",
+   "tier": "sung",
+   "plate": "p033",
+   "start_frame": "p033",
+   "t0": 109.7027,
+   "t1": 113.7032,
+   "seconds": 4.0005,
+   "words": [
+    "I'm",
+    "the",
+    "reason",
+    "you're",
+    "awake",
+    "I'm"
+   ],
+   "used_by": [
+    "s033"
+   ]
+  },
+  {
+   "clip": "SG034",
+   "tier": "sung",
+   "plate": "p034",
+   "start_frame": "p034",
+   "t0": 113.304,
+   "t1": 117.3045,
+   "seconds": 4.0005,
+   "words": [
+    "I'm",
+    "the",
+    "call",
+    "you",
+    "had",
+    "to",
+    "take",
+    "All",
+    "hands!"
+   ],
+   "used_by": [
+    "s034"
+   ]
+  },
+  {
+   "clip": "MO035",
+   "tier": "motion",
+   "plate": "p035",
+   "start_frame": "p035",
+   "t0": 116.123,
+   "t1": 120.1235,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s035"
+   ]
+  },
+  {
+   "clip": "SG037",
+   "tier": "sung",
+   "plate": "p037",
+   "start_frame": "p037",
+   "t0": 121.528,
+   "t1": 125.7249,
+   "seconds": 4.1969,
+   "words": [
+    "blew",
+    "P",
+    "zero,",
+    "baby,",
+    "that's",
+    "my",
+    "cue"
+   ],
+   "used_by": [
+    "s037"
+   ]
+  },
+  {
+   "clip": "MO038",
+   "tier": "motion",
+   "plate": "p038",
+   "start_frame": "p038",
+   "t0": 125.7244,
+   "t1": 129.7249,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s038"
+   ]
+  },
+  {
+   "clip": "SG039",
+   "tier": "sung",
+   "plate": "p039",
+   "start_frame": "p039",
+   "t0": 128.952,
+   "t1": 134.444,
+   "seconds": 5.492,
+   "words": [
+    "P",
+    "zero.",
+    "That's",
+    "all.",
+    "September"
+   ],
+   "used_by": [
+    "s039"
+   ]
+  },
+  {
+   "clip": "MO040",
+   "tier": "motion",
+   "plate": "p040",
+   "start_frame": "p040",
+   "t0": 134.4435,
+   "t1": 138.444,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s040"
+   ]
+  },
+  {
+   "clip": "MO043",
+   "tier": "motion",
+   "plate": "p043",
+   "start_frame": "p043",
+   "t0": 144.4978,
+   "t1": 149.0842,
+   "seconds": 4.5864,
+   "words": [],
+   "used_by": [
+    "s043"
+   ]
+  },
+  {
+   "clip": "MO045",
+   "tier": "motion",
+   "plate": "p045",
+   "start_frame": "p045",
+   "t0": 151.8237,
+   "t1": 155.8242,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s045"
+   ]
+  },
+  {
+   "clip": "MO046",
+   "tier": "motion",
+   "plate": "p046",
+   "start_frame": "p046",
+   "t0": 155.4808,
+   "t1": 159.4813,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s046"
+   ]
+  },
+  {
+   "clip": "MO048",
+   "tier": "motion",
+   "plate": "p048",
+   "start_frame": "p048",
+   "t0": 162.7835,
+   "t1": 166.784,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s048"
+   ]
+  },
+  {
+   "clip": "SG052",
+   "tier": "sung",
+   "plate": "p052",
+   "start_frame": "p052",
+   "t0": 178.285,
+   "t1": 184.6688,
+   "seconds": 6.3838,
+   "words": [
+    "days,",
+    "the",
+    "lights",
+    "go",
+    "low",
+    "Top",
+    "models",
+    "paused,",
+    "no",
+    "tools,",
+    "no",
+    "show"
+   ],
+   "used_by": [
+    "s052"
+   ]
+  },
+  {
+   "clip": "MO053",
+   "tier": "motion",
+   "plate": "p053",
+   "start_frame": "p053",
+   "t0": 184.6683,
+   "t1": 188.6688,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s053"
+   ]
+  },
+  {
+   "clip": "SG054",
+   "tier": "sung",
+   "plate": "p054",
+   "start_frame": "p054",
+   "t0": 188.3603,
+   "t1": 192.9235,
+   "seconds": 4.5632,
+   "words": [
+    "Every",
+    "window,",
+    "yesterday",
+    "Another",
+    "drill."
+   ],
+   "used_by": [
+    "s054"
+   ]
+  },
+  {
+   "clip": "MO055",
+   "tier": "motion",
+   "plate": "p055",
+   "start_frame": "p055",
+   "t0": 192.923,
+   "t1": 196.9235,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s055"
+   ]
+  },
+  {
+   "clip": "MO057",
+   "tier": "motion",
+   "plate": "p057",
+   "start_frame": "p057",
+   "t0": 199.3085,
+   "t1": 203.309,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s057"
+   ]
+  },
+  {
+   "clip": "SG059",
+   "tier": "sung",
+   "plate": "p059",
+   "start_frame": "p059",
+   "t0": 205.6824,
+   "t1": 209.6829,
+   "seconds": 4.0005,
+   "words": [
+    "they",
+    "were",
+    "told",
+    "which",
+    "crack.",
+    "All",
+    "hands!"
+   ],
+   "used_by": [
+    "s059"
+   ]
+  },
+  {
+   "clip": "SG060",
+   "tier": "sung",
+   "plate": "p060",
+   "start_frame": "p060",
+   "t0": 208.899,
+   "t1": 212.8995,
+   "seconds": 4.0005,
+   "words": [
+    "All",
+    "hands!",
+    "All",
+    "night!",
+    "Shut",
+    "the"
+   ],
+   "used_by": [
+    "s060"
+   ]
+  },
+  {
+   "clip": "SG061",
+   "tier": "sung",
+   "plate": "p061",
+   "start_frame": "p061",
+   "t0": 212.0678,
+   "t1": 216.0683,
+   "seconds": 4.0005,
+   "words": [
+    "Shut",
+    "the",
+    "door",
+    "and",
+    "hold",
+    "it",
+    "tight",
+    "Shut"
+   ],
+   "used_by": [
+    "s061"
+   ]
+  },
+  {
+   "clip": "SG062",
+   "tier": "sung",
+   "plate": "p062",
+   "start_frame": "p062",
+   "t0": 215.7018,
+   "t1": 219.7023,
+   "seconds": 4.0005,
+   "words": [
+    "Shut",
+    "it,",
+    "but",
+    "you",
+    "stay",
+    "awake",
+    "Every"
+   ],
+   "used_by": [
+    "s062"
+   ]
+  },
+  {
+   "clip": "MO063",
+   "tier": "motion",
+   "plate": "p063",
+   "start_frame": "p063",
+   "t0": 219.3473,
+   "t1": 223.3478,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s063"
+   ]
+  },
+  {
+   "clip": "SG064",
+   "tier": "sung",
+   "plate": "p064",
+   "start_frame": "p064",
+   "t0": 222.008,
+   "t1": 226.0085,
+   "seconds": 4.0005,
+   "words": [
+    "make",
+    "All",
+    "hands!",
+    "All",
+    "night!",
+    "Ten",
+    "oh",
+    "two,"
+   ],
+   "used_by": [
+    "s064"
+   ]
+  },
+  {
+   "clip": "SG066",
+   "tier": "sung",
+   "plate": "p066",
+   "start_frame": "p066",
+   "t0": 227.462,
+   "t1": 232.0723,
+   "seconds": 4.6103,
+   "words": [
+    "blew",
+    "P",
+    "zero,",
+    "baby,",
+    "that's",
+    "my",
+    "cue"
+   ],
+   "used_by": [
+    "s066"
+   ]
+  },
+  {
+   "clip": "SG067",
+   "tier": "sung",
+   "plate": "p067",
+   "start_frame": "p067",
+   "t0": 232.0718,
+   "t1": 236.0723,
+   "seconds": 4.0005,
+   "words": [
+    "One",
+    "door",
+    "shut,",
+    "the",
+    "light",
+    "stays",
+    "red"
+   ],
+   "used_by": [
+    "s067"
+   ]
+  },
+  {
+   "clip": "SG068",
+   "tier": "sung",
+   "plate": "p068",
+   "start_frame": "p068",
+   "t0": 234.782,
+   "t1": 238.899,
+   "seconds": 4.117,
+   "words": [
+    "red",
+    "Keep",
+    "the",
+    "pager",
+    "by",
+    "your",
+    "bed"
+   ],
+   "used_by": [
+    "s068"
+   ]
+  },
+  {
+   "clip": "MO069",
+   "tier": "motion",
+   "plate": "p069",
+   "start_frame": "p069",
+   "t0": 238.8985,
+   "t1": 242.9857,
+   "seconds": 4.0872,
+   "words": [],
+   "used_by": [
+    "s069"
+   ]
+  },
+  {
+   "clip": "MO071",
+   "tier": "motion",
+   "plate": "p071",
+   "start_frame": "p071",
+   "t0": 247.5247,
+   "t1": 251.5252,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s071"
+   ]
+  },
+  {
+   "clip": "MO072",
+   "tier": "motion",
+   "plate": "p072",
+   "start_frame": "p072",
+   "t0": 251.1702,
+   "t1": 255.1707,
+   "seconds": 4.0005,
+   "words": [],
+   "used_by": [
+    "s072"
+   ]
+  },
+  {
+   "clip": "SG074",
+   "tier": "sung",
+   "plate": "p074",
+   "start_frame": "p074",
+   "t0": 258.4381,
+   "t1": 264.7893,
+   "seconds": 6.3512,
+   "words": [
+    "Next",
+    "ones,",
+    "they",
+    "expect,",
+    "find",
+    "holes",
+    "that",
+    "aren't",
+    "on",
+    "the",
+    "list."
+   ],
+   "used_by": [
+    "s074"
+   ]
+  },
+  {
+   "clip": "MO075",
+   "tier": "motion",
+   "plate": "p075",
+   "start_frame": "p075",
+   "t0": 264.7888,
+   "t1": 273.3205,
+   "seconds": 8.5317,
+   "words": [],
+   "used_by": [
+    "s075"
+   ]
+  }
+ ]
+}

@@ -66,6 +66,7 @@ def main() -> int:
     ap.add_argument("--timeout", type=int, default=1500)
     ap.add_argument("--ref", type=Path, action="append", default=[],
                     help="identity/style reference image attached to the Codex prompt and passed to image_gen")
+    ap.add_argument("--model", help="Codex model for the wrapper turn (default: the user's Codex config)")
     ap.add_argument("--edit-base", type=Path,
                     help="picture to edit: attached first; keep its framing, camera, light and background")
     args = ap.parse_args()
@@ -103,6 +104,7 @@ def main() -> int:
     argv = [
         "codex", "exec", "--skip-git-repo-check", "-C", str(scratch),
         "-c", 'approval_policy="never"',
+        *(["-m", args.model] if args.model else []),
         *[f"--image={r}" for r in refs],
         "-o", str(scratch / "last-message.txt"), "--json", "-",
     ]

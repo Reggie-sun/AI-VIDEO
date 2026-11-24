@@ -1,0 +1,71 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG05-n-1",
+ "question": "提交前预览页：http://127.0.0.1:8769/pilot/s015-030/submit/index.html\n\ns015–s030 共 13 条要拍：7 条唱段，人声已切好，页上可以听；6 条是动作。每条列了首帧、逐字 prompt、为什么这样拍、秒数和费用。\n\n按 s014 的教训，我把 7 条 prompt 改成从首帧的状态写起，例如：\n- s025 首帧里她已经接住了电脑，prompt 就从“把电脑塞回他怀里”写起。\n- s028 泛光灯亮起来那一下，改到后期用调色做。\n\n静图 s021/s023/s030 和 4 个插镜不用生成。每条拍 2 次挑一条，预计共 12,000 积分，上限 13,000。每条出片后先过逐镜 Gate，再拍下一条。\n\n按这个开拍吗？",
+ "user_quote": "按页面开拍 (Recommended)",
+ "approved_at": "2026-11-22T17:40:38Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "a96addc1819cff9636e3709d3569f9b641909f5220a4842d622446d0be0fd67c"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "346038f3daf611a66de846e3d004a58fa7cf590fee1b1cc6686c9e279a25a6b0"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "6090e683a3eb007c6c24a997d7b98d40befb4b2dd233a5e04de0a62badd8985e"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p015-w1.png",
+   "sha256": "b8eabb6ae89dbe66a01c8d6bf59809f8ed74c91e8a033f2ac9265b31da4a76d3",
+   "role": "SG05 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05.wav",
+   "sha256": "848c964e0e8262ece595d4de0d640de0ddefe49c63ddcf471b3937d36b1adca0",
+   "role": "SG05 vocal"
+  }
+ ],
+ "prompts": {
+  "SG05": {
+   "text": "{{image:0}}中的她刚从钢制侧门里走上湿亮的人行道，对着镜头边走边唱，口型与{{audio:1}}里的人声逐字精确同步。中景，手持镜头在她前方与她同速后退，她和镜头的距离始终不变。唱到一半时她低头看一眼腰前腰链上震动的黑色寻呼机，用右手拇指按掉，再抬头接着唱。寻呼机和工牌一直挂在她身前的腰链上。嘴前没有任何遮挡。机头直闪。街上的车灯只有白色和琥珀色。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "3b684e29f0ad3326341cc43ee12a119bc2667178d201a1d693d673c883f4936f"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 7,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 600,
+  "cumulative_CRD": 600
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p015-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P015/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg05-n-1-source-001",
+  "policy_id": "iris-sg05-n-1-source-001",
+  "reservation_id": "iris-sg05-n-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG05-n-1",
+   "sd-SG05-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1200,
+  "this_take": "sd-SG05-n-1"
+ }
+}

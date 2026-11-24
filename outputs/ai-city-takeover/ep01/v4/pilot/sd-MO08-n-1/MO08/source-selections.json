@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo08-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p018-w1.png",
+    "sha256": "5a8ac46aec0079ddd02f4178e7a4f03d47043ff580b702708a48d0d3e928f529",
+    "size_bytes": 2191440,
+    "width": 1670,
+    "height": 941,
+    "role": "approved p018-w1.png: the first frame",
+    "need_id": "folsom-street-high",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

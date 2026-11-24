@@ -1,0 +1,45 @@
+{
+ "unit": "SG01",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "ace973add01a779e95a36c3307394afd88b6dd978be5e98ceedf7b5a640ba974",
+ "compiled_prompt_sha256": "4014034819fbcf839d8f5ee05ecdc4f8fc1efeeab9447607d6f20fc5a10008f8",
+ "approval_sha256": "02bc206f5d07a63d4950e19ae9e4b29efb91cb896219f7bf2816f27f932d1439",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG01-o-1/continuity-report.json",
+  "sha256": "2f5e37b9a8cf37fb88b8b83bdb93cd0ca261c4245ce86a81fedfc737d59f0742",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "逐字口型，开头 0.15 s 内张嘴，两段句间静音嘴要合上；侧身摘听筒时脸大致正对、不挡嘴、听筒不贴耳，耳挂不能换到右耳；听筒在片内约 3.6–4.7 s 才摘下；背景白衣人不能醒目；手机屏无字；记下她用哪只手拿听筒。spec 里“前排手机还暗着”一句不在认可 prompt 内，不作判据"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 500,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   500
+  ]
+ },
+ "new_calls": 0
+}

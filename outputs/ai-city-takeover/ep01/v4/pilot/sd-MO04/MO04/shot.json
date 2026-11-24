@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo04-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "096ddd5b4c498111cd6f10a2f471f19dff4f17aea64ef1a90034ff622ddcb52d",
+  "creation_receipt_id": "iris-v4-MO04-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6a24a40e468417e5d704101f3b722fc7948ec4aa46b6cb96f577d509fdd661d1.json",
+      "content_hash": "6a24a40e468417e5d704101f3b722fc7948ec4aa46b6cb96f577d509fdd661d1"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/845a7361b6906aeb39d52b4356d523ca1e3ee3551d3a215e096ee02fb05d0c59.json",
+      "content_hash": "845a7361b6906aeb39d52b4356d523ca1e3ee3551d3a215e096ee02fb05d0c59"
+    }
+  ],
+  "shot_id": "ep01v4-mo04",
+  "scene_id": "street-billboard-tree",
+  "storyboard_beat_id": "mo04",
+  "intent": "镜头固定，全身远景。夜里潮湿的人行道，她站在树下，伸手把一根挡在面前的树枝往下拽，眯眼往上看树后那块发着白光的巨大广告牌；她松开手，树枝弹回去轻轻晃动，广告牌的白光整片打到她脸上，她不躲，从外套口袋里掏出一张空白的姓名贴。路灯和远处的车灯安静地亮着。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；造型1雕塑白：白色雕塑感短款立领外套与左侧立领的极细红灯线完整保持（由认可的首帧承担）",
+    "她拽下树枝、松手让它弹回去，白光整片打到脸上她不躲，从外套口袋里掏出一张空白的姓名贴",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo04-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

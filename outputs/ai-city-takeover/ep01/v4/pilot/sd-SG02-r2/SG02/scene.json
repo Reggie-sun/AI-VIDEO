@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg02-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "b65878a5060763391a210eed8f82b70dc5abd2993afc37e282459525618d8ec8",
+  "creation_receipt_id": "iris-v4-SG02-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/5bfabf0825838a81c9ba9c8dec048117e5ad62a8a6831812b7d0891b265c96af.json",
+      "content_hash": "5bfabf0825838a81c9ba9c8dec048117e5ad62a8a6831812b7d0891b265c96af"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b.json",
+      "content_hash": "6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6765353faee0305685a9a3732d6778e6d40244fd903003cb0c515767ada2d87a.json",
+      "content_hash": "6765353faee0305685a9a3732d6778e6d40244fd903003cb0c515767ada2d87a"
+    }
+  ],
+  "scene_id": "billboard-light",
+  "location": "同一块广告牌下，白光里",
+  "time": "深夜",
+  "mood": "冷、压迫、不羁",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左侧立领红灯线位置一致（v4身份锚点F1a）",
+    "冷色调；红色只做讯号灯，是唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg02-reference"
+  ]
+}

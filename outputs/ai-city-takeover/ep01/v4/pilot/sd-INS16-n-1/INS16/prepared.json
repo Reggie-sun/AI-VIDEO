@@ -1,0 +1,4068 @@
+{
+  "execution_binding": {
+    "schema_version": "1",
+    "projection": {
+      "requirement": {
+        "contract_version": "provider-neutral-video-requirement/4",
+        "requirement_id": "video-requirement-70bb632786c61588980b0738",
+        "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+        "source_request_content_hash": "da88b6108e65f4100e92f6cc55869bd29696a4bd4d26d84e939e45e66dd0678c",
+        "intent_evidence_hash": "253329a79b4ec510097dd4ae3b1f75e627ec61147c67856e5949d7726d6abc88",
+        "generation_intent_hash": "d167ae41e20a865544ea7b84086712f3274520108df9defb7e69b440f8e80d37",
+        "target_shot": {
+          "artifact_id": "iris-v4-ins16-shot",
+          "schema_version": "2.0",
+          "revision": 1,
+          "content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+          "creation_receipt_id": "iris-v4-INS16-authoring:shot",
+          "source_provenance": [
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf.json",
+              "content_hash": "859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+              "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176.json",
+              "content_hash": "fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176"
+            }
+          ],
+          "shot_id": "ep01v4-ins16",
+          "scene_id": "folsom-payphone-shelf",
+          "storyboard_beat_id": "ins16",
+          "intent": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+          "dialogue": "",
+          "narration": "",
+          "duration_policy": {
+            "mode": "fixed",
+            "seconds": 6.0,
+            "minimum_seconds": null,
+            "maximum_seconds": null
+          },
+          "character_ids": [],
+          "continuity_constraints": [
+            "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+            "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+            "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+          ],
+          "visual_strategy": "generated_video",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            },
+            {
+              "role": "first_frame",
+              "asset_ids": [
+                "iris-c-v4-ins16-first-frame"
+              ],
+              "allowed_asset_types": [
+                "image"
+              ]
+            }
+          ],
+          "motion_directives": [],
+          "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+          "hybrid_layers": [],
+          "composition_directives": [],
+          "review_policy": {
+            "required_checks": []
+          }
+        },
+        "scene": {
+          "artifact_id": "iris-v4-ins16-scene",
+          "schema_version": "2.0",
+          "revision": 1,
+          "content_hash": "b928613c6a093b5b20ce526644222b602fdb000165145a7872deefe3bddc19fd",
+          "creation_receipt_id": "iris-v4-INS16-authoring:scene",
+          "source_provenance": [
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf.json",
+              "content_hash": "859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+              "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176.json",
+              "content_hash": "fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176"
+            }
+          ],
+          "scene_id": "folsom-payphone-shelf",
+          "location": "Folsom 街角那台老式投币电话的搁板下方，背后是钢板",
+          "time": "深夜",
+          "mood": "冷、安静、刚松手的余波",
+          "participant_ids": [],
+          "continuity_constraints": [
+            "冷白、青蓝和琥珀色的夜间灯色；画面里没有任何红色"
+          ],
+          "visual_reference_asset_ids": [
+            "iris-c-v4-ins16-first-frame"
+          ]
+        },
+        "characters": [],
+        "review_evidence": null,
+        "asset_evidence": [
+          {
+            "role": "first_frame",
+            "asset_id": "iris-c-v4-ins16-first-frame",
+            "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+            "canonical_owner_id": "ep01v4-ins16",
+            "canonical_owner_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2256345,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "c4_multi_anchor_binding": null,
+        "generation_mode": "image_to_video",
+        "continuity_mode": "none",
+        "motion_requirement": "character_action",
+        "generation_intent": {
+          "reference_planning": {
+            "contract_version": "shot-reference-intent/1",
+            "facets": [
+              "stable"
+            ],
+            "structure": "continuous",
+            "segment_ids": [],
+            "events": [],
+            "anchors": [],
+            "selections": [],
+            "natural_generation": [
+              "听筒在后面钢板上的影子跟着一起晃",
+              "画面里没有人，也没有手",
+              "画面里没有任何红色"
+            ],
+            "director_coverage": {
+              "coverage_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011",
+              "unit_id": "INS16"
+            },
+            "preview_approval": {
+              "approval_hash": "fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176"
+            }
+          },
+          "open_state": {
+            "kind": "typed_text",
+            "state_ref": null,
+            "state_text": "INS16首帧：特写，投币电话搁板下方，黑色听筒斜挂在金属电话线上偏向一侧，看得出刚松手还在晃；画面里没有人和手",
+            "state_hash": null,
+            "required_change": false
+          },
+          "close_state": {
+            "kind": "typed_text",
+            "state_ref": null,
+            "state_text": "听筒几乎停住，只轻轻转一点，机位与构图不变",
+            "state_hash": null,
+            "required_change": false
+          },
+          "identity_continuity": {
+            "character_ids": [],
+            "preservation": "unspecified",
+            "allowed_variation": []
+          },
+          "scene_continuity": {
+            "scene_id": "folsom-payphone-shelf",
+            "time_of_day": "深夜",
+            "mood": "冷、安静、刚松手的余波",
+            "state_constraints": [
+              "INS16首帧：特写，投币电话搁板下方，黑色听筒斜挂在金属电话线上偏向一侧，看得出刚松手还在晃；画面里没有人和手",
+              "不新增人物、设备、文字或界面"
+            ]
+          },
+          "space_continuity": {
+            "subject_position": "听筒挂在从搁板前沿垂下的电话线上，原位来回晃",
+            "screen_direction": "保持参考图方向",
+            "entrance_state": null,
+            "exit_state": null,
+            "crossing_policy": "不换位、不翻轴"
+          },
+          "axis_continuity": {
+            "camera_axis": "参考图原机位视轴",
+            "framing_continuity": "INS16首帧：特写，投币电话搁板下方",
+            "crossing_policy": "不翻轴、不环绕"
+          },
+          "subject_action": {
+            "start_state": "听筒从首帧里偏向一侧的位置荡回来",
+            "progression": "来回晃，越晃越慢，晃动的幅度一次比一次小",
+            "endpoint": {
+              "state_ref": null,
+              "state_text": "最后几乎停住，只轻轻转一点",
+              "state_hash": null,
+              "required_change": false
+            }
+          },
+          "motion_envelope": {
+            "onset": "平滑开始",
+            "peak": "听筒荡到最高处",
+            "settle": "摄影机始终静止",
+            "direction": "摄影机不移动",
+            "amplitude_class": "很小"
+          },
+          "pacing": {
+            "cadence": "四秒连续原速",
+            "tempo_class": "正常原速",
+            "shot_duration_seconds": 4.0
+          },
+          "camera_intent": {
+            "movement": "摄影机完全固定，全程不推近、不移动、不摇镜",
+            "stability": "完全静止的固定机位",
+            "framing_intent": "INS16首帧：特写，投币电话搁板下方",
+            "expression_strength": "semantic_prompt_allowed"
+          },
+          "camera_endpoint": {
+            "start_framing": "INS16首帧原始构图",
+            "end_framing": "与起始相同的构图",
+            "position_lock": false,
+            "orientation_lock": false
+          },
+          "performance_intent": {
+            "trigger": "她刚松手，听筒的余势",
+            "visible_response": "听筒来回晃，越晃越慢，最后几乎停住",
+            "gaze_target": "画面里没有人物",
+            "body_behavior": "画面里没有人",
+            "hand_behavior": "画面里没有手",
+            "terminal_performance_state": "听筒几乎停住，只轻轻转一点"
+          },
+          "visual_treatment": {
+            "medium_look": "真人电影摄影",
+            "palette": "冷白、青蓝和琥珀色的夜间灯色；画面里没有任何红色",
+            "material_treatment": "自然材质与真实光影",
+            "prohibited_visual_drift": [
+              "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+              "改变参考图的场景与光线"
+            ]
+          },
+          "lighting_intent": {
+            "motivated_source": "相机机头直闪与琥珀色的街灯",
+            "direction": "参考图方向",
+            "exposure_priority": "保留暗部细节",
+            "continuity_state": "与首帧同一冷光"
+          },
+          "ambience_intent": {
+            "environment_bed": "几乎无声（成片使用独立音轨）",
+            "foley_cues": [],
+            "explicitly_silent": false
+          },
+          "dialogue_intent": {
+            "mode": "none",
+            "speaker_id": null,
+            "verbatim_text": null,
+            "start_seconds": null,
+            "end_seconds": null,
+            "on_screen": null,
+            "response_obligation": null,
+            "lip_sync_required": false
+          },
+          "music_intent": {
+            "mode": "none",
+            "instrumentation": null,
+            "tempo_rhythm": null,
+            "dynamics": null
+          },
+          "primary_camera_motion": {
+            "movement_kind": "locked",
+            "direction": "none",
+            "amplitude_class": "subtle",
+            "speed_class": "very_slow",
+            "start_motion_state": "stationary",
+            "end_motion_state": "settled"
+          },
+          "camera_subject_relation": {
+            "subject_id": "payphone-handset",
+            "relation_kind": "fixed_frame",
+            "start_relation": "特写，听筒在搁板下方偏向一侧",
+            "end_relation": "构图与机位不变，听筒几乎停住"
+          }
+        },
+        "conditioning_compatibility": {
+          "lane": "i2va",
+          "first_anchor_id": "iris-c-v4-ins16-first-frame",
+          "last_anchor_id": null,
+          "same_subject_scale": null,
+          "composition_compatible": null,
+          "screen_order_compatible": null,
+          "axis_compatible": null,
+          "camera_path_reachable": null,
+          "character_prop_state_reachable": null,
+          "action_endpoint_reachable": null,
+          "available_duration_seconds": 4.0
+        },
+        "semantic_reference_roles": [
+          "first_frame"
+        ],
+        "capability_need": {
+          "needs_identity_reference": false,
+          "needs_scene_reference": false,
+          "needs_first_frame": true,
+          "needs_last_frame": false,
+          "needs_terminal_reference": false,
+          "needs_native_audio": false,
+          "needs_continuity_state": false,
+          "max_reference_count": null,
+          "accepts_local_execution": false,
+          "accepts_remote_execution": true
+        },
+        "output_need": {
+          "timing_mode": "content_driven",
+          "duration_seconds": 4.0,
+          "frame_count": null,
+          "geometry_policy": "adaptive",
+          "width": null,
+          "height": null,
+          "aspect_ratio": "16:9",
+          "fps": null,
+          "container_mime": "video/mp4"
+        },
+        "audio_need": "optional",
+        "quality_need": {
+          "objective_tier": "preview",
+          "minimum_raster": null,
+          "minimum_codec": null,
+          "native_enforcement_required": false
+        }
+      },
+      "plan_hash": "7f04879a20cbd377af992ecee8effe83b5c1f559bfbbd1c10e98f66a5498cef6",
+      "verified_source_request_content_hash": "da88b6108e65f4100e92f6cc55869bd29696a4bd4d26d84e939e45e66dd0678c",
+      "target_shot_id": "ep01v4-ins16",
+      "target_shot_revision": 1,
+      "target_shot_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+      "projection_hash": "0e0e9ea51f76385d72b22540e78443f779e4bb92e8c553260156874e2d604661"
+    },
+    "context": {
+      "activated_shot": {
+        "artifact_id": "iris-v4-ins16-shot",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+        "creation_receipt_id": "iris-v4-INS16-authoring:shot",
+        "source_provenance": [
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf.json",
+            "content_hash": "859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+            "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176.json",
+            "content_hash": "fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176"
+          }
+        ],
+        "shot_id": "ep01v4-ins16",
+        "scene_id": "folsom-payphone-shelf",
+        "storyboard_beat_id": "ins16",
+        "intent": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [],
+        "continuity_constraints": [
+          "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+          "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+          "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [
+          {
+            "role": "primary_visual",
+            "asset_ids": [],
+            "allowed_asset_types": [
+              "video"
+            ]
+          },
+          {
+            "role": "first_frame",
+            "asset_ids": [
+              "iris-c-v4-ins16-first-frame"
+            ],
+            "allowed_asset_types": [
+              "image"
+            ]
+          }
+        ],
+        "motion_directives": [],
+        "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": []
+        }
+      },
+      "target_shot_id": "ep01v4-ins16",
+      "target_shot_revision": 1,
+      "target_shot_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+      "storyboard_revision": 1,
+      "storyboard_content_hash": "cd3fcc60cd52aa75ee845eac767ae70c7485f5a0d6d084c31c3831134d085eef",
+      "selected_registry_revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+      "character_bible_content_hashes": [],
+      "scene_content_hash": "b928613c6a093b5b20ce526644222b602fdb000165145a7872deefe3bddc19fd",
+      "important_character_ids": [],
+      "canonical_character_references": [],
+      "canonical_scene_reference": null,
+      "approved_existing_video": null,
+      "shot_keyframe": {
+        "role": "first_frame",
+        "asset_id": "iris-c-v4-ins16-first-frame",
+        "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+        "source_registry_revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+        "canonical_owner_kind": null,
+        "canonical_owner_id": null,
+        "canonical_owner_content_hash": null,
+        "mime_type": "image/png",
+        "size_bytes": 2256345,
+        "width": 1672,
+        "height": 941,
+        "duration_millis": null,
+        "fps": null
+      },
+      "upstream_terminal": null,
+      "last_frame": null,
+      "reference_videos": [],
+      "reference_audios": [],
+      "motion_requirement": "character_action",
+      "continuity_mode": "none",
+      "semantic_continuity_state": null,
+      "allowed_visual_strategies": [
+        "generated_video"
+      ],
+      "allowed_generation_modes": [
+        "text_to_video",
+        "image_to_video",
+        "reference_to_video",
+        "video_edit",
+        "video_extend"
+      ]
+    },
+    "policy": {
+      "identity": {
+        "policy_id": "iris-v4-ins16-qualification",
+        "policy_version": "1",
+        "policy_sha256": "0aadd80e9318dbb62242c4f5e0d580fc42f266cf1aa471b792351dcfd12cff16"
+      },
+      "local_resources_available": false,
+      "remote_authorized": true,
+      "budget_authorized": true,
+      "execution_purpose": "qualification"
+    },
+    "lifecycle": {
+      "generation_id": "canvas-generation-baf3b697bd30a27b7770af895ca2e67e",
+      "target_asset_role": "primary_visual",
+      "base_project": {
+        "path": "state/projects/project.1.d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4.yaml",
+        "revision": 1,
+        "content_hash": "d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4",
+        "file_sha256": "39561f3edfc679c9c3333acf95dfcc610434519aa4d0a36d45e4db69f3f8d368"
+      },
+      "base_registry": {
+        "path": "assets/registry.2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96.json",
+        "revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+        "content_hash": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+        "file_sha256": "4e5140567493d3480df3664a60079d95f6d57a7905ced51b3338e61d38e6d654"
+      },
+      "base_dependency_graph": {
+        "revision_id": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+        "content_hash": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+        "path": "state/dependency_graph.277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da.json",
+        "file_sha256": "ebf1f564ecb5e673f9deb8e112c8680a1c047f09965c6a62bb2a1930647200eb"
+      },
+      "input_artifact_ids": [
+        "iris-v4-ins16-shot",
+        "iris-v4-ins16-scene",
+        "iris-c-v4-ins16-first-frame"
+      ],
+      "output_asset_id": "canvas-video-baf3b697bd30a27b7770af895ca2e67e",
+      "continuity_binding": null,
+      "hard_cut_keyframe_binding": null,
+      "seal_terminal_frame": false
+    },
+    "inputs": {
+      "projection_hash": "0e0e9ea51f76385d72b22540e78443f779e4bb92e8c553260156874e2d604661",
+      "facts_hash": "55c19085cc153db49fd50929d1b4275f86f89b51e63633a3a55063c9a61903bb",
+      "rubric_hash": "78021cbfa8b2b841f8d3164518e06f7cdf3914fc12f844159d873693d764afc0",
+      "policy": {
+        "policy_id": "generation-decision",
+        "version": "3",
+        "repeated_failure_threshold": 3,
+        "max_resamples": 0,
+        "allow_bounded_exploration": true
+      },
+      "limits": {
+        "task_id": "iris-v4-ins16-source-001",
+        "generation_forbidden": false,
+        "allowed_remote_candidates": [
+          "jimeng/jimeng-seedance-2.0-vip-first-frame-v1"
+        ],
+        "paid_submit_ceiling": 1,
+        "paid_submits_used": 0,
+        "local_batch_limit": 1,
+        "local_batch_used": 0,
+        "local_total_limit": null,
+        "local_total_used": 0,
+        "local_resource_available": false,
+        "batch_review_evidence_hash": null
+      },
+      "candidates": [
+        {
+          "candidate_id": "jimeng/jimeng-seedance-2.0-vip-first-frame-v1",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+            "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+            "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+          },
+          "capabilities": {
+            "provider_name": "jimeng",
+            "variants": [
+              {
+                "capability_id": "jimeng-seedance-2.0-vip-first-frame-v1",
+                "provider_kind": "jimeng",
+                "model_id": "seedance_2.0_vip",
+                "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+                "execution_kind": "remote",
+                "billing_kind": "metered",
+                "mode": "image_to_video",
+                "output": null,
+                "output_capability": {
+                  "min_duration_seconds": 4,
+                  "max_duration_seconds": 15,
+                  "provider_selected_duration": false,
+                  "timing_modes": [
+                    "nominal_seconds"
+                  ],
+                  "frame_count_min": null,
+                  "frame_count_max": null,
+                  "frame_count_step": null,
+                  "frame_count_remainder": null,
+                  "dimension_modes": [
+                    "adaptive"
+                  ],
+                  "resolution_labels": [
+                    "720p",
+                    "1080p",
+                    "4k"
+                  ],
+                  "ratios": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:3",
+                    "3:4"
+                  ],
+                  "fps_values": [
+                    null
+                  ],
+                  "containers": [
+                    "mp4"
+                  ],
+                  "native_audio_options": [
+                    true
+                  ]
+                },
+                "allowed_image_roles": [
+                  "first_frame"
+                ],
+                "required_first_frame": true,
+                "max_reference_count": 0,
+                "allowed_image_mime_types": [
+                  "image/png",
+                  "image/jpeg",
+                  "image/webp"
+                ],
+                "max_image_bytes": 52428800,
+                "min_image_width": 1,
+                "min_image_height": 1,
+                "media_capabilities": [],
+                "negative_prompt_supported": false,
+                "seed_supported": false,
+                "fps_supported": false,
+                "idempotent_submit": false,
+                "lookup_supported": true,
+                "output_recovery_strategy": "REQUERY_BY_EFFECT_ID",
+                "binding_cardinality_constraints": [
+                  {
+                    "roles": [
+                      "first_frame"
+                    ],
+                    "min_count": 1,
+                    "max_count": 1
+                  },
+                  {
+                    "roles": [
+                      "last_frame"
+                    ],
+                    "min_count": 0,
+                    "max_count": 0
+                  },
+                  {
+                    "roles": [
+                      "reference"
+                    ],
+                    "min_count": 0,
+                    "max_count": 0
+                  }
+                ],
+                "production_qualification": "UNQUALIFIED"
+              }
+            ],
+            "capabilities_fingerprint": "278aabbc4512c9f3a1542e07ab9a73536a4fc99025f353ce6759caf239b85e76"
+          },
+          "capability_id": "jimeng-seedance-2.0-vip-first-frame-v1",
+          "compiler_contract": {
+            "compiler_id": "jimeng-seedance-2.0-vip-first-frame-video-compiler",
+            "compiler_version": "1",
+            "compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0"
+          },
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 4,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "4k",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "recipe": {
+            "contract_version": "generation-recipe/1",
+            "seed": {
+              "kind": "uncontrolled",
+              "value": null
+            },
+            "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622",
+            "compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0",
+            "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+            "rubric_hash": "78021cbfa8b2b841f8d3164518e06f7cdf3914fc12f844159d873693d764afc0",
+            "acceptance_policy": {
+              "domain_id": "iris-source",
+              "profile_id": "iris-v4-ins16-raw",
+              "profile_version": "1",
+              "profile_content_hash": "78021cbfa8b2b841f8d3164518e06f7cdf3914fc12f844159d873693d764afc0",
+              "profile_payload": {
+                "content_hash": "78021cbfa8b2b841f8d3164518e06f7cdf3914fc12f844159d873693d764afc0",
+                "domain_id": "iris-source",
+                "generation_requirements": [
+                  {
+                    "dimension": "performance",
+                    "intent_paths": [
+                      "generation_intent.reference_planning.contract_version",
+                      "generation_intent.reference_planning.facets.0",
+                      "generation_intent.reference_planning.structure",
+                      "generation_intent.reference_planning.natural_generation.0",
+                      "generation_intent.reference_planning.natural_generation.1",
+                      "generation_intent.reference_planning.natural_generation.2",
+                      "generation_intent.reference_planning.director_coverage.coverage_hash",
+                      "generation_intent.reference_planning.director_coverage.unit_id",
+                      "generation_intent.reference_planning.preview_approval.approval_hash",
+                      "generation_intent.open_state.kind",
+                      "generation_intent.open_state.state_text",
+                      "generation_intent.open_state.required_change",
+                      "generation_intent.close_state.kind",
+                      "generation_intent.close_state.state_text",
+                      "generation_intent.close_state.required_change",
+                      "generation_intent.scene_continuity.scene_id",
+                      "generation_intent.scene_continuity.time_of_day",
+                      "generation_intent.scene_continuity.mood",
+                      "generation_intent.scene_continuity.state_constraints.0",
+                      "generation_intent.scene_continuity.state_constraints.1",
+                      "generation_intent.subject_action.start_state",
+                      "generation_intent.subject_action.progression",
+                      "generation_intent.subject_action.endpoint.state_text",
+                      "generation_intent.subject_action.endpoint.required_change",
+                      "generation_intent.motion_envelope.onset",
+                      "generation_intent.motion_envelope.peak",
+                      "generation_intent.motion_envelope.settle",
+                      "generation_intent.motion_envelope.direction",
+                      "generation_intent.motion_envelope.amplitude_class",
+                      "generation_intent.pacing.cadence",
+                      "generation_intent.pacing.tempo_class",
+                      "generation_intent.pacing.shot_duration_seconds",
+                      "generation_intent.performance_intent.trigger",
+                      "generation_intent.performance_intent.visible_response",
+                      "generation_intent.performance_intent.gaze_target",
+                      "generation_intent.performance_intent.body_behavior",
+                      "generation_intent.performance_intent.hand_behavior",
+                      "generation_intent.performance_intent.terminal_performance_state",
+                      "generation_intent.lighting_intent.motivated_source",
+                      "generation_intent.lighting_intent.direction",
+                      "generation_intent.lighting_intent.exposure_priority",
+                      "generation_intent.lighting_intent.continuity_state"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                    "native_text": [
+                      "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                    ],
+                    "native_text_mapping": {
+                      "bindings": [
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.contract_version"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.facets.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.structure"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.natural_generation.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.natural_generation.1"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.natural_generation.2"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.director_coverage.coverage_hash"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.director_coverage.unit_id"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.preview_approval.approval_hash"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.open_state.kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.open_state.state_text"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.open_state.required_change"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.close_state.kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.close_state.state_text"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.close_state.required_change"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.scene_id"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.time_of_day"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.mood"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.state_constraints.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.state_constraints.1"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.start_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.progression"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.endpoint.required_change"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.onset"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.peak"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.settle"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.amplitude_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.pacing.cadence"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.pacing.tempo_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.pacing.shot_duration_seconds"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.trigger"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.visible_response"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.gaze_target"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.body_behavior"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.hand_behavior"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.motivated_source"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.exposure_priority"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.continuity_state"
+                        }
+                      ],
+                      "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b"
+                    },
+                    "observable": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "performance",
+                    "semantics": {
+                      "category": "narrative_critical",
+                      "hard_basis": {
+                        "kind": "approved_narrative",
+                        "locator": "row.shot.continuity_constraints",
+                        "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。",
+                        "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                      },
+                      "intent_role": "must_happen",
+                      "source_refs": [
+                        {
+                          "intent_item_id": "performance",
+                          "locator": "row.shot.continuity_constraints",
+                          "origin": "director_choice",
+                          "quote": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                          "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                        }
+                      ],
+                      "version": "requirement-semantics/1"
+                    },
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS"
+                  },
+                  {
+                    "dimension": "camera",
+                    "intent_paths": [
+                      "generation_intent.space_continuity.subject_position",
+                      "generation_intent.space_continuity.screen_direction",
+                      "generation_intent.space_continuity.crossing_policy",
+                      "generation_intent.axis_continuity.camera_axis",
+                      "generation_intent.axis_continuity.framing_continuity",
+                      "generation_intent.axis_continuity.crossing_policy",
+                      "generation_intent.camera_intent.movement",
+                      "generation_intent.camera_intent.stability",
+                      "generation_intent.camera_intent.framing_intent",
+                      "generation_intent.camera_intent.expression_strength",
+                      "generation_intent.camera_endpoint.start_framing",
+                      "generation_intent.camera_endpoint.end_framing",
+                      "generation_intent.camera_endpoint.position_lock",
+                      "generation_intent.camera_endpoint.orientation_lock",
+                      "generation_intent.primary_camera_motion.movement_kind",
+                      "generation_intent.primary_camera_motion.direction",
+                      "generation_intent.primary_camera_motion.amplitude_class",
+                      "generation_intent.primary_camera_motion.speed_class",
+                      "generation_intent.primary_camera_motion.start_motion_state",
+                      "generation_intent.primary_camera_motion.end_motion_state",
+                      "generation_intent.camera_subject_relation.subject_id",
+                      "generation_intent.camera_subject_relation.relation_kind",
+                      "generation_intent.camera_subject_relation.start_relation",
+                      "generation_intent.camera_subject_relation.end_relation"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                    "native_text": [
+                      "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                    ],
+                    "native_text_mapping": {
+                      "bindings": [
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.space_continuity.subject_position"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.space_continuity.screen_direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.space_continuity.crossing_policy"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.axis_continuity.camera_axis"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.axis_continuity.framing_continuity"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.axis_continuity.crossing_policy"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.movement"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.stability"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.framing_intent"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.expression_strength"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.start_framing"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.end_framing"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.position_lock"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.orientation_lock"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.movement_kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.amplitude_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.speed_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.start_motion_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.subject_id"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.relation_kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.start_relation"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.end_relation"
+                        }
+                      ],
+                      "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b"
+                    },
+                    "observable": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "camera",
+                    "semantics": {
+                      "category": "narrative_critical",
+                      "hard_basis": {
+                        "kind": "approved_narrative",
+                        "locator": "row.shot.continuity_constraints",
+                        "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。",
+                        "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                      },
+                      "intent_role": "must_happen",
+                      "source_refs": [
+                        {
+                          "intent_item_id": "camera",
+                          "locator": "row.shot.continuity_constraints",
+                          "origin": "director_choice",
+                          "quote": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                          "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                        }
+                      ],
+                      "version": "requirement-semantics/1"
+                    },
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS"
+                  },
+                  {
+                    "dimension": "no-new-graphics",
+                    "intent_paths": [
+                      "generation_intent.visual_treatment.medium_look",
+                      "generation_intent.visual_treatment.palette",
+                      "generation_intent.visual_treatment.material_treatment",
+                      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                      "generation_intent.ambience_intent.environment_bed",
+                      "generation_intent.ambience_intent.explicitly_silent",
+                      "generation_intent.dialogue_intent.mode",
+                      "generation_intent.dialogue_intent.lip_sync_required",
+                      "generation_intent.music_intent.mode"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                    "native_text": [
+                      "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                    ],
+                    "native_text_mapping": {
+                      "bindings": [
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.medium_look"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.palette"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.material_treatment"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.ambience_intent.environment_bed"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.ambience_intent.explicitly_silent"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.dialogue_intent.mode"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.dialogue_intent.lip_sync_required"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.music_intent.mode"
+                        }
+                      ],
+                      "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b"
+                    },
+                    "observable": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "no-new-graphics",
+                    "semantics": {
+                      "category": "narrative_critical",
+                      "hard_basis": {
+                        "kind": "approved_narrative",
+                        "locator": "row.shot.continuity_constraints",
+                        "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。",
+                        "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                      },
+                      "intent_role": "must_happen",
+                      "source_refs": [
+                        {
+                          "intent_item_id": "no-new-graphics",
+                          "locator": "row.shot.continuity_constraints",
+                          "origin": "director_choice",
+                          "quote": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                          "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                        }
+                      ],
+                      "version": "requirement-semantics/1"
+                    },
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS"
+                  }
+                ],
+                "measurement_contract_version": "iris-exact-mp4-review/1",
+                "profile_id": "iris-v4-ins16-raw",
+                "profile_version": "1",
+                "required_requirement_ids": [
+                  "performance",
+                  "camera",
+                  "no-new-graphics"
+                ],
+                "requirement_semantics_version": "requirement-semantics/1"
+              },
+              "measurement_contract_version": "iris-exact-mp4-review/1",
+              "required_requirement_ids": [
+                "performance",
+                "camera",
+                "no-new-graphics"
+              ]
+            },
+            "expressions": [
+              {
+                "requirement_id": "camera",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "camera",
+                "observable": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS",
+                "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.space_continuity.subject_position",
+                  "generation_intent.space_continuity.screen_direction",
+                  "generation_intent.space_continuity.crossing_policy",
+                  "generation_intent.axis_continuity.camera_axis",
+                  "generation_intent.axis_continuity.framing_continuity",
+                  "generation_intent.axis_continuity.crossing_policy",
+                  "generation_intent.camera_intent.movement",
+                  "generation_intent.camera_intent.stability",
+                  "generation_intent.camera_intent.framing_intent",
+                  "generation_intent.camera_intent.expression_strength",
+                  "generation_intent.camera_endpoint.start_framing",
+                  "generation_intent.camera_endpoint.end_framing",
+                  "generation_intent.camera_endpoint.position_lock",
+                  "generation_intent.camera_endpoint.orientation_lock",
+                  "generation_intent.primary_camera_motion.movement_kind",
+                  "generation_intent.primary_camera_motion.direction",
+                  "generation_intent.primary_camera_motion.amplitude_class",
+                  "generation_intent.primary_camera_motion.speed_class",
+                  "generation_intent.primary_camera_motion.start_motion_state",
+                  "generation_intent.primary_camera_motion.end_motion_state",
+                  "generation_intent.camera_subject_relation.subject_id",
+                  "generation_intent.camera_subject_relation.relation_kind",
+                  "generation_intent.camera_subject_relation.start_relation",
+                  "generation_intent.camera_subject_relation.end_relation"
+                ],
+                "native_text": [
+                  "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                ],
+                "production_owner": "shot_authoring",
+                "semantics": {
+                  "version": "requirement-semantics/1",
+                  "category": "narrative_critical",
+                  "intent_role": "must_happen",
+                  "source_refs": [
+                    {
+                      "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                      "locator": "row.shot.continuity_constraints",
+                      "intent_item_id": "camera",
+                      "quote": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                      "origin": "director_choice"
+                    }
+                  ],
+                  "hard_basis": {
+                    "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                    "locator": "row.shot.continuity_constraints",
+                    "kind": "approved_narrative",
+                    "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。"
+                  },
+                  "derived_from": []
+                },
+                "native_text_mapping": {
+                  "contract_version": "native-text-mapping/1",
+                  "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b",
+                  "bindings": [
+                    {
+                      "intent_path": "generation_intent.space_continuity.subject_position",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.space_continuity.screen_direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.space_continuity.crossing_policy",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.axis_continuity.camera_axis",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.axis_continuity.framing_continuity",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.axis_continuity.crossing_policy",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.movement",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.stability",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.framing_intent",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.expression_strength",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.start_framing",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.end_framing",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.position_lock",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.orientation_lock",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.movement_kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.amplitude_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.speed_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.start_motion_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.subject_id",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.relation_kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.start_relation",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.end_relation",
+                      "fragment_indices": [
+                        0
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "requirement_id": "no-new-graphics",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "no-new-graphics",
+                "observable": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS",
+                "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.visual_treatment.medium_look",
+                  "generation_intent.visual_treatment.palette",
+                  "generation_intent.visual_treatment.material_treatment",
+                  "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                  "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                  "generation_intent.ambience_intent.environment_bed",
+                  "generation_intent.ambience_intent.explicitly_silent",
+                  "generation_intent.dialogue_intent.mode",
+                  "generation_intent.dialogue_intent.lip_sync_required",
+                  "generation_intent.music_intent.mode"
+                ],
+                "native_text": [
+                  "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                ],
+                "production_owner": "shot_authoring",
+                "semantics": {
+                  "version": "requirement-semantics/1",
+                  "category": "narrative_critical",
+                  "intent_role": "must_happen",
+                  "source_refs": [
+                    {
+                      "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                      "locator": "row.shot.continuity_constraints",
+                      "intent_item_id": "no-new-graphics",
+                      "quote": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                      "origin": "director_choice"
+                    }
+                  ],
+                  "hard_basis": {
+                    "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                    "locator": "row.shot.continuity_constraints",
+                    "kind": "approved_narrative",
+                    "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。"
+                  },
+                  "derived_from": []
+                },
+                "native_text_mapping": {
+                  "contract_version": "native-text-mapping/1",
+                  "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b",
+                  "bindings": [
+                    {
+                      "intent_path": "generation_intent.visual_treatment.medium_look",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.palette",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.material_treatment",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.ambience_intent.environment_bed",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.ambience_intent.explicitly_silent",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.dialogue_intent.mode",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.dialogue_intent.lip_sync_required",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.music_intent.mode",
+                      "fragment_indices": [
+                        0
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "requirement_id": "performance",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "performance",
+                "observable": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS",
+                "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.reference_planning.contract_version",
+                  "generation_intent.reference_planning.facets.0",
+                  "generation_intent.reference_planning.structure",
+                  "generation_intent.reference_planning.natural_generation.0",
+                  "generation_intent.reference_planning.natural_generation.1",
+                  "generation_intent.reference_planning.natural_generation.2",
+                  "generation_intent.reference_planning.director_coverage.coverage_hash",
+                  "generation_intent.reference_planning.director_coverage.unit_id",
+                  "generation_intent.reference_planning.preview_approval.approval_hash",
+                  "generation_intent.open_state.kind",
+                  "generation_intent.open_state.state_text",
+                  "generation_intent.open_state.required_change",
+                  "generation_intent.close_state.kind",
+                  "generation_intent.close_state.state_text",
+                  "generation_intent.close_state.required_change",
+                  "generation_intent.scene_continuity.scene_id",
+                  "generation_intent.scene_continuity.time_of_day",
+                  "generation_intent.scene_continuity.mood",
+                  "generation_intent.scene_continuity.state_constraints.0",
+                  "generation_intent.scene_continuity.state_constraints.1",
+                  "generation_intent.subject_action.start_state",
+                  "generation_intent.subject_action.progression",
+                  "generation_intent.subject_action.endpoint.state_text",
+                  "generation_intent.subject_action.endpoint.required_change",
+                  "generation_intent.motion_envelope.onset",
+                  "generation_intent.motion_envelope.peak",
+                  "generation_intent.motion_envelope.settle",
+                  "generation_intent.motion_envelope.direction",
+                  "generation_intent.motion_envelope.amplitude_class",
+                  "generation_intent.pacing.cadence",
+                  "generation_intent.pacing.tempo_class",
+                  "generation_intent.pacing.shot_duration_seconds",
+                  "generation_intent.performance_intent.trigger",
+                  "generation_intent.performance_intent.visible_response",
+                  "generation_intent.performance_intent.gaze_target",
+                  "generation_intent.performance_intent.body_behavior",
+                  "generation_intent.performance_intent.hand_behavior",
+                  "generation_intent.performance_intent.terminal_performance_state",
+                  "generation_intent.lighting_intent.motivated_source",
+                  "generation_intent.lighting_intent.direction",
+                  "generation_intent.lighting_intent.exposure_priority",
+                  "generation_intent.lighting_intent.continuity_state"
+                ],
+                "native_text": [
+                  "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                ],
+                "production_owner": "shot_authoring",
+                "semantics": {
+                  "version": "requirement-semantics/1",
+                  "category": "narrative_critical",
+                  "intent_role": "must_happen",
+                  "source_refs": [
+                    {
+                      "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                      "locator": "row.shot.continuity_constraints",
+                      "intent_item_id": "performance",
+                      "quote": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                      "origin": "director_choice"
+                    }
+                  ],
+                  "hard_basis": {
+                    "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                    "locator": "row.shot.continuity_constraints",
+                    "kind": "approved_narrative",
+                    "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。"
+                  },
+                  "derived_from": []
+                },
+                "native_text_mapping": {
+                  "contract_version": "native-text-mapping/1",
+                  "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b",
+                  "bindings": [
+                    {
+                      "intent_path": "generation_intent.reference_planning.contract_version",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.facets.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.structure",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.natural_generation.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.natural_generation.1",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.natural_generation.2",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.director_coverage.coverage_hash",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.director_coverage.unit_id",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.preview_approval.approval_hash",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.open_state.kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.open_state.state_text",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.open_state.required_change",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.close_state.kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.close_state.state_text",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.close_state.required_change",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.scene_id",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.time_of_day",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.mood",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.state_constraints.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.state_constraints.1",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.start_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.progression",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.endpoint.required_change",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.onset",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.peak",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.settle",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.amplitude_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.pacing.cadence",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.pacing.tempo_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.pacing.shot_duration_seconds",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.trigger",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.visible_response",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.gaze_target",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.body_behavior",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.hand_behavior",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.motivated_source",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.exposure_priority",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.continuity_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "editorial_operations": [],
+            "comparison": null
+          },
+          "final_output_goal": {
+            "goal_id": "iris-v4-ins16-source",
+            "goal_version": "1",
+            "user_goal": "分镜 v4 INS16 四秒源片（INS16）；不代表整集或人工验收",
+            "requirements": [
+              {
+                "requirement_id": "performance",
+                "observable": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "camera",
+                "observable": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "no-new-graphics",
+                "observable": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                "proof": "human"
+              }
+            ]
+          }
+        }
+      ],
+      "evidence": [],
+      "latest_attempt_hash": null,
+      "interventions": [],
+      "conflicts": [],
+      "historical_recipes": [],
+      "baseline_request": null,
+      "user_fixed_candidates": [],
+      "experiences": [],
+      "feature_scope": {
+        "version": "generation-features/1",
+        "character_count": 0,
+        "motion_requirement": "character_action",
+        "camera_movement": "locked",
+        "camera_amplitude": "subtle",
+        "dialogue_length_band": "none",
+        "dialogue_window_band": "unknown",
+        "reference_structure": [
+          "first_frame"
+        ],
+        "continuity": "none",
+        "identity_preservation": "unspecified",
+        "audio_need": "optional",
+        "duration_band": "1",
+        "output_geometry": [
+          null,
+          null,
+          null
+        ],
+        "unknown_features": [
+          "action_complexity",
+          "hand_prop_interaction"
+        ]
+      },
+      "runtime_repairs": []
+    },
+    "decision": {
+      "snapshot_hash": "5cabd1a304f34e6d7f8bf3b7fc9e6f5c179d02c59ec13ca3e53c318c00a946bf",
+      "disposition": "GENERATE_ONCE",
+      "selected_candidate_id": "jimeng/jimeng-seedance-2.0-vip-first-frame-v1",
+      "assessments": [
+        {
+          "candidate_id": "jimeng/jimeng-seedance-2.0-vip-first-frame-v1",
+          "scope_hash": "493268524994f2460c10631f4d9fb372767a278ec7c3ba5715c6bfe4751d8840",
+          "fit": "unknown",
+          "compatible": true,
+          "executable": true,
+          "supported_dimensions": [],
+          "failed_dimensions": [],
+          "unknown_dimensions": [
+            "camera",
+            "no-new-graphics",
+            "performance"
+          ],
+          "evidence_hashes": [],
+          "ignored_evidence_hashes": [],
+          "sample_count": 0,
+          "pass_count": 0,
+          "fail_count": 0,
+          "not_evaluated_count": 0,
+          "runtime_failure_count": 0,
+          "unknown_outcome_count": 0,
+          "not_submitted_count": 0,
+          "reasons": [],
+          "empirical": {
+            "version": "generation-cohort/1",
+            "supported_artifacts": [],
+            "failed_artifacts": [],
+            "incomplete_artifacts": [],
+            "evidence_hashes": [],
+            "exclusions": [],
+            "failed_requirements": [],
+            "observed_success_fraction": null,
+            "interval_95": null,
+            "limitations": [
+              "observational cohort; selection and intervention confounding remain",
+              "unknown action complexity and hand/prop interaction are not matched",
+              "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+            ]
+          }
+        }
+      ],
+      "diagnosis": null,
+      "intervention": null,
+      "runtime_repair": null,
+      "routing": {
+        "decision": {
+          "target_shot_id": "ep01v4-ins16",
+          "target_shot_revision": 1,
+          "target_shot_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+          "continuity_mode": "none",
+          "semantic_continuity_state": null,
+          "required_mode": "image_to_video",
+          "selected_mode": "image_to_video",
+          "required_binding_roles": [
+            "first_frame"
+          ],
+          "input_assets": [
+            {
+              "role": "first_frame",
+              "asset_id": "iris-c-v4-ins16-first-frame",
+              "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+              "source_registry_revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+              "canonical_owner_kind": null,
+              "canonical_owner_id": null,
+              "canonical_owner_content_hash": null,
+              "mime_type": "image/png",
+              "size_bytes": 2256345,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            }
+          ],
+          "provider_name": "jimeng",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+            "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+            "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+          },
+          "provider_capabilities_fingerprint": "278aabbc4512c9f3a1542e07ab9a73536a4fc99025f353ce6759caf239b85e76",
+          "selected_capability_id": "jimeng-seedance-2.0-vip-first-frame-v1",
+          "selected_capability_fingerprint": "31d2fd62f7ba4cdf66dde68e8278260fb9b9d24f89090f2c3b06faa95b0cccd1",
+          "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+          "continuity_transition_policy_hash": null,
+          "previous_provider_bound_request_hash": null,
+          "continuity_provider_route_binding_hash": null,
+          "execution_kind": "remote",
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 4,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "4k",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "reason_codes": [
+            "CANONICAL_REFERENCES_ENABLE_R2V"
+          ],
+          "rationale": "Bind the verified neutral requirement to the exact capability.",
+          "policy": {
+            "policy_id": "iris-v4-ins16-qualification",
+            "policy_version": "1",
+            "policy_sha256": "0aadd80e9318dbb62242c4f5e0d580fc42f266cf1aa471b792351dcfd12cff16"
+          },
+          "outcome": "selected",
+          "semantic_routing_hash": "1c64f25c939cb88f4a613c31ecc0ad79f86a6598a04803d627053203b90027a8",
+          "audit_decision_hash": "d26fc7afdef7e60a7903186478cbebb2bd9bcf31534cf7bb2170cfd7a01a7f63"
+        },
+        "provider_bound_request": {
+          "plan_hash": "7f04879a20cbd377af992ecee8effe83b5c1f559bfbbd1c10e98f66a5498cef6",
+          "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+          "verified_projection_hash": "0e0e9ea51f76385d72b22540e78443f779e4bb92e8c553260156874e2d604661",
+          "target_shot_id": "ep01v4-ins16",
+          "target_shot_revision": 1,
+          "target_shot_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+          "semantic_routing_hash": "1c64f25c939cb88f4a613c31ecc0ad79f86a6598a04803d627053203b90027a8",
+          "audit_decision_hash": "d26fc7afdef7e60a7903186478cbebb2bd9bcf31534cf7bb2170cfd7a01a7f63",
+          "provider_name": "jimeng",
+          "provider_kind": "jimeng",
+          "model_id": "seedance_2.0_vip",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+            "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+            "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+          },
+          "capability_id": "jimeng-seedance-2.0-vip-first-frame-v1",
+          "capability_fingerprint": "31d2fd62f7ba4cdf66dde68e8278260fb9b9d24f89090f2c3b06faa95b0cccd1",
+          "execution_kind": "remote",
+          "billing_kind": "metered",
+          "mode": "image_to_video",
+          "binding_roles": [
+            "first_frame"
+          ],
+          "input_assets": [
+            {
+              "role": "first_frame",
+              "asset_id": "iris-c-v4-ins16-first-frame",
+              "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+              "source_registry_revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+              "canonical_owner_kind": null,
+              "canonical_owner_id": null,
+              "canonical_owner_content_hash": null,
+              "mime_type": "image/png",
+              "size_bytes": 2256345,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            }
+          ],
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 4,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "4k",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "lifecycle": {
+            "generation_id": "canvas-generation-baf3b697bd30a27b7770af895ca2e67e",
+            "target_asset_role": "primary_visual",
+            "base_project": {
+              "path": "state/projects/project.1.d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4.yaml",
+              "revision": 1,
+              "content_hash": "d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4",
+              "file_sha256": "39561f3edfc679c9c3333acf95dfcc610434519aa4d0a36d45e4db69f3f8d368"
+            },
+            "base_registry": {
+              "path": "assets/registry.2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96.json",
+              "revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+              "content_hash": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+              "file_sha256": "4e5140567493d3480df3664a60079d95f6d57a7905ced51b3338e61d38e6d654"
+            },
+            "base_dependency_graph": {
+              "revision_id": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+              "content_hash": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+              "path": "state/dependency_graph.277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da.json",
+              "file_sha256": "ebf1f564ecb5e673f9deb8e112c8680a1c047f09965c6a62bb2a1930647200eb"
+            },
+            "input_artifact_ids": [
+              "iris-v4-ins16-shot",
+              "iris-v4-ins16-scene",
+              "iris-c-v4-ins16-first-frame"
+            ],
+            "output_asset_id": "canvas-video-baf3b697bd30a27b7770af895ca2e67e",
+            "continuity_binding": null,
+            "hard_cut_keyframe_binding": null,
+            "seal_terminal_frame": false
+          },
+          "compiler_contract": {
+            "compiler_id": "jimeng-seedance-2.0-vip-first-frame-video-compiler",
+            "compiler_version": "1",
+            "compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0"
+          },
+          "expression_strength": "semantic_prompt_allowed",
+          "generation_recipe": {
+            "contract_version": "generation-recipe/1",
+            "seed": {
+              "kind": "uncontrolled",
+              "value": null
+            },
+            "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622",
+            "compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0",
+            "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+            "rubric_hash": "78021cbfa8b2b841f8d3164518e06f7cdf3914fc12f844159d873693d764afc0",
+            "acceptance_policy": {
+              "domain_id": "iris-source",
+              "profile_id": "iris-v4-ins16-raw",
+              "profile_version": "1",
+              "profile_content_hash": "78021cbfa8b2b841f8d3164518e06f7cdf3914fc12f844159d873693d764afc0",
+              "profile_payload": {
+                "content_hash": "78021cbfa8b2b841f8d3164518e06f7cdf3914fc12f844159d873693d764afc0",
+                "domain_id": "iris-source",
+                "generation_requirements": [
+                  {
+                    "dimension": "performance",
+                    "intent_paths": [
+                      "generation_intent.reference_planning.contract_version",
+                      "generation_intent.reference_planning.facets.0",
+                      "generation_intent.reference_planning.structure",
+                      "generation_intent.reference_planning.natural_generation.0",
+                      "generation_intent.reference_planning.natural_generation.1",
+                      "generation_intent.reference_planning.natural_generation.2",
+                      "generation_intent.reference_planning.director_coverage.coverage_hash",
+                      "generation_intent.reference_planning.director_coverage.unit_id",
+                      "generation_intent.reference_planning.preview_approval.approval_hash",
+                      "generation_intent.open_state.kind",
+                      "generation_intent.open_state.state_text",
+                      "generation_intent.open_state.required_change",
+                      "generation_intent.close_state.kind",
+                      "generation_intent.close_state.state_text",
+                      "generation_intent.close_state.required_change",
+                      "generation_intent.scene_continuity.scene_id",
+                      "generation_intent.scene_continuity.time_of_day",
+                      "generation_intent.scene_continuity.mood",
+                      "generation_intent.scene_continuity.state_constraints.0",
+                      "generation_intent.scene_continuity.state_constraints.1",
+                      "generation_intent.subject_action.start_state",
+                      "generation_intent.subject_action.progression",
+                      "generation_intent.subject_action.endpoint.state_text",
+                      "generation_intent.subject_action.endpoint.required_change",
+                      "generation_intent.motion_envelope.onset",
+                      "generation_intent.motion_envelope.peak",
+                      "generation_intent.motion_envelope.settle",
+                      "generation_intent.motion_envelope.direction",
+                      "generation_intent.motion_envelope.amplitude_class",
+                      "generation_intent.pacing.cadence",
+                      "generation_intent.pacing.tempo_class",
+                      "generation_intent.pacing.shot_duration_seconds",
+                      "generation_intent.performance_intent.trigger",
+                      "generation_intent.performance_intent.visible_response",
+                      "generation_intent.performance_intent.gaze_target",
+                      "generation_intent.performance_intent.body_behavior",
+                      "generation_intent.performance_intent.hand_behavior",
+                      "generation_intent.performance_intent.terminal_performance_state",
+                      "generation_intent.lighting_intent.motivated_source",
+                      "generation_intent.lighting_intent.direction",
+                      "generation_intent.lighting_intent.exposure_priority",
+                      "generation_intent.lighting_intent.continuity_state"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                    "native_text": [
+                      "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                    ],
+                    "native_text_mapping": {
+                      "bindings": [
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.contract_version"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.facets.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.structure"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.natural_generation.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.natural_generation.1"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.natural_generation.2"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.director_coverage.coverage_hash"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.director_coverage.unit_id"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.reference_planning.preview_approval.approval_hash"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.open_state.kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.open_state.state_text"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.open_state.required_change"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.close_state.kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.close_state.state_text"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.close_state.required_change"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.scene_id"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.time_of_day"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.mood"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.state_constraints.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.scene_continuity.state_constraints.1"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.start_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.progression"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.endpoint.state_text"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.subject_action.endpoint.required_change"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.onset"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.peak"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.settle"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.motion_envelope.amplitude_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.pacing.cadence"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.pacing.tempo_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.pacing.shot_duration_seconds"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.trigger"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.visible_response"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.gaze_target"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.body_behavior"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.hand_behavior"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.performance_intent.terminal_performance_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.motivated_source"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.exposure_priority"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.lighting_intent.continuity_state"
+                        }
+                      ],
+                      "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b"
+                    },
+                    "observable": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "performance",
+                    "semantics": {
+                      "category": "narrative_critical",
+                      "hard_basis": {
+                        "kind": "approved_narrative",
+                        "locator": "row.shot.continuity_constraints",
+                        "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。",
+                        "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                      },
+                      "intent_role": "must_happen",
+                      "source_refs": [
+                        {
+                          "intent_item_id": "performance",
+                          "locator": "row.shot.continuity_constraints",
+                          "origin": "director_choice",
+                          "quote": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                          "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                        }
+                      ],
+                      "version": "requirement-semantics/1"
+                    },
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS"
+                  },
+                  {
+                    "dimension": "camera",
+                    "intent_paths": [
+                      "generation_intent.space_continuity.subject_position",
+                      "generation_intent.space_continuity.screen_direction",
+                      "generation_intent.space_continuity.crossing_policy",
+                      "generation_intent.axis_continuity.camera_axis",
+                      "generation_intent.axis_continuity.framing_continuity",
+                      "generation_intent.axis_continuity.crossing_policy",
+                      "generation_intent.camera_intent.movement",
+                      "generation_intent.camera_intent.stability",
+                      "generation_intent.camera_intent.framing_intent",
+                      "generation_intent.camera_intent.expression_strength",
+                      "generation_intent.camera_endpoint.start_framing",
+                      "generation_intent.camera_endpoint.end_framing",
+                      "generation_intent.camera_endpoint.position_lock",
+                      "generation_intent.camera_endpoint.orientation_lock",
+                      "generation_intent.primary_camera_motion.movement_kind",
+                      "generation_intent.primary_camera_motion.direction",
+                      "generation_intent.primary_camera_motion.amplitude_class",
+                      "generation_intent.primary_camera_motion.speed_class",
+                      "generation_intent.primary_camera_motion.start_motion_state",
+                      "generation_intent.primary_camera_motion.end_motion_state",
+                      "generation_intent.camera_subject_relation.subject_id",
+                      "generation_intent.camera_subject_relation.relation_kind",
+                      "generation_intent.camera_subject_relation.start_relation",
+                      "generation_intent.camera_subject_relation.end_relation"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                    "native_text": [
+                      "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                    ],
+                    "native_text_mapping": {
+                      "bindings": [
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.space_continuity.subject_position"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.space_continuity.screen_direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.space_continuity.crossing_policy"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.axis_continuity.camera_axis"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.axis_continuity.framing_continuity"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.axis_continuity.crossing_policy"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.movement"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.stability"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.framing_intent"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_intent.expression_strength"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.start_framing"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.end_framing"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.position_lock"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_endpoint.orientation_lock"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.movement_kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.direction"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.amplitude_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.speed_class"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.start_motion_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.primary_camera_motion.end_motion_state"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.subject_id"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.relation_kind"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.start_relation"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.camera_subject_relation.end_relation"
+                        }
+                      ],
+                      "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b"
+                    },
+                    "observable": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "camera",
+                    "semantics": {
+                      "category": "narrative_critical",
+                      "hard_basis": {
+                        "kind": "approved_narrative",
+                        "locator": "row.shot.continuity_constraints",
+                        "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。",
+                        "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                      },
+                      "intent_role": "must_happen",
+                      "source_refs": [
+                        {
+                          "intent_item_id": "camera",
+                          "locator": "row.shot.continuity_constraints",
+                          "origin": "director_choice",
+                          "quote": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                          "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                        }
+                      ],
+                      "version": "requirement-semantics/1"
+                    },
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS"
+                  },
+                  {
+                    "dimension": "no-new-graphics",
+                    "intent_paths": [
+                      "generation_intent.visual_treatment.medium_look",
+                      "generation_intent.visual_treatment.palette",
+                      "generation_intent.visual_treatment.material_treatment",
+                      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                      "generation_intent.ambience_intent.environment_bed",
+                      "generation_intent.ambience_intent.explicitly_silent",
+                      "generation_intent.dialogue_intent.mode",
+                      "generation_intent.dialogue_intent.lip_sync_required",
+                      "generation_intent.music_intent.mode"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                    "native_text": [
+                      "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                    ],
+                    "native_text_mapping": {
+                      "bindings": [
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.medium_look"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.palette"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.material_treatment"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.ambience_intent.environment_bed"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.ambience_intent.explicitly_silent"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.dialogue_intent.mode"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.dialogue_intent.lip_sync_required"
+                        },
+                        {
+                          "fragment_indices": [
+                            0
+                          ],
+                          "intent_path": "generation_intent.music_intent.mode"
+                        }
+                      ],
+                      "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b"
+                    },
+                    "observable": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "no-new-graphics",
+                    "semantics": {
+                      "category": "narrative_critical",
+                      "hard_basis": {
+                        "kind": "approved_narrative",
+                        "locator": "row.shot.continuity_constraints",
+                        "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。",
+                        "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                      },
+                      "intent_role": "must_happen",
+                      "source_refs": [
+                        {
+                          "intent_item_id": "no-new-graphics",
+                          "locator": "row.shot.continuity_constraints",
+                          "origin": "director_choice",
+                          "quote": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                          "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb"
+                        }
+                      ],
+                      "version": "requirement-semantics/1"
+                    },
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS"
+                  }
+                ],
+                "measurement_contract_version": "iris-exact-mp4-review/1",
+                "profile_id": "iris-v4-ins16-raw",
+                "profile_version": "1",
+                "required_requirement_ids": [
+                  "performance",
+                  "camera",
+                  "no-new-graphics"
+                ],
+                "requirement_semantics_version": "requirement-semantics/1"
+              },
+              "measurement_contract_version": "iris-exact-mp4-review/1",
+              "required_requirement_ids": [
+                "performance",
+                "camera",
+                "no-new-graphics"
+              ]
+            },
+            "expressions": [
+              {
+                "requirement_id": "camera",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "camera",
+                "observable": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS",
+                "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.space_continuity.subject_position",
+                  "generation_intent.space_continuity.screen_direction",
+                  "generation_intent.space_continuity.crossing_policy",
+                  "generation_intent.axis_continuity.camera_axis",
+                  "generation_intent.axis_continuity.framing_continuity",
+                  "generation_intent.axis_continuity.crossing_policy",
+                  "generation_intent.camera_intent.movement",
+                  "generation_intent.camera_intent.stability",
+                  "generation_intent.camera_intent.framing_intent",
+                  "generation_intent.camera_intent.expression_strength",
+                  "generation_intent.camera_endpoint.start_framing",
+                  "generation_intent.camera_endpoint.end_framing",
+                  "generation_intent.camera_endpoint.position_lock",
+                  "generation_intent.camera_endpoint.orientation_lock",
+                  "generation_intent.primary_camera_motion.movement_kind",
+                  "generation_intent.primary_camera_motion.direction",
+                  "generation_intent.primary_camera_motion.amplitude_class",
+                  "generation_intent.primary_camera_motion.speed_class",
+                  "generation_intent.primary_camera_motion.start_motion_state",
+                  "generation_intent.primary_camera_motion.end_motion_state",
+                  "generation_intent.camera_subject_relation.subject_id",
+                  "generation_intent.camera_subject_relation.relation_kind",
+                  "generation_intent.camera_subject_relation.start_relation",
+                  "generation_intent.camera_subject_relation.end_relation"
+                ],
+                "native_text": [
+                  "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                ],
+                "production_owner": "shot_authoring",
+                "semantics": {
+                  "version": "requirement-semantics/1",
+                  "category": "narrative_critical",
+                  "intent_role": "must_happen",
+                  "source_refs": [
+                    {
+                      "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                      "locator": "row.shot.continuity_constraints",
+                      "intent_item_id": "camera",
+                      "quote": "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+                      "origin": "director_choice"
+                    }
+                  ],
+                  "hard_basis": {
+                    "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                    "locator": "row.shot.continuity_constraints",
+                    "kind": "approved_narrative",
+                    "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。"
+                  },
+                  "derived_from": []
+                },
+                "native_text_mapping": {
+                  "contract_version": "native-text-mapping/1",
+                  "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b",
+                  "bindings": [
+                    {
+                      "intent_path": "generation_intent.space_continuity.subject_position",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.space_continuity.screen_direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.space_continuity.crossing_policy",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.axis_continuity.camera_axis",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.axis_continuity.framing_continuity",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.axis_continuity.crossing_policy",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.movement",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.stability",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.framing_intent",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_intent.expression_strength",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.start_framing",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.end_framing",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.position_lock",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_endpoint.orientation_lock",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.movement_kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.amplitude_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.speed_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.start_motion_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.primary_camera_motion.end_motion_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.subject_id",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.relation_kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.start_relation",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.camera_subject_relation.end_relation",
+                      "fragment_indices": [
+                        0
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "requirement_id": "no-new-graphics",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "no-new-graphics",
+                "observable": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS",
+                "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.visual_treatment.medium_look",
+                  "generation_intent.visual_treatment.palette",
+                  "generation_intent.visual_treatment.material_treatment",
+                  "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                  "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                  "generation_intent.ambience_intent.environment_bed",
+                  "generation_intent.ambience_intent.explicitly_silent",
+                  "generation_intent.dialogue_intent.mode",
+                  "generation_intent.dialogue_intent.lip_sync_required",
+                  "generation_intent.music_intent.mode"
+                ],
+                "native_text": [
+                  "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                ],
+                "production_owner": "shot_authoring",
+                "semantics": {
+                  "version": "requirement-semantics/1",
+                  "category": "narrative_critical",
+                  "intent_role": "must_happen",
+                  "source_refs": [
+                    {
+                      "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                      "locator": "row.shot.continuity_constraints",
+                      "intent_item_id": "no-new-graphics",
+                      "quote": "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡",
+                      "origin": "director_choice"
+                    }
+                  ],
+                  "hard_basis": {
+                    "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                    "locator": "row.shot.continuity_constraints",
+                    "kind": "approved_narrative",
+                    "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。"
+                  },
+                  "derived_from": []
+                },
+                "native_text_mapping": {
+                  "contract_version": "native-text-mapping/1",
+                  "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b",
+                  "bindings": [
+                    {
+                      "intent_path": "generation_intent.visual_treatment.medium_look",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.palette",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.material_treatment",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.visual_treatment.prohibited_visual_drift.1",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.ambience_intent.environment_bed",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.ambience_intent.explicitly_silent",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.dialogue_intent.mode",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.dialogue_intent.lip_sync_required",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.music_intent.mode",
+                      "fragment_indices": [
+                        0
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "requirement_id": "performance",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "performance",
+                "observable": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                "tolerance": "逐项满足已认可参考与上述职责，未生成前不得判PASS",
+                "measurement": "exact MP4正常速度审看与project-local video-analysis逐项核对",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.reference_planning.contract_version",
+                  "generation_intent.reference_planning.facets.0",
+                  "generation_intent.reference_planning.structure",
+                  "generation_intent.reference_planning.natural_generation.0",
+                  "generation_intent.reference_planning.natural_generation.1",
+                  "generation_intent.reference_planning.natural_generation.2",
+                  "generation_intent.reference_planning.director_coverage.coverage_hash",
+                  "generation_intent.reference_planning.director_coverage.unit_id",
+                  "generation_intent.reference_planning.preview_approval.approval_hash",
+                  "generation_intent.open_state.kind",
+                  "generation_intent.open_state.state_text",
+                  "generation_intent.open_state.required_change",
+                  "generation_intent.close_state.kind",
+                  "generation_intent.close_state.state_text",
+                  "generation_intent.close_state.required_change",
+                  "generation_intent.scene_continuity.scene_id",
+                  "generation_intent.scene_continuity.time_of_day",
+                  "generation_intent.scene_continuity.mood",
+                  "generation_intent.scene_continuity.state_constraints.0",
+                  "generation_intent.scene_continuity.state_constraints.1",
+                  "generation_intent.subject_action.start_state",
+                  "generation_intent.subject_action.progression",
+                  "generation_intent.subject_action.endpoint.state_text",
+                  "generation_intent.subject_action.endpoint.required_change",
+                  "generation_intent.motion_envelope.onset",
+                  "generation_intent.motion_envelope.peak",
+                  "generation_intent.motion_envelope.settle",
+                  "generation_intent.motion_envelope.direction",
+                  "generation_intent.motion_envelope.amplitude_class",
+                  "generation_intent.pacing.cadence",
+                  "generation_intent.pacing.tempo_class",
+                  "generation_intent.pacing.shot_duration_seconds",
+                  "generation_intent.performance_intent.trigger",
+                  "generation_intent.performance_intent.visible_response",
+                  "generation_intent.performance_intent.gaze_target",
+                  "generation_intent.performance_intent.body_behavior",
+                  "generation_intent.performance_intent.hand_behavior",
+                  "generation_intent.performance_intent.terminal_performance_state",
+                  "generation_intent.lighting_intent.motivated_source",
+                  "generation_intent.lighting_intent.direction",
+                  "generation_intent.lighting_intent.exposure_priority",
+                  "generation_intent.lighting_intent.continuity_state"
+                ],
+                "native_text": [
+                  "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。"
+                ],
+                "production_owner": "shot_authoring",
+                "semantics": {
+                  "version": "requirement-semantics/1",
+                  "category": "narrative_critical",
+                  "intent_role": "must_happen",
+                  "source_refs": [
+                    {
+                      "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                      "locator": "row.shot.continuity_constraints",
+                      "intent_item_id": "performance",
+                      "quote": "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+                      "origin": "director_choice"
+                    }
+                  ],
+                  "hard_basis": {
+                    "source_hash": "f6627c2c48f9c47057b573f24fda481be2c3abd6d4e8829b2d5e67d5603f08eb",
+                    "locator": "row.shot.continuity_constraints",
+                    "kind": "approved_narrative",
+                    "necessity": "分镜 v4 与使用者认可的预览包决定这一镜承担的可见事件。"
+                  },
+                  "derived_from": []
+                },
+                "native_text_mapping": {
+                  "contract_version": "native-text-mapping/1",
+                  "intent_sha256": "3eed50f36c303800fed23f5151c2c0fc8be4d0964dccf3de0c792581081d717b",
+                  "bindings": [
+                    {
+                      "intent_path": "generation_intent.reference_planning.contract_version",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.facets.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.structure",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.natural_generation.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.natural_generation.1",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.natural_generation.2",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.director_coverage.coverage_hash",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.director_coverage.unit_id",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.reference_planning.preview_approval.approval_hash",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.open_state.kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.open_state.state_text",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.open_state.required_change",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.close_state.kind",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.close_state.state_text",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.close_state.required_change",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.scene_id",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.time_of_day",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.mood",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.state_constraints.0",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.scene_continuity.state_constraints.1",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.start_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.progression",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.endpoint.state_text",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.subject_action.endpoint.required_change",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.onset",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.peak",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.settle",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.motion_envelope.amplitude_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.pacing.cadence",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.pacing.tempo_class",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.pacing.shot_duration_seconds",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.trigger",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.visible_response",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.gaze_target",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.body_behavior",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.hand_behavior",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.performance_intent.terminal_performance_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.motivated_source",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.direction",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.exposure_priority",
+                      "fragment_indices": [
+                        0
+                      ]
+                    },
+                    {
+                      "intent_path": "generation_intent.lighting_intent.continuity_state",
+                      "fragment_indices": [
+                        0
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "editorial_operations": [],
+            "comparison": null
+          },
+          "provider_bound_request_hash": "bf732a422f7a839dfd9c22befb045e96bfdcb63fdd5fa42fd22afd0d56d0f99e"
+        }
+      },
+      "rationale": [
+        "jimeng/jimeng-seedance-2.0-vip-first-frame-v1: unknown; one bounded attempt, no quality guarantee",
+        "evidence and policy affect audit identity, not unrelated media semantics"
+      ],
+      "revalidate_requirements": [
+        "camera",
+        "no-new-graphics",
+        "performance"
+      ]
+    },
+    "continuity_routing": null,
+    "compiled_request": {
+      "generation_id": "canvas-generation-baf3b697bd30a27b7770af895ca2e67e",
+      "request_input_hash": "0a5d9dd2b4734c02f2da662e3d22fe33c2b7555b67a78be39cac305cb40c2483",
+      "provider_name": "jimeng",
+      "provider_kind": "jimeng",
+      "model_id": "seedance_2.0_vip",
+      "provider_profile": {
+        "profile_id": "jimeng",
+        "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+        "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+        "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+      },
+      "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+      "provider_bound_request_hash": "bf732a422f7a839dfd9c22befb045e96bfdcb63fdd5fa42fd22afd0d56d0f99e",
+      "adapter_compiler_id": "jimeng-seedance-2.0-vip-first-frame-video-compiler",
+      "adapter_compiler_version": "1",
+      "adapter_compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0",
+      "execution_stack_hash": null,
+      "capability_id": "jimeng-seedance-2.0-vip-first-frame-v1",
+      "execution_kind": "remote",
+      "billing_kind": "metered",
+      "mode": "image_to_video",
+      "prompt_text": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+      "image_bindings": [
+        {
+          "role": "first_frame",
+          "asset_id": "iris-c-v4-ins16-first-frame",
+          "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 2256345
+        }
+      ],
+      "c4_multi_anchor_binding": null,
+      "continuity_binding": null,
+      "hard_cut_keyframe_binding": null,
+      "seal_terminal_frame": false,
+      "media_bindings": [],
+      "effective_output": {
+        "timing_mode": "nominal_seconds",
+        "duration_seconds": 4,
+        "frame_count": null,
+        "dimension_mode": "adaptive",
+        "width": null,
+        "height": null,
+        "resolution_label": "4k",
+        "ratio": "16:9",
+        "fps": null,
+        "container": "mp4",
+        "mime_type": "video/mp4",
+        "native_audio": true
+      },
+      "provider_task_binding": null,
+      "effective_seed": null,
+      "effective_negative_prompt_text": "",
+      "output_asset_id": "canvas-video-baf3b697bd30a27b7770af895ca2e67e",
+      "activation_scope": {
+        "request": {
+          "generation_id": "canvas-generation-baf3b697bd30a27b7770af895ca2e67e",
+          "provider_name": "jimeng",
+          "provider_kind": "jimeng",
+          "model_id": "seedance_2.0_vip",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+            "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+            "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+          },
+          "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+          "provider_bound_request_hash": "bf732a422f7a839dfd9c22befb045e96bfdcb63fdd5fa42fd22afd0d56d0f99e",
+          "adapter_compiler_id": "jimeng-seedance-2.0-vip-first-frame-video-compiler",
+          "adapter_compiler_version": "1",
+          "adapter_compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0",
+          "execution_stack_hash": null,
+          "target_shot_id": "ep01v4-ins16",
+          "target_shot_revision": 1,
+          "target_shot_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+          "target_asset_role": "primary_visual",
+          "target_visual_strategy": "generated_video",
+          "mode": "image_to_video",
+          "prompt_text": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+          "negative_prompt_text": "",
+          "image_bindings": [
+            {
+              "role": "first_frame",
+              "asset_id": "iris-c-v4-ins16-first-frame",
+              "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+              "mime_type": "image/png",
+              "width": 1672,
+              "height": 941,
+              "size_bytes": 2256345
+            }
+          ],
+          "c4_multi_anchor_binding": null,
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false,
+          "media_bindings": [],
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 4,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "4k",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "seed": null,
+          "base_project": {
+            "path": "state/projects/project.1.d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4.yaml",
+            "revision": 1,
+            "content_hash": "d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4",
+            "file_sha256": "39561f3edfc679c9c3333acf95dfcc610434519aa4d0a36d45e4db69f3f8d368"
+          },
+          "base_registry": {
+            "path": "assets/registry.2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96.json",
+            "revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+            "content_hash": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+            "file_sha256": "4e5140567493d3480df3664a60079d95f6d57a7905ced51b3338e61d38e6d654"
+          },
+          "base_dependency_graph": {
+            "revision_id": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+            "content_hash": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+            "path": "state/dependency_graph.277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da.json",
+            "file_sha256": "ebf1f564ecb5e673f9deb8e112c8680a1c047f09965c6a62bb2a1930647200eb"
+          },
+          "input_artifact_ids": [
+            "iris-v4-ins16-shot",
+            "iris-v4-ins16-scene",
+            "iris-c-v4-ins16-first-frame"
+          ],
+          "output_asset_id": "canvas-video-baf3b697bd30a27b7770af895ca2e67e",
+          "request_input_hash": "0a5d9dd2b4734c02f2da662e3d22fe33c2b7555b67a78be39cac305cb40c2483"
+        },
+        "usage_license": "provider-output",
+        "scope_fingerprint": "e85569272bf570c0c9d9c5ac5e874894edec8c63273756c8a68bffa9dc056fc4"
+      },
+      "resolved_generation_hash": "77f74f74c55b07cb5775fd803fe83022cfeb6bb9e7d23d8a5abc8e79b89b8484",
+      "desired_generation_fingerprint": "77f74f74c55b07cb5775fd803fe83022cfeb6bb9e7d23d8a5abc8e79b89b8484"
+    },
+    "binding_hash": "a6bfd18dd72c7d385de94943ecd045b441be7461a5181883ea4e71da269bded1"
+  },
+  "resolved_request": {
+    "generation_id": "canvas-generation-baf3b697bd30a27b7770af895ca2e67e",
+    "request_input_hash": "0a5d9dd2b4734c02f2da662e3d22fe33c2b7555b67a78be39cac305cb40c2483",
+    "provider_name": "jimeng",
+    "provider_kind": "jimeng",
+    "model_id": "seedance_2.0_vip",
+    "provider_profile": {
+      "profile_id": "jimeng",
+      "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+      "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+      "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+    },
+    "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+    "provider_bound_request_hash": "bf732a422f7a839dfd9c22befb045e96bfdcb63fdd5fa42fd22afd0d56d0f99e",
+    "adapter_compiler_id": "jimeng-seedance-2.0-vip-first-frame-video-compiler",
+    "adapter_compiler_version": "1",
+    "adapter_compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0",
+    "execution_stack_hash": null,
+    "capability_id": "jimeng-seedance-2.0-vip-first-frame-v1",
+    "execution_kind": "remote",
+    "billing_kind": "metered",
+    "mode": "image_to_video",
+    "prompt_text": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+    "image_bindings": [
+      {
+        "role": "first_frame",
+        "asset_id": "iris-c-v4-ins16-first-frame",
+        "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2256345
+      }
+    ],
+    "c4_multi_anchor_binding": null,
+    "continuity_binding": null,
+    "hard_cut_keyframe_binding": null,
+    "seal_terminal_frame": false,
+    "media_bindings": [],
+    "effective_output": {
+      "timing_mode": "nominal_seconds",
+      "duration_seconds": 4,
+      "frame_count": null,
+      "dimension_mode": "adaptive",
+      "width": null,
+      "height": null,
+      "resolution_label": "4k",
+      "ratio": "16:9",
+      "fps": null,
+      "container": "mp4",
+      "mime_type": "video/mp4",
+      "native_audio": true
+    },
+    "provider_task_binding": null,
+    "effective_seed": null,
+    "effective_negative_prompt_text": "",
+    "output_asset_id": "canvas-video-baf3b697bd30a27b7770af895ca2e67e",
+    "activation_scope": {
+      "request": {
+        "generation_id": "canvas-generation-baf3b697bd30a27b7770af895ca2e67e",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.0_vip",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+          "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+          "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+        },
+        "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+        "provider_bound_request_hash": "bf732a422f7a839dfd9c22befb045e96bfdcb63fdd5fa42fd22afd0d56d0f99e",
+        "adapter_compiler_id": "jimeng-seedance-2.0-vip-first-frame-video-compiler",
+        "adapter_compiler_version": "1",
+        "adapter_compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0",
+        "execution_stack_hash": null,
+        "target_shot_id": "ep01v4-ins16",
+        "target_shot_revision": 1,
+        "target_shot_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+        "target_asset_role": "primary_visual",
+        "target_visual_strategy": "generated_video",
+        "mode": "image_to_video",
+        "prompt_text": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+        "negative_prompt_text": "",
+        "image_bindings": [
+          {
+            "role": "first_frame",
+            "asset_id": "iris-c-v4-ins16-first-frame",
+            "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2256345
+          }
+        ],
+        "c4_multi_anchor_binding": null,
+        "continuity_binding": null,
+        "hard_cut_keyframe_binding": null,
+        "seal_terminal_frame": false,
+        "media_bindings": [],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 4,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "4k",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "seed": null,
+        "base_project": {
+          "path": "state/projects/project.1.d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4.yaml",
+          "revision": 1,
+          "content_hash": "d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4",
+          "file_sha256": "39561f3edfc679c9c3333acf95dfcc610434519aa4d0a36d45e4db69f3f8d368"
+        },
+        "base_registry": {
+          "path": "assets/registry.2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96.json",
+          "revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+          "content_hash": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+          "file_sha256": "4e5140567493d3480df3664a60079d95f6d57a7905ced51b3338e61d38e6d654"
+        },
+        "base_dependency_graph": {
+          "revision_id": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+          "content_hash": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+          "path": "state/dependency_graph.277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da.json",
+          "file_sha256": "ebf1f564ecb5e673f9deb8e112c8680a1c047f09965c6a62bb2a1930647200eb"
+        },
+        "input_artifact_ids": [
+          "iris-v4-ins16-shot",
+          "iris-v4-ins16-scene",
+          "iris-c-v4-ins16-first-frame"
+        ],
+        "output_asset_id": "canvas-video-baf3b697bd30a27b7770af895ca2e67e",
+        "request_input_hash": "0a5d9dd2b4734c02f2da662e3d22fe33c2b7555b67a78be39cac305cb40c2483"
+      },
+      "usage_license": "provider-output",
+      "scope_fingerprint": "e85569272bf570c0c9d9c5ac5e874894edec8c63273756c8a68bffa9dc056fc4"
+    },
+    "resolved_generation_hash": "77f74f74c55b07cb5775fd803fe83022cfeb6bb9e7d23d8a5abc8e79b89b8484",
+    "desired_generation_fingerprint": "77f74f74c55b07cb5775fd803fe83022cfeb6bb9e7d23d8a5abc8e79b89b8484"
+  },
+  "compiled_request": {
+    "generation_id": "canvas-generation-baf3b697bd30a27b7770af895ca2e67e",
+    "provider_name": "jimeng",
+    "provider_kind": "jimeng",
+    "model_id": "seedance_2.0_vip",
+    "provider_profile": {
+      "profile_id": "jimeng",
+      "profile_version": "canvas-seedance-2.0-vip-first-frame-v1",
+      "profile_path": "provider-profiles/512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622.json",
+      "profile_sha256": "512b74e2909238d09640d74837182aa7013dd508c4f52094bae481581e6ec622"
+    },
+    "requirement_hash": "70bb632786c61588980b0738e4e6425d052ea059f72c00a6a97d68908e6ec249",
+    "provider_bound_request_hash": "bf732a422f7a839dfd9c22befb045e96bfdcb63fdd5fa42fd22afd0d56d0f99e",
+    "adapter_compiler_id": "jimeng-seedance-2.0-vip-first-frame-video-compiler",
+    "adapter_compiler_version": "1",
+    "adapter_compiler_hash": "54f8abf7ec9f8af4d0f1c28be52b6d15603a67f6df196b6e3cf278c3ffbadcb0",
+    "execution_stack_hash": null,
+    "target_shot_id": "ep01v4-ins16",
+    "target_shot_revision": 1,
+    "target_shot_content_hash": "97a03a69df7c8c01bace65bf8c9dcf75a6720f473429237eb22879ba88b5e0c3",
+    "target_asset_role": "primary_visual",
+    "target_visual_strategy": "generated_video",
+    "mode": "image_to_video",
+    "prompt_text": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+    "negative_prompt_text": "",
+    "image_bindings": [
+      {
+        "role": "first_frame",
+        "asset_id": "iris-c-v4-ins16-first-frame",
+        "asset_sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2256345
+      }
+    ],
+    "c4_multi_anchor_binding": null,
+    "continuity_binding": null,
+    "hard_cut_keyframe_binding": null,
+    "seal_terminal_frame": false,
+    "media_bindings": [],
+    "output_requirement": {
+      "timing_mode": "nominal_seconds",
+      "duration_seconds": 4,
+      "frame_count": null,
+      "dimension_mode": "adaptive",
+      "width": null,
+      "height": null,
+      "resolution_label": "4k",
+      "ratio": "16:9",
+      "fps": null,
+      "container": "mp4",
+      "mime_type": "video/mp4",
+      "native_audio": true
+    },
+    "seed": null,
+    "base_project": {
+      "path": "state/projects/project.1.d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4.yaml",
+      "revision": 1,
+      "content_hash": "d6a72df46ab9c8847c6c1533b8a35b0d08b4f05a50652991f5915f2d1f7febb4",
+      "file_sha256": "39561f3edfc679c9c3333acf95dfcc610434519aa4d0a36d45e4db69f3f8d368"
+    },
+    "base_registry": {
+      "path": "assets/registry.2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96.json",
+      "revision_id": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+      "content_hash": "2e2984c814e79bc8637d08bc9a4381bfaedebe039e6357fff416a9b966ab1b96",
+      "file_sha256": "4e5140567493d3480df3664a60079d95f6d57a7905ced51b3338e61d38e6d654"
+    },
+    "base_dependency_graph": {
+      "revision_id": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+      "content_hash": "277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da",
+      "path": "state/dependency_graph.277c21da58f8e9fac50f4d188d94c567797cfc5f38c1ebc117e8a2a118cd29da.json",
+      "file_sha256": "ebf1f564ecb5e673f9deb8e112c8680a1c047f09965c6a62bb2a1930647200eb"
+    },
+    "input_artifact_ids": [
+      "iris-v4-ins16-shot",
+      "iris-v4-ins16-scene",
+      "iris-c-v4-ins16-first-frame"
+    ],
+    "output_asset_id": "canvas-video-baf3b697bd30a27b7770af895ca2e67e",
+    "request_input_hash": "0a5d9dd2b4734c02f2da662e3d22fe33c2b7555b67a78be39cac305cb40c2483"
+  },
+  "paid_provider_preview": {
+    "attempt_id": "iris-ins16-n-1-source-001",
+    "operation": "video_generation",
+    "provider_kind": "jimeng",
+    "model_id": "seedance_2.0_vip",
+    "request_fingerprint": "77f74f74c55b07cb5775fd803fe83022cfeb6bb9e7d23d8a5abc8e79b89b8484",
+    "billing_mode": "remote_metered",
+    "currency": "CRD",
+    "estimated_cost_upper_bound_microunits": 400000000,
+    "destination": "https://jimeng.jianying.com",
+    "method": "POST",
+    "egress_items": [
+      {
+        "item_id": "prompt",
+        "sha256": "bb405202f3a2a2fb8fec63581d4a4c426200150260f831abc36d7cffb9c89728",
+        "size_bytes": 582,
+        "mime_type": "text/plain",
+        "purpose": "prompt"
+      },
+      {
+        "item_id": "iris-c-v4-ins16-first-frame",
+        "sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+        "size_bytes": 2256345,
+        "mime_type": "image/png",
+        "purpose": "reference"
+      }
+    ],
+    "retention_mode": "provider_standard",
+    "provider_policy_snapshot_id": "iris-ins16-n-1-source-001",
+    "secret_reference": {
+      "kind": "secret_store",
+      "reference_id": "JIMENG_BROWSER_SESSION"
+    },
+    "preview_fingerprint": "b4d5635efda0015c7141527f087fb297106fed4d5043f1929029bc32dacd81da"
+  }
+}

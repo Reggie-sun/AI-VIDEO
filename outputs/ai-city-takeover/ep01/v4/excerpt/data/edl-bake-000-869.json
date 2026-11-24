@@ -1,0 +1,502 @@
+{
+ "version": 15,
+ "bake": true,
+ "picture_only": true,
+ "fps": 24,
+ "W": 1920,
+ "H": 1080,
+ "offset": 0.0,
+ "end": 36.208333333333336,
+ "frames": 869,
+ "shots": [
+  {
+   "id": "s001",
+   "agentcut_clip": "move-s001",
+   "f0": 0,
+   "f1": 99,
+   "kind": "still",
+   "stills": [
+    [
+     "p001",
+     0
+    ]
+   ],
+   "move": {
+    "src": "p001",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 11,
+     "to": 99,
+     "scale": 1.03,
+     "ox": 495,
+     "oy": 940
+    },
+    "cuts": []
+   }
+  },
+  {
+   "id": "s002",
+   "agentcut_clip": "move-s002",
+   "f0": 99,
+   "f1": 231,
+   "kind": "still",
+   "stills": [
+    [
+     "p002",
+     0
+    ]
+   ],
+   "move": {
+    "src": "p002",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 132,
+     "scale": 1.03,
+     "ox": 1132,
+     "oy": 455
+    },
+    "cuts": [
+     {
+      "at": 67,
+      "scale": 1.22,
+      "ox": 1132,
+      "oy": 455,
+      "kind": "crop",
+      "flash": 0.5
+     },
+     {
+      "at": 89,
+      "scale": 1,
+      "ox": 1132,
+      "oy": 455,
+      "kind": "crop",
+      "flash": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "s003",
+   "agentcut_clip": "move-s003",
+   "f0": 231,
+   "f1": 274,
+   "kind": "still",
+   "stills": [
+    [
+     "p003",
+     0
+    ]
+   ],
+   "move": {
+    "src": "p003",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 43,
+     "scale": 1.03,
+     "ox": 560,
+     "oy": 500
+    },
+    "cuts": []
+   }
+  },
+  {
+   "id": "s004",
+   "agentcut_clip": "move-s004",
+   "f0": 274,
+   "f1": 406,
+   "kind": "still",
+   "stills": [
+    [
+     "p004",
+     0
+    ]
+   ],
+   "move": {
+    "src": "p004",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 132,
+     "scale": 1.03,
+     "ox": 1045,
+     "oy": 330
+    },
+    "cuts": [
+     {
+      "at": 44,
+      "scale": 1.25,
+      "ox": 1560,
+      "oy": 330,
+      "kind": "crop",
+      "flash": 0.5
+     },
+     {
+      "at": 87,
+      "scale": 1,
+      "ox": 1560,
+      "oy": 330,
+      "kind": "crop",
+      "flash": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "s005",
+   "agentcut_clip": "move-s005",
+   "f0": 406,
+   "f1": 493,
+   "kind": "still",
+   "stills": [
+    [
+     "p005",
+     0
+    ]
+   ],
+   "move": {
+    "src": "p005",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 87,
+     "scale": 1.03,
+     "ox": 1400,
+     "oy": 420
+    },
+    "cuts": []
+   }
+  },
+  {
+   "id": "s006",
+   "agentcut_clip": "move-s006",
+   "f0": 493,
+   "f1": 625,
+   "kind": "still",
+   "stills": [
+    [
+     "p006",
+     0
+    ]
+   ],
+   "move": {
+    "src": "p006",
+    "mosaic": "mosaic-p006",
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 132,
+     "scale": 1.03,
+     "ox": 1620,
+     "oy": 250
+    },
+    "cuts": [
+     {
+      "at": 43,
+      "scale": 1.18,
+      "ox": 1620,
+      "oy": 250,
+      "kind": "pixel"
+     }
+    ]
+   }
+  },
+  {
+   "id": "s007",
+   "agentcut_clip": "move-s007",
+   "f0": 625,
+   "f1": 714,
+   "kind": "still",
+   "stills": [
+    [
+     "X07a",
+     0
+    ]
+   ],
+   "move": {
+    "src": "X07a",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 89,
+     "scale": 1.03,
+     "ox": 1150,
+     "oy": 150
+    },
+    "cuts": [
+     {
+      "at": 44,
+      "scale": 1.2,
+      "ox": 1150,
+      "oy": 150,
+      "kind": "crop",
+      "flash": 0.5
+     },
+     {
+      "at": 77,
+      "scale": 1,
+      "ox": 1150,
+      "oy": 150,
+      "kind": "crop",
+      "flash": 0.5
+     }
+    ]
+   }
+  },
+  {
+   "id": "s008",
+   "agentcut_clip": "move-s008",
+   "f0": 714,
+   "f1": 747,
+   "kind": "still",
+   "stills": [
+    [
+     "X08a",
+     0
+    ]
+   ],
+   "move": {
+    "src": "X08a",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 33,
+     "scale": 1.03,
+     "ox": 1232,
+     "oy": 690
+    },
+    "cuts": []
+   }
+  },
+  {
+   "id": "s009a",
+   "agentcut_clip": "move-s009a",
+   "f0": 747,
+   "f1": 847,
+   "kind": "still",
+   "stills": [
+    [
+     "X09a",
+     0
+    ]
+   ],
+   "move": {
+    "src": "X09a",
+    "mosaic": "mosaic-X09a",
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 100,
+     "scale": 1.03,
+     "ox": 1660,
+     "oy": 600
+    },
+    "cuts": [
+     {
+      "at": 55,
+      "scale": 1.15,
+      "ox": 1660,
+      "oy": 600,
+      "kind": "pixel"
+     }
+    ]
+   }
+  },
+  {
+   "id": "s009b",
+   "agentcut_clip": "move-s009b",
+   "f0": 847,
+   "f1": 869,
+   "kind": "still",
+   "stills": [
+    [
+     "X09b",
+     0
+    ]
+   ],
+   "move": {
+    "src": "X09b",
+    "mosaic": null,
+    "size": [
+     1672,
+     941
+    ],
+    "push": {
+     "from": 0,
+     "to": 22,
+     "scale": 1.03,
+     "ox": 1150,
+     "oy": 700
+    },
+    "cuts": []
+   }
+  }
+ ],
+ "images": {
+  "p001": "media/agentcut-bake/p001.png",
+  "p002": "media/agentcut-bake/p002.png",
+  "p003": "media/agentcut-bake/p003.png",
+  "p004": "media/agentcut-bake/p004.png",
+  "p005": "media/agentcut-bake/p005.png",
+  "p006": "media/agentcut-bake/p006.png",
+  "mosaic-p006": "media/agentcut-bake/mosaic-p006.png",
+  "X07a": "media/agentcut-bake/X07a.png",
+  "X08a": "media/agentcut-bake/X08a.png",
+  "X09a": "media/agentcut-bake/X09a.png",
+  "mosaic-X09a": "media/agentcut-bake/mosaic-X09a.png",
+  "X09b": "media/agentcut-bake/X09b.png"
+ },
+ "levels": {
+  "p001": [
+   0.00645,
+   0.85,
+   0.006
+  ],
+  "p002": [
+   0.004,
+   0.9229,
+   0.006
+  ],
+  "p003": [
+   0.00368,
+   0.9314,
+   0.006
+  ],
+  "p004": [
+   0.00612,
+   0.9423,
+   0.006
+  ],
+  "p005": [
+   0.0057,
+   0.85,
+   0.006
+  ],
+  "p006": [
+   0.00655,
+   1.001,
+   0.006
+  ],
+  "X07a": [
+   0.00537,
+   0.9031,
+   0.006
+  ],
+  "X08a": [
+   0.00586,
+   0.8729,
+   0.006
+  ],
+  "X09a": [
+   0.00529,
+   0.9043,
+   0.006
+  ],
+  "X09b": [
+   0.00352,
+   1.0805,
+   0.006
+  ],
+  "mosaic-p006": [
+   0.00655,
+   1.001,
+   0.006
+  ],
+  "mosaic-X09a": [
+   0.00529,
+   0.9043,
+   0.006
+  ]
+ },
+ "lines": [],
+ "beats": [],
+ "downbeats": [],
+ "snare": [],
+ "kick": [],
+ "tracks": {},
+ "source": {
+  "p001": {
+   "agentcut": "assets/images/iris/p001.png",
+   "sha256": "7f39c6e8d044b07edf0db380439887101f355fe6764c3316e4b2f64f679524a3"
+  },
+  "p002": {
+   "agentcut": "assets/images/iris/p002.png",
+   "sha256": "dab44ba4d52834d0c82f667ddfcf4bdf8add3ae85a4cfe193f7386d157912980"
+  },
+  "p003": {
+   "agentcut": "assets/images/iris/p003.png",
+   "sha256": "04fd5b000ed18bc6547e120726f2b104518616c8ca692ff11207f2cec03320f8"
+  },
+  "p004": {
+   "agentcut": "assets/images/iris/p004.png",
+   "sha256": "a6d7c57536c460c4bc5603b46b87ed3a6ef1defa6caa7f34660730f78c260a52"
+  },
+  "p005": {
+   "agentcut": "assets/images/iris/p005.png",
+   "sha256": "1eb01637eb37a276ec908a968d7555d5dce69bfe2bc5f84de2c4c8f6602abc33"
+  },
+  "p006": {
+   "agentcut": "assets/images/iris/p006.png",
+   "sha256": "b19bbef31c509c5d355fcc3f7cd13d3b229af11e93b2dcbce56f0e3f0c65a28b"
+  },
+  "mosaic-p006": {
+   "agentcut": "assets/images/texture/mosaic-p006.png",
+   "sha256": "1eedf142c1fb652ace1a357e9609b50a5cd993b82ef34fdac1e9a139802a6211"
+  },
+  "X07a": {
+   "agentcut": "assets/images/iris/X07a.png",
+   "sha256": "96f2cdd05ef407ae5a6e81ca2ab42d860e046ae4ab2995f0064a1343a8110aaf"
+  },
+  "X08a": {
+   "agentcut": "assets/images/iris/X08a.png",
+   "sha256": "c3bedeb3eebc95ace165b75062b24cb66f8f5797e8ca890052c3809882d21719"
+  },
+  "X09a": {
+   "agentcut": "assets/images/iris/X09a.png",
+   "sha256": "e8c6b5d98ad77ec4502c5ebe49d064f41fed8b3dcd27b8dd7f5ccacfb4e014c0"
+  },
+  "mosaic-X09a": {
+   "agentcut": "assets/images/texture/mosaic-X09a.png",
+   "sha256": "0891b9c2a5c5bf3b2c69b2f4489daeb2fc619c4244ed02468b4b57e7a681682f"
+  },
+  "X09b": {
+   "agentcut": "assets/images/iris/X09b.png",
+   "sha256": "d2462ab8eebfa5faf6b40fe9c3087dc3fcb9d6096aa337068c204e502087c326"
+  }
+ }
+}

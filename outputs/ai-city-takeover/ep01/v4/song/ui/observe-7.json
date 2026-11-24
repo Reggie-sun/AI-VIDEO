@@ -1,0 +1,51 @@
+{
+ "n": "7",
+ "at": "2026-11-17T03:55:23.810Z",
+ "fields_sha256": "c70c524fb74384264b80c809ccf03ec88c015583cd38871086000dde16c83d0d",
+ "read": {
+  "lyrics": "[Intro - instrumental, 8 bars, pager beep motif]\n\n\n\n\n[Spoken - deadpan, dry]\n\nIncident Week. Every look got somebody pag…",
+  "style": "ballroom vogue house, 128 BPM, 4/4, hard ballroom kick, the Ha crash on the off-beats, snapping claps, deep sub bass, cold minor-key synth stabs, runway catwalk energy, opens with an 8-bar instrumental intro, one American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, a euphoric sung chorus that bursts open on Hello, world with a big lift and a shouted stacked last line, a stacked chanted post-chorus hook, key change up into the final chorus, fierce, untamed, clean modern mix",
+  "exclude": "rap, male lead vocal, mumbled vocals, lo-fi, rock guitar, big room EDM, dubstep, electroclash, acid techno, trance",
+  "title": "Hello World r3",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": null,
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 0,
+  "lyrics_sha256": "a53dc951d181b799ea19c436a4925f47641ace1154ac29398f0f9869d19567b7"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

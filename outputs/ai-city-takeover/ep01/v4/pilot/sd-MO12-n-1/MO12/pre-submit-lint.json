@@ -1,0 +1,42 @@
+{
+ "unit": "MO12",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "6fa12c755a4e3f355272d9c02f22962da5f3cba8df88f898e277435e1b6e8941",
+ "compiled_prompt_sha256": "7dbf231b08226de25f2593be5b53154c47c470a92f08b533faf8c6e711a2a081",
+ "approval_sha256": "343d8e02ddcf89c51fd851693a883c8982ea89465f8586b3a72eb32597e43118",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO12-n-1/continuity-report.json",
+  "sha256": "47785b7b8755dc03973074effa5fa32c31ef86e71ac464c4f91608d7d91364b3",
+  "unit": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；compiled/egress prompt、首帧、人声 sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸一致；耳挂左耳小红灯；除耳灯无红色；无文字；唱段分段测口型、嘴不被挡；从画面右侧出画，不沿列车往纵深走；人不被缩小；电脑无 logo"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

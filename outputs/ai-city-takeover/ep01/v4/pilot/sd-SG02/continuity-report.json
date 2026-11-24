@@ -1,0 +1,37 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-18T00:13:38+00:00",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG02/preview-approval.json",
+   "sha256": "2ebdb14089cd5f1e1995e34b42f0cab56f80695a249643a5f9b6c5b160958e83"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/preview-inputs.json",
+   "sha256": "9d668152515e92e089e2c3686528400d48e3dd7abe67e29b5a9773cb70ff80aa"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/index.html",
+   "sha256": "f4b740ac2478e12b150413f40f851420cc974eac1775923fc07b62db21e491d3"
+  }
+ },
+ "units": {
+  "SG02": {
+   "verdict": "ready",
+   "continuity": "PASS（场记逐项，见本轮报告）",
+   "handoff": "PASS（按设计）",
+   "axis_action_camera": "PASS",
+   "prompt_fit": "PASS：编译文本、认可、preview-inputs 逐字一致",
+   "lint": "由主会话运行 lint.py 取证",
+   "risks": [
+    "说完转身只剩 0.11 s",
+    "姓名贴在 s009 起消失（分镜层缺口）",
+    "全能参考非首帧：查左右与镜像",
+    "自带音轨可能提前：sync_check",
+    "手腕黑色腕带非 canon"
+   ],
+   "full_report_note": "场记完整报告见本轮对话；主会话依其结论落盘"
+  }
+ }
+}

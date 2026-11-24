@@ -1,0 +1,46 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-excerpt-MO04",
+ "question": "样片页：http://127.0.0.1:8769/pilot/excerpt/ 检查点 5 第二段：样片 26–59 秒（主歌 1 加副歌 1）。用你选的 Seedance 4k，SG03 已经有了。还要生成 6 条：2 条对口型（SG02 对镜头念 A I: Average Individual；SG04 唱 I'm the call you had to take），4 条动作（拽树枝看广告牌、天桥上踹铁丝网、T 台快步走向镜头、T 台尽头急转身按住寻呼机）。费用：每条一次、不重试，共 28 秒，约 2,240 积分；单条上限 800，合计上限 4,000。可以拍吗？",
+ "user_quote": "可以，开拍 (Recommended)",
+ "approved_at": "2026-11-18T00:05:21+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/index.html",
+  "sha256": "f4b740ac2478e12b150413f40f851420cc974eac1775923fc07b62db21e491d3"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/preview-inputs.json",
+  "sha256": "9d668152515e92e089e2c3686528400d48e3dd7abe67e29b5a9773cb70ff80aa"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p007.png",
+   "sha256": "c67df3b27c594d9442a18a6eeec7e28013a866330b5cfbaa5d49ef77ffb31373",
+   "role": "MO04 first frame"
+  }
+ ],
+ "prompts": {
+  "MO04": {
+   "text": "镜头固定，全身远景。夜里潮湿的人行道，她站在树下，伸手把一根挡在面前的树枝往下拽，眯眼往上看树后那块发着白光的巨大广告牌；她松开手，树枝弹回去轻轻晃动，广告牌的白光整片打到她脸上，她不躲，从外套口袋里掏出一张空白的姓名贴。路灯和远处的车灯安静地亮着。",
+   "sha256": "6c86e97fd49623f73c2ae94f8bee22bcd9b5f3c96e479cbc1afb6a2cd14dc56d"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 800,
+  "cumulative_CRD": 800
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p007.png）承担 IRIS（v4 锚点 F1a）的身份，使用者在节选预览页上看过并认可；不附身份图"
+}

@@ -1,0 +1,10 @@
+<!doctype html><meta charset="utf-8"><title>闭眼唱脸 · 重做首帧 D4</title>
+<style>body{background:#0b0d12;color:#dfe6ee;font:15px/1.6 system-ui;max-width:1400px;margin:24px auto;padding:0 20px}img{width:100%}h2{color:#f3d9a8}.row{display:flex;gap:12px}.row>div{flex:1}code{color:#f3d9a8}</style>
+<h1>闭眼唱脸 · 重做首帧（D4）</h1>
+<p>上一条失败的原因：首帧换了场地，生成时镜头又环绕、丢了工程师。这次底图直接用前一镜实拍画面往她脸上推近：同一停车场、同一根柱子、同一批观众、左前景同一个工程师，只把她改成闭眼、下巴抬起、嘴先闭着（避免开头抢拍）。</p>
+<h2>前一镜实拍（切出点）</h2><img src="design/D4/sg03w1-t4.6-1080.jpg">
+<div class="row"><div><h2>D4-a（推荐）· 下巴抬起，投入</h2><img src="design/D4/D4-a-1080.jpg"></div>
+<div><h2>D4-c · 更平静</h2><img src="design/D4/D4-c-1080.jpg"></div></div>
+<h2>生成用的 prompt（只管口型和镜头不动）</h2>
+<p><code>{{image:0}}中的她闭着眼睛唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，机头直闪。左前景的工程师一直在画面里。镜头固定不动，不推不拉不摇不环绕，一镜到底。嘴前没有任何遮挡。</code></p>
+<p>拍法：Seedance 2.0 4K，同一首帧拍 2 条，挑口型最准、镜头最稳的一条；剪辑从 49.08（you're 前的拍点）切进来唱 you're awake，awake 唱完切到 AWAKE 图形。</p>

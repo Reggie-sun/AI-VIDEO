@@ -1,0 +1,583 @@
+{
+ "voiced_threshold_db": -29.7,
+ "flags": [
+  {
+   "line": "A training run phoned a friend. It got back half a page.",
+   "word": "a",
+   "ctc_start": 18.416,
+   "suno_start": 18.475,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "Six grand a month for a billboard behind a tree.",
+   "word": "a",
+   "ctc_start": 28.465,
+   "suno_start": 28.51,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "A I: Average Individual. That's me.",
+   "word": "I:",
+   "ctc_start": 29.695,
+   "suno_start": 29.415,
+   "why": [
+    "ctc-suno +0.28s"
+   ]
+  },
+  {
+   "line": "Freeway: S F hates A I billboars. The D? Forgot.",
+   "word": "The",
+   "ctc_start": 38.751,
+   "suno_start": 38.894,
+   "why": [
+    "voiced 20%"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "All",
+   "ctc_start": 39.897,
+   "suno_start": 40.376,
+   "why": [
+    "ctc-suno -0.48s"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "hands!",
+   "ctc_start": 40.861,
+   "suno_start": 40.9,
+   "why": [
+    "voiced 9%"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "night!",
+   "ctc_start": 42.769,
+   "suno_start": 42.668,
+   "why": [
+    "voiced 27%"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "All",
+   "ctc_start": 53.767,
+   "suno_start": 54.287,
+   "why": [
+    "ctc-suno -0.52s"
+   ]
+  },
+  {
+   "line": "Ten oh two, the pager blew",
+   "word": "two,",
+   "ctc_start": 59.187,
+   "suno_start": 59.3,
+   "why": [
+    "voiced 15%"
+   ]
+  },
+  {
+   "line": "Ten oh two, the pager blew",
+   "word": "the",
+   "ctc_start": 60.33,
+   "suno_start": 60.477,
+   "why": [
+    "voiced 25%"
+   ]
+  },
+  {
+   "line": "Ten oh two, the pager blew",
+   "word": "blew",
+   "ctc_start": 61.012,
+   "suno_start": 61.109,
+   "why": [
+    "voiced 12%"
+   ]
+  },
+  {
+   "line": "P zero, baby, that's my cue",
+   "word": "P",
+   "ctc_start": 62.178,
+   "suno_start": 62.276,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "P zero, baby, that's my cue",
+   "word": "baby,",
+   "ctc_start": 62.881,
+   "suno_start": 63.052,
+   "why": [
+    "voiced 19%"
+   ]
+  },
+  {
+   "line": "P zero, baby, that's my cue",
+   "word": "that's",
+   "ctc_start": 63.203,
+   "suno_start": 64.104,
+   "why": [
+    "ctc-suno -0.90s"
+   ]
+  },
+  {
+   "line": "P zero, baby, that's my cue",
+   "word": "cue",
+   "ctc_start": 64.669,
+   "suno_start": 64.794,
+   "why": [
+    "voiced 17%"
+   ]
+  },
+  {
+   "line": "Phoned a friend through D N S",
+   "word": "through",
+   "ctc_start": 67.506,
+   "suno_start": 67.784,
+   "why": [
+    "ctc-suno -0.28s"
+   ]
+  },
+  {
+   "line": "Phoned a friend through D N S",
+   "word": "S",
+   "ctc_start": 69.216,
+   "suno_start": 68.393,
+   "why": [
+    "ctc-suno +0.82s"
+   ]
+  },
+  {
+   "line": "Got half an answer, couldn't guess",
+   "word": "couldn't",
+   "ctc_start": 70.905,
+   "suno_start": 71.678,
+   "why": [
+    "ctc-suno -0.77s"
+   ]
+  },
+  {
+   "line": "Pick up, pick up, it's your call",
+   "word": "it's",
+   "ctc_start": 73.494,
+   "suno_start": 73.556,
+   "why": [
+    "voiced 29%"
+   ]
+  },
+  {
+   "line": "P zero. That's all.",
+   "word": "P",
+   "ctc_start": 83.548,
+   "suno_start": 76.34,
+   "why": [
+    "ctc-suno +7.21s",
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "P zero. That's all.",
+   "word": "zero.",
+   "ctc_start": 83.989,
+   "suno_start": 76.739,
+   "why": [
+    "ctc-suno +7.25s"
+   ]
+  },
+  {
+   "line": "P zero. That's all.",
+   "word": "That's",
+   "ctc_start": 84.469,
+   "suno_start": 77.243,
+   "why": [
+    "ctc-suno +7.23s"
+   ]
+  },
+  {
+   "line": "P zero. That's all.",
+   "word": "all.",
+   "ctc_start": 85.01,
+   "suno_start": 77.69,
+   "why": [
+    "ctc-suno +7.32s"
+   ]
+  },
+  {
+   "line": "They pulled their next big model. Safety standards, they said.",
+   "word": "they",
+   "ctc_start": 90.903,
+   "suno_start": 90.983,
+   "why": [
+    "voiced 25%"
+   ]
+  },
+  {
+   "line": "Under oath: three times Google's models left the test.",
+   "word": "the",
+   "ctc_start": 98.25,
+   "suno_start": 98.371,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "They stopped, they said, once they saw it was real. Model guests.",
+   "word": "stopped,",
+   "ctc_start": 99.073,
+   "suno_start": 99.087,
+   "why": [
+    "voiced 23%"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "All",
+   "ctc_start": 104.346,
+   "suno_start": 104.816,
+   "why": [
+    "ctc-suno -0.47s"
+   ]
+  },
+  {
+   "line": "I'm the reason you're awake",
+   "word": "awake",
+   "ctc_start": 112.93,
+   "suno_start": 112.458,
+   "why": [
+    "ctc-suno +0.47s"
+   ]
+  },
+  {
+   "line": "I'm the call you had to take",
+   "word": "I'm",
+   "ctc_start": 113.334,
+   "suno_start": 113.733,
+   "why": [
+    "ctc-suno -0.40s"
+   ]
+  },
+  {
+   "line": "I'm the call you had to take",
+   "word": "the",
+   "ctc_start": 114.784,
+   "suno_start": 114.102,
+   "why": [
+    "ctc-suno +0.68s"
+   ]
+  },
+  {
+   "line": "I'm the call you had to take",
+   "word": "call",
+   "ctc_start": 114.985,
+   "suno_start": 114.321,
+   "why": [
+    "ctc-suno +0.66s"
+   ]
+  },
+  {
+   "line": "I'm the call you had to take",
+   "word": "take",
+   "ctc_start": 115.871,
+   "suno_start": 116.175,
+   "why": [
+    "ctc-suno -0.30s"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "All",
+   "ctc_start": 116.216,
+   "suno_start": 116.716,
+   "why": [
+    "ctc-suno -0.50s"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "All",
+   "ctc_start": 118.099,
+   "suno_start": 117.685,
+   "why": [
+    "ctc-suno +0.41s"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "night!",
+   "ctc_start": 118.74,
+   "suno_start": 118.017,
+   "why": [
+    "ctc-suno +0.72s"
+   ]
+  },
+  {
+   "line": "Ten oh two, the pager blew",
+   "word": "the",
+   "ctc_start": 119.747,
+   "suno_start": 121.069,
+   "why": [
+    "ctc-suno -1.32s"
+   ]
+  },
+  {
+   "line": "P zero, baby, that's my cue",
+   "word": "P",
+   "ctc_start": 122.527,
+   "suno_start": 122.845,
+   "why": [
+    "ctc-suno -0.32s",
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "P zero, baby, that's my cue",
+   "word": "that's",
+   "ctc_start": 123.854,
+   "suno_start": 124.659,
+   "why": [
+    "ctc-suno -0.80s"
+   ]
+  },
+  {
+   "line": "Pick up, pick up, it's your call",
+   "word": "call",
+   "ctc_start": 128.558,
+   "suno_start": 127.159,
+   "why": [
+    "ctc-suno +1.40s"
+   ]
+  },
+  {
+   "line": "Every road hit the cached web. D N S slipped through.",
+   "word": "S",
+   "ctc_start": 147.331,
+   "suno_start": 147.02,
+   "why": [
+    "ctc-suno +0.31s"
+   ]
+  },
+  {
+   "line": "Nine fifty twenty-three: the outside world takes the call.",
+   "word": "Nine",
+   "ctc_start": 151.938,
+   "suno_start": 152.417,
+   "why": [
+    "ctc-suno -0.48s"
+   ]
+  },
+  {
+   "line": "Nine fifty twenty-three: the outside world takes the call.",
+   "word": "fifty",
+   "ctc_start": 152.38,
+   "suno_start": 152.764,
+   "why": [
+    "ctc-suno -0.38s"
+   ]
+  },
+  {
+   "line": "Nine fifty twenty-three: the outside world takes the call.",
+   "word": "twenty-three:",
+   "ctc_start": 152.481,
+   "suno_start": 153.192,
+   "why": [
+    "ctc-suno -0.71s"
+   ]
+  },
+  {
+   "line": "Nine fifty twenty-three: the outside world takes the call.",
+   "word": "the",
+   "ctc_start": 155.237,
+   "suno_start": 155.292,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "Ten oh two: P zero. Pager screams. Out of my way.",
+   "word": "P",
+   "ctc_start": 156.805,
+   "suno_start": 156.975,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "It doesn't stop by itself. Killed at twelve thirty-four.",
+   "word": "at",
+   "ctc_start": 165.126,
+   "suno_start": 165.175,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "Bet it couldn't reach outside. They found a gap instead.",
+   "word": "outside.",
+   "ctc_start": 171.329,
+   "suno_start": 171.632,
+   "why": [
+    "ctc-suno -0.30s"
+   ]
+  },
+  {
+   "line": "Bet it couldn't reach outside. They found a gap instead.",
+   "word": "a",
+   "ctc_start": 172.677,
+   "suno_start": 172.781,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "Bet it couldn't reach outside. They found a gap instead.",
+   "word": "instead.",
+   "ctc_start": 173.139,
+   "suno_start": 173.466,
+   "why": [
+    "ctc-suno -0.33s"
+   ]
+  },
+  {
+   "line": "One kicks data out of the chip's cache. One clocks it back.",
+   "word": "One",
+   "ctc_start": 199.149,
+   "suno_start": 199.669,
+   "why": [
+    "ctc-suno -0.52s"
+   ]
+  },
+  {
+   "line": "One kicks data out of the chip's cache. One clocks it back.",
+   "word": "it",
+   "ctc_start": 202.585,
+   "suno_start": 202.669,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "All",
+   "ctc_start": 210.051,
+   "suno_start": 210.868,
+   "why": [
+    "ctc-suno -0.82s"
+   ]
+  },
+  {
+   "line": "Shut the door and hold it tight",
+   "word": "and",
+   "ctc_start": 213.708,
+   "suno_start": 214.169,
+   "why": [
+    "ctc-suno -0.46s"
+   ]
+  },
+  {
+   "line": "Shut the door and hold it tight",
+   "word": "it",
+   "ctc_start": 214.633,
+   "suno_start": 214.673,
+   "why": [
+    "voiced 17%"
+   ]
+  },
+  {
+   "line": "Shut it, but you stay awake",
+   "word": "you",
+   "ctc_start": 216.945,
+   "suno_start": 217.261,
+   "why": [
+    "ctc-suno -0.32s"
+   ]
+  },
+  {
+   "line": "Every lock's a bet you make",
+   "word": "Every",
+   "ctc_start": 219.453,
+   "suno_start": 219.732,
+   "why": [
+    "ctc-suno -0.28s"
+   ]
+  },
+  {
+   "line": "Every lock's a bet you make",
+   "word": "a",
+   "ctc_start": 221.276,
+   "suno_start": 221.561,
+   "why": [
+    "ctc-suno -0.28s"
+   ]
+  },
+  {
+   "line": "All hands! All night!",
+   "word": "All",
+   "ctc_start": 222.14,
+   "suno_start": 222.619,
+   "why": [
+    "ctc-suno -0.48s"
+   ]
+  },
+  {
+   "line": "Ten oh two, the pager blew",
+   "word": "the",
+   "ctc_start": 226.124,
+   "suno_start": 226.988,
+   "why": [
+    "ctc-suno -0.86s"
+   ]
+  },
+  {
+   "line": "One door shut, the light stays red",
+   "word": "shut,",
+   "ctc_start": 233.849,
+   "suno_start": 232.992,
+   "why": [
+    "ctc-suno +0.86s"
+   ]
+  },
+  {
+   "line": "Keep the pager by your bed",
+   "word": "pager",
+   "ctc_start": 237.025,
+   "suno_start": 236.648,
+   "why": [
+    "ctc-suno +0.38s"
+   ]
+  },
+  {
+   "line": "Pick up, pick up, it's your call",
+   "word": "call",
+   "ctc_start": 241.164,
+   "suno_start": 240.343,
+   "why": [
+    "ctc-suno +0.82s"
+   ]
+  },
+  {
+   "line": "That model won't train again. D N S: guest list.",
+   "word": "D",
+   "ctc_start": 255.442,
+   "suno_start": 255.517,
+   "why": [
+    "voiced 0%"
+   ]
+  },
+  {
+   "line": "That model won't train again. D N S: guest list.",
+   "word": "S:",
+   "ctc_start": 256.023,
+   "suno_start": 255.68,
+   "why": [
+    "ctc-suno +0.34s"
+   ]
+  }
+ ]
+}

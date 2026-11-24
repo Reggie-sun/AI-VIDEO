@@ -1,0 +1,195 @@
+{
+ "schema": "iris-music-map/1",
+ "song": "outputs/ai-city-takeover/ep01/v4/song/master/all-hands-r4-edc6c6bf.wav",
+ "bpm_global": 130.85,
+ "bar_s": 1.8228,
+ "downbeat_phase": 1,
+ "bars_total": 149,
+ "duration": 273.32,
+ "pre": {
+  "section": "Intro (instrumental)",
+  "bar": 1,
+  "bars": 6,
+  "t0": 0.0,
+  "t1": 11.42,
+  "rms_db": -23.8,
+  "strong_hits": [
+   0.48,
+   4.12,
+   7.81
+  ]
+ },
+ "sections": [
+  {
+   "section": "Spoken",
+   "bar": 7,
+   "bars": 8,
+   "t0": 11.42,
+   "t1": 26.05,
+   "first_vocal": 11.3,
+   "last_vocal": 19.04,
+   "rms_db": -23.2,
+   "strong_hits": [
+    11.42
+   ]
+  },
+  {
+   "section": "Verse 1",
+   "bar": 15,
+   "bars": 8,
+   "t0": 26.05,
+   "t1": 40.79,
+   "first_vocal": 25.99,
+   "last_vocal": 40.05,
+   "rms_db": -22.2,
+   "strong_hits": []
+  },
+  {
+   "section": "Chorus",
+   "bar": 23,
+   "bars": 10,
+   "t0": 40.79,
+   "t1": 59.23,
+   "first_vocal": 39.9,
+   "last_vocal": 58.44,
+   "rms_db": -21.1,
+   "strong_hits": [
+    40.79
+   ]
+  },
+  {
+   "section": "Post-Chorus",
+   "bar": 33,
+   "bars": 16,
+   "t0": 59.23,
+   "t1": 88.62,
+   "first_vocal": 58.73,
+   "last_vocal": 78.99,
+   "rms_db": -18.1,
+   "strong_hits": [
+    59.23,
+    77.6
+   ]
+  },
+  {
+   "section": "Verse 2",
+   "bar": 49,
+   "bars": 8,
+   "t0": 88.62,
+   "t1": 103.29,
+   "first_vocal": 87.92,
+   "last_vocal": 102.64,
+   "rms_db": -18.9,
+   "strong_hits": []
+  },
+  {
+   "section": "Chorus",
+   "bar": 57,
+   "bars": 9,
+   "t0": 103.29,
+   "t1": 119.78,
+   "first_vocal": 102.88,
+   "last_vocal": 118.38,
+   "rms_db": -17.6,
+   "strong_hits": [
+    103.29
+   ]
+  },
+  {
+   "section": "Post-Chorus",
+   "bar": 66,
+   "bars": 8,
+   "t0": 119.78,
+   "t1": 134.44,
+   "first_vocal": 119.26,
+   "last_vocal": 131.12,
+   "rms_db": -17.0,
+   "strong_hits": [
+    119.78,
+    130.76
+   ]
+  },
+  {
+   "section": "Verse 3",
+   "bar": 74,
+   "bars": 24,
+   "t0": 134.44,
+   "t1": 178.33,
+   "first_vocal": 134.17,
+   "last_vocal": 177.47,
+   "rms_db": -17.9,
+   "strong_hits": [
+    149.08,
+    163.7
+   ]
+  },
+  {
+   "section": "Bridge",
+   "bar": 98,
+   "bars": 8,
+   "t0": 178.33,
+   "t1": 192.92,
+   "first_vocal": 177.69,
+   "last_vocal": 191.24,
+   "rms_db": -22.3,
+   "strong_hits": [
+    181.1,
+    185.59,
+    187.44
+   ]
+  },
+  {
+   "section": "Verse 4",
+   "bar": 106,
+   "bars": 9,
+   "t0": 192.92,
+   "t1": 209.34,
+   "first_vocal": 192.5,
+   "last_vocal": 208.77,
+   "rms_db": -18.2,
+   "strong_hits": [
+    192.92
+   ]
+  },
+  {
+   "section": "Final Chorus",
+   "bar": 115,
+   "bars": 9,
+   "t0": 209.34,
+   "t1": 225.71,
+   "first_vocal": 208.93,
+   "last_vocal": 224.83,
+   "rms_db": -15.2,
+   "strong_hits": [
+    209.34
+   ]
+  },
+  {
+   "section": "Post-Chorus",
+   "bar": 124,
+   "bars": 14,
+   "t0": 225.71,
+   "t1": 251.17,
+   "first_vocal": 225.24,
+   "last_vocal": 247.89,
+   "rms_db": -14.9,
+   "strong_hits": [
+    225.71,
+    247.52
+   ]
+  },
+  {
+   "section": "Outro",
+   "bar": 138,
+   "bars": 12,
+   "t0": 251.17,
+   "t1": 273.32,
+   "first_vocal": 250.9,
+   "last_vocal": 264.96,
+   "rms_db": -14.6,
+   "strong_hits": [
+    264.8
+   ]
+  }
+ ]
+}

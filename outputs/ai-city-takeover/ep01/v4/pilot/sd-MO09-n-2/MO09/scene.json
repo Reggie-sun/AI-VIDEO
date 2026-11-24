@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo09-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "4126e02af5fa9ff1ad1caf65418028b2e9977f5cb0a99c9364909edf9ae8d0ef",
+  "creation_receipt_id": "iris-v4-MO09-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/d324e61f3b5f4f5828b9660ac1a3058b9c9b092edb6feea5fdcf444d344e7c84.json",
+      "content_hash": "d324e61f3b5f4f5828b9660ac1a3058b9c9b092edb6feea5fdcf444d344e7c84"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/cd72220d54b3bb69f4aa1f3bf03d064f03479d0a757017453d5ad3148e4007fd.json",
+      "content_hash": "cd72220d54b3bb69f4aa1f3bf03d064f03479d0a757017453d5ad3148e4007fd"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/5eef17aab3a0adf1d324fd45450d5bbc64236f36935f2038788206ddbd657cb2.json",
+      "content_hash": "5eef17aab3a0adf1d324fd45450d5bbc64236f36935f2038788206ddbd657cb2"
+    }
+  ],
+  "scene_id": "hotel-service-corridor",
+  "location": "酒店宴会厅后面的服务走廊，推车和叠起来的折叠椅",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a）；本镜从造型W1快速换成造型B",
+    "除了耳挂上的小红灯，画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo09-first-frame"
+  ]
+}

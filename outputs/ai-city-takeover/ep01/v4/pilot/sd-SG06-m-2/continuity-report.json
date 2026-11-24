@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-22",
+ "written_by": "主会话据 continuity-supervisor SG06–SG11 m 增量报告转写（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG06-m-2/preview-approval.json",
+   "sha256": "476e3d296e1a37ba2c0c74ee0c96aff09d2a3af8d7c188ebe46f7fdf418c9861"
+  }
+ },
+ "units": {
+  "SG06": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；compiled/egress prompt、首帧、人声 sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "分段测口型延迟；脸与开场一致；耳挂左耳小红灯；除耳灯无红色；无文字；嘴前无遮挡；剪辑用片内 0.149–5.664 s；末尾约 1.3 s 无人声嘴要闭；听筒垂下晃、向画左走开、听筒不贴耳不挡嘴；无多余红色"
+  }
+ }
+}

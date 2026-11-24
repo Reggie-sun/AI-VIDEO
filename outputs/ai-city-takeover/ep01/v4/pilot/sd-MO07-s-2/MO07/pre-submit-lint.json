@@ -1,0 +1,55 @@
+{
+ "unit": "MO07",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "775a331ee431c84efb7021c816fa35c28422fe9e87df4745c4bce44e1c9b91ee",
+ "compiled_prompt_sha256": "0b5a2a72ae7e1e9605c70387c904d1fc56e082347ea00d810e0d7d2878b1812f",
+ "approval_sha256": "8fac5f4e293b5954ea5c979be75d487280926dbb851dfb0ebebaef54a499407c",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-2/continuity-report.json",
+  "sha256": "b30dc54d969605f9918b7fccb77e5188b91b4766f0f843dcccb08846caad50b5",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。首帧与 s-1 相同，都是 p014-w1b.png（sha c85aa47e…ace8），结论也相同。(1) 带子方向：看了原图和 zoom-s014-b 放大图，都是从右肩斜到左胯，与分镜 s014 提示词、s013、SG03-w1、新的 s011 一致。(2) 带子以外：和原首帧 p014-w1 一样。露左肩、长袖在右臂并甩出、黑色高领、腰链、寻呼机、空白工牌、及膝靴都在，红色只有左耳挂上那一处；只有带子经过的地方做了局部重绘。(3) 场地和光线：两侧是同一批工程师，柱上有黄黑警示条，青白灯管、湿亮的地面都在，没有漂移。",
+   "handoff": "PASS。s013→s014：在 55.078 的 All hands 节拍上省略一段空间，前面的“手机落回”短插交代她离开；切过去后她的造型和 s013 一致。s014→s015：她按着寻呼机从画面右侧走出，接 s015 推门、寻呼机响起，动作连得上。s015 还是旧造型，见风险，按约定不阻塞。",
+   "axis_action_camera": "PASS。长焦正对 T 台，镜头固定，左右对称，没有越轴。首帧里转身已经开始。5 s 的生成用 4.156 s，余量 0.84 s。",
+   "prompt_fit": "PASS。compiled-native-prompt.zh.txt 与 preview-approval 逐字相同，与 s-1 以及 round2 认可的原文一致，prompt 没改。prepared 里 prompt_text 出现 5 处。实际上传的 sha 等于认可值：prompt 0b5a2a72…812f（第 4750 行），首帧 c85aa47e…ace8（第 4757 行）。生成参数：first_frame、5 s、4k、16:9、上限 400 CRD、1 次、不重试。attempt、policy、reservation 都是 iris-mo07-s-2-*，和 s-1 不重复；节点 node_dtn7ejkcy0 也和 s-1 的 node_h6ee9fnkhh 不同；generation_POSTs=0。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "动作偏多（沿用上次）：4.156 s 里要完成转身、袖子落下、按寻呼机、出画，按寻呼机最好落在 58.73。Gate 要逐个标出这几个动作所在的帧。",
+    "logo（沿用上次）：笔记本上有类似苹果的标，Gate 要确认没有变得更清楚。",
+    "带子方向只锁在首帧上，急转身时可能被画反、画歪或丢掉。Gate 要逐帧确认一直是右肩到左胯。",
+    "长袖不能换到另一只手，不能变短，也不能多出第二条；左臂要一直露在外面。",
+    "远景里耳挂上的红灯很小，Gate 要放大确认它在她左耳，且画面里没有别的红色。",
+    "s015 的底片和分镜仍是旧造型（白色立领外套带红线），需要另外重做。按约定只记风险，不阻塞。",
+    "shot.duration_policy.seconds=6.0，与 5 s 输出不一致，交给 lint 判定。",
+    "我没有 Bash，无法核对首帧与 STRAP/s014-b 是否逐字节相同。",
+    "permit 在 2026-11-20T00:04:20Z 过期。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

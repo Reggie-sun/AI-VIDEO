@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-20",
+ "written_by": "主会话据 continuity-supervisor 2026-11-20 批报告转写（该子代理只读）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO20-o-2/preview-approval.json",
+   "sha256": "87b0de48eec07e0dbccbf9a5f8af10e59b3a161df20394145617b4428f077951"
+  }
+ },
+ "units": {
+  "MO20": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "她不能重新抓起听筒；撕纸、扔掉一半、留一半在片内 3.62 s 内；纸上无字；耳挂不能被头发吞掉或换耳；画面里嘴不动不算失败（念白在画外）"
+  }
+ }
+}

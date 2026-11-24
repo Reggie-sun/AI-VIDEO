@@ -1,0 +1,51 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-excerpt-SG04",
+ "question": "样片页：http://127.0.0.1:8769/pilot/excerpt/ 检查点 5 第二段：样片 26–59 秒（主歌 1 加副歌 1）。用你选的 Seedance 4k，SG03 已经有了。还要生成 6 条：2 条对口型（SG02 对镜头念 A I: Average Individual；SG04 唱 I'm the call you had to take），4 条动作（拽树枝看广告牌、天桥上踹铁丝网、T 台快步走向镜头、T 台尽头急转身按住寻呼机）。费用：每条一次、不重试，共 28 秒，约 2,240 积分；单条上限 800，合计上限 4,000。可以拍吗？",
+ "user_quote": "可以，开拍 (Recommended)",
+ "approved_at": "2026-11-18T00:05:21+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/index.html",
+  "sha256": "f4b740ac2478e12b150413f40f851420cc974eac1775923fc07b62db21e491d3"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/preview-inputs.json",
+  "sha256": "9d668152515e92e089e2c3686528400d48e3dd7abe67e29b5a9773cb70ff80aa"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p013.png",
+   "sha256": "8f3bc40f074315b514b8497d6accb679960c8607dfc8d482b41024e82a8c314c",
+   "role": "SG04 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG04.wav",
+   "sha256": "055dd8719d0d773173c351b1d7e9d25ca6f3760957e4b6f3071195a1055afd91",
+   "role": "SG04 vocal"
+  }
+ ],
+ "prompts": {
+  "SG04": {
+   "text": "{{image:0}}中的她低头看着手里亮着的手机，对着值班工程师唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，她唱到一半把手机扔回他怀里，手机始终在她胸口以下，不挡住嘴；唱最后两个字时她转过身去。镜头全程锁定，一镜到底。",
+   "sha256": "5f1c17ed3fe68fce4aaddcb07812d4b62e4691e9464912978a107ad0af40f256"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 800,
+  "cumulative_CRD": 800
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p013.png）承担 IRIS（v4 锚点 F1a）的身份，使用者在节选预览页上看过并认可；不附身份图"
+}

@@ -1,0 +1,45 @@
+{
+ "unit": "SG02",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "fbb6176999e58dcd8cf45b20e0108135f374155f7e77581d148ba2919b009922",
+ "compiled_prompt_sha256": "5c4b1459be0907a17a892d0792fb9b3dc9902bb9f3c8a7102f0366abb908dfcb",
+ "approval_sha256": "50301666cb19d32f11d2917f69cf3b8bf3dc32da947fee483de055ebec3d34c2",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG02-o-1/continuity-report.json",
+  "sha256": "5446dcf91eeedaeba0285f8cd64ad5a5bab0b15f1639258c3a57c82f49fab227",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "全程不转身不转头；耳挂一直在左耳，不能换到右耳，也不能变成入耳式；片内 1.8 s 后的 That's me / Bus stop 重点查有没有拉伸、有没有嘴提前；静音段嘴要合上；手不挡嘴；贴纸无字不发光；灯箱白光不吃掉脸"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

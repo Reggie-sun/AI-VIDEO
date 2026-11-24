@@ -1,0 +1,42 @@
+{
+ "unit": "SG10",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "8182d2f4c78606078bdf5a9b6ca6ba021e28ed62f16a71906fbf2948fc5c5c01",
+ "compiled_prompt_sha256": "833226c19a373916739ca9f6b7f637f077248e45647acbd9841edc973c623b49",
+ "approval_sha256": "ee2450d557c0a29e7d8b5f4e9d93b32fd51603bbd6683459cbf5116be8a016bb",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG10-m-1/continuity-report.json",
+  "sha256": "2f0511a9a1a3c8d77fff695a0437d11127d9a0b3722370c52abb806f32c9ff4d",
+  "unit": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；compiled/egress prompt、首帧、人声 sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸一致；耳挂左耳小红灯；除耳灯无红色；无文字；唱段分段测口型、嘴不被挡；手从画外伸入是否自然；寻呼机屏不出数字；脸不转开"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 700,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   700
+  ]
+ },
+ "new_calls": 0
+}

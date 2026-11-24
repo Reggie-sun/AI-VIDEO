@@ -1,0 +1,77 @@
+{
+  "artifact_id": "iris-v4-sg02-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "b314812c5f264beadec43a156ecc8eaa76a03c13c05f19991928d458b8670f90",
+  "creation_receipt_id": "iris-v4-SG02-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/5bfabf0825838a81c9ba9c8dec048117e5ad62a8a6831812b7d0891b265c96af.json",
+      "content_hash": "5bfabf0825838a81c9ba9c8dec048117e5ad62a8a6831812b7d0891b265c96af"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b.json",
+      "content_hash": "6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/5b0b0c5d0b29225c19605166a7a48f523f66ab884097c620478df58a420e5932.json",
+      "content_hash": "5b0b0c5d0b29225c19605166a7a48f523f66ab884097c620478df58a420e5932"
+    }
+  ],
+  "shot_id": "ep01v4-sg02",
+  "scene_id": "billboard-light",
+  "storyboard_beat_id": "sg02",
+  "intent": "{{image:0}}中的她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步。近景，她用拇指把胸口那张空白姓名贴按平，神情冷淡；说完最后几个字，她转身往画面右边迈出半步。镜头全程锁定，一镜到底。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；造型1雕塑白：白色雕塑感短款立领外套与左侧立领的极细红灯线完整保持（由认可的参考图承担）",
+    "念白期间嘴在说、与参考人声逐字同步，无声处嘴唇闭合；对嘴准确度由片段自带音轨与参考人声的对齐量测和使用者审看判定",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，一镜到底",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v4-sg02-reference"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

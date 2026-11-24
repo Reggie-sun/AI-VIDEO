@@ -1,0 +1,46 @@
+{
+ "unit": "MO07",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "63043b017d44f78e276924b5cd35390b9e9998f424f71b68447b02e4d70edb70",
+ "compiled_prompt_sha256": "9b632bef3c083750b0cdfa68306b9eea31b164faa89df34721c2846c7cb3282f",
+ "approval_sha256": "0b8d55ebf9ad79d55b89d26b54065d8aeb915ba57b62e7dbc6ecea08de5356c3",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r4-1/continuity-report.json",
+  "sha256": "99b4a44c1ecb144333ef62ca946a2998a9afece5c71b99b183556df2f6a46d6b",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "首帧 p014-w1c 与 p014-w1b 只差两侧工程师全部低头；脸、短发、W1 服装、斜挎带右肩→左胯、寻呼机不亮、空白工牌、构图不变；前接 s013b 换机位硬切（手中无手机，与已认可 s-2 相同）",
+   "handoff": "结尾她朝画面右侧走开、手按寻呼机，接 s014c 寻呼机正面特写（10:02 后期点亮）；剪辑只用 0–3.69 s",
+   "axis_action_camera": "长焦全身远景正面固定；先向画面左侧旋身，再朝画面右侧走；头顶余量 10.5%（r3 实测会靠近镜头致头顶出画，r4 以新增字句约束，属使用者已接受风险）",
+   "prompt_fit": "PASS；与 r3 只多「她始终完整在画面里，头顶不出画。」",
+   "gate_scope": "主会话定：『完整在画面里』按剪辑用段 0–3.69 s 判，头顶任一帧出画即 FAIL；旋身后朝右走出右边缘或靴尖出下边缘不判 FAIL（与已认可 s-2 一致）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "观众全程低头不抬头不动；0–3.69 s 头顶不出画；寻呼机不亮红灯、除耳挂外无红色（r3 两条都在此出过问题）；耳挂小红灯在；斜挎带右肩→左胯；干脆旋身甩袖成圆；镜头固定不推拉；无文字；3.69 s 时手已按在寻呼机上"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

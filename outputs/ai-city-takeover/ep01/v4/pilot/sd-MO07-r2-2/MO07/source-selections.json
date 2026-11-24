@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo07-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1.png",
+    "sha256": "db997e4fe7d1704f96605bbfd4ad07dce38fac0e4fb345e8b9cb522775037950",
+    "size_bytes": 2759881,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p014-w1.png: the first frame",
+    "need_id": "runway-end-w1",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

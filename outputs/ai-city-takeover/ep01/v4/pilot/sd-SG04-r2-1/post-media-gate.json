@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-post-media-gate/1",
+ "unit": "SG04",
+ "take_sha256": "e18949ce2639bdce058609c34bfb9b9926f98768420a52133237261f6d45ec29",
+ "reviewer": "shot-gate-reviewer",
+ "verdict": "FAIL",
+ "items": {
+  "lip_sync": "FAIL (copy=false re-sung; lag unsteady 1.12->0.95; 'I'm the call' not synced; full window does not fit)",
+  "camera_locked": "PASS",
+  "engineer_hand": "PASS",
+  "gaze_to_camera": "PASS",
+  "phone_below_chin_no_logo": "PASS",
+  "wardrobe_identity": "PASS",
+  "artifacts": "PASS",
+  "cut_from_s012": "PASS"
+ },
+ "usable_song_s": [
+  52.1,
+  54.95
+ ],
+ "spent_CRD_observed": 4880,
+ "parent_note": "subsegment use needs user decision; mock at excerpt/review/sg04-r2/"
+}

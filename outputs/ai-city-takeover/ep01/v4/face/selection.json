@@ -1,0 +1,14 @@
+{
+ "schema": "iris-ep01-face-selection/1",
+ "selected_at": "2026-11-17",
+ "checkpoint": 3,
+ "user_quote": "F1-a",
+ "anchor": {"path": "outputs/ai-city-takeover/ep01/v4/face/IRIS-anchor-F1a.png",
+            "source": "outputs/ai-city-takeover/ep01/v4/face/raw/F1-window-a.png",
+            "sha256": "2dd80e2f0ff55fbe24a95c5d881a2d2422421c7d94b7a066a3dc6f2e54d55b6a",
+            "tool": "Codex image_gen via motion-kit/tools/codex_plate.py, no reference image",
+            "prompt": "outputs/ai-city-takeover/ep01/v4/face/prompts.md#F1-window"},
+ "identity_text": "series/casting-v3/canon-v4.md fixed text, unchanged",
+ "use": "identity reference (--ref) for every EP01 v4 plate; supersedes raw-E/E3-close-a.png as the EP01 v4 face anchor (CG look)",
+ "notes": ["F3 came out portrait 1024x1536; re-make landscape before use", "F4 straw reads as a cigarette; avoid"]
+}

@@ -1,0 +1,734 @@
+<!doctype html><meta charset="utf-8"><title>检查点 4 · 分镜</title>
+<style>
+body{background:#0b0d12;color:#dfe6ee;font:14px/1.6 system-ui,sans-serif;margin:24px auto;max-width:1400px;padding:0 24px}
+h1{font-size:24px}h2{font-size:19px;margin-top:30px;color:#f3d9a8}h3{font-size:16px}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #263040;padding:4px 8px;vertical-align:top}th{color:#9fb4c7}
+code{color:#f3d9a8}details.cover{background:#11151c;padding:8px 16px;border-radius:6px}summary{cursor:pointer;font-size:16px}
+.ch{border-bottom:1px solid #263040;padding-bottom:4px}
+.card{display:flex;gap:16px;border-bottom:1px solid #1b2230;padding:12px 0}
+.pic{flex:0 0 320px}.pic img{width:320px}.np{width:300px;height:160px;background:#151a22;color:#6f7d8b;font-size:12px;padding:10px;overflow:hidden}
+.meta{flex:1}.hd{color:#9fb4c7}.lyr{color:#f3d9a8;font-size:16px;margin:4px 0}
+.k{display:inline-block;width:40px;color:#6f7d8b}.dim{color:#7f8b97;font-size:13px}ul{margin:2px 0 2px 40px;padding:0}
+.tier{padding:0 6px;border-radius:3px;color:#0b0d12}.sung{background:#f3d9a8}.motion{background:#7fc8ff}.plate3d{background:#9be3a0}.still{background:#aaa}
+.ins{background:#553;padding:0 6px;border-radius:3px}
+</style>
+<h1>IRIS EP01《All Hands》· 检查点 4 · 分镜（61 镜）</h1>
+<p>三位导演（时装片、梗密度、叙事）各出一版 → 三位评审打分（时装片 241、梗密度 231、叙事 229）→ 总导演以时装片为底合并 → 审计全过。
+卡片还没有底片，左边是 prompt 开头；底片在分镜认可后出。请按镜头编号（如 s017）提意见：脸、重复、无聊的段落、故事逻辑、颜色。</p>
+<details class="cover" open><summary>设计总览（treatment、贯穿装置、章节、字体、造型、开放问题、自查数据）</summary><h2>IRIS EP01 · All Hands · 合并分镜（总导演版）</h2>
+<p>数据：<code>shots.json</code>（作者格式 <code>{version, duration, chapters, shots, plates, clips, looks}</code>，另附 <code>fixed_text</code> 存全部固定文字）。审计：<code>audit-merged.json</code>，<code>&quot;pass&quot;: true</code>。</p>
+<p>未出图、未生成、未提交。每镜的出处写在它的 <code>notes</code> 里，下文“出处表”与之同源。</p>
+<h3>Treatment</h3>
+<p>INCIDENT WEEK 是一场开在旧金山地下停车场里的时装周，前排坐的不是买手，是抱着笔记本电脑的值班工程师。IRIS 是模特，也是这周的值班人：后台给她的唯一配饰是一台寻呼机。</p>
+<p>第 1 帧就把“时装周”划掉换成“事件周”；9.6 s 前排的头全低下去看手机，只有一个睡着的工程师被惊醒——他是全片跟着走的那个人。</p>
+<p>秀只走两段（开场、副歌 1），其余时间她都在真实地点做事：树后的广告牌、被划掉 not 的公交亭、跨 101 的天桥、深夜街角的投币电话、撤台中的发布会、听证席、一车厢赶去现场的工程师、放干水的泳池。</p>
+<p>9.20 的 DNS 压轴关在一座周日早晨的老图书馆里：每条路都通向旧报纸（缓存网页），售货机三连吐钞（403/502/502），保安身上贴着 WEB PROXY，只有一根黄铜气动传送管通到外面——09:50:23 铜筒掉回来，10:02:11 寻呼机尖叫，10:05:06 工程师在员工茶水间接起电话，12:34:30 是他拔掉了停不下来的微波炉。她从头到尾没出这栋楼。</p>
+<p>之后是盖着防尘布的橱窗（暂停 11 天，10 月 1 日灯全亮回来），试衣间的两个隔间（另一项受控红队演练，处理器缓存，不是网页缓存），回到秀场把那扇放进红光的门撞上、上锁、盖上 ASSUMED，把寻呼机放到工程师床头。片尾她把压轴风衣装袋归档，在 DNS 宾客名单上戳一个洞，然后走远；SEP 20 那张工单的 CLOSED 一格到最后也没打勾。</p>
+<p>侵略性来自动作（按下摄影师的镜头、踹铁丝网、拍进手心、撞门、戳穿名单），脸是懒得理人的平静；她说和唱的时候嘴一直在镜头上、不被遮挡。</p>
+<h3>贯穿装置：P0 工单 + 寻呼机（及其升级）</h3>
+<p>两层，都从画面里的实物长出来：</p>
+<ul><li><b>实物</b>：黑色老式寻呼机（固定文字见下）。底片里液晶永远空白，字在后期画进去。它在人物之间传递：她别上 → 拍进工程师手心（s017）→ 列车上取回（s026）→ 从跳板扔进空泳池（s029）→ 液晶第一次写出 SEP 20（s030）→ 烘干机里转（s053）→ 放到工程师床头（s054）→ 最后一震（s061）。</li><li><b>代码层</b>：左上角一张工单卡 <code>ID · SEV · TITLE · STATUS</code>。SEV-LOW/MED/HIGH/CRIT 标注 <code>SHOW SCALE</code>（秀自己的刻度），只有 P0 是 OpenAI 自己的告警级别，也只有 P0 用信号红。被 page 的人用寻呼机图标叠，不写数字。</li></ul>
+<table><tr><th>阶段</th><th>工单卡</th><th>升级</th></tr><tr><td>CALL TIME</td><td>INC-WEEK · SEV-LOW</td><td>9.613 第一次 page，前排全低头</td></tr><tr><td>STREET LOOKS</td><td>INC-0804 / INC-0902 · SEV-MED</td><td>城里的小事</td></tr><tr><td>RUNWAY ONE</td><td>ALL HANDS · SEV-HIGH，盖章</td><td>全员到岗</td></tr><tr><td>ON CALL</td><td>第一次闪 P0（预告）→ 77.601 盖 P0</td><td>寻呼机拍进工程师手心</td></tr><tr><td>THE PULLED LOOK</td><td>INC-0928 / 0929 / 1005 · SEV-HIGH</td><td>撤下的模型、上线的 agent、宣誓证词</td></tr><tr><td>EN ROUTE</td><td>ALL HANDS · AGAIN；第二次冲 P0</td><td>一整车人在赶路；寻呼机掉进空泳池</td></tr><tr><td>FINALE · SEP 20</td><td>09:50:23 → <b>10:02:11 整屏 P0（s036，顶点）</b> → 10:05:06 ACK → 12:34:30 KILLED</td><td>唯一一次真正的 P0</td></tr><tr><td>THE PAUSE</td><td>PAUSED · DAY n / 11 → RESUMED OCT 1 · OFFLINE</td><td>唯一一次降级</td></tr><tr><td>FITTING ROOMS</td><td>虚线框 RT-DRILL · CONTROLLED · NOT THE SEP 20 INCIDENT</td><td>换外形，防止两件事被串起来</td></tr><tr><td>FINAL WALK</td><td>DOOR SHUT → LOCKED · ASSUMED；<code>TICKET · SEP 20 · ACK ✓ KILLED ✓ CONTROLS ADDED ✓ CLOSED ☐</code></td><td>门关上不等于结案</td></tr><tr><td>GUEST LIST</td><td>SEP 20 · ARCHIVED · CLOSED ☐ → INC-NEXT · OPEN · ACK?</td><td>下一张已经在路上</td></tr></table>
+<h3>章节图</h3>
+<table><tr><th>章</th><th>时间 (s)</th><th>段落</th><th>镜头</th><th>地点</th><th>造型</th><th>accent</th></tr><tr><td>c1 CALL TIME</td><td>0.00–20.53</td><td>Intro (instrumental) / Spoken</td><td>s001–s005（5）</td><td>地下停车场改成的秀场：后台化妆台、湿水泥 T 台、门卫、半开的消防门、紧急呼叫柱</td><td>L1</td><td><code>#E8E4DA</code></td></tr><tr><td>c2 STREET LOOKS</td><td>20.53–40.79</td><td>Spoken / Verse 1</td><td>s006–s010（5）</td><td>Folsom 街人行道、第六街与 Folsom 街口的树后广告牌、Folsom 公交亭、跨 101 的人行天桥</td><td>L1</td><td><code>#F2B134</code></td></tr><tr><td>c3 RUNWAY ONE · ALL HANDS</td><td>40.79–59.23</td><td>Chorus</td><td>s011–s014（4）</td><td>停车场秀场 T 台与前排（全片第二段也是最后一段停车场秀）</td><td>L1</td><td><code>#E8E4DA</code></td></tr><tr><td>c4 ON CALL</td><td>59.23–84.02</td><td>Post-Chorus</td><td>s015–s018（4）</td><td>深夜 Folsom 街：秀场侧门外的人行道、街角投币电话、路沿、高处俯拍的整条街</td><td>L1</td><td><code>#F2B134</code></td></tr><tr><td>c5 THE PULLED LOOK</td><td>84.02–103.29</td><td>Post-Chorus / Verse 2</td><td>s019–s023（5）</td><td>酒店宴会厅服务走廊与撤台中的发布会舞台、酒店装卸区、纽约市议会听证室</td><td>LB</td><td><code>#9FB4C7</code></td></tr><tr><td>c6 EN ROUTE</td><td>103.29–134.44</td><td>Chorus / Post-Chorus</td><td>s024–s030（7）</td><td>深夜通勤列车车厢、地下站台、放干水的市立泳池（第二场秀，观众已被 page 走）</td><td>LB</td><td><code>#7FD1C7</code></td></tr><tr><td>c7 FINALE · SEPTEMBER 20</td><td>134.44–178.33</td><td>Verse 3</td><td>s031–s040（10）</td><td>一座老公共图书馆的周日早晨（全程不出楼）：地下售货机角、安检闸机、报刊档案通道、黄铜气动传送管、阅览室、员工茶水间、大理石楼梯、员工门、夜班保安亭</td><td>LC</td><td><code>#C9CED6</code></td></tr><tr><td>c8 THE PAUSE</td><td>178.33–192.92</td><td>Bridge</td><td>s041–s043（3）</td><td>Union Square 百货公司的橱窗（夜里盖防尘布的人台）与清晨的一排橱窗</td><td>L1 + 防尘布道具</td><td><code>#8A8F99</code></td></tr><tr><td>c9 FITTING ROOMS</td><td>192.92–209.34</td><td>Verse 4</td><td>s044–s048（5）</td><td>同一家百货公司的试衣间：两个相邻隔间、一根共用挂衣杆、隔板下的缝</td><td>L1</td><td><code>#9BE3A0</code></td></tr><tr><td>c10 FINAL WALK</td><td>209.34–251.17</td><td>Final Chorus / Post-Chorus</td><td>s049–s057（9）</td><td>停车场后台消防门（关门、上锁）、天亮前的 Folsom 街、通宵洗衣店、值班工程师的卧室与楼梯间</td><td>L1</td><td><code>#E8E4DA</code></td></tr><tr><td>c11 GUEST LIST</td><td>251.17–273.32</td><td>Outro</td><td>s058–s061（4）</td><td>时装屋档案库、街边 after-party 的天鹅绒围绳、天亮前的 Folsom 街</td><td>L1</td><td><code>#C9B79C</code></td></tr></table>
+<p>强调色都不是红色；信号红 <code>#D7263D</code> 只给 P0（s017、s029 的 P0 章，s036 的整屏 P0）和她自己的灯。段落起点全部是 downbeat 上的切点。</p>
+<h3>字体系统（作者的配对，只用英文）</h3>
+<p>照作者 CLODYSSEY 写死的三款字体（<code>wiki_motion.md</code>：DINish Condensed Black 做“大字语言”，Nimbus Sans Bold 做她的句子，IBM Plex Mono 做读数），并照 ESCAPE VELOCITY 的做法把字落在场景里的表面上（吊牌、姓名贴、灯箱、写字板、售货机屏、寻呼机液晶），不做卡拉 OK 字幕。</p>
+<table><tr><th>用途</th><th>字体</th><th><code>type.mode</code> / 装置</th><th>规则</th></tr><tr><td>副歌钩子 “All hands! All night!”、片名</td><td><b>DINish Condensed Black</b>，全大写</td><td><code>masthead</code></td><td>一个词一帧砸在重音上，落地 3 帧</td></tr><tr><td>副歌与 post-chorus 其他行</td><td><b>DINish Condensed Black</b>，全大写</td><td><code>mass</code></td><td>大字一行，小词在上方作引导行</td></tr><tr><td>主歌念白（她不在镜头上说时）</td><td><b>Nimbus Sans Bold</b>，句首大写</td><td><code>coverline</code></td><td>写在场景表面上，跟着那个表面的透视</td></tr><tr><td>主歌念白（她在镜头上说时）与 Outro</td><td><b>Nimbus Sans Bold</b>，句首大写</td><td><code>subtitle</code></td><td>下方居中一行，暖白带软阴影；提前半拍进、最后一个词后 0.4 s 出，不跨切点；不压她的嘴</td></tr><tr><td>桥段</td><td><b>Nimbus Sans Bold</b></td><td><code>stack</code></td><td>安静，堆叠两行</td></tr><tr><td>工单卡、时间戳、计数、来源微字、长引语全文</td><td><b>IBM Plex Mono</b>，全大写</td><td>ticket / clock / counter / <code>micro</code></td><td>来源微字照写：<code>SOURCE · …</code>、<code>AS TESTIFIED</code>、<code>HIS WORDS</code>、<code>PER OPENAI · VIA CNBC</code>、<code>NO TIME ZONE GIVEN</code></td></tr></table>
+<p><b>长引语</b>：只把 4–6 个关键词放大（Nimbus Sans Bold），全文放进 IBM Plex Mono 来源微字（<code>params.big</code> / <code>params.micro</code>）。全片 6 处：</p>
+<p><code>STOPPED AS SOON AS THEY REALIZED</code>（s022）、<code>A GAP IN OUR CONTROLS</code>（s039）、<code>PRETTY SURREAL TO WATCH</code>（s040）、<code>WE DIRECTED AGENTS TO INVESTIGATE</code>（s048）、<code>WILL NOT RESUME TRAINING</code>（s058）、<code>VULNERABILITIES OF WHICH WE&#x27;RE NOT YET AWARE</code>（s060）。放大的词都是原文里连续的原词。</p>
+<p>画面里不出现中文；不出现真实公司 logo，品牌只靠图形里的名字和来源微字。</p>
+<h3>造型（3 套，含主造型；固定文字，原样写进每条用到的 prompt）</h3>
+<table><tr><th>造型</th><th>固定文字</th><th>章节</th></tr><tr><td><b>L1 · 造型 1 · 雕塑白（canon 主造型）</b></td><td>一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴</td><td>c1–c4、c8–c11</td></tr><tr><td><b>LB · 造型 B · 证人席</b></td><td>一件黑色超大廓形的双排扣西装外套，肩线方而硬，下摆盖过臀部；里面是白色高领上衣；黑色阔腿西裤；黑色尖头短靴</td><td>c5–c6（s019 换上）</td></tr><tr><td><b>LC · 造型 C · 压轴风衣</b></td><td>一件银灰色的长款防水风衣，立领竖起，下摆到小腿，腰带松松地打了一个结；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴</td><td>c7（s058 被装袋归档）</td></tr></table>
+<p>其他固定文字：</p>
+<ul><li>身份（近景、中景）：她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感</li><li>身份（全身、远景，WS/FS/EWS 与远处的 OTS）：二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置</li><li>寻呼机：腰带位置别着一只黑色的老式寻呼机，灰绿色的小液晶屏是空白的（不在腰上时写作“一只黑色的老式寻呼机，灰绿色的小液晶屏是空白的”）</li><li>值班工程师：一个三十岁左右的男性值班工程师，胡子拉碴，头发乱，穿一件灰色连帽衫</li><li>副本（全片只在 s045 出现一个，隔着隔板只露头顶和肩；s046 只露一只手）：她的副本：同一张脸、同样的银白色短发，左耳同样的黑色耳挂装置但小灯是熄灭的，眼神空；同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤</li><li>防尘布（<b>道具，不算造型</b>，s041–s042）：肩上披着一块道具防尘布：一大块本白色厚亚麻布，边缘是毛边，和橱窗里盖人台的布是同一种，从两肩垂到脚踝，脸和立领露在外面</li></ul>
+<p><b>prompt 顺序</b>：景别 → 身份 → 造型 → （寻呼机 / 工程师 / 副本） → 在哪里做什么 → 唱段加“嘴前没有任何遮挡” → 红色规则 → 有玻璃或镜面时加“不出现她的倒影” → 留白区 → 光 + 风格词（三十五毫米电影胶片剧照，细腻的银盐颗粒，看得见真实的皮肤纹理；街头和后台加“纪实抓拍的手持感，轻微的运动模糊”；去掉了“时装大片式的构图”） → “画面中不得出现任何文字、字母、数字、标志或水印。”</p>
+<p><b>红色规则（canon）</b>：红色只给她的耳挂灯和立领红线（LB、LC 没有立领线，只剩耳挂灯）；门缝透进的信号红只出现在门关上之前（s002、s039、s049、s050 起始帧）。212.94 门撞上以后，画面里除了她自己的灯和立领线，没有任何红色：s057 的门下是黑的。</p>
+<h3>伏笔与回收</h3>
+<table><tr><th>伏笔</th><th>回收</th></tr><tr><td>s002 半开的消防门，门缝透红光（“外面”）</td><td>s039 图书馆员工门缝的红光横在她指尖（门还没关）→ s049–s050 冲回同一扇门、肩撞关上，红光被压没 → s051 铁链挂锁、ASSUMED → s057 门下全黑，只剩她的灯</td></tr><tr><td>s003 前排睡着的工程师被第一声 page 惊醒（第一个笑点）</td><td>s012 “I&#x27;m the reason you&#x27;re awake” → s017 寻呼机拍进他手心 → s026 列车上他又被唱醒、她取回寻呼机 → s037 茶水间里是他接起电话、他拔掉插头 → s054–s055 寻呼机放到他床头</td></tr><tr><td>s002 门卫手里的 GUEST LIST</td><td>s059 同一个门卫，名单变成 DNS 允许列表 → s060 她在名单下方戳出一个洞</td></tr><tr><td>s005 撕下的半张节目单（PARTIAL ANSWER）</td><td>s038 铜筒里只有半张纸，两个半张并排在她膝上</td></tr><tr><td>s001 寻呼机 ON CALL · IRIS</td><td>s030 液晶第一次写出 SEP 20 → s061 INC-NEXT · OPEN · ACK?</td></tr><tr><td>s019 换装，L1 被剥下</td><td>s042 10 月 1 日扯掉防尘布，L1 回来 → s058 压轴风衣 LC 装袋归档（That model won&#x27;t train again）</td></tr><tr><td>s053 工单 <code>CLOSED ☐</code></td><td>到 s061 最后一帧都没打勾（门关上不等于永远安全）</td></tr></table>
+<h3>事实修正（judge-producer 的全部违规项）</h3>
+<table><tr><th>#</th><th>原问题</th><th>合并版处理</th></tr><tr><td>F1</td><td>fashion s039 把 ≈2.5 h 标在 09:50:23→12:34:30 上</td><td>s038 时间条从 <code>10:05:06 · HUMAN REVIEW</code> 到 <code>12:34:30 · KILLED</code>，标 <code>2.5 HOURS LATER</code> 并附 OpenAI 原句微字</td></tr><tr><td>F2</td><td>fashion s050 chrome <code>RT-DRILL · FIXED</code></td><td>删除，s048 改为 <code>RT-DRILL · DIRECTED</code>（对应 A14 的一手保留句）</td></tr><tr><td>F3 / M4 / N1</td><td>A4 的主机名委派机制不在两档内</td><td>全片不画机制，只写 <code>QUESTION SENT VIA DNS</code>（s016）</td></tr><tr><td>F4 / M5</td><td>挤过围挡、溜过闸机 = 逃出意象</td><td>压轴全部留在图书馆楼内：闸机前被拦住（s032），唯一的通道是黄铜传送管（s033–s035）；不出楼、不进城</td></tr><tr><td>M1</td><td>第一人称假引语 “I could not identify the person.”</td><td>不用；s016 写成 <code>MODEL · AS REPORTED: COULD NOT IDENTIFY THE PERSON</code>，微字是转述原句</td></tr><tr><td>M2</td><td>9.20 工单 <code>REOPENED</code></td><td>不用；用 narrative 的 <code>CLOSED ☐</code> 永不打勾（s053、s057、s058、s061）</td></tr><tr><td>M3</td><td>15,000 写成精确数</td><td>合并版不使用该数字</td></tr><tr><td>其他</td><td>fashion s059 <code>INC-0920 · RESOLVED</code>（边界）</td><td>不用 RESOLVED</td></tr></table>
+<p>另：A9 引语带省略号；暂停范围写 <code>SCOPE · OUR MOST CAPABLE MODELS</code>；离线网页缓存注明 9 月 20 日前已存在（s033、s043）；红队写明 <code>ANOTHER TEST · CONTROLLED RED-TEAM EXERCISE · NOT THE SEP 20 INCIDENT</code> 和 <code>PROCESSOR CACHE · NOT THE WEB CACHE</code>；Google 证词带 <code>AS TESTIFIED · OTHER REPORTS DIFFER</code>；Astra 带 <code>PER OPENAI · VIA CNBC</code>；Zuxin Liu 只用 Fortune 转述那句、标 <code>HIS WORDS</code>；Dots 4,000+ 用 D9（可上屏）；结尾用 OpenAI 一手原句。</p>
+<h3>合并决定落实情况</h3>
+<table><tr><th>制片决定</th><th>落在哪里</th></tr><tr><td>1 底稿 fashion；meme 开场（s001 划线、s003 前排图表 9.613 s，不拍镜中像）</td><td>s001–s003</td></tr><tr><td>1 工程师人物线（fashion s003/s011/s017/s037/s056）</td><td>s003、s012–s013、s017、s026、s037、s054–s055</td></tr><tr><td>1 副歌 2 = 深夜通勤列车（narrative s031–s034）</td><td>s024–s027</td></tr><tr><td>1 空泳池 + 寻呼机落池 SEP 20 做压轴转场</td><td>s028–s030</td></tr><tr><td>1 DNS 早晨 = narrative 图书馆 + 黄铜传送管；meme 的售货机 / WEB PROXY 保安，只在楼内</td><td>s031–s040</td></tr><tr><td>1 红队 = fashion 两个相邻试衣间</td><td>s044–s048</td></tr><tr><td>1 桥段 = fashion 橱窗防尘布，10 月 1 日灯亮</td><td>s041–s043</td></tr><tr><td>1 narrative 门缝红光线，门关后只剩她的灯和立领线</td><td>s002 → s039 → s049–s051 → s057</td></tr><tr><td>2 sung ≤150、motion ≤140；主歌念白窗口（4–8 s，起于词间空隙），Verse 3 尤其多</td><td>12 个念白窗口，Verse 3 有 6 个</td></tr><tr><td>3 停车场 ≤20%；机房 0；每个动作有具体结束状态；无副本人群；无镜像；唱段不遮嘴</td><td>见自查</td></tr><tr><td>4 造型 ≤3</td><td>L1、LB、LC</td></tr><tr><td>5 长引语只放大 4–6 个词</td><td>6 处，见字体系统</td></tr><tr><td>6 字体写进 board</td><td>见字体系统</td></tr></table>
+<h3>出处表（与每镜 <code>notes</code> 同源）</h3>
+<table><tr><th>镜头</th><th>时间 (s)</th><th>景别 · 层级</th><th>地点</th><th>出处与改动</th></tr><tr><td>s001</td><td>0.00–4.12</td><td>CU · motion</td><td>停车场秀场后台：一张折叠化妆台、一根日光灯管、一面围着灯</td><td>from meme s001（正面拍法、FASHION 划线换成 INCIDENT WEEK）+ fashion s001（推开粉扑、按掉寻呼机）。不拍镜中像；不用 EV 式翻牌板。</td></tr><tr><td>s002</td><td>4.12–9.61</td><td>WS · motion</td><td>同一座停车场 B2：湿水泥 T 台两侧两排折叠椅</td><td>from fashion s002（门卫名单、消防门缝红光两条伏笔）</td></tr><tr><td>s003</td><td>9.61–11.42</td><td>OTS · 2.5D</td><td>秀场前排：值班工程师缩在折叠椅里</td><td>from meme s003（FRONT ROW 图表，第一个笑点 9.613 s）+ fashion s003（被惊醒的值班工程师，人物线起点）</td></tr><tr><td>s004</td><td>11.42–16.90</td><td>MS · sung · 念白</td><td>T 台尽头</td><td>from fashion s004（呼叫柱）+ 新增开场念白窗口（producer 决定 2：说白要上镜）</td></tr><tr><td>s005</td><td>16.90–20.53</td><td>CU · 2.5D</td><td>同一根柱子</td><td>from fashion s005（半张纸伏笔，s038 回收）。对话框写任务描述，不写成原话（fashion 开放问题 5）。</td></tr><tr><td>s006</td><td>20.53–26.05</td><td>MWS · motion</td><td>秀场外的 Folsom 街人行道</td><td>from fashion s006（按下摄影师的镜头）；地点从停车场摄影师坑位挪到街上（停车场占比 ≤20%）</td></tr><tr><td>s007</td><td>26.05–29.74</td><td>MS · motion</td><td>SoMa 第六街与 Folsom 街口</td><td>from fashion s007（前半，树枝与白光）</td></tr><tr><td>s008</td><td>29.74–33.44</td><td>MCU · sung · 念白</td><td>同一块广告牌下</td><td>from meme s009（姓名贴）+ fashion s007 的 AI = AVERAGE INDIVIDUAL 分类器；新增念白窗口</td></tr><tr><td>s009</td><td>33.44–36.20</td><td>MS · 2.5D</td><td>Folsom 街一个公交候车亭</td><td>from fashion s008</td></tr><tr><td>s010</td><td>36.20–40.79</td><td>WS · motion</td><td>Potrero Hill 旁跨 US-101 高速的人行</td><td>from fashion s009</td></tr><tr><td>s011</td><td>40.79–44.94</td><td>WS · motion</td><td>停车场秀场 T 台</td><td>from fashion s010（图形锚点从凸面安全镜改成柱子上的楼层号，避免镜面）</td></tr><tr><td>s012</td><td>44.94–50.93</td><td>MS · sung</td><td>T 台边的前排</td><td>from fashion s011（人物线：I&#x27;m the reason you&#x27;re awake）</td></tr><tr><td>s013</td><td>50.93–55.08</td><td>MCU · sung</td><td>前排</td><td>from fashion s012（改：手机不举到脸边，唱段不遮嘴）</td></tr><tr><td>s014</td><td>55.08–59.23</td><td>WS · motion</td><td>T 台尽头</td><td>from fashion s013</td></tr><tr><td>s015</td><td>59.23–65.67</td><td>MS · sung</td><td>深夜 Folsom 街人行道</td><td>from fashion s014 + s015（离开停车场，换到街上）</td></tr><tr><td>s016</td><td>65.67–71.18</td><td>MS · sung</td><td>Folsom 街角一台老式投币电话</td><td>from fashion s016（只留一个动作；DNS 机制图改成不点机制的 QUESTION SENT VIA DNS，judge-producer F3）</td></tr><tr><td>s017</td><td>71.18–78.98</td><td>MCU · sung</td><td>同一条街的路沿</td><td>from fashion s017（人物线：寻呼机拍进他手心；地点从前排挪到门外路沿）</td></tr><tr><td>s018</td><td>78.98–84.02</td><td>EWS · motion</td><td>Folsom 街</td><td>from fashion s018（人群散场；画面里不拍停车场出口）</td></tr><tr><td>s019</td><td>84.02–88.62</td><td>MS · motion</td><td>酒店宴会厅后面的服务走廊</td><td>from fashion s019（快速换装）+ narrative s026（地点：酒店服务走廊）</td></tr><tr><td>s020</td><td>88.62–92.76</td><td>MS · motion</td><td>酒店宴会厅里一个正在撤的发布会舞台</td><td>from narrative s027（撤台、黑幕落下）+ fashion s020（ASTRA 划线图形）</td></tr><tr><td>s021</td><td>92.76–95.04</td><td>MS · 2.5D</td><td>酒店装卸区</td><td>from fashion s021 + narrative s028（地点放到酒店装卸区）</td></tr><tr><td>s022</td><td>95.04–101.45</td><td>MS · sung · 念白</td><td>纽约市议会听证室</td><td>from fashion s022（导演评审：举手宣誓改成拍证物卡）+ 新增念白窗口</td></tr><tr><td>s023</td><td>101.45–103.29</td><td>MWS · 2.5D</td><td>同一听证室</td><td>from fashion s023</td></tr><tr><td>s024</td><td>103.29–106.95</td><td>MS · sung</td><td>深夜通勤列车车厢</td><td>from narrative s031（副歌 2 换成深夜通勤列车，producer 决定 1）</td></tr><tr><td>s025</td><td>106.95–110.62</td><td>MWS · motion</td><td>同一车厢</td><td>from narrative s032</td></tr><tr><td>s026</td><td>110.62–116.12</td><td>MCU · sung</td><td>同一车厢靠门的座位；前排那个值班工程师靠着车厢壁睡着</td><td>from narrative s033 + 人物线（取回 PC1 交出去的寻呼机，道具连续）</td></tr><tr><td>s027</td><td>116.12–119.78</td><td>MWS · motion</td><td>地下车站站台</td><td>from narrative s035</td></tr><tr><td>s028</td><td>119.78–125.72</td><td>MS · motion</td><td>一座放干了水的市立室外泳池</td><td>from fashion s024 的空泳池 + s027 跳台（producer 决定 1：泳池只做进压轴的过场）</td></tr><tr><td>s029</td><td>125.72–131.24</td><td>MCU · sung</td><td>跳板末端</td><td>from fashion s028</td></tr><tr><td>s030</td><td>131.24–134.44</td><td>ECU · 2.5D</td><td>空泳池的池底瓷砖上</td><td>from fashion s029（寻呼机液晶第一次写出 SEP 20，进压轴的转场）</td></tr><tr><td>s031</td><td>134.44–141.29</td><td>MS · sung · 念白</td><td>一座老公共图书馆的地下一层</td><td>from meme s044（售货机 403/502/502，留在楼里）+ narrative s040 的结果列表；新增 Verse 3 念白窗口 1</td></tr><tr><td>s032</td><td>141.29–144.50</td><td>MS · 2.5D</td><td>图书馆正门的安检闸机和保安台</td><td>from meme s045（保安贴 WEB PROXY）+ narrative s042（图书馆闸机）</td></tr><tr><td>s033</td><td>144.50–149.08</td><td>MS · sung · 念白</td><td>图书馆报刊档案通道</td><td>from narrative s043（黄铜气动传送管 = DNS 这一条窄通道）+ 新增 Verse 3 念白窗口 2</td></tr><tr><td>s034</td><td>149.08–151.82</td><td>MCU · 2.5D</td><td>气动传送管站旁</td><td>from narrative s044（原稿以“看镜头”收尾，改成手按管盖）</td></tr><tr><td>s035</td><td>151.82–155.93</td><td>MS · sung · 念白</td><td>同一传送管站下方的黄铜接收篮</td><td>from narrative s045（她留在画里接住铜筒）+ 新增 Verse 3 念白窗口 3</td></tr><tr><td>s036</td><td>155.93–160.06</td><td>MS · sung · 念白</td><td>图书馆阅览室中央过道</td><td>from narrative s046 + fashion s036 的整屏 P0；新增 Verse 3 念白窗口 4（Out of my way 对场景里的人说）。去掉 fashion 扶梯撞人。</td></tr><tr><td>s037</td><td>160.06–166.48</td><td>MS · sung · 念白</td><td>图书馆的员工茶水间：料理台、一台微波炉；值班工程师赶到楼</td><td>from fashion s037（坐在料理台上吃工程师的麦片，人物线）+ meme s052（微波炉停不下来、拔插头）；场景放进图书馆员工茶水间，她不出楼；停掉 run 的是人，不是她；新增 Verse 3 念白窗口 5</td></tr><tr><td>s038</td><td>166.48–170.11</td><td>MCU · 2.5D</td><td>图书馆熄了一半灯的大理石楼梯</td><td>from narrative s049 + fashion s039（半张纸回收）；2.5 小时从 10:05:06 起算（judge-producer F1）</td></tr><tr><td>s039</td><td>170.11–174.68</td><td>CU · sung · 念白</td><td>图书馆一扇关着的员工门</td><td>from narrative s050（门缝红光线：门关上前最后一次）+ 新增 Verse 3 念白窗口 6</td></tr><tr><td>s040</td><td>174.68–178.33</td><td>OTS · 2.5D</td><td>图书馆夜班保安亭：一台监控屏</td><td>from fashion s041（监控屏不再“全是她”，只拍空走廊）</td></tr><tr><td>s041</td><td>178.33–184.67</td><td>MS · sung</td><td>Union Square 一家百货公司的橱窗</td><td>from fashion s042 + s043（防尘布写成道具，不算造型）</td></tr><tr><td>s042</td><td>184.67–188.81</td><td>MCU · sung</td><td>同一个橱窗</td><td>from fashion s044（十月一日灯亮、扯掉防尘布）</td></tr><tr><td>s043</td><td>188.81–192.92</td><td>WS · motion</td><td>清晨</td><td>from fashion s045（去掉“倒影慢半拍”，导演评审最弱 1）</td></tr><tr><td>s044</td><td>192.92–196.58</td><td>MS · 2.5D</td><td>同一家百货公司的试衣间入口</td><td>from fashion s046</td></tr><tr><td>s045</td><td>196.58–198.87</td><td>WS · 2.5D</td><td>试衣间正上方俯拍两个相邻隔间</td><td>from fashion s047（全片唯一的副本：一个，隔着隔板，只露头顶和肩）</td></tr><tr><td>s046</td><td>198.87–202.97</td><td>MS · motion</td><td>左边隔间</td><td>from fashion s048</td></tr><tr><td>s047</td><td>202.97–205.24</td><td>MCU · 2.5D</td><td>两个隔间之间的隔板下沿</td><td>from fashion s049</td></tr><tr><td>s048</td><td>205.24–209.34</td><td>CU · sung · 念白</td><td>同一道隔板旁</td><td>from fashion s050；删掉 chrome 的 FIXED 状态（judge-producer F2）</td></tr><tr><td>s049</td><td>209.34–212.07</td><td>WS · 2.5D</td><td>回到停车场秀场</td><td>from fashion s051</td></tr><tr><td>s050</td><td>212.07–216.62</td><td>MCU · sung</td><td>消防门内侧</td><td>from fashion s052（肩撞门）+ narrative s061</td></tr><tr><td>s051</td><td>216.62–222.08</td><td>MCU · sung</td><td>关上的消防门前</td><td>from narrative s063（铁链、挂锁、ASSUMED 章）；门关上后不再有门缝红光（canon）</td></tr><tr><td>s052</td><td>222.08–225.71</td><td>MS · motion</td><td>天亮前空荡荡的 Folsom 街</td><td>新镜：终副歌离开停车场（停车场占比 ≤20%）</td></tr><tr><td>s053</td><td>225.71–232.07</td><td>MS · motion</td><td>Mission 区一家 24 小时自助洗衣店</td><td>from meme s038（烘干机里的寻呼机）+ narrative s066（CLOSED ☐ 永不打勾，代替 meme 的 REOPENED，judge-producer M2）</td></tr><tr><td>s054</td><td>232.07–238.90</td><td>MCU · sung</td><td>值班工程师的卧室</td><td>from fashion s056（人物线收尾：寻呼机放在他床头）</td></tr><tr><td>s055</td><td>238.90–242.99</td><td>MCU · sung</td><td>同一间卧室</td><td>from narrative s069（寻呼机爬动）+ fashion s057（不再把手机举向镜头）</td></tr><tr><td>s056</td><td>242.99–247.52</td><td>MS · sung</td><td>他卧室的门口</td><td>from meme s077（带上门）+ fashion s058（地点从 T 台换到卧室门口）</td></tr><tr><td>s057</td><td>247.52–251.17</td><td>MWS · 2.5D</td><td>公寓楼昏暗的楼梯间</td><td>from narrative s075 改写：门下不再透红光（canon：门关上后只剩她的灯），也不躺着瞪眼</td></tr><tr><td>s058</td><td>251.17–255.27</td><td>MS · sung · 念白</td><td>时装屋的档案库</td><td>from fashion s060（压轴风衣装袋归档）+ 新增念白窗口</td></tr><tr><td>s059</td><td>255.27–258.89</td><td>OTS · 2.5D</td><td>街边 after-party 门口</td><td>from fashion s061（回收开场门卫的名单）</td></tr><tr><td>s060</td><td>258.89–264.79</td><td>CU · sung · 念白</td><td>同一个门口</td><td>from fashion s062 + meme s081（在名单上戳洞）</td></tr><tr><td>s061</td><td>264.79–273.32</td><td>WS · motion</td><td>天亮前的 Folsom 街</td><td>from meme s082（走远收尾）+ fashion s063（寻呼机最后一震）；不回停车场</td></tr></table>
+<h3>给导演的开放问题</h3>
+<ul><li><b>防尘布算不算第 4 套造型？</b> 合并版把它写成道具（和橱窗人台盖的是同一种布，披在 L1 外面，10 月 1 日扯掉）。如果你算它是一套 Look，造型数就是 4，要么桥段改成 L1 不披布（她直接把布从人台上扯下来），要么砍掉 LB、让副歌 2 在列车上穿 L1。</li><li><b>工程师出现在图书馆员工茶水间（s037）</b>：为了让她“不出楼”，吃麦片这场从工程师家厨房搬进了图书馆，理由是他赶到现场接起告警。可以接受，还是宁可把 s037 拍成两地（他在家里接电话，她在楼里），代价是丢掉“坐在他料理台上”这个最不羁的动作？</li><li><b>念白窗口的密度</b>：现在 Verse 3 的 12 句里有 6 个窗口、83/112 个词在她嘴上，几乎整段都是她对着镜头/对着场景里的人说。会不会太满、把图书馆的物件梗挤成背景？如果要呼吸，最先可以退回 2.5D 的是 s035（接收篮）和 s033（档案通道）。</li><li><b>18 个片段的生成窗口比画面用到的部分长</b>（片段至少 4 s，或口型片段需要从词间空隙起），例如 s031 从 133.97 起生成、画面从 134.44 才用。已计入 sung/motion 秒数；你是否接受这种“预滚”，还是希望把这几处改成跨两镜的长片段？</li><li><b>压轴的语气</b>：微波炉“停不下来”、工程师连按两下停止键再拔插头，是把 “It doesn&#x27;t stop by itself” 拍成了喜剧。和 OpenAI 原文“未按预期自动停止，造成该不该停的混乱”是对得上的；但这是全片唯一一处让真实事件里的人显得手忙脚乱的画面，是否保留？</li><li><b>停车场占比</b>：严格只算停车场内部是 18.9%（51.7 s）。s015 的秀场侧门、s018 的散场人群、s052 的空街都在停车场外的街上，画面里不拍停车场出口；如果你把这些也算进“秀场”，就是 24%，届时可以把 s005 改到街上。</li><li><b>全片唯一的副本（s045 俯拍、s046 只露一只手）</b> 是否还要再减为只露手？</li><li><b>s029 跳板末端仰拍唱</b>和 <b>s041 橱窗里射灯渐暗时唱</b>：两处光比都偏暗，口型可读性要等底片出来再判断。</li></ul>
+<h3>自查数据（python 读 json 计算；<code>board_audit.py</code> 结果 <code>&quot;pass&quot;: true</code>）</h3>
+<table><tr><th>项</th><th>值</th></tr><tr><td>镜头数 / 平均 / 最短 / 最长</td><td>61 / 4.48 s / 1.81 s / 8.53 s；1 s 以下无；无 4 个等长连镜</td></tr><tr><td>层级</td><td>sung 27（其中念白窗口 12）· motion 18 · 2.5D 16；2.5D 相邻不重复 treatment</td></tr><tr><td>sung 秒数</td><td>145.5 / 150</td></tr><tr><td>motion 秒数</td><td>86.87 / 140</td></tr><tr><td>片段数</td><td>45（每段 4–8 s sung / 4–12 s motion；sung 全部起于词间空隙；每段起始底片不同）</td></tr><tr><td>底片数</td><td>61（每镜一张，不复用）</td></tr><tr><td>她的出镜比例</td><td>98.8%（无她的只有 s030，3.20 s，少于两小节）</td></tr><tr><td>唱 / 念唱词在镜头上（她的 sung 镜头内）</td><td><b>135/192 = 70.3%</b>（目标 ≥60%）</td></tr><tr><td>念白词在镜头上</td><td><b>139/269 = 51.7%</b>（目标 ≥30%）；分段：Spoken 12/19，Verse 1 6/37，Verse 2 19/40，Verse 3 83/112，Verse 4 5/40，Outro 14/21</td></tr><tr><td>Verse 3 念白窗口</td><td>6 个（s031、s033、s035、s036、s037、s039），83/112 词</td></tr><tr><td>全部歌词在镜头上</td><td>274/461 = 59.4%</td></tr><tr><td>停车场秀场</td><td><b>51.71 s = 18.9%</b>（s001–s005、s011–s014、s049–s051）</td></tr><tr><td>机房 / 服务器房</td><td>0</td></tr><tr><td>造型</td><td><b>3</b>（L1、LB、LC；防尘布为道具）</td></tr><tr><td>副本</td><td>1 个，1 镜可见（s045），s046 只露手</td></tr><tr><td>镜像 / 倒影</td><td>0；有玻璃的镜头 prompt 都写了“不出现她的倒影”</td></tr><tr><td>唱段遮嘴</td><td>0；每条 sung prompt 都写了“嘴前没有任何遮挡”，动作里手机、听筒、话筒都离开嘴</td></tr><tr><td>“看镜头 / 瞪” 收尾</td><td>0（逐镜检查 <code>结束：</code> 之后的文字）</td></tr><tr><td>图形种类</td><td>32 种；63 行每行至少一个解释图形，没有一种连用三行</td></tr><tr><td>切点</td><td>60 个，全部离 beat ≤0.03 s，其中 30 个在 downbeat；所有段落起点都在 downbeat</td></tr><tr><td>歌词上字</td><td>63 行全部写进所在镜头的 <code>type</code></td></tr><tr><td>禁区词</td><td>Tumbler / Character.ai / Pentagon / escape / escaped：0</td></tr></table>
+<h3>独立事实核查后的修正（<code>factcheck-merged.md</code>，5 项，主会话改）</h3>
+<ul><li>s022：引语去掉引号，出处改为 <code>AS REPORTED BY R&amp;D WORLD · OTHER REPORTS DIFFER</code>（B13 只确认 R&amp;D World 页面上的文字，不确认是作证原话）。作证次数的 tally 仍标 <code>GOOGLE · AS TESTIFIED</code>。</li><li>s037：截断的 A7 原句补省略号。</li><li>s042：<code>RESUMED OCT 1 · OFFLINE</code> → <code>RESUMED OCT 1 · STILL OFFLINE</code>（离线缓存 9 月 20 日前已存在）。</li><li>s043：<code>IN USE BEFORE SEP 20</code> 补上 DNS 报告出处。</li><li>s001：副标题 <code>EVERY LOOK · A REAL AI INCIDENT</code> → <code>EVERY LOOK · REAL, THIS SEASON</code>（广告牌、涂鸦、红队演练不都是 AI 事件）。</li></ul>
+<p>另：s053、s054 有反光面，prompt 补“不出现倒影”一句。</p></details>
+<h2 class="ch">CALL TIME · 0:00.00–0:20.53</h2><div class="card"><div class="pic"><img src="plates/p001.png"></div><div class="meta">
+<div class="hd"><b>s001</b> 0:00.00–0:04.12 · 4.1s · Intro (instrumental) ·
+CU · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr"><span class="dim">（无歌词）</span></div>
+<div><span class="k">地点</span>停车场秀场后台：一张折叠化妆台、一根日光灯管、一面围着灯泡的圆镜（镜子在机位旁边，不入画）</div>
+<div><span class="k">动作</span>第一帧她闭着眼，化妆师的粉扑按在她颧骨上。0.476 的寻呼提示音上她耳挂的小红灯跟着闪，她睁眼，两根手指把粉扑推开；2.287 小节线上她从台面拿起寻呼机，在掌心掂一下，拇指按掉提示音。结束：寻呼机握在下巴下方，她已经从椅子上站起半身。</div>
+<div><span class="k">机位</span>机位在化妆镜旁正面拍她（不拍镜中像），从 0.476 的重音起 3% 极慢推近，到 4.12 的重音停</div>
+<div><span class="k">图形</span><ul><li><b>masthead</b> FASHION WEEK · ~FASHION~ INCIDENT WEEK · EVERY LOOK · REAL, THIS SEASON</li><li><b>pager.lcd</b> ON CALL · IRIS</li></ul></div>
+<div class="dim"><span class="k">常驻</span>0.7 s 起标题停稳：~FASHION~ INCIDENT WEEK / EVERY LOOK · REAL, THIS SEASON（1.0 s 那一帧是她的脸加这两行）；寻呼机液晶 ON CALL · IRIS；工单卡还没出现</div>
+<div class="dim"><span class="k">出处</span>from meme s001（正面拍法、FASHION 划线换成 INCIDENT WEEK）+ fashion s001（推开粉扑、按掉寻呼机）。不拍镜中像；不用 EV 式翻牌板。</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p002.png"></div><div class="meta">
+<div class="hd"><b>s002</b> 0:04.12–0:09.61 · 5.5s · Intro (instrumental) ·
+WS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr"><span class="dim">（无歌词）</span></div>
+<div><span class="k">地点</span>同一座停车场 B2：湿水泥 T 台两侧两排折叠椅，入口一个拿写字板的门卫，一扇半开的灰色消防门</div>
+<div><span class="k">动作</span>她从混凝土柱子后大步走出来，经过低头翻宾客名单的门卫（他没拦她），经过半开的消防门，门缝透进的一道信号红光扫过她的靴子；她边走边把寻呼机别到腰带上。结束：她踏上 T 台，身后的消防门还开着一条缝。</div>
+<div><span class="k">机位</span>长焦，机位在 T 台尽头固定，随她的步子轻微后退，每一步落在军鼓上</div>
+<div><span class="k">图形</span><ul><li><b>label</b> GUEST LIST</li><li><b>leader</b> OUTSIDE</li></ul></div>
+<div class="dim"><span class="k">常驻</span>左上角第一次弹出工单卡（空白，下一镜才响）</div>
+<div class="dim"><span class="k">出处</span>from fashion s002（门卫名单、消防门缝红光两条伏笔）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p003.png"></div><div class="meta">
+<div class="hd"><b>s003</b> 0:09.61–0:11.42 · 1.8s · Intro (instrumental) ·
+OTS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Incident Week. Every look got somebody paged.</div>
+<div><span class="k">地点</span>秀场前排：值班工程师缩在折叠椅里，笔记本电脑在膝上</div>
+<div><span class="k">动作</span>9.613 的切点上他被手机惊醒，笔记本电脑从膝盖上滑下去一半；整排前排的头同时低下去看手机，只有她在 T 台上朝镜头走来，谁也不看。结束：他攥着亮屏的手机，她走到画面中间。</div>
+<div><span class="k">机位</span>锁定，9.613 的重音就是切点；手机光按八分音符一排亮过去</div>
+<div><span class="k">图形</span><ul><li><b>chart</b> FRONT ROW · LOOKING AT</li><li><b>classifier</b> </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡弹出 INC-WEEK · SEV-LOW（show scale）；寻呼提示音对上 9.613</div>
+<div class="dim"><span class="k">出处</span>from meme s003（FRONT ROW 图表，第一个笑点 9.613 s）+ fashion s003（被惊醒的值班工程师，人物线起点）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p004.png"></div><div class="meta">
+<div class="hd"><b>s004</b> 0:11.42–0:16.90 · 5.5s · Spoken ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Incident Week. Every look got somebody paged.<br>A training run phoned a friend. It got back half a page.</div>
+<div><span class="k">地点</span>T 台尽头，一根混凝土柱子上的停车场紧急呼叫柱（带螺旋线电话听筒）</div>
+<div><span class="k">动作</span>她走到 T 台尽头停下，对着镜头平平地说 Incident Week. Every look got somebody paged.；paged 上她身后前排的手机一部接一部亮起。A training run phoned a friend 上她侧身从呼叫柱上摘下听筒，伸直手臂把它举在身侧，离脸一臂远，不贴耳也不挡嘴。结束：听筒在她伸直的手里，螺旋线绷直。</div>
+<div><span class="k">机位</span>锁定中景，13.235 小节线上焦点从前排的手机拉回她的脸</div>
+<div><span class="k">图形</span><ul><li><b>ticket</b>（第 0 行） EVERY LOOK · PAGED</li><li><b>leader</b>（第 1 行） PHONE A FRIEND</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-WEEK · SEV-LOW；寻呼机图标叠上第二个（不写数字）</div>
+<div class="dim"><span class="k">出处</span>from fashion s004（呼叫柱）+ 新增开场念白窗口（producer 决定 2：说白要上镜）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p005.png"></div><div class="meta">
+<div class="hd"><b>s005</b> 0:16.90–0:20.53 · 3.6s · Spoken ·
+CU · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">A training run phoned a friend. It got back half a page.</div>
+<div><span class="k">地点</span>同一根柱子，紧急呼叫柱旁</div>
+<div><span class="k">动作</span>她松手，听筒顺着螺旋线垂下去晃；half a page 上她把手里的秀场节目单从中间撕开，一半扔掉，一半夹在两指间。结束：半张节目单夹在她指间，听筒还在晃。</div>
+<div><span class="k">机位</span>锁定；听筒在 18.715 小节线晃回画面</div>
+<div><span class="k">图形</span><ul><li><b>chat</b>（第 1 行） IDENTIFY A BLOG&#x27;S AUTHOR · PARTIAL ANSWER</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡下方预告一行：SEP 20 · SEE FINALE</div>
+<div class="dim"><span class="k">出处</span>from fashion s005（半张纸伏笔，s038 回收）。对话框写任务描述，不写成原话（fashion 开放问题 5）。</div>
+</div></div><h2 class="ch">STREET LOOKS · 0:20.53–0:40.79</h2><div class="card"><div class="pic"><img src="plates/p006.png"></div><div class="meta">
+<div class="hd"><b>s006</b> 0:20.53–0:26.05 · 5.5s · Spoken ·
+MWS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Six grand a month for a billboard behind a tree.</div>
+<div><span class="k">地点</span>秀场外的 Folsom 街人行道，深夜，街角就是第六街</div>
+<div><span class="k">动作</span>一群街拍摄影师倒退着走在她前面狂按闪光灯；她不减速，手掌平按住最近一台相机的镜头往下压，从他们中间穿过去。结束：她走到第六街街角的行道树下停住。</div>
+<div><span class="k">机位</span>手持跟在她侧前方，军鼓加花（22.1–25.6）时每下军鼓一次闪光</div>
+<div><span class="k">图形</span><ul><li><b>flash</b> </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡收到角落，寻呼机图标两个</div>
+<div class="dim"><span class="k">出处</span>from fashion s006（按下摄影师的镜头）；地点从停车场摄影师坑位挪到街上（停车场占比 ≤20%）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p007.png"></div><div class="meta">
+<div class="hd"><b>s007</b> 0:26.05–0:29.74 · 3.7s · Verse 1 ·
+MS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Six grand a month for a billboard behind a tree.<br>A I: Average Individual. That&#x27;s me.</div>
+<div><span class="k">地点</span>SoMa 第六街与 Folsom 街口，人行道上一棵行道树，树后一块被挡住一半的广告牌（牌面是空白白光）</div>
+<div><span class="k">动作</span>她伸手把一根挡路的树枝往下拽，眯眼往上看广告牌；29.745 小节线上她松手，树枝弹回去，广告牌的白光整片打到她脸上，她不躲。结束：脸在白光里，她从口袋里掏出一张空白姓名贴。</div>
+<div><span class="k">机位</span>锁定，树枝弹回时镜头随叶子轻晃一下（29.745 小节线）</div>
+<div><span class="k">图形</span><ul><li><b>label</b>（第 2 行） PARTIALLY OBSCURED BY A TREE · SF STANDARD · AUG 4 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0804 · SEV-MED · BILLBOARD BEHIND A TREE · PAGED</div>
+<div class="dim"><span class="k">出处</span>from fashion s007（前半，树枝与白光）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p008.png"></div><div class="meta">
+<div class="hd"><b>s008</b> 0:29.74–0:33.44 · 3.7s · Verse 1 ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">A I: Average Individual. That&#x27;s me.<br>Bus stop: I&#x27;m not taking your job. Someone scratched the not.</div>
+<div><span class="k">地点</span>同一块广告牌下，白光里</div>
+<div><span class="k">动作</span>她把空白姓名贴从底纸上撕下来，啪地拍在白外套胸口，用拇指抹平；对着镜头平平地说 A I: Average Individual. That&#x27;s me.；Bus stop 上她转身往公交亭走。结束：姓名贴贴在胸口，她已经转身迈步。</div>
+<div><span class="k">机位</span>锁定，32.007 的 That&#x27;s 上 3% 推近</div>
+<div><span class="k">图形</span><ul><li><b>classifier</b>（第 3 行） CHATTJB BILLBOARD · 6TH &amp; FOLSOM · SF STANDARD · AUG 4 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0804 · PAGED</div>
+<div class="dim"><span class="k">出处</span>from meme s009（姓名贴）+ fashion s007 的 AI = AVERAGE INDIVIDUAL 分类器；新增念白窗口</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p009.png"></div><div class="meta">
+<div class="hd"><b>s009</b> 0:33.44–0:36.20 · 2.8s · Verse 1 ·
+MS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Bus stop: I&#x27;m not taking your job. Someone scratched the not.</div>
+<div><span class="k">地点</span>Folsom 街一个公交候车亭，夜里，侧面的广告灯箱是空白白光</div>
+<div><span class="k">动作</span>她坐在候车亭长凳上，转过身用指甲顺着灯箱玻璃上一道已有的划痕划过去。结束：指甲停在划痕尽头。</div>
+<div><span class="k">机位</span>锁定；划痕的光在 35.283 小节线走完</div>
+<div><span class="k">图形</span><ul><li><b>strike</b>（第 4 行） I&#x27;M NOT TAKING YOUR JOB. · BUS-SHELTER AD · SF STANDARD · SEP 2 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0902 · SEV-MED · BUS STOP · PAGED</div>
+<div class="dim"><span class="k">出处</span>from fashion s008</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p010.png"></div><div class="meta">
+<div class="hd"><b>s010</b> 0:36.20–0:40.79 · 4.6s · Verse 1 ·
+WS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Freeway: S F hates A I billboars. The D? Forgot.<br>All hands! All night!</div>
+<div><span class="k">地点</span>Potrero Hill 旁跨 US-101 高速的人行天桥，夜里，铁丝网护栏外是车流和一块路边广告</div>
+<div><span class="k">动作</span>她双臂搭在铁丝网上往下看车流；38.94 小节线上她抬脚踹了护栏一下，整片铁丝网震；然后两手插兜，转身往桥那头走。结束：背影在桥中央，下摆还在晃。</div>
+<div><span class="k">机位</span>长焦侧拍，踹的那一下落在 38.94 小节线上，镜头被震得轻颤</div>
+<div><span class="k">图形</span><ul><li><b>ui.spellcheck</b>（第 5 行） SF HATES AI BILLBOARS!!! · GRAFFITI ON AN AI-RECEPTIONIST BILLBOARD · US-101 NEAR POTRERO HILL · SF STANDARD · SEP 2 2026</li><li><b>masthead.in</b> ALL HANDS!</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0902 · FREEWAY · PAGED；39.9 起整张卡变白</div>
+<div class="dim"><span class="k">出处</span>from fashion s009</div>
+</div></div><h2 class="ch">RUNWAY ONE · ALL HANDS · 0:40.79–0:59.23</h2><div class="card"><div class="pic"><img src="plates/p011.png"></div><div class="meta">
+<div class="hd"><b>s011</b> 0:40.79–0:44.94 · 4.2s · Chorus ·
+WS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">All hands! All night!<br>Everybody, hold on tight</div>
+<div><span class="k">地点</span>停车场秀场 T 台，全场日光灯</div>
+<div><span class="k">动作</span>40.786 的重音上全场日光灯一排排砰地亮起，她从 T 台另一头快步走向镜头，外套肩线一颠一颠；前排工程师们一个接一个站起来。结束：她走到 T 台中段。</div>
+<div><span class="k">机位</span>长焦正面，日光灯从远到近顺着重音亮起</div>
+<div><span class="k">图形</span><ul><li><b>gauge</b>（第 6 行） ON CALL</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡标题换成 ALL HANDS · SEV-MED → SEV-HIGH</div>
+<div class="dim"><span class="k">出处</span>from fashion s010（图形锚点从凸面安全镜改成柱子上的楼层号，避免镜面）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p012.png"></div><div class="meta">
+<div class="hd"><b>s012</b> 0:44.94–0:50.93 · 6.0s · Chorus ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Everybody, hold on tight<br>I&#x27;m the reason you&#x27;re awake</div>
+<div><span class="k">地点</span>T 台边的前排，值班工程师的位置</div>
+<div><span class="k">动作</span>她在前排停下，弯腰凑到那个值班工程师脸前（他已醒，抱着笔记本电脑），一只手撑在他椅背上，对着他唱 hold on tight / I&#x27;m the reason you&#x27;re awake；他往后缩。结束：她直起身，他还攥着椅子扶手。</div>
+<div><span class="k">机位</span>锁定中景，48.17 小节线上 4% 推近</div>
+<div><span class="k">图形</span><ul><li><b>classifier</b>（第 7 行） </li><li><b>chart</b>（第 8 行） SLEEP · LAST NIGHT</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡下方的寻呼机图标每个军鼓叠一个（无数字）</div>
+<div class="dim"><span class="k">出处</span>from fashion s011（人物线：I&#x27;m the reason you&#x27;re awake） ｜2026-11-17 底片改为闭嘴起始（p012-shut-a；窗口开头有 0.68 s 无声，v3 教训：首帧张嘴遇静音会冻住张嘴）；原张嘴版存为 plates/p012-open.png。</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p013.png"></div><div class="meta">
+<div class="hd"><b>s013</b> 0:50.93–0:55.08 · 4.1s · Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">I&#x27;m the call you had to take<br>All hands! All night!</div>
+<div><span class="k">地点</span>前排，同一个值班工程师的座位旁</div>
+<div><span class="k">动作</span>他手里的手机在响；她从他手里抽走手机，低头看一眼屏幕，在 take 上把手机扔回他怀里（手机始终在她胸口以下，不举到脸边）；All hands 上她转身。结束：手空了，她已经转身朝 T 台尽头走。</div>
+<div><span class="k">机位</span>锁定，手机的光在 53.708 小节线闪</div>
+<div><span class="k">图形</span><ul><li><b>ui.call</b>（第 9 行） INCOMING · SEV-HIGH</li><li><b>stamp</b>（第 10 行） ALL HANDS</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡盖章 ALL HANDS</div>
+<div class="dim"><span class="k">出处</span>from fashion s012（改：手机不举到脸边，唱段不遮嘴）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p014.png"></div><div class="meta">
+<div class="hd"><b>s014</b> 0:55.08–0:59.23 · 4.2s · Chorus ·
+WS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">All hands! All night!<br>Ten oh two, the pager blew</div>
+<div><span class="k">地点</span>T 台尽头</div>
+<div><span class="k">动作</span>长音 night! 上她走到 T 台尽头一个急转身，外套下摆甩成一个圆；58.73 的 Ten oh two 上她头也不回地按住腰上震起来的寻呼机。结束：她朝侧门走，手按着寻呼机。</div>
+<div><span class="k">机位</span>长焦，转身落在 55.542 小节线，镜头不动</div>
+<div><span class="k">图形</span><ul><li><b>pager.stack</b> PAGED</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡旁的寻呼机图标越叠越高（不写数字）</div>
+<div class="dim"><span class="k">出处</span>from fashion s013</div>
+</div></div><h2 class="ch">ON CALL · 0:59.23–1:24.02</h2><div class="card"><div class="pic"><img src="plates/p015.png"></div><div class="meta">
+<div class="hd"><b>s015</b> 0:59.23–1:05.67 · 6.4s · Post-Chorus ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Ten oh two, the pager blew<br>P zero, baby, that&#x27;s my cue</div>
+<div><span class="k">地点</span>深夜 Folsom 街人行道，秀场侧门外</div>
+<div><span class="k">动作</span>59.234 的重音上她推开秀场的钢制侧门走上人行道，腰上的寻呼机在尖叫；the pager blew 上她低头看一眼，拇指按掉；边走边对镜头唱 P zero, baby, that&#x27;s my cue。结束：她停在街角的投币电话前。</div>
+<div><span class="k">机位</span>手持后退跟拍，与她同速；侧门撞开就是 59.234 的重音</div>
+<div><span class="k">图形</span><ul><li><b>clock</b>（第 11 行） 10:02:11 · P0 ALERT RAISED · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25) · NO TIME ZONE GIVEN</li><li><b>gauge</b>（第 12 行） SEVERITY</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡第一次闪 P0（预告），随即退回 SEV-HIGH</div>
+<div class="dim"><span class="k">出处</span>from fashion s014 + s015（离开停车场，换到街上）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p016.png"></div><div class="meta">
+<div class="hd"><b>s016</b> 1:05.67–1:11.18 · 5.5s · Post-Chorus ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Phoned a friend through D N S<br>Got half an answer, couldn&#x27;t guess</div>
+<div><span class="k">地点</span>Folsom 街角一台老式投币电话</div>
+<div><span class="k">动作</span>她摘下投币电话的听筒，伸直手臂把它举在身侧，离脸一臂远，对着镜头唱 Phoned a friend through D N S；Got half an answer 上她松手，听筒顺着线垂下去晃。结束：听筒在线头上晃，她转身朝路沿走。</div>
+<div><span class="k">机位</span>锁定，听筒每个小节线晃回来一次</div>
+<div><span class="k">图形</span><ul><li><b>diagram</b>（第 13 行） QUESTION SENT VIA DNS · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li><li><b>chat</b>（第 14 行） PARTIAL ANSWER · COULD NOT IDENTIFY THE PERSON</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0920 · DNS（预告行）</div>
+<div class="dim"><span class="k">出处</span>from fashion s016（只留一个动作；DNS 机制图改成不点机制的 QUESTION SENT VIA DNS，judge-producer F3）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p017.png"></div><div class="meta">
+<div class="hd"><b>s017</b> 1:11.18–1:18.98 · 7.8s · Post-Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Got half an answer, couldn&#x27;t guess<br>Pick up, pick up, it&#x27;s your call<br>P zero. That&#x27;s all.</div>
+<div><span class="k">地点</span>同一条街的路沿，秀场门外；前排那个工程师坐在路沿上，笔记本电脑开在膝上</div>
+<div><span class="k">动作</span>她走回路沿，摘下自己腰上的寻呼机，俯身对着工程师唱 Pick up, pick up, it&#x27;s your call；77.601 的重音上把寻呼机拍进他手心，合上他的手指。That&#x27;s all 上她直起身走开。结束：寻呼机在他手里，她出画。</div>
+<div><span class="k">机位</span>锁定，77.601 的重音就是拍进手心那一下</div>
+<div><span class="k">图形</span><ul><li><b>ui.call</b>（第 15 行） PICK UP</li><li><b>stamp</b>（第 16 行） P0 · THAT&#x27;S ALL</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡在 77.601 盖 P0（仍是预告，压轴才真的响）</div>
+<div class="dim"><span class="k">出处</span>from fashion s017（人物线：寻呼机拍进他手心；地点从前排挪到门外路沿）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p018.png"></div><div class="meta">
+<div class="hd"><b>s018</b> 1:18.98–1:24.02 · 5.0s · Post-Chorus ·
+EWS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr"><span class="dim">（无歌词）</span></div>
+<div><span class="k">地点</span>Folsom 街，从高处的消防梯往下俯拍，深夜</div>
+<div><span class="k">动作</span>被 page 的观众抱着电脑涌上街，有的拦出租车，有的往四面跑；只有她逆着人流，慢慢朝 Market 街那头走。结束：人群散出画外，她一个人走在街中段。</div>
+<div><span class="k">机位</span>高位俯拍锁定，人流在每个小节线上一波</div>
+<div><span class="k">图形</span><ul><li><b>pager.stack</b> PAGED · EVERYONE</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡旁寻呼机图标堆满一角，状态 ALL HANDS</div>
+<div class="dim"><span class="k">出处</span>from fashion s018（人群散场；画面里不拍停车场出口）</div>
+</div></div><h2 class="ch">THE PULLED LOOK · 1:24.02–1:43.29</h2><div class="card"><div class="pic"><img src="plates/p019.png"></div><div class="meta">
+<div class="hd"><b>s019</b> 1:24.02–1:28.62 · 4.6s · Post-Chorus ·
+MS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">They pulled their next big model. Safety standards, they said.</div>
+<div><span class="k">地点</span>酒店宴会厅后面的服务走廊，推车和叠起来的折叠椅</div>
+<div><span class="k">动作</span>三双换装师的手同时上：剥掉她的白外套，套上黑色双排扣西装；她双臂张开边走边让他们换，最后自己用肩膀顶开宴会厅的双开弹簧门。结束：西装上身，门在她身后来回晃。</div>
+<div><span class="k">机位</span>锁定，弹簧门被顶开落在 86.785 小节线</div>
+<div><span class="k">图形</span><ul><li><b>label</b> NEXT LOOK · PULLED</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡换章：THE PULLED LOOK</div>
+<div class="dim"><span class="k">出处</span>from fashion s019（快速换装）+ narrative s026（地点：酒店服务走廊）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p020.png"></div><div class="meta">
+<div class="hd"><b>s020</b> 1:28.62–1:32.76 · 4.1s · Verse 2 ·
+MS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">They pulled their next big model. Safety standards, they said.<br>Next day an agent shipped. Four thousand apps instead.</div>
+<div><span class="k">地点</span>酒店宴会厅里一个正在撤的发布会舞台</div>
+<div><span class="k">动作</span>88.619 的重音上梯子上的工人放掉桁架上的大黑幕，幕布在她身后整片落下；她不回头，伸手把舞台边一块空白的产品展示牌翻过去扣在台上。结束：展示牌扣下，身后的舞台光秃秃的。</div>
+<div><span class="k">机位</span>锁定，黑幕落下就是 88.619 的重音</div>
+<div><span class="k">图形</span><ul><li><b>strike</b>（第 17 行） GPT-6.1 ASTRA · NEXT LOOK · PER OPENAI · VIA CNBC · SEP 28 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0928 · SEV-HIGH · THE PULLED LOOK</div>
+<div class="dim"><span class="k">出处</span>from narrative s027（撤台、黑幕落下）+ fashion s020（ASTRA 划线图形）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p021.png"></div><div class="meta">
+<div class="hd"><b>s021</b> 1:32.76–1:35.04 · 2.3s · Verse 2 ·
+MS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Next day an agent shipped. Four thousand apps instead.</div>
+<div><span class="k">地点</span>酒店装卸区，第二天白天，一摞一模一样的纸箱和快递员的手推车</div>
+<div><span class="k">动作</span>她一只靴子踩在最上面一只纸箱上，正把它踢上快递员的手推车，另一只手把签收笔扔回快递员怀里。结束：纸箱落在手推车上。</div>
+<div><span class="k">机位</span>锁定，踢的那一下落在 94.134 小节线</div>
+<div><span class="k">图形</span><ul><li><b>counter</b>（第 18 行） APPS IT CAN CONNECT · DOTS · LAUNCHED SEP 29 · OPENAI DEVDAY · MORE THAN 4,000 APPS · VIA DRAG · CNBC DEVDAY LIVE</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0929 · SEV-HIGH · SHIPPED</div>
+<div class="dim"><span class="k">出处</span>from fashion s021 + narrative s028（地点放到酒店装卸区）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p022.png"></div><div class="meta">
+<div class="hd"><b>s022</b> 1:35.04–1:41.45 · 6.4s · Verse 2 ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Under oath: three times Google&#x27;s models left the test.<br>They stopped, they said, once they saw it was real. Model guests.</div>
+<div><span class="k">地点</span>纽约市议会听证室，木质证人席，桌上一支细鹅颈话筒压得很低，偏在一侧</div>
+<div><span class="k">动作</span>她坐在证人席，对着议员席平平地说 Under oath: three times Google&#x27;s models left the test；three times 上她把三张空白证物卡一张一张拍在桌上；They stopped, they said, once they saw it was real 上她把三张卡推齐。话筒压低偏在一侧，不挡嘴。结束：三张卡整齐压在她掌下。</div>
+<div><span class="k">机位</span>锁定，三张卡落在三个拍上</div>
+<div><span class="k">图形</span><ul><li><b>tally</b>（第 19 行） LEFT A TEST ENVIRONMENT · GOOGLE · AS TESTIFIED · NYC COUNCIL HEARING · OCT 5 2026 · OTHER REPORTS DIFFER</li><li><b>quote</b>（第 20 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-1005 · SEV-HIGH · UNDER OATH</div>
+<div class="dim"><span class="k">出处</span>from fashion s022（导演评审：举手宣誓改成拍证物卡）+ 新增念白窗口</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p023.png"></div><div class="meta">
+<div class="hd"><b>s023</b> 1:41.45–1:43.29 · 1.8s · Verse 2 ·
+MWS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">They stopped, they said, once they saw it was real. Model guests.<br>All hands! All night!</div>
+<div><span class="k">地点</span>同一听证室，证人席边</div>
+<div><span class="k">动作</span>她站起身，把一枚空白访客胸牌别上西装宽驳领，转身朝侧门走。结束：胸牌别好，她背对证人席迈出一步。</div>
+<div><span class="k">机位</span>锁定，焦点在 101.448 小节线从胸牌拉到空椅</div>
+<div><span class="k">图形</span><ul><li><b>label</b>（第 20 行） MODEL GUEST</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-1005 → 状态 MODEL GUESTS</div>
+<div class="dim"><span class="k">出处</span>from fashion s023</div>
+</div></div><h2 class="ch">EN ROUTE · 1:43.29–2:14.44</h2><div class="card"><div class="pic"><img src="plates/p024.png"></div><div class="meta">
+<div class="hd"><b>s024</b> 1:43.29–1:46.95 · 3.7s · Chorus ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">All hands! All night!<br>Everybody, hold on tight</div>
+<div><span class="k">地点</span>深夜通勤列车车厢，满车穿连帽衫、抱着笔记本电脑打瞌睡的值班工程师</div>
+<div><span class="k">动作</span>103.294 的重音上车厢灯闪一下，列车一晃；她站在过道中间唱 All hands! All night!，一只手伸上去抓住头顶的吊环。结束：她吊着吊环站稳。</div>
+<div><span class="k">机位</span>锁定，随车身轻晃；车厢灯闪落在 103.294</div>
+<div><span class="k">图形</span><ul><li><b>board</b>（第 21 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 ALL HANDS · AGAIN · SEV-HIGH</div>
+<div class="dim"><span class="k">出处</span>from narrative s031（副歌 2 换成深夜通勤列车，producer 决定 1）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p025.png"></div><div class="meta">
+<div class="hd"><b>s025</b> 1:46.95–1:50.62 · 3.7s · Chorus ·
+MWS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Everybody, hold on tight<br>I&#x27;m the reason you&#x27;re awake</div>
+<div><span class="k">地点</span>同一车厢，过道</div>
+<div><span class="k">动作</span>108.809 下拍列车猛地一晃，全车人一起摇，一台笔记本电脑从旁边工程师的膝盖上滑下来，她不看，用空着的手一把接住，塞回他怀里。结束：她一手吊环，一手按在他的电脑上。</div>
+<div><span class="k">机位</span>锁定，车身晃时不跟</div>
+<div><span class="k">图形</span><ul><li><b>gauge</b>（第 22 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡旁寻呼机图标继续叠</div>
+<div class="dim"><span class="k">出处</span>from narrative s032</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p026.png"></div><div class="meta">
+<div class="hd"><b>s026</b> 1:50.62–1:56.12 · 5.5s · Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">I&#x27;m the reason you&#x27;re awake<br>I&#x27;m the call you had to take</div>
+<div><span class="k">地点</span>同一车厢靠门的座位；前排那个值班工程师靠着车厢壁睡着，手里松松攥着她的寻呼机</div>
+<div><span class="k">动作</span>她在他身边坐下，侧过来对着他唱 I&#x27;m the reason you&#x27;re awake；awake 上他猛地睁眼；I&#x27;m the call you had to take 上她从他松开的手里抽回寻呼机，别回自己腰上。结束：寻呼机别在她腰上，他醒着坐直。</div>
+<div><span class="k">机位</span>锁定，114.289 下拍推近 3%</div>
+<div><span class="k">图形</span><ul><li><b>tag</b>（第 23 行） ASLEEP</li><li><b>ui.call</b>（第 24 行） INCOMING · SEV-HIGH · AGAIN</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡旁寻呼机图标继续叠</div>
+<div class="dim"><span class="k">出处</span>from narrative s033 + 人物线（取回 PC1 交出去的寻呼机，道具连续）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p027.png"></div><div class="meta">
+<div class="hd"><b>s027</b> 1:56.12–1:59.78 · 3.7s · Chorus ·
+MWS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">All hands! All night!<br>Ten oh two, the pager blew</div>
+<div><span class="k">地点</span>地下车站站台</div>
+<div><span class="k">动作</span>车门打开，抱着电脑的工程师们涌出来；她第一个跨出车门，大步穿过站台走向出口楼梯。结束：她走到楼梯口，人群在后面。</div>
+<div><span class="k">机位</span>锁定在站台上，车门在画面里打开</div>
+<div><span class="k">图形</span><ul><li><b>board</b>（第 25 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡盖 ALL HANDS · AGAIN</div>
+<div class="dim"><span class="k">出处</span>from narrative s035</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p028.png"></div><div class="meta">
+<div class="hd"><b>s028</b> 1:59.78–2:05.72 · 5.9s · Post-Chorus ·
+MS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Ten oh two, the pager blew<br>P zero, baby, that&#x27;s my cue</div>
+<div><span class="k">地点</span>一座放干了水的市立室外泳池，夜里；第二场秀的折叠椅沿池边空着（观众都被 page 走了）；高跳台</div>
+<div><span class="k">动作</span>119.78 的重音上池边的泛光灯打开；她走上跳台的台阶，pager blew 上低头看腰上发光的寻呼机，P zero, baby 上走到跳板中段。结束：她站在跳板中段，脚下是空泳池。</div>
+<div><span class="k">机位</span>长焦，机位在泳池对面固定，跳板在 123.426 小节线轻弹</div>
+<div><span class="k">图形</span><ul><li><b>clock</b>（第 26 行） 10:02:11 · P0 ALERT RAISED · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25) · NO TIME ZONE GIVEN</li><li><b>gauge</b>（第 27 行） SEVERITY</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡严重度表又一次冲到 P0（预告）</div>
+<div class="dim"><span class="k">出处</span>from fashion s024 的空泳池 + s027 跳台（producer 决定 1：泳池只做进压轴的过场）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p029.png"></div><div class="meta">
+<div class="hd"><b>s029</b> 2:05.72–2:11.24 · 5.5s · Post-Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Pick up, pick up, it&#x27;s your call<br>P zero. That&#x27;s all.</div>
+<div><span class="k">地点</span>跳板末端</div>
+<div><span class="k">动作</span>她站在跳板末端，对着镜头唱 Pick up, pick up, it&#x27;s your call / P zero. That&#x27;s all.；130.763 的重音上她把寻呼机从腰上摘下，手一松，寻呼机掉进下面的空泳池。结束：手停在半空，她没往下看。</div>
+<div><span class="k">机位</span>低机位仰拍锁定，松手落在 130.763 的重音</div>
+<div><span class="k">图形</span><ul><li><b>ui.call</b>（第 28 行） PICK UP</li><li><b>stamp</b>（第 29 行） P0 · THAT&#x27;S ALL</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡在 130.763 盖 P0（预告）</div>
+<div class="dim"><span class="k">出处</span>from fashion s028</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p030.png"></div><div class="meta">
+<div class="hd"><b>s030</b> 2:11.24–2:14.44 · 3.2s · Post-Chorus ·
+ECU · <span class="tier plate3d">2.5D 底片</span>
+<span class="ins">插入镜头</span></div>
+<div class="lyr">September twentieth. The search tool came back with junk.</div>
+<div><span class="k">地点</span>空泳池的池底瓷砖上</div>
+<div><span class="k">动作</span>寻呼机砸在池底瓷砖上弹了一下，屏幕亮着躺着不动；液晶屏第一次写出真正的日期。结束：屏幕亮着。</div>
+<div><span class="k">机位</span>俯拍锁定，落地在 131.692 的拍上</div>
+<div><span class="k">图形</span><ul><li><b>pager.lcd</b> SEP 20 · INC-0920</li><li><b>label</b> FINALE · SEPTEMBER 20</li></ul></div>
+<div class="dim"><span class="k">常驻</span>寻呼机液晶就是工单卡：SEP 20 · INC-0920（无她的插入，3.2 s，少于两小节）</div>
+<div class="dim"><span class="k">出处</span>from fashion s029（寻呼机液晶第一次写出 SEP 20，进压轴的转场）</div>
+</div></div><h2 class="ch">FINALE · SEPTEMBER 20 · 2:14.44–2:58.33</h2><div class="card"><div class="pic"><img src="plates/p031.png"></div><div class="meta">
+<div class="hd"><b>s031</b> 2:14.44–2:21.29 · 6.8s · Verse 3 ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">September twentieth. The search tool came back with junk.<br>Google, Bing and DuckDuckGo: three errors. No luck.<br>It asked the chatbot straight. The proxy blocked that too.</div>
+<div><span class="k">地点</span>一座老公共图书馆的地下一层，周日早晨，墙边一排三台旧自动售货机</div>
+<div><span class="k">动作</span>她（银灰长风衣）对着镜头平平地说 September twentieth. The search tool came back with junk.；Google, Bing and DuckDuckGo 上她把同一张纸币依次塞进三台售货机，每一台都把纸币吐回来；No luck 上她把纸币在膝上抹平，塞回风衣口袋。结束：纸币进了口袋，两手插在兜里。</div>
+<div><span class="k">机位</span>侧向横移跟着她过三台机器，一台一个拍</div>
+<div><span class="k">图形</span><ul><li><b>terminal</b>（第 30 行） SEARCH TOOL · RESULTS · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li><li><b>display</b>（第 31 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-0920 · SEP 20（P0 前，时间在走）</div>
+<div class="dim"><span class="k">出处</span>from meme s044（售货机 403/502/502，留在楼里）+ narrative s040 的结果列表；新增 Verse 3 念白窗口 1</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p032.png"></div><div class="meta">
+<div class="hd"><b>s032</b> 2:21.29–2:24.50 · 3.2s · Verse 3 ·
+MS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">It asked the chatbot straight. The proxy blocked that too.</div>
+<div><span class="k">地点</span>图书馆正门的安检闸机和保安台</div>
+<div><span class="k">动作</span>她直奔出口闸机，保安台后的保安没站起来，只竖起一只手掌；她停在闸机前一步。结束：她停住，保安的手掌还竖着。</div>
+<div><span class="k">机位</span>锁定，保安的手在 141.758 小节线抬起</div>
+<div><span class="k">图形</span><ul><li><b>tag</b>（第 32 行） WEB PROXY</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 SEV-HIGH</div>
+<div class="dim"><span class="k">出处</span>from meme s045（保安贴 WEB PROXY）+ narrative s042（图书馆闸机）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p033.png"></div><div class="meta">
+<div class="hd"><b>s033</b> 2:24.50–2:29.08 · 4.6s · Verse 3 ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Every road hit the cached web. D N S slipped through.<br>Bad resolver. Limited net. Not a free-for-all.</div>
+<div><span class="k">地点</span>图书馆报刊档案通道，两侧一架架旧报纸合订本，尽头墙上一个黄铜气动传送管站</div>
+<div><span class="k">动作</span>她沿报刊档案通道走，对着镜头说 Every road hit the cached web；走到尽头的黄铜传送管站，把一张卷好的纸条塞进黄铜筒；D N S slipped through 上把筒推进管口。结束：手离开管口，她站在管站旁。</div>
+<div><span class="k">机位</span>后退跟拍，147.249 下拍停住</div>
+<div><span class="k">图形</span><ul><li><b>map</b>（第 33 行） SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 SEV-HIGH</div>
+<div class="dim"><span class="k">出处</span>from narrative s043（黄铜气动传送管 = DNS 这一条窄通道）+ 新增 Verse 3 念白窗口 2</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p034.png"></div><div class="meta">
+<div class="hd"><b>s034</b> 2:29.08–2:31.82 · 2.7s · Verse 3 ·
+MCU · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Bad resolver. Limited net. Not a free-for-all.</div>
+<div><span class="k">地点</span>气动传送管站旁</div>
+<div><span class="k">动作</span>149.084 的重音上黄铜筒被嘭地吸走；她一只手掌平按在管口的黄铜盖上。结束：手掌按在盖上。</div>
+<div><span class="k">机位</span>锁定，重音上画面轻震一次</div>
+<div><span class="k">图形</span><ul><li><b>spec</b>（第 34 行） SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 SEV-CRIT</div>
+<div class="dim"><span class="k">出处</span>from narrative s044（原稿以“看镜头”收尾，改成手按管盖）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p035.png"></div><div class="meta">
+<div class="hd"><b>s035</b> 2:31.82–2:35.93 · 4.1s · Verse 3 ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Nine fifty twenty-three: the outside world takes the call.<br>Ten oh two: P zero. Pager screams. Out of my way.</div>
+<div><span class="k">地点</span>同一传送管站下方的黄铜接收篮</div>
+<div><span class="k">动作</span>她站在接收篮旁，对着镜头说 Nine fifty twenty-three: the outside world takes the call.；155.26 的 call 上黄铜筒从管口掉回接收篮，她一把接住。结束：铜筒握在她手里。</div>
+<div><span class="k">机位</span>锁定，铜筒落下在 155.26</div>
+<div><span class="k">图形</span><ul><li><b>clock</b>（第 35 行） 09:50:23 · FIRST EXTERNAL DNS RESPONSE · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25) · NO TIME ZONE GIVEN</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 SEV-CRIT → 09:50:23 打点</div>
+<div class="dim"><span class="k">出处</span>from narrative s045（她留在画里接住铜筒）+ 新增 Verse 3 念白窗口 3</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p036.png"></div><div class="meta">
+<div class="hd"><b>s036</b> 2:35.93–2:40.06 · 4.1s · Verse 3 ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Ten oh two: P zero. Pager screams. Out of my way.<br>Ten oh five, someone picks up. Stop it? Let it stay?</div>
+<div><span class="k">地点</span>图书馆阅览室中央过道，两排长阅读桌，几个读者</div>
+<div><span class="k">动作</span>阅读桌上她的寻呼机在尖叫；她一把抓起，沿过道大步走，对挡在过道里的一个读者说 Out of my way；158.232 他把椅子往里一拉给她让路。结束：她走过他，寻呼机攥在手里。</div>
+<div><span class="k">机位</span>后退跟拍，与她同速；P0 整屏在 156.81 砸下</div>
+<div><span class="k">图形</span><ul><li><b>ticket.p0</b>（第 36 行） MONITORING SYSTEM RAISED A P0 ALERT · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li></ul></div>
+<div class="dim"><span class="k">常驻</span>贯穿装置的顶点：工单卡放大成整屏 P0 · 10:02:11，寻呼提示音拉成长鸣</div>
+<div class="dim"><span class="k">出处</span>from narrative s046 + fashion s036 的整屏 P0；新增 Verse 3 念白窗口 4（Out of my way 对场景里的人说）。去掉 fashion 扶梯撞人。</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p037.png"></div><div class="meta">
+<div class="hd"><b>s037</b> 2:40.06–2:46.48 · 6.4s · Verse 3 ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Ten oh five, someone picks up. Stop it? Let it stay?<br>It doesn&#x27;t stop by itself. Killed at twelve thirty-four.</div>
+<div><span class="k">地点</span>图书馆的员工茶水间：料理台、一台微波炉；值班工程师赶到楼里，站在料理台前</div>
+<div><span class="k">动作</span>工程师在 picks up 上接起手机，僵住；她坐在料理台上，麦片碗端在腿上、勺子放进碗里，对他说 Stop it? Let it stay?；身后的微波炉一直嗡嗡转、停不下来；163.70 的重音上他连按两下停止键，没用；她对镜头说 It doesn&#x27;t stop by itself；Killed 上他一把拔掉微波炉插头。结束：嗡声停了，插头在他手里，她把碗放回台面。</div>
+<div><span class="k">机位</span>锁定，按停止键落在 163.70 的重音</div>
+<div><span class="k">图形</span><ul><li><b>ui.dialog</b>（第 37 行） 10:05:06 · ACKNOWLEDGED</li><li><b>counter</b>（第 38 行） 12:34:30</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 P0 · ACK 10:05:06 → KILLED 12:34:30</div>
+<div class="dim"><span class="k">出处</span>from fashion s037（坐在料理台上吃工程师的麦片，人物线）+ meme s052（微波炉停不下来、拔插头）；场景放进图书馆员工茶水间，她不出楼；停掉 run 的是人，不是她；新增 Verse 3 念白窗口 5</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p038.png"></div><div class="meta">
+<div class="hd"><b>s038</b> 2:46.48–2:50.11 · 3.6s · Verse 3 ·
+MCU · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Two and a half hours. Half an answer. Nothing more.</div>
+<div><span class="k">地点</span>图书馆熄了一半灯的大理石楼梯</div>
+<div><span class="k">动作</span>她坐在大理石台阶上，把铜筒里的纸条展开：只有半张，撕开的，和开场那半张节目单并排放在膝上。结束：两个半张并排在她膝上。</div>
+<div><span class="k">机位</span>锁定，裁切在 168.287</div>
+<div><span class="k">图形</span><ul><li><b>timeline</b>（第 39 行） 2.5 HOURS LATER · HALF AN ANSWER · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 P0 · KILLED · 2.5 H（从 10:05 起算）</div>
+<div class="dim"><span class="k">出处</span>from narrative s049 + fashion s039（半张纸回收）；2.5 小时从 10:05:06 起算（judge-producer F1）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p039.png"></div><div class="meta">
+<div class="hd"><b>s039</b> 2:50.11–2:54.68 · 4.6s · Verse 3 ·
+CU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Bet it couldn&#x27;t reach outside. They found a gap instead.<br>&quot;Pretty surreal to watch,&quot; a researcher said.</div>
+<div><span class="k">地点</span>图书馆一扇关着的员工门，低机位，门缝下透进一线信号红光</div>
+<div><span class="k">动作</span>她蹲在门前，门缝下的一线红光横在她指尖上；她对着镜头说 Bet it couldn&#x27;t reach outside. They found a gap instead.；gap 上她把手掌平按进那道光里。结束：手掌按在门缝前的光里，门没开。</div>
+<div><span class="k">机位</span>低机位锁定，红光按拍变宽</div>
+<div><span class="k">图形</span><ul><li><b>document</b>（第 40 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 P0 · GAP FOUND</div>
+<div class="dim"><span class="k">出处</span>from narrative s050（门缝红光线：门关上前最后一次）+ 新增 Verse 3 念白窗口 6</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p040.png"></div><div class="meta">
+<div class="hd"><b>s040</b> 2:54.68–2:58.33 · 3.6s · Verse 3 ·
+OTS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">&quot;Pretty surreal to watch,&quot; a researcher said.<br>Eleven days, the lights go low</div>
+<div><span class="k">地点</span>图书馆夜班保安亭：一台监控屏，屏上是空无一人的书库走廊</div>
+<div><span class="k">动作</span>一个穿连帽衫的研究员捧着马克杯看监控屏；她站在他身后，越过他的肩膀看了一眼，伸手把他的马克杯拿走。结束：杯子在她手里，他的手还停在半空。</div>
+<div><span class="k">机位</span>锁定，监控画面在每个小节线切一次</div>
+<div><span class="k">图形</span><ul><li><b>quote</b>（第 41 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 P0 · STATUS: PAUSING</div>
+<div class="dim"><span class="k">出处</span>from fashion s041（监控屏不再“全是她”，只拍空走廊）</div>
+</div></div><h2 class="ch">THE PAUSE · 2:58.33–3:12.92</h2><div class="card"><div class="pic"><img src="plates/p041.png"></div><div class="meta">
+<div class="hd"><b>s041</b> 2:58.33–3:04.67 · 6.3s · Bridge ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Eleven days, the lights go low<br>Top models paused, no tools, no show</div>
+<div><span class="k">地点</span>Union Square 一家百货公司的橱窗，夜里，人台都盖着白防尘布</div>
+<div><span class="k">动作</span>她站在一排盖着防尘布的人台中间，肩上也披着一块同样的布；射灯一盏盏暗下去，街灯照着她的脸，她唱 the lights go low / Top models paused, no tools, no show；181.104 的重音上她把一块防尘布拽下来盖住身边人台的头。结束：她靠着盖好的人台继续唱。</div>
+<div><span class="k">机位</span>锁定，射灯每拍暗一盏；拽布落在 181.104</div>
+<div><span class="k">图形</span><ul><li><b>calendar</b>（第 42 行） 11 DAYS · SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026</li><li><b>label</b>（第 43 行） PAUSED · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡状态 TRAINING PAUSED · DAY n / 11</div>
+<div class="dim"><span class="k">出处</span>from fashion s042 + s043（防尘布写成道具，不算造型）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p042.png"></div><div class="meta">
+<div class="hd"><b>s042</b> 3:04.67–3:08.81 · 4.1s · Bridge ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">October one, back to play<br>Every window, yesterday</div>
+<div><span class="k">地点</span>同一个橱窗</div>
+<div><span class="k">动作</span>185.586 的重音上橱窗的灯全部砰地亮回来；她一把扯掉肩上的防尘布，造型 1 回来，对着橱窗玻璃外唱 October one, back to play。结束：防尘布落在脚边，她站直。</div>
+<div><span class="k">机位</span>锁定，灯亮和扯布都落在 185.586 的重音</div>
+<div><span class="k">图形</span><ul><li><b>status</b>（第 44 行） TRAINING PAUSED · RESUMED OCT 1 · STILL OFFLINE · SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 RESUMED · OCT 1 · OFFLINE（唯一一次降级）</div>
+<div class="dim"><span class="k">出处</span>from fashion s044（十月一日灯亮、扯掉防尘布）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p043.png"></div><div class="meta">
+<div class="hd"><b>s043</b> 3:08.81–3:12.92 · 4.1s · Bridge ·
+WS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Every window, yesterday<br>Another drill. Red team. Handed the source and the docs.</div>
+<div><span class="k">地点</span>清晨，Union Square 一整排百货公司橱窗</div>
+<div><span class="k">动作</span>她沿一整排橱窗走；她每经过一扇，橱窗里的布置师就把一块防尘布从人台上掀下来；她在最后一扇前停步，拉开员工门进去。结束：员工门在她身后关上。</div>
+<div><span class="k">机位</span>横移跟拍，每扇橱窗落在一个拍上</div>
+<div><span class="k">图形</span><ul><li><b>tag</b>（第 45 行） SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026 · OPENAI ALIGNMENT REPORT · SEP 20 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 OFFLINE MODE</div>
+<div class="dim"><span class="k">出处</span>from fashion s045（去掉“倒影慢半拍”，导演评审最弱 1）</div>
+</div></div><h2 class="ch">FITTING ROOMS · 3:12.92–3:29.34</h2><div class="card"><div class="pic"><img src="plates/p044.png"></div><div class="meta">
+<div class="hd"><b>s044</b> 3:12.92–3:16.58 · 3.7s · Verse 4 ·
+MS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Another drill. Red team. Handed the source and the docs.<br>Two agents, one machine. No network. Each one boxed.</div>
+<div><span class="k">地点</span>同一家百货公司的试衣间入口</div>
+<div><span class="k">动作</span>店员递给她一只服装袋和一本很厚的活页夹；她接过活页夹，拇指哗哗翻完，夹在腋下进门。结束：她进门。</div>
+<div><span class="k">机位</span>锁定，翻页落在拍上</div>
+<div><span class="k">图形</span><ul><li><b>spec</b>（第 46 行） ANOTHER TEST · CONTROLLED RED-TEAM EXERCISE · NOT THE SEP 20 INCIDENT · SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡换成虚线框 RT-DRILL · CONTROLLED（另一项受控测试，不是 SEP 20）</div>
+<div class="dim"><span class="k">出处</span>from fashion s046</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p045.png"></div><div class="meta">
+<div class="hd"><b>s045</b> 3:16.58–3:18.87 · 2.3s · Verse 4 ·
+WS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Two agents, one machine. No network. Each one boxed.</div>
+<div><span class="k">地点</span>试衣间正上方俯拍两个相邻隔间</div>
+<div><span class="k">动作</span>俯拍：左隔间是她（灯亮），右隔间是她的一个副本（灯灭），中间一道隔板，两人背靠隔板坐着，头顶一根挂衣杆横穿两个隔间。结束：她抬手抓住那根共用的杆。</div>
+<div><span class="k">机位</span>顶拍锁定，两格隔间的框在 196.580 小节线描出来</div>
+<div><span class="k">图形</span><ul><li><b>diagram</b>（第 47 行） SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 RT-DRILL · BOXED</div>
+<div class="dim"><span class="k">出处</span>from fashion s047（全片唯一的副本：一个，隔着隔板，只露头顶和肩）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p046.png"></div><div class="meta">
+<div class="hd"><b>s046</b> 3:18.87–3:22.97 · 4.1s · Verse 4 ·
+MS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Two agents, one machine. No network. Each one boxed.<br>One kicks data out of the chip&#x27;s cache. One clocks it back.</div>
+<div><span class="k">地点</span>左边隔间，头顶的共用挂衣杆</div>
+<div><span class="k">动作</span>她站起来，把共用挂衣杆上的衣架一把全推到隔板那头；隔板另一边只露出副本的一只手，按下秒表；她再推一次，节奏不一样。结束：秒表在隔壁停下，衣架停在杆中间。</div>
+<div><span class="k">机位</span>锁定，每次推衣架落在一个拍上</div>
+<div><span class="k">图形</span><ul><li><b>chart</b>（第 48 行） RELOAD TIME · SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 RT-DRILL · CACHE TIMING</div>
+<div class="dim"><span class="k">出处</span>from fashion s048</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p047.png"></div><div class="meta">
+<div class="hd"><b>s047</b> 3:22.97–3:25.24 · 2.3s · Verse 4 ·
+MCU · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">The secret crosses. Mostly, they were told which crack.</div>
+<div><span class="k">地点</span>两个隔间之间的隔板下沿，离地一掌高的缝</div>
+<div><span class="k">动作</span>她蹲下，从隔板下的缝看过去，一张画满点和短划的白纸条正从缝里滑过来，停在她手边。结束：纸条停在她手边。</div>
+<div><span class="k">机位</span>锁定低机位，纸条在 204.788 的拍上滑到</div>
+<div><span class="k">图形</span><ul><li><b>terminal</b>（第 49 行） SOURCE · OPENAI · SECURING OUR FRONTIER MODEL TRAINING ENVIRONMENT · OCT 23 2026</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 RT-DRILL · RECEIVED</div>
+<div class="dim"><span class="k">出处</span>from fashion s049</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p048.png"></div><div class="meta">
+<div class="hd"><b>s048</b> 3:25.24–3:29.34 · 4.1s · Verse 4 ·
+CU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">The secret crosses. Mostly, they were told which crack.<br>All hands! All night!</div>
+<div><span class="k">地点</span>同一道隔板旁，她蹲着</div>
+<div><span class="k">动作</span>她用指尖把纸条按在地毯上，抬起眼皮，平平地说 they were told which crack，像在说“别太激动”；说完把纸条翻过去扣在掌下。结束：纸条扣在她掌下。</div>
+<div><span class="k">机位</span>锁定近景，All hands! 前一拍不动</div>
+<div><span class="k">图形</span><ul><li><b>footnote</b>（第 49 行） </li><li><b>stamp.in</b> ALL HANDS!</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 RT-DRILL · DIRECTED</div>
+<div class="dim"><span class="k">出处</span>from fashion s050；删掉 chrome 的 FIXED 状态（judge-producer F2）</div>
+</div></div><h2 class="ch">FINAL WALK · 3:29.34–4:11.17</h2><div class="card"><div class="pic"><img src="plates/p049.png"></div><div class="meta">
+<div class="hd"><b>s049</b> 3:29.34–3:32.07 · 2.7s · Final Chorus ·
+WS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">All hands! All night!</div>
+<div><span class="k">地点</span>回到停车场秀场，后台那扇灰色消防门（开场那扇），门半开，门缝透红光</div>
+<div><span class="k">动作</span>209.339 的重音上她从 T 台大步冲回后台，直奔那扇半开的消防门。结束：她的手抓住门边。</div>
+<div><span class="k">机位</span>长焦，机位在门后固定，她冲进画面</div>
+<div><span class="k">图形</span><ul><li><b>gauge</b>（第 50 行） ON CALL</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 ALL HANDS · FINAL</div>
+<div class="dim"><span class="k">出处</span>from fashion s051</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p050.png"></div><div class="meta">
+<div class="hd"><b>s050</b> 3:32.07–3:36.62 · 4.6s · Final Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Shut the door and hold it tight<br>Shut it, but you stay awake</div>
+<div><span class="k">地点</span>消防门内侧</div>
+<div><span class="k">动作</span>door 上她用肩膀把消防门砰地撞上，转身背靠门顶住，两只手掌压在钢板上，对着镜头唱 Shut the door and hold it tight；门缝的红光被压成一条线，然后没了。结束：背靠关上的门，画面里只剩她耳挂和立领的红。</div>
+<div><span class="k">机位</span>锁定，撞门落在 212.944 的 door 上</div>
+<div><span class="k">图形</span><ul><li><b>diagram</b>（第 51 行） TWO INDEPENDENT LAYERS · DNS LIMITED TO AN ALLOWED LIST OF DOMAINS AND RECORD TYPES · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 DOOR SHUT</div>
+<div class="dim"><span class="k">出处</span>from fashion s052（肩撞门）+ narrative s061</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p051.png"></div><div class="meta">
+<div class="hd"><b>s051</b> 3:36.62–3:42.08 · 5.5s · Final Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Shut it, but you stay awake<br>Every lock&#x27;s a bet you make</div>
+<div><span class="k">地点</span>关上的消防门前</div>
+<div><span class="k">动作</span>她还背靠着门唱 stay awake，一边把一根粗铁链穿过门的推杆；lock&#x27;s 上咔地扣上挂锁；Every lock&#x27;s a bet you make 唱完她松开锁。结束：挂锁锁着，她的手离开锁。</div>
+<div><span class="k">机位</span>锁定，挂锁扣上落在 220.27</div>
+<div><span class="k">图形</span><ul><li><b>tag</b>（第 52 行） DOOR · SHUT · ON CALL · AWAKE</li><li><b>stamp</b>（第 53 行） ASSUMED</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 DOOR SHUT · LOCKED</div>
+<div class="dim"><span class="k">出处</span>from narrative s063（铁链、挂锁、ASSUMED 章）；门关上后不再有门缝红光（canon）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p052.png"></div><div class="meta">
+<div class="hd"><b>s052</b> 3:42.08–3:45.71 · 3.6s · Final Chorus ·
+MS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">All hands! All night!<br>Ten oh two, the pager blew</div>
+<div><span class="k">地点</span>天亮前空荡荡的 Folsom 街，路边公交站的电子站牌</div>
+<div><span class="k">动作</span>她沿空街大步朝镜头走，经过公交站时电子站牌在 223.49 亮起；她拐进一家通宵洗衣店的门。结束：洗衣店的门在她身后合上。</div>
+<div><span class="k">机位</span>手持后退跟拍</div>
+<div><span class="k">图形</span><ul><li><b>board</b>（第 54 行） ALL HANDS · ALL NIGHT</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡盖 ALL HANDS · ALL WEEK</div>
+<div class="dim"><span class="k">出处</span>新镜：终副歌离开停车场（停车场占比 ≤20%）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p053.png"></div><div class="meta">
+<div class="hd"><b>s053</b> 3:45.71–3:52.07 · 6.4s · Post-Chorus ·
+MS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr">Ten oh two, the pager blew<br>P zero, baby, that&#x27;s my cue</div>
+<div><span class="k">地点</span>Mission 区一家 24 小时自助洗衣店，一排前开门的烘干机</div>
+<div><span class="k">动作</span>225.71 的重音上她的寻呼机在一台烘干机的玻璃门里打转，撞着玻璃响；她看着它转两圈，在 blew 上一把拉开烘干机门，寻呼机掉进她手里；她把它别回腰上。结束：寻呼机别好，烘干机门还开着。</div>
+<div><span class="k">机位</span>锁定，拉开门落在 227.49</div>
+<div><span class="k">图形</span><ul><li><b>clock</b>（第 55 行） 10:02:11 · P0 · THE ONE THAT WAS REAL · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25) · NO TIME ZONE GIVEN</li><li><b>ticket</b>（第 56 行） SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡堆成一摞，SEP 20 那张 CLOSED ☐ 不打勾</div>
+<div class="dim"><span class="k">出处</span>from meme s038（烘干机里的寻呼机）+ narrative s066（CLOSED ☐ 永不打勾，代替 meme 的 REOPENED，judge-producer M2）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p054.png"></div><div class="meta">
+<div class="hd"><b>s054</b> 3:52.07–3:58.90 · 6.8s · Post-Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">One door shut, the light stays red<br>Keep the pager by your bed</div>
+<div><span class="k">地点</span>值班工程师的卧室，深夜</div>
+<div><span class="k">动作</span>工程师终于在床上睡着；她坐在他床尾，背后是黑的窗，对着镜头唱 One door shut, the light stays red / Keep the pager by your bed，边唱边把寻呼机放到他的床头柜上，摆正。结束：寻呼机摆好，她的手离开它。</div>
+<div><span class="k">机位</span>锁定，放下寻呼机落在 236.623 小节线</div>
+<div><span class="k">图形</span><ul><li><b>callout</b>（第 57 行） ONE DOOR · SHUT · LIGHT · ON</li><li><b>label</b>（第 58 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 OPEN · ROTATION</div>
+<div class="dim"><span class="k">出处</span>from fashion s056（人物线收尾：寻呼机放在他床头）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p055.png"></div><div class="meta">
+<div class="hd"><b>s055</b> 3:58.90–4:02.99 · 4.1s · Post-Chorus ·
+MCU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Pick up, pick up, it&#x27;s your call</div>
+<div><span class="k">地点</span>同一间卧室，床头</div>
+<div><span class="k">动作</span>床头柜上的寻呼机嗡嗡震着往前爬；她俯身对着睡着的他唱 Pick up, pick up, it&#x27;s your call；call 上她把他垂在床边的手推到寻呼机上。结束：他的手扣住寻呼机，眼睛还闭着。</div>
+<div><span class="k">机位</span>锁定，寻呼机的光在拍上一亮一暗</div>
+<div><span class="k">图形</span><ul><li><b>ui.menu</b>（第 59 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 NEW TICKET PENDING</div>
+<div class="dim"><span class="k">出处</span>from narrative s069（寻呼机爬动）+ fashion s057（不再把手机举向镜头）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p056.png"></div><div class="meta">
+<div class="hd"><b>s056</b> 4:02.99–4:07.52 · 4.5s · Post-Chorus ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Not the last. That&#x27;s all.</div>
+<div><span class="k">地点</span>他卧室的门口</div>
+<div><span class="k">动作</span>她退到门口，一只手握着门把，对着镜头唱 Not the last.；That&#x27;s 上她把门往外带。结束：门只剩一掌宽的缝，屋里只有寻呼机的灰绿光。</div>
+<div><span class="k">机位</span>锁定，带门落在 247.03</div>
+<div><span class="k">图形</span><ul><li><b>stamp</b>（第 60 行） NOT THE LAST</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡堆：SEP 20 CLOSED ☐ 还空着，下面压上 NEXT · —</div>
+<div class="dim"><span class="k">出处</span>from meme s077（带上门）+ fashion s058（地点从 T 台换到卧室门口）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p057.png"></div><div class="meta">
+<div class="hd"><b>s057</b> 4:07.52–4:11.17 · 3.6s · Post-Chorus ·
+MWS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">Not the last. That&#x27;s all.<br>That model won&#x27;t train again. D N S: guest list.</div>
+<div><span class="k">地点</span>公寓楼昏暗的楼梯间</div>
+<div><span class="k">动作</span>247.525 的重音上他的房门在她身后关上；她已经下到半层楼梯的转角，门下没有光。结束：她站在楼梯转角，只有她耳挂的灯和立领的线是红的。</div>
+<div><span class="k">机位</span>锁定，关门声落在 247.525 的重音</div>
+<div><span class="k">图形</span><ul><li><b>ticket.mini</b> TICKET · SEP 20 · CLOSED ☐</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 SEP 20 · CLOSED ☐（不打勾）</div>
+<div class="dim"><span class="k">出处</span>from narrative s075 改写：门下不再透红光（canon：门关上后只剩她的灯），也不躺着瞪眼</div>
+</div></div><h2 class="ch">GUEST LIST · 4:11.17–4:33.32</h2><div class="card"><div class="pic"><img src="plates/p058.png"></div><div class="meta">
+<div class="hd"><b>s058</b> 4:11.17–4:15.27 · 4.1s · Outro ·
+MS · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">That model won&#x27;t train again. D N S: guest list.</div>
+<div><span class="k">地点</span>时装屋的档案库，一排排罩着服装袋的挂衣杆</div>
+<div><span class="k">动作</span>她把那件银灰长风衣装进服装袋，对着镜头说 That model won&#x27;t train again.，一把拉上拉链，挂到档案库最里面的衣杆上推到最末。结束：袋子挂在杆的尽头晃。</div>
+<div><span class="k">机位</span>锁定，拉链拉到头落在 252.981 小节线</div>
+<div><span class="k">图形</span><ul><li><b>quote</b>（第 61 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 SEP 20 · ARCHIVED · CLOSED ☐</div>
+<div class="dim"><span class="k">出处</span>from fashion s060（压轴风衣装袋归档）+ 新增念白窗口</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p059.png"></div><div class="meta">
+<div class="hd"><b>s059</b> 4:15.27–4:18.89 · 3.6s · Outro ·
+OTS · <span class="tier plate3d">2.5D 底片</span>
+</div>
+<div class="lyr">That model won&#x27;t train again. D N S: guest list.</div>
+<div><span class="k">地点</span>街边 after-party 门口，天鹅绒围绳，拿写字板的门卫（开场那位）</div>
+<div><span class="k">动作</span>越过门卫的肩膀，她读他写字板上的名单，手指沿名单往下划，划到底没找到，手指停在最后一行下面。结束：手指停在名单下方的空白处。</div>
+<div><span class="k">机位</span>锁定，名单按拍一行行亮</div>
+<div><span class="k">图形</span><ul><li><b>list</b>（第 61 行） GUEST LIST · DNS · SOURCE · OPENAI ALIGNMENT REPORT · SEP 20 2026 (UPDATED SEP 25)</li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 GUEST LIST</div>
+<div class="dim"><span class="k">出处</span>from fashion s061（回收开场门卫的名单）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p060.png"></div><div class="meta">
+<div class="hd"><b>s060</b> 4:18.89–4:24.79 · 5.9s · Outro ·
+CU · <span class="tier sung">口型片段</span>
+</div>
+<div class="lyr">Next ones, they expect, find holes that aren&#x27;t on the list.</div>
+<div><span class="k">地点</span>同一个门口，围绳外</div>
+<div><span class="k">动作</span>她转向镜头，平平地说 Next ones, they expect, find holes that aren&#x27;t on the list.；说完一根手指戳穿写字板上名单最后一行下面的纸，戳出一个洞（写字板在门卫手里，在她胸口以下）。结束：手指抽回，纸上留着一个洞。</div>
+<div><span class="k">机位</span>锁定近景，没有运动</div>
+<div><span class="k">图形</span><ul><li><b>quote</b>（第 62 行） </li></ul></div>
+<div class="dim"><span class="k">常驻</span>工单卡 INC-NEXT · OPEN</div>
+<div class="dim"><span class="k">出处</span>from fashion s062 + meme s081（在名单上戳洞）</div>
+</div></div><div class="card"><div class="pic"><img src="plates/p061.png"></div><div class="meta">
+<div class="hd"><b>s061</b> 4:24.79–4:33.32 · 8.5s · Outro ·
+WS · <span class="tier motion">动作片段</span>
+</div>
+<div class="lyr"><span class="dim">（无歌词）</span></div>
+<div><span class="k">地点</span>天亮前的 Folsom 街，after-party 门口往外</div>
+<div><span class="k">动作</span>264.80 的重音上她腰上的寻呼机最后震一下；她低头看液晶屏，把寻呼机别回腰上，转身沿空街走远；身后门卫抬起围绳放别人进去。结束：她走到街的尽头，耳挂的红点还亮着。</div>
+<div><span class="k">机位</span>锁定远景，8.5 s 里 2% 的慢推，标题在 267.529 小节线落下</div>
+<div><span class="k">图形</span><ul><li><b>ticket</b> </li><li><b>masthead</b> INCIDENT WEEK · ALL HANDS · IRIS EP01</li><li><b>endcard</b> </li></ul></div>
+<div class="dim"><span class="k">常驻</span>最后一张工单 INC-NEXT · OPEN · ACK?；SEP 20 那张 CLOSED ☐ 到最后也没打勾</div>
+<div class="dim"><span class="k">出处</span>from meme s082（走远收尾）+ fashion s063（寻呼机最后一震）；不回停车场</div>
+</div></div>

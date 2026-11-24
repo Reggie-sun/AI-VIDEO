@@ -1,0 +1,29 @@
+{
+ "what": "s018 still: bounded local composite of p018-w1 (original plate, untouched) with the car region of P018E/a.png (taxi -> plain dark sedan, no roof sign/lettering); everything outside the box (her, her ear lamp, the crowd, the street) is p018-w1's pixels",
+ "box_xyxy_plate_px": [
+  0,
+  390,
+  495,
+  845
+ ],
+ "feather_gauss_px": 12,
+ "plate_size": [
+  1670,
+  941
+ ],
+ "before": {
+  "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p018-w1.png",
+  "sha256": "5a8ac46aec0079ddd02f4178e7a4f03d47043ff580b702708a48d0d3e928f529"
+ },
+ "car_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P018E/a.png",
+  "sha256": "0f65e129d573534046aceba635eff1458852bcb5c6c10675d14e544247b43b57",
+  "note": "made by the previous session (prompts.md); its whole frame is regenerated and drops her ear lamp (0 red px), so only its car box is used"
+ },
+ "after": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P018E/w1-local-car.png",
+  "sha256": "05b4080b6b8277ae488ea32a4ffce4f0e9633ab1929b0c8378c1037f9defc42a"
+ },
+ "outside_box_identical": true,
+ "date": "2026-11-23"
+}

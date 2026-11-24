@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-22",
+ "written_by": "主会话转写；continuity-supervisor 独立复核结尾改动 ready（2026-11-22）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG07-m-2/preview-approval.json",
+   "sha256": "e3ae71d31905be669b4afe4e2db2eeed1dca2cf79d08c97efe3583663d935cd1"
+  }
+ },
+ "units": {
+  "SG07": {
+   "verdict": "ready",
+   "prompt_fit": "PASS（egress 由 lint 核对）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "分段测口型；脸与开场一致；耳挂左耳小红灯；除耳灯无红色；无文字；嘴前无遮挡；唱段不出画：拍寻呼机进他手心合上手指后只直起身、仍在画面里；背景皮卡不亮灯不开走；工程师同一人；剪辑用 0–7.80 s"
+  }
+ }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo13-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p028-b1.png",
+    "sha256": "3adfc73750b8ef030d28b2727e0f0cbf6fe066cbfdacc3db566b1d29dba5fcd6",
+    "size_bytes": 2179936,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p028-b1.png: the first frame",
+    "need_id": "dry-pool-tower",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

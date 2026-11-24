@@ -1,0 +1,273 @@
+{
+  "shot": {
+    "shot_id": "ep01v4-mo07",
+    "scene_id": "runway-end",
+    "storyboard_beat_id": "mo07",
+    "intent": "长焦，镜头固定。秀场走秀台的尽头，她一个急转身，外套下摆甩开成一个圆；转完她头也不回地用一只手按住腰间正在震动的寻呼机，朝画面右侧的侧门走去。两边观众举着手机拍她，手机屏幕的光点点亮着。",
+    "dialogue": "",
+    "narration": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 6.0,
+      "minimum_seconds": null,
+      "maximum_seconds": null
+    },
+    "character_ids": [
+      "IRIS"
+    ],
+    "continuity_constraints": [
+      "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+      "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；造型1雕塑白：白色雕塑感短款立领外套与左侧立领的极细红灯线完整保持（由认可的首帧承担）",
+      "她急转身、外套下摆甩开成一个圆，头也不回地按住震动的寻呼机朝右侧侧门走去；观众举着手机",
+      "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+      "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "first_frame",
+        "asset_ids": [
+          "iris-c-v4-mo07-first-frame"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ],
+    "motion_directives": [],
+    "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+    "hybrid_layers": [],
+    "composition_directives": [],
+    "review_policy": {
+      "required_checks": []
+    }
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "approved_keyframe",
+        "asset_id": "iris-c-v4-mo07-first-frame"
+      }
+    ],
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "stable"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [],
+        "anchors": [],
+        "selections": [],
+        "natural_generation": [
+          "外套下摆甩开成一个圆",
+          "两边观众举着手机拍她"
+        ],
+        "director_coverage": {
+          "coverage_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc",
+          "unit_id": "MO07"
+        },
+        "preview_approval": {
+          "approval_hash": "600a0b216e9b58f2f5e902a76fb0f0ec1120937175816c2e5669ebcadc2df3a6"
+        },
+        "identity_waivers": [
+          {
+            "character_id": "IRIS",
+            "reason": "首帧生视频：身份由使用者在预览中认可的首帧承担；认可的参考包只有首帧，不附身份图"
+          }
+        ]
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "MO07首帧：长焦，她在走秀台的尽头，两边观众举着手机拍她",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "她一只手按着腰间的寻呼机，朝画面右侧的侧门走去，构图不变",
+        "state_hash": null,
+        "required_change": false
+      },
+      "identity_continuity": {
+        "character_ids": [],
+        "preservation": "unspecified",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "runway-end",
+        "time_of_day": "深夜",
+        "mood": "冷、压迫、不羁",
+        "state_constraints": [
+          "MO07首帧：长焦，她在走秀台的尽头，两边观众举着手机拍她",
+          "不新增人物、设备、文字或界面"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "她在走秀台尽头转身，朝右侧侧门走",
+        "screen_direction": "保持参考图方向",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不换位、不翻轴"
+      },
+      "axis_continuity": {
+        "camera_axis": "参考图原机位视轴",
+        "framing_continuity": "MO07首帧：长焦，走秀台尽头",
+        "crossing_policy": "不翻轴、不环绕"
+      },
+      "subject_action": {
+        "start_state": "她走到走秀台的尽头",
+        "progression": "一个急转身，外套下摆甩开成一个圆，按住腰间震动的寻呼机",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "她朝画面右侧的侧门走去",
+          "state_hash": null,
+          "required_change": false
+        }
+      },
+      "motion_envelope": {
+        "onset": "平滑开始",
+        "peak": "急转身，外套下摆甩开成一个圆",
+        "settle": "摄影机始终静止",
+        "direction": "摄影机不移动",
+        "amplitude_class": "很小"
+      },
+      "pacing": {
+        "cadence": "五秒连续原速",
+        "tempo_class": "正常原速",
+        "shot_duration_seconds": 5.0
+      },
+      "camera_intent": {
+        "movement": "摄影机完全固定，全程不推近、不移动、不摇镜",
+        "stability": "完全静止的固定机位",
+        "framing_intent": "MO07首帧：长焦，走秀台尽头",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "MO07首帧原始构图",
+        "end_framing": "与起始相同的机位",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "腰间的寻呼机震动",
+        "visible_response": "急转身，头也不回地按住寻呼机走向侧门",
+        "gaze_target": "画面右侧的侧门",
+        "body_behavior": "急转身后朝侧门走",
+        "hand_behavior": "一只手按住腰间的寻呼机",
+        "terminal_performance_state": "手按着寻呼机走向侧门",
+        "character_directions": [
+          {
+            "character_id": "IRIS",
+            "screen_identity": "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "腰间的寻呼机震动",
+                "emotion": "平静",
+                "intensity": "subtle",
+                "facial_expression": "神情平静却带着压迫感",
+                "gaze_target": "画面右侧的侧门",
+                "breathing": "自然平稳",
+                "body_behavior": "急转身后朝侧门走"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "真人电影摄影",
+        "palette": "冷色调；红色只做讯号灯，是唯一暖色",
+        "material_treatment": "自然材质与真实光影",
+        "prohibited_visual_drift": [
+          "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+          "改变参考图的场景与光线"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "日光灯顶光与观众手机屏幕的光点",
+        "direction": "参考图方向",
+        "exposure_priority": "保留暗部细节",
+        "continuity_state": "与首帧同一冷光"
+      },
+      "ambience_intent": {
+        "environment_bed": "几乎无声（成片使用独立音轨）",
+        "foley_cues": [],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "IRIS",
+        "relation_kind": "fixed_frame",
+        "start_relation": "长焦，她在走秀台尽头",
+        "end_relation": "机位不变，她走向画面右侧的侧门"
+      }
+    },
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": false,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 5,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "optional",
+    "quality_need": {
+      "objective_tier": "preview"
+    },
+    "conditioning_compatibility": {
+      "lane": "i2va",
+      "first_anchor_id": "iris-c-v4-mo07-first-frame",
+      "available_duration_seconds": 5.0
+    }
+  },
+  "composition": {
+    "muted": true,
+    "source_audio_policy": "MUTE",
+    "source_audio_reason": "成片使用已选定歌曲 all-hands-r4 母带独立音轨"
+  },
+  "boundary": {
+    "independent": true,
+    "reason": "按分镜 v4 由最终剪辑切接；不要求复制前镜终态"
+  }
+}

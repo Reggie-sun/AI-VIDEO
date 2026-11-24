@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-mo07-r4-1-MO07",
+ "question": "审看页：http://127.0.0.1:8769/pilot/opening/review-s014r4/index.html\n\ns014 上次重拍的 2 条失败（耗费 800），原因是首帧里的观众本来就抬着头。我让 Codex 只改了观众这一处，推荐用 a：\n- 两侧观众全部低头看笔记本\n- 她和服装保持不变\n- 寻呼机屏幕不亮\n\nd 和 e 是给头顶留空的版本，但人物缩得太小，我不推荐。\n\nprompt 在上次的基础上只加一句：“她始终完整在画面里，头顶不出画。”还是拍 2 条，约 800 积分。\n\n用 a 拍吗？",
+ "user_quote": "用 a 拍 (Recommended)",
+ "approved_at": "2026-11-21T22:40:42Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/opening/review-s014r4/index.html",
+  "sha256": "a152e507f3424da4ed9ece6baf10e130f039faeb5a30b1d66cdec8199031dd45"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s014-r4-seedance.md",
+  "sha256": "043bd77f73a197ed2b9defbfbf94f8360e47867fe4cdc55506e0ebae18449518"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1c.png",
+   "sha256": "ae34b54393afe1df4e15f35326de17752734af1f3661b2c4a307adec89f74374",
+   "role": "MO07 first frame"
+  }
+ ],
+ "prompts": {
+  "MO07": {
+   "text": "长焦全身远景，镜头固定不动。她走到走秀台尽头，重心落在前脚，一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，一只手按住腰间震动的黑色寻呼机，朝画面右侧走开。她始终完整在画面里，头顶不出画。两侧的值班工程师一直低头盯着自己腿上的笔记本电脑，全程不抬头，身体保持不动。她腰间的寻呼机不亮任何红灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "9b632bef3c083750b0cdfa68306b9eea31b164faa89df34721c2846c7cb3282f"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p014-w1c.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S14r4/a.png 逐字节相同；只把 p014-w1b 的两侧观众改为低头，她和服装不变，使用者认可「用 a 拍」）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo07-r4-1-source-001",
+  "policy_id": "iris-mo07-r4-1-source-001",
+  "reservation_id": "iris-mo07-r4-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO07-r4-1",
+   "sd-MO07-r4-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO07-r4-1"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r3-1/preview-approval.json",
+  "sha256": "a2087627be5e7c231b026605dae8e2ea3804959b67d134d811ef3677941c53d1",
+  "reason": "s014 重拍 r4：r3 两条 Gate 失败，根因是首帧 p014-w1b 里观众本来就在仰头；首帧换 p014-w1c（观众全部低头），prompt 在 r3 基础上加「她始终完整在画面里，头顶不出画。」；时长不变；r3 approval 与 sd-MO07-r3-1/r3-2 产物保留"
+ }
+}

@@ -1,0 +1,55 @@
+{
+ "unit": "SG04",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "f9bda6c5efb2b00fcde25ac368ce400e1dd9d41bab9d88786bf401f8ae3ee2a3",
+ "compiled_prompt_sha256": "418661cbbdca44cb4f535472388c18efa397e25b0295cdcba2b82b176e6ce67e",
+ "approval_sha256": "d5891478fc7513e039921b109c537f3f455697452c317a29a0f89350423ab9f1",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG04-r2-1/continuity-report.json",
+  "sha256": "f74799029072cb8049ab1d67c3988cf3bd79cefe8b1556664d9638b1cfec9cf7",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。逐项对照 p013-w1.png 与 SG03-w1、SG03C-d1，以及 prev-s012-end.jpg：\n(1) 露左肩：画面右侧是她的左肩，皮肤露出。\n(2) 黑色贴身高领在。\n(3) 斜挎黑皮带从她的右肩（画面左，被手机和外套挡住一段）斜到左胯（画面右下），与 SG03-w1 和 s013 底片提示词一致。\n(4) 灰色卫衣面料的拉链短外套，右臂穿袖拿手机。\n(5) 腰链、黑色寻呼机（液晶空白）、空白工牌都在。\n(6) 红色只有画面右侧（她的左耳）耳挂上的一处小灯，耳骨一排银钉也在；手机、寻呼机、灯光都没有红色。\n(7) 人物与 F1a 和前几镜一致。\n(8) 场地相同：同一停车场秀场，左边是带黄黑警示条的水泥柱，天花板有青色和琥珀色灯管，右侧 T 台边缘发白光，有一位米色模特在走，旁边是戴墨镜的观众，与 SG03-w1 背景一致。\n(9) 光线：机头直闪，加上手机屏幕从下往上的冷光，与前面的直闪基调一致。\n(10) 左下角工程师的空手带着深蓝牛仔工装袖口，与 SG03-w1 和 prev-s012-end 里他的夹克一致。",
+   "handoff": "PASS（中间有一段省略，需要剪辑交代）。s012 结尾停在工程师和她撑在椅背上的手，叠着 AWAKE 图形，见 prev-s012-end.jpg。s013 开场她已经站直，手里拿着刚从他手里抽走的亮屏手机，他的空手伸在左下角。“站起来、抽走手机”这个动作发生在切点之间，靠 AWAKE 图形转场和她手里的手机交代，属于可读的动作省略。人声 SG04.wav：sha 055dd871…5afd91，4.145 s，对应歌曲 50.933–55.0777，与 windows.json 一致；唱词是“I'm the call you had to take All hands!”，从 0.31 s 唱到 4.16 s。",
+   "axis_action_camera": "PASS（反打没有越轴）。s012 的轴线是：工程师在画面左，向右上方看；她在画面右，向左下方看。s013 是工程师视角的仰拍反打：他的手从画面左下进来，她在画面中间偏右，低头向左下方看镜头。两人在画面中的左右关系和视线方向都和 s012 一致，没有越过 180 度线。背景里柱子在左、T 台在右，也和 SG03-w1 一致，说明机位在同一侧。镜头要求固定，不推不拉不摇不环绕。4.145 s 的唱段装进 5 s 生成足够。",
+   "prompt_fit": "PASS。以下几处 prompt 逐字相同：compiled-native-prompt.zh.txt、preview-approval.prompts.SG04.text、round2.html 第 9 行，以及 prepared.json 的 prompt_text（第 5251、5323、5427、5499、5602 行）。上传内容的 sha 都等于认可值：prompt 418661cbbdca44cb4f535472388c18efa397e25b0295cdcba2b82b176e6ce67e（第 5690 行），参考图 2f159721e0da2b9e2247a32fadd14ec79b3628152c911f07cee5c2c4dd1f3f21（第 5697 行），人声 055dd8719d0d773173c351b1d7e9d25ca6f3760957e4b6f3071195a1055afd91（第 5704 行）。生成方式 multimodal，5 s，4k，16:9，上限 400 CRD，1 次，不重试。attempt、policy、reservation 均为 iris-sg04-r2-1-*，节点 node_1ay527xv2h，generation_POSTs=0。prompt 写明了景别、光、口型逐字同步，并要求手机在胸口下方、嘴前无遮挡。open_state 和 close_state（第 265、272 行）与底片一致。上一轮失败点的对策：环绕，prompt 写了不推不拉不摇不环绕；抢拍，首帧嘴是合着的；场地不同，底片与 SG03-w1 是同一场地；遮嘴，手机压在胸口下方。前景丢失这一点只防了一半：prompt 和 close_state 都没要求工程师的手一直在画面里，见风险第 2 条。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "抢拍：人声开头只有 0.31 s 静音，而成片会从 0 s 用到 4.145 s，没有余量裁掉开头。上传方式是 reference_to_video，第 0 帧不锁定，首帧闭嘴只能降低风险。Gate 要做对齐量测，逐字查 I'm、call、take、All hands；如果开头不稳，没有裁切空间可以补救。",
+    "前景丢失（上一轮 c 的失败点）：左下角工程师的空手只在首帧里有，prompt 和 close_state 都没要求它一直留在画面里。Gate 要逐帧确认那只手在不在；手没了，反打的轴线就不好读了。",
+    "手机：之前的镜头里从没出现过这部手机，它在这里突然出现，靠“刚从他手里抽走”的画面交代。剪辑结尾计划用一个手机落回他怀里的短插收尾，这个短插还没有素材。分镜里 ui.call 图形要锚在手机屏幕上（51.76），但首帧里屏幕朝着她自己，镜头只拍到手机背面。Gate 还要查手机背面有没有长出品牌标志。",
+    "唱词范围：end_seconds 是 4.16，比音频长度 4.145 s 还长，说明“All hands!”的尾音被窗口截断了。Gate 要看截断处的口型。",
+    "s013→s014 的空间跳跃：从前排旁边直接到 T 台尽头，中间要靠剪辑里的短插和图形节拍交代，详见 MO07 报告。",
+    "shot.duration_policy.seconds=6.0（prepared 第 48、497 行），与 5 s 输出不一致，交给 lint 判定。",
+    "人声内容我这边核不了：本地转写工具对纯 wav 报 no_video_stream，记为 NOT_EVALUATED。",
+    "我没有 Bash，不能自己核对 p013-w1.png 与 S13-b.png 是否逐字节相同，目前依据的是认可文件里的声明。",
+    "permit 到 2026-11-19T23:20:13Z 过期。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

@@ -1,0 +1,57 @@
+{
+ "shot": "s026b",
+ "t0": 112.4542,
+ "t1": 113.3714,
+ "why": "'awake': he opens his eyes (clip 4.4-5.3), the A-B-A insert",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG10-m-2/SG10/project/state/video-generation/fetch/files/bfcd2a3ba6bf8d2db424238ac733f06ccfd645e4438a5e00e8082b3a516bf4bf.mp4",
+ "clip_sha256": "bfcd2a3ba6bf8d2db424238ac733f06ccfd645e4438a5e00e8082b3a516bf4bf",
+ "pictures": 193,
+ "frames": 22,
+ "first": {
+  "f": 1277,
+  "t": 112.4583,
+  "clip_t": 4.4041,
+  "idx": 106
+ },
+ "last": {
+  "f": 1298,
+  "t": 113.3333,
+  "clip_t": 5.2791,
+  "idx": 127
+ },
+ "crop": [
+  0.33,
+  0.33,
+  2.5
+ ],
+ "speed": 1.0,
+ "knots": null,
+ "repeats": 0,
+ "skips": 0,
+ "map": [
+  106,
+  107,
+  108,
+  109,
+  110,
+  111,
+  112,
+  113,
+  114,
+  115,
+  116,
+  117,
+  118,
+  119,
+  120,
+  121,
+  122,
+  123,
+  124,
+  125,
+  126,
+  127
+ ],
+ "orange_px_max": 0,
+ "pager_red": null
+}

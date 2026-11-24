@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>IRIS EP01 s027 首帧重做（P027R）</title><style>body{background:#111;color:#ddd;font:14px/1.6 sans-serif;margin:20px;max-width:1700px}img{width:100%;display:block}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}figure{margin:0}figure.rec{outline:3px solid #6c6}figcaption{font-size:13px;color:#aaa}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #555;padding:3px 8px;font-size:13px;vertical-align:top}h2{margin-top:28px;border-top:1px solid #444;padding-top:12px}code{color:#9cf;font-size:12px}.ok{color:#6c6}.warn{color:#fc6}.bad{color:#f88}</style></head><body>
+<h1>s027（MO12）首帧重做：旧图 | 三个候选（仅静图，未提交任何视频生成）</h1>
+<p>裁决：「照页面改 (Recommended)」（审查页 <code>pilot/s015-030/audit/index.html</code>）：旧首帧里她已经下车、人群也已在站台上，脚碰到画面下沿，左上站牌会长字。重做：她刚跨出车门、人还小（头顶脚下留足空间），站牌改成纯黑结构件，人群还在车门里。新 prompt 是「她大步朝画面右侧走，从画面右侧走出去；身后抱着电脑的人群从车门涌出来跟着走。电脑外壳没有标志。」——旧图里列车在她右边，往右走会撞车厢，所以三个候选都把列车放到她左边或身后。</p>
+<p>工具：<code>motion-kit/tools/codex_plate.py</code>；a、b 以旧图 <code>board/plates/p027-b1.png</code> 为编辑底图（<code>--edit-base</code>），c 只把旧图当人物与服装参考（<code>--ref</code>）重新构图。提示词 <code>excerpt/flash/design/S15-30/P027R/prompts.md</code>，运行记录 <code>P027R/runs.md</code>。新图只在 <code>P027R/</code>，board 和 spec 都没改，选定后才接入 MO12。</p>
+<div class="g">
+<figure><img src="../../../board/plates/p027-b1.png"><figcaption>旧 p027-b1 · sha f91d4cb6…：她已下车、脚碰下沿、人群已在站台、左上站牌</figcaption></figure>
+<figure class="rec"><img src="../../../excerpt/flash/design/S15-30/P027R/a.png"><figcaption>a（推荐）：列车在左、往远处延伸；她刚跨出车门，朝画面右侧，右边是空站台；人群挤在车门口和车厢里；顶上素黑横梁 · sha e64597bf…</figcaption></figure>
+<figure><img src="../../../excerpt/flash/design/S15-30/P027R/b.png"><figcaption>b：机位正对列车，车身横贯画面；她刚出车门，人很小，右边一大段空站台 · sha f3e3416e…</figcaption></figure>
+<figure><img src="../../../excerpt/flash/design/S15-30/P027R/c.png"><figcaption>c：重新构图（不以旧图为底）；列车在左，她已一步踏上站台，人比 a 大 · sha a5fc03af…</figcaption></figure>
+</div>
+<h2>自查</h2>
+<table><tr><th></th><th>a</th><th>b</th><th>c</th></tr>
+<tr><td>刚跨出车门、人群还在车门里/车厢里</td><td class="ok">是</td><td class="ok">是</td><td class="warn">她已离开车门一步；人群在车门口</td></tr>
+<tr><td>人小、头顶脚下留足空间</td><td class="ok">约画面高度的一半；脚在画面 85% 高处</td><td class="ok">很小（约四分之一）</td><td class="bad">脚几乎碰到下沿（约 94%），和旧图同样的问题</td></tr>
+<tr><td>右边留出走出画面右侧的空间</td><td class="ok">右边是长长的空站台</td><td class="ok">右边一大段空站台</td><td class="ok">有</td></tr>
+<tr><td>脸（开场统一脸）、造型 B</td><td class="ok">一致</td><td class="warn">脸太小，4K 生成时身份难稳住</td><td class="ok">一致，最清楚</td></tr>
+<tr><td>左耳耳挂和小红灯；别处无红色</td><td class="ok">在左耳，可见红点；别处没有</td><td class="ok">在左耳；红点很小</td><td class="ok">在左耳，可见红点；别处没有</td></tr>
+<tr><td>站牌换成素黑横梁，无字；电脑无标志</td><td class="ok">是（看全图未见文字或标志）</td><td class="ok">是</td><td class="ok">是</td></tr></table>
+<p>推荐 a：满足全部要求，且以旧图为底，灯光、地砖、列车和她的样子最接近已认可的 s025/s026。c 的脚贴近下沿，会重演“往哪走都出画”的问题；b 的脸太小。</p>
+<h2>脸放大（旧 | a | b | c）</h2>
+<div class="g4"><figure><img src="zoom-old-face.jpg"><figcaption>旧</figcaption></figure><figure class="rec"><img src="zoom-a-face.jpg"><figcaption>a</figcaption></figure><figure><img src="zoom-b-face.jpg"><figcaption>b</figcaption></figure><figure><img src="zoom-c-face.jpg"><figcaption>c</figcaption></figure></div>
+</body></html>

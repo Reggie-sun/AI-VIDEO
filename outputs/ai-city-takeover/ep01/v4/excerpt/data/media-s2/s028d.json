@@ -1,0 +1,87 @@
+{
+ "shot": "s028d",
+ "t0": 123.9017,
+ "t1": 125.7244,
+ "why": "she leaves the frame top right; the empty stair held to the 125.72 cut, whole frame out of focus (E)",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO13-n-1/MO13/project/state/video-generation/fetch/files/47c40d7a1b9a60c02cd432e5262b2bec2f557e5401b84e7cd9f71ac8af5499a6.mp4",
+ "clip_sha256": "47c40d7a1b9a60c02cd432e5262b2bec2f557e5401b84e7cd9f71ac8af5499a6",
+ "pictures": 145,
+ "frames": 43,
+ "first": {
+  "f": 1552,
+  "t": 123.9167,
+  "clip_t": 5.461,
+  "idx": 131
+ },
+ "last": {
+  "f": 1594,
+  "t": 125.6667,
+  "clip_t": 6.08,
+  "idx": 144
+ },
+ "crop": null,
+ "speed": 1.0,
+ "knots": [
+  [
+   123.9017,
+   5.446000000000003
+  ],
+  [
+   124.5357,
+   6.08
+  ],
+  [
+   125.7244,
+   6.08
+  ]
+ ],
+ "repeats": 29,
+ "skips": 0,
+ "map": [
+  131,
+  132,
+  133,
+  134,
+  135,
+  136,
+  137,
+  138,
+  139,
+  140,
+  141,
+  142,
+  143,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144,
+  144
+ ],
+ "orange_px_max": 0,
+ "pager_red": null
+}

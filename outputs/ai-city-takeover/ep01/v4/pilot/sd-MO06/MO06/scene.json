@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo06-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "fbacd7617112cfe01df3d7364944ec86de237fa46d9711b312ab4cae730bdae0",
+  "creation_receipt_id": "iris-v4-MO06-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/cf73ba135ffb9942f1747ed29c7fc8e4cdc49ca6b66d894df6c3ed1512b2559e.json",
+      "content_hash": "cf73ba135ffb9942f1747ed29c7fc8e4cdc49ca6b66d894df6c3ed1512b2559e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/93863f8bf9bb4409847764ef621e5be963bab7266d828896b19338e9e8dc2f31.json",
+      "content_hash": "93863f8bf9bb4409847764ef621e5be963bab7266d828896b19338e9e8dc2f31"
+    }
+  ],
+  "scene_id": "garage-runway",
+  "location": "地下停车场改成的秀场，湿水泥走秀台，头顶一排排日光灯管",
+  "time": "深夜",
+  "mood": "冷、压迫、不羁",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左侧立领红灯线位置一致（v4身份锚点F1a）",
+    "冷色调；红色只做讯号灯，是唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo06-first-frame"
+  ]
+}

@@ -1,0 +1,214 @@
+{
+ "unit": "SG03",
+ "observed_at": "2026-11-17T23:36:51.750Z",
+ "tab": "https://jimeng.jianying.com/ai-tool/home#omnihuman-SG03",
+ "generation_POSTs": 0,
+ "inputs": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012.png",
+   "sha256": "5c5323ace6605783c58a029b275e67b21523ed6f1f74d63a87f6de4ad5d5f0d2"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+   "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559"
+  }
+ ],
+ "mode_label": "大师模式",
+ "model_title": "选择模型：大师模式 by OmniHuman 1.5",
+ "price": 0,
+ "balance_text": "",
+ "balance_precise": null,
+ "generate_enabled": false,
+ "rows": {
+  "speech_text": null,
+  "speech_audio": null,
+  "action": "镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。"
+ },
+ "resolution": null,
+ "vivid": false,
+ "image_uploaded": true,
+ "audio_uploaded": true,
+ "action_text": "镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。",
+ "panel": {
+  "found": true,
+  "text": "音频原声\n角色1说\n00:00\n/\n00:04\n动作描述\n\n镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。\n\n数字人\n大师模式\n上传音频\n0",
+  "mode": "大师模式",
+  "imgs": [
+   {
+    "src": "blob:https://jimeng.jianying.com/92f62655-d6c6-4804-a288-7e1f97e5716c",
+    "w": 48,
+    "h": 64
+   },
+   {
+    "src": "https://p9-dreamina-sign.byteimg.com/tos-cn-i-tb4s082cfz/42e11fd0c2c348b3a2dde40",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/92f62655-d6c6-4804-a288-7e1f97e5716c",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "https://p9-dreamina-sign.byteimg.com/tos-cn-i-tb4s082cfz/42e11fd0c2c348b3a2dde40",
+    "w": 16,
+    "h": 16
+   },
+   {
+    "src": "blob:https://jimeng.jianying.com/92f62655-d6c6-4804-a288-7e1f97e5716c",
+    "w": 16,
+    "h": 16
+   }
+  ],
+  "editors": [
+   {
+    "tag": "DIV",
+    "value": "角色1说\n00:00\n/\n00:04\n动作描述\n\n镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。",
+    "placeholder": null
+   },
+   {
+    "tag": "DIV",
+    "value": "",
+    "placeholder": null
+   }
+  ],
+  "buttons": [
+   {
+    "text": "移除 · 参考内容",
+    "x": 55,
+    "y": 12,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "移除 · 参考内容",
+    "x": 133,
+    "y": 17,
+    "w": 22,
+    "h": 22,
+    "disabled": false,
+    "cls": "remove-button-container-QtJdC6"
+   },
+   {
+    "text": "角色1说",
+    "x": 165,
+    "y": 17,
+    "w": 89,
+    "h": 24,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-text lv-btn-size-mini lv-btn-shape-square button-EkZazO button-m_Z1Tn tag-HAOZ2L"
+   },
+   {
+    "text": "",
+    "x": 263,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 371,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-text lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-EzcYwh"
+   },
+   {
+    "text": "动作描述",
+    "x": 165,
+    "y": 53,
+    "w": 76,
+    "h": 24,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-text lv-btn-size-mini lv-btn-shape-square button-EkZazO button-m_Z1Tn tag-HAOZ2L"
+   },
+   {
+    "text": "",
+    "x": 165,
+    "y": 17,
+    "w": 89,
+    "h": 24,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-text lv-btn-size-mini lv-btn-shape-square button-EkZazO button-m_Z1Tn tag-HAOZ2L"
+   },
+   {
+    "text": "",
+    "x": 263,
+    "y": 20,
+    "w": 20,
+    "h": 20,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-mini lv-btn-shape-circle lv-btn-icon-only button-EkZazO button-E9b8NU audio-player-b"
+   },
+   {
+    "text": "",
+    "x": 371,
+    "y": 24,
+    "w": 12,
+    "h": 12,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-text lv-btn-size-mini lv-btn-shape-square lv-btn-icon-only button-EkZazO button-EzcYwh"
+   },
+   {
+    "text": "",
+    "x": 165,
+    "y": 53,
+    "w": 76,
+    "h": 24,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-text lv-btn-size-mini lv-btn-shape-square button-EkZazO button-m_Z1Tn tag-HAOZ2L"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 117,
+    "w": 32,
+    "h": 32,
+    "disabled": true,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only lv-btn-disabled button-EkZazO button-E9b8"
+   },
+   {
+    "text": "上传音频",
+    "x": 215,
+    "y": 117,
+    "w": 84,
+    "h": 32,
+    "disabled": false,
+    "cls": "lv-btn lv-btn-secondary lv-btn-size-small lv-btn-shape-square button-EkZazO button-E9b8NU toolbar-button-J5Ou4K"
+   },
+   {
+    "text": "生成",
+    "x": 1151,
+    "y": 117,
+    "w": 32,
+    "h": 32,
+    "disabled": true,
+    "cls": "lv-btn lv-btn-primary lv-btn-size-default lv-btn-shape-circle lv-btn-icon-only lv-btn-disabled button-EkZazO button-E9b8"
+   }
+  ],
+  "numbers": [
+   {
+    "n": 0,
+    "x": 1131,
+    "y": 127
+   }
+  ],
+  "price": 0,
+  "size": [
+   1200,
+   166
+  ],
+  "rows": {
+   "speech_text": null,
+   "speech_audio": null,
+   "action": "镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。"
+  },
+  "resolution": null,
+  "vivid": false
+ }
+}

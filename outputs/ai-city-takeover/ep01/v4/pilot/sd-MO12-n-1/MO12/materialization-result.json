@@ -1,0 +1,10 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO12-n-1/MO12/project",
+  "task_id": "iris-v4-mo12-source-001",
+  "request_hash": "6fa12c755a4e3f355272d9c02f22962da5f3cba8df88f898e277435e1b6e8941",
+  "resolved_reference_order": [
+    "iris-c-v4-mo12-first-frame"
+  ],
+  "new_provider_calls": 0,
+  "new_attempt_started": false
+}

@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg09-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "42de0242a7eee483e05dcd30f5a5c3373be1b8acadbcab1c8320d4487df2855f",
+  "creation_receipt_id": "iris-v4-SG09-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/f251c0288ac288a56615846b976ada9c738207a068aa4d69c841c0aa160a3503.json",
+      "content_hash": "f251c0288ac288a56615846b976ada9c738207a068aa4d69c841c0aa160a3503"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/28c3fa7a498c13223cc9caf63859395853090b68025d19a526b5ae044e904e79.json",
+      "content_hash": "28c3fa7a498c13223cc9caf63859395853090b68025d19a526b5ae044e904e79"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/9d5f7bb3357576abbb2892acb89d7c7944119d1a6de071907f0514901ed4bc65.json",
+      "content_hash": "9d5f7bb3357576abbb2892acb89d7c7944119d1a6de071907f0514901ed4bc65"
+    }
+  ],
+  "scene_id": "night-train-car",
+  "location": "深夜通勤列车车厢，两边座位上是抱着笔记本电脑打瞌睡的人",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变",
+    "除了耳挂上的小红灯，画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg09-reference"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo21-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "eca3dc99429232204a81cb3d7a5c59e3f7bac0fdfed82fe68655135aa6e9b077",
+  "creation_receipt_id": "iris-v4-MO21-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/dc61575bd666a86df57033e07309feaf4ef302560d9dc2306d29ce4a504d060c.json",
+      "content_hash": "dc61575bd666a86df57033e07309feaf4ef302560d9dc2306d29ce4a504d060c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7bfadac07a4cdfca5c57eff2a61a5ec1fa245088149d98e16e393caad58b29dd.json",
+      "content_hash": "7bfadac07a4cdfca5c57eff2a61a5ec1fa245088149d98e16e393caad58b29dd"
+    }
+  ],
+  "shot_id": "ep01v4-mo21",
+  "scene_id": "folsom-bus-shelter",
+  "storyboard_beat_id": "mo21",
+  "intent": "镜头固定。她侧身坐在候车亭的长凳上，伸出一根手指，用指甲顺着灯箱玻璃上那道划痕慢慢划过去，停在划痕尽头。面无表情，带着一点好奇。机头直闪。画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的首帧承担；本镜她侧身，左耳与耳挂在画面外）",
+    "她侧身坐在长凳上，伸出一根手指，用指甲顺着灯箱玻璃上那道划痕慢慢划过去，停在划痕尽头；不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo21-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

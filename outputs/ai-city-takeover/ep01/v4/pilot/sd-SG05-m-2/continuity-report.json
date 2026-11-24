@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-22",
+ "written_by": "主会话据 continuity-supervisor 增量报告转写（内容各项 PASS，仅缺 lint，由 lint.py 执行）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG05-m-2/preview-approval.json",
+   "sha256": "039edf95cb70a0103aafe4b0ba309d228986c2c1b7a620f4a77bca8e78a6041a"
+  }
+ },
+ "units": {
+  "SG05": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；egress prompt/首帧/人声 sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸与开场一致；耳挂左耳小红灯；除耳灯无红色；无文字；测人声实际偏移（>约1.03 s 会截 that's my cue），剪辑入点按实测换算；左肩成块模糊；远处白车头灯不变成开走的车或红尾灯；入点那帧已在唱且嘴前无遮挡"
+  }
+ }
+}

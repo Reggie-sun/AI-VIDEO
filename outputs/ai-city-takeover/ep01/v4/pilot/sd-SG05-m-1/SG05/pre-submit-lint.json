@@ -1,0 +1,42 @@
+{
+ "unit": "SG05",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "30f8db8e4372f097c11252daa44facb8997428ad908ecef3d39bd889c25f3dcc",
+ "compiled_prompt_sha256": "d06ca8ee630104c6b4aeacbaf0cc4474bc4986a162e65213819f2ccc3b43d4fe",
+ "approval_sha256": "5c3ba190f455845098c226fbfbb7936df934a2925bcdadd8270c67a732924f55",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG05-m-1/continuity-report.json",
+  "sha256": "bae6d495ab6c94d6e793451b3e8436fe6762b2fa5335b56526cf1e5b9690954d",
+  "unit": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；egress prompt/首帧/人声 sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸与开场一致；耳挂左耳小红灯；除耳灯无红色；无文字；测人声实际偏移（>约1.03 s 会截 that's my cue），剪辑入点按实测换算；左肩成块模糊；远处白车头灯不变成开走的车或红尾灯；入点那帧已在唱且嘴前无遮挡"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 700,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   700
+  ]
+ },
+ "new_calls": 0
+}

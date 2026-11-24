@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg06-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p016-w1.png",
+    "sha256": "b176e3b2944c92c67cf7b438cb7c127d6336be690d4e6fda1d354d40c2743521",
+    "size_bytes": 2177871,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p016-w1.png: the reference image",
+    "need_id": "folsom-payphone",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg06-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG06m.wav",
+    "sha256": "9bd0c1e889f18d480074b5969e8ca3e9e1eece7d22e08276504ce81912b4a624",
+    "size_bytes": 499590,
+    "kind": "audio",
+    "duration_millis": 5664,
+    "sample_rate_hz": 44100,
+    "role": "approved SG06m.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        65.517,
+        71.1808
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

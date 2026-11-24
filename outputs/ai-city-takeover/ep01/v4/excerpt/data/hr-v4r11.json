@@ -1,0 +1,19 @@
+{
+ "s012d": {
+  "clip": "pilot/sd-SG03-w1/SG03/project/state/video-generation/fetch/files/02169f1ebff05dc4700e37c6baa361adee2a24de2ad1cdd4460c8395063c0bbd.mp4",
+  "clip_sha256": "02169f1ebff05dc4700e37c6baa361adee2a24de2ad1cdd4460c8395063c0bbd",
+  "clip_picture": 129,
+  "seq_picture": 84,
+  "size": [
+   3840,
+   2160
+  ],
+  "hue": {
+   "shifted_px": 670,
+   "kept_red_px_in_matte": 337
+  },
+  "file": "media/hr11/s012d/0000.jpg",
+  "sha256": "cd744d86d61d1df04a73039792460659ed1225898c7682f24b3fc7788e009b99",
+  "replaces": "media/seq/s012b/0084.jpg (2304x1296)"
+ }
+}

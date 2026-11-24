@@ -1,0 +1,49 @@
+{
+ "unit": "SG03",
+ "checks": {
+  "unit_in_approved_preview": true,
+  "user_approval_quoted": true,
+  "take_has_own_image_and_audio": true,
+  "approved_inputs_unchanged": true,
+  "take_inputs_in_preview": true,
+  "audio_seconds_match_file": true,
+  "action_text_is_approved_text": true,
+  "action_text_pure_chinese": true,
+  "mode_is_master": true,
+  "continuity_report_ready": true,
+  "never_submitted": true,
+  "ledger_has_room": true
+ },
+ "pass": true,
+ "at": "2026-11-17T23:08:50.745774+00:00",
+ "approval_sha256": "95eba0a38604c39b803bdd37809670de35a3a651b81b45c55b7c65c5aab95012",
+ "continuity_report_sha256": "005b1e83d2334d545f3a3bb90c50b623f54f5473fd42905a7f083639fe49993a",
+ "inputs": {
+  "image": {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012.png",
+   "sha256": "5c5323ace6605783c58a029b275e67b21523ed6f1f74d63a87f6de4ad5d5f0d2"
+  },
+  "audio": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+   "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559",
+   "seconds": 5.99
+  }
+ },
+ "page_audio_accepted": {
+  "seconds": 5.99,
+  "floor": "00:05",
+  "ceil": "00:06"
+ },
+ "action_text": "镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。",
+ "ledger": {
+  "takes": 0,
+  "credits": 0,
+  "closed": false
+ },
+ "caps": {
+  "submits": 1,
+  "credits": 300,
+  "per_take": 300,
+  "submits_per_take": 1
+ }
+}

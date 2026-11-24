@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo05-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "ebe8aaa99bde7970224eb7222d808515dd85d9e64ccf03f6b366d08a03b2323b",
+  "creation_receipt_id": "iris-v4-MO05-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/dc06ced815ebbc8a2e8cfbb01166cf383d794eaf2e51d2d5a876558f5ea2b870.json",
+      "content_hash": "dc06ced815ebbc8a2e8cfbb01166cf383d794eaf2e51d2d5a876558f5ea2b870"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a6988c9d1e1f6cee9b92defa281bc07ac6cdc0b207b31628b5df759303ea72ac.json",
+      "content_hash": "a6988c9d1e1f6cee9b92defa281bc07ac6cdc0b207b31628b5df759303ea72ac"
+    }
+  ],
+  "shot_id": "ep01v4-mo05",
+  "scene_id": "freeway-footbridge",
+  "storyboard_beat_id": "mo05",
+  "intent": "长焦侧拍，镜头固定。她双臂搭在天桥的铁丝网护栏上往下看桥下的车流；然后抬脚踹了护栏一下，整片铁丝网震动；她两手插进外套口袋，转身沿着天桥往远处走去，银白短发保持原样。桥下车灯只有白色和琥珀色。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的首帧承担）",
+    "她踹一下护栏、整片铁丝网震动，两手插进外套口袋转身沿着天桥往远处走去，银白短发保持原样；桥下车灯只有白色和琥珀色",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo05-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

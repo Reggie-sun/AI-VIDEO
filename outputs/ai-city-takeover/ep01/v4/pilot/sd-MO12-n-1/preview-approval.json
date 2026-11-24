@@ -1,0 +1,70 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-MO12-n-1",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/p027r/index.html\n\ns027（她第一个从列车里出来）重做的首帧有 3 个候选，推荐 a：\n- 她刚跨出车门，身体朝画面右侧，右边是空站台，人群还挤在车门口。\n- 站牌换成了素黑横梁。\n- 她的脚在画面高度约 85% 的位置，下方有余量。\n\nb 里的人太小，脸不稳；c 的脚几乎碰到下沿，还是会出画。\n\n用 a 吗？（另：s016 听筒插镜已通过：背景里一个小光点偏红，局部修成琥珀色后过了 Gate。）",
+ "user_quote": "用 a (Recommended)",
+ "approved_at": "2026-11-22T23:13:26Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "1a8c0c4309d8abf0aea07740ebf7a81de825698b3232a5c81591b07ae87f0df8"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "42e3225d526b3e2f3491774261e2a246753fc769d4d22abf73920211dbae87a0"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "2a906ad6b37601201cf2bc7d73eadb9e1f8cc520671d064a5b2c7175bb24e00a"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p027-b2.png",
+   "sha256": "e64597bf2e272caf96da11f24399f136e104b32e45d6d1cea8f0094af17a203c",
+   "role": "MO12 first frame"
+  }
+ ],
+ "prompts": {
+  "MO12": {
+   "text": "镜头固定在站台上。车门开着，她大步朝画面右侧走，从画面右侧走出去；身后抱着电脑的人群从车门涌出来跟着走。电脑外壳没有标志。她始终完整在画面里，头顶不出画，直到走出画面右侧。面无表情。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "7dbf231b08226de25f2593be5b53154c47c470a92f08b533faf8c6e711a2a081"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p027-b2.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P027R/a.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 B）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo12-n-1-source-001",
+  "policy_id": "iris-mo12-n-1-source-001",
+  "reservation_id": "iris-mo12-n-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO12-n-1",
+   "sd-MO12-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO12-n-1"
+ },
+ "decision_notes": [
+  "开拍前审查按页面逐句改 prompt（「照页面改 (Recommended)」，pilot/s015-030/audit/index.html）；本 take 文件夹原先的 approval（旧 prompt）备份为 preview-approval.json.before-audit-2026-11-22，未提交过",
+  "首帧换成 p027-b2（= excerpt/flash/design/S15-30/P027R/a.png：她刚跨出车门、列车在她左边、右边是空站台、人群还在车门口、顶上素黑横梁），「用 a (Recommended)」，pilot/s015-030/p027r/index.html"
+ ]
+}

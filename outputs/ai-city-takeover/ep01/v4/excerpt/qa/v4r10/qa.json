@@ -1,0 +1,742 @@
+{
+ "render": "outputs/ai-city-takeover/ep01/v4/excerpt/renders/IRIS-EP01-v4-excerpt-v4r10-036-059.mp4",
+ "spec": {
+  "width": 1920,
+  "height": 1080,
+  "fps": "24/1",
+  "frames": 552,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "color": [
+   "bt709",
+   "bt709",
+   "bt709"
+  ],
+  "audio": {
+   "codec": "aac",
+   "rate": "48000",
+   "channels": 2,
+   "bit_rate": "321335"
+  },
+  "duration": "23.022000",
+  "pass": true
+ },
+ "sound": {
+  "render_samples": 1104896,
+  "master_slice_samples": 1104000,
+  "offset_samples": 0,
+  "offset_ms": 0.0,
+  "rms_diff_db": -0.016,
+  "pass": true
+ },
+ "cuts": {
+  "cuts": [
+   {
+    "shot": "s010:X10b",
+    "planned_t": 39.8454,
+    "nearest_beat": 39.8454,
+    "cut_dt_beat": 0.0,
+    "frame": 87,
+    "frame_t": 39.8445,
+    "frame_dt_beat": -0.0009,
+    "render_change_frame": 87,
+    "change": 0.0688,
+    "pass": true
+   },
+   {
+    "shot": "s011",
+    "planned_t": 40.7859,
+    "nearest_beat": 40.7859,
+    "cut_dt_beat": 0.0,
+    "frame": 110,
+    "frame_t": 40.8028,
+    "frame_dt_beat": 0.0169,
+    "render_change_frame": 110,
+    "change": 0.0448,
+    "pass": true
+   },
+   {
+    "shot": "s012a",
+    "planned_t": 44.9422,
+    "nearest_beat": 44.9422,
+    "cut_dt_beat": 0.0,
+    "frame": 209,
+    "frame_t": 44.9278,
+    "frame_dt_beat": -0.0144,
+    "render_change_frame": 209,
+    "change": 0.0869,
+    "pass": true
+   },
+   {
+    "shot": "s012a:p012w1-engineer",
+    "planned_t": 45.8594,
+    "nearest_beat": 45.8594,
+    "cut_dt_beat": 0.0,
+    "frame": 231,
+    "frame_t": 45.8445,
+    "frame_dt_beat": -0.0149,
+    "render_change_frame": 231,
+    "change": 0.0776,
+    "pass": true
+   },
+   {
+    "shot": "s012b",
+    "planned_t": 46.7882,
+    "nearest_beat": 46.7882,
+    "cut_dt_beat": 0.0,
+    "frame": 254,
+    "frame_t": 46.8028,
+    "frame_dt_beat": 0.0146,
+    "render_change_frame": 254,
+    "change": 0.0946,
+    "pass": true
+   },
+   {
+    "shot": "s012c",
+    "planned_t": 49.087,
+    "nearest_beat": 49.087,
+    "cut_dt_beat": 0.0,
+    "frame": 309,
+    "frame_t": 49.0945,
+    "frame_dt_beat": 0.0075,
+    "render_change_frame": 309,
+    "change": 0.1007,
+    "pass": true
+   },
+   {
+    "shot": "s012d",
+    "planned_t": 50.4686,
+    "nearest_beat": 50.4686,
+    "cut_dt_beat": 0.0,
+    "frame": 342,
+    "frame_t": 50.4695,
+    "frame_dt_beat": 0.0009,
+    "render_change_frame": 342,
+    "change": 0.1323,
+    "pass": true
+   },
+   {
+    "shot": "s013a",
+    "planned_t": 50.933,
+    "nearest_beat": 50.933,
+    "cut_dt_beat": 0.0,
+    "frame": 353,
+    "frame_t": 50.9278,
+    "frame_dt_beat": -0.0052,
+    "render_change_frame": 353,
+    "change": 0.1104,
+    "pass": true
+   },
+   {
+    "shot": "s013b",
+    "planned_t": 52.3146,
+    "nearest_beat": 52.3146,
+    "cut_dt_beat": 0.0,
+    "frame": 386,
+    "frame_t": 52.3028,
+    "frame_dt_beat": -0.0118,
+    "render_change_frame": 386,
+    "change": 0.1693,
+    "pass": true
+   },
+   {
+    "shot": "s014a",
+    "planned_t": 55.0777,
+    "nearest_beat": 55.0777,
+    "cut_dt_beat": 0.0,
+    "frame": 453,
+    "frame_t": 55.0945,
+    "frame_dt_beat": 0.0168,
+    "render_change_frame": 453,
+    "change": 0.0766,
+    "pass": true
+   },
+   {
+    "shot": "s014b",
+    "planned_t": 57.3765,
+    "nearest_beat": 57.3765,
+    "cut_dt_beat": 0.0,
+    "frame": 508,
+    "frame_t": 57.3861,
+    "frame_dt_beat": 0.0096,
+    "render_change_frame": 508,
+    "change": 0.0564,
+    "pass": true
+   },
+   {
+    "shot": "s014c",
+    "planned_t": 58.7697,
+    "nearest_beat": 58.7697,
+    "cut_dt_beat": 0.0,
+    "frame": 541,
+    "frame_t": 58.7611,
+    "frame_dt_beat": -0.0086,
+    "render_change_frame": 541,
+    "change": 0.1364,
+    "pass": true
+   }
+  ],
+  "cut_threshold": 0.0358,
+  "unplanned_changes_above_threshold": [
+   21,
+   65,
+   373,
+   374
+  ],
+  "pass": true
+ },
+ "lyrics": {
+  "words": 37,
+  "on_time": 37,
+  "pass": true,
+  "rows": [
+   {
+    "line": 5,
+    "word": "Freeway:",
+    "start": 36.363,
+    "onset_frame": 3,
+    "first_frame": 3,
+    "held_frames": 99,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "S",
+    "start": 37.226,
+    "onset_frame": 24,
+    "first_frame": 24,
+    "held_frames": 78,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "F",
+    "start": 37.426,
+    "onset_frame": 29,
+    "first_frame": 29,
+    "held_frames": 73,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "hates",
+    "start": 37.527,
+    "onset_frame": 31,
+    "first_frame": 31,
+    "held_frames": 71,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "A",
+    "start": 37.868,
+    "onset_frame": 40,
+    "first_frame": 40,
+    "held_frames": 62,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "I",
+    "start": 38.048,
+    "onset_frame": 44,
+    "first_frame": 44,
+    "held_frames": 58,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "billboars.",
+    "start": 38.129,
+    "onset_frame": 46,
+    "first_frame": 46,
+    "held_frames": 56,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "The",
+    "start": 38.751,
+    "onset_frame": 61,
+    "first_frame": 61,
+    "held_frames": 41,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "D?",
+    "start": 38.931,
+    "onset_frame": 65,
+    "first_frame": 65,
+    "held_frames": 37,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "Forgot.",
+    "start": 39.674,
+    "onset_frame": 83,
+    "first_frame": 83,
+    "held_frames": 19,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "All",
+    "start": 39.897,
+    "onset_frame": 88,
+    "first_frame": 88,
+    "held_frames": 100,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "hands!",
+    "start": 40.861,
+    "onset_frame": 111,
+    "first_frame": 111,
+    "held_frames": 77,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "All",
+    "start": 42.247,
+    "onset_frame": 145,
+    "first_frame": 145,
+    "held_frames": 43,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "night!",
+    "start": 42.769,
+    "onset_frame": 157,
+    "first_frame": 157,
+    "held_frames": 32,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "Everybody,",
+    "start": 44.077,
+    "onset_frame": 189,
+    "first_frame": 189,
+    "held_frames": 65,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "hold",
+    "start": 45.625,
+    "onset_frame": 226,
+    "first_frame": 226,
+    "held_frames": 28,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "on",
+    "start": 46.047,
+    "onset_frame": 236,
+    "first_frame": 236,
+    "held_frames": 18,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "tight",
+    "start": 46.308,
+    "onset_frame": 242,
+    "first_frame": 242,
+    "held_frames": 12,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "I'm",
+    "start": 47.517,
+    "onset_frame": 271,
+    "first_frame": 271,
+    "held_frames": 82,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "the",
+    "start": 47.919,
+    "onset_frame": 281,
+    "first_frame": 281,
+    "held_frames": 72,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "reason",
+    "start": 48.181,
+    "onset_frame": 287,
+    "first_frame": 287,
+    "held_frames": 66,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "you're",
+    "start": 49.307,
+    "onset_frame": 314,
+    "first_frame": 314,
+    "held_frames": 39,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "awake",
+    "start": 49.89,
+    "onset_frame": 328,
+    "first_frame": 328,
+    "held_frames": 25,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "I'm",
+    "start": 51.239,
+    "onset_frame": 360,
+    "first_frame": 360,
+    "held_frames": 81,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "the",
+    "start": 51.62,
+    "onset_frame": 370,
+    "first_frame": 370,
+    "held_frames": 71,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "call",
+    "start": 51.76,
+    "onset_frame": 373,
+    "first_frame": 373,
+    "held_frames": 68,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "you",
+    "start": 53.024,
+    "onset_frame": 403,
+    "first_frame": 403,
+    "held_frames": 38,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "had",
+    "start": 53.224,
+    "onset_frame": 408,
+    "first_frame": 408,
+    "held_frames": 33,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "to",
+    "start": 53.445,
+    "onset_frame": 413,
+    "first_frame": 413,
+    "held_frames": 28,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "take",
+    "start": 53.645,
+    "onset_frame": 418,
+    "first_frame": 418,
+    "held_frames": 23,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "All",
+    "start": 53.767,
+    "onset_frame": 421,
+    "first_frame": 421,
+    "held_frames": 122,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "hands!",
+    "start": 54.59,
+    "onset_frame": 441,
+    "first_frame": 441,
+    "held_frames": 102,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "All",
+    "start": 55.152,
+    "onset_frame": 454,
+    "first_frame": 454,
+    "held_frames": 89,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "night!",
+    "start": 55.513,
+    "onset_frame": 463,
+    "first_frame": 463,
+    "held_frames": 80,
+    "pass": true
+   },
+   {
+    "line": 11,
+    "word": "Ten",
+    "start": 58.726,
+    "onset_frame": 540,
+    "first_frame": 540,
+    "held_frames": 12,
+    "pass": true
+   },
+   {
+    "line": 11,
+    "word": "oh",
+    "start": 59.027,
+    "onset_frame": 547,
+    "first_frame": 547,
+    "held_frames": 5,
+    "pass": true
+   },
+   {
+    "line": 11,
+    "word": "two,",
+    "start": 59.187,
+    "onset_frame": 551,
+    "first_frame": 551,
+    "held_frames": 1,
+    "pass": true
+   }
+  ]
+ },
+ "flash": {
+  "max_flashes_per_second_any_cell": 3.0,
+  "at": {
+   "cell": 6,
+   "frame": 497
+  },
+  "single_frame_jumps": [],
+  "pass": true
+ },
+ "chinese": {
+  "cjk_in_drawn_sources": [],
+  "cjk_glyphs_in_fonts": {
+   "NimbusSans-Bold-subset.otf": 0,
+   "IBMPlexMono-Medium-subset.otf": 0,
+   "NimbusSans-Regular-subset.otf": 0,
+   "IBMPlexMono-SemiBold-subset.otf": 0,
+   "IBMPlexMono-Regular-subset.otf": 0,
+   "DINishCondensed-Bold-subset.otf": 0,
+   "DINishCondensed-Black-subset.otf": 0
+  },
+  "pass": true
+ },
+ "red": {
+  "still_red_boxes": {
+   "X07a": [
+    1038,
+    154,
+    1042,
+    159
+   ],
+   "X08a": [
+    1091,
+    187,
+    1101,
+    197
+   ],
+   "X09a": [
+    744,
+    263,
+    752,
+    272
+   ],
+   "X09b": [
+    1239,
+    234,
+    1254,
+    258
+   ],
+   "X10a": [
+    922,
+    244,
+    928,
+    251
+   ],
+   "X10b": [
+    957,
+    87,
+    959,
+    90
+   ],
+   "X11a": [
+    912,
+    97,
+    917,
+    102
+   ],
+   "X12a": [
+    819,
+    181,
+    829,
+    190
+   ],
+   "X12b": [
+    1183,
+    199,
+    1192,
+    208
+   ],
+   "X13a": [
+    897,
+    172,
+    905,
+    179
+   ],
+   "X14a": [
+    946,
+    129,
+    951,
+    132
+   ],
+   "p012-w1": [
+    1192,
+    237,
+    1200,
+    245
+   ],
+   "INS13-a": [
+    1343,
+    119,
+    1349,
+    125
+   ],
+   "INS14-b": null
+  },
+  "still_red_is_lamp_only": {
+   "X07a": true,
+   "X08a": true,
+   "X09a": true,
+   "X09b": true,
+   "X10a": true,
+   "X10b": true,
+   "X11a": true,
+   "X12a": true,
+   "X12b": true,
+   "X13a": true,
+   "X14a": true,
+   "p012-w1": true,
+   "INS13-a": true,
+   "INS14-b": true
+  },
+  "method": "v4r10: render red mapped back through the frame's camera into its still; allowed where the still is red (checked on qa/v4r10/still-reds.jpg: her ear lamp only) or on the P0 label",
+  "frames_checked": 138,
+  "frames_with_red": 83,
+  "frames_with_red_outside_her_or_p0_over_12px": 49,
+  "worst": [
+   {
+    "frame": 368,
+    "red_px": 445,
+    "outside_px": 445,
+    "red_px_incl_isolated_specks": 1782
+   },
+   {
+    "frame": 360,
+    "red_px": 444,
+    "outside_px": 444,
+    "red_px_incl_isolated_specks": 2001
+   },
+   {
+    "frame": 364,
+    "red_px": 419,
+    "outside_px": 419,
+    "red_px_incl_isolated_specks": 1829
+   },
+   {
+    "frame": 356,
+    "red_px": 386,
+    "outside_px": 386,
+    "red_px_incl_isolated_specks": 2092
+   },
+   {
+    "frame": 384,
+    "red_px": 385,
+    "outside_px": 385,
+    "red_px_incl_isolated_specks": 1482
+   },
+   {
+    "frame": 372,
+    "red_px": 383,
+    "outside_px": 383,
+    "red_px_incl_isolated_specks": 1600
+   },
+   {
+    "frame": 376,
+    "red_px": 367,
+    "outside_px": 367,
+    "red_px_incl_isolated_specks": 1458
+   },
+   {
+    "frame": 380,
+    "red_px": 349,
+    "outside_px": 349,
+    "red_px_incl_isolated_specks": 1491
+   }
+  ],
+  "pass": false
+ },
+ "logos": {
+  "per_logo": {
+   "s011:held-laptop-right": {
+    "pictures": 99,
+    "blotted": 92,
+    "skipped_not_lid": 7
+   },
+   "s011:small-laptop-right": {
+    "pictures": 99,
+    "blotted": 92,
+    "skipped_not_lid": 7
+   },
+   "s011:laptop-left-blue": {
+    "pictures": 99,
+    "blotted": 99,
+    "skipped_not_lid": 0
+   },
+   "s011:held-laptop-left": {
+    "pictures": 99,
+    "blotted": 99,
+    "skipped_not_lid": 0
+   },
+   "s014a:laptop-right": {
+    "pictures": 55,
+    "blotted": 55,
+    "skipped_not_lid": 0
+   },
+   "s014b:laptop-right": {
+    "pictures": 33,
+    "blotted": 33,
+    "skipped_not_lid": 0
+   }
+  },
+  "sheet": "qa/v4r10/logos.jpg (480x270 render crops, 2x)",
+  "note": "skipped = her leg in front of the lid (skin); checked on the sheet",
+  "pass": true
+ },
+ "pass": false
+}

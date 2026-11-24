@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-22",
+ "written_by": "主会话据 continuity-supervisor INS16 报告转写（ready；线长特写取巧已由使用者认可首帧）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-INS16-n-1/preview-approval.json",
+   "sha256": "9ddee7a9ed3626997a56fdf9deb76dbeb0c6e1af6a99b65f133b2e8f74d54666"
+  }
+ },
+ "units": {
+  "INS16": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；compiled/egress prompt 与首帧 sha 等于 approval；4 s",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "机位不动；听筒从左偏荡回、摆幅递减近乎停住，不挂回、不落地；电话线拉直不卷不断不多；影子同晃；无人无手无文字无标志无红色；背景虚焦、灯色不被改成红；剪辑取摆动最清楚的 1.78 s"
+  }
+ }
+}

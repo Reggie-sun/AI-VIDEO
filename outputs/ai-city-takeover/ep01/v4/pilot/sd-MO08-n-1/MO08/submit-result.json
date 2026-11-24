@@ -1,0 +1,10 @@
+{
+  "generation_id": "canvas-generation-fb8361d6a2ca264ce1f60384ad75cbd5",
+  "resolved_generation_hash": "4c9a94c1cd696d5188fd58eb18cd2c1864a2dab65826d4e4d031f30abf207084",
+  "paid_submit_receipt_fingerprint": "fcbb4a39fa66da016ba90ee7c65abf317497217e6cb7a8ec3fed245fdcc911e6",
+  "submitted_at": "2026-11-22T22:16:20.703324Z",
+  "provider_task_binding": null,
+  "expected_container": "mp4",
+  "expected_content_type": "video/mp4",
+  "submission_fingerprint": "50bfd63592470f19b99c671c414c6f220a54b6a74f605120621a448b759c5b44"
+}

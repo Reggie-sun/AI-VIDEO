@@ -1,0 +1,27 @@
+{
+ "unit": "SG03",
+ "lane": "seedance_2.0_vip multimodal 4k",
+ "media": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03/SG03/project/state/video-generation/fetch/files/fee974f046e8df07d582c7730b14ccf74c0accd496221244833608068a47cb02.mp4",
+  "sha256": "fee974f046e8df07d582c7730b14ccf74c0accd496221244833608068a47cb02"
+ },
+ "reviewed_by": "shot-gate-reviewer",
+ "overall": "FAIL",
+ "items": {
+  "sings": "FAIL (wide-open mouth with teeth at clip 2.25–2.50 s in the inter-line silence; audible inhale in the reference vocal)",
+  "identity": "PASS",
+  "action": "FAIL (straightens during 'awake'; engineer does not shrink back)",
+  "camera_background": "PASS",
+  "technical": "PASS (3840x2160; 145 frames ≈24 fps effective; AAC)"
+ },
+ "sync": {
+  "lag_s": -0.0385,
+  "copy": true,
+  "evidence": "gate/SG03-sd/sync.json"
+ },
+ "frames": "gate/frames (source.sha256)",
+ "user_decision": {
+  "quote": "这条可以，再拍 A 条对比 (Recommended)",
+  "effect": "user accepts both FAIL items for this take; take kept as the method sample, not a Gate PASS"
+ }
+}

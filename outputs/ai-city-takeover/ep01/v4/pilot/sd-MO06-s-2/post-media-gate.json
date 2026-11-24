@@ -1,0 +1,13 @@
+{
+ "schema": "iris-v4-post-media-gate/1",
+ "unit": "MO06",
+ "take_sha256": "bf49d05f9d48ba1b897bcb64fef1f85fa0cbd4b0845877211f5ccb31d45319a7",
+ "reviewer": "shot-gate-reviewer",
+ "verdict": "FAIL",
+ "items": {
+  "logo": "FAIL (new apple-like logo at t1.75)",
+  "others": "PASS"
+ },
+ "spent_CRD_observed": 400,
+ "selected": false
+}

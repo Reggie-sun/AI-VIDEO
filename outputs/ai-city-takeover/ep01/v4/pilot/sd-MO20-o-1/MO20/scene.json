@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo20-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "9686619f06398b51aa2a51ad9400bd0b74522b99db1badd59a6d077d36c85b49",
+  "creation_receipt_id": "iris-v4-MO20-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/73e7fb2d46cfe2548e445dd7d27f5ed7f52001150745e50ea3ecfd086af095f3.json",
+      "content_hash": "73e7fb2d46cfe2548e445dd7d27f5ed7f52001150745e50ea3ecfd086af095f3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/f72df32b1026353fac7699ccde104be647e801200f8b447143fc7f6914ffe0d6.json",
+      "content_hash": "f72df32b1026353fac7699ccde104be647e801200f8b447143fc7f6914ffe0d6"
+    }
+  ],
+  "scene_id": "runway-call-box-close",
+  "location": "同一根柱子，紧急呼叫柱旁",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo20-first-frame"
+  ]
+}

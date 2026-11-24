@@ -1,0 +1,21 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-22",
+ "written_by": "主会话据 continuity-supervisor s015–s030 报告转写（该 unit ready；逐字节核对 compiled/egress prompt 与 approval 一致）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG06-n-1/preview-approval.json",
+   "sha256": "dd63ae870e37ac103778149346b8fdbd1f2df7562b9434bd9a6f6b6484e60be4"
+  }
+ },
+ "units": {
+  "SG06": {
+   "verdict": "ready",
+   "continuity": "见 s015–s030 连续性报告（2026-11-22）",
+   "prompt_fit": "PASS；compiled 与 egress prompt sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸与开场一致（像不像由使用者判）；耳挂在左耳小红灯亮；除耳灯无红色；无文字；唱段嘴前无遮挡、口型对人声、开头不张嘴定住；寻呼机按连续性安排；听筒和电话线不挡嘴；half 附近松手；听筒吊着晃；向画左走出"
+  }
+ }
+}

@@ -1,0 +1,10 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>s014 r4 Gate 失败 · 下一步</title>
+<style>body{background:#111;color:#ddd;font:15px/1.6 sans-serif;max-width:1400px;margin:24px auto;padding:0 16px}img,video{width:100%;margin:6px 0}h2{margin-top:28px}.bad{color:#f77}</style>
+<h1>s014（MO07）r4 两条：Gate 都没过</h1>
+<p>观众这次<b>全程低头</b>，这个问题解决了。新问题：两条她都先<b>朝镜头直走 1.5–2.5 秒</b>，人越走越大，<span class="bad">头顶出画</span>；转身前后挂件也跳了（工牌消失、寻呼机挪到背后）。r4-2 另有<span class="bad">耳挂跑到右耳</span>。</p>
+<p>根因：prompt 第一句「她走到走秀台尽头」让模型把“走到”演成了往前走，首帧头顶只留 10.5%，走近两步就出画。加的「头顶不出画」压不住。r3 也是这个机制。</p>
+<h2>r4-1（每 0.25 秒一张，前 4 秒）</h2><img src="r4-1.jpg"><video src="r4-1.mp4" controls></video>
+<h2>r4-2</h2><img src="r4-2.jpg"><video src="r4-2.mp4" controls></video>
+<h2>建议 r5：首帧不变（a），只改动作句</h2>
+<pre style="white-space:pre-wrap;background:#222;padding:12px">长焦全身远景，镜头固定不动。她已经停在走秀台尽头，不再往前走，站在原地一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，一只手按住腰间震动的黑色寻呼机，背对镜头朝画面右侧走开，越走越远。她始终完整在画面里，头顶不出画。两侧的值班工程师一直低头盯着自己腿上的笔记本电脑，全程不抬头，身体保持不动。她腰间的寻呼机不亮任何红灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</pre>
+<p>改动：「她走到走秀台尽头，重心落在前脚，」→「她已经停在走秀台尽头，不再往前走，站在原地」；「朝画面右侧走开」→「背对镜头朝画面右侧走开，越走越远」。仍拍 2 条，约 800 积分。</p>

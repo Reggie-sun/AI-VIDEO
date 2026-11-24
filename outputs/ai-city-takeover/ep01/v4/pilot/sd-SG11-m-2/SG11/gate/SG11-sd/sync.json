@@ -1,0 +1,238 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG11-m-2/SG11/project/state/video-generation/fetch/files/973775e29f83bb773ef24cde9c2de442fc5ac0de275bec432ae99b1a3ecd61de.mp4",
+ "take_sha256": "973775e29f83bb773ef24cde9c2de442fc5ac0de275bec432ae99b1a3ecd61de",
+ "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG11m.wav",
+ "window_sha256": "e53fe70efaf330d3153bebca43f3bdcc9a0118e32eb3241ad78fd75945725dc8",
+ "song_t0": 125.608,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": -0.2939,
+ "ncc": 0.0203,
+ "copy": false,
+ "threshold": {
+  "null90": 0.4275,
+  "matched_med": 0.343,
+  "thr": 0.3937,
+  "strong_frames": 0
+ },
+ "frames": {
+  "total": 709,
+  "active": 547,
+  "matched": 95,
+  "matched_of_active": 0.174
+ },
+ "divergence": {
+  "frame": 0,
+  "rule": "stretch",
+  "last_match": null,
+  "clip_s": 0.0,
+  "song_s": 125.902
+ },
+ "synced_until": null,
+ "spans": [
+  {
+   "clip_s": [
+    2.09,
+    2.84
+   ],
+   "song_s": [
+    127.992,
+    128.742
+   ]
+  }
+ ],
+ "envelope": {
+  "lag_s": -0.978,
+  "ncc": 0.423,
+  "windows": [
+   {
+    "clip_t0": 0.0,
+    "clip_t1": 1.5,
+    "lag_s": -0.976,
+    "ncc": 0.645
+   },
+   {
+    "clip_t0": 0.25,
+    "clip_t1": 1.75,
+    "lag_s": -0.824,
+    "ncc": 0.516
+   },
+   {
+    "clip_t0": 0.5,
+    "clip_t1": 2.0,
+    "lag_s": -1.48,
+    "ncc": 0.216
+   },
+   {
+    "clip_t0": 0.75,
+    "clip_t1": 2.25,
+    "lag_s": -0.497,
+    "ncc": 0.238
+   },
+   {
+    "clip_t0": 1.0,
+    "clip_t1": 2.5,
+    "lag_s": -1.48,
+    "ncc": 0.187
+   },
+   {
+    "clip_t0": 1.25,
+    "clip_t1": 2.75,
+    "lag_s": -1.48,
+    "ncc": 0.393
+   },
+   {
+    "clip_t0": 1.5,
+    "clip_t1": 3.0,
+    "lag_s": -1.463,
+    "ncc": 0.325
+   },
+   {
+    "clip_t0": 1.75,
+    "clip_t1": 3.25,
+    "lag_s": -1.459,
+    "ncc": 0.271
+   },
+   {
+    "clip_t0": 2.0,
+    "clip_t1": 3.5,
+    "lag_s": -0.754,
+    "ncc": 0.203
+   },
+   {
+    "clip_t0": 2.25,
+    "clip_t1": 3.75,
+    "lag_s": -1.227,
+    "ncc": 0.281
+   },
+   {
+    "clip_t0": 2.5,
+    "clip_t1": 4.0,
+    "lag_s": -1.187,
+    "ncc": 0.379
+   },
+   {
+    "clip_t0": 2.75,
+    "clip_t1": 4.25,
+    "lag_s": -0.888,
+    "ncc": 0.504
+   },
+   {
+    "clip_t0": 3.0,
+    "clip_t1": 4.5,
+    "lag_s": -0.565,
+    "ncc": 0.428
+   }
+  ],
+  "max_dev_s": 0.502,
+  "steady": false,
+  "segments": [
+   {
+    "clip_s": [
+     0.625,
+     0.875
+    ],
+    "lag_s": -0.976,
+    "windows": 1,
+    "min_ncc": 0.645
+   },
+   {
+    "clip_s": [
+     0.875,
+     1.125
+    ],
+    "lag_s": -0.824,
+    "windows": 1,
+    "min_ncc": 0.516
+   },
+   {
+    "clip_s": [
+     1.125,
+     1.375
+    ],
+    "lag_s": -1.48,
+    "windows": 1,
+    "min_ncc": 0.216
+   },
+   {
+    "clip_s": [
+     1.375,
+     1.625
+    ],
+    "lag_s": -0.497,
+    "windows": 1,
+    "min_ncc": 0.238
+   },
+   {
+    "clip_s": [
+     1.625,
+     2.625
+    ],
+    "lag_s": -1.472,
+    "windows": 4,
+    "min_ncc": 0.187
+   },
+   {
+    "clip_s": [
+     2.625,
+     2.875
+    ],
+    "lag_s": -0.754,
+    "windows": 1,
+    "min_ncc": 0.203
+   },
+   {
+    "clip_s": [
+     2.875,
+     3.375
+    ],
+    "lag_s": -1.207,
+    "windows": 2,
+    "min_ncc": 0.281
+   },
+   {
+    "clip_s": [
+     3.375,
+     3.625
+    ],
+    "lag_s": -0.888,
+    "windows": 1,
+    "min_ncc": 0.504
+   },
+   {
+    "clip_s": [
+     3.625,
+     3.875
+    ],
+    "lag_s": -0.565,
+    "windows": 1,
+    "min_ncc": 0.428
+   }
+  ]
+ },
+ "placement": {
+  "lag_s": -0.978,
+  "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+  "song_t_of_clip0": 126.586,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "SG11-sd",
+ "reviews": [
+  {
+   "kind": "placement",
+   "lag_s": -0.978,
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG11-m-2/SG11/gate/SG11-sd/review-SG11-sd-973775e29f83-placement-lag-0.978.mp4",
+   "sha256": "ba044cc8a9d0b24b176955d80c3770038d3b592fd34d4b04eeb28ebb0ebc0dca"
+  }
+ ]
+}

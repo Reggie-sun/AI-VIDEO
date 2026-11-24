@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo12-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p027-b3.png",
+    "sha256": "942eac1020263ff3ab6df31411132bae5c781c34a90fb5b2f565424e83b5d88b",
+    "size_bytes": 2407978,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p027-b3.png: the first frame",
+    "need_id": "subway-platform",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

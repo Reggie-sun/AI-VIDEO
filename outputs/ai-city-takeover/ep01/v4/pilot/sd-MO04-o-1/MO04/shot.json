@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo04-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "2b0124a6f63dec6937338c019142ea7bf229a46c682358dd335ae52035f8be84",
+  "creation_receipt_id": "iris-v4-MO04-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c51d28b965de9a32210fd9ad0d87b4336677ba3c19172a923ec131adb67deaf8.json",
+      "content_hash": "c51d28b965de9a32210fd9ad0d87b4336677ba3c19172a923ec131adb67deaf8"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/28eecc8b8f135b06e3e54827ecb309882554a473c82541c76ebc5bbe99a825f1.json",
+      "content_hash": "28eecc8b8f135b06e3e54827ecb309882554a473c82541c76ebc5bbe99a825f1"
+    }
+  ],
+  "shot_id": "ep01v4-mo04",
+  "scene_id": "street-billboard-tree",
+  "storyboard_beat_id": "mo04",
+  "intent": "镜头固定。她把挡在面前的树枝往下拽，眯眼往上看树后那块发白光的广告牌；然后松手，树枝弹回去、叶子晃动，广告牌的白光整片打到她脸上，她不躲，从外套口袋里掏出一张空白的白色姓名贴。面无表情，带着一点好奇。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的首帧承担）",
+    "她拽下树枝、松手让它弹回去，叶子晃动，白光整片打到脸上她不躲，从外套口袋里掏出一张空白的白色姓名贴",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo04-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

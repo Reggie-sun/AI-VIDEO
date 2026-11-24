@@ -1,0 +1,71 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-MO12-p-2",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/p027b/index.html\n\ns027 改成背影后的首帧有 3 个候选，推荐 b：\n- 镜头在她身后，她背对镜头站在画面正中，往深处的出口楼梯走。\n- 列车在右侧，车门开着，戴兜帽的人群从车门涌出，跟在她两侧。\n- 她占画面约 40% 高，走远只会变小。\n- 电脑合着抱在胸前，没有标志；没有字，没有红色。\n\nprompt（页上有全文）：镜头固定，她背对镜头沿站台朝出口大步走远，人群跟着。\n\n再拍 2 条约 640 积分。用 b 吗？（s028 的“结果未知”还在查，会先处理好那个再拍。）",
+ "user_quote": "用 b (Recommended)",
+ "approved_at": "2026-11-23T06:51:04Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "981665ba8ce6be0abb8990c0d913cb21159e0e7b6dcf683d146be3e79dd15e26"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "7d89c71ea86aed9320d239b07df8d46761f7467a90c1d40899af15e90f679263"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "4c2cd4deaacdf1130fde65c89a396dee152a5da93d3cd356489e587ea514b529"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p027-b3.png",
+   "sha256": "942eac1020263ff3ab6df31411132bae5c781c34a90fb5b2f565424e83b5d88b",
+   "role": "MO12 first frame"
+  }
+ ],
+ "prompts": {
+  "MO12": {
+   "text": "镜头固定不动。她背对镜头，沿站台朝远处的出口楼梯大步走远，不回头，越走越小。戴兜帽的人群从开着的车门里涌出来，在她身后两侧跟着她朝出口走；他们把合着的笔记本电脑竖着抱在胸前，电脑背面朝向自己的身体。她背后没有包，也没有任何挂件。电脑外壳和连帽衫上没有任何标志或图案。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "ab4244317cb4526f84238f985d3c513abd17b4450a2c3ac1cb62cc7a1b34fe15"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p027-b3.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P027B/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 B）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo12-p-2-source-001",
+  "policy_id": "iris-mo12-p-2-source-001",
+  "reservation_id": "iris-mo12-p-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO12-p-1",
+   "sd-MO12-p-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO12-p-2"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO12-n-1/preview-approval.json",
+  "sha256": "343d8e02ddcf89c51fd851693a883c8982ea89465f8586b3a72eb32597e43118",
+  "reason": "s027 重拍 p：n-1、n-2 两条 Gate 不通过（都朝镜头斜走，约 1.5 s 脚出画，没从画面右侧出去；n-1 电脑背面露苹果标志，n-2 帽衫和电脑上有图形）。使用者选「A 重做背影首帧再拍 (Recommended)」，再在 pilot/s015-030/p027b/index.html 选「用 b (Recommended)」：首帧换成 p027-b3（= excerpt/flash/design/S15-30/P027B/b.png，机位在她身后），prompt 换成背影版（她背对镜头朝出口楼梯走远、人群在身后两侧跟着、电脑合着背面朝内）；此前开拍前审查的改句随之作废；n approval 与 sd-MO12-n-1/n-2 产物保留"
+ }
+}

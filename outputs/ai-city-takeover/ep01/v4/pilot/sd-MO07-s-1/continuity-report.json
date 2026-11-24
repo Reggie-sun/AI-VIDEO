@@ -1,0 +1,47 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "inputs": {
+  "preview_approval": {
+   "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-1/preview-approval.json",
+   "user_quote": "两镜都用 b，拍 (Recommended)",
+   "approved_at": "2026-11-19T17:54:00Z",
+   "replaces_approval": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-1/preview-approval.json (sha ebd30941…7e04)",
+   "sha256_recorded": "prompt 0b5a2a72…812f; first_frame c85aa47e…ace8; page strapfix.html 188c99d4…2ffa",
+   "takes": "同一认可两条 take（s-1/s-2），各 1 次，合计上限 800 CRD"
+  },
+  "compiled_prompt": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-1/MO07/compiled-native-prompt.zh.txt",
+  "prepared": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-1/MO07/prepared.json",
+  "profile": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-1/MO07/profile.json",
+  "operator_bound": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-1/MO07/operator-bound.json",
+  "first_frame": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1b.png",
+  "zoom_checked": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/STRAP/zoom-s014-b.jpg",
+  "compared_against": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1.png（原首帧，上一份报告已查看）",
+  "neighbours": [
+   "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/plates/p013-w1.png（s013 底片）",
+   "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/shots.json（s015 第 1078 行起）"
+  ],
+  "preview_page": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/strapfix.html"
+ },
+ "units": {
+  "MO07": {
+   "verdict": "ready",
+   "continuity": "PASS。\n(1) 带子方向：p014-w1b.png 原图里，斜挎带从她的右肩出发（画面左，脖子左侧，约 840,235），带扣在胸前（约 895,295），斜到左胯（画面右，约 965,410）。zoom-s014-b.jpg 放大后看到的也是右肩到左胯。这和分镜 s014 底片提示词（shots.json 第 1039 行）、s013 底片 p013-w1、SG03-w1、新 s011 的 p011-w1c 都一致。上一份报告里的阻塞因此解除。\n(2) 带子以外的造型：和原首帧 p014-w1 对比没有被改动。露左肩（画面右），长袖在右臂、向画面左甩出，黑高领，腰链、寻呼机、空白工牌、及膝长靴都在。红色只有画面右侧（她的左耳）耳挂上的一处小灯。转身姿势和下摆甩开的形状也没变。胸口带子经过的地方有局部重绘，缝线走向略有变化。\n(3) 场地和光线：两侧同一批工程师（左边戴眼镜的卷发男、右边扎发髻戴耳机的女人）、柱子上的黄黑警示条、青白色灯管、湿亮的水泥地，都和原首帧一致，没看出漂移。也和新 s011 是同一个空间。",
+   "handoff": "PASS。\ns013→s014：她从前排工程师旁的仰拍中近景，切到 T 台尽头的长焦全身远景。剪点在 55.078 的“All hands! / All night!”节拍上，属于空间省略，前面有“手机落回他怀里”的短插交代她离开。两侧是同一批工程师，带子方向、露肩一侧、黑高领都和 s013 一致。\ns014→s015：MO07 结束时她手按着震动的寻呼机，朝画面右侧走出。s015 在 59.234 的重音上推开钢门，寻呼机尖叫，她低头按掉。动作接得上；换地点靠撞门那一下的省略；她在 s015 里朝镜头走，方向是中性的。s015 的造型问题见风险，按约定不阻塞。",
+   "axis_action_camera": "PASS。长焦正对 T 台，镜头固定，两侧对称，没有越轴。首帧里转身已经起势，长袖已经甩出，画面左边留了甩开的空间。使用时长 4.156 s，5 s 生成有 0.84 s 余量。",
+   "prompt_fit": "PASS。compiled-native-prompt.zh.txt 与 preview-approval.prompts.MO07.text 逐字相同，和 round2 认可的原文一样，没有改。prepared 里 prompt_text 出现 5 处。上传内容的 sha 都等于认可值：prompt 0b5a2a72ae7e1e9605c70387c904d1fc56e082347ea00d810e0d7d2878b1812f（第 4750 行），首帧 c85aa47e12686ccdd6421bcae732eecd2862f43e736b62c33547b766c7f3ace8（第 4757 行）。生成参数：first_frame、5 s、4k、16:9、上限 400 CRD、1 次、不重试。attempt、policy、reservation 都是 iris-mo07-s-1-*，节点 node_h6ee9fnkhh，generation_POSTs=0。open_state 和 close_state（第 205、212 行）与首帧和分镜一致。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "动作偏多（沿用上次的风险）：4.156 s 里要完成急转身、袖子甩圆落下、按住寻呼机、走出画面。按寻呼机最好落在 58.73 的“Ten oh two”，也就是片内约 3.65 s，这个时点模型控制不了，只能在剪辑里用 0.84 s 余量去对。Gate 要标出转身、袖子落下、按寻呼机、出画各在哪一帧。",
+    "logo（沿用上次的风险）：首帧右侧笔记本上有类似苹果的标志，约在 1440,490。分镜要求不能出现任何标志，Gate 要确认这些标没有变清楚。",
+    "带子方向只靠首帧锁定，prompt 里没写。急转身时模型可能把带子画反、画滑或者画没。转身后半段她会侧身或背对镜头，带子看起来的样子也会变。Gate 要逐帧确认带子仍然挂在右肩、斜到左胯。",
+    "长袖：转身时不能换臂、不能变短、不能多出第二条，左臂要一直露着。",
+    "红灯：远景里耳挂很小，Gate 要放大确认红灯在她左耳（画面右侧），并且画面里没有别的红色。",
+    "s015 的底片 p015 和分镜提示词（shots.json 第 1094 行）还是旧造型：22 岁、白色立领外套带红色灯线、阔腿裤。不改的话，s014→s015 这一刀会穿帮。按约定只记风险，不阻塞，但 s015 需要另外重做。",
+    "shot.duration_policy.seconds=6.0（prepared 第 43、442 行），与 5 s 的输出不一致，交给 lint 判定。",
+    "我没有 Bash，没法核对 p014-w1b.png 与 STRAP/s014-b.png 是否逐字节相同，目前只有认可文件里的声明为证。",
+    "permit 在 2026-11-20T00:04:14Z 过期。"
+   ]
+  }
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "downloads": {
+  "ibm-plex-mono.zip": {
+   "url": "https://github.com/IBM/plex/releases/download/%40ibm/plex-mono%402.5.0/ibm-plex-mono.zip",
+   "release": "@ibm/plex-mono@2.5.0",
+   "sha256": "6d23f01257663d8cc49a0d64c22ced630b79e0e2a0ac08a0da86e9a38bbc481c"
+  },
+  "dinish-otf.zip": {
+   "url": "https://github.com/playbeing/dinish/releases/download/v4.007/dinish-otf.zip",
+   "release": "v4.007",
+   "sha256": "747f05f21f8195eb07ad8bc6307cc29e0a333db16b43092e6842a026c9763a58"
+  },
+  "OFL-DINish.txt": {
+   "url": "https://raw.githubusercontent.com/playbeing/dinish/main/OFL.txt"
+  }
+ },
+ "files": {
+  "DINishCondensed-Black.otf": "5ea63c0c30ef3cdd206be91baa718f13aa38547006fccb6228b34bc20cb12835",
+  "DINishCondensed-Bold.otf": "ebfe59928157d3cf61f966792b94456b8ec339cb7487b2a3318ad9c35067aeef",
+  "IBMPlexMono-Medium.otf": "f7db820bddfbf7fce52946e69fee89a150938d401d82850cdf975b2c4c31b97b",
+  "IBMPlexMono-Regular.otf": "372fe8f8a459baef84ee346b0a478084e80c46bd299a0c27bcb0f3412f5a9d28",
+  "IBMPlexMono-SemiBold.otf": "bc63f5550b440d5edd4da15c4740e7468d2064a72f5509aca55348f930588267",
+  "NimbusSans-Bold.otf": "7f33328e6b4d4cd21b45fa625791928c9407dc702db6780e56b09ca9a3ecaa67",
+  "NimbusSans-Regular.otf": "7c25be4d78155523080ab85b10277150657ff7dabbcad7037bdd536c9b6d0d08",
+  "OFL-DINish.txt": "b3a684e797eb0b99df2017409ceb95771ff7411743e086b0eeeeb48ad84e85e5",
+  "OFL-IBMPlexMono.txt": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da"
+ }
+}

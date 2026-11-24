@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg08-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p022-b1.png",
+    "sha256": "3104bb6d25636b982addedd290f3228ee7cd4850149c3ef69441f536c03cc5a9",
+    "size_bytes": 1890845,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p022-b1.png: the reference image",
+    "need_id": "hearing-room-witness",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg08-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG08.wav",
+    "sha256": "e56666227990e6fe0463d3ee0d668dda53423aeb43dd25c6417600962e2d8ec7",
+    "size_bytes": 612240,
+    "kind": "audio",
+    "duration_millis": 6941,
+    "sample_rate_hz": 44100,
+    "role": "approved SG08.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        94.507,
+        101.448
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

@@ -1,0 +1,48 @@
+{
+ "unit": "MO04",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "dbb79d7740803c424197d3f99720bf15521b73a6ea773cd4f53c022868fa7bc3",
+ "compiled_prompt_sha256": "6c86e97fd49623f73c2ae94f8bee22bcd9b5f3c96e479cbc1afb6a2cd14dc56d",
+ "approval_sha256": "e0a95ba650d8b712f6b80ff25bdd1d624d6ccbf5ee96b26612d729d536065754",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO04/continuity-report.json",
+  "sha256": "3080858552328f4d1c7e724d835f692b60fc7260ea00a4d551aab809ab4675f6",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS（场记逐项，见本轮报告）",
+   "handoff": "PASS（按设计）",
+   "axis_action_camera": "PASS",
+   "prompt_fit": "PASS：编译文本、认可、preview-inputs 逐字一致",
+   "lint": "由主会话运行 lint.py 取证",
+   "risks": [
+    "松手结束态可能落在 SG02 切点之后",
+    "「从外套口袋里掏出」可能凭空加口袋",
+    "眼睛上翻露眼白多，Gate 查身份"
+   ],
+   "full_report_note": "场记完整报告见本轮对话；主会话依其结论落盘"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 800,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   800
+  ]
+ },
+ "new_calls": 0
+}

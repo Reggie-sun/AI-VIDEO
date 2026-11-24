@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo03-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "7d539fa54c89ff720407eaea8929aed555b109a19332b6198d7fb371cfc65f81",
+  "creation_receipt_id": "iris-v4-MO03-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e581260a624af76b69dba6fb97147d226842f3c030ff72d711c1f7c190012f34.json",
+      "content_hash": "e581260a624af76b69dba6fb97147d226842f3c030ff72d711c1f7c190012f34"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ccbc3e8bf69bfcd94f259cacb1601347537803dea33b9637dda6e04d68e9f4d6.json",
+      "content_hash": "ccbc3e8bf69bfcd94f259cacb1601347537803dea33b9637dda6e04d68e9f4d6"
+    }
+  ],
+  "shot_id": "ep01v4-mo03",
+  "scene_id": "folsom-sidewalk",
+  "storyboard_beat_id": "mo03",
+  "intent": "手持跟拍，在她侧前方。夜里湿亮的人行道上，一群街拍摄影师倒退着走在她前面，不停按闪光灯；她不减速，伸手掌平按住最近一台相机的镜头往下压，从他们中间穿过去，走向街角的行道树。面无表情。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的首帧承担）",
+    "她不减速，伸手掌平按住最近一台相机的镜头往下压，从倒退着按闪光灯的摄影师中间穿过去，走向街角的行道树；不新增人物",
+    "手持跟拍，摄影机在她侧前方随她倒退移动，不环绕、不翻轴",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo03-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

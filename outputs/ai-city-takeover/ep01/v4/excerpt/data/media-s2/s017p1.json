@@ -1,0 +1,57 @@
+{
+ "shot": "s017p1",
+ "t0": 71.1808,
+ "t1": 72.098,
+ "why": "the engineer's open palm and laptop on the kerb (A of A-B-A; 'couldn't guess'), 2x crop; his hand sharp, street soft",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG07-m-2/SG07/project/state/video-generation/fetch/files/8a72e1fc311d7634bdca4201de2e163209218e4c56173ac728aca62b6e290cb9.mp4",
+ "clip_sha256": "8a72e1fc311d7634bdca4201de2e163209218e4c56173ac728aca62b6e290cb9",
+ "pictures": 217,
+ "frames": 22,
+ "first": {
+  "f": 286,
+  "t": 71.1667,
+  "clip_t": 0.2859,
+  "idx": 7
+ },
+ "last": {
+  "f": 307,
+  "t": 72.0417,
+  "clip_t": 1.1609,
+  "idx": 28
+ },
+ "crop": [
+  0.27,
+  0.55,
+  2.0
+ ],
+ "speed": 1.0,
+ "knots": null,
+ "repeats": 0,
+ "skips": 0,
+ "map": [
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28
+ ],
+ "orange_px_max": 21,
+ "pager_red": null
+}

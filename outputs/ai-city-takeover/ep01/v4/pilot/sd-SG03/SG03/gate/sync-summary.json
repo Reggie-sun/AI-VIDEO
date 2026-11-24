@@ -1,0 +1,65 @@
+[
+ {
+  "name": "SG03-sd",
+  "take_sha256": "fee974f046e8df07d582c7730b14ccf74c0accd496221244833608068a47cb02",
+  "lag_s": -0.0385,
+  "ncc": 0.3356,
+  "copy": true,
+  "divergence": {
+   "frame": 594,
+   "rule": "voice after the last match",
+   "last_match": 593,
+   "clip_s": 5.94,
+   "song_s": 50.921
+  },
+  "synced_until": {
+   "clip_s": 5.888,
+   "song_s": 50.869
+  },
+  "spans": [
+   {
+    "clip_s": [
+     0.0,
+     1.16
+    ],
+    "song_s": [
+     44.981,
+     46.141
+    ]
+   },
+   {
+    "clip_s": [
+     1.43,
+     5.93
+    ],
+    "song_s": [
+     46.411,
+     50.911
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": -0.0385,
+   "method": "tool 15 waveform lag (copy)",
+   "song_t_of_clip0": 44.9807,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": -0.042,
+   "ncc": 0.879,
+   "max_dev_s": 0.047,
+   "steady": true,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      5.375
+     ],
+     "lag_s": -0.038,
+     "windows": 19,
+     "min_ncc": 0.831
+    }
+   ]
+  }
+ }
+]

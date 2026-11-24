@@ -1,0 +1,42 @@
+{
+ "unit": "INS16",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "77f74f74c55b07cb5775fd803fe83022cfeb6bb9e7d23d8a5abc8e79b89b8484",
+ "compiled_prompt_sha256": "bb405202f3a2a2fb8fec63581d4a4c426200150260f831abc36d7cffb9c89728",
+ "approval_sha256": "9ddee7a9ed3626997a56fdf9deb76dbeb0c6e1af6a99b65f133b2e8f74d54666",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-INS16-n-1/continuity-report.json",
+  "sha256": "7f2e1242f41d40fb66884335991139da21cd578bc6bd5731f229a9a133b2f1c3",
+  "unit": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；compiled/egress prompt 与首帧 sha 等于 approval；4 s",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "机位不动；听筒从左偏荡回、摆幅递减近乎停住，不挂回、不落地；电话线拉直不卷不断不多；影子同晃；无人无手无文字无标志无红色；背景虚焦、灯色不被改成红；剪辑取摆动最清楚的 1.78 s"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

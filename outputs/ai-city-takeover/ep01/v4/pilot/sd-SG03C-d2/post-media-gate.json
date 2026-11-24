@@ -1,0 +1,3 @@
+{"schema":"iris-v4-post-media-gate/1","unit":"SG03C","take_sha256":"c6f6531b535ad4693f28033a5d100696b1e8b2bec266b3c0e4b8079ec80ab1a2","reviewer":"shot-gate-reviewer","verdict":"NOT_EVALUATED",
+ "items":{"lip_sync":"NOT_EVALUATED (awake segment: native audio transcribes 'ready'; 4 fps cannot separate)","in_out":"PASS","camera_locked":"PASS","engineer_foreground":"PASS","wardrobe_identity":"PASS","artifacts":"PASS","cut_from_SG03-w1":"PASS"},
+ "spent_CRD_observed":320,"selected":false,"note":"d1 selected; no further evidence collected for d2"}

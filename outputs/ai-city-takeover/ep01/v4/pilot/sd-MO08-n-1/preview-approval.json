@@ -1,0 +1,66 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-MO08-n-1",
+ "question": "提交前预览页：http://127.0.0.1:8769/pilot/s015-030/submit/index.html\n\ns015–s030 共 13 条要拍：7 条唱段，人声已切好，页上可以听；6 条是动作。每条列了首帧、逐字 prompt、为什么这样拍、秒数和费用。\n\n按 s014 的教训，我把 7 条 prompt 改成从首帧的状态写起，例如：\n- s025 首帧里她已经接住了电脑，prompt 就从“把电脑塞回他怀里”写起。\n- s028 泛光灯亮起来那一下，改到后期用调色做。\n\n静图 s021/s023/s030 和 4 个插镜不用生成。每条拍 2 次挑一条，预计共 12,000 积分，上限 13,000。每条出片后先过逐镜 Gate，再拍下一条。\n\n按这个开拍吗？",
+ "user_quote": "按页面开拍 (Recommended)",
+ "approved_at": "2026-11-22T17:40:38Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "a96addc1819cff9636e3709d3569f9b641909f5220a4842d622446d0be0fd67c"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "346038f3daf611a66de846e3d004a58fa7cf590fee1b1cc6686c9e279a25a6b0"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "6090e683a3eb007c6c24a997d7b98d40befb4b2dd233a5e04de0a62badd8985e"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p018-w1.png",
+   "sha256": "5a8ac46aec0079ddd02f4178e7a4f03d47043ff580b702708a48d0d3e928f529",
+   "role": "MO08 first frame"
+  }
+ ],
+ "prompts": {
+  "MO08": {
+   "text": "高机位俯拍，镜头固定不动。抱着笔记本电脑的人群从楼里涌上湿亮的街道，往四面散开，有人跑着去拦出租车；只有她一个人逆着人流，不紧不慢地朝画面下方走。人群一波一波地涌。街上的车灯只有白色和琥珀色。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "64370caa0f9fb53368e3f8883c9369ebbcfd81d58efc7fc243a3565a5641d2ac"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 6,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 500,
+  "cumulative_CRD": 500
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p018-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P018/d.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo08-n-1-source-001",
+  "policy_id": "iris-mo08-n-1-source-001",
+  "reservation_id": "iris-mo08-n-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO08-n-1",
+   "sd-MO08-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1000,
+  "this_take": "sd-MO08-n-1"
+ }
+}

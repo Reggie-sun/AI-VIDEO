@@ -1,0 +1,39 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-17T23:05:19+00:00",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03/preview-approval.json",
+   "sha256": "d72cdf16565d98aeb10d00d6e36836b54f45ccfef73ad6d5c06b895b9dc57df7"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/preview-inputs.json",
+   "sha256": "8bb261d67e212a418ded7ab9c5ab97237b3bb1d925870e2dc4fdd19c640da7af"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/index.html",
+   "sha256": "9477f016602abeb85d63d4fac76b6eef85c21f8ebd64754ea44a3075fea097bd"
+  }
+ },
+ "units": {
+  "SG03": {
+   "verdict": "ready",
+   "continuity": "PASS：脸与 F1-a 锚点一致；耳挂、小红灯、立领红线在画面右侧且亮着；造型 L1 与 p011/p013 一致；红色只在讯号灯（场记报告逐项）。",
+   "handoff": "PASS（按设计）：44.9422 s 由 MO06「走到走秀台中段」硬切到前排凑近；50.933 s 硬切到 s013，她在右他在左，衔接得上。",
+   "axis_action_camera": "PASS：180 度线同侧无越轴；动作顺序 合嘴→唱→直起身 对应人声片内 0–0.68 静音、0.68–5.43 唱、5.43–5.99 收尾；生成锁定机位，4% 推近留剪辑。",
+   "prompt_fit": "PASS：编译 prompt 与认可原文逐字相同（sha b219295c…），参考包只有底图与人声；与分镜的差异只有锁定机位与闭嘴起始，预览页已列明。",
+   "lint": "由主会话运行 lint.py 取证（见 SG03/pre-submit-lint.json）。",
+   "risks": [
+    "认可文本「他还攥着椅子扶手」而 p012 折叠椅无扶手：可能凭空加扶手或第三只手；Gate 专查。主会话决定不为方法试验改认可文本。",
+    "tight 与 I'm 之间 0.71 s 无声：Gate 单测句间是否合嘴。",
+    "awake 结束到片尾只 0.56 s，直起身可能做不完或提前。",
+    "自带音轨可能提前（v2 LSen1 约 0.8 s）：Gate 先用 sync_check.py 量 lag。",
+    "全能参考非首帧：核对左右侧、领线亮灭、无镜像。",
+    "p011→p012 场景与群演的既有差异（检查点 4 已过），拼接审看时提出。",
+    "4k 价格无记录：上限 1000，实付以前后精确余额为准。"
+   ],
+   "full_report_note": "场记完整报告见本轮对话；本文件为主会话依其结论落盘。"
+  }
+ }
+}

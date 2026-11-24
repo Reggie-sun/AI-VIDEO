@@ -1,0 +1,71 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-MO08-n-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "981665ba8ce6be0abb8990c0d913cb21159e0e7b6dcf683d146be3e79dd15e26"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "7d89c71ea86aed9320d239b07df8d46761f7467a90c1d40899af15e90f679263"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "4c2cd4deaacdf1130fde65c89a396dee152a5da93d3cd356489e587ea514b529"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p018-w1.png",
+   "sha256": "5a8ac46aec0079ddd02f4178e7a4f03d47043ff580b702708a48d0d3e928f529",
+   "role": "MO08 first frame"
+  }
+ ],
+ "prompts": {
+  "MO08": {
+   "text": "高机位俯拍，镜头固定不动。抱着笔记本电脑的人群从楼里涌上湿亮的街道，往四面散开，有人跑着去拦出租车；只有她一个人逆着人流，不紧不慢地朝画面下方走。人群一波一波地涌。街上的车灯只有白色和琥珀色。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "64370caa0f9fb53368e3f8883c9369ebbcfd81d58efc7fc243a3565a5641d2ac"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 6,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 500,
+  "cumulative_CRD": 500
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p018-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P018/d.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo08-n-1-source-001",
+  "policy_id": "iris-mo08-n-1-source-001",
+  "reservation_id": "iris-mo08-n-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO08-n-1",
+   "sd-MO08-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1000,
+  "this_take": "sd-MO08-n-1"
+ },
+ "_template_notes": [
+  "本文件是 n-1 的模板；写成 pilot/sd-MO08-n-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s015-030-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "n-2：unit_group 末尾 n-1→n-2；bound_ids 三个 id 中 -n-1- → -n-2-；takes.this_take → sd-MO08-n-2（takes.folders 保持 [n-1, n-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-MO08-n-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh MO08 6 first_frame 500"
+ ]
+}

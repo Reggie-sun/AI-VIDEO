@@ -1,0 +1,23 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "ee83528f636ebd2de46db4d1493b5169cfae3ff1bb47974ff9cb13415807f311",
+  "unit_ids": [
+    "SG05"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p015-w1.png",
+      "sha256": "b8eabb6ae89dbe66a01c8d6bf59809f8ed74c91e8a033f2ac9265b31da4a76d3",
+      "role": "SG05 reference image"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05m.wav",
+      "sha256": "85f247e588704eac72e2feec01b621911a84d290a3b873ba05322b840eb02b4c",
+      "role": "SG05 vocal"
+    }
+  ],
+  "user_quote": "按页面重拍 (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

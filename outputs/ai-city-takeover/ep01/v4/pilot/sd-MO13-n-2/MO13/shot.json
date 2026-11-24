@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo13-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "d67dd363bcc3ca7921b666d1df0efa8c8894faa11021a86fb824ca18db782d94",
+  "creation_receipt_id": "iris-v4-MO13-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/336ce83f6fedacbb9f2500b028696b944d48fcda10af93100dfd31ff49028696.json",
+      "content_hash": "336ce83f6fedacbb9f2500b028696b944d48fcda10af93100dfd31ff49028696"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3ea2bdf707125d6c0df82037d052ffdd65687416c372ff3677b2cc10f9be2e90.json",
+      "content_hash": "3ea2bdf707125d6c0df82037d052ffdd65687416c372ff3677b2cc10f9be2e90"
+    }
+  ],
+  "shot_id": "ep01v4-mo13",
+  "scene_id": "dry-pool-tower",
+  "storyboard_beat_id": "mo13",
+  "intent": "镜头固定不动。她转身朝画面右侧，沿台阶往上走，走到一半低头看一眼身前腰带上的黑色寻呼机，寻呼机的液晶屏发出灰绿色的光，再接着往上走，从画面右上方走出去。背后没有包，也没有任何挂件。寻呼机屏幕只有灰绿底光，没有数字和字。池底干燥，没有水。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤完整保持；没有立领灯线（由认可的首帧承担）",
+    "她转身朝画面右侧，沿台阶往上走，走到一半低头看一眼身前腰带上的黑色寻呼机（液晶屏只有灰绿底光，没有数字和字），再接着往上走，从画面右上方走出去；背后没有包，也没有任何挂件；池底干燥没有水；不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo13-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

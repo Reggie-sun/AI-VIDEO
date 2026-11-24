@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo04-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p007.png",
+    "sha256": "c67df3b27c594d9442a18a6eeec7e28013a866330b5cfbaa5d49ef77ffb31373",
+    "size_bytes": 2602578,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p007.png: the first frame",
+    "need_id": "street-billboard-tree",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

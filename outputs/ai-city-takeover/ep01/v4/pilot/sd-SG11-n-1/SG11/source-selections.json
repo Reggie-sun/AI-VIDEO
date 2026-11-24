@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg11-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p029-b1.png",
+    "sha256": "f64e2472f4dfaefe426e33fe05bebf61fb0b4f1e2b32e370aca171b3d12da98b",
+    "size_bytes": 1901597,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p029-b1.png: the reference image",
+    "need_id": "dry-pool-board-end",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg11-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG11.wav",
+    "sha256": "7b556199a076a35a674c1f12ec8a5fec42c1ec1521c47c16688819fb2d8e6699",
+    "size_bytes": 486450,
+    "kind": "audio",
+    "duration_millis": 5515,
+    "sample_rate_hz": 44100,
+    "role": "approved SG11.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        125.7244,
+        131.2392
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

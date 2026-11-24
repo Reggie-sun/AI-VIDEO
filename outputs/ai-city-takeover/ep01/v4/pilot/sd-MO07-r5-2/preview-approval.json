@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-mo07-r5-2-MO07",
+ "question": "审看页：http://127.0.0.1:8769/pilot/opening/review-s014r5/index.html\n\ns014 r4 两条（800 积分）Gate 都没过：\n- 观众全程低头，这个问题已经解决\n- 新问题：两条她都先朝镜头直走 1.5–2.5 秒，人越走越大，头顶出画\n- 转身时工牌消失，寻呼机跳到背后\n- r4-2 的耳挂还跑到了右耳\n\n根因是 prompt 第一句「她走到走秀台尽头」被模型演成了往前走。首帧头顶只留了 10.5%，走两步头顶就出画。\n\n我建议 r5：首帧仍用 a，只改动作句，改成「已经停在走秀台尽头，不再往前走，站在原地急转身……背对镜头朝画面右侧走开，越走越远」。再拍 2 条，约 800 积分。\n\n怎么做？",
+ "user_quote": "按页面改 prompt 拍 r5 (Recommended)",
+ "approved_at": "2026-11-21T23:39:42Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/opening/review-s014r5/index.html",
+  "sha256": "9740c96c6fdc3d942ce0eb1fac63562b13f84ca4c58400abda656c8ad0201263"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s014-r5-seedance.md",
+  "sha256": "2361b2e9bfac2c8b5d9279a18a2fd26dd30568be0f0559864b7b9cdc60359e89"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1c.png",
+   "sha256": "ae34b54393afe1df4e15f35326de17752734af1f3661b2c4a307adec89f74374",
+   "role": "MO07 first frame"
+  }
+ ],
+ "prompts": {
+  "MO07": {
+   "text": "长焦全身远景，镜头固定不动。她已经停在走秀台尽头，不再往前走，站在原地一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，一只手按住腰间震动的黑色寻呼机，背对镜头朝画面右侧走开，越走越远。她始终完整在画面里，头顶不出画。两侧的值班工程师一直低头盯着自己腿上的笔记本电脑，全程不抬头，身体保持不动。她腰间的寻呼机不亮任何红灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "6ae93970c9a8d2beee3b4c0fbb33fd405b527956d044529d036876a9c31ca6c7"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p014-w1c.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S14r4/a.png 逐字节相同；只把 p014-w1b 的两侧观众改为低头，她和服装不变，使用者认可「用 a 拍」）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo07-r5-2-source-001",
+  "policy_id": "iris-mo07-r5-2-source-001",
+  "reservation_id": "iris-mo07-r5-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO07-r5-1",
+   "sd-MO07-r5-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO07-r5-2"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r4-1/preview-approval.json",
+  "sha256": "0b8d55ebf9ad79d55b89d26b54065d8aeb915ba57b62e7dbc6ecea08de5356c3",
+  "reason": "s014 重拍 r5：r4 两条 Gate 失败，她先朝镜头直走、人变大、头顶出画（r4-2 另有耳挂到右耳）；首帧 p014-w1c 不变，动作句改为原地转身、背对镜头走远；r4 approval 与 sd-MO07-r4-1/r4-2 产物保留"
+ }
+}

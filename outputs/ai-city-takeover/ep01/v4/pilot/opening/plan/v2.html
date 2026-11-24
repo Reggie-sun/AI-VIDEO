@@ -1,0 +1,28 @@
+<!doctype html><meta charset="utf-8"><title>动静逐镜判断 v2</title>
+<style>body{background:#111;color:#ddd;font:15px/1.7 sans-serif;max-width:1300px;margin:20px auto;padding:0 16px}h2{color:#F2B134}td,th{border:1px solid #444;padding:6px 8px;vertical-align:top}table{border-collapse:collapse}pre{white-space:pre-wrap;background:#1c1c1c;padding:10px}</style>
+<h1>每一镜放静帧合不合适（v2）</h1>
+<p><b>判断标准</b>（来自 EV 的用法：主歌“用照片讲梗”，副歌“把表演交还给她”）：</p>
+<ul>
+<li>这一句的笑点由画面上的字或图形来承担、动作不是重点的，用<b>静帧</b>。照片上可以叠更满的图形。</li>
+<li>笑点本身就是一个动作，或者要对口型的，<b>保留视频</b>。</li>
+</ul>
+<table>
+<tr><th>镜</th><th>这一句 / 画面</th><th>判断</th><th>理由</th></tr>
+<tr><td>s001</td><td>寻呼机响，她睁眼、拿起寻呼机</td><td>视频</td><td>片头第一个动作：被呼叫、醒过来</td></tr>
+<tr><td>s002</td><td>器乐段，她入场走秀</td><td>视频</td><td>走秀的步子就是内容</td></tr>
+<tr><td>s003</td><td>Incident Week，工程师盯着手机</td><td><b>静帧</b></td><td>笑点在 FRONT ROW 图表（看她 0、看寻呼机 1），照片加图表就能讲清；改成静帧后，倒退的问题也随之消失</td></tr>
+<tr><td>s004</td><td>念白：Every look got somebody paged / A training run phoned a friend</td><td>视频，后半句<b>定格</b></td><td>前半句要对口型；后半句口型对不上，定格在她举着听筒的那一帧，人声当画外音</td></tr>
+<tr><td>s005</td><td>It got back half a page</td><td><b>视频</b>（与上一版方案不同）</td><td>“撕成半页”这个动作就是笑点；这一条逐镜 Gate 全部通过</td></tr>
+<tr><td>s006</td><td>Six grand 前的军鼓加花，街拍摄影师</td><td>视频</td><td>压镜头、穿过人群是动作戏</td></tr>
+<tr><td>s007</td><td>Six grand a month for a billboard behind a tree</td><td><b>静帧</b></td><td>笑点在 $6,000 和“被树挡住”的标签；原视频里她本来就几乎不动</td></tr>
+<tr><td>s008</td><td>念白：A I: Average Individual. That's me.</td><td>视频</td><td>要对口型</td></tr>
+<tr><td>s009</td><td>Bus stop: I'm not taking your job. Someone scratched the not.</td><td><b>静帧</b></td><td>笑点在划掉的 NOT，用图形表现；改成静帧后，“刻新划痕”的动作问题也随之消失</td></tr>
+<tr><td>s010</td><td>Freeway: S F hates A I billboars. The D? Forgot.</td><td><b>静帧</b>，最后约 1 秒换成纯黑图形帧打出 ALL</td><td>笑点在拼写检查的图形；这样主歌 s007–s010 连成一串静帧，和 EV 主歌的做法一致；背影斜挎带的问题不再出现</td></tr>
+<tr><td>s011–s014 副歌</td><td>All hands! All night!</td><td>视频，原有的插镜和定格不变</td><td>副歌把表演交还给她</td></tr>
+</table>
+<p>静帧约占整段时长的 30%，落在 EV 的区间里。静帧都取自已有素材：首帧、或从已拍视频里挑最好的一帧。</p>
+
+<h2>s014 重拍</h2>
+<p>首帧不变，仍是 <code>p014-w1b.png</code>，只改 prompt。每镜拍 2 条，按 5 秒 4k 计，预计约 800 积分。剪辑连续用 0–3.69 秒，不再跳切。</p>
+<pre>长焦全身远景，镜头固定不动。她走到走秀台尽头，重心落在前脚，一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，一只手按住腰间震动的黑色寻呼机，朝画面右侧走开。两侧的值班工程师一直低头盯着自己腿上的笔记本电脑，全程不抬头，身体保持不动。她腰间的寻呼机不亮任何红灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</pre>
+<p>与原 prompt 的区别只有两处：原来写“两侧的值班工程师抬头看着她”，现在改为观众一直低头、不动；另外加了“寻呼机不亮红灯”。</p>

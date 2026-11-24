@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo11-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "968e2d87dc25aa43d08713e704c9bf262948364655b01063b8f1c28e8c3f64d1",
+  "creation_receipt_id": "iris-v4-MO11-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7931058e70a85efaecd4557b1e2fafe34b69aef3b6462e674cde2d31b78c308b.json",
+      "content_hash": "7931058e70a85efaecd4557b1e2fafe34b69aef3b6462e674cde2d31b78c308b"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/952db032fe6205f39afb0be3eb7e523b1ebef386e2c55c7e2984b79f3c94d83c.json",
+      "content_hash": "952db032fe6205f39afb0be3eb7e523b1ebef386e2c55c7e2984b79f3c94d83c"
+    }
+  ],
+  "shot_id": "ep01v4-mo11",
+  "scene_id": "night-train-aisle",
+  "storyboard_beat_id": "mo11",
+  "intent": "镜头固定不动。列车猛地一晃，全车人一起摇；她不看，把刚接住的笔记本电脑塞回身边睡着的值班工程师怀里，另一只手一直抓着吊环。面无表情。车窗里不出现她的倒影。笔记本电脑外壳是素银色，没有任何标志。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤完整保持；没有立领灯线（由认可的首帧承担）",
+    "列车猛地一晃、全车人一起摇；她不看，把刚接住的笔记本电脑塞回工程师怀里，另一只手一直抓着吊环；值班工程师是开头那位（深蓝色工装夹克），不新增人物；车窗里不出现她的倒影",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo11-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

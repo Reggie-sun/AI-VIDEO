@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg09-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p024-b2.png",
+    "sha256": "d13da23ff4ecb4079a855d78ce19fe7c786eec9fbe38bec04700c5b7765b738f",
+    "size_bytes": 2073109,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p024-b2.png: the reference image",
+    "need_id": "night-train-car",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg09-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG09.wav",
+    "sha256": "0e15e4286ad2f7a5fb2bd3b8390cd41c501262540ebd4c0d07ef88cd9b672939",
+    "size_bytes": 352844,
+    "kind": "audio",
+    "duration_millis": 4000,
+    "sample_rate_hz": 44100,
+    "role": "approved SG09.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        103.183,
+        107.183
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

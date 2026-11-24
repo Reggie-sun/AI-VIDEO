@@ -1,0 +1,28 @@
+{
+ "schema_version": "iris-v4-unit/1",
+ "unit": "MO13",
+ "task": "IRIS EP01 v4 MO13; Seedance 2.0 VIP first_frame, 6 s 4k 16:9",
+ "user_quote": "照页面改 (Recommended)",
+ "preview_approval": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO13-n-2/preview-approval.json",
+ "attempt_id": "iris-mo13-n-2-source-001",
+ "policy_id": "iris-mo13-n-2-source-001",
+ "reservation_id": "iris-mo13-n-2-reservation-001",
+ "max_submit_count": 1,
+ "automatic_retries": 0,
+ "operator_currency": "CRD",
+ "operator_ceiling": 500,
+ "ledger": "ledger.json",
+ "cumulative_submit_ceiling": 1,
+ "cumulative_operator_credit_ceiling": 500,
+ "issued_at": "2026-11-23T05:34:34+00:00",
+ "expires_at": "2026-11-23T11:34:34+00:00",
+ "stop_on_unknown": true,
+ "window_history": [
+  {
+   "issued_at": "2026-11-22T23:12:36+00:00",
+   "expires_at": "2026-11-23T05:12:36+00:00",
+   "archived": "operator-bound.expired-2026-11-23T051236.json",
+   "reason": "expired before submit; no ledger entry; resealed by main session 2026-11-23"
+  }
+ ]
+}

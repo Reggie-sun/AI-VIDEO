@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg02-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "af3dca462a4191997f9ed65bb28787bd5a20cb7c0b3f4ac40617312228b51148",
+  "creation_receipt_id": "iris-v4-SG02-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/cc2b00359b04391d9d148f3647205806959b48c8bbd5ad783baa2022fe053caf.json",
+      "content_hash": "cc2b00359b04391d9d148f3647205806959b48c8bbd5ad783baa2022fe053caf"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b.json",
+      "content_hash": "6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/92e49212068c6ce57bc9ad01dc1c7595d9e51376a795ff8aa56ccde53f71c472.json",
+      "content_hash": "92e49212068c6ce57bc9ad01dc1c7595d9e51376a795ff8aa56ccde53f71c472"
+    }
+  ],
+  "scene_id": "billboard-light",
+  "location": "同一块广告牌下，白光里",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg02-reference"
+  ]
+}

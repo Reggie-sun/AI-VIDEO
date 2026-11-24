@@ -1,0 +1,47 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-SG03C",
+ "question": "http://127.0.0.1:8769/excerpt/flash/closeup.html ／ s012 后半句 · 闭眼唱脸（Seedance 2.0 VIP 4k 唱段，4 秒，约 320 积分）；问：可以拍吗？",
+ "user_quote": "没有我只是让你自己判断",
+ "approved_at": "2026-11-19T10:57:20+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/closeup.html",
+  "sha256": "524a988254a82eeccc9da70e56f3cbff0480c1fdb97736b54ff134719e007ecf"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012c-w1.png",
+   "sha256": "fddf927a65eedf558b85ac501580f7f32f297dec8c9754f9672f635d14939fc7",
+   "role": "SG03C reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03C.wav",
+   "sha256": "4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09",
+   "role": "SG03C vocal"
+  }
+ ],
+ "prompts": {
+  "SG03C": {
+   "text": "{{image:0}}中的她闭着眼睛唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，前排笔记本屏幕的光照着她的脸，嘴前没有任何遮挡。镜头全程锁定，一镜到底。",
+   "sha256": "5798f92846e0b0ef7cea1a277183c8794aa5a4f456c9c43e5bb80b71e495823c"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p012c-w1.png，与预览页上的 D1-b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图"
+}

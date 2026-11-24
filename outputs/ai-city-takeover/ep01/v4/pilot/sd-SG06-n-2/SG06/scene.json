@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg06-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "08f9f528107790b4865b7d46fcf8cd857f9a40a1ee67b841d3b50e3ac226d2a0",
+  "creation_receipt_id": "iris-v4-SG06-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/82289b9767baacd537ff05aef7359d2b75b8e2df4e18a1cdbf150a1b23a4d5c4.json",
+      "content_hash": "82289b9767baacd537ff05aef7359d2b75b8e2df4e18a1cdbf150a1b23a4d5c4"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a39ed061deac8ec0c6698c2291b4c1b85545d29f400bbdb835817fc7a63c546e.json",
+      "content_hash": "a39ed061deac8ec0c6698c2291b4c1b85545d29f400bbdb835817fc7a63c546e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c.json",
+      "content_hash": "7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/2618ebdc894c7ad9648f5c21c785b0c99dd90d333c3fb76f158bb8ff8827eb8c.json",
+      "content_hash": "2618ebdc894c7ad9648f5c21c785b0c99dd90d333c3fb76f158bb8ff8827eb8c"
+    }
+  ],
+  "scene_id": "folsom-payphone",
+  "location": "Folsom 街角一台老式投币电话旁",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg06-reference"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "b0df0e63e794ae5fbb38647681c028f9b45da4ecf14295c91a6634d345c1a846",
+  "unit_ids": [
+    "SG03C"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012c-w1c.png",
+      "sha256": "779b1414e29914a33b96a0489295c6c89338df44badcad1a38192a6f27f40687",
+      "role": "SG03C reference image"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03C.wav",
+      "sha256": "4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09",
+      "role": "SG03C vocal"
+    }
+  ],
+  "user_quote": "可以，拍 (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo19-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "9d49cbfcd9008de9b20d4a93c8cf931b4ceb78527c0ad754b21b828a3c89499e",
+  "creation_receipt_id": "iris-v4-MO19-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/365e64ff2c53c7e39e71183d6ebed406a20656662d11dda8abf1e3ad0fa0b19b.json",
+      "content_hash": "365e64ff2c53c7e39e71183d6ebed406a20656662d11dda8abf1e3ad0fa0b19b"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0aa1e524a43fc99ea22a9d0bef7f5a8a8d9f42ce214bedca140e80278ff78149.json",
+      "content_hash": "0aa1e524a43fc99ea22a9d0bef7f5a8a8d9f42ce214bedca140e80278ff78149"
+    }
+  ],
+  "shot_id": "ep01v4-mo19",
+  "scene_id": "runway-front-row-ots",
+  "storyboard_beat_id": "mo19",
+  "intent": "镜头固定，从坐着的值班工程师肩后拍。他被手里突然亮起的手机惊醒，膝盖上的笔记本电脑滑下去一半；整排前排的人同时低头看手机，屏幕一部接一部亮起；她在湿亮的走秀台上朝镜头走来，谁也不看。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的首帧承担）",
+    "前景的值班工程师被亮起的手机惊醒，笔记本电脑滑下去一半；前排的手机一部接一部亮起；她在走秀台上朝镜头走来，谁也不看，不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo19-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

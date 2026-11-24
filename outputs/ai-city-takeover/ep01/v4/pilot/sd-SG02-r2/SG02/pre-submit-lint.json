@@ -1,0 +1,51 @@
+{
+ "unit": "SG02",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true
+ },
+ "pass": true,
+ "request_hash": "a9735efaa4852be95bfc21c99d9f364ab8710d2ac428c2f6407ead162847e33a",
+ "compiled_prompt_sha256": "acad955e48253a6cc2a517516eb61c782b935e4e79a7a977bdf1633763f40587",
+ "approval_sha256": "9bebcd09dabe9d13b7a390773cc7e37f9c911974728033816ed37629928e9e95",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG02-r2/continuity-report.json",
+  "sha256": "adbe8fc7d08eb63749e1e3c9d3ece5cae03d075c2101e5be4ef5573ae1cfa88e",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS（场记）",
+   "handoff": "PASS（按设计，省略撕贴）",
+   "axis_action_camera": "PASS：正对镜头锁定，说完停住，硬切 s009",
+   "prompt_fit": "PASS：编译文本与 r2 认可逐字相同",
+   "lint": "由主会话运行 lint.py",
+   "risks": [
+    "姓名贴 MO04 发光/SG02 哑白不连",
+    "手与姓名贴可能漂移",
+    "耳挂镜像或入耳式复发：逐帧查",
+    "首帧张嘴、I: 片内 0.17 s：sync_check",
+    "停住可能僵或提前收口",
+    "s009 起姓名贴消失"
+   ],
+   "full_report_note": "场记完整报告见本轮对话"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 800,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   800
+  ]
+ },
+ "new_calls": 0
+}

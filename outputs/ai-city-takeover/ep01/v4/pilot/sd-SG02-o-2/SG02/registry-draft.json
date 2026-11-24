@@ -1,0 +1,88 @@
+{
+  "schema_version": "2.1",
+  "revision_id": "c89f433d5759c78ec28cb96810235585974fdcdffbc80531ab701fec3b30598e",
+  "content_hash": "c89f433d5759c78ec28cb96810235585974fdcdffbc80531ab701fec3b30598e",
+  "assets": [
+    {
+      "asset_id": "iris-c-v4-sg02-reference",
+      "asset_type": "image",
+      "artifact_path": "assets/files/c602b3883f46db5a4f97b44c9e67acbe2d5122709a665ee6b75225214a9f4747.png",
+      "sha256": "c602b3883f46db5a4f97b44c9e67acbe2d5122709a665ee6b75225214a9f4747",
+      "size_bytes": 2306551,
+      "mime_type": "image/png",
+      "duration_seconds": null,
+      "width": 1672,
+      "height": 941,
+      "source_kind": "imported",
+      "tool": {
+        "name": "approved-local-source-import",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "cc2b00359b04391d9d148f3647205806959b48c8bbd5ad783baa2022fe053caf",
+      "creation_receipt_id": "iris-v4-local-import:c602b3883f46db5a4f97b44c9e67acbe2d5122709a665ee6b75225214a9f4747",
+      "usage_license": "User-authorized project reference; no platform ownership claim.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null
+    },
+    {
+      "asset_id": "iris-c-v4-sg02-vocal",
+      "asset_type": "voice",
+      "artifact_path": "assets/audio/27b5e6f657bc255125aee11d4885def24281c554f6e8d409121ccb915118c733.wav",
+      "sha256": "27b5e6f657bc255125aee11d4885def24281c554f6e8d409121ccb915118c733",
+      "size_bytes": 352844,
+      "mime_type": "audio/wav",
+      "duration_seconds": 4.0,
+      "width": null,
+      "height": null,
+      "source_kind": "derived",
+      "tool": {
+        "name": "htdemucs_ft-stem+cut_audio.py",
+        "version": "1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b",
+      "creation_receipt_id": "iris-v4-vocal-window:27b5e6f657bc255125aee11d4885def24281c554f6e8d409121ccb915118c733",
+      "usage_license": "Derived from the user-selected v4 song all-hands-r4 (Demucs vocal stem); project reference only.",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null,
+      "audio_metadata": {
+        "audio_kind": "dialogue",
+        "source": {
+          "kind": "derived",
+          "provider_or_tool": {
+            "name": "htdemucs_ft-stem+cut_audio.py",
+            "version": "1"
+          },
+          "input_artifact_ids": [],
+          "input_fingerprint": "6b961424f850866e3dfa15788286226e2d64a657aae7c03d5349d0dad736ab3b",
+          "original_reference": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav"
+        },
+        "speaker_id": "IRIS",
+        "voice_id": null,
+        "language": "en",
+        "script_hash": "cfb98ca28460cf34aa65f9aa45bcc00f134c5b8bfde4a84d9ece675098b6646c",
+        "duration_samples": 176400,
+        "sample_rate_hz": 44100,
+        "channels": 1,
+        "channel_layout": "mono",
+        "codec_name": "pcm_s16le",
+        "loudness": {
+          "integrated_lufs_milli": null,
+          "true_peak_dbfs_milli": null,
+          "measurement_standard": null
+        },
+        "provenance_receipt_id": "iris-v4-vocal-window:27b5e6f657bc255125aee11d4885def24281c554f6e8d409121ccb915118c733",
+        "alignment_receipt_id": null
+      }
+    }
+  ]
+}

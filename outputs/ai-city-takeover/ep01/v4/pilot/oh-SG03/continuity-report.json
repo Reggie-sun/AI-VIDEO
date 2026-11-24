@@ -1,0 +1,39 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-17T23:08:50+00:00",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/oh-SG03/preview-approval.json",
+   "sha256": "95eba0a38604c39b803bdd37809670de35a3a651b81b45c55b7c65c5aab95012"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/preview-inputs.json",
+   "sha256": "8bb261d67e212a418ded7ab9c5ab97237b3bb1d925870e2dc4fdd19c640da7af"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/index.html",
+   "sha256": "9477f016602abeb85d63d4fac76b6eef85c21f8ebd64754ea44a3075fea097bd"
+  }
+ },
+ "units": {
+  "SG03": {
+   "verdict": "ready",
+   "continuity": "PASS：同一镜头、同一底片与人声，结论同 sd-SG03 报告；v3 数字人曾立领红线熄灭，Gate 逐帧跟踪。",
+   "handoff": "PASS：同 sd-SG03 报告。",
+   "axis_action_camera": "PASS：同 sd-SG03 报告；数字人输出长度随人声约 5.99 s。",
+   "prompt_fit": "PASS：动作描述与认可原文逐字相同（sha fadfdbbe…），纯中文，无红字，无文字要求。",
+   "lint": "由主会话运行 omnihuman.py lint（OMNI_TRIAL=oh-SG03）取证。",
+   "risks": [
+    "单主体模式下画面有两人：人声可能驱动工程师的嘴或冻住他；Gate 逐帧确认只有她在唱。",
+    "扶手与手（同 sd-SG03）。",
+    "静音段（0–0.68 s、1.87–2.58 s）是否合嘴。",
+    "直起身可能做不出。",
+    "立领红线可能熄灭（v3 前例）。",
+    "神情可能读成凶，观感由用户判。",
+    "画质：permit 只挡 1080P 以下，主会话人工核对 fill-observed 是否为页面最高档。"
+   ],
+   "full_report_note": "场记完整报告见本轮对话；本文件为主会话依其结论落盘。"
+  }
+ }
+}

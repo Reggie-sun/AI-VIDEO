@@ -1,0 +1,51 @@
+{
+ "n": "9",
+ "at": "2026-11-17T03:55:35.142Z",
+ "fields_sha256": "7624ed16cdd90b76ad056ffa2785ae33d0a744179e8b36eb56210b9a029e7a94",
+ "read": {
+  "lyrics": "[Intro - instrumental, 8 bars, pager beep motif]\n\n\n\n\n[Spoken - deadpan, dry]\n\nIncident Week. Every look got somebody pag…",
+  "style": "industrial glitch club, 130 BPM, 4/4, distorted industrial kick, metallic percussion, pager and alarm tone samples, gated noise bursts, glitch cuts on the bar ends, dark sub bass, opens with an 8-bar instrumental intro, one American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, a euphoric sung chorus that bursts open on Hello, world with a big lift and a shouted stacked last line, a stacked chanted post-chorus hook, key change up into the final chorus, aggressive, untamed, clean modern mix",
+  "exclude": "rap, male lead vocal, mumbled vocals, lo-fi, rock guitar, big room EDM, dubstep, electroclash, acid techno, trance, metal screaming",
+  "title": "Hello World r3",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": null,
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 5,
+  "lyrics_sha256": "a53dc951d181b799ea19c436a4925f47641ace1154ac29398f0f9869d19567b7"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

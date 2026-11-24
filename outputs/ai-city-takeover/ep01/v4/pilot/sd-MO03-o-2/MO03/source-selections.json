@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo03-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p006-w1.png",
+    "sha256": "aa0679464dec0a0872a858ea07db291f73bf79046f1784a1a7b33c2e0f0af09c",
+    "size_bytes": 2603296,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p006-w1.png: the first frame",
+    "need_id": "folsom-sidewalk",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

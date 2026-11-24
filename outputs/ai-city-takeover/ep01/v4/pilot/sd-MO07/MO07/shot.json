@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo07-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "52e255362502415040a8dd81ffbb18962c9958b9fb3bc6958a76d5c540635305",
+  "creation_receipt_id": "iris-v4-MO07-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6680cda2e6f4e827d6ab65e788d0de66f13f40e438c71b2331af7c2ae070d867.json",
+      "content_hash": "6680cda2e6f4e827d6ab65e788d0de66f13f40e438c71b2331af7c2ae070d867"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/600a0b216e9b58f2f5e902a76fb0f0ec1120937175816c2e5669ebcadc2df3a6.json",
+      "content_hash": "600a0b216e9b58f2f5e902a76fb0f0ec1120937175816c2e5669ebcadc2df3a6"
+    }
+  ],
+  "shot_id": "ep01v4-mo07",
+  "scene_id": "runway-end",
+  "storyboard_beat_id": "mo07",
+  "intent": "长焦，镜头固定。秀场走秀台的尽头，她一个急转身，外套下摆甩开成一个圆；转完她头也不回地用一只手按住腰间正在震动的寻呼机，朝画面右侧的侧门走去。两边观众举着手机拍她，手机屏幕的光点点亮着。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；造型1雕塑白：白色雕塑感短款立领外套与左侧立领的极细红灯线完整保持（由认可的首帧承担）",
+    "她急转身、外套下摆甩开成一个圆，头也不回地按住震动的寻呼机朝右侧侧门走去；观众举着手机",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo07-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

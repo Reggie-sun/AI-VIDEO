@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-mo07-r6-1-MO07",
+ "question": "审看页：http://127.0.0.1:8769/pilot/opening/review-s014r6/index.html\n\ns014 r5 两条（800 积分）比 r4 好很多：\n- 原地转身，背对镜头走远\n- 头顶始终在画内\n- 观众全程低头\n- r5-2 的转身最干脆\n\nGate 仍没过，原因：\n- 她一背过身，寻呼机就被模型挪到后腰，工牌也消失了\n- 到 3.69 s 剪点时，手没有按在寻呼机上\n\n原因是 prompt 里“按寻呼机”写在“背对走开”前面。我建议 r6：\n- 首帧不变\n- 按寻呼机改到转身之前，并写明「寻呼机和工牌一直挂在身前，背对时看不见」\n- s014c 寻呼机特写改作插入镜头，不再要求接着她的手\n\n再拍 2 条，约 800 积分。怎么做？",
+ "user_quote": "按页面拍 r6 (Recommended)",
+ "approved_at": "2026-11-22T00:21:25Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/opening/review-s014r6/index.html",
+  "sha256": "f7e18d362a92da2f54b3d0ec3c011bce5cf0df21b9ef07a7e7789b8b32713fbd"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s014-r6-seedance.md",
+  "sha256": "6dc08d72d16b88478d94b8a1f6b76417d6f5febaf14790c99f69d3a14dbbfdc0"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1c.png",
+   "sha256": "ae34b54393afe1df4e15f35326de17752734af1f3661b2c4a307adec89f74374",
+   "role": "MO07 first frame"
+  }
+ ],
+ "prompts": {
+  "MO07": {
+   "text": "长焦全身远景，镜头固定不动。她已经停在走秀台尽头，不再往前走，先低头用右手按住身前腰链上震动的黑色寻呼机，然后松开手，站在原地一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，背对镜头朝画面右侧走开，越走越远。寻呼机和工牌一直挂在她身前的腰链上，背对镜头时看不见。她始终完整在画面里，头顶不出画。两侧的值班工程师一直低头盯着自己腿上的笔记本电脑，全程不抬头，身体保持不动。她腰间的寻呼机不亮任何红灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "7543c057158eb1526b8e8143fbb6bc1eb194fe256c62cd4d601c95c4f17afa37"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p014-w1c.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S14r4/a.png 逐字节相同；只把 p014-w1b 的两侧观众改为低头，她和服装不变，使用者认可「用 a 拍」）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo07-r6-1-source-001",
+  "policy_id": "iris-mo07-r6-1-source-001",
+  "reservation_id": "iris-mo07-r6-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO07-r6-1",
+   "sd-MO07-r6-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO07-r6-1"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r5-1/preview-approval.json",
+  "sha256": "8ce3572eaf64873520cadecb41c73fbb065b05d6c17da58b419368c0762f940b",
+  "reason": "s014 重拍 r6：r5 两条 Gate 失败，背过身后寻呼机被挪到后腰、工牌消失、3.69 s 手不在寻呼机上；首帧 p014-w1c 不变，按寻呼机移到转身前（右手、身前），写明寻呼机和工牌留在身前；s014c 改作插入镜头；r5 approval 与 sd-MO07-r5-1/r5-2 产物保留"
+ }
+}

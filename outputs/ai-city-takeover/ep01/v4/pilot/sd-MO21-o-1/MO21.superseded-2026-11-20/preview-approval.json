@@ -1,0 +1,18 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126",
+  "unit_ids": [
+    "MO21"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p009-w1.png",
+      "sha256": "451f67af1297cfcfc63229c06cc5129c063c7d8966682ed6932ed45b429ecc73",
+      "role": "MO21 first frame"
+    }
+  ],
+  "user_quote": "按页面拍 (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

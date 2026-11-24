@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo07-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "732033fa8ac6886bef9182bc4a446af4dca833ddf7bdfbcf9630797dfae55a8d",
+  "creation_receipt_id": "iris-v4-MO07-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/fbc6d97861b0758718370154cd80fcec756f8c0bc438a336228901bedc8fc971.json",
+      "content_hash": "fbc6d97861b0758718370154cd80fcec756f8c0bc438a336228901bedc8fc971"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/5548415b7037cabf6bae057bbb263cd91748c08fcc3a62f68eb24822c7953d46.json",
+      "content_hash": "5548415b7037cabf6bae057bbb263cd91748c08fcc3a62f68eb24822c7953d46"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/52521bc5d4ca2858f1dd745bac9d4ec6fda615d310f2e5c18f036e4b20bfc542.json",
+      "content_hash": "52521bc5d4ca2858f1dd745bac9d4ec6fda615d310f2e5c18f036e4b20bfc542"
+    }
+  ],
+  "scene_id": "runway-end-w1",
+  "location": "地下停车场改成的秀场，走秀台的尽头，两侧坐着抱笔记本电脑的值班工程师",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo07-first-frame"
+  ]
+}

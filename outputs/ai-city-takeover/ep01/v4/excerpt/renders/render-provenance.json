@@ -1,0 +1,17 @@
+{
+ "hyperframes_render": {
+  "file": "hf-render.mp4",
+  "sha256": "452f3117cb34d0d03d34d0ae9b572370a8237672814d60a1cfdbbc18f7f42389",
+  "bytes": 292865275
+ },
+ "audio_source": {
+  "file": "audio/master-026-059.wav",
+  "sha256": "07c0e95eeb0e84fdaf47f3c37a3e65679c9a887f85ba66a0f659e1a7b8045a00"
+ },
+ "final": {
+  "file": "IRIS-EP01-v4-excerpt-026-059.mp4",
+  "sha256": "76b06af94bba81d94cb5c95e8c6c1ebb090bb318bb49cf46b513e33d4c14fc95",
+  "bytes": 293397807
+ },
+ "how": "video stream copied from the HyperFrames render; AAC-LC 320k encoded by ffmpeg from the master slice"
+}

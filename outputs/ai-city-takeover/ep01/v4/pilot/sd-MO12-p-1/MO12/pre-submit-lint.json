@@ -1,0 +1,42 @@
+{
+ "unit": "MO12",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "983dda69a0f24adc40d59922ea0dff06801d75cfd60928a301bbc9f79c8025ba",
+ "compiled_prompt_sha256": "ab4244317cb4526f84238f985d3c513abd17b4450a2c3ac1cb62cc7a1b34fe15",
+ "approval_sha256": "5cca59ae9a62342c74e25a1927de4d45088a0c6dbe350d1d64743fff14b74287",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO12-p-1/continuity-report.json",
+  "sha256": "bb44831c0b67166284c18c6c2459cd242fc14f08243b22b54618689a1f358b2b",
+  "unit": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；egress prompt ab424431…、首帧 942eac10… 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "全程背对不回头不转身、越走越小不出画、不朝镜头斜走；机位固定；电脑合着背面朝内无标志；帽衫电脑无图形文字、无站牌字；除左耳灯无红色；背后无包无挂件；人群跟在后面、无人回头看镜头、无分身重影"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

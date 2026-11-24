@@ -1,0 +1,12 @@
+{
+ "schema": "iris-v4-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "SG05",
+   "attempt_id": "iris-sg05-n-1-source-001",
+   "operator_ceiling": 600,
+   "intent_at": "2026-11-22T17:53:36.606244+00:00",
+   "outcome": "submitted"
+  }
+ ]
+}

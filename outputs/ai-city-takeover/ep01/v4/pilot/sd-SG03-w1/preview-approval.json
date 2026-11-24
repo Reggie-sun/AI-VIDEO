@@ -1,0 +1,47 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-round1-SG03-w1",
+ "question": "第一轮预览页：http://127.0.0.1:8769/excerpt/flash/v4r1.html s011（走台落步）和 s012（对工程师唱）各出了两张 W1 首帧，页面上有 prompt 原文。工程师改穿深蓝工装夹克；唱段首帧嘴先合着；两条约 880 积分，各一次、不重试。选哪两张，可以拍吗？",
+ "user_quote": "s011 选 1，s012 选 1，开拍",
+ "approved_at": "2026-11-19T03:39:16+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/v4r1.html",
+  "sha256": "a288fed9f5bf35e27392f0097e0a33e1c054cd8e6a0215d053197abdd6a30879"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012-w1.png",
+   "sha256": "720e8f3cb1bbea1ca82c451a7c87a9f410ff0d38f97ffe2ce761d9894acec9f8",
+   "role": "SG03 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+   "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559",
+   "role": "SG03 vocal"
+  }
+ ],
+ "prompts": {
+  "SG03": {
+   "text": "{{image:0}}中的她对着值班工程师唱歌，口型与{{audio:1}}里的人声逐字精确同步。中近景，嘴前没有任何遮挡。镜头全程锁定，一镜到底。",
+   "sha256": "9b2f192331c535d7732dc58651026a5e268ae8af62eacf3c7e1553f2ba2f14f2"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 6,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 700,
+  "cumulative_CRD": 700
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p012-w1.png，与使用者选中的 V12a-1.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图"
+}

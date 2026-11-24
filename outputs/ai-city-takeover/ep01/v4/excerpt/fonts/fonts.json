@@ -1,0 +1,57 @@
+{
+ "faces": [
+  {
+   "family": "XDIN",
+   "file": "DINishCondensed-Black-subset.otf",
+   "source": "fonts/src/DINishCondensed-Black.otf",
+   "glyphs": 166,
+   "missing": [
+    "\u2192"
+   ]
+  },
+  {
+   "family": "XDINB",
+   "file": "DINishCondensed-Bold-subset.otf",
+   "source": "fonts/src/DINishCondensed-Bold.otf",
+   "glyphs": 166,
+   "missing": [
+    "\u2192"
+   ]
+  },
+  {
+   "family": "XNIM",
+   "file": "NimbusSans-Bold-subset.otf",
+   "source": "fonts/src/NimbusSans-Bold.otf",
+   "glyphs": 131,
+   "missing": []
+  },
+  {
+   "family": "XNIMR",
+   "file": "NimbusSans-Regular-subset.otf",
+   "source": "fonts/src/NimbusSans-Regular.otf",
+   "glyphs": 131,
+   "missing": []
+  },
+  {
+   "family": "XMONO",
+   "file": "IBMPlexMono-Medium-subset.otf",
+   "source": "fonts/src/IBMPlexMono-Medium.otf",
+   "glyphs": 178,
+   "missing": []
+  },
+  {
+   "family": "XMONOR",
+   "file": "IBMPlexMono-Regular-subset.otf",
+   "source": "fonts/src/IBMPlexMono-Regular.otf",
+   "glyphs": 178,
+   "missing": []
+  },
+  {
+   "family": "XMONOS",
+   "file": "IBMPlexMono-SemiBold-subset.otf",
+   "source": "fonts/src/IBMPlexMono-SemiBold.otf",
+   "glyphs": 178,
+   "missing": []
+  }
+ ]
+}

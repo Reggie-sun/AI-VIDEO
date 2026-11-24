@@ -1,0 +1,60 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>IRIS EP01 INS16 首帧候选：挂着晃的听筒（s016 后插镜）</title><style>body{background:#111;color:#ddd;font:14px/1.5 sans-serif;margin:20px}img{width:100%;display:block}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}figure{margin:0}figure.rec{outline:3px solid #6c6}figure.rej{opacity:.75}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #555;padding:3px 6px;font-size:12px;vertical-align:top}h2{margin-top:32px;border-top:1px solid #444;padding-top:12px}code{color:#9cf;font-size:11px}.ok{color:#6c6}.warn{color:#fc6}.bad{color:#f66}.note{color:#f99}pre{white-space:pre-wrap;background:#1b1b1b;padding:10px;border:1px solid #333}</style></head><body>
+<h1>IRIS EP01 INS16 首帧候选：黑色听筒挂在金属电话线上晃（s016 后插镜，69.40–71.18「Got half an answer」）</h1>
+<p>仅静图，未提交任何视频生成，未 commit。旧首帧、board、gen、director-coverage.json、pilot/sd-* 都没有改。要对上的是已接受片 <code>pilot/sd-SG06-p-1</code>（f14–f17 她松手，听筒顺着线垂下去）：同一台电话、同一种金属铠装线、同样的光和街。</p>
+<p>工具：<code>motion-kit/tools/codex_plate.py --size 1920x1080 --ref board/plates/p016-w1.png --ref excerpt/flash/design/INS14/INS14-b.png</code>（c、f 另加 <code>INS16/refs/payphone-p016w1.png</code>，从 p016-w1 右侧裁出的电话机身，画面里没有人）。提示词：<code>excerpt/flash/design/S15-30/INS16/prompts.md</code>，运行记录：<code>INS16/runs.md</code>。共两轮 6 张，都是 1672×941。绿框 = 推荐。好不好看由你判，下表只是我的核对。</p>
+
+<h2>第二轮候选 d / e / f（第一轮全部不合格，见下文）</h2>
+<div class=g>
+<figure class=rec><a href="../../../excerpt/flash/design/S15-30/INS16/d.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/INS16/d.png"></a><figcaption><b>d（推荐）</b> · INS16D · 2 张参考<br><code>excerpt/flash/design/S15-30/INS16/d.png</code><br><small>sha256 0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0（1672×941）</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S15-30/INS16/e.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/INS16/e.png"></a><figcaption>e · INS16E（更紧）· 2 张参考<br><code>excerpt/flash/design/S15-30/INS16/e.png</code><br><small>sha256 ca0fe96403ff4b4abc8adf45ae1b991589d169e07a485f4498a45bc905fcd154（1672×941）</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S15-30/INS16/f.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/INS16/f.png"></a><figcaption>f · INS16D · 3 张参考（加电话机身裁图）<br><code>excerpt/flash/design/S15-30/INS16/f.png</code><br><small>sha256 2048f1bcaeb3fc590ba234fed6723b1bb26a5c72553bd09844268ba49e7f7758（1672×941）</small></figcaption></figure>
+</div>
+
+<h2>对照：s016 首帧 p016-w1 | 已接受片 sd-SG06-p-1 第 16 帧</h2>
+<div class=g2>
+<figure><a href="../../../board/plates/p016-w1.png" target="_blank"><img src="../../../board/plates/p016-w1.png"></a><figcaption>p016-w1（不改）<br><code>board/plates/p016-w1.png</code><br><small>sha256 b176e3b2944c92c6…</small></figcaption></figure>
+<figure><a href="../../sd-SG06-p-1/SG06/gate/frames/f16.jpg" target="_blank"><img src="../../sd-SG06-p-1/SG06/gate/frames/f16.jpg"></a><figcaption>sd-SG06-p-1 f16（不改）<br><code>pilot/sd-SG06-p-1/SG06/gate/frames/f16.jpg</code><br><small>sha256 2fde0b4dc29c8571…</small></figcaption></figure>
+</div>
+<p>插镜风格参考（开场寻呼机插镜）：<a href="../../../excerpt/flash/design/INS14/INS14-b.png" target="_blank"><code>excerpt/flash/design/INS14/INS14-b.png</code></a></p>
+
+<h2>局部放大（在原图 1672 宽上裁切，放大到 600–800 高看）</h2>
+<p>电话机身与电话线对照：p016-w1 | f16 | d | f</p><img src="../../../excerpt/flash/design/S15-30/INS16/zoom/match-phone-cord.jpg">
+<p>听筒：d | e | f</p><img src="../../../excerpt/flash/design/S15-30/INS16/zoom/handset-def.jpg">
+<p>线口和搁板：d | e | f</p><img src="../../../excerpt/flash/design/S15-30/INS16/zoom/cord-top-def.jpg">
+
+<h2>自检表（第二轮）</h2>
+<table>
+<tr><th>项</th><th>d</th><th>e</th><th>f</th><th>方法</th></tr>
+<tr><td>听筒挂在电话下方、靠重力垂着</td><td class=ok>是：线从线口出来，越过搁板前沿往下垂，听筒吊在搁板下方</td><td class=ok>是：线从搁板前沿上方竖直垂下</td><td class=ok>是，同 d</td><td>全图 + 放大目检</td></tr>
+<tr><td>正在晃（动作感）</td><td class=ok>听筒明显偏离竖直、斜着；墙上影子与听筒错开，读得出在荡</td><td class=warn>听筒几乎竖直，看起来更像静止挂着</td><td class=ok>有倾斜，比 d 小一点</td><td>目检</td></tr>
+<tr><td>线从电话那头绷直</td><td class=ok>搁板下方一段是直的；搁板前沿处顺势弯过</td><td class=ok>直</td><td class=ok>同 d，线口处弯得稍多</td><td>放大目检</td></tr>
+<tr><td>与 p016 同一台电话</td><td class=ok>深色、磨旧、带锈斑水渍的钢板，湿亮的金属搁板，圆形金属线口在搁板上方；与 p016-w1 / f16 的位置关系一致（线口在机身下部、搁板之上）</td><td class=warn>只露出一条搁板和右侧钢板，看不出是哪台电话</td><td class=ok>同 d；机身面板上的方框更像 p016 的面板</td><td>并排放大目检</td></tr>
+<tr><td>电话线类型</td><td class=ok>银色金属铠装线，与 p016 / f16 同类</td><td class=ok>同</td><td class=ok>同</td><td>并排放大目检</td></tr>
+<tr><td>光线：直闪夜拍、硬阴影</td><td class=ok>正面硬闪光，墙上有听筒硬阴影，胶片颗粒</td><td class=ok>有闪光，阴影不明显</td><td class=ok>同 d</td><td>目检，对照 INS14-b</td></tr>
+<tr><td>背后湿街灯光虚斑</td><td class=ok>左侧琥珀钠灯 + 冷白、青蓝虚斑，湿地面反光</td><td class=ok>是，背景占比最大</td><td class=ok>是</td><td>目检</td></tr>
+<tr><td>无人、无手</td><td class=ok>是</td><td class=ok>是</td><td class=ok>是</td><td>全图目检</td></tr>
+<tr><td>文字、数字、标志、按键</td><td class=ok>无；没有按键面板</td><td class=ok>无</td><td class=ok>无</td><td>放大目检</td></tr>
+<tr><td>红色</td><td class=ok>无</td><td class=ok>无</td><td class=ok>无</td><td>像素检测（HSV 色相红、饱和度 &gt;120、亮度 &gt;90）：6 张全部 0 像素；街灯是琥珀色</td></tr>
+<tr><td>尺寸 1672×941</td><td class=ok>是</td><td class=ok>是</td><td class=ok>是</td><td>PNG 头</td></tr>
+</table>
+
+<h2>推荐：d</h2>
+<p><code>excerpt/flash/design/S15-30/INS16/d.png</code><br>sha256 <code>0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0</code></p>
+<p>理由：d 的听筒偏离竖直最多，加上墙上错开的硬阴影，一眼读得出「刚松手、还在晃」，正好接 sd-SG06-p-1 的 f17 之后；线口在搁板之上、线越过搁板前沿垂下，和 p016-w1 / f16 里电话的结构一致；左侧留出湿街虚斑，和开场 INS14 的直闪夜拍质感一致。f 几乎同样好（面板更像 p016），但晃动感弱一点，作为备选。e 只看得到一条搁板，认不出是同一台电话，而且听筒几乎竖直，不推荐。</p>
+<p class=warn>与 p016 的小差异：p016 机身上方的灯箱和空挂钩不在插镜画面里（只拍了机身下部）；d 线口周围是一块带框的面板，p016 是几块分开的钢板，插镜景别里不明显。</p>
+
+<h2>Seedance first_frame 提示词草稿（3 s，写在 <code>INS16/prompt.md</code>）</h2>
+<pre>镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。</pre>
+
+<h2>第一轮 a / b / c（不合格，留档）</h2>
+<div class=g>
+<figure class=rej><a href="../../../excerpt/flash/design/S15-30/INS16/a.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/INS16/a.png"></a><figcaption>a · INS16A<br><small>sha256 93f926e2f3b769de…</small></figcaption></figure>
+<figure class=rej><a href="../../../excerpt/flash/design/S15-30/INS16/b.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/INS16/b.png"></a><figcaption>b · INS16B<br><small>sha256 460d26eec2c4f7ef…</small></figcaption></figure>
+<figure class=rej><a href="../../../excerpt/flash/design/S15-30/INS16/c.png" target="_blank"><img src="../../../excerpt/flash/design/S15-30/INS16/c.png"></a><figcaption>c · INS16C（加机身裁图）<br><small>sha256 99004accdcde1c3e…</small></figcaption></figure>
+</div>
+<p class=bad>不合格原因：三张的电话线都几乎水平地从线口伸出，听筒悬在机身左侧半空，像有人拉着，不符合重力，也不是「挂在电话下方」；b 还画了卡通式的运动弧线。电话机、线、灯箱、街景和质感是对的，所以第二轮只改了听筒和线的几何，并写明不画运动弧线。</p>
+
+<p class=note>未做的事：没有提交 INS16 视频生成，没有改 board / gen / director-coverage.json，没有 commit。要用 d 作为 INS16 首帧并加进剪辑，需要你认可后由主会话处理。</p>
+</body></html>

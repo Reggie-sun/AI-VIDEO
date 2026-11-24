@@ -1,0 +1,26 @@
+{
+  "artifact_id": "iris-v4-sg10-draft-character",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "f4e06455e0de6d225c15d7b5567b21919697c00e7c7be4303d523e13eb317feb",
+  "creation_receipt_id": "iris-v4-SG10-authoring:character",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/b98caefb06e22f3f390c96b794227211fc9791bfbc9840e20bceb192ada79b71.json",
+      "content_hash": "b98caefb06e22f3f390c96b794227211fc9791bfbc9840e20bceb192ada79b71"
+    }
+  ],
+  "character_id": "IRIS",
+  "name": "IRIS",
+  "identity": "IRIS v4 身份锚点 F1a；全身与远景：一位二十八岁的成年白人女性，成熟的、有棱角的脸，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置",
+  "appearance_bible": "一位二十八岁的成年白人女性，成熟的、有棱角的脸，颧骨分明，下颌线硬朗；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白，鼻梁上有淡淡的雀斑，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她平时面无表情，但带着好奇，冷静地看着世界",
+  "wardrobe": [
+    "一件黑色超大廓形的双排扣西装外套，肩线方而硬，下摆盖过臀部；里面是白色高领上衣；黑色阔腿西裤；黑色尖头短靴"
+  ],
+  "voice_profile": null,
+  "reference_asset_ids": [],
+  "allowed_variations": [
+    "同一身份的镜头角度与景别变化"
+  ]
+}

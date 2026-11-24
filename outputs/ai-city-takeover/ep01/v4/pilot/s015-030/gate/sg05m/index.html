@@ -1,0 +1,16 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>s015 重拍 Gate</title>
+<style>body{background:#111;color:#ddd;font:15px/1.6 sans-serif;max-width:1400px;margin:24px auto;padding:0 16px}img,video{width:100%}.bad{color:#f77}.ok{color:#7f7}</style>
+<h1>s015（SG05）重拍两条：Gate 仍不通过</h1>
+<p>重拍修好了一处：8 秒加前导人声以后，"that's my cue" 不再被截掉（m-2 唱完了整句）。</p>
+<p class="bad">m-1：模型唱成了另一句词（"I know you're out there watching me…"），不能用。</p>
+<p class="bad">m-2：歌词对，但模型是自己重唱的，中途慢了约 0.5 s，一个入点对不上整段；5 s 后首帧里那辆车尾朝镜头的车亮了红尾灯并开走；低头按寻呼机那段左肩又出现成块模糊（四条都有，是系统性问题）。</p>
+<p>实测 m-2 的口型：歌曲 58.3–62.1 s（Ten oh two, the pager blew）对得上；61.8–63.6 s（P zero, baby）对得上但比前一段晚 0.5 s；"that's my cue" 那段置信度低。</p>
+<h2>m-2</h2><img src="SG05-m-2.jpg"><video src="m-2.mp4" controls></video>
+<h2>m-1</h2><img src="SG05-m-1.jpg"><video src="m-1.mp4" controls></video>
+<h2>建议：用作者的“量、剪、盖”（不再花钱）</h2>
+<p>作者文档原话：唱段对不准时 <i>"Measure, cut, cover; otherwise cut away."</i></p>
+<ol><li>59.23–62.09：m-2 第一段，口型对上（the pager blew）。</li>
+<li>62.09–63.59：同一条按第二段的偏移接上（P zero, baby），这一刀落在小节上；或者用从这条 4K 裁的寻呼机特写盖住（正好盖掉左肩模糊那段）。</li>
+<li>63.59–65.67 "that's my cue"：切到她看镜头的那一段，逐帧对口型；对不上就用寻呼机/街景插镜盖住，让歌声在画外。</li>
+<li>红尾灯用开头用过的同一套后期修色改成琥珀色。</li></ol>
+<p>另一个选择：重做首帧（街上没有车、镜头固定不跟拍）再拍 2 条，约 1,280 积分；但模型重唱跑速、左肩模糊这两件事换首帧解决不了。</p>

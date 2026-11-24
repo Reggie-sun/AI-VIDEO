@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-22",
+ "written_by": "主会话据 continuity-supervisor 审查后复核报告转写（ready；其提出的“完整在画面里”新风险已按使用者裁决改为“她的头顶始终不出画”，其余不变）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO09-n-1/preview-approval.json",
+   "sha256": "e11608b4bbe0c9cf49ffc123224379fb75e8d5406782800ed8308074b2e5e2c8"
+  }
+ },
+ "units": {
+  "MO09": {
+   "verdict": "ready",
+   "prompt_fit": "PASS（egress 由 lint 核对）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸一致；耳挂左耳小红灯；除耳灯无红色；镜头不拉远不推近；她站在原地不往前走；头顶不出画；斜挎带随外套剥下；换上的是盖过臀部的西装外套；工牌无字"
+  }
+ }
+}

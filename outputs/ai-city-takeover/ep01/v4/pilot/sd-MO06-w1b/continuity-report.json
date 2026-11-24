@@ -1,0 +1,30 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-19T05:01:37+00:00",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO06-w1b/preview-approval.json",
+   "sha256": "3105953288127ba9157abd270dad747080ac12433e708e54a1c425379ccc59ab"
+  }
+ },
+ "units": {
+  "MO06": {
+   "verdict": "ready",
+   "continuity": "PASS（露左肩，与 X10b、SG03-w1 一致）",
+   "handoff": "PASS（ALL 跨切；接静图短插再进 SG03 后半句）",
+   "axis_action_camera": "PASS（锁定，落步在 4.156 s 窗口内）",
+   "prompt_fit": "PASS（与认可逐字相同，sha 16d83c76…）",
+   "lint": "由主会话运行 lint.py",
+   "attempt_note": "attempt/reservation id 与 sd-MO06-w1 同名，但两者是不同 trial 目录、不同项目与各自 ledger.json；sd-MO06-w1 从未提交（无 intent/permit/ledger，generation_POSTs=0），主会话已核对",
+   "risks": [
+    "长袖摆回、不换臂；左臂保持光着",
+    "耳挂红灯在左耳",
+    "前排笔记本 logo 状标记与入耳设备",
+    "可能出画：HANDS 落步要在出画前",
+    "插入镜头裁紧只见手与椅背"
+   ],
+   "full_report_note": "场记完整报告见本轮对话"
+  }
+ }
+}

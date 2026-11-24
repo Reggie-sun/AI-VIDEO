@@ -1,0 +1,27 @@
+{
+  "artifact_id": "iris-v4-mo07-draft-character",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "09a14aeb4159124f5cc13c24c04181d1557a3d06d362f8444b4af294ee3eb73d",
+  "creation_receipt_id": "iris-v4-MO07-authoring:character",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0790eca068a879ac39c63c0ca53325d8e1ca791343ec3942774dc072031a837f.json",
+      "content_hash": "0790eca068a879ac39c63c0ca53325d8e1ca791343ec3942774dc072031a837f"
+    }
+  ],
+  "character_id": "IRIS",
+  "name": "IRIS",
+  "identity": "IRIS v4 身份锚点 F1a；全身与远景：二十二岁左右的年轻白人女性，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置",
+  "appearance_bible": "她二十二岁左右，年轻的成年白人女性，非常漂亮，气质冷、诡异、一点都不乖；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白没有腮红，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她不笑，神情平静却带着压迫感",
+  "wardrobe": [
+    "一件雕塑感的白色短款立领外套，肩线夸张圆润，左侧立领内嵌一道极细的红色指示灯线；里面是黑色高领上衣；黑色阔腿西裤；黑色尖头短靴"
+  ],
+  "voice_profile": null,
+  "reference_asset_ids": [],
+  "allowed_variations": [
+    "同一身份的镜头角度与景别变化",
+    "其他副本（同款，灯熄灭）：她的副本：同一张脸、同样的银白色短发，左耳同样的黑色耳挂装置但小灯是熄灭的，眼神空；同样的白色雕塑感立领短外套，左侧立领那道细线是熄灭的；黑色高领上衣；黑色阔腿西裤"
+  ]
+}

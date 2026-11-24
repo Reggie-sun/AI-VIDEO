@@ -1,0 +1,23 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "ef2c89b8fbca2869adf995dbf8269d0b70d793df5af89b2121991c2c2dedeaf3",
+  "unit_ids": [
+    "SG03C"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012c-w1.png",
+      "sha256": "fddf927a65eedf558b85ac501580f7f32f297dec8c9754f9672f635d14939fc7",
+      "role": "SG03C reference image"
+    },
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03C.wav",
+      "sha256": "4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09",
+      "role": "SG03C vocal"
+    }
+  ],
+  "user_quote": "没有我只是让你自己判断",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

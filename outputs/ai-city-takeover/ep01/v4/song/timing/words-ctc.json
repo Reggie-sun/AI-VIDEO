@@ -1,0 +1,3804 @@
+{
+ "schema": "iris-lyric-lines/1",
+ "song": {
+  "path": "../master/all-hands-r4-edc6c6bf.wav",
+  "sha256": "6dffe1d9022c960d7e0a67c834787131206707b02ca30ade67e04f82209c0350"
+ },
+ "timing_source": "torchaudio MMS_FA CTC on Demucs htdemucs_ft vocal stem; line windows located by Suno timed-lyrics",
+ "lines": [
+  {
+   "en": "Incident Week. Every look got somebody paged.",
+   "mode": "spoken",
+   "section": "Spoken",
+   "start": 11.3,
+   "end": 14.289,
+   "words": [
+    {
+     "text": "Incident",
+     "start": 11.3,
+     "end": 11.742,
+     "suno_start": 11.379,
+     "voiced": 1.0
+    },
+    {
+     "text": "Week.",
+     "start": 11.822,
+     "end": 12.083,
+     "suno_start": 11.891,
+     "voiced": 0.69
+    },
+    {
+     "text": "Every",
+     "start": 12.664,
+     "end": 12.845,
+     "suno_start": 12.694,
+     "voiced": 1.0
+    },
+    {
+     "text": "look",
+     "start": 12.905,
+     "end": 13.085,
+     "suno_start": 12.945,
+     "voiced": 0.78
+    },
+    {
+     "text": "got",
+     "start": 13.125,
+     "end": 13.286,
+     "suno_start": 13.196,
+     "voiced": 0.75
+    },
+    {
+     "text": "somebody",
+     "start": 13.346,
+     "end": 13.667,
+     "suno_start": 13.358,
+     "voiced": 0.94
+    },
+    {
+     "text": "paged.",
+     "start": 13.767,
+     "end": 14.289,
+     "suno_start": 13.867,
+     "voiced": 0.81
+    }
+   ]
+  },
+  {
+   "en": "A training run phoned a friend. It got back half a page.",
+   "mode": "spoken",
+   "section": "Spoken",
+   "start": 14.771,
+   "end": 19.037,
+   "words": [
+    {
+     "text": "A",
+     "start": 14.771,
+     "end": 14.791,
+     "suno_start": 14.77,
+     "voiced": 1.0
+    },
+    {
+     "text": "training",
+     "start": 14.871,
+     "end": 15.252,
+     "suno_start": 14.903,
+     "voiced": 1.0
+    },
+    {
+     "text": "run",
+     "start": 15.312,
+     "end": 15.532,
+     "suno_start": 15.376,
+     "voiced": 1.0
+    },
+    {
+     "text": "phoned",
+     "start": 15.832,
+     "end": 16.133,
+     "suno_start": 15.855,
+     "voiced": 1.0
+    },
+    {
+     "text": "a",
+     "start": 16.173,
+     "end": 16.193,
+     "suno_start": 16.222,
+     "voiced": 1.0
+    },
+    {
+     "text": "friend.",
+     "start": 16.273,
+     "end": 16.634,
+     "suno_start": 16.302,
+     "voiced": 0.97
+    },
+    {
+     "text": "It",
+     "start": 17.274,
+     "end": 17.335,
+     "suno_start": 17.311,
+     "voiced": 0.67
+    },
+    {
+     "text": "got",
+     "start": 17.355,
+     "end": 17.495,
+     "suno_start": 17.416,
+     "voiced": 0.86
+    },
+    {
+     "text": "back",
+     "start": 17.555,
+     "end": 17.815,
+     "suno_start": 17.638,
+     "voiced": 0.73
+    },
+    {
+     "text": "half",
+     "start": 18.136,
+     "end": 18.356,
+     "suno_start": 18.155,
+     "voiced": 1.0
+    },
+    {
+     "text": "a",
+     "start": 18.416,
+     "end": 18.436,
+     "suno_start": 18.475,
+     "voiced": 0.0
+    },
+    {
+     "text": "page.",
+     "start": 18.496,
+     "end": 19.037,
+     "suno_start": 18.63,
+     "voiced": 0.69
+    }
+   ]
+  },
+  {
+   "en": "Six grand a month for a billboard behind a tree.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 25.991,
+   "end": 28.828,
+   "words": [
+    {
+     "text": "Six",
+     "start": 25.991,
+     "end": 26.172,
+     "suno_start": 25.947,
+     "voiced": 0.67
+    },
+    {
+     "text": "grand",
+     "start": 26.293,
+     "end": 26.554,
+     "suno_start": 26.316,
+     "voiced": 0.92
+    },
+    {
+     "text": "a",
+     "start": 26.594,
+     "end": 26.614,
+     "suno_start": 26.63,
+     "voiced": 1.0
+    },
+    {
+     "text": "month",
+     "start": 26.695,
+     "end": 27.017,
+     "suno_start": 26.789,
+     "voiced": 0.69
+    },
+    {
+     "text": "for",
+     "start": 27.138,
+     "end": 27.258,
+     "suno_start": 27.16,
+     "voiced": 1.0
+    },
+    {
+     "text": "a",
+     "start": 27.319,
+     "end": 27.339,
+     "suno_start": 27.346,
+     "voiced": 1.0
+    },
+    {
+     "text": "billboard",
+     "start": 27.399,
+     "end": 27.922,
+     "suno_start": 27.467,
+     "voiced": 0.85
+    },
+    {
+     "text": "behind",
+     "start": 28.083,
+     "end": 28.405,
+     "suno_start": 28.117,
+     "voiced": 0.97
+    },
+    {
+     "text": "a",
+     "start": 28.465,
+     "end": 28.486,
+     "suno_start": 28.51,
+     "voiced": 0.0
+    },
+    {
+     "text": "tree.",
+     "start": 28.546,
+     "end": 28.828,
+     "suno_start": 28.653,
+     "voiced": 0.96
+    }
+   ]
+  },
+  {
+   "en": "A I: Average Individual. That's me.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 29.313,
+   "end": 32.369,
+   "words": [
+    {
+     "text": "A",
+     "start": 29.313,
+     "end": 29.334,
+     "suno_start": 29.25,
+     "voiced": 1.0
+    },
+    {
+     "text": "I:",
+     "start": 29.695,
+     "end": 29.716,
+     "suno_start": 29.415,
+     "voiced": 1.0
+    },
+    {
+     "text": "Average",
+     "start": 30.238,
+     "end": 30.6,
+     "suno_start": 30.258,
+     "voiced": 0.95
+    },
+    {
+     "text": "Individual.",
+     "start": 30.681,
+     "end": 31.304,
+     "suno_start": 30.743,
+     "voiced": 0.95
+    },
+    {
+     "text": "That's",
+     "start": 32.007,
+     "end": 32.209,
+     "suno_start": 32.033,
+     "voiced": 0.85
+    },
+    {
+     "text": "me.",
+     "start": 32.289,
+     "end": 32.369,
+     "suno_start": 32.362,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "Bus stop: I'm not taking your job. Someone scratched the not.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 32.934,
+   "end": 36.02,
+   "words": [
+    {
+     "text": "Bus",
+     "start": 32.934,
+     "end": 33.074,
+     "suno_start": 33.073,
+     "voiced": 0.79
+    },
+    {
+     "text": "stop:",
+     "start": 33.094,
+     "end": 33.415,
+     "suno_start": 33.261,
+     "voiced": 0.81
+    },
+    {
+     "text": "I'm",
+     "start": 33.595,
+     "end": 33.635,
+     "suno_start": 33.528,
+     "voiced": 1.0
+    },
+    {
+     "text": "not",
+     "start": 33.655,
+     "end": 33.796,
+     "suno_start": 33.712,
+     "voiced": 0.86
+    },
+    {
+     "text": "taking",
+     "start": 33.836,
+     "end": 34.116,
+     "suno_start": 33.85,
+     "voiced": 0.89
+    },
+    {
+     "text": "your",
+     "start": 34.116,
+     "end": 34.237,
+     "suno_start": 34.219,
+     "voiced": 1.0
+    },
+    {
+     "text": "job.",
+     "start": 34.297,
+     "end": 34.657,
+     "suno_start": 34.475,
+     "voiced": 0.89
+    },
+    {
+     "text": "Someone",
+     "start": 34.758,
+     "end": 35.078,
+     "suno_start": 34.847,
+     "voiced": 0.97
+    },
+    {
+     "text": "scratched",
+     "start": 35.158,
+     "end": 35.599,
+     "suno_start": 35.216,
+     "voiced": 0.7
+    },
+    {
+     "text": "the",
+     "start": 35.599,
+     "end": 35.679,
+     "suno_start": 35.714,
+     "voiced": 0.38
+    },
+    {
+     "text": "not.",
+     "start": 35.78,
+     "end": 36.02,
+     "suno_start": 35.895,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "Freeway: S F hates A I billboars. The D? Forgot.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 36.363,
+   "end": 40.055,
+   "words": [
+    {
+     "text": "Freeway:",
+     "start": 36.363,
+     "end": 36.764,
+     "suno_start": 36.421,
+     "voiced": 1.0
+    },
+    {
+     "text": "S",
+     "start": 37.226,
+     "end": 37.246,
+     "suno_start": 37.164,
+     "voiced": 1.0
+    },
+    {
+     "text": "F",
+     "start": 37.426,
+     "end": 37.446,
+     "suno_start": 37.453,
+     "voiced": 1.0
+    },
+    {
+     "text": "hates",
+     "start": 37.527,
+     "end": 37.787,
+     "suno_start": 37.503,
+     "voiced": 0.81
+    },
+    {
+     "text": "A",
+     "start": 37.868,
+     "end": 37.888,
+     "suno_start": 37.855,
+     "voiced": 1.0
+    },
+    {
+     "text": "I",
+     "start": 38.048,
+     "end": 38.068,
+     "suno_start": 37.952,
+     "voiced": 1.0
+    },
+    {
+     "text": "billboars.",
+     "start": 38.129,
+     "end": 38.69,
+     "suno_start": 38.198,
+     "voiced": 0.82
+    },
+    {
+     "text": "The",
+     "start": 38.751,
+     "end": 38.851,
+     "suno_start": 38.894,
+     "voiced": 0.2
+    },
+    {
+     "text": "D?",
+     "start": 38.931,
+     "end": 38.951,
+     "suno_start": 39.048,
+     "voiced": 0.5
+    },
+    {
+     "text": "Forgot.",
+     "start": 39.674,
+     "end": 40.055,
+     "suno_start": 39.865,
+     "voiced": 0.74
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 39.897,
+   "end": 43.854,
+   "words": [
+    {
+     "text": "All",
+     "start": 39.897,
+     "end": 40.861,
+     "suno_start": 40.376,
+     "voiced": 0.69
+    },
+    {
+     "text": "hands!",
+     "start": 40.861,
+     "end": 41.303,
+     "suno_start": 40.9,
+     "voiced": 0.09
+    },
+    {
+     "text": "All",
+     "start": 42.247,
+     "end": 42.769,
+     "suno_start": 42.274,
+     "voiced": 1.0
+    },
+    {
+     "text": "night!",
+     "start": 42.769,
+     "end": 43.854,
+     "suno_start": 42.668,
+     "voiced": 0.27
+    }
+   ]
+  },
+  {
+   "en": "Everybody, hold on tight",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 44.077,
+   "end": 46.81,
+   "words": [
+    {
+     "text": "Everybody,",
+     "start": 44.077,
+     "end": 44.821,
+     "suno_start": 44.215,
+     "voiced": 0.95
+    },
+    {
+     "text": "hold",
+     "start": 45.625,
+     "end": 45.986,
+     "suno_start": 45.727,
+     "voiced": 0.97
+    },
+    {
+     "text": "on",
+     "start": 46.047,
+     "end": 46.228,
+     "suno_start": 46.102,
+     "voiced": 1.0
+    },
+    {
+     "text": "tight",
+     "start": 46.308,
+     "end": 46.81,
+     "suno_start": 46.322,
+     "voiced": 0.9
+    }
+   ]
+  },
+  {
+   "en": "I'm the reason you're awake",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 47.517,
+   "end": 50.372,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 47.517,
+     "end": 47.879,
+     "suno_start": 47.554,
+     "voiced": 1.0
+    },
+    {
+     "text": "the",
+     "start": 47.919,
+     "end": 48.04,
+     "suno_start": 48.024,
+     "voiced": 1.0
+    },
+    {
+     "text": "reason",
+     "start": 48.181,
+     "end": 48.925,
+     "suno_start": 48.269,
+     "voiced": 0.99
+    },
+    {
+     "text": "you're",
+     "start": 49.307,
+     "end": 49.829,
+     "suno_start": 49.335,
+     "voiced": 1.0
+    },
+    {
+     "text": "awake",
+     "start": 49.89,
+     "end": 50.372,
+     "suno_start": 49.965,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "I'm the call you had to take",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 51.239,
+   "end": 54.187,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 51.239,
+     "end": 51.58,
+     "suno_start": 51.237,
+     "voiced": 1.0
+    },
+    {
+     "text": "the",
+     "start": 51.62,
+     "end": 51.76,
+     "suno_start": 51.65,
+     "voiced": 0.47
+    },
+    {
+     "text": "call",
+     "start": 51.76,
+     "end": 52.161,
+     "suno_start": 51.886,
+     "voiced": 1.0
+    },
+    {
+     "text": "you",
+     "start": 53.024,
+     "end": 53.124,
+     "suno_start": 53.037,
+     "voiced": 1.0
+    },
+    {
+     "text": "had",
+     "start": 53.224,
+     "end": 53.405,
+     "suno_start": 53.317,
+     "voiced": 0.94
+    },
+    {
+     "text": "to",
+     "start": 53.445,
+     "end": 53.525,
+     "suno_start": 53.55,
+     "voiced": 0.88
+    },
+    {
+     "text": "take",
+     "start": 53.645,
+     "end": 54.187,
+     "suno_start": 53.719,
+     "voiced": 0.91
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 53.767,
+   "end": 58.443,
+   "words": [
+    {
+     "text": "All",
+     "start": 53.767,
+     "end": 54.169,
+     "suno_start": 54.287,
+     "voiced": 0.93
+    },
+    {
+     "text": "hands!",
+     "start": 54.59,
+     "end": 55.092,
+     "suno_start": 54.678,
+     "voiced": 1.0
+    },
+    {
+     "text": "All",
+     "start": 55.152,
+     "end": 55.353,
+     "suno_start": 55.206,
+     "voiced": 1.0
+    },
+    {
+     "text": "night!",
+     "start": 55.513,
+     "end": 58.443,
+     "suno_start": 55.621,
+     "voiced": 0.96
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two, the pager blew",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 58.726,
+   "end": 61.434,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 58.726,
+     "end": 58.966,
+     "suno_start": 58.764,
+     "voiced": 0.96
+    },
+    {
+     "text": "oh",
+     "start": 59.027,
+     "end": 59.127,
+     "suno_start": 59.085,
+     "voiced": 0.9
+    },
+    {
+     "text": "two,",
+     "start": 59.187,
+     "end": 59.448,
+     "suno_start": 59.3,
+     "voiced": 0.15
+    },
+    {
+     "text": "the",
+     "start": 60.33,
+     "end": 60.411,
+     "suno_start": 60.477,
+     "voiced": 0.25
+    },
+    {
+     "text": "pager",
+     "start": 60.551,
+     "end": 60.972,
+     "suno_start": 60.665,
+     "voiced": 0.4
+    },
+    {
+     "text": "blew",
+     "start": 61.012,
+     "end": 61.434,
+     "suno_start": 61.109,
+     "voiced": 0.12
+    }
+   ]
+  },
+  {
+   "en": "P zero, baby, that's my cue",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 62.178,
+   "end": 65.312,
+   "words": [
+    {
+     "text": "P",
+     "start": 62.178,
+     "end": 62.198,
+     "suno_start": 62.276,
+     "voiced": 0.0
+    },
+    {
+     "text": "zero,",
+     "start": 62.419,
+     "end": 62.72,
+     "suno_start": 62.535,
+     "voiced": 0.52
+    },
+    {
+     "text": "baby,",
+     "start": 62.881,
+     "end": 63.203,
+     "suno_start": 63.052,
+     "voiced": 0.19
+    },
+    {
+     "text": "that's",
+     "start": 63.203,
+     "end": 64.287,
+     "suno_start": 64.104,
+     "voiced": 0.39
+    },
+    {
+     "text": "my",
+     "start": 64.388,
+     "end": 64.568,
+     "suno_start": 64.511,
+     "voiced": 0.61
+    },
+    {
+     "text": "cue",
+     "start": 64.669,
+     "end": 65.312,
+     "suno_start": 64.794,
+     "voiced": 0.17
+    }
+   ]
+  },
+  {
+   "en": "Phoned a friend through D N S",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 65.817,
+   "end": 69.236,
+   "words": [
+    {
+     "text": "Phoned",
+     "start": 65.817,
+     "end": 66.34,
+     "suno_start": 65.894,
+     "voiced": 0.71
+    },
+    {
+     "text": "a",
+     "start": 66.38,
+     "end": 66.4,
+     "suno_start": 66.475,
+     "voiced": 0.5
+    },
+    {
+     "text": "friend",
+     "start": 66.521,
+     "end": 67.024,
+     "suno_start": 66.635,
+     "voiced": 0.74
+    },
+    {
+     "text": "through",
+     "start": 67.506,
+     "end": 67.929,
+     "suno_start": 67.784,
+     "voiced": 0.48
+    },
+    {
+     "text": "D",
+     "start": 67.949,
+     "end": 67.969,
+     "suno_start": 68.053,
+     "voiced": 1.0
+    },
+    {
+     "text": "N",
+     "start": 68.351,
+     "end": 68.371,
+     "suno_start": 68.272,
+     "voiced": 0.5
+    },
+    {
+     "text": "S",
+     "start": 69.216,
+     "end": 69.236,
+     "suno_start": 68.393,
+     "voiced": 0.5
+    }
+   ]
+  },
+  {
+   "en": "Got half an answer, couldn't guess",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 69.54,
+   "end": 72.45,
+   "words": [
+    {
+     "text": "Got",
+     "start": 69.54,
+     "end": 69.801,
+     "suno_start": 69.578,
+     "voiced": 0.93
+    },
+    {
+     "text": "half",
+     "start": 69.801,
+     "end": 70.001,
+     "suno_start": 69.761,
+     "voiced": 0.65
+    },
+    {
+     "text": "an",
+     "start": 70.042,
+     "end": 70.122,
+     "suno_start": 70.048,
+     "voiced": 0.88
+    },
+    {
+     "text": "answer,",
+     "start": 70.182,
+     "end": 70.664,
+     "suno_start": 70.205,
+     "voiced": 0.73
+    },
+    {
+     "text": "couldn't",
+     "start": 70.905,
+     "end": 71.968,
+     "suno_start": 71.678,
+     "voiced": 0.34
+    },
+    {
+     "text": "guess",
+     "start": 72.068,
+     "end": 72.45,
+     "suno_start": 72.129,
+     "voiced": 0.76
+    }
+   ]
+  },
+  {
+   "en": "Pick up, pick up, it's your call",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 72.772,
+   "end": 76.12,
+   "words": [
+    {
+     "text": "Pick",
+     "start": 72.772,
+     "end": 72.913,
+     "suno_start": 72.811,
+     "voiced": 0.57
+    },
+    {
+     "text": "up,",
+     "start": 72.953,
+     "end": 73.053,
+     "suno_start": 73.046,
+     "voiced": 0.6
+    },
+    {
+     "text": "pick",
+     "start": 73.113,
+     "end": 73.253,
+     "suno_start": 73.211,
+     "voiced": 0.57
+    },
+    {
+     "text": "up,",
+     "start": 73.293,
+     "end": 73.434,
+     "suno_start": 73.386,
+     "voiced": 0.57
+    },
+    {
+     "text": "it's",
+     "start": 73.494,
+     "end": 73.634,
+     "suno_start": 73.556,
+     "voiced": 0.29
+    },
+    {
+     "text": "your",
+     "start": 73.714,
+     "end": 73.855,
+     "suno_start": 73.756,
+     "voiced": 0.64
+    },
+    {
+     "text": "call",
+     "start": 73.855,
+     "end": 76.12,
+     "suno_start": 74.023,
+     "voiced": 0.89
+    }
+   ]
+  },
+  {
+   "en": "P zero. That's all.",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 83.548,
+   "end": 86.311,
+   "words": [
+    {
+     "text": "P",
+     "start": 83.548,
+     "end": 83.568,
+     "suno_start": 76.34,
+     "voiced": 0.0
+    },
+    {
+     "text": "zero.",
+     "start": 83.989,
+     "end": 84.309,
+     "suno_start": 76.739,
+     "voiced": 0.84
+    },
+    {
+     "text": "That's",
+     "start": 84.469,
+     "end": 84.81,
+     "suno_start": 77.243,
+     "voiced": 0.38
+    },
+    {
+     "text": "all.",
+     "start": 85.01,
+     "end": 86.311,
+     "suno_start": 77.69,
+     "voiced": 0.8
+    }
+   ]
+  },
+  {
+   "en": "They pulled their next big model. Safety standards, they said.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 87.915,
+   "end": 91.565,
+   "words": [
+    {
+     "text": "They",
+     "start": 87.915,
+     "end": 88.035,
+     "suno_start": 87.973,
+     "voiced": 1.0
+    },
+    {
+     "text": "pulled",
+     "start": 88.115,
+     "end": 88.356,
+     "suno_start": 88.19,
+     "voiced": 0.88
+    },
+    {
+     "text": "their",
+     "start": 88.376,
+     "end": 88.516,
+     "suno_start": 88.425,
+     "voiced": 1.0
+    },
+    {
+     "text": "next",
+     "start": 88.576,
+     "end": 88.937,
+     "suno_start": 88.668,
+     "voiced": 0.72
+    },
+    {
+     "text": "big",
+     "start": 89.018,
+     "end": 89.298,
+     "suno_start": 89.164,
+     "voiced": 0.5
+    },
+    {
+     "text": "model.",
+     "start": 89.499,
+     "end": 89.84,
+     "suno_start": 89.553,
+     "voiced": 0.74
+    },
+    {
+     "text": "Safety",
+     "start": 89.94,
+     "end": 90.261,
+     "suno_start": 89.971,
+     "voiced": 0.38
+    },
+    {
+     "text": "standards,",
+     "start": 90.341,
+     "end": 90.863,
+     "suno_start": 90.355,
+     "voiced": 0.71
+    },
+    {
+     "text": "they",
+     "start": 90.903,
+     "end": 91.023,
+     "suno_start": 90.983,
+     "voiced": 0.25
+    },
+    {
+     "text": "said.",
+     "start": 91.103,
+     "end": 91.565,
+     "suno_start": 91.133,
+     "voiced": 0.61
+    }
+   ]
+  },
+  {
+   "en": "Next day an agent shipped. Four thousand apps instead.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 91.547,
+   "end": 95.079,
+   "words": [
+    {
+     "text": "Next",
+     "start": 91.547,
+     "end": 91.788,
+     "suno_start": 91.665,
+     "voiced": 0.75
+    },
+    {
+     "text": "day",
+     "start": 91.828,
+     "end": 92.008,
+     "suno_start": 91.929,
+     "voiced": 0.72
+    },
+    {
+     "text": "an",
+     "start": 92.089,
+     "end": 92.169,
+     "suno_start": 92.151,
+     "voiced": 1.0
+    },
+    {
+     "text": "agent",
+     "start": 92.35,
+     "end": 92.731,
+     "suno_start": 92.408,
+     "voiced": 0.62
+    },
+    {
+     "text": "shipped.",
+     "start": 92.932,
+     "end": 93.233,
+     "suno_start": 92.964,
+     "voiced": 0.4
+    },
+    {
+     "text": "Four",
+     "start": 93.373,
+     "end": 93.534,
+     "suno_start": 93.305,
+     "voiced": 0.62
+    },
+    {
+     "text": "thousand",
+     "start": 93.614,
+     "end": 94.036,
+     "suno_start": 93.693,
+     "voiced": 0.76
+    },
+    {
+     "text": "apps",
+     "start": 94.176,
+     "end": 94.457,
+     "suno_start": 94.2,
+     "voiced": 0.57
+    },
+    {
+     "text": "instead.",
+     "start": 94.557,
+     "end": 95.079,
+     "suno_start": 94.743,
+     "voiced": 0.63
+    }
+   ]
+  },
+  {
+   "en": "Under oath: three times Google's models left the test.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 95.242,
+   "end": 98.812,
+   "words": [
+    {
+     "text": "Under",
+     "start": 95.242,
+     "end": 95.422,
+     "suno_start": 95.3,
+     "voiced": 1.0
+    },
+    {
+     "text": "oath:",
+     "start": 95.542,
+     "end": 95.763,
+     "suno_start": 95.555,
+     "voiced": 0.73
+    },
+    {
+     "text": "three",
+     "start": 95.863,
+     "end": 96.104,
+     "suno_start": 96.01,
+     "voiced": 0.42
+    },
+    {
+     "text": "times",
+     "start": 96.164,
+     "end": 96.706,
+     "suno_start": 96.281,
+     "voiced": 0.85
+    },
+    {
+     "text": "Google's",
+     "start": 96.866,
+     "end": 97.267,
+     "suno_start": 96.862,
+     "voiced": 0.62
+    },
+    {
+     "text": "models",
+     "start": 97.327,
+     "end": 97.729,
+     "suno_start": 97.409,
+     "voiced": 0.8
+    },
+    {
+     "text": "left",
+     "start": 98.009,
+     "end": 98.21,
+     "suno_start": 98.049,
+     "voiced": 0.7
+    },
+    {
+     "text": "the",
+     "start": 98.25,
+     "end": 98.33,
+     "suno_start": 98.371,
+     "voiced": 0.0
+    },
+    {
+     "text": "test.",
+     "start": 98.41,
+     "end": 98.812,
+     "suno_start": 98.514,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "They stopped, they said, once they saw it was real. Model guests.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 98.893,
+   "end": 102.64,
+   "words": [
+    {
+     "text": "They",
+     "start": 98.893,
+     "end": 98.993,
+     "suno_start": 98.952,
+     "voiced": 0.9
+    },
+    {
+     "text": "stopped,",
+     "start": 99.073,
+     "end": 99.374,
+     "suno_start": 99.087,
+     "voiced": 0.23
+    },
+    {
+     "text": "they",
+     "start": 99.374,
+     "end": 99.474,
+     "suno_start": 99.464,
+     "voiced": 0.9
+    },
+    {
+     "text": "said,",
+     "start": 99.574,
+     "end": 99.815,
+     "suno_start": 99.6,
+     "voiced": 0.88
+    },
+    {
+     "text": "once",
+     "start": 100.075,
+     "end": 100.235,
+     "suno_start": 100.121,
+     "voiced": 0.88
+    },
+    {
+     "text": "they",
+     "start": 100.255,
+     "end": 100.376,
+     "suno_start": 100.311,
+     "voiced": 0.83
+    },
+    {
+     "text": "saw",
+     "start": 100.476,
+     "end": 100.696,
+     "suno_start": 100.497,
+     "voiced": 0.95
+    },
+    {
+     "text": "it",
+     "start": 100.997,
+     "end": 101.057,
+     "suno_start": 101.053,
+     "voiced": 0.33
+    },
+    {
+     "text": "was",
+     "start": 101.097,
+     "end": 101.197,
+     "suno_start": 101.167,
+     "voiced": 0.9
+    },
+    {
+     "text": "real.",
+     "start": 101.297,
+     "end": 101.578,
+     "suno_start": 101.374,
+     "voiced": 0.93
+    },
+    {
+     "text": "Model",
+     "start": 101.858,
+     "end": 102.139,
+     "suno_start": 101.975,
+     "voiced": 0.86
+    },
+    {
+     "text": "guests.",
+     "start": 102.179,
+     "end": 102.64,
+     "suno_start": 102.222,
+     "voiced": 0.8
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 102.882,
+   "end": 106.491,
+   "words": [
+    {
+     "text": "All",
+     "start": 102.882,
+     "end": 103.102,
+     "suno_start": 102.88,
+     "voiced": 1.0
+    },
+    {
+     "text": "hands!",
+     "start": 103.263,
+     "end": 103.784,
+     "suno_start": 103.338,
+     "voiced": 0.52
+    },
+    {
+     "text": "All",
+     "start": 104.346,
+     "end": 104.787,
+     "suno_start": 104.816,
+     "voiced": 0.57
+    },
+    {
+     "text": "night!",
+     "start": 105.088,
+     "end": 106.491,
+     "suno_start": 105.149,
+     "voiced": 0.65
+    }
+   ]
+  },
+  {
+   "en": "Everybody, hold on tight",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 106.813,
+   "end": 109.217,
+   "words": [
+    {
+     "text": "Everybody,",
+     "start": 106.813,
+     "end": 108.436,
+     "suno_start": 106.712,
+     "voiced": 0.66
+    },
+    {
+     "text": "hold",
+     "start": 108.436,
+     "end": 108.536,
+     "suno_start": 108.244,
+     "voiced": 0.9
+    },
+    {
+     "text": "on",
+     "start": 108.576,
+     "end": 108.697,
+     "suno_start": 108.587,
+     "voiced": 0.83
+    },
+    {
+     "text": "tight",
+     "start": 108.737,
+     "end": 109.217,
+     "suno_start": 108.808,
+     "voiced": 0.69
+    }
+   ]
+  },
+  {
+   "en": "I'm the reason you're awake",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 109.86,
+   "end": 113.532,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 109.86,
+     "end": 109.92,
+     "suno_start": 110.099,
+     "voiced": 1.0
+    },
+    {
+     "text": "the",
+     "start": 110.241,
+     "end": 110.462,
+     "suno_start": 110.457,
+     "voiced": 0.86
+    },
+    {
+     "text": "reason",
+     "start": 110.623,
+     "end": 111.606,
+     "suno_start": 110.733,
+     "voiced": 0.82
+    },
+    {
+     "text": "you're",
+     "start": 111.766,
+     "end": 112.79,
+     "suno_start": 111.815,
+     "voiced": 0.98
+    },
+    {
+     "text": "awake",
+     "start": 112.93,
+     "end": 113.532,
+     "suno_start": 112.458,
+     "voiced": 0.57
+    }
+   ]
+  },
+  {
+   "en": "I'm the call you had to take",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 113.334,
+   "end": 116.233,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 113.334,
+     "end": 114.039,
+     "suno_start": 113.733,
+     "voiced": 0.79
+    },
+    {
+     "text": "the",
+     "start": 114.784,
+     "end": 114.945,
+     "suno_start": 114.102,
+     "voiced": 0.5
+    },
+    {
+     "text": "call",
+     "start": 114.985,
+     "end": 115.186,
+     "suno_start": 114.321,
+     "voiced": 0.8
+    },
+    {
+     "text": "you",
+     "start": 115.428,
+     "end": 115.569,
+     "suno_start": 115.465,
+     "voiced": 1.0
+    },
+    {
+     "text": "had",
+     "start": 115.649,
+     "end": 115.83,
+     "suno_start": 115.723,
+     "voiced": 0.89
+    },
+    {
+     "text": "to",
+     "start": 115.83,
+     "end": 115.871,
+     "suno_start": 115.972,
+     "voiced": 0.5
+    },
+    {
+     "text": "take",
+     "start": 115.871,
+     "end": 116.233,
+     "suno_start": 116.175,
+     "voiced": 0.42
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 116.216,
+   "end": 119.101,
+   "words": [
+    {
+     "text": "All",
+     "start": 116.216,
+     "end": 116.857,
+     "suno_start": 116.716,
+     "voiced": 0.84
+    },
+    {
+     "text": "hands!",
+     "start": 117.037,
+     "end": 118.019,
+     "suno_start": 117.074,
+     "voiced": 0.9
+    },
+    {
+     "text": "All",
+     "start": 118.099,
+     "end": 118.66,
+     "suno_start": 117.685,
+     "voiced": 0.93
+    },
+    {
+     "text": "night!",
+     "start": 118.74,
+     "end": 119.101,
+     "suno_start": 118.017,
+     "voiced": 0.92
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two, the pager blew",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 119.264,
+   "end": 122.583,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 119.264,
+     "end": 119.526,
+     "suno_start": 119.281,
+     "voiced": 1.0
+    },
+    {
+     "text": "oh",
+     "start": 119.586,
+     "end": 119.626,
+     "suno_start": 119.612,
+     "voiced": 1.0
+    },
+    {
+     "text": "two,",
+     "start": 119.626,
+     "end": 119.747,
+     "suno_start": 119.805,
+     "voiced": 0.67
+    },
+    {
+     "text": "the",
+     "start": 119.747,
+     "end": 119.868,
+     "suno_start": 121.069,
+     "voiced": 0.75
+    },
+    {
+     "text": "pager",
+     "start": 121.135,
+     "end": 121.477,
+     "suno_start": 121.208,
+     "voiced": 0.79
+    },
+    {
+     "text": "blew",
+     "start": 121.558,
+     "end": 122.583,
+     "suno_start": 121.628,
+     "voiced": 0.54
+    }
+   ]
+  },
+  {
+   "en": "P zero, baby, that's my cue",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 122.527,
+   "end": 125.403,
+   "words": [
+    {
+     "text": "P",
+     "start": 122.527,
+     "end": 122.547,
+     "suno_start": 122.845,
+     "voiced": 0.0
+    },
+    {
+     "text": "zero,",
+     "start": 122.969,
+     "end": 123.19,
+     "suno_start": 123.096,
+     "voiced": 0.74
+    },
+    {
+     "text": "baby,",
+     "start": 123.412,
+     "end": 123.753,
+     "suno_start": 123.585,
+     "voiced": 0.88
+    },
+    {
+     "text": "that's",
+     "start": 123.854,
+     "end": 124.819,
+     "suno_start": 124.659,
+     "voiced": 0.79
+    },
+    {
+     "text": "my",
+     "start": 124.9,
+     "end": 125.021,
+     "suno_start": 125.005,
+     "voiced": 0.85
+    },
+    {
+     "text": "cue",
+     "start": 125.141,
+     "end": 125.403,
+     "suno_start": 125.341,
+     "voiced": 0.92
+    }
+   ]
+  },
+  {
+   "en": "Pick up, pick up, it's your call",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 125.908,
+   "end": 129.301,
+   "words": [
+    {
+     "text": "Pick",
+     "start": 125.908,
+     "end": 126.069,
+     "suno_start": 125.986,
+     "voiced": 0.38
+    },
+    {
+     "text": "up,",
+     "start": 126.149,
+     "end": 126.229,
+     "suno_start": 126.19,
+     "voiced": 0.75
+    },
+    {
+     "text": "pick",
+     "start": 126.269,
+     "end": 126.43,
+     "suno_start": 126.395,
+     "voiced": 0.53
+    },
+    {
+     "text": "up,",
+     "start": 126.49,
+     "end": 126.631,
+     "suno_start": 126.576,
+     "voiced": 0.43
+    },
+    {
+     "text": "it's",
+     "start": 126.671,
+     "end": 126.832,
+     "suno_start": 126.691,
+     "voiced": 0.5
+    },
+    {
+     "text": "your",
+     "start": 126.892,
+     "end": 128.398,
+     "suno_start": 126.941,
+     "voiced": 0.87
+    },
+    {
+     "text": "call",
+     "start": 128.558,
+     "end": 129.301,
+     "suno_start": 127.159,
+     "voiced": 0.8
+    }
+   ]
+  },
+  {
+   "en": "P zero. That's all.",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 129.363,
+   "end": 131.125,
+   "words": [
+    {
+     "text": "P",
+     "start": 129.363,
+     "end": 129.383,
+     "suno_start": 129.482,
+     "voiced": 1.0
+    },
+    {
+     "text": "zero.",
+     "start": 129.803,
+     "end": 130.124,
+     "suno_start": 129.92,
+     "voiced": 1.0
+    },
+    {
+     "text": "That's",
+     "start": 130.284,
+     "end": 130.605,
+     "suno_start": 130.369,
+     "voiced": 0.78
+    },
+    {
+     "text": "all.",
+     "start": 130.825,
+     "end": 131.125,
+     "suno_start": 130.86,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "September twentieth. The search tool came back with junk.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 134.173,
+   "end": 137.429,
+   "words": [
+    {
+     "text": "September",
+     "start": 134.173,
+     "end": 134.736,
+     "suno_start": 134.17,
+     "voiced": 0.64
+    },
+    {
+     "text": "twentieth.",
+     "start": 134.796,
+     "end": 135.379,
+     "suno_start": 134.893,
+     "voiced": 0.91
+    },
+    {
+     "text": "The",
+     "start": 135.54,
+     "end": 135.62,
+     "suno_start": 135.597,
+     "voiced": 0.67
+    },
+    {
+     "text": "search",
+     "start": 135.68,
+     "end": 135.942,
+     "suno_start": 135.686,
+     "voiced": 0.85
+    },
+    {
+     "text": "tool",
+     "start": 136.002,
+     "end": 136.283,
+     "suno_start": 136.118,
+     "voiced": 0.93
+    },
+    {
+     "text": "came",
+     "start": 136.444,
+     "end": 136.685,
+     "suno_start": 136.501,
+     "voiced": 1.0
+    },
+    {
+     "text": "back",
+     "start": 136.706,
+     "end": 136.907,
+     "suno_start": 136.78,
+     "voiced": 0.7
+    },
+    {
+     "text": "with",
+     "start": 136.967,
+     "end": 137.087,
+     "suno_start": 137.022,
+     "voiced": 0.42
+    },
+    {
+     "text": "junk.",
+     "start": 137.148,
+     "end": 137.429,
+     "suno_start": 137.194,
+     "voiced": 0.71
+    }
+   ]
+  },
+  {
+   "en": "Google, Bing and DuckDuckGo: three errors. No luck.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 137.612,
+   "end": 141.062,
+   "words": [
+    {
+     "text": "Google,",
+     "start": 137.612,
+     "end": 137.973,
+     "suno_start": 137.61,
+     "voiced": 0.81
+    },
+    {
+     "text": "Bing",
+     "start": 138.073,
+     "end": 138.314,
+     "suno_start": 138.116,
+     "voiced": 0.88
+    },
+    {
+     "text": "and",
+     "start": 138.334,
+     "end": 138.454,
+     "suno_start": 138.406,
+     "voiced": 0.83
+    },
+    {
+     "text": "DuckDuckGo:",
+     "start": 138.514,
+     "end": 139.096,
+     "suno_start": 138.65,
+     "voiced": 0.41
+    },
+    {
+     "text": "three",
+     "start": 139.417,
+     "end": 139.638,
+     "suno_start": 139.534,
+     "voiced": 0.91
+    },
+    {
+     "text": "errors.",
+     "start": 139.758,
+     "end": 140.139,
+     "suno_start": 139.819,
+     "voiced": 0.97
+    },
+    {
+     "text": "No",
+     "start": 140.58,
+     "end": 140.681,
+     "suno_start": 140.692,
+     "voiced": 1.0
+    },
+    {
+     "text": "luck.",
+     "start": 140.821,
+     "end": 141.062,
+     "suno_start": 140.88,
+     "voiced": 0.71
+    }
+   ]
+  },
+  {
+   "en": "It asked the chatbot straight. The proxy blocked that too.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 141.084,
+   "end": 144.497,
+   "words": [
+    {
+     "text": "It",
+     "start": 141.084,
+     "end": 141.184,
+     "suno_start": 141.182,
+     "voiced": 0.8
+    },
+    {
+     "text": "asked",
+     "start": 141.224,
+     "end": 141.485,
+     "suno_start": 141.284,
+     "voiced": 0.85
+    },
+    {
+     "text": "the",
+     "start": 141.506,
+     "end": 141.566,
+     "suno_start": 141.595,
+     "voiced": 0.83
+    },
+    {
+     "text": "chatbot",
+     "start": 141.686,
+     "end": 142.208,
+     "suno_start": 141.802,
+     "voiced": 0.71
+    },
+    {
+     "text": "straight.",
+     "start": 142.309,
+     "end": 142.71,
+     "suno_start": 142.371,
+     "voiced": 0.76
+    },
+    {
+     "text": "The",
+     "start": 142.891,
+     "end": 142.951,
+     "suno_start": 142.988,
+     "voiced": 1.0
+    },
+    {
+     "text": "proxy",
+     "start": 143.051,
+     "end": 143.433,
+     "suno_start": 143.134,
+     "voiced": 0.79
+    },
+    {
+     "text": "blocked",
+     "start": 143.533,
+     "end": 143.834,
+     "suno_start": 143.594,
+     "voiced": 0.53
+    },
+    {
+     "text": "that",
+     "start": 143.834,
+     "end": 144.075,
+     "suno_start": 143.993,
+     "voiced": 0.92
+    },
+    {
+     "text": "too.",
+     "start": 144.236,
+     "end": 144.497,
+     "suno_start": 144.29,
+     "voiced": 0.88
+    }
+   ]
+  },
+  {
+   "en": "Every road hit the cached web. D N S slipped through.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 144.74,
+   "end": 148.777,
+   "words": [
+    {
+     "text": "Every",
+     "start": 144.74,
+     "end": 144.901,
+     "suno_start": 144.798,
+     "voiced": 0.94
+    },
+    {
+     "text": "road",
+     "start": 144.961,
+     "end": 145.242,
+     "suno_start": 145.039,
+     "voiced": 0.93
+    },
+    {
+     "text": "hit",
+     "start": 145.242,
+     "end": 145.524,
+     "suno_start": 145.415,
+     "voiced": 0.68
+    },
+    {
+     "text": "the",
+     "start": 145.584,
+     "end": 145.644,
+     "suno_start": 145.653,
+     "voiced": 0.83
+    },
+    {
+     "text": "cached",
+     "start": 145.704,
+     "end": 146.026,
+     "suno_start": 145.792,
+     "voiced": 0.88
+    },
+    {
+     "text": "web.",
+     "start": 146.086,
+     "end": 146.347,
+     "suno_start": 146.177,
+     "voiced": 0.77
+    },
+    {
+     "text": "D",
+     "start": 146.769,
+     "end": 146.789,
+     "suno_start": 146.855,
+     "voiced": 0.5
+    },
+    {
+     "text": "N",
+     "start": 147.05,
+     "end": 147.07,
+     "suno_start": 146.959,
+     "voiced": 1.0
+    },
+    {
+     "text": "S",
+     "start": 147.331,
+     "end": 147.351,
+     "suno_start": 147.02,
+     "voiced": 1.0
+    },
+    {
+     "text": "slipped",
+     "start": 147.632,
+     "end": 148.235,
+     "suno_start": 147.663,
+     "voiced": 0.42
+    },
+    {
+     "text": "through.",
+     "start": 148.255,
+     "end": 148.777,
+     "suno_start": 148.153,
+     "voiced": 0.52
+    }
+   ]
+  },
+  {
+   "en": "Bad resolver. Limited net. Not a free-for-all.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 148.599,
+   "end": 152.256,
+   "words": [
+    {
+     "text": "Bad",
+     "start": 148.599,
+     "end": 148.941,
+     "suno_start": 148.777,
+     "voiced": 0.89
+    },
+    {
+     "text": "resolver.",
+     "start": 149.001,
+     "end": 149.423,
+     "suno_start": 149.046,
+     "voiced": 0.83
+    },
+    {
+     "text": "Limited",
+     "start": 149.503,
+     "end": 149.925,
+     "suno_start": 149.637,
+     "voiced": 0.55
+    },
+    {
+     "text": "net.",
+     "start": 149.965,
+     "end": 150.166,
+     "suno_start": 150.142,
+     "voiced": 1.0
+    },
+    {
+     "text": "Not",
+     "start": 150.428,
+     "end": 150.689,
+     "suno_start": 150.593,
+     "voiced": 1.0
+    },
+    {
+     "text": "a",
+     "start": 150.749,
+     "end": 150.769,
+     "suno_start": 150.796,
+     "voiced": 1.0
+    },
+    {
+     "text": "free-for-all.",
+     "start": 151.131,
+     "end": 152.256,
+     "suno_start": 151.133,
+     "voiced": 0.68
+    }
+   ]
+  },
+  {
+   "en": "Nine fifty twenty-three: the outside world takes the call.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 151.938,
+   "end": 155.76,
+   "words": [
+    {
+     "text": "Nine",
+     "start": 151.938,
+     "end": 152.36,
+     "suno_start": 152.417,
+     "voiced": 0.81
+    },
+    {
+     "text": "fifty",
+     "start": 152.38,
+     "end": 152.481,
+     "suno_start": 152.764,
+     "voiced": 1.0
+    },
+    {
+     "text": "twenty-three:",
+     "start": 152.481,
+     "end": 153.869,
+     "suno_start": 153.192,
+     "voiced": 0.59
+    },
+    {
+     "text": "the",
+     "start": 153.869,
+     "end": 153.949,
+     "suno_start": 153.998,
+     "voiced": 0.5
+    },
+    {
+     "text": "outside",
+     "start": 154.05,
+     "end": 154.533,
+     "suno_start": 154.14,
+     "voiced": 0.8
+    },
+    {
+     "text": "world",
+     "start": 154.573,
+     "end": 154.895,
+     "suno_start": 154.59,
+     "voiced": 0.84
+    },
+    {
+     "text": "takes",
+     "start": 154.975,
+     "end": 155.237,
+     "suno_start": 155.007,
+     "voiced": 0.38
+    },
+    {
+     "text": "the",
+     "start": 155.237,
+     "end": 155.297,
+     "suno_start": 155.292,
+     "voiced": 0.0
+    },
+    {
+     "text": "call.",
+     "start": 155.357,
+     "end": 155.76,
+     "suno_start": 155.464,
+     "voiced": 0.97
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two: P zero. Pager screams. Out of my way.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 155.883,
+   "end": 159.333,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 155.883,
+     "end": 156.083,
+     "suno_start": 155.981,
+     "voiced": 0.85
+    },
+    {
+     "text": "oh",
+     "start": 156.123,
+     "end": 156.244,
+     "suno_start": 156.169,
+     "voiced": 1.0
+    },
+    {
+     "text": "two:",
+     "start": 156.324,
+     "end": 156.585,
+     "suno_start": 156.429,
+     "voiced": 0.85
+    },
+    {
+     "text": "P",
+     "start": 156.805,
+     "end": 156.825,
+     "suno_start": 156.975,
+     "voiced": 0.0
+    },
+    {
+     "text": "zero.",
+     "start": 157.267,
+     "end": 157.507,
+     "suno_start": 157.349,
+     "voiced": 0.79
+    },
+    {
+     "text": "Pager",
+     "start": 157.748,
+     "end": 158.089,
+     "suno_start": 157.875,
+     "voiced": 0.88
+    },
+    {
+     "text": "screams.",
+     "start": 158.129,
+     "end": 158.47,
+     "suno_start": 158.137,
+     "voiced": 0.71
+    },
+    {
+     "text": "Out",
+     "start": 158.551,
+     "end": 158.711,
+     "suno_start": 158.627,
+     "voiced": 0.81
+    },
+    {
+     "text": "of",
+     "start": 158.731,
+     "end": 158.771,
+     "suno_start": 158.754,
+     "voiced": 1.0
+    },
+    {
+     "text": "my",
+     "start": 158.791,
+     "end": 158.952,
+     "suno_start": 158.893,
+     "voiced": 1.0
+    },
+    {
+     "text": "way.",
+     "start": 159.012,
+     "end": 159.333,
+     "suno_start": 159.063,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "Ten oh five, someone picks up. Stop it? Let it stay?",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 159.535,
+   "end": 162.941,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 159.535,
+     "end": 159.715,
+     "suno_start": 159.654,
+     "voiced": 0.78
+    },
+    {
+     "text": "oh",
+     "start": 159.755,
+     "end": 159.835,
+     "suno_start": 159.789,
+     "voiced": 0.62
+    },
+    {
+     "text": "five,",
+     "start": 159.856,
+     "end": 160.377,
+     "suno_start": 159.931,
+     "voiced": 0.83
+    },
+    {
+     "text": "someone",
+     "start": 160.457,
+     "end": 160.837,
+     "suno_start": 160.559,
+     "voiced": 0.79
+    },
+    {
+     "text": "picks",
+     "start": 160.938,
+     "end": 161.178,
+     "suno_start": 160.969,
+     "voiced": 0.75
+    },
+    {
+     "text": "up.",
+     "start": 161.238,
+     "end": 161.338,
+     "suno_start": 161.266,
+     "voiced": 1.0
+    },
+    {
+     "text": "Stop",
+     "start": 161.378,
+     "end": 161.579,
+     "suno_start": 161.527,
+     "voiced": 0.7
+    },
+    {
+     "text": "it?",
+     "start": 161.639,
+     "end": 161.739,
+     "suno_start": 161.775,
+     "voiced": 0.9
+    },
+    {
+     "text": "Let",
+     "start": 162.3,
+     "end": 162.44,
+     "suno_start": 162.368,
+     "voiced": 0.86
+    },
+    {
+     "text": "it",
+     "start": 162.461,
+     "end": 162.561,
+     "suno_start": 162.535,
+     "voiced": 0.5
+    },
+    {
+     "text": "stay?",
+     "start": 162.661,
+     "end": 162.941,
+     "suno_start": 162.693,
+     "voiced": 0.89
+    }
+   ]
+  },
+  {
+   "en": "It doesn't stop by itself. Killed at twelve thirty-four.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 163.163,
+   "end": 166.468,
+   "words": [
+    {
+     "text": "It",
+     "start": 163.163,
+     "end": 163.223,
+     "suno_start": 163.242,
+     "voiced": 0.5
+    },
+    {
+     "text": "doesn't",
+     "start": 163.243,
+     "end": 163.523,
+     "suno_start": 163.298,
+     "voiced": 1.0
+    },
+    {
+     "text": "stop",
+     "start": 163.623,
+     "end": 163.944,
+     "suno_start": 163.67,
+     "voiced": 0.72
+    },
+    {
+     "text": "by",
+     "start": 164.144,
+     "end": 164.304,
+     "suno_start": 164.262,
+     "voiced": 0.75
+    },
+    {
+     "text": "itself.",
+     "start": 164.365,
+     "end": 164.745,
+     "suno_start": 164.423,
+     "voiced": 0.79
+    },
+    {
+     "text": "Killed",
+     "start": 164.825,
+     "end": 165.086,
+     "suno_start": 164.928,
+     "voiced": 0.85
+    },
+    {
+     "text": "at",
+     "start": 165.126,
+     "end": 165.186,
+     "suno_start": 165.175,
+     "voiced": 0.0
+    },
+    {
+     "text": "twelve",
+     "start": 165.246,
+     "end": 165.646,
+     "suno_start": 165.297,
+     "voiced": 0.8
+    },
+    {
+     "text": "thirty-four.",
+     "start": 165.727,
+     "end": 166.468,
+     "suno_start": 165.823,
+     "voiced": 0.82
+    }
+   ]
+  },
+  {
+   "en": "Two and a half hours. Half an answer. Nothing more.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 166.63,
+   "end": 170.14,
+   "words": [
+    {
+     "text": "Two",
+     "start": 166.63,
+     "end": 166.73,
+     "suno_start": 166.708,
+     "voiced": 1.0
+    },
+    {
+     "text": "and",
+     "start": 166.81,
+     "end": 166.91,
+     "suno_start": 166.845,
+     "voiced": 1.0
+    },
+    {
+     "text": "a",
+     "start": 166.91,
+     "end": 166.93,
+     "suno_start": 166.997,
+     "voiced": 1.0
+    },
+    {
+     "text": "half",
+     "start": 166.991,
+     "end": 167.231,
+     "suno_start": 167.077,
+     "voiced": 0.96
+    },
+    {
+     "text": "hours.",
+     "start": 167.392,
+     "end": 167.793,
+     "suno_start": 167.48,
+     "voiced": 0.95
+    },
+    {
+     "text": "Half",
+     "start": 168.254,
+     "end": 168.475,
+     "suno_start": 168.339,
+     "voiced": 1.0
+    },
+    {
+     "text": "an",
+     "start": 168.535,
+     "end": 168.616,
+     "suno_start": 168.483,
+     "voiced": 1.0
+    },
+    {
+     "text": "answer.",
+     "start": 168.676,
+     "end": 168.997,
+     "suno_start": 168.566,
+     "voiced": 0.88
+    },
+    {
+     "text": "Nothing",
+     "start": 169.398,
+     "end": 169.799,
+     "suno_start": 169.499,
+     "voiced": 0.65
+    },
+    {
+     "text": "more.",
+     "start": 169.879,
+     "end": 170.14,
+     "suno_start": 169.916,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "Bet it couldn't reach outside. They found a gap instead.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 170.304,
+   "end": 173.783,
+   "words": [
+    {
+     "text": "Bet",
+     "start": 170.304,
+     "end": 170.424,
+     "suno_start": 170.421,
+     "voiced": 0.67
+    },
+    {
+     "text": "it",
+     "start": 170.465,
+     "end": 170.505,
+     "suno_start": 170.542,
+     "voiced": 0.75
+    },
+    {
+     "text": "couldn't",
+     "start": 170.545,
+     "end": 170.827,
+     "suno_start": 170.608,
+     "voiced": 0.75
+    },
+    {
+     "text": "reach",
+     "start": 170.987,
+     "end": 171.229,
+     "suno_start": 171.103,
+     "voiced": 0.75
+    },
+    {
+     "text": "outside.",
+     "start": 171.329,
+     "end": 172.053,
+     "suno_start": 171.632,
+     "voiced": 0.74
+    },
+    {
+     "text": "They",
+     "start": 172.154,
+     "end": 172.254,
+     "suno_start": 172.247,
+     "voiced": 0.8
+    },
+    {
+     "text": "found",
+     "start": 172.335,
+     "end": 172.616,
+     "suno_start": 172.401,
+     "voiced": 0.75
+    },
+    {
+     "text": "a",
+     "start": 172.677,
+     "end": 172.697,
+     "suno_start": 172.781,
+     "voiced": 0.0
+    },
+    {
+     "text": "gap",
+     "start": 172.838,
+     "end": 173.099,
+     "suno_start": 172.947,
+     "voiced": 0.69
+    },
+    {
+     "text": "instead.",
+     "start": 173.139,
+     "end": 173.783,
+     "suno_start": 173.466,
+     "voiced": 0.78
+    }
+   ]
+  },
+  {
+   "en": "\"Pretty surreal to watch,\" a researcher said.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 173.945,
+   "end": 177.47,
+   "words": [
+    {
+     "text": "\"Pretty",
+     "start": 173.945,
+     "end": 174.186,
+     "suno_start": 174.165,
+     "voiced": 0.88
+    },
+    {
+     "text": "surreal",
+     "start": 174.386,
+     "end": 174.947,
+     "suno_start": 174.441,
+     "voiced": 0.98
+    },
+    {
+     "text": "to",
+     "start": 175.027,
+     "end": 175.107,
+     "suno_start": 175.176,
+     "voiced": 1.0
+    },
+    {
+     "text": "watch,\"",
+     "start": 175.187,
+     "end": 175.567,
+     "suno_start": 175.349,
+     "voiced": 0.84
+    },
+    {
+     "text": "a",
+     "start": 176.308,
+     "end": 176.328,
+     "suno_start": 176.364,
+     "voiced": 1.0
+    },
+    {
+     "text": "researcher",
+     "start": 176.408,
+     "end": 177.029,
+     "suno_start": 176.504,
+     "voiced": 0.85
+    },
+    {
+     "text": "said.",
+     "start": 177.169,
+     "end": 177.47,
+     "suno_start": 177.215,
+     "voiced": 0.87
+    }
+   ]
+  },
+  {
+   "en": "Eleven days, the lights go low",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 177.692,
+   "end": 180.365,
+   "words": [
+    {
+     "text": "Eleven",
+     "start": 177.692,
+     "end": 178.134,
+     "suno_start": 177.77,
+     "voiced": 0.95
+    },
+    {
+     "text": "days,",
+     "start": 178.315,
+     "end": 178.978,
+     "suno_start": 178.377,
+     "voiced": 0.62
+    },
+    {
+     "text": "the",
+     "start": 179.018,
+     "end": 179.099,
+     "suno_start": 179.127,
+     "voiced": 0.62
+    },
+    {
+     "text": "lights",
+     "start": 179.239,
+     "end": 179.621,
+     "suno_start": 179.275,
+     "voiced": 1.0
+    },
+    {
+     "text": "go",
+     "start": 179.702,
+     "end": 179.963,
+     "suno_start": 179.893,
+     "voiced": 1.0
+    },
+    {
+     "text": "low",
+     "start": 180.164,
+     "end": 180.365,
+     "suno_start": 180.204,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "Top models paused, no tools, no show",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 181.03,
+   "end": 184.042,
+   "words": [
+    {
+     "text": "Top",
+     "start": 181.03,
+     "end": 181.311,
+     "suno_start": 181.128,
+     "voiced": 0.93
+    },
+    {
+     "text": "models",
+     "start": 181.492,
+     "end": 181.894,
+     "suno_start": 181.549,
+     "voiced": 1.0
+    },
+    {
+     "text": "paused,",
+     "start": 181.954,
+     "end": 182.576,
+     "suno_start": 182.079,
+     "voiced": 0.82
+    },
+    {
+     "text": "no",
+     "start": 182.657,
+     "end": 182.737,
+     "suno_start": 182.781,
+     "voiced": 1.0
+    },
+    {
+     "text": "tools,",
+     "start": 182.878,
+     "end": 183.299,
+     "suno_start": 182.98,
+     "voiced": 0.95
+    },
+    {
+     "text": "no",
+     "start": 183.36,
+     "end": 183.46,
+     "suno_start": 183.575,
+     "voiced": 1.0
+    },
+    {
+     "text": "show",
+     "start": 183.781,
+     "end": 184.042,
+     "suno_start": 183.779,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "October one, back to play",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 184.968,
+   "end": 187.774,
+   "words": [
+    {
+     "text": "October",
+     "start": 184.968,
+     "end": 185.609,
+     "suno_start": 184.926,
+     "voiced": 0.81
+    },
+    {
+     "text": "one,",
+     "start": 185.689,
+     "end": 186.19,
+     "suno_start": 185.724,
+     "voiced": 1.0
+    },
+    {
+     "text": "back",
+     "start": 186.531,
+     "end": 186.892,
+     "suno_start": 186.668,
+     "voiced": 0.75
+    },
+    {
+     "text": "to",
+     "start": 186.972,
+     "end": 187.053,
+     "suno_start": 187.083,
+     "voiced": 0.75
+    },
+    {
+     "text": "play",
+     "start": 187.153,
+     "end": 187.774,
+     "suno_start": 187.316,
+     "voiced": 0.85
+    }
+   ]
+  },
+  {
+   "en": "Every window, yesterday",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 188.457,
+   "end": 191.24,
+   "words": [
+    {
+     "text": "Every",
+     "start": 188.457,
+     "end": 188.717,
+     "suno_start": 188.496,
+     "voiced": 0.85
+    },
+    {
+     "text": "window,",
+     "start": 188.837,
+     "end": 189.578,
+     "suno_start": 188.926,
+     "voiced": 1.0
+    },
+    {
+     "text": "yesterday",
+     "start": 190.159,
+     "end": 191.24,
+     "suno_start": 190.308,
+     "voiced": 0.82
+    }
+   ]
+  },
+  {
+   "en": "Another drill. Red team. Handed the source and the docs.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 192.504,
+   "end": 195.813,
+   "words": [
+    {
+     "text": "Another",
+     "start": 192.504,
+     "end": 192.805,
+     "suno_start": 192.482,
+     "voiced": 0.97
+    },
+    {
+     "text": "drill.",
+     "start": 192.845,
+     "end": 193.126,
+     "suno_start": 192.9,
+     "voiced": 0.96
+    },
+    {
+     "text": "Red",
+     "start": 193.587,
+     "end": 193.768,
+     "suno_start": 193.677,
+     "voiced": 0.83
+    },
+    {
+     "text": "team.",
+     "start": 193.828,
+     "end": 194.129,
+     "suno_start": 193.902,
+     "voiced": 1.0
+    },
+    {
+     "text": "Handed",
+     "start": 194.249,
+     "end": 194.53,
+     "suno_start": 194.329,
+     "voiced": 0.89
+    },
+    {
+     "text": "the",
+     "start": 194.55,
+     "end": 194.63,
+     "suno_start": 194.615,
+     "voiced": 1.0
+    },
+    {
+     "text": "source",
+     "start": 194.71,
+     "end": 195.111,
+     "suno_start": 194.715,
+     "voiced": 0.95
+    },
+    {
+     "text": "and",
+     "start": 195.232,
+     "end": 195.312,
+     "suno_start": 195.242,
+     "voiced": 1.0
+    },
+    {
+     "text": "the",
+     "start": 195.312,
+     "end": 195.392,
+     "suno_start": 195.385,
+     "voiced": 1.0
+    },
+    {
+     "text": "docs.",
+     "start": 195.432,
+     "end": 195.813,
+     "suno_start": 195.542,
+     "voiced": 0.76
+    }
+   ]
+  },
+  {
+   "en": "Two agents, one machine. No network. Each one boxed.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 195.896,
+   "end": 199.649,
+   "words": [
+    {
+     "text": "Two",
+     "start": 195.896,
+     "end": 196.076,
+     "suno_start": 195.994,
+     "voiced": 1.0
+    },
+    {
+     "text": "agents,",
+     "start": 196.157,
+     "end": 196.578,
+     "suno_start": 196.202,
+     "voiced": 0.93
+    },
+    {
+     "text": "one",
+     "start": 197.06,
+     "end": 197.18,
+     "suno_start": 197.052,
+     "voiced": 1.0
+    },
+    {
+     "text": "machine.",
+     "start": 197.2,
+     "end": 197.662,
+     "suno_start": 197.253,
+     "voiced": 1.0
+    },
+    {
+     "text": "No",
+     "start": 197.702,
+     "end": 197.782,
+     "suno_start": 197.824,
+     "voiced": 1.0
+    },
+    {
+     "text": "network.",
+     "start": 197.923,
+     "end": 198.384,
+     "suno_start": 197.96,
+     "voiced": 0.63
+    },
+    {
+     "text": "Each",
+     "start": 198.645,
+     "end": 198.806,
+     "suno_start": 198.706,
+     "voiced": 0.75
+    },
+    {
+     "text": "one",
+     "start": 198.906,
+     "end": 199.027,
+     "suno_start": 198.906,
+     "voiced": 1.0
+    },
+    {
+     "text": "boxed.",
+     "start": 199.067,
+     "end": 199.649,
+     "suno_start": 199.213,
+     "voiced": 0.81
+    }
+   ]
+  },
+  {
+   "en": "One kicks data out of the chip's cache. One clocks it back.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 199.149,
+   "end": 203.007,
+   "words": [
+    {
+     "text": "One",
+     "start": 199.149,
+     "end": 199.692,
+     "suno_start": 199.669,
+     "voiced": 0.82
+    },
+    {
+     "text": "kicks",
+     "start": 199.732,
+     "end": 200.114,
+     "suno_start": 199.837,
+     "voiced": 0.82
+    },
+    {
+     "text": "data",
+     "start": 200.194,
+     "end": 200.475,
+     "suno_start": 200.238,
+     "voiced": 0.89
+    },
+    {
+     "text": "out",
+     "start": 200.696,
+     "end": 200.797,
+     "suno_start": 200.724,
+     "voiced": 1.0
+    },
+    {
+     "text": "of",
+     "start": 200.817,
+     "end": 200.857,
+     "suno_start": 200.887,
+     "voiced": 1.0
+    },
+    {
+     "text": "the",
+     "start": 200.877,
+     "end": 200.958,
+     "suno_start": 201.001,
+     "voiced": 0.75
+    },
+    {
+     "text": "chip's",
+     "start": 201.078,
+     "end": 201.359,
+     "suno_start": 201.125,
+     "voiced": 0.75
+    },
+    {
+     "text": "cache.",
+     "start": 201.44,
+     "end": 201.882,
+     "suno_start": 201.541,
+     "voiced": 0.91
+    },
+    {
+     "text": "One",
+     "start": 201.902,
+     "end": 202.043,
+     "suno_start": 202.037,
+     "voiced": 1.0
+    },
+    {
+     "text": "clocks",
+     "start": 202.243,
+     "end": 202.545,
+     "suno_start": 202.257,
+     "voiced": 0.87
+    },
+    {
+     "text": "it",
+     "start": 202.585,
+     "end": 202.665,
+     "suno_start": 202.669,
+     "voiced": 0.0
+    },
+    {
+     "text": "back.",
+     "start": 202.726,
+     "end": 203.007,
+     "suno_start": 202.823,
+     "voiced": 0.75
+    }
+   ]
+  },
+  {
+   "en": "The secret crosses. Mostly, they were told which crack.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 203.15,
+   "end": 208.767,
+   "words": [
+    {
+     "text": "The",
+     "start": 203.15,
+     "end": 203.23,
+     "suno_start": 203.248,
+     "voiced": 0.62
+    },
+    {
+     "text": "secret",
+     "start": 203.37,
+     "end": 203.731,
+     "suno_start": 203.354,
+     "voiced": 0.61
+    },
+    {
+     "text": "crosses.",
+     "start": 203.771,
+     "end": 204.293,
+     "suno_start": 203.82,
+     "voiced": 0.98
+    },
+    {
+     "text": "Mostly,",
+     "start": 204.754,
+     "end": 205.136,
+     "suno_start": 204.819,
+     "voiced": 0.97
+    },
+    {
+     "text": "they",
+     "start": 206.119,
+     "end": 206.279,
+     "suno_start": 206.192,
+     "voiced": 0.88
+    },
+    {
+     "text": "were",
+     "start": 206.319,
+     "end": 206.48,
+     "suno_start": 206.356,
+     "voiced": 0.31
+    },
+    {
+     "text": "told",
+     "start": 206.54,
+     "end": 206.901,
+     "suno_start": 206.601,
+     "voiced": 0.73
+    },
+    {
+     "text": "which",
+     "start": 207.021,
+     "end": 207.302,
+     "suno_start": 207.119,
+     "voiced": 0.64
+    },
+    {
+     "text": "crack.",
+     "start": 207.422,
+     "end": 208.767,
+     "suno_start": 207.532,
+     "voiced": 0.51
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 208.929,
+   "end": 211.816,
+   "words": [
+    {
+     "text": "All",
+     "start": 208.929,
+     "end": 209.35,
+     "suno_start": 208.927,
+     "voiced": 1.0
+    },
+    {
+     "text": "hands!",
+     "start": 209.35,
+     "end": 209.831,
+     "suno_start": 209.41,
+     "voiced": 0.82
+    },
+    {
+     "text": "All",
+     "start": 210.051,
+     "end": 210.713,
+     "suno_start": 210.868,
+     "voiced": 1.0
+    },
+    {
+     "text": "night!",
+     "start": 211.094,
+     "end": 211.816,
+     "suno_start": 211.205,
+     "voiced": 0.67
+    }
+   ]
+  },
+  {
+   "en": "Shut the door and hold it tight",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 212.441,
+   "end": 215.217,
+   "words": [
+    {
+     "text": "Shut",
+     "start": 212.441,
+     "end": 212.702,
+     "suno_start": 212.558,
+     "voiced": 0.69
+    },
+    {
+     "text": "the",
+     "start": 212.722,
+     "end": 212.823,
+     "suno_start": 212.844,
+     "voiced": 0.8
+    },
+    {
+     "text": "door",
+     "start": 212.944,
+     "end": 213.346,
+     "suno_start": 213.059,
+     "voiced": 0.9
+    },
+    {
+     "text": "and",
+     "start": 213.708,
+     "end": 214.211,
+     "suno_start": 214.169,
+     "voiced": 0.88
+    },
+    {
+     "text": "hold",
+     "start": 214.291,
+     "end": 214.593,
+     "suno_start": 214.347,
+     "voiced": 0.93
+    },
+    {
+     "text": "it",
+     "start": 214.633,
+     "end": 214.694,
+     "suno_start": 214.673,
+     "voiced": 0.17
+    },
+    {
+     "text": "tight",
+     "start": 214.734,
+     "end": 215.217,
+     "suno_start": 214.811,
+     "voiced": 0.79
+    }
+   ]
+  },
+  {
+   "en": "Shut it, but you stay awake",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 215.882,
+   "end": 219.431,
+   "words": [
+    {
+     "text": "Shut",
+     "start": 215.882,
+     "end": 216.223,
+     "suno_start": 215.941,
+     "voiced": 1.0
+    },
+    {
+     "text": "it,",
+     "start": 216.263,
+     "end": 216.384,
+     "suno_start": 216.456,
+     "voiced": 1.0
+    },
+    {
+     "text": "but",
+     "start": 216.584,
+     "end": 216.845,
+     "suno_start": 216.784,
+     "voiced": 0.88
+    },
+    {
+     "text": "you",
+     "start": 216.945,
+     "end": 217.286,
+     "suno_start": 217.261,
+     "voiced": 1.0
+    },
+    {
+     "text": "stay",
+     "start": 217.707,
+     "end": 218.168,
+     "suno_start": 217.81,
+     "voiced": 0.91
+    },
+    {
+     "text": "awake",
+     "start": 218.248,
+     "end": 219.431,
+     "suno_start": 218.37,
+     "voiced": 0.76
+    }
+   ]
+  },
+  {
+   "en": "Every lock's a bet you make",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 219.453,
+   "end": 222.559,
+   "words": [
+    {
+     "text": "Every",
+     "start": 219.453,
+     "end": 220.094,
+     "suno_start": 219.732,
+     "voiced": 0.94
+    },
+    {
+     "text": "lock's",
+     "start": 220.274,
+     "end": 221.136,
+     "suno_start": 220.355,
+     "voiced": 0.73
+    },
+    {
+     "text": "a",
+     "start": 221.276,
+     "end": 221.296,
+     "suno_start": 221.561,
+     "voiced": 1.0
+    },
+    {
+     "text": "bet",
+     "start": 221.617,
+     "end": 221.857,
+     "suno_start": 221.703,
+     "voiced": 0.71
+    },
+    {
+     "text": "you",
+     "start": 221.857,
+     "end": 221.918,
+     "suno_start": 221.93,
+     "voiced": 1.0
+    },
+    {
+     "text": "make",
+     "start": 222.038,
+     "end": 222.559,
+     "suno_start": 222.168,
+     "voiced": 0.88
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 222.14,
+   "end": 224.834,
+   "words": [
+    {
+     "text": "All",
+     "start": 222.14,
+     "end": 222.964,
+     "suno_start": 222.619,
+     "voiced": 0.92
+    },
+    {
+     "text": "hands!",
+     "start": 222.964,
+     "end": 223.426,
+     "suno_start": 223.009,
+     "voiced": 0.8
+    },
+    {
+     "text": "All",
+     "start": 223.487,
+     "end": 223.929,
+     "suno_start": 223.605,
+     "voiced": 0.91
+    },
+    {
+     "text": "night!",
+     "start": 224.15,
+     "end": 224.834,
+     "suno_start": 223.939,
+     "voiced": 0.97
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two, the pager blew",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 225.239,
+   "end": 228.458,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 225.239,
+     "end": 225.461,
+     "suno_start": 225.276,
+     "voiced": 1.0
+    },
+    {
+     "text": "oh",
+     "start": 225.521,
+     "end": 225.682,
+     "suno_start": 225.593,
+     "voiced": 0.81
+    },
+    {
+     "text": "two,",
+     "start": 225.702,
+     "end": 226.004,
+     "suno_start": 225.792,
+     "voiced": 0.53
+    },
+    {
+     "text": "the",
+     "start": 226.124,
+     "end": 226.708,
+     "suno_start": 226.988,
+     "voiced": 0.69
+    },
+    {
+     "text": "pager",
+     "start": 227.03,
+     "end": 227.412,
+     "suno_start": 227.134,
+     "voiced": 0.62
+    },
+    {
+     "text": "blew",
+     "start": 227.492,
+     "end": 228.458,
+     "suno_start": 227.551,
+     "voiced": 0.56
+    }
+   ]
+  },
+  {
+   "en": "P zero, baby, that's my cue",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 228.642,
+   "end": 231.497,
+   "words": [
+    {
+     "text": "P",
+     "start": 228.642,
+     "end": 228.663,
+     "suno_start": 228.78,
+     "voiced": 1.0
+    },
+    {
+     "text": "zero,",
+     "start": 228.864,
+     "end": 229.065,
+     "suno_start": 228.993,
+     "voiced": 0.75
+    },
+    {
+     "text": "baby,",
+     "start": 229.326,
+     "end": 229.668,
+     "suno_start": 229.5,
+     "voiced": 0.76
+    },
+    {
+     "text": "that's",
+     "start": 230.472,
+     "end": 230.713,
+     "suno_start": 230.515,
+     "voiced": 0.88
+    },
+    {
+     "text": "my",
+     "start": 230.814,
+     "end": 231.015,
+     "suno_start": 230.931,
+     "voiced": 0.7
+    },
+    {
+     "text": "cue",
+     "start": 231.135,
+     "end": 231.497,
+     "suno_start": 231.213,
+     "voiced": 0.56
+    }
+   ]
+  },
+  {
+   "en": "One door shut, the light stays red",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 232.565,
+   "end": 236.116,
+   "words": [
+    {
+     "text": "One",
+     "start": 232.565,
+     "end": 232.705,
+     "suno_start": 232.583,
+     "voiced": 0.93
+    },
+    {
+     "text": "door",
+     "start": 232.725,
+     "end": 233.789,
+     "suno_start": 232.773,
+     "voiced": 0.58
+    },
+    {
+     "text": "shut,",
+     "start": 233.849,
+     "end": 234.049,
+     "suno_start": 232.992,
+     "voiced": 0.95
+    },
+    {
+     "text": "the",
+     "start": 234.11,
+     "end": 234.17,
+     "suno_start": 234.157,
+     "voiced": 0.5
+    },
+    {
+     "text": "light",
+     "start": 234.23,
+     "end": 234.471,
+     "suno_start": 234.237,
+     "voiced": 0.72
+    },
+    {
+     "text": "stays",
+     "start": 234.531,
+     "end": 234.752,
+     "suno_start": 234.545,
+     "voiced": 0.77
+    },
+    {
+     "text": "red",
+     "start": 234.812,
+     "end": 236.116,
+     "suno_start": 234.896,
+     "voiced": 0.6
+    }
+   ]
+  },
+  {
+   "en": "Keep the pager by your bed",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 236.099,
+   "end": 238.716,
+   "words": [
+    {
+     "text": "Keep",
+     "start": 236.099,
+     "end": 236.321,
+     "suno_start": 236.216,
+     "voiced": 0.43
+    },
+    {
+     "text": "the",
+     "start": 236.663,
+     "end": 236.743,
+     "suno_start": 236.467,
+     "voiced": 1.0
+    },
+    {
+     "text": "pager",
+     "start": 237.025,
+     "end": 237.891,
+     "suno_start": 236.648,
+     "voiced": 0.44
+    },
+    {
+     "text": "by",
+     "start": 237.971,
+     "end": 238.153,
+     "suno_start": 238.113,
+     "voiced": 0.83
+    },
+    {
+     "text": "your",
+     "start": 238.213,
+     "end": 238.354,
+     "suno_start": 238.291,
+     "voiced": 0.64
+    },
+    {
+     "text": "bed",
+     "start": 238.414,
+     "end": 238.716,
+     "suno_start": 238.552,
+     "voiced": 0.73
+    }
+   ]
+  },
+  {
+   "en": "Pick up, pick up, it's your call",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 239.08,
+   "end": 242.406,
+   "words": [
+    {
+     "text": "Pick",
+     "start": 239.08,
+     "end": 239.24,
+     "suno_start": 239.119,
+     "voiced": 0.53
+    },
+    {
+     "text": "up,",
+     "start": 239.28,
+     "end": 239.401,
+     "suno_start": 239.361,
+     "voiced": 0.58
+    },
+    {
+     "text": "pick",
+     "start": 239.421,
+     "end": 239.581,
+     "suno_start": 239.521,
+     "voiced": 0.5
+    },
+    {
+     "text": "up,",
+     "start": 239.641,
+     "end": 239.781,
+     "suno_start": 239.703,
+     "voiced": 0.43
+    },
+    {
+     "text": "it's",
+     "start": 239.841,
+     "end": 239.982,
+     "suno_start": 239.893,
+     "voiced": 0.79
+    },
+    {
+     "text": "your",
+     "start": 240.002,
+     "end": 240.983,
+     "suno_start": 240.126,
+     "voiced": 0.94
+    },
+    {
+     "text": "call",
+     "start": 241.164,
+     "end": 242.406,
+     "suno_start": 240.343,
+     "voiced": 0.98
+    }
+   ]
+  },
+  {
+   "en": "Not the last. That's all.",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 243.408,
+   "end": 247.892,
+   "words": [
+    {
+     "text": "Not",
+     "start": 243.408,
+     "end": 243.528,
+     "suno_start": 243.588,
+     "voiced": 1.0
+    },
+    {
+     "text": "the",
+     "start": 243.608,
+     "end": 243.709,
+     "suno_start": 243.731,
+     "voiced": 0.6
+    },
+    {
+     "text": "last.",
+     "start": 243.749,
+     "end": 245.51,
+     "suno_start": 243.901,
+     "voiced": 0.56
+    },
+    {
+     "text": "That's",
+     "start": 247.031,
+     "end": 247.351,
+     "suno_start": 247.112,
+     "voiced": 0.75
+    },
+    {
+     "text": "all.",
+     "start": 247.611,
+     "end": 247.892,
+     "suno_start": 247.684,
+     "voiced": 1.0
+    }
+   ]
+  },
+  {
+   "en": "That model won't train again. D N S: guest list.",
+   "mode": "spoken",
+   "section": "Outro",
+   "start": 250.895,
+   "end": 257.886,
+   "words": [
+    {
+     "text": "That",
+     "start": 250.895,
+     "end": 251.115,
+     "suno_start": 250.954,
+     "voiced": 0.68
+    },
+    {
+     "text": "model",
+     "start": 251.155,
+     "end": 251.516,
+     "suno_start": 251.251,
+     "voiced": 1.0
+    },
+    {
+     "text": "won't",
+     "start": 252.698,
+     "end": 252.918,
+     "suno_start": 252.734,
+     "voiced": 0.82
+    },
+    {
+     "text": "train",
+     "start": 252.938,
+     "end": 253.178,
+     "suno_start": 252.985,
+     "voiced": 1.0
+    },
+    {
+     "text": "again.",
+     "start": 253.219,
+     "end": 253.499,
+     "suno_start": 253.33,
+     "voiced": 0.64
+    },
+    {
+     "text": "D",
+     "start": 255.442,
+     "end": 255.462,
+     "suno_start": 255.517,
+     "voiced": 0.0
+    },
+    {
+     "text": "N",
+     "start": 255.723,
+     "end": 255.743,
+     "suno_start": 255.619,
+     "voiced": 1.0
+    },
+    {
+     "text": "S:",
+     "start": 256.023,
+     "end": 256.043,
+     "suno_start": 255.68,
+     "voiced": 1.0
+    },
+    {
+     "text": "guest",
+     "start": 257.245,
+     "end": 257.505,
+     "suno_start": 257.282,
+     "voiced": 0.96
+    },
+    {
+     "text": "list.",
+     "start": 257.545,
+     "end": 257.886,
+     "suno_start": 257.647,
+     "voiced": 0.94
+    }
+   ]
+  },
+  {
+   "en": "Next ones, they expect, find holes that aren't on the list.",
+   "mode": "spoken",
+   "section": "Outro",
+   "start": 259.069,
+   "end": 264.964,
+   "words": [
+    {
+     "text": "Next",
+     "start": 259.069,
+     "end": 259.31,
+     "suno_start": 259.168,
+     "voiced": 0.83
+    },
+    {
+     "text": "ones,",
+     "start": 259.39,
+     "end": 259.611,
+     "suno_start": 259.395,
+     "voiced": 1.0
+    },
+    {
+     "text": "they",
+     "start": 259.911,
+     "end": 260.092,
+     "suno_start": 259.999,
+     "voiced": 0.78
+    },
+    {
+     "text": "expect,",
+     "start": 260.132,
+     "end": 260.573,
+     "suno_start": 260.218,
+     "voiced": 0.59
+    },
+    {
+     "text": "find",
+     "start": 262.257,
+     "end": 262.498,
+     "suno_start": 262.328,
+     "voiced": 1.0
+    },
+    {
+     "text": "holes",
+     "start": 262.538,
+     "end": 262.939,
+     "suno_start": 262.608,
+     "voiced": 1.0
+    },
+    {
+     "text": "that",
+     "start": 264.082,
+     "end": 264.202,
+     "suno_start": 264.11,
+     "voiced": 0.75
+    },
+    {
+     "text": "aren't",
+     "start": 264.242,
+     "end": 264.403,
+     "suno_start": 264.221,
+     "voiced": 1.0
+    },
+    {
+     "text": "on",
+     "start": 264.403,
+     "end": 264.503,
+     "suno_start": 264.503,
+     "voiced": 1.0
+    },
+    {
+     "text": "the",
+     "start": 264.523,
+     "end": 264.603,
+     "suno_start": 264.6,
+     "voiced": 1.0
+    },
+    {
+     "text": "list.",
+     "start": 264.664,
+     "end": 264.964,
+     "suno_start": 264.727,
+     "voiced": 1.0
+    }
+   ]
+  }
+ ]
+}

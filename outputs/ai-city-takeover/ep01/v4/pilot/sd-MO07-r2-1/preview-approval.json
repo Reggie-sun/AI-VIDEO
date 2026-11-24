@@ -1,0 +1,62 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-mo07-r2-1-MO07",
+ "question": "第二轮首帧：http://127.0.0.1:8769/excerpt/flash/round2.html\n\n- s013（唱 I'm the call you had to take）：换成工程师抬头看她的仰拍。她站直了，手里拿着刚从他手里抽走的亮屏手机，低头看着他。我推荐 b。\n- s014（旋身收尾）：长焦正对 T 台，她在尽头急转身甩开长袖，然后按住寻呼机走开。我推荐 c。\n\n页面上都和前面已认可的镜头并排放着，生成用的 prompt 也在上面。每镜拍 2 条，挑最好的一条。\n\n可以按推荐的拍吗？",
+ "user_quote": "s013 用 b、s014 用 c，拍 (Recommended)",
+ "approved_at": "2026-11-19T17:13:30Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/round2.html",
+  "sha256": "0b137487eabd670b2ca09d91873b62fbf69e45a3c20b0cf4ab9d6319e38b1d28"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1.png",
+   "sha256": "db997e4fe7d1704f96605bbfd4ad07dce38fac0e4fb345e8b9cb522775037950",
+   "role": "MO07 first frame"
+  }
+ ],
+ "prompts": {
+  "MO07": {
+   "text": "长焦全身远景，镜头固定不动。她走到走秀台尽头，重心落在前脚，一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，一只手按住腰间震动的黑色寻呼机，朝画面右侧走开。两侧的值班工程师抬头看着她。",
+   "sha256": "0b5a2a72ae7e1e9605c70387c904d1fc56e082347ea00d810e0d7d2878b1812f"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p014-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/R2/S14-c.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07/preview-approval.json",
+  "sha256": "c3654e9589924b4e51d129ffb924ddce44e67ad3d8a205a8a14c59f808b82441"
+ },
+ "bound_ids": {
+  "attempt_id": "iris-mo07-r2-1-source-001",
+  "policy_id": "iris-mo07-r2-1-source-001",
+  "reservation_id": "iris-mo07-r2-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO07-r2-1",
+   "sd-MO07-r2-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO07-r2-1"
+ }
+}

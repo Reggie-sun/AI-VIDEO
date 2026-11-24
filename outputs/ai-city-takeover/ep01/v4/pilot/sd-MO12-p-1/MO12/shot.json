@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo12-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "a21b6a110b114e1f4e7a24f63c242ed7331e96f69cc48e0ce81ea361b756545d",
+  "creation_receipt_id": "iris-v4-MO12-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/082c9b819a6fee1239c38c2f60a6d366949c062163e5079d65c50566d22a4aa6.json",
+      "content_hash": "082c9b819a6fee1239c38c2f60a6d366949c062163e5079d65c50566d22a4aa6"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/85fb17c5daf44d746dec6421a5ccb5621c6ba14d86f19fabef26c34bb46890e3.json",
+      "content_hash": "85fb17c5daf44d746dec6421a5ccb5621c6ba14d86f19fabef26c34bb46890e3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c29333ed394200deb5ff69cf821b1c7bb131f7f34e845ac181a07620f5555e83.json",
+      "content_hash": "c29333ed394200deb5ff69cf821b1c7bb131f7f34e845ac181a07620f5555e83"
+    }
+  ],
+  "shot_id": "ep01v4-mo12",
+  "scene_id": "subway-platform",
+  "storyboard_beat_id": "mo12",
+  "intent": "镜头固定不动。她背对镜头，沿站台朝远处的出口楼梯大步走远，不回头，越走越小。戴兜帽的人群从开着的车门里涌出来，在她身后两侧跟着她朝出口走；他们把合着的笔记本电脑竖着抱在胸前，电脑背面朝向自己的身体。她背后没有包，也没有任何挂件。电脑外壳和连帽衫上没有任何标志或图案。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤完整保持；没有立领灯线（由认可的首帧承担）",
+    "她背对镜头沿站台朝远处的出口楼梯大步走远，不回头，越走越小；戴兜帽的人群从开着的车门里涌出来，在她身后两侧跟着；电脑合着抱在胸前、背面朝内，没有标志；她背后没有包；不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo12-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

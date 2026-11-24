@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo06-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p011-w1.png",
+    "sha256": "778664284bccb297561bfa0c4d1ab11c0676827f74eaf496dea968d5506f2799",
+    "size_bytes": 2325749,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p011-w1.png: the first frame",
+    "need_id": "garage-runway",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

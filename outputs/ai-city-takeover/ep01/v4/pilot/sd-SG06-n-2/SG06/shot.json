@@ -1,0 +1,77 @@
+{
+  "artifact_id": "iris-v4-sg06-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "8596e12ef6942f6451fdd015c1193a7b56bd5d9e00f64277e18bda12e3613749",
+  "creation_receipt_id": "iris-v4-SG06-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/82289b9767baacd537ff05aef7359d2b75b8e2df4e18a1cdbf150a1b23a4d5c4.json",
+      "content_hash": "82289b9767baacd537ff05aef7359d2b75b8e2df4e18a1cdbf150a1b23a4d5c4"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a39ed061deac8ec0c6698c2291b4c1b85545d29f400bbdb835817fc7a63c546e.json",
+      "content_hash": "a39ed061deac8ec0c6698c2291b4c1b85545d29f400bbdb835817fc7a63c546e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c.json",
+      "content_hash": "7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/2618ebdc894c7ad9648f5c21c785b0c99dd90d333c3fb76f158bb8ff8827eb8c.json",
+      "content_hash": "2618ebdc894c7ad9648f5c21c785b0c99dd90d333c3fb76f158bb8ff8827eb8c"
+    }
+  ],
+  "shot_id": "ep01v4-sg06",
+  "scene_id": "folsom-payphone",
+  "storyboard_beat_id": "sg06",
+  "intent": "{{image:0}}中的她站在投币电话旁，伸直手臂把黑色听筒举在身侧，离脸一臂远，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头固定不动。唱最后一句时她松开手，听筒顺着金属电话线垂下去来回晃，她转身朝画面左侧走开。听筒不贴耳，不挡嘴。嘴前没有任何遮挡。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的参考图承担）",
+    "歌词期间嘴在唱、与参考人声逐字同步，无声处嘴唇闭合；对嘴准确度由片段自带音轨与参考人声的对齐量测和使用者审看判定",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，一镜到底；听筒不贴耳，不挡嘴",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v4-sg06-reference"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

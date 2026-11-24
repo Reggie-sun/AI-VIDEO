@@ -1,0 +1,51 @@
+{
+ "n": "3",
+ "at": "2026-11-17T03:24:24.023Z",
+ "fields_sha256": "e8ac243728912306d1f65b1376495168f77f8e823bfb46cd30ba085260126751",
+ "read": {
+  "lyrics": "[Intro - spoken, deadpan, close and dry, phone buzz, no drums]\n\nIncident Week. Every look got somebody paged.\n\nA trainin…",
+  "style": "industrial glitch club, 130 BPM, 4/4, distorted industrial kick, metallic percussion, pager and alarm tone samples, gated noise bursts, glitch cuts on the bar ends, dark sub bass, the chorus explodes, one cool close-mic American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, sung chorus with big clear vowels, one syllable per note, never rushed, half-bar stop before the last chorus line, key change up into the final chorus, cold, aggressive, untamed, clean modern mix",
+  "exclude": "rap, male lead vocal, mumbled vocals, lo-fi, rock guitar, big room EDM, dubstep, electroclash, acid techno, trance, supersaw, metal screaming",
+  "title": "P Zero",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": null,
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 3,
+  "lyrics_sha256": "7e059341490e782077854669de561ab57b7a883508aba9ff66b069c393e3bf3d"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

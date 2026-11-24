@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo04-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "cbfef838207f7090d243003f613e4a8b26b1a83ff88b27d783f2a2e82ef518fc",
+  "creation_receipt_id": "iris-v4-MO04-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6a24a40e468417e5d704101f3b722fc7948ec4aa46b6cb96f577d509fdd661d1.json",
+      "content_hash": "6a24a40e468417e5d704101f3b722fc7948ec4aa46b6cb96f577d509fdd661d1"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/845a7361b6906aeb39d52b4356d523ca1e3ee3551d3a215e096ee02fb05d0c59.json",
+      "content_hash": "845a7361b6906aeb39d52b4356d523ca1e3ee3551d3a215e096ee02fb05d0c59"
+    }
+  ],
+  "scene_id": "street-billboard-tree",
+  "location": "SoMa 第六街与 Folsom 街口，人行道上一棵行道树，树后一块被挡住一半的广告牌（牌面是空白白光）",
+  "time": "深夜",
+  "mood": "冷、压迫、不羁",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左侧立领红灯线位置一致（v4身份锚点F1a）",
+    "冷色调；红色只做讯号灯，是唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo04-first-frame"
+  ]
+}

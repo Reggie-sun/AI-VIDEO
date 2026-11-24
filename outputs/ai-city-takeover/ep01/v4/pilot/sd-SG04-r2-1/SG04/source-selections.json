@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg04-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p013-w1.png",
+    "sha256": "2f159721e0da2b9e2247a32fadd14ec79b3628152c911f07cee5c2c4dd1f3f21",
+    "size_bytes": 2452625,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p013-w1.png: the reference image",
+    "need_id": "runway-front-row-reverse",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg04-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG04.wav",
+    "sha256": "055dd8719d0d773173c351b1d7e9d25ca6f3760957e4b6f3071195a1055afd91",
+    "size_bytes": 365608,
+    "kind": "audio",
+    "duration_millis": 4145,
+    "sample_rate_hz": 44100,
+    "role": "approved SG04.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        50.933,
+        55.0777
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

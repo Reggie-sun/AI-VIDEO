@@ -1,0 +1,45 @@
+{
+ "unit": "MO07",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "6aa5b89b30bd53b253876925925a97d76c10cc110c5a18036d3c5c62e2032c81",
+ "compiled_prompt_sha256": "8667d247c4517be8d2ffcbcbe98b505d6ffd98feb2928fa666e6cfc0a1a9d0a3",
+ "approval_sha256": "a2087627be5e7c231b026605dae8e2ea3804959b67d134d811ef3677941c53d1",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r3-1/continuity-report.json",
+  "sha256": "257f19e95410e2a29931591658ad4f50510e9a0543f932ab2468bb76f2b84d11",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "首帧 p014-w1b 与已认可 s014 相同；前接 s013（工程师视线 MCU），新机位硬切",
+   "handoff": "结尾她朝画面右侧走开、手按寻呼机，接 s014c 寻呼机特写（10:02 后期点亮）",
+   "axis_action_camera": "长焦全身远景固定；旋身后朝画面右侧走",
+   "prompt_fit": "PASS；与 s-2 只差观众静止与寻呼机不亮红灯",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "观众全程低头看笔记本不抬头不动；寻呼机不亮红灯、除耳挂外无红色；斜挎带右肩→左胯；干脆旋身、甩袖成圆；头顶不出画；镜头固定；无文字"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

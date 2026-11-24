@@ -1,0 +1,62 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-mo06-s-2-MO06",
+ "question": "斜挎带修正后的首帧：http://127.0.0.1:8769/excerpt/flash/strapfix.html\n\n以原首帧为底图，只把带子改成右肩斜到左胯，构图、动作、场地都没动。每镜两张，我放大核对过 b。\n\n生成用的 prompt 都不变：s011 用你上次认可的走台 prompt，s014 用第二轮页面上那段。每镜拍 2 条，挑最好的一条。\n\n用 b 拍吗？",
+ "user_quote": "两镜都用 b，拍 (Recommended)",
+ "approved_at": "2026-11-19T17:54:00Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/strapfix.html",
+  "sha256": "188c99d4b4f72064130fc18d80529ad61dcefef9c8e4c6a4d4885a3bd3bb2ffa"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p011-w1c.png",
+   "sha256": "22492025abac1e542346b54a26a0cfa19f78c00bb39a7448234618ff6e786b26",
+   "role": "MO06 first frame"
+  }
+ ],
+ "prompts": {
+  "MO06": {
+   "text": "镜头固定，低机位，从侧前方拍。地下停车场改成的秀场，她沿着湿的水泥走秀台大步向前走，抬起的那只靴子落地，重心越过支撑脚，长的那只袖子随后摆回；面无表情，带着一点好奇看着前方；两边前排的值班工程师一个接一个站起来。",
+   "sha256": "16d83c7635fc7bf85418986b1f79753f020d0133964916d6be35c8b207d673cf"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p011-w1c.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/STRAP/s011-b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO06-w1b/preview-approval.json",
+  "sha256": "3105953288127ba9157abd270dad747080ac12433e708e54a1c425379ccc59ab"
+ },
+ "bound_ids": {
+  "attempt_id": "iris-mo06-s-2-source-001",
+  "policy_id": "iris-mo06-s-2-source-001",
+  "reservation_id": "iris-mo06-s-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO06-s-1",
+   "sd-MO06-s-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO06-s-2"
+ }
+}

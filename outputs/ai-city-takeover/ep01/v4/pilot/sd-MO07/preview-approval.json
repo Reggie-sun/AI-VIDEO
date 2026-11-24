@@ -1,0 +1,46 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-excerpt-MO07",
+ "question": "样片页：http://127.0.0.1:8769/pilot/excerpt/ 检查点 5 第二段：样片 26–59 秒（主歌 1 加副歌 1）。用你选的 Seedance 4k，SG03 已经有了。还要生成 6 条：2 条对口型（SG02 对镜头念 A I: Average Individual；SG04 唱 I'm the call you had to take），4 条动作（拽树枝看广告牌、天桥上踹铁丝网、T 台快步走向镜头、T 台尽头急转身按住寻呼机）。费用：每条一次、不重试，共 28 秒，约 2,240 积分；单条上限 800，合计上限 4,000。可以拍吗？",
+ "user_quote": "可以，开拍 (Recommended)",
+ "approved_at": "2026-11-18T00:05:21+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/index.html",
+  "sha256": "f4b740ac2478e12b150413f40f851420cc974eac1775923fc07b62db21e491d3"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/preview-inputs.json",
+  "sha256": "9d668152515e92e089e2c3686528400d48e3dd7abe67e29b5a9773cb70ff80aa"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014.png",
+   "sha256": "3cfb22a5755232ebce9636c18b0ddb2deb92a64feb06dcd38851bbf3049dd9aa",
+   "role": "MO07 first frame"
+  }
+ ],
+ "prompts": {
+  "MO07": {
+   "text": "长焦，镜头固定。秀场走秀台的尽头，她一个急转身，外套下摆甩开成一个圆；转完她头也不回地用一只手按住腰间正在震动的寻呼机，朝画面右侧的侧门走去。两边观众举着手机拍她，手机屏幕的光点点亮着。",
+   "sha256": "0a20955c37bd8329e3d6360cbc591842c9ea262ccb855605ae2d59ee7b395cec"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 800,
+  "cumulative_CRD": 800
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p014.png）承担 IRIS（v4 锚点 F1a）的身份，使用者在节选预览页上看过并认可；不附身份图"
+}

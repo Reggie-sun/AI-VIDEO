@@ -1,0 +1,77 @@
+{
+  "artifact_id": "iris-v4-sg03c-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "42cd60ffc6f88b260e2ab8bf6173493067e17bc5fca8c84f2f8950d6dded8493",
+  "creation_receipt_id": "iris-v4-SG03C-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/284d3c8ee4bb6b1577303e1f5cb98f338233af659e3dbd0f5fba59cc13b50254.json",
+      "content_hash": "284d3c8ee4bb6b1577303e1f5cb98f338233af659e3dbd0f5fba59cc13b50254"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4ee43fc0cc034461d6a455ae312db937e572fdba0eea508b19918cefa8c9e0e3.json",
+      "content_hash": "4ee43fc0cc034461d6a455ae312db937e572fdba0eea508b19918cefa8c9e0e3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ef2c89b8fbca2869adf995dbf8269d0b70d793df5af89b2121991c2c2dedeaf3.json",
+      "content_hash": "ef2c89b8fbca2869adf995dbf8269d0b70d793df5af89b2121991c2c2dedeaf3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7e14610a1aaf7b7032ceaa7b1984c98596abfbd1f094675dd0c25456e56a7d74.json",
+      "content_hash": "7e14610a1aaf7b7032ceaa7b1984c98596abfbd1f094675dd0c25456e56a7d74"
+    }
+  ],
+  "shot_id": "ep01v4-sg03c",
+  "scene_id": "runway-front-row-closeup",
+  "storyboard_beat_id": "sg03c",
+  "intent": "{{image:0}}中的她闭着眼睛唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，前排笔记本屏幕的光照着她的脸，嘴前没有任何遮挡。镜头全程锁定，一镜到底。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的参考图承担）",
+    "歌词期间嘴在唱、与参考人声逐字同步，无声处嘴唇闭合；对嘴准确度由片段自带音轨与参考人声的对齐量测和使用者审看判定",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，一镜到底",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v4-sg03c-reference"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

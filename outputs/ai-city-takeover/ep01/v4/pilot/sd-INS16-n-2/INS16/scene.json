@@ -1,0 +1,35 @@
+{
+  "artifact_id": "iris-v4-ins16-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "652da7bd0c106ea210e1a68b806f761ca0faf8e611bd53a928335cfbdbf0dfe9",
+  "creation_receipt_id": "iris-v4-INS16-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf.json",
+      "content_hash": "859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176.json",
+      "content_hash": "fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176"
+    }
+  ],
+  "scene_id": "folsom-payphone-shelf",
+  "location": "Folsom 街角那台老式投币电话的搁板下方，背后是钢板",
+  "time": "深夜",
+  "mood": "冷、安静、刚松手的余波",
+  "participant_ids": [],
+  "continuity_constraints": [
+    "冷白、青蓝和琥珀色的夜间灯色；画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-ins16-first-frame"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-20",
+ "written_by": "主会话据 continuity-supervisor 2026-11-20 批报告转写；原 blocked 原因（p009 右耳红点＋黑线）已由使用者认可的修正首帧 p009-w1b 消除（OP09-fix-c，sha 25e4895c…，红色像素 0）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO21-o-1/preview-approval.json",
+   "sha256": "7210c1bdcbad7a2ddc3a521cba8208772b22cd3352c868fc4f0295d9930a574d"
+  }
+ },
+ "units": {
+  "MO21": {
+   "verdict": "ready",
+   "continuity": "换场到公交亭，与 s008 为省略剪辑；首帧坐长凳、左手食指在划痕起点（推断）",
+   "handoff": "结束时指甲停在划痕尽头，接 s010 换场",
+   "axis_action_camera": "PASS，锁定；划痕左下→右上可达",
+   "prompt_fit": "PASS（风险：只用 0–2.763 s，划完须在内）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "右耳不得出现红点或耳挂；左耳全程在画外，镜头不转到能看见左耳；指甲在片内 2.76 s 内走到划痕尽头；灯箱玻璃无字、无倒影"
+  }
+ }
+}

@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg04-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "18f537767b09b84b84c57076bf60d4fc350531c5783aa4c017c6af1d591d4ab7",
+  "creation_receipt_id": "iris-v4-SG04-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/13a943a972f713dce515082d75acf1c15dede5cf522560d11d0039f576391aeb.json",
+      "content_hash": "13a943a972f713dce515082d75acf1c15dede5cf522560d11d0039f576391aeb"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/f4951b347f83b4558e0a7350efa42e0ab067c14ff067bba391b7bc3ab502f93c.json",
+      "content_hash": "f4951b347f83b4558e0a7350efa42e0ab067c14ff067bba391b7bc3ab502f93c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3f7df2b8660760d0fdad62815502bde49792cd763499266efbb16ad65347b00a.json",
+      "content_hash": "3f7df2b8660760d0fdad62815502bde49792cd763499266efbb16ad65347b00a"
+    }
+  ],
+  "scene_id": "runway-front-row-phone",
+  "location": "前排，同一个值班工程师的座位旁",
+  "time": "深夜",
+  "mood": "冷、压迫、不羁",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左侧立领红灯线位置一致（v4身份锚点F1a）",
+    "冷色调；红色只做讯号灯，是唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg04-reference"
+  ]
+}

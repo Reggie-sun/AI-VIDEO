@@ -1,0 +1,30 @@
+{
+ "shot": "s021",
+ "t0": 91.3821,
+ "t1": 95.0393,
+ "why": "still for a line a graphic tells better (Four thousand apps); one 1.06 push step on 'Four' with the counter",
+ "still": "outputs/ai-city-takeover/ep01/v4/board/plates/p021-b1.png",
+ "still_sha256": "6f6cf8958fa7466a32b8ed1c00d8f9a2be2d335ffcc79bf4980d47202160c850",
+ "frames": 88,
+ "pictures": 88,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "step": [
+   93.37,
+   1.06
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 16
+ },
+ "log": []
+}

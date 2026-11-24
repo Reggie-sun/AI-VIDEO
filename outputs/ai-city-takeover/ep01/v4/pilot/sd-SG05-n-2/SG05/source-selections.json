@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg05-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p015-w1.png",
+    "sha256": "b8eabb6ae89dbe66a01c8d6bf59809f8ed74c91e8a033f2ac9265b31da4a76d3",
+    "size_bytes": 2033321,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p015-w1.png: the reference image",
+    "need_id": "folsom-side-door",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg05-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05.wav",
+    "sha256": "848c964e0e8262ece595d4de0d640de0ddefe49c63ddcf471b3937d36b1adca0",
+    "size_bytes": 574138,
+    "kind": "audio",
+    "duration_millis": 6509,
+    "sample_rate_hz": 44100,
+    "role": "approved SG05.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        59.157,
+        65.666
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

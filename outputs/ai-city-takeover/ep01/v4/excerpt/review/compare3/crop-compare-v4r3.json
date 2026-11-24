@@ -1,0 +1,58 @@
+{
+ "ev": [
+  {
+   "crisp": 0.5813,
+   "lap": 1.487,
+   "fine": 26.548,
+   "detail": 0.1033,
+   "sat": 0.495,
+   "warm": 0.219,
+   "screen": {
+    "pitch_px": 4.0,
+    "angle_deg": -162.1,
+    "prominence": 686.7
+   }
+  },
+  {
+   "crisp": 0.6604,
+   "lap": 2.159,
+   "fine": 20.188,
+   "detail": 0.2624,
+   "sat": 0.501,
+   "warm": 0.173,
+   "screen": {
+    "pitch_px": 4.0,
+    "angle_deg": -162.1,
+    "prominence": 461.7
+   }
+  }
+ ],
+ "ours": [
+  {
+   "crisp": 0.6149,
+   "lap": 1.897,
+   "fine": 15.993,
+   "detail": 0.2462,
+   "sat": 0.236,
+   "warm": 0.078,
+   "screen": {
+    "pitch_px": 4.0,
+    "angle_deg": -162.1,
+    "prominence": 535.6
+   }
+  },
+  {
+   "crisp": 0.5093,
+   "lap": 1.241,
+   "fine": 5.037,
+   "detail": 0.2079,
+   "sat": 0.246,
+   "warm": 0.1,
+   "screen": {
+    "pitch_px": 4.0,
+    "angle_deg": -162.1,
+    "prominence": 518.7
+   }
+  }
+ ]
+}

@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-mo07-r3-1-MO07",
+ "question": "方案页：http://127.0.0.1:8769/pilot/opening/plan/v2.html\n\n我逐镜判断了哪里适合放静帧。标准沿用作者的做法：笑点靠字和图形传达的用静帧；动作本身就是笑点、或者要对口型的，保留视频。\n\n改成静帧的是：\n- s003：工程师配图表\n- s007：$6,000\n- s009：划掉的 NOT\n- s010：拼写检查，最后约 1 秒接一帧纯黑底的 ALL\n\n另外两处：\n- s004 后半句定格。\n- s005 撕纸是笑点本身，保留视频。\n\ns014 的重拍 prompt 也在页面上。按这样做吗？",
+ "user_quote": "按 v2 做，s014 开拍 (Recommended)",
+ "approved_at": "2026-11-21T21:00:00Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/opening/plan/v2.html",
+  "sha256": "41001ca3f92d07a4f4cbc006474f015356e2ffaa49317169acf7fb0ca270e0e5"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s014-r3-seedance.md",
+  "sha256": "47657776e0c3ec20ff9104910787b777925d33d65d62f3cd962cd5ab01a36de1"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1b.png",
+   "sha256": "c85aa47e12686ccdd6421bcae732eecd2862f43e736b62c33547b766c7f3ace8",
+   "role": "MO07 first frame"
+  }
+ ],
+ "prompts": {
+  "MO07": {
+   "text": "长焦全身远景，镜头固定不动。她走到走秀台尽头，重心落在前脚，一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，一只手按住腰间震动的黑色寻呼机，朝画面右侧走开。两侧的值班工程师一直低头盯着自己腿上的笔记本电脑，全程不抬头，身体保持不动。她腰间的寻呼机不亮任何红灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "8667d247c4517be8d2ffcbcbe98b505d6ffd98feb2928fa666e6cfc0a1a9d0a3"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p014-w1b.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/STRAP/s014-b.png 逐字节相同，沿用 s-2 已认可首帧，不改）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo07-r3-1-source-001",
+  "policy_id": "iris-mo07-r3-1-source-001",
+  "reservation_id": "iris-mo07-r3-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO07-r3-1",
+   "sd-MO07-r3-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO07-r3-1"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-2/preview-approval.json",
+  "sha256": "8fac5f4e293b5954ea5c979be75d487280926dbb851dfb0ebebaef54a499407c",
+  "reason": "s014 重拍 r3：观众改为全程低头、寻呼机不亮红灯（s-2 take 里观众反复抬头低头、寻呼机出现红灯）；首帧与时长不变；旧 approval 与 sd-MO07-s-1/s-2 产物保留"
+ }
+}

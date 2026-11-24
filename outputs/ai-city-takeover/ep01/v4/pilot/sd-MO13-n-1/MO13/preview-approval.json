@@ -1,0 +1,18 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011",
+  "unit_ids": [
+    "MO13"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p028-b1.png",
+      "sha256": "3adfc73750b8ef030d28b2727e0f0cbf6fe066cbfdacc3db566b1d29dba5fcd6",
+      "role": "MO13 first frame"
+    }
+  ],
+  "user_quote": "照页面改 (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

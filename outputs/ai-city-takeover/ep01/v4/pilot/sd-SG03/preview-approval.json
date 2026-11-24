@@ -1,0 +1,53 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-seedance-lipsync-SG03",
+ "question": "检查点 5 页面：http://127.0.0.1:8769/pilot/method/\n\n花钱前先照作者的做法，在一个镜头上找到“她真的在唱”的方法。选的是 s012（副歌 1）：她凑到值班工程师脸前唱 hold on tight / I'm the reason you're awake。\n\n同一张首帧、同一段只有她声音的人声，两条路线各拍一条：\n- A：即梦数字人（大师模式）。\n- B：Seedance 2.0 全能参考，一张图加一段人声，是作者唱段用的方法。\n\n首帧改成了闭嘴起始，因为 v3 试过张嘴首帧，遇到静音嘴会卡在张开的样子。\n\n费用：各一次、不重试，合计上限 365 积分。v3 数字人一条 4.4 秒花了 24 积分。\n\n页面上有首帧、人声和原曲，也有两条 prompt 的原文。可以拍吗？",
+ "user_quote": "积分随便用，我现在积分很多。画质最高",
+ "user_followup": "2.5也可以用（本条仍用 2.0 VIP：≤15 s 预设 2.0，且 4k 只有 2.0 VIP 支援）",
+ "approved_at": "2026-11-17T22:56:54+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/index.html",
+  "sha256": "9477f016602abeb85d63d4fac76b6eef85c21f8ebd64754ea44a3075fea097bd"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/method/preview-inputs.json",
+  "sha256": "8bb261d67e212a418ded7ab9c5ab97237b3bb1d925870e2dc4fdd19c640da7af"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012.png",
+   "sha256": "5c5323ace6605783c58a029b275e67b21523ed6f1f74d63a87f6de4ad5d5f0d2",
+   "role": "SG03 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+   "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559",
+   "role": "SG03 vocal"
+  }
+ ],
+ "prompts": {
+  "SG03": {
+   "text": "{{image:0}}中的她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上，对着他唱歌，口型与{{audio:1}}里的人声逐字精确同步。中景，开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地唱，神情平静；唱完最后一个字，她慢慢直起身，他还攥着椅子扶手。他抱着笔记本电脑往后缩。镜头全程锁定，一镜到底。",
+   "sha256": "b219295c3d8757124350034d9b42e2ebac1f632201f5c161eeb0fa48d4e1ee13"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 6,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 1000,
+  "cumulative_CRD": 1000,
+  "basis": "使用者「积分随便用」「画质最高」；4k 价格仓库无记录，上限 1000 只是封顶，实付以提交前后精确余额为准"
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "这张参考图（以 F1-a 锚点为身份参考出的 p012）承担 IRIS（v4 锚点 F1a）的身份，不附身份图"
+}

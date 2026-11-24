@@ -1,0 +1,18 @@
+{
+ "unit": "MO05",
+ "media": {
+  "sha256": "ce47961f40bbaecda1eb8f9dc704bf9f10b4ed839d00a63da747121fd6b422e8"
+ },
+ "reviewed_by": "shot-gate-reviewer",
+ "overall": "FAIL",
+ "items": {
+  "action": "NOT_EVALUATED (mesh shake, hem swing need dense frames; other beats PASS)",
+  "identity": "FAIL (hair turns fluffy/curly on the back view after 3.0 s)",
+  "camera_background": "FAIL (new red tail lights in traffic)",
+  "technical": "PASS (121 frames ≈24 fps, 5.06 s)"
+ },
+ "user_decision": {
+  "quote": "这条可以；小问题以后先记下不停 (Recommended)",
+  "effect": "accept MO05; red tail lights to be pulled to orange in the grade"
+ }
+}

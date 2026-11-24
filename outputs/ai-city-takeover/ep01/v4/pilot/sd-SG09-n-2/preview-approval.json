@@ -1,0 +1,71 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG09-n-2",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/p024r/index.html\n\ns024 的车厢重做了 3 张，推荐 b：\n- 车厢和 p025/p026 一致：三角拉手、沿车窗的纵向长凳。\n- 她的脸、造型、站位不变，右手抓拉手，和 p025 一样。\n- 开头那位工程师睡在画面右侧，电脑放在他自己膝上，正好接 s025 她接住他滑落的电脑。\n\n用 b 吗？",
+ "user_quote": "用 b (Recommended)",
+ "approved_at": "2026-11-22T18:03:19Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "5b021df814f686eace8d44c89d18c6dda64f6684c6a05fae964053244706a137"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "50d432b2abb7fb11141202b5a8a4a01140d91ffdb35db9591f441053cf3b3fe2"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "b7f74db41234d5da01efc40eed0e0dbab22838b007d5a8887a7a327dbc4a758a"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p024-b2.png",
+   "sha256": "d13da23ff4ecb4079a855d78ce19fe7c786eec9fbe38bec04700c5b7765b738f",
+   "role": "SG09 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG09.wav",
+   "sha256": "0e15e4286ad2f7a5fb2bd3b8390cd41c501262540ebd4c0d07ef88cd9b672939",
+   "role": "SG09 vocal"
+  }
+ ],
+ "prompts": {
+  "SG09": {
+   "text": "{{image:0}}中的她站在列车车厢的过道里，一只手抓着头顶的吊环，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头随车身轻轻晃动。开头车厢顶灯闪一下。两边座位上的人抱着笔记本电脑打瞌睡，不抬头。嘴前没有任何遮挡。车窗里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "6f4d1815c7729659f46ad99375e13775112870c946a254bec0012cf188c7c127"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p024-b2.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P024R/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 B）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg09-n-2-source-001",
+  "policy_id": "iris-sg09-n-2-source-001",
+  "reservation_id": "iris-sg09-n-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG09-n-1",
+   "sd-SG09-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG09-n-2"
+ }
+}

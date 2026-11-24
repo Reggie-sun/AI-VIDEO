@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo07-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "005c0f5bbca7a3bf400064604e5a17144133f59ec99bf18f7e8ae11c6944abc7",
+  "creation_receipt_id": "iris-v4-MO07-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6680cda2e6f4e827d6ab65e788d0de66f13f40e438c71b2331af7c2ae070d867.json",
+      "content_hash": "6680cda2e6f4e827d6ab65e788d0de66f13f40e438c71b2331af7c2ae070d867"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/600a0b216e9b58f2f5e902a76fb0f0ec1120937175816c2e5669ebcadc2df3a6.json",
+      "content_hash": "600a0b216e9b58f2f5e902a76fb0f0ec1120937175816c2e5669ebcadc2df3a6"
+    }
+  ],
+  "scene_id": "runway-end",
+  "location": "T 台尽头",
+  "time": "深夜",
+  "mood": "冷、压迫、不羁",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份、左耳装置与左侧立领红灯线位置一致（v4身份锚点F1a）",
+    "冷色调；红色只做讯号灯，是唯一暖色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo07-first-frame"
+  ]
+}

@@ -1,0 +1,1190 @@
+{
+ "schema": "iris-v4-preview-inputs/s015-030-1",
+ "range_s": [
+  59.2341,
+  134.4435
+ ],
+ "method": "Seedance 2.0 VIP 4k（使用者 2026-11-17：画质最高/积分随便用）",
+ "director_plan": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/plan/index.html",
+  "sha256": "087bdb00377c9a15f4ce9f670d9bf7c75094b1715300c074c0d68ade27bee1cf"
+ },
+ "first_frame_preview": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/preview/index.html",
+  "sha256": "75daed4a963618b72502ac6498597aaecdd2317d11869455d554f598fce981fb"
+ },
+ "source_prompt_file": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+ "source_prompt_file_sha256": "4c2cd4deaacdf1130fde65c89a396dee152a5da93d3cd356489e587ea514b529",
+ "board": {
+  "path": "outputs/ai-city-takeover/ep01/v4/board/shots.json",
+  "sha256": "b5f599322f7f19daea1b7eb1f132bf640fdec4712c1cdf5da097ced5cfbe0107"
+ },
+ "plan": "每 unit 同一首帧拍 2 条，过逐镜 Gate 后挑一条；每条一次不重试",
+ "cost_basis": "4k 每秒 80 积分（开头实付口径）；单条上限 = 该价向上取整到百",
+ "total_seconds_per_take_set": 87,
+ "estimated_total_CRD": 13920,
+ "ceiling_per_take_sum_CRD": 7600,
+ "ceiling_total_CRD": 15200,
+ "previous_shot_first_frame": {
+  "shot": "s014",
+  "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1c.png",
+  "sha256": "ae34b54393afe1df4e15f35326de17752734af1f3661b2c4a307adec89f74374"
+ },
+ "units": [
+  {
+   "shot": "s015",
+   "unit": "SG05",
+   "clip": "SG05",
+   "mode": "multimodal",
+   "look": "W1",
+   "song_span_s": [
+    59.2341,
+    65.666
+   ],
+   "generation_window_s": [
+    58.7,
+    65.666
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p015-w1.png",
+    "sha256": "b8eabb6ae89dbe66a01c8d6bf59809f8ed74c91e8a033f2ac9265b31da4a76d3",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P015/b.png"
+   },
+   "prompt": "{{image:0}}中的她刚从钢制侧门里走上湿亮的人行道，对着镜头边走边唱，口型与{{audio:1}}里的人声逐字精确同步。中景，手持镜头在她前方与她同速后退，她和镜头的距离始终不变。唱到一半时她低头看一眼腰前腰链上震动的黑色寻呼机，用右手拇指按掉，再抬头接着唱。寻呼机和工牌一直挂在她身前的腰链上。嘴前没有任何遮挡。机头直闪。街上的车灯只有白色和琥珀色。街上只有停着的车，没有行驶的车。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "d06ca8ee630104c6b4aeacbaf0cc4474bc4986a162e65213819f2ccc3b43d4fe",
+   "required_phrases": [
+    "中景",
+    "对着镜头边走边唱",
+    "逐字精确同步",
+    "再抬头接着唱",
+    "手持镜头在她前方与她同速后退",
+    "用右手拇指按掉",
+    "寻呼机和工牌一直挂在她身前的腰链上",
+    "嘴前没有任何遮挡",
+    "街上只有停着的车，没有行驶的车"
+   ],
+   "seconds": 8,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 640,
+   "ceiling_per_take_CRD": 700,
+   "plan": {
+    "s015": {
+     "time": "59.23–65.67",
+     "lyric": "Ten oh two… P zero",
+     "picture": "重音上撞开侧门，低头按掉寻呼机，边走边唱，一镜到底",
+     "why": "重音上的动作；s014c 刚给过寻呼机特写，这里不再插",
+     "prep": "W1 首帧（闭嘴，寻呼机在身前）",
+     "kind": "v"
+    }
+   },
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05m.wav",
+    "sha256": "85f247e588704eac72e2feec01b621911a84d290a3b873ba05322b840eb02b4c",
+    "seconds": 6.97,
+    "song_window_s": [
+     58.7,
+     65.666
+    ],
+    "clip_words": [
+     "Ten",
+     "oh",
+     "two,",
+     "the",
+     "pager",
+     "blew",
+     "P",
+     "zero,",
+     "baby,",
+     "that's",
+     "my",
+     "cue"
+    ],
+    "lyric_text": "Ten oh two, the pager blew P zero, baby, that's my cue",
+    "dialogue_s": [
+     0.03,
+     6.61
+    ]
+   }
+  },
+  {
+   "shot": "s016",
+   "unit": "SG06",
+   "clip": "SG06",
+   "mode": "multimodal",
+   "look": "W1",
+   "song_span_s": [
+    65.666,
+    71.1808
+   ],
+   "generation_window_s": [
+    65.517,
+    71.1808
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p016-w1.png",
+    "sha256": "b176e3b2944c92c67cf7b438cb7c127d6336be690d4e6fda1d354d40c2743521",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P016/b.png"
+   },
+   "prompt": "{{image:0}}中的她站在投币电话旁，伸直手臂把黑色听筒举在身侧，离脸一臂远，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头固定不动。唱最后一句时她松开手，听筒顺着金属电话线垂下去来回晃，她仍站在原地看着镜头。听筒不贴耳，不挡嘴。嘴前没有任何遮挡。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "6e169b093edf1ad533418ed9efd9344aff4e59179ebef6f96039808b6237062b",
+   "required_phrases": [
+    "中景",
+    "对着镜头唱",
+    "逐字精确同步",
+    "她仍站在原地看着镜头",
+    "镜头固定不动",
+    "唱最后一句时她松开手",
+    "听筒不贴耳，不挡嘴",
+    "嘴前没有任何遮挡"
+   ],
+   "seconds": 7,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 560,
+   "ceiling_per_take_CRD": 600,
+   "plan": {
+    "s016": {
+     "time": "65.67–71.18",
+     "lyric": "Phoned… half",
+     "picture": "投币电话，听筒举在身侧唱，half 上松手，听筒在小节线晃回",
+     "why": "和 s004/s005 的听筒、半页纸押韵",
+     "prep": "W1 首帧（闭嘴）",
+     "kind": "v"
+    }
+   },
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG06m.wav",
+    "sha256": "9bd0c1e889f18d480074b5969e8ca3e9e1eece7d22e08276504ce81912b4a624",
+    "seconds": 5.66,
+    "song_window_s": [
+     65.517,
+     71.1808
+    ],
+    "clip_words": [
+     "Phoned",
+     "a",
+     "friend",
+     "through",
+     "D",
+     "N",
+     "S",
+     "Got",
+     "half",
+     "an",
+     "answer,"
+    ],
+    "lyric_text": "Phoned a friend through D N S Got half an answer,",
+    "dialogue_s": [
+     0.3,
+     5.15
+    ]
+   }
+  },
+  {
+   "shot": "s016",
+   "unit": "INS16",
+   "clip": "INS16",
+   "mode": "first_frame",
+   "look": "W1",
+   "song_span_s": [
+    65.666,
+    71.1808
+   ],
+   "generation_window_s": [
+    69.4,
+    71.1808
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p016-ins16.png",
+    "sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/INS16/d.png"
+   },
+   "prompt": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "bb405202f3a2a2fb8fec63581d4a4c426200150260f831abc36d7cffb9c89728",
+   "required_phrases": [
+    "投币电话的搁板下方",
+    "黑色听筒挂在金属电话线上来回晃",
+    "镜头固定不动",
+    "最后几乎停住，只轻轻转一点",
+    "越晃越慢",
+    "听筒在后面钢板上的影子跟着一起晃",
+    "画面里没有人，也没有手",
+    "画面里没有任何红色"
+   ],
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400,
+   "plan": {
+    "s016": {
+     "time": "65.67–71.18",
+     "lyric": "Phoned… half",
+     "picture": "投币电话，听筒举在身侧唱，half 上松手，听筒在小节线晃回",
+     "why": "和 s004/s005 的听筒、半页纸押韵",
+     "prep": "W1 首帧（闭嘴）",
+     "kind": "v"
+    }
+   },
+   "clip_words": []
+  },
+  {
+   "shot": "s017",
+   "unit": "SG07",
+   "clip": "SG07",
+   "mode": "multimodal",
+   "look": "W1",
+   "song_span_s": [
+    71.1808,
+    78.9827
+   ],
+   "generation_window_s": [
+    71.1808,
+    78.9827
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p017-w2b.png",
+    "sha256": "0a75579f7d5b709d4b81499470f61e5531e5d9cf465570bdbf761204f56b0e60",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/CARS/p017-w2b.png"
+   },
+   "prompt": "{{image:0}}中的她蹲在路沿边，俯身对着坐在路沿上的值班工程师唱，口型与{{audio:1}}里的人声逐字精确同步。中近景，镜头固定不动。他抬着头看她，一只手摊开放在膝上的笔记本电脑旁。唱完一句后她停住不动一拍；最后她用右手从身前腰链上摘下黑色寻呼机，啪地拍进他摊开的手心，再把他的手指合上，然后直起身。嘴前没有任何遮挡。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "f421e055e52f0938fa7101403ddc620f269c51ceefe7436ec882c926e918f9ef",
+   "required_phrases": [
+    "中近景",
+    "俯身对着坐在路沿上的值班工程师唱",
+    "逐字精确同步",
+    "然后直起身",
+    "镜头固定不动",
+    "唱完一句后她停住不动一拍",
+    "啪地拍进他摊开的手心",
+    "再把他的手指合上",
+    "嘴前没有任何遮挡"
+   ],
+   "seconds": 9,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 720,
+   "ceiling_per_take_CRD": 800,
+   "plan": {
+    "s017a": {
+     "time": "71.18–77.60",
+     "lyric": "Pick up…",
+     "picture": "对路沿上的工程师唱；换气段她保持俯身、镜头不动",
+     "why": "对人唱",
+     "prep": "W1 首帧，工程师与开场同一人",
+     "kind": "v"
+    },
+    "s017b": {
+     "time": "77.60–78.98",
+     "lyric": "That's all",
+     "picture": "寻呼机拍进他手心，手指合上",
+     "why": "重音 + 歌词点名的物件",
+     "prep": "从 SG07 的 4K 裁",
+     "kind": "i"
+    }
+   },
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG07.wav",
+    "sha256": "95e8b29ecb421ccaf057c447b9b7d8be1ed4f4d2a671bd991e45a0d61580d697",
+    "seconds": 7.8,
+    "song_window_s": [
+     71.1808,
+     78.9827
+    ],
+    "clip_words": [
+     "couldn't",
+     "guess",
+     "Pick",
+     "up,",
+     "pick",
+     "up,",
+     "it's",
+     "your",
+     "call",
+     "P",
+     "zero.",
+     "That's",
+     "all."
+    ],
+    "lyric_text": "couldn't guess Pick up, pick up, it's your call P zero. That's all.",
+    "dialogue_s": [
+     0.5,
+     7.8
+    ]
+   }
+  },
+  {
+   "shot": "s018",
+   "unit": "MO08",
+   "clip": "MO08",
+   "mode": "first_frame",
+   "look": "W1",
+   "song_span_s": [
+    78.9827,
+    84.0214
+   ],
+   "generation_window_s": [
+    78.9827,
+    84.0214
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p018-w1.png",
+    "sha256": "5a8ac46aec0079ddd02f4178e7a4f03d47043ff580b702708a48d0d3e928f529",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P018/d.png"
+   },
+   "prompt": "高机位俯拍，镜头固定不动。抱着笔记本电脑的人群从楼里涌上湿亮的街道，往四面散开，有人跑着去拦出租车；只有她一个人逆着人流，不紧不慢地朝画面下方走。人群一波一波地涌。街上的车灯只有白色和琥珀色。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "64370caa0f9fb53368e3f8883c9369ebbcfd81d58efc7fc243a3565a5641d2ac",
+   "required_phrases": [
+    "高机位俯拍",
+    "抱着笔记本电脑的人群从楼里涌上湿亮的街道",
+    "镜头固定不动",
+    "只有她一个人逆着人流",
+    "人群一波一波地涌",
+    "有人跑着去拦出租车",
+    "往四面散开",
+    "街上的车灯只有白色和琥珀色"
+   ],
+   "seconds": 6,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 480,
+   "ceiling_per_take_CRD": 500,
+   "plan": {
+    "s018": {
+     "time": "78.98–84.02",
+     "lyric": "器乐",
+     "picture": "高位俯拍，人群涌上街，她逆流走",
+     "why": "切出去看规模和后果（如 EV S0002）",
+     "prep": "W1 首帧",
+     "kind": "v"
+    }
+   },
+   "clip_words": []
+  },
+  {
+   "shot": "s019",
+   "unit": "MO09",
+   "clip": "MO09",
+   "mode": "first_frame",
+   "look": "W1",
+   "song_span_s": [
+    84.0214,
+    88.619
+   ],
+   "generation_window_s": [
+    84.0214,
+    88.619
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p019-w1.png",
+    "sha256": "395553d2b87342c0274a5bd6e66f3bfee2b926b630d788dbe52a7b1f0f4eac07",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P019/f2.png"
+   },
+   "prompt": "镜头固定不动。服务走廊里，三双换装师的手同时动作：把她身上的灰色外套连同斜挎带一起剥下来，把一件黑色双排扣西装外套套上她的双臂；她双臂张开，站在原地不动，任他们换。她的头顶始终不出画。腰链上的工牌是空白的，没有任何字。面无表情。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "411c869e70786c04f60a4882192bcac643b4078459f447cd2a33332cb83be885",
+   "required_phrases": [
+    "服务走廊里",
+    "三双换装师的手同时动作",
+    "镜头固定不动",
+    "她的头顶始终不出画",
+    "把一件黑色双排扣西装外套套上她的双臂",
+    "把她身上的灰色外套连同斜挎带一起剥下来",
+    "她双臂张开，站在原地不动，任他们换",
+    "腰链上的工牌是空白的，没有任何字",
+    "面无表情"
+   ],
+   "seconds": 5,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 400,
+   "ceiling_per_take_CRD": 400,
+   "plan": {
+    "s019": {
+     "time": "84.02–87.70",
+     "lyric": "（换气）",
+     "picture": "换装师剥下 W1 灰外套、换成西装，86.78 肩膀顶开弹簧门；Look 卡",
+     "why": "换造型用穿衣动作入场",
+     "prep": "新首帧：从 W1 开始换",
+     "kind": "v"
+    }
+   },
+   "clip_words": [
+    "They",
+    "pulled",
+    "their",
+    "next"
+   ]
+  },
+  {
+   "shot": "s020",
+   "unit": "MO10",
+   "clip": "MO10",
+   "mode": "first_frame",
+   "look": "B",
+   "song_span_s": [
+    88.619,
+    92.7637
+   ],
+   "generation_window_s": [
+    88.619,
+    92.7637
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p020-b1.png",
+    "sha256": "7e6c124eabb1c32eb2a2924ee809ad1baead4998423d6c0e07ae3a103973f65d",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P020/f1.png"
+   },
+   "prompt": "镜头固定不动。她身后桁架上的大块黑幕一下子整片落下，梯子上的工人松开手，人仍站在梯子上；她不回头，伸手把身边那块空白白板连同架子一起往前推倒，牌面朝下扣在地毯上；白板背面是素黑色的板，没有任何字；黑幕落下后，后面是同样的黑色墙面，没有屏幕。面无表情。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "1b0b1e2b89469fd19b632e24565868c2d5878c32ef6cdaec5f594389b4d01305",
+   "required_phrases": [
+    "她身后桁架上的大块黑幕",
+    "一下子整片落下",
+    "镜头固定不动",
+    "牌面朝下扣在地毯上",
+    "她不回头",
+    "梯子上的工人松开手，人仍站在梯子上",
+    "白板背面是素黑色的板，没有任何字",
+    "后面是同样的黑色墙面，没有屏幕",
+    "面无表情"
+   ],
+   "seconds": 5,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 400,
+   "ceiling_per_take_CRD": 400,
+   "plan": {
+    "s020": {
+     "time": "87.70–91.38",
+     "lyric": "pulled… said",
+     "picture": "88.62 重音黑幕落下，翻扣展示牌，划线图形",
+     "why": "切点提前到台词起拍",
+     "prep": "p020 可用",
+     "kind": "v"
+    }
+   },
+   "clip_words": [
+    "big",
+    "model.",
+    "Safety",
+    "standards,",
+    "they",
+    "said.",
+    "Next",
+    "day",
+    "an",
+    "agent"
+   ]
+  },
+  {
+   "shot": "s022",
+   "unit": "SG08",
+   "clip": "SG08",
+   "mode": "multimodal",
+   "look": "B",
+   "song_span_s": [
+    95.0393,
+    101.448
+   ],
+   "generation_window_s": [
+    94.507,
+    101.448
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p022-b1.png",
+    "sha256": "3104bb6d25636b982addedd290f3228ee7cd4850149c3ef69441f536c03cc5a9",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P022/f2.png"
+   },
+   "prompt": "{{image:0}}中的她坐在证人席上，对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头固定不动。说话时她把手下那张空白卡片在桌面上拍一下，最后用手掌把两张卡推齐压住。桌上的细话筒一直压低偏在一侧，不挡嘴。嘴前没有任何遮挡。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "b1d1dbbf2fb711d1e4765686740b97597a028ddaf9c6ac6bb80eae5fee7c0fbd",
+   "required_phrases": [
+    "中景",
+    "对着镜头平平地说话",
+    "逐字精确同步",
+    "最后用手掌把两张卡推齐压住",
+    "镜头固定不动",
+    "桌上的细话筒一直压低偏在一侧，不挡嘴",
+    "嘴前没有任何遮挡"
+   ],
+   "seconds": 8,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 640,
+   "ceiling_per_take_CRD": 700,
+   "plan": {
+    "s022a": {
+     "time": "95.04–99.63",
+     "lyric": "Under oath…",
+     "picture": "证人席对镜头念，三张卡落在三拍",
+     "why": "对镜头说",
+     "prep": "p022 闭嘴版",
+     "kind": "v"
+    },
+    "s022b": {
+     "time": "99.63–101.45",
+     "lyric": "They stopped…",
+     "picture": "她掌下三张卡，LEFT A TEST ×3",
+     "why": "换气处用图形讲台词",
+     "prep": "从 SG08 4K 裁",
+     "kind": "i"
+    }
+   },
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG08.wav",
+    "sha256": "e56666227990e6fe0463d3ee0d668dda53423aeb43dd25c6417600962e2d8ec7",
+    "seconds": 6.94,
+    "song_window_s": [
+     94.507,
+     101.448
+    ],
+    "clip_words": [
+     "instead.",
+     "Under",
+     "oath:",
+     "three",
+     "times",
+     "Google's",
+     "models",
+     "left",
+     "the",
+     "test.",
+     "They",
+     "stopped,",
+     "they",
+     "said,",
+     "once",
+     "they",
+     "saw",
+     "it",
+     "was",
+     "real."
+    ],
+    "lyric_text": "instead. Under oath: three times Google's models left the test. They stopped, they said, once they saw it was real.",
+    "dialogue_s": [
+     0.05,
+     6.94
+    ]
+   }
+  },
+  {
+   "shot": "s024",
+   "unit": "SG09",
+   "clip": "SG09",
+   "mode": "multimodal",
+   "look": "B",
+   "song_span_s": [
+    103.294,
+    106.9511
+   ],
+   "generation_window_s": [
+    102.64,
+    107.183
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p024-b2.png",
+    "sha256": "d13da23ff4ecb4079a855d78ce19fe7c786eec9fbe38bec04700c5b7765b738f",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P024R/b.png"
+   },
+   "prompt": "{{image:0}}中的她站在列车车厢的过道里，一只手抓着头顶的吊环，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头随车身轻轻晃动。开头车厢顶灯闪一下。两边座位上的人低头打瞌睡，不抬头。笔记本电脑外壳是素银色，没有任何标志；挂绳工牌是空白的。嘴前没有任何遮挡。车窗里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "f974040237af389f2fe9c61de42dc9712aea46ddb258ba19cee73d6b16b1eae7",
+   "required_phrases": [
+    "中景",
+    "对着镜头唱",
+    "逐字精确同步",
+    "两边座位上的人低头打瞌睡，不抬头",
+    "镜头随车身轻轻晃动",
+    "开头车厢顶灯闪一下",
+    "一只手抓着头顶的吊环",
+    "车窗里不出现她的倒影",
+    "嘴前没有任何遮挡",
+    "笔记本电脑外壳是素银色，没有任何标志；挂绳工牌是空白的"
+   ],
+   "seconds": 6,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 480,
+   "ceiling_per_take_CRD": 500,
+   "plan": {
+    "s024": {
+     "time": "103.29–106.95",
+     "lyric": "All hands",
+     "picture": "副歌：车厢灯闪、列车晃，抓吊环唱",
+     "why": "段落重音",
+     "prep": "p024 闭嘴版",
+     "kind": "v"
+    }
+   },
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG09m.wav",
+    "sha256": "dcb86f37c0bf42aa78af7687548cf29366150abd1f1406254bac163d0b251501",
+    "seconds": 4.54,
+    "song_window_s": [
+     102.64,
+     107.183
+    ],
+    "clip_words": [
+     "All",
+     "hands!",
+     "All",
+     "night!",
+     "Everybody,"
+    ],
+    "lyric_text": "All hands! All night! Everybody,",
+    "dialogue_s": [
+     0.24,
+     4.54
+    ]
+   }
+  },
+  {
+   "shot": "s025",
+   "unit": "MO11",
+   "clip": "MO11",
+   "mode": "first_frame",
+   "look": "B",
+   "song_span_s": [
+    106.9511,
+    110.6199
+   ],
+   "generation_window_s": [
+    106.9511,
+    110.951
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p025-b1.png",
+    "sha256": "57f05856e73109b5556e4c24682f0ef37f989a9e3cc03cda0e1bfe6e9ae46476",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P025/f1.png"
+   },
+   "prompt": "镜头固定不动。列车猛地一晃，全车人一起摇；她不看，把刚接住的笔记本电脑塞回身边睡着的值班工程师怀里，另一只手一直抓着吊环。面无表情。车窗里不出现她的倒影。笔记本电脑外壳是素银色，没有任何标志。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "5916fda8a0953fc2ae7a75c4bcd1ad32b18323bd741accc4b8639d394a3377aa",
+   "required_phrases": [
+    "另一只手一直抓着吊环",
+    "列车猛地一晃",
+    "镜头固定不动",
+    "塞回身边睡着的值班工程师怀里",
+    "她不看",
+    "全车人一起摇",
+    "车窗里不出现她的倒影",
+    "面无表情",
+    "笔记本电脑外壳是素银色，没有任何标志"
+   ],
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400,
+   "plan": {
+    "s025": {
+     "time": "106.95–109.72",
+     "lyric": "hold on tight",
+     "picture": "列车猛晃，她接住滑落的电脑",
+     "why": "动作就是台词",
+     "prep": "p025 可用",
+     "kind": "v"
+    }
+   },
+   "clip_words": [
+    "hold",
+    "on",
+    "tight",
+    "I'm",
+    "the",
+    "reason"
+   ]
+  },
+  {
+   "shot": "s026",
+   "unit": "SG10",
+   "clip": "SG10",
+   "mode": "multimodal",
+   "look": "B",
+   "song_span_s": [
+    110.6199,
+    116.123
+   ],
+   "generation_window_s": [
+    109.56,
+    116.123
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p026-b1.png",
+    "sha256": "0a361f2d941333afd0fa3372f2150e3ac167193c71a7a6bf222a19166aa5771f",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P026/f1.png"
+   },
+   "prompt": "{{image:0}}中的她坐在睡着的值班工程师身边，她一直看着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中近景，镜头固定不动。唱到一半时他猛地睁开眼睛；最后她伸手从他松开的手里拿走黑色寻呼机，收到画面下方。车窗里不出现她的倒影。寻呼机屏幕只有灰绿底光，没有数字和字。嘴前没有任何遮挡。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "833226c19a373916739ca9f6b7f637f077248e45647acbd9841edc973c623b49",
+   "required_phrases": [
+    "中近景",
+    "她一直看着镜头唱",
+    "逐字精确同步",
+    "收到画面下方",
+    "镜头固定不动",
+    "唱到一半时他猛地睁开眼睛",
+    "最后她伸手从他松开的手里拿走黑色寻呼机",
+    "嘴前没有任何遮挡",
+    "车窗里不出现她的倒影",
+    "寻呼机屏幕只有灰绿底光，没有数字和字"
+   ],
+   "seconds": 8,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 640,
+   "ceiling_per_take_CRD": 700,
+   "plan": {
+    "s026a": {
+     "time": "109.72–112.45",
+     "lyric": "I'm the reason you're",
+     "picture": "对睡着的工程师唱",
+     "why": "对人唱",
+     "prep": "p026 闭嘴版，工程师统一",
+     "kind": "v"
+    },
+    "s026b": {
+     "time": "112.45–113.37",
+     "lyric": "awake",
+     "picture": "工程师猛地睁眼（跨过 I'm，约 0.9 s）",
+     "why": "A–B–A 反应镜；和 s001 她睁眼押韵",
+     "prep": "从 SG10 裁",
+     "kind": "i"
+    },
+    "s026c": {
+     "time": "113.37–116.12",
+     "lyric": "the call",
+     "picture": "回到同一条，她取回寻呼机",
+     "why": "切回时片段已往前走",
+     "prep": "—",
+     "kind": "v"
+    }
+   },
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG10m.wav",
+    "sha256": "aae6bec70aaf8d1062a7552fbfb8115e92e9818f6ff0bc52e26b0dc49a971900",
+    "seconds": 6.56,
+    "song_window_s": [
+     109.56,
+     116.123
+    ],
+    "clip_words": [
+     "I'm",
+     "the",
+     "reason",
+     "you're",
+     "awake",
+     "I'm",
+     "the",
+     "call",
+     "you",
+     "had",
+     "to",
+     "take"
+    ],
+    "lyric_text": "I'm the reason you're awake I'm the call you had to take",
+    "dialogue_s": [
+     0.3,
+     6.56
+    ]
+   }
+  },
+  {
+   "shot": "s027",
+   "unit": "MO12",
+   "clip": "MO12",
+   "mode": "first_frame",
+   "look": "B",
+   "song_span_s": [
+    116.123,
+    119.7801
+   ],
+   "generation_window_s": [
+    116.123,
+    120.123
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p027-b3.png",
+    "sha256": "942eac1020263ff3ab6df31411132bae5c781c34a90fb5b2f565424e83b5d88b",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P027B/b.png"
+   },
+   "prompt": "镜头固定不动。她背对镜头，沿站台朝远处的出口楼梯大步走远，不回头，越走越小。戴兜帽的人群从开着的车门里涌出来，在她身后两侧跟着她朝出口走；他们把合着的笔记本电脑竖着抱在胸前，电脑背面朝向自己的身体。她背后没有包，也没有任何挂件。电脑外壳和连帽衫上没有任何标志或图案。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "ab4244317cb4526f84238f985d3c513abd17b4450a2c3ac1cb62cc7a1b34fe15",
+   "required_phrases": [
+    "镜头固定不动",
+    "她背对镜头，沿站台朝远处的出口楼梯大步走远",
+    "戴兜帽的人群从开着的车门里涌出来",
+    "越走越小",
+    "在她身后两侧跟着她朝出口走",
+    "不回头",
+    "电脑背面朝向自己的身体",
+    "她背后没有包，也没有任何挂件",
+    "电脑外壳和连帽衫上没有任何标志或图案"
+   ],
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400,
+   "plan": {
+    "s027": {
+     "time": "116.12–119.78",
+     "lyric": "All hands",
+     "picture": "车门打开她第一个走出；换气段镜头锁定",
+     "why": "强拍开门",
+     "prep": "p027 可用",
+     "kind": "v"
+    }
+   },
+   "clip_words": [
+    "All",
+    "hands!",
+    "All",
+    "night!",
+    "Ten",
+    "oh",
+    "two,",
+    "the"
+   ]
+  },
+  {
+   "shot": "s028",
+   "unit": "MO13",
+   "clip": "MO13",
+   "mode": "first_frame",
+   "look": "B",
+   "song_span_s": [
+    119.7801,
+    125.7244
+   ],
+   "generation_window_s": [
+    119.7801,
+    125.7244
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p028-b1.png",
+    "sha256": "3adfc73750b8ef030d28b2727e0f0cbf6fe066cbfdacc3db566b1d29dba5fcd6",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P028/f1.png"
+   },
+   "prompt": "镜头固定不动。她转身朝画面右侧，沿台阶往上走，走到一半低头看一眼身前腰带上的黑色寻呼机，寻呼机的液晶屏发出灰绿色的光，再接着往上走，从画面右上方走出去。背后没有包，也没有任何挂件。寻呼机屏幕只有灰绿底光，没有数字和字。池底干燥，没有水。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "11727da8a5e4444d80753837e3d5aa7665db6710c922cc41c6285cb99adf3f5c",
+   "required_phrases": [
+    "镜头固定不动",
+    "她转身朝画面右侧，沿台阶往上走",
+    "走到一半低头看一眼身前腰带上的黑色寻呼机",
+    "再接着往上走",
+    "从画面右上方走出去",
+    "寻呼机的液晶屏发出灰绿色的光",
+    "池底干燥，没有水",
+    "背后没有包，也没有任何挂件",
+    "寻呼机屏幕只有灰绿底光，没有数字和字"
+   ],
+   "seconds": 6,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 480,
+   "ceiling_per_take_CRD": 500,
+   "plan": {
+    "s028a": {
+     "time": "119.78–121.16",
+     "lyric": "—",
+     "picture": "重音上泛光灯亮",
+     "why": "声音带动光",
+     "prep": "p028 可用",
+     "kind": "v"
+    },
+    "s028b": {
+     "time": "121.16–122.06",
+     "lyric": "pager blew",
+     "picture": "她低头，腰上发光的寻呼机",
+     "why": "头部动作把镜头交出去；与 s014c 押韵",
+     "prep": "从 MO13 4K 裁",
+     "kind": "i"
+    },
+    "s028c": {
+     "time": "122.06–125.72",
+     "lyric": "P zero",
+     "picture": "继续走上跳台",
+     "why": "切回同一条",
+     "prep": "—",
+     "kind": "v"
+    }
+   },
+   "clip_words": [
+    "pager",
+    "blew",
+    "P",
+    "zero,",
+    "baby,",
+    "that's",
+    "my",
+    "cue"
+   ]
+  },
+  {
+   "shot": "s029",
+   "unit": "SG11",
+   "clip": "SG11",
+   "mode": "multimodal",
+   "look": "B",
+   "song_span_s": [
+    125.7244,
+    131.2392
+   ],
+   "generation_window_s": [
+    125.608,
+    131.2392
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p029-b1.png",
+    "sha256": "f64e2472f4dfaefe426e33fe05bebf61fb0b4f1e2b32e370aca171b3d12da98b",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P029/f1.png"
+   },
+   "prompt": "{{image:0}}中的她站在跳板末端，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。低机位仰拍，镜头固定不动。唱完一句后她站着不动等一拍；最后她从身前腰带上摘下黑色寻呼机，伸直手臂到身体右侧（画面左侧），不挡脸；寻呼机屏幕没有数字和字。手一松，寻呼机掉出画面下方；她不往下看。嘴前没有任何遮挡。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "a96a2cc2e7400f8291e17797ea74bb62ae553a502e155ce5ae907506c53c6e7a",
+   "required_phrases": [
+    "低机位仰拍",
+    "对着镜头唱",
+    "逐字精确同步",
+    "寻呼机掉出画面下方",
+    "镜头固定不动",
+    "唱完一句后她站着不动等一拍",
+    "伸直手臂到身体右侧（画面左侧），不挡脸",
+    "寻呼机屏幕没有数字和字",
+    "她不往下看",
+    "嘴前没有任何遮挡"
+   ],
+   "seconds": 7,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 560,
+   "ceiling_per_take_CRD": 600,
+   "plan": {
+    "s029": {
+     "time": "125.72–131.24",
+     "lyric": "Pick up… all",
+     "picture": "跳板末端唱；换气时不动；130.76 重音松手丢下寻呼机",
+     "why": "重音上的动作",
+     "prep": "p029 闭嘴版",
+     "kind": "v"
+    }
+   },
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG11m.wav",
+    "sha256": "e53fe70efaf330d3153bebca43f3bdcc9a0118e32eb3241ad78fd75945725dc8",
+    "seconds": 5.63,
+    "song_window_s": [
+     125.608,
+     131.2392
+    ],
+    "clip_words": [
+     "Pick",
+     "up,",
+     "pick",
+     "up,",
+     "it's",
+     "your",
+     "call",
+     "P",
+     "zero.",
+     "That's",
+     "all."
+    ],
+    "lyric_text": "Pick up, pick up, it's your call P zero. That's all.",
+    "dialogue_s": [
+     0.3,
+     5.52
+    ]
+   }
+  }
+ ],
+ "stills": [
+  {
+   "shot": "s021",
+   "plate": "outputs/ai-city-takeover/ep01/v4/board/plates/p021-b1.png",
+   "sha256": "6f6cf8958fa7466a32b8ed1c00d8f9a2be2d335ffcc79bf4980d47202160c850",
+   "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P021/f2.png",
+   "song_span_s": [
+    92.7637,
+    95.0393
+   ],
+   "plan": {
+    "s021": {
+     "time": "91.38–95.04",
+     "lyric": "Next day… Four thousand",
+     "picture": "装卸区，计数器在 Four thousand 跳到 4,000+，踢箱时冲一下",
+     "why": "换时间；数字配计数器",
+     "prep": "p021 可用",
+     "kind": "s"
+    }
+   }
+  },
+  {
+   "shot": "s023",
+   "plate": "outputs/ai-city-takeover/ep01/v4/board/plates/p023-b1.png",
+   "sha256": "07bb239e5ca2c8ef1a94ed1be5c9b99926870b18c801ff48f3b31bb5e0a9e634",
+   "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P023/f1.png",
+   "song_span_s": [
+    101.448,
+    103.294
+   ],
+   "plan": {
+    "s023": {
+     "time": "101.45–103.29",
+     "lyric": "Model guests",
+     "picture": "别上空白访客胸牌，焦点拉到空椅",
+     "why": "一句一图",
+     "prep": "p023 可用",
+     "kind": "s"
+    }
+   }
+  },
+  {
+   "shot": "s030",
+   "plate": "outputs/ai-city-takeover/ep01/v4/board/plates/p030.png",
+   "sha256": "872d80bc86bd71a35a5673329402debafe47102df177fe4b028467fb983361cc",
+   "design_frame": null,
+   "song_span_s": [
+    131.2392,
+    134.4435
+   ],
+   "plan": {
+    "s030": {
+     "time": "131.24–134.44",
+     "lyric": "（September）",
+     "picture": "寻呼机落在干泳池底，131.69 落地冲一下；SEP 20 在 September 才出现",
+     "why": "动作延续；图形在点名的词上",
+     "prep": "p030（不用 wet 版）",
+     "kind": "s"
+    }
+   }
+  }
+ ],
+ "inserts": [
+  {
+   "segment": "s017b",
+   "from_unit": "SG07",
+   "plan": {
+    "time": "77.60–78.98",
+    "lyric": "That's all",
+    "picture": "寻呼机拍进他手心，手指合上",
+    "why": "重音 + 歌词点名的物件",
+    "prep": "从 SG07 的 4K 裁",
+    "kind": "i"
+   }
+  },
+  {
+   "segment": "s022b",
+   "from_unit": "SG08",
+   "plan": {
+    "time": "99.63–101.45",
+    "lyric": "They stopped…",
+    "picture": "她掌下三张卡，LEFT A TEST ×3",
+    "why": "换气处用图形讲台词",
+    "prep": "从 SG08 4K 裁",
+    "kind": "i"
+   }
+  },
+  {
+   "segment": "s026b",
+   "from_unit": "SG10",
+   "plan": {
+    "time": "112.45–113.37",
+    "lyric": "awake",
+    "picture": "工程师猛地睁眼（跨过 I'm，约 0.9 s）",
+    "why": "A–B–A 反应镜；和 s001 她睁眼押韵",
+    "prep": "从 SG10 裁",
+    "kind": "i"
+   }
+  },
+  {
+   "segment": "s028b",
+   "from_unit": "MO13",
+   "plan": {
+    "time": "121.16–122.06",
+    "lyric": "pager blew",
+    "picture": "她低头，腰上发光的寻呼机",
+    "why": "头部动作把镜头交出去；与 s014c 押韵",
+    "prep": "从 MO13 4K 裁",
+    "kind": "i"
+   }
+  }
+ ],
+ "known_issues": [
+  {
+   "where": "s016/s017/s018/s022/s025/s027/s028",
+   "issue": "2026-11-22 主会话已按首帧状态改了 7 处动作句（s014 教训：prompt 从首帧的状态写起）；s028 泛光灯在 119.78 亮起改为后期调色（前段压暗、重音上恢复）。",
+   "proposal": "已改，见 excerpt/flash/s015-030-seedance.md。"
+  },
+  {
+   "where": "s024 SG09",
+   "issue": "「镜头随车身轻轻晃动」：即梦管线的机位合同没有“晃动”这一类，按分镜「锁定，随车身轻晃」写成固定机位（相对车厢），spec 的稳定性与收束写明随车身轻晃。",
+   "proposal": "技术处理，不改 prompt。"
+  },
+  {
+   "where": "s026 SG10",
+   "issue": "方案把 s026a 切点提前到 109.72（唱 I'm the reason），分镜原窗口从 110.543 起（不含 I'm the）。生成窗口起点已改到 109.7027 拍点，人声多 0.84 s、秒数 6→7（每条 +80）；分镜 s025/s026 的剪辑区间（plays 110.6199）未动。",
+   "proposal": "剪辑按方案还是按分镜切，由主会话定。"
+  },
+  {
+   "where": "s019/s020 MO09/MO10",
+   "issue": "方案的 s019 84.02–87.70、s020 87.70–91.38 与分镜（84.02–88.62、88.62–92.76）不同；动作片段不送人声，按分镜窗口各生成 5 s，足够覆盖方案的 3.68 s。",
+   "proposal": "若按方案改分镜窗口为 4 s，每条可省 80 积分。"
+  },
+  {
+   "where": "s022 SG08 / s024 SG09",
+   "issue": "人声窗口超出生成秒数：SG08 「real.」到 7.07 s、SG09 「Everybody,」到 5.25 s（窗口在那里截断）；spec 的口型结束时间取生成秒数（7.0 / 4.0 s）。SG08 窗口开头 0.05–0.57 s 是上一句的「instead.」，剪辑从 95.04（片内 0.53 s）起用。",
+   "proposal": "技术处理。"
+  },
+  {
+   "where": "s024 SG09 / s028 MO13",
+   "issue": "2026-11-22 开拍前连续性检查（pilot/s015-030/issues/index.html）：s024 首帧的车厢和 s025/s026 对不上，重做后使用者选「用 b (Recommended)」（pilot/s015-030/p024r/index.html），首帧换成 p024-b2；s028 首帧是台阶下的中景、看不到跳板，使用者选「按问题页改 (Recommended)」，prompt 改为镜头固定、沿台阶往上走、半途低头看发光的寻呼机、从画面右上方走出。",
+   "proposal": "已改；SG09、MO13 的 approval 按这两条裁决重写，其余 unit 不变。"
+  },
+  {
+   "where": "s015 SG05",
+   "issue": "n-1、n-2 两条 Gate 不通过（人声从句中 59.157 切入、7 s 无余量，“that's my cue”被截；n-1 开走的车红尾灯；左肩成块模糊）。使用者选「按页面重拍 (Recommended)」（pilot/s015-030/gate/sg05/index.html）：首帧不变；人声 58.70–65.666 s（SG05m.wav，含 Ten oh two）、生成 8 s（比窗口多 1 s 给模型的前奏）；prompt 加「街上只有停着的车，没有行驶的车。」；剪辑仍从 59.2341 用起。",
+   "proposal": "重拍 2 条，take 文件夹 sd-SG05-m-1|2；n 的 approval 与产物保留。"
+  },
+  {
+   "where": "s016/s017/s022/s024/s026/s029 SG06–SG11",
+   "issue": "使用者选「照 s015 的教训改 (Recommended)」：人声窗口从各自那句的句首前约 0.3 s 起（SG06m 65.517、SG09m 102.64（前一词 guests. 到 102.64 结束，留 0.24 s）、SG10m 109.56、SG11m 125.608；SG07 原窗口已在句首前 0.50 s，SG08 的剪辑从 95.0393 起、落在 instead. 里，往前 0.3 s 又落在 apps 里，两条窗口不变），生成各多 1 s（SG09 窗口 4.543 s，主会话定生成 6 s 留满 1 s，上限 500）；剪辑区间与 prompt 不变。",
+   "proposal": "take 文件夹 sd-<UNIT>-m-1|2；n 的 approval 保留（未提交）。"
+  },
+  {
+   "where": "s027 MO12",
+   "issue": "n 两条 Gate 不通过（朝镜头斜走、脚出画、标志与图形）。使用者选「A 重做背影首帧再拍 (Recommended)」，并在 pilot/s015-030/p027b/index.html 选「用 b (Recommended)」：首帧 p027-b3（机位在她身后），prompt 换成背影版。",
+   "proposal": "重拍 sd-MO12-p-1|2，4 s，每条上限 400。"
+  },
+  {
+   "where": "s019–s029（MO09、MO10、SG08、SG09、MO11、SG10、MO12、MO13、SG11）",
+   "issue": "开拍前按 s014–s018 的教训再审一遍首帧和 prompt：不写朝镜头走、出画；不转身露背面；道具物理和首帧一致；电脑、工牌、寻呼机屏幕写明空白没有标志。使用者选「照页面改 (Recommended)」（pilot/s015-030/audit/index.html），逐句照改；s027 另重做首帧（pilot/s015-030/p027r/index.html），认可后接入。",
+   "proposal": "prompt 已改；s027 首帧换成 p027-b2（P027R/a，「用 a (Recommended)」）。"
+  },
+  {
+   "where": "s016 INS16",
+   "issue": "s016 剪辑改为 p-1 的 65.67–69.40 加一条新插镜：投币电话搁板下方的听筒在金属电话线上来回晃（69.40–71.18，Got half an answer），无人镜头。使用者在 pilot/s015-030/ins16/index.html 选「用 d 拍 (Recommended)」：首帧 p016-ins16（= design/S15-30/INS16/d.png），prompt 逐字取自 INS16/prompt.md；first_frame 4 s（使用者看到 3 s；即梦最短 4 s，主会话定 3→4 s；剪辑取所需长度）。",
+   "proposal": "take 文件夹 sd-INS16-n-1|2，每条上限 400。"
+  },
+  {
+   "where": "s016 SG06 / s017 SG07",
+   "issue": "s016 m 两条 Gate 不通过（唱到一半松手转身，模型补出黑色挎包、裙变短裤）。使用者选「按页面重拍，唱段不转身 (Recommended)」（pilot/s015-030/gate/sg06/index.html）：s016 最后一句改为「她仍站在原地看着镜头」，重拍 sd-SG06-p-1|2；s017 结尾改为只「然后直起身」。离开画面交给剪辑。",
+   "proposal": "已改。"
+  },
+  {
+   "where": "s017 SG07",
+   "issue": "首帧背景有一辆车尾朝镜头的浅色皮卡（动起来会亮红尾灯）。使用者在 pilot/s015-030/cars/index.html 选「用 b (Recommended)」：首帧换成 p017-w2b（= excerpt/flash/design/S15-30/CARS/p017-w2b.png，只把皮卡改成车头朝镜头、不开灯）。s018 出租车是车头朝镜头，不改。",
+   "proposal": "已改；prompt 不变。"
+  }
+ ]
+}

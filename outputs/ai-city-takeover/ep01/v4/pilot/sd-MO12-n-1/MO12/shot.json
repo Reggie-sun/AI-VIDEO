@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo12-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "eba3d1e2f8a53e5ccf33a72ddfdaec532bc7a5fa04a8d32a8e518fd185e76d48",
+  "creation_receipt_id": "iris-v4-MO12-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/8aae2a84113c050c4919cf07d97e1eeb92081c8625dee6b1715874a85e05a90f.json",
+      "content_hash": "8aae2a84113c050c4919cf07d97e1eeb92081c8625dee6b1715874a85e05a90f"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/cd72220d54b3bb69f4aa1f3bf03d064f03479d0a757017453d5ad3148e4007fd.json",
+      "content_hash": "cd72220d54b3bb69f4aa1f3bf03d064f03479d0a757017453d5ad3148e4007fd"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/568b0da500dd7f5454538722eb95e24eef58c266c6e5c02f8a4b418d276db805.json",
+      "content_hash": "568b0da500dd7f5454538722eb95e24eef58c266c6e5c02f8a4b418d276db805"
+    }
+  ],
+  "shot_id": "ep01v4-mo12",
+  "scene_id": "subway-platform",
+  "storyboard_beat_id": "mo12",
+  "intent": "镜头固定在站台上。车门开着，她大步朝画面右侧走，从画面右侧走出去；身后抱着电脑的人群从车门涌出来跟着走。电脑外壳没有标志。她始终完整在画面里，头顶不出画，直到走出画面右侧。面无表情。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤完整保持；没有立领灯线（由认可的首帧承担）",
+    "她大步朝画面右侧走，从画面右侧走出去；身后抱着电脑的人群从车门涌出来跟着走；电脑外壳没有标志；她始终完整在画面里，头顶不出画",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo12-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

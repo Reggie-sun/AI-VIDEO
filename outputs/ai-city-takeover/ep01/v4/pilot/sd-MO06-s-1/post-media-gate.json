@@ -1,0 +1,26 @@
+{
+ "schema": "iris-v4-post-media-gate/1",
+ "unit": "MO06",
+ "take_sha256": "234b4a7ef49dd1fa74ac71399bcb0d946cf645c94e3441bcbe81a2ba84f9d40c",
+ "reviewer": "shot-gate-reviewer",
+ "verdict": "PASS",
+ "items": {
+  "strap": "PASS",
+  "landing_on_HANDS": "PASS (land frame 12 @0.500 s; in 0.417)",
+  "sleeve_swing_back": "PASS",
+  "camera_locked": "PASS",
+  "identity_red": "PASS",
+  "logo": "PASS after 4K evidence repair (no new/larger logo)"
+ },
+ "usable_clip_s": [
+  0.417,
+  4.573
+ ],
+ "song_s": [
+  40.786,
+  44.942
+ ],
+ "spent_CRD_observed": 2820,
+ "spend_note": "project history shows 400 for this task; excess not in IRIS project",
+ "selected": true
+}

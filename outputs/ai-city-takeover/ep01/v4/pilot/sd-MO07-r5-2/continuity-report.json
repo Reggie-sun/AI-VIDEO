@@ -1,0 +1,24 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-21",
+ "written_by": "主会话据 continuity-supervisor r5 增量报告转写（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r5-2/preview-approval.json",
+   "sha256": "b703a2a07410b93e5aeb67d19fcae60d926b744fd81529b74eda572c85eb0c20"
+  }
+ },
+ "units": {
+  "MO07": {
+   "verdict": "ready",
+   "continuity": "首帧 p014-w1c 与 r4 同一张；脸、短发、左耳耳挂、W1 造型、斜挎带右肩→左胯、腰链寻呼机（不亮）与空白工牌与 INS14-b 一致",
+   "handoff": "前接 s013b 换机位硬切；剪辑用 0–3.69 s，3.69 s 时手已按寻呼机，切 INS14-b（已认可切法）",
+   "axis_action_camera": "长焦正面固定；首帧为跨步，以前脚为轴向画左急转身，背对后往画右后方走远；『已经停住』与行进中首帧有字面张力，落下首帧那一步允许",
+   "prompt_fit": "PASS；与 approval、审看页逐字一致（egress prompt sha 6ae93970…，615 字节）",
+   "gate_scope": "0–3.69 s：头顶任一帧出画 FAIL；落下首帧那一步之后再朝镜头迈步、人物持续变大 FAIL；开头腿部瞬变/变形 FAIL；旋身后出右边缘或靴尖出下边缘不判 FAIL",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "头顶不出画；不再朝镜头迈步；开头腿不瞬变；干脆急转身甩袖成圆；寻呼机与工牌全程在身前腰链不跳不消失；耳挂在左耳、小红灯在；寻呼机不亮红灯、除耳挂外无红色；斜挎带右肩→左胯；工程师全程低头不动；3.69 s 手按寻呼机（右手最好）；不走进右侧观众席；镜头不推拉、无文字"
+  }
+ }
+}

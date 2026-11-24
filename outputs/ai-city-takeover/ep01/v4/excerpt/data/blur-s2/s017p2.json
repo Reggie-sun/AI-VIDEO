@@ -1,0 +1,12 @@
+{
+ "class": "B",
+ "pictures": 56,
+ "bg_sigma_px": 18.0,
+ "region": [
+  0.0,
+  0.0,
+  1.0,
+  1.0
+ ],
+ "sha256_0000": "f5daad783e9ac58d9c81d2d7d81fad840e28bc61033af72cad1a490d651900f3"
+}

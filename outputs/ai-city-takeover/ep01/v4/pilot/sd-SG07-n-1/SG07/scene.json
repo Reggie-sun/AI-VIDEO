@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg07-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "b362dd4058e1e95d3727d335e91bbe397c0413cec886988f7b9bf796dc1dcd4c",
+  "creation_receipt_id": "iris-v4-SG07-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4c5e1ff2a5376872d44935b2086874d90b7f01b5ff35c1b5fba243e2187824b2.json",
+      "content_hash": "4c5e1ff2a5376872d44935b2086874d90b7f01b5ff35c1b5fba243e2187824b2"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e682a428c6b001d8677093fff2c6fdd6a142d5c93149b45b9e0935cfee9e8781.json",
+      "content_hash": "e682a428c6b001d8677093fff2c6fdd6a142d5c93149b45b9e0935cfee9e8781"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c.json",
+      "content_hash": "7502941a24548bf0fb29e9165d8426b5370e31ce30df0259c050af836374dc2c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c4102be296d3ba2fe9ae493c81bbb324733242eaf4daf0ccbddaad0c8d6fe61d.json",
+      "content_hash": "c4102be296d3ba2fe9ae493c81bbb324733242eaf4daf0ccbddaad0c8d6fe61d"
+    }
+  ],
+  "scene_id": "folsom-curb",
+  "location": "秀场门外同一条街湿亮的路沿，开头那位值班工程师坐在路沿上，笔记本电脑开在膝上",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg07-reference"
+  ]
+}

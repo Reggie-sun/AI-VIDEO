@@ -1,0 +1,51 @@
+{
+ "n": "1",
+ "at": "2026-11-17T03:23:40.183Z",
+ "fields_sha256": "bd479b3477a9770f756a3a382a6eb457007caf71c168e25603825aa0e3a665e6",
+ "read": {
+  "lyrics": "[Intro - spoken, deadpan, close and dry, phone buzz, no drums]\n\nIncident Week. Every look got somebody paged.\n\nA trainin…",
+  "style": "ballroom vogue house, 128 BPM, 4/4, hard ballroom kick, the Ha crash on the off-beats, snapping claps, deep sub bass, cold minor-key synth stabs, runway catwalk energy, the spoken verses delivered like a cold ballroom commentator, one cool close-mic American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, sung chorus with big clear vowels, one syllable per note, never rushed, half-bar stop before the last chorus line, key change up into the final chorus, cold, fierce, untamed, clean modern mix",
+  "exclude": "rap, male lead vocal, mumbled vocals, lo-fi, rock guitar, big room EDM, dubstep, electroclash, acid techno, trance, supersaw",
+  "title": "P Zero",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": null,
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 0,
+  "lyrics_sha256": "7e059341490e782077854669de561ab57b7a883508aba9ff66b069c393e3bf3d"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

@@ -1,0 +1,81 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG10-m-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s015-030/audit/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "981665ba8ce6be0abb8990c0d913cb21159e0e7b6dcf683d146be3e79dd15e26"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "7d89c71ea86aed9320d239b07df8d46761f7467a90c1d40899af15e90f679263"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "4c2cd4deaacdf1130fde65c89a396dee152a5da93d3cd356489e587ea514b529"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p026-b1.png",
+   "sha256": "0a361f2d941333afd0fa3372f2150e3ac167193c71a7a6bf222a19166aa5771f",
+   "role": "SG10 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG10m.wav",
+   "sha256": "aae6bec70aaf8d1062a7552fbfb8115e92e9818f6ff0bc52e26b0dc49a971900",
+   "role": "SG10 vocal"
+  }
+ ],
+ "prompts": {
+  "SG10": {
+   "text": "{{image:0}}中的她坐在睡着的值班工程师身边，她一直看着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中近景，镜头固定不动。唱到一半时他猛地睁开眼睛；最后她伸手从他松开的手里拿走黑色寻呼机，收到画面下方。车窗里不出现她的倒影。寻呼机屏幕只有灰绿底光，没有数字和字。嘴前没有任何遮挡。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "833226c19a373916739ca9f6b7f637f077248e45647acbd9841edc973c623b49"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 8,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 700,
+  "cumulative_CRD": 700
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p026-b1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P026/f1.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 B）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg10-m-1-source-001",
+  "policy_id": "iris-sg10-m-1-source-001",
+  "reservation_id": "iris-sg10-m-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG10-m-1",
+   "sd-SG10-m-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1400,
+  "this_take": "sd-SG10-m-1"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG10-n-1/preview-approval.json",
+  "sha256": "3336a5ce80417fe63442b79abaa92f91f76826ca16152d90bd12c9c79dbbf8ac",
+  "reason": "人声窗口与余量按 s015 教训调整；开拍前审查按页面逐句改 prompt（「照页面改 (Recommended)」，pilot/s015-030/audit/index.html）"
+ },
+ "_template_notes": [
+  "本文件是 m-1 的模板；写成 pilot/sd-SG10-m-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s015-030-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "m-2：unit_group 末尾 m-1→m-2；bound_ids 三个 id 中 -m-1- → -m-2-；takes.this_take → sd-SG10-m-2（takes.folders 保持 [m-1, m-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG10-m-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG10 8 multimodal 700"
+ ]
+}

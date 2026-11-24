@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo03-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "aa170460b4b2e12f42e600028ef4284f3ce0e16b1a4b83622b53d96d21632109",
+  "creation_receipt_id": "iris-v4-MO03-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e581260a624af76b69dba6fb97147d226842f3c030ff72d711c1f7c190012f34.json",
+      "content_hash": "e581260a624af76b69dba6fb97147d226842f3c030ff72d711c1f7c190012f34"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ccbc3e8bf69bfcd94f259cacb1601347537803dea33b9637dda6e04d68e9f4d6.json",
+      "content_hash": "ccbc3e8bf69bfcd94f259cacb1601347537803dea33b9637dda6e04d68e9f4d6"
+    }
+  ],
+  "scene_id": "folsom-sidewalk",
+  "location": "秀场外的 Folsom 街人行道，深夜，湿亮的地面，街角是行道树",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo03-first-frame"
+  ]
+}

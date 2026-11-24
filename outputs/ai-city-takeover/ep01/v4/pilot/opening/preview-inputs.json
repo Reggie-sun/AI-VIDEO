@@ -1,0 +1,331 @@
+{
+ "schema": "iris-v4-preview-inputs/opening-1",
+ "range_s": [
+  0.0,
+  40.7859
+ ],
+ "method": "Seedance 2.0 VIP 4k (user 2026-11-17: 画质最高/积分随便用; 2026-11-20: 开头用 seedance 生成)",
+ "source_prompt_file": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/opening-seedance.md",
+ "source_prompt_file_sha256": "3e02c3266a2e47f88dbd9da9e65d98cbe59950e61dc4cc718ebacc811b45fbdc",
+ "plan": "每 unit 同一首帧拍 2 条，过逐镜 Gate 后挑一条；每条一次不重试",
+ "cost_basis": "4s=320、5s=400、6s=480 实付（80/秒，pilot spend.json）；每批首条窗口内偶发的 2,820/3,052/4,880 余额下降来源 UNKNOWN，不计入单价",
+ "units": [
+  {
+   "shot": "s001",
+   "unit": "MO01",
+   "clip": "MO01",
+   "new_unit_needs_spec": false,
+   "mode": "first_frame",
+   "song_span_s": [
+    0.0,
+    4.1215
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP01-c.png",
+    "sha256": "63b1195d4528a7b75c7c1999abc3596499bee7a6d1bbe8920eb9f58aed37a611"
+   },
+   "prompt": "镜头在化妆镜旁正面拍她，极慢地推近。她闭着眼，化妆师的粉扑按在她颧骨上；她睁开眼，用两根手指把粉扑推开，伸手从台面上拿起那台黑色寻呼机，在掌心掂一下，用拇指按掉它，然后从椅子上站起半身，寻呼机握在下巴下方。面无表情，带着一点好奇。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "7b69aa0fa2317896a9e7c794076e03b087172fd9ba7cb956070f4dd46223c2b6",
+   "seconds": 5,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 400,
+   "ceiling_per_take_CRD": 400,
+   "clip_words": []
+  },
+  {
+   "shot": "s002",
+   "unit": "MO02",
+   "clip": "MO02",
+   "new_unit_needs_spec": false,
+   "mode": "first_frame",
+   "song_span_s": [
+    4.1215,
+    9.6131
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP02-d.png",
+    "sha256": "4cdc13467ed25a2fb32cb0b022988cca11cf44d56b0aa67b2084a1ed75f226fb"
+   },
+   "prompt": "长焦，机位在走秀台尽头，随她的步子轻微后退。她从混凝土柱子旁大步走出来，边走边把手里的黑色寻呼机别到腰链上，经过半开的消防门，门缝里的一道红光扫过她的靴子，她踏上湿亮的水泥走秀台向镜头走来。两边前排的人低头看笔记本。面无表情。机头直闪。除了她左耳耳挂上的小红灯和门缝里的那道红光，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "64a7f4c1a0d2125091eff03dc3a164a6c5bbd67ff6e9efc59947f52e09da6490",
+   "seconds": 6,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 480,
+   "ceiling_per_take_CRD": 500,
+   "clip_words": []
+  },
+  {
+   "shot": "s003",
+   "unit": "s003-new",
+   "clip": null,
+   "new_unit_needs_spec": true,
+   "mode": "first_frame",
+   "song_span_s": [
+    9.6131,
+    11.4242
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP03-c.png",
+    "sha256": "a20283d6bf24e702cbfb1ecc210dc97aba704366bdaf21f2cfa2a8d9d036ab61"
+   },
+   "prompt": "镜头固定，从坐着的值班工程师肩后拍。他被手里突然亮起的手机惊醒，膝盖上的笔记本电脑滑下去一半；整排前排的人同时低头看手机，屏幕一部接一部亮起；她在湿亮的走秀台上朝镜头走来，谁也不看。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "7ec2dc09ddc353ee58c53b8bb2bae3f55822b8e4f4c2eeffdbbbf51d27be6cd3",
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400
+  },
+  {
+   "shot": "s004",
+   "unit": "SG01",
+   "clip": "SG01",
+   "new_unit_needs_spec": false,
+   "mode": "multimodal",
+   "song_span_s": [
+    11.4242,
+    16.9041
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP04-c.png",
+    "sha256": "b012df34e10b3ef713e63f4011d7aadc331d0e765abe1b0d2d22de5ec928fc4c"
+   },
+   "prompt": "{{image:0}}中的她站在呼叫柱旁，对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头固定不动，全程正对镜头。说到后半句时她侧身从呼叫柱上摘下听筒，伸直手臂把听筒举在身侧，离脸一臂远，不贴耳也不挡嘴。身后前排的手机一部接一部亮起。机头直闪。嘴前没有任何遮挡。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "4014034819fbcf839d8f5ee05ecdc4f8fc1efeeab9447607d6f20fc5a10008f8",
+   "seconds": 6,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 480,
+   "ceiling_per_take_CRD": 500,
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG01.wav",
+    "sha256": "1a821e13899132e0415e06d7a70e1e48ba9dd18b39dc3d5e4b712832815ebb58",
+    "seconds": 5.75,
+    "song_window_s": [
+     11.15,
+     16.9041
+    ],
+    "clip_words": [
+     "Incident",
+     "Week.",
+     "Every",
+     "look",
+     "got",
+     "somebody",
+     "paged.",
+     "A",
+     "training",
+     "run",
+     "phoned",
+     "a",
+     "friend."
+    ]
+   }
+  },
+  {
+   "shot": "s005",
+   "unit": "s005-new",
+   "clip": null,
+   "new_unit_needs_spec": true,
+   "mode": "first_frame",
+   "song_span_s": [
+    16.9041,
+    20.5264
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP05-d.png",
+    "sha256": "4d3f102771e6f3f8b162c7f3942103dc371051f27f8c70761af07de7e731021b"
+   },
+   "prompt": "近景，镜头固定。她松开手，听筒顺着螺旋线垂下去来回晃；她把手里那张白纸从中间撕开，一半扔出画面，一半夹在两指间，低头看着它，面无表情。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "e5418f58f98511c1003e1cb1857b4dd269728df326697aa972875a92a67ef112",
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400
+  },
+  {
+   "shot": "s006",
+   "unit": "MO03",
+   "clip": "MO03",
+   "new_unit_needs_spec": false,
+   "mode": "first_frame",
+   "song_span_s": [
+    20.5264,
+    26.0528
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP06-c.png",
+    "sha256": "aa0679464dec0a0872a858ea07db291f73bf79046f1784a1a7b33c2e0f0af09c"
+   },
+   "prompt": "手持跟拍，在她侧前方。夜里湿亮的人行道上，一群街拍摄影师倒退着走在她前面，不停按闪光灯；她不减速，伸手掌平按住最近一台相机的镜头往下压，从他们中间穿过去，走向街角的行道树。面无表情。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "e82590bf8d31f2e64f845638fd3466ea5b0b03b3684ce82566ea04fc5aae7dce",
+   "seconds": 6,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 480,
+   "ceiling_per_take_CRD": 500,
+   "clip_words": [
+    "Six"
+   ]
+  },
+  {
+   "shot": "s007",
+   "unit": "MO04",
+   "clip": "MO04",
+   "new_unit_needs_spec": false,
+   "mode": "first_frame",
+   "song_span_s": [
+    26.0528,
+    29.7448
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP07-a.png",
+    "sha256": "41c78422afe94819a01a2b9cb1c97f322d9aa43fbebb685381f2cfc3ef4ae4cd"
+   },
+   "prompt": "镜头固定。她把挡在面前的树枝往下拽，眯眼往上看树后那块发白光的广告牌；然后松手，树枝弹回去、叶子晃动，广告牌的白光整片打到她脸上，她不躲，从外套口袋里掏出一张空白的白色姓名贴。面无表情，带着一点好奇。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "a41b690262012ed90f96949500dd5908fa68db2a03b5d171fcb37caa8a4f87f7",
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400,
+   "clip_words": [
+    "grand",
+    "a",
+    "month",
+    "for",
+    "a",
+    "billboard",
+    "behind",
+    "a",
+    "tree.",
+    "A",
+    "I:"
+   ]
+  },
+  {
+   "shot": "s008",
+   "unit": "SG02",
+   "clip": "SG02",
+   "new_unit_needs_spec": false,
+   "mode": "multimodal",
+   "song_span_s": [
+    29.7448,
+    33.4367
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP08-a.png",
+    "sha256": "c602b3883f46db5a4f97b44c9e67acbe2d5122709a665ee6b75225214a9f4747"
+   },
+   "prompt": "{{image:0}}中的她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步。中近景，镜头固定不动，全程正对镜头，不转身，不转头。她把空白姓名贴从底纸上撕下来，啪地拍在胸口，用拇指抹平。嘴前没有任何遮挡。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "5c4b1459be0907a17a892d0792fb9b3dc9902bb9f3c8a7102f0366abb908dfcb",
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400,
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG02.wav",
+    "sha256": "27b5e6f657bc255125aee11d4885def24281c554f6e8d409121ccb915118c733",
+    "seconds": 4.0,
+    "song_window_s": [
+     29.529,
+     33.529
+    ],
+    "clip_words": [
+     "I:",
+     "Average",
+     "Individual.",
+     "That's",
+     "me.",
+     "Bus",
+     "stop:"
+    ]
+   }
+  },
+  {
+   "shot": "s009",
+   "unit": "s009-new",
+   "clip": null,
+   "new_unit_needs_spec": true,
+   "mode": "first_frame",
+   "song_span_s": [
+    33.4367,
+    36.1999
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP09-a.png",
+    "sha256": "451f67af1297cfcfc63229c06cc5129c063c7d8966682ed6932ed45b429ecc73"
+   },
+   "prompt": "镜头固定。她侧身坐在候车亭的长凳上，伸出一根手指，用指甲顺着灯箱玻璃上那道划痕慢慢划过去，停在划痕尽头。面无表情，带着一点好奇。机头直闪。画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "5043d74aa0922a246b124079700b92197efaa2e0560f0fbf5f4e28f1593c2e11",
+   "seconds": 4,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 320,
+   "ceiling_per_take_CRD": 400
+  },
+  {
+   "shot": "s010",
+   "unit": "MO05",
+   "clip": "MO05",
+   "new_unit_needs_spec": false,
+   "mode": "first_frame",
+   "song_span_s": [
+    36.1999,
+    40.7859
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP10-a.png",
+    "sha256": "a46b48ce8ce9d7217f9ca5bb06dedcfae4134f145cca7d04732fc6b10c808a23"
+   },
+   "prompt": "长焦侧拍，镜头固定。她双臂搭在天桥的铁丝网护栏上往下看桥下的车流；然后抬脚踹了护栏一下，整片铁丝网震动；她两手插进外套口袋，转身沿着天桥往远处走去，银白短发保持原样。桥下车灯只有白色和琥珀色。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "a0302ca1b6c98f5fde8167e35bef4ad9317be99a01a8c7c13f0f1fa815e7b897",
+   "seconds": 5,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 400,
+   "ceiling_per_take_CRD": 400,
+   "clip_words": [
+    "Freeway:",
+    "S",
+    "F",
+    "hates",
+    "A",
+    "I",
+    "billboars.",
+    "The",
+    "D?",
+    "Forgot.",
+    "All"
+   ]
+  }
+ ],
+ "estimated_total_CRD": 7680,
+ "ceiling_per_take_sum_CRD": 4300,
+ "ceiling_total_CRD": 8600,
+ "next_shot_first_frame": {
+  "shot": "s011",
+  "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p011-w1c.png",
+  "sha256": "22492025abac1e542346b54a26a0cfa19f78c00bb39a7448234618ff6e786b26"
+ },
+ "known_issues": [
+  "s009 左耳耳挂因机位不可见",
+  "s002 门缝红光为分镜规定",
+  "s004 首帧嘴闭合（念白从窗口开头开始，由 Seedance 张嘴）",
+  "s003、s005、s009 原为 2.5D 静图，改成视频"
+ ]
+}

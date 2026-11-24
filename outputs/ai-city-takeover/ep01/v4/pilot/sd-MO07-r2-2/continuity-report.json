@@ -1,0 +1,47 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "inputs": {
+  "preview_approval": {
+   "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-2/preview-approval.json",
+   "user_quote": "s013 用 b、s014 用 c，拍 (Recommended)",
+   "approved_at": "2026-11-19T17:13:30Z",
+   "replaces_approval": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07/preview-approval.json (sha c3654e95…b441)",
+   "sha256_recorded": "prompt 0b5a2a72…812f; first_frame db997e4f…7950; page round2.html 0b137487…1d28",
+   "takes": "同一认可两条 take（r2-1/r2-2），各 1 次，合计上限 800 CRD"
+  },
+  "compiled_prompt": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-2/MO07/compiled-native-prompt.zh.txt",
+  "prepared": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-2/MO07/prepared.json",
+  "profile": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-2/MO07/profile.json",
+  "operator_bound": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-2/MO07/operator-bound.json",
+  "first_frame": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1.png",
+  "preview_page": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/round2.html",
+  "board": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/shots.json (s014 第 1023–1076 行；s015 第 1078 行起)",
+  "prior_accepted": [
+   "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/R2/mo06w1b-4k-t0.2.png",
+   "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/R2/prev-s011-walk.jpg",
+   "s013 底片 p013-w1.png"
+  ]
+ },
+ "units": {
+  "MO07": {
+   "verdict": "blocked",
+   "continuity": "FAIL：只有斜挎带方向一项不过。这条和 r2-1 用的是同一张首帧 p014-w1.png（sha db997e4f…7950），结论也一样。场地、两侧同一批工程师、露左肩、右臂长袖、黑高领、腰链、寻呼机、工牌、及膝靴、左耳那一处红灯、光线，都和已接受的 s011（MO06-w1b）对得上。问题是：斜挎带从她的左肩斜到右胯，而分镜 s014 的底片提示词（shots.json 第 1039 行）、这次核对要求，以及 s012、s013 都是右肩到左胯。已接受的 s011 本来也是左肩到右胯，这处前后不一致我在 MO06-w1b 报告里漏查了，这里补报。要不要把它改判为次要，只能由使用者当次决定。",
+   "handoff": "PASS（只看剪辑语义）。s013→s014：在 55.078 的 All hands 节拍上，从前排直接切到 T 台尽头，这是空间省略；手机落回的短插交代她离开了，两侧还是同一批工程师，观众能认出是同一个秀场。s014→s015：她按住寻呼机从画面右侧出画，s015 推门、寻呼机尖叫，动作接得上；s015 里她朝镜头走，方向是中性的，不冲突。",
+   "axis_action_camera": "PASS。长焦从正面对着 T 台，镜头固定，两侧工程师对称，没有轴线问题。首帧里转身已经起势，长袖已经甩出，画面左边留出了甩开的空间。使用时长 4.156 s，5 s 生成有 0.84 s 余量。",
+   "prompt_fit": "PASS。以下几处 prompt 逐字相同：compiled-native-prompt.zh.txt、preview-approval、round2.html 第 15 行、prepared.json 的 prompt_text（第 4379、4438、4528、4587、4676 行），也与 r2-1 相同。上传内容的 sha 都等于认可值：prompt 0b5a2a72…812f（第 4750 行），首帧 db997e4f…7950（第 4757 行）。生成参数：first_frame、5 s、4k、16:9，上限 400 CRD，1 次，不重试。attempt、policy、reservation 都是 iris-mo07-r2-2-*，和 r2-1 不重复；节点 node_bme9zv813j，和 r2-1 的 node_0pmbmgzr69 不同，generation_POSTs=0。上一轮失败点的对策：环绕靠锁首帧加“镜头固定不动”；前景丢失和抢拍这一镜不适用，没有前景元素，也没有人声。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "【阻塞】斜挎带方向与分镜 s014、s013、s012 相反，与 s011 相同。三种处理办法：(a) 使用者明确接受；(b) 重出 S14 首帧；(c) 由使用者统一 W1 的斜挎带方向。三种都需要使用者当次决定。不能镜像翻转，翻过来耳挂会到右耳，长袖会到左臂。",
+    "4.156 s 内动作偏多：转身、袖子落下、按寻呼机、出画都要发生。按寻呼机最好落在 58.73，也就是片内约 3.65 s，只能靠剪辑去对。Gate 要标出这几个动作各自在哪一帧。",
+    "长袖不能换臂、不能变短、不能多出第二条；左臂要一直露着。",
+    "笔记本上有类似苹果的标，Gate 要确认没有变清楚。",
+    "远景里耳挂很小，Gate 要放大确认红灯在左耳，且画面里没有别的红色。",
+    "s015 的分镜提示词和底片 p015 还是旧造型（白色立领外套带红线），需要另外重做，否则 s014→s015 会穿帮。",
+    "shot.duration_policy.seconds=6.0，与 5 s 输出不一致，交给 lint 判定。",
+    "我没有 Bash，没法核对 p014-w1 和 S14-c 是否逐字节相同，目前只有认可文件里的声明。",
+    "permit 在 2026-11-19T23:20:33Z 过期。"
+   ]
+  }
+ }
+}

@@ -1,0 +1,76 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG06-m-2",
+ "question": "还有 6 条唱段没拍（s016/s017/s022/s024/s026/s029）。s015 的教训是：人声如果从一句中间切进去，生成时长又没有余量，模型会自己先唱一段前奏，把结尾的词挤掉。重拍时人声从句首开始、多给 1 秒，这个问题就没了。\n\n建议这 6 条都照此改：\n- 人声窗口从各自那句的句首前约 0.3 秒开始。\n- 生成多 1 秒。\n- 剪辑仍按原方案的时间用。\n\n共多约 960 积分。另外，首帧里车尾朝镜头的车（例如 s018 的出租车）先改成车头朝镜头或去掉。这样改吗？",
+ "user_quote": "照 s015 的教训改 (Recommended)",
+ "approved_at": "2026-11-22T19:38:19Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "b2f37febb8860a1acfa56805b5cf3a1823b6581232173466f82e5d218f7f36fc"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "9f9da9336977a318950568c3431c344f216fda75bc9205d4779fcec3434076f9"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "b7f74db41234d5da01efc40eed0e0dbab22838b007d5a8887a7a327dbc4a758a"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p016-w1.png",
+   "sha256": "b176e3b2944c92c67cf7b438cb7c127d6336be690d4e6fda1d354d40c2743521",
+   "role": "SG06 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG06m.wav",
+   "sha256": "9bd0c1e889f18d480074b5969e8ca3e9e1eece7d22e08276504ce81912b4a624",
+   "role": "SG06 vocal"
+  }
+ ],
+ "prompts": {
+  "SG06": {
+   "text": "{{image:0}}中的她站在投币电话旁，伸直手臂把黑色听筒举在身侧，离脸一臂远，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头固定不动。唱最后一句时她松开手，听筒顺着金属电话线垂下去来回晃，她转身朝画面左侧走开。听筒不贴耳，不挡嘴。嘴前没有任何遮挡。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "7047eab2753027c089fa9e75cd905ad822276c3d1ac36822732bd4086a58aa4e"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 7,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 600,
+  "cumulative_CRD": 600
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p016-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P016/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg06-m-2-source-001",
+  "policy_id": "iris-sg06-m-2-source-001",
+  "reservation_id": "iris-sg06-m-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG06-m-1",
+   "sd-SG06-m-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1200,
+  "this_take": "sd-SG06-m-2"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG06-n-1/preview-approval.json",
+  "sha256": "dd63ae870e37ac103778149346b8fdbd1f2df7562b9434bd9a6f6b6484e60be4",
+  "reason": "人声窗口与余量按 s015 教训调整"
+ }
+}

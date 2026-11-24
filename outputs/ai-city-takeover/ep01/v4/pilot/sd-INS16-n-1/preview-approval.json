@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-INS16-n-1",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/ins16/index.html\n\ns016 “Got half an answer”的听筒插镜首帧做好了，推荐 d：\n- 听筒挂在搁板下方的金属线上，斜着，看得出刚松手还在晃。\n- 没有人和手，也没有文字和红色。\n- 质感和 s016 一致。\n\nprompt（页上有全文）：镜头固定，听筒来回晃，越晃越慢，影子跟着晃。\n\n生成 3 秒，拍 2 条约 480 积分。用 d 拍吗？",
+ "user_quote": "用 d 拍 (Recommended)",
+ "approved_at": "2026-11-22T22:06:49Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "8f92f3bcf2048bdafb35d6d473a134fd903af07daebcbea4c63f5b44ae3621ca"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "0c46c62bca6122e8f57ce77b86b05a92b03ee42c553e2ba89c9b5c0dd4c4a0b0"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "84b969a5cb7c255ea58839ef8920467cef2d6a5dd9ecb6ee5ebcf2ed35743599"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p016-ins16.png",
+   "sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+   "role": "INS16 first frame"
+  }
+ ],
+ "prompts": {
+  "INS16": {
+   "text": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "bb405202f3a2a2fb8fec63581d4a4c426200150260f831abc36d7cffb9c89728"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [],
+ "identity_waiver_basis": "画面里没有人物（p016-ins16.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/INS16/d.png 逐字节相同），不涉及身份",
+ "bound_ids": {
+  "attempt_id": "iris-ins16-n-1-source-001",
+  "policy_id": "iris-ins16-n-1-source-001",
+  "reservation_id": "iris-ins16-n-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-INS16-n-1",
+   "sd-INS16-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-INS16-n-1"
+ },
+ "decision_notes": [
+  "使用者看到的是生成 3 s（约 480 积分）；即梦 Seedance 合同最短 4 s（JimengProfile duration_seconds ≥ 4），主会话定改为 4 s、每条上限 400（logs/decisions.md 2026-11-22）；首帧与 prompt 不变"
+ ]
+}

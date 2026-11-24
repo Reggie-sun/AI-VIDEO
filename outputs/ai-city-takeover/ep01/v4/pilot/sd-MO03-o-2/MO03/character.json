@@ -1,0 +1,26 @@
+{
+  "artifact_id": "iris-v4-mo03-draft-character",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "af11f93c343acb94cd146072f52fefe3b8132a21c350448ddf1fbdd75479f8c8",
+  "creation_receipt_id": "iris-v4-MO03-authoring:character",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/03ded653d51e0ad3f9bc6385cf2b5d795840c71366f90dba6380fd2b08eb8419.json",
+      "content_hash": "03ded653d51e0ad3f9bc6385cf2b5d795840c71366f90dba6380fd2b08eb8419"
+    }
+  ],
+  "character_id": "IRIS",
+  "name": "IRIS",
+  "identity": "IRIS v4 身份锚点 F1a；全身与远景：一位二十八岁的成年白人女性，成熟的、有棱角的脸，银白色的利落短发和银白色的眉毛，左耳一只亮着小红灯的黑色耳挂装置",
+  "appearance_bible": "一位二十八岁的成年白人女性，成熟的、有棱角的脸，颧骨分明，下颌线硬朗；银白色的利落短发，侧分的短刘海，眉毛和睫毛也是银白色，眼睛是很浅的冰灰色，皮肤冷白，鼻梁上有淡淡的雀斑，嘴唇是偏冷的裸色，眼尾一笔细细的深色眼线；左耳戴一只黑色的耳挂装置，装置上亮着一颗小红灯，左耳耳骨上一排小小的银色耳钉；她平时面无表情，但带着好奇，冷静地看着世界",
+  "wardrobe": [
+    "她穿一件用灰色连帽衫改造成的不对称高定短外套，一边袖子很长、一边露肩，外面斜挎一条黑色皮质背带，腰间一条细链挂着一台黑色老式寻呼机和一张空白工牌；黑色高腰迷你裙；黑色及膝长靴"
+  ],
+  "voice_profile": null,
+  "reference_asset_ids": [],
+  "allowed_variations": [
+    "同一身份的镜头角度与景别变化"
+  ]
+}

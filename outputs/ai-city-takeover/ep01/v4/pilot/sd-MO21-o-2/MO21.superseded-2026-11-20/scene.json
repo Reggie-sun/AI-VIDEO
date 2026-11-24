@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo21-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "f35bc9f1a4de4e82dbeb7e1eeb44a2d085a30d9bc2d8603c452415d1c07314d9",
+  "creation_receipt_id": "iris-v4-MO21-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/dc61575bd666a86df57033e07309feaf4ef302560d9dc2306d29ce4a504d060c.json",
+      "content_hash": "dc61575bd666a86df57033e07309feaf4ef302560d9dc2306d29ce4a504d060c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7bfadac07a4cdfca5c57eff2a61a5ec1fa245088149d98e16e393caad58b29dd.json",
+      "content_hash": "7bfadac07a4cdfca5c57eff2a61a5ec1fa245088149d98e16e393caad58b29dd"
+    }
+  ],
+  "scene_id": "folsom-bus-shelter",
+  "location": "Folsom 街一个公交候车亭，夜里，侧面的广告灯箱是空白白光",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；画面里没有任何红色（本镜看不到左耳耳挂）"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo21-first-frame"
+  ]
+}

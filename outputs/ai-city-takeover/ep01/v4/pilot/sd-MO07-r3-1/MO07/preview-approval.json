@@ -1,0 +1,18 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "197101e56b72cc3bbfa463def8ad5c55709ded38278a8c1b932c1592402ed90c",
+  "unit_ids": [
+    "MO07"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1b.png",
+      "sha256": "c85aa47e12686ccdd6421bcae732eecd2862f43e736b62c33547b766c7f3ace8",
+      "role": "MO07 first frame"
+    }
+  ],
+  "user_quote": "按 v2 做，s014 开拍 (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

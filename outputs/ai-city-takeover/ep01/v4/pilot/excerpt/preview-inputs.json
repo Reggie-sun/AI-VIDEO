@@ -1,0 +1,203 @@
+{
+ "schema": "iris-v4-preview-inputs/excerpt-1",
+ "range_s": [
+  26.0528,
+  59.2341
+ ],
+ "method": "Seedance 2.0 VIP 4k (user: 不拍 A 了，就用 Seedance)",
+ "already_made": {
+  "SG03": "pilot/sd-SG03 (fee974f0…)"
+ },
+ "plate3d": [
+  "s009"
+ ],
+ "units": [
+  {
+   "clip": "MO04",
+   "shot": "s007",
+   "mode": "first_frame",
+   "seconds": 4,
+   "window": [
+    26.0528,
+    30.053
+   ],
+   "words": [
+    "grand",
+    "a",
+    "month",
+    "for",
+    "a",
+    "billboard",
+    "behind",
+    "a",
+    "tree.",
+    "A",
+    "I:"
+   ],
+   "plate": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p007.png",
+    "sha256": "c67df3b27c594d9442a18a6eeec7e28013a866330b5cfbaa5d49ef77ffb31373"
+   },
+   "prompt": "镜头固定，全身远景。夜里潮湿的人行道，她站在树下，伸手把一根挡在面前的树枝往下拽，眯眼往上看树后那块发着白光的巨大广告牌；她松开手，树枝弹回去轻轻晃动，广告牌的白光整片打到她脸上，她不躲，从外套口袋里掏出一张空白的姓名贴。路灯和远处的车灯安静地亮着。",
+   "prompt_sha256": "6c86e97fd49623f73c2ae94f8bee22bcd9b5f3c96e479cbc1afb6a2cd14dc56d",
+   "board_action": "她伸手把一根挡路的树枝往下拽，眯眼往上看广告牌；29.745 小节线上她松手，树枝弹回去，广告牌的白光整片打到她脸上，她不躲。结束：脸在白光里，她从口袋里掏出一张空白姓名贴。",
+   "board_camera": "锁定，树枝弹回时镜头随叶子轻晃一下（29.745 小节线）",
+   "note": null
+  },
+  {
+   "clip": "SG02",
+   "shot": "s008",
+   "mode": "multimodal",
+   "seconds": 4,
+   "window": [
+    29.529,
+    33.529
+   ],
+   "words": [
+    "I:",
+    "Average",
+    "Individual.",
+    "That's",
+    "me.",
+    "Bus",
+    "stop:"
+   ],
+   "plate": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p008.png",
+    "sha256": "774bf3a1884f1876a5442831f9357030ec4abf7c4c7fa0187873cda65ad07755"
+   },
+   "prompt": "{{image:0}}中的她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步。近景，她用拇指把胸口那张空白姓名贴按平，神情冷淡；说完最后几个字，她转身往画面右边迈出半步。镜头全程锁定，一镜到底。",
+   "prompt_sha256": "95fa2b8670d74f915ec32288c631447d138fb99ead6deb7a3d05cbffc93dbfd2",
+   "board_action": "她把空白姓名贴从底纸上撕下来，啪地拍在白外套胸口，用拇指抹平；对着镜头平平地说 A I: Average Individual. That's me.；Bus stop 上她转身往公交亭走。结束：姓名贴贴在胸口，她已经转身迈步。",
+   "board_camera": "锁定，32.007 的 That's 上 3% 推近",
+   "note": "念白口型窗：她对镜头平平地说 A I: Average Individual. That's me. Bus stop:；首帧里姓名贴已经贴在胸口，动作改为按平。",
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG02.wav"
+   }
+  },
+  {
+   "clip": "MO05",
+   "shot": "s010",
+   "mode": "first_frame",
+   "seconds": 5,
+   "window": [
+    36.1999,
+    40.7859
+   ],
+   "words": [
+    "Freeway:",
+    "S",
+    "F",
+    "hates",
+    "A",
+    "I",
+    "billboars.",
+    "The",
+    "D?",
+    "Forgot.",
+    "All"
+   ],
+   "plate": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p010.png",
+    "sha256": "294f89ab921e2375b055fb0e88678c85c7b685379ab23cdc8ad39c25ced7e772"
+   },
+   "prompt": "镜头固定，长焦侧拍。夜里，她双臂搭在天桥的铁丝网护栏上，往下看高速公路上流过的车灯；她抬脚踹了一下护栏，整片铁丝网震动起来；然后她两手插进裤兜，转身沿着天桥往远处走，外套下摆还在晃。远处城市的灯安静地亮着。",
+   "prompt_sha256": "60899348d9f14f5abd3fea321f341cc8922c4bb22f53c1e06f7c5980b990296a",
+   "board_action": "她双臂搭在铁丝网上往下看车流；38.94 小节线上她抬脚踹了护栏一下，整片铁丝网震；然后两手插兜，转身往桥那头走。结束：背影在桥中央，下摆还在晃。",
+   "board_camera": "长焦侧拍，踹的那一下落在 38.94 小节线上，镜头被震得轻颤",
+   "note": null
+  },
+  {
+   "clip": "MO06",
+   "shot": "s011",
+   "mode": "first_frame",
+   "seconds": 5,
+   "window": [
+    40.7859,
+    44.9422
+   ],
+   "words": [
+    "hands!",
+    "All",
+    "night!",
+    "Everybody,"
+   ],
+   "plate": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p011.png",
+    "sha256": "77caea925e5522cb371f1c9abe155ae84fa552781ecd5f9d6412643567d01887"
+   },
+   "prompt": "长焦正面，全身远景，镜头固定。地下停车场改成的秀场，她从走秀台远端快步走向镜头，步子很大，面无表情，外套肩线一颠一颠；两边前排工程师们一个接一个站起来；她走到走秀台中段。头顶一排排日光灯管亮着，湿的水泥地面反着光。",
+   "prompt_sha256": "4372f70c6517ecaed41874126efd4912af271efe575b838ffd301411fa9e9827",
+   "board_action": "40.786 的重音上全场日光灯一排排砰地亮起，她从 T 台另一头快步走向镜头，外套肩线一颠一颠；前排工程师们一个接一个站起来。结束：她走到 T 台中段。",
+   "board_camera": "长焦正面，日光灯从远到近顺着重音亮起",
+   "note": "分镜写“重音上全场日光灯一排排亮起”，但首帧里灯已亮着，首帧生视频做不出“亮起”：亮灯放到剪辑里做（曝光从暗拉亮，卡 40.786 s 重音）。"
+  },
+  {
+   "clip": "SG04",
+   "shot": "s013",
+   "mode": "multimodal",
+   "seconds": 5,
+   "window": [
+    50.933,
+    55.0777
+   ],
+   "words": [
+    "I'm",
+    "the",
+    "call",
+    "you",
+    "had",
+    "to",
+    "take",
+    "All",
+    "hands!"
+   ],
+   "plate": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p013.png",
+    "sha256": "8f3bc40f074315b514b8497d6accb679960c8607dfc8d482b41024e82a8c314c"
+   },
+   "prompt": "{{image:0}}中的她低头看着手里亮着的手机，对着值班工程师唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，她唱到一半把手机扔回他怀里，手机始终在她胸口以下，不挡住嘴；唱最后两个字时她转过身去。镜头全程锁定，一镜到底。",
+   "prompt_sha256": "5f1c17ed3fe68fce4aaddcb07812d4b62e4691e9464912978a107ad0af40f256",
+   "board_action": "他手里的手机在响；她从他手里抽走手机，低头看一眼屏幕，在 take 上把手机扔回他怀里（手机始终在她胸口以下，不举到脸边）；All hands 上她转身。结束：手空了，她已经转身朝 T 台尽头走。",
+   "board_camera": "锁定，手机的光在 53.708 小节线闪",
+   "note": "首帧里手机已经在她手里（分镜的“从他手里抽走手机”由上一镜的切点省略）；手机写明不挡嘴。",
+   "audio": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG04.wav"
+   }
+  },
+  {
+   "clip": "MO07",
+   "shot": "s014",
+   "mode": "first_frame",
+   "seconds": 5,
+   "window": [
+    55.0777,
+    59.2341
+   ],
+   "words": [
+    "All",
+    "night!",
+    "Ten",
+    "oh",
+    "two,"
+   ],
+   "plate": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p014.png",
+    "sha256": "3cfb22a5755232ebce9636c18b0ddb2deb92a64feb06dcd38851bbf3049dd9aa"
+   },
+   "prompt": "长焦，镜头固定。秀场走秀台的尽头，她一个急转身，外套下摆甩开成一个圆；转完她头也不回地用一只手按住腰间正在震动的寻呼机，朝画面右侧的侧门走去。两边观众举着手机拍她，手机屏幕的光点点亮着。",
+   "prompt_sha256": "0a20955c37bd8329e3d6360cbc591842c9ea262ccb855605ae2d59ee7b395cec",
+   "board_action": "长音 night! 上她走到 T 台尽头一个急转身，外套下摆甩成一个圆；58.73 的 Ten oh two 上她头也不回地按住腰上震起来的寻呼机。结束：她朝侧门走，手按着寻呼机。",
+   "board_camera": "长焦，转身落在 55.542 小节线，镜头不动",
+   "note": null
+  }
+ ],
+ "budget": {
+  "generations": 6,
+  "retries": 0,
+  "price_reference": "SG03: 6 s 4k = 480 CRD (80/s)",
+  "estimate_CRD": 2240,
+  "ceiling_per_unit_CRD": 800,
+  "cumulative_CRD": 4000
+ }
+}

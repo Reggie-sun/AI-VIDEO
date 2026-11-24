@@ -1,0 +1,27 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>IRIS EP01 s027 背影首帧（P027B）</title><style>body{background:#111;color:#ddd;font:14px/1.6 sans-serif;margin:20px;max-width:1700px}img{width:100%;display:block}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}figure{margin:0}figure.rec{outline:3px solid #6c6}figcaption{font-size:13px;color:#aaa}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #555;padding:3px 8px;font-size:13px;vertical-align:top}h2{margin-top:28px;border-top:1px solid #444;padding-top:12px}code{color:#9cf;font-size:12px}.ok{color:#6c6}.warn{color:#fc6}.pr{background:#1a1f27;padding:8px 12px;border-radius:6px}</style></head><body>
+<h1>s027（MO12）背影首帧：旧 p027-b2 | 三个候选（仅静图，未提交任何视频生成）</h1>
+<p>裁决：「A 重做背影首帧再拍 (Recommended)」（decisions.md 2026-11-23）：MO12 n-1、n-2 都朝镜头斜走、脚出画，n-1 电脑露苹果标志、n-2 帽衫和电脑有图形。改成机位在她身后：她背对镜头沿站台朝出口走远，人群从车门涌出跟在后面，电脑合着、背面朝内；顶上素黑结构，没有站牌和字。</p>
+<p>工具：<code>motion-kit/tools/codex_plate.py</code>。机位和旧图相反，a、b 只把 <code>board/plates/p027-b2.png</code> 当参考（<code>--ref</code>）重新构图，c 以它为编辑底图（<code>--edit-base</code>）。提示词 <code>excerpt/flash/design/S15-30/P027B/prompts.md</code>，运行记录 <code>P027B/runs.md</code>。board 与 spec 都没改，选定后才接入。</p>
+<div class="g">
+<figure><img src="../../../board/plates/p027-b2.png"><figcaption>旧 p027-b2（e64597bf…）：她朝画面右侧、脸朝镜头——两条都朝镜头走、脚出画</figcaption></figure>
+<figure><img src="../../../excerpt/flash/design/S15-30/P027B/a.png"><figcaption>a：列车在左，人群沿车门一侧涌出；她在画面右侧、走在人群前面 · sha 2764afb2…</figcaption></figure>
+<figure class="rec"><img src="../../../excerpt/flash/design/S15-30/P027B/b.png"><figcaption>b（推荐）：列车在右，她在画面正中背对镜头，出口楼梯在正前方深处；人群从车门涌出、在她身后两侧跟着 · sha 942eac10…</figcaption></figure>
+<figure><img src="../../../excerpt/flash/design/S15-30/P027B/c.png"><figcaption>c：以旧图为底改机位；她很小、偏右，人群只在左侧 · sha 238b0753…</figcaption></figure>
+</div>
+<h2>自查</h2>
+<table><tr><th></th><th>a</th><th>b</th><th>c</th></tr>
+<tr><td>机位在她身后，她背对镜头朝出口走</td><td class="ok">是（出口在右侧深处）</td><td class="ok">是（出口楼梯在正前方深处）</td><td class="ok">是</td></tr>
+<tr><td>人群从车门涌出、跟在她身后</td><td class="warn">只在左侧车门一线，她已走在人群前面</td><td class="ok">两侧都有，近处的人在她身后</td><td class="warn">只在左侧</td></tr>
+<tr><td>大小（约画面高度的 1/3–1/2），在画面中间</td><td class="warn">约 38%，偏右</td><td class="ok">约 40%，正中</td><td class="warn">约 29%，偏右</td></tr>
+<tr><td>背后干净（无包、无挂件），造型 B</td><td class="ok">是</td><td class="ok">是</td><td class="ok">是</td></tr>
+<tr><td>电脑合着、背面朝内、无标志；帽衫无图案</td><td class="ok">放大看未见标志</td><td class="ok">放大看未见标志</td><td class="ok">放大看未见标志</td></tr>
+<tr><td>无站牌、无字；红色</td><td class="ok">素黑横梁；全图未检出红色（耳挂在背面看不见）</td><td class="ok">同左</td><td class="ok">同左</td></tr></table>
+<p>推荐 b：她在正中、往深处走只会越来越小，出口就在她正前方，人群在两侧和身后跟着，最符合“人群涌出跟着她”。</p>
+<h2>放大</h2>
+<div class="g3"><figure><img src="zoom-a-her.jpg"><figcaption>a 她</figcaption></figure><figure class="rec"><img src="zoom-b-her.jpg"><figcaption>b 她</figcaption></figure><figure><img src="zoom-c-her.jpg"><figcaption>c 她</figcaption></figure></div>
+<div class="g"><figure class="rec"><img src="zoom-b-crowd.jpg"><figcaption>b 左侧人群与电脑</figcaption></figure><figure class="rec"><img src="zoom-b-crowd2.jpg"><figcaption>b 右侧车门与人群</figcaption></figure></div>
+<h2>配套 prompt（草稿，<code>P027B/prompt.md</code>）</h2>
+<p class="pr">镜头固定不动。她背对镜头，沿站台朝远处的出口楼梯大步走远，不回头，越走越小。戴兜帽的人群从开着的车门里涌出来，在她身后两侧跟着她朝出口走；他们把合着的笔记本电脑竖着抱在胸前，电脑背面朝向自己的身体。她背后没有包，也没有任何挂件。电脑外壳和连帽衫上没有任何标志或图案。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</p>
+</body></html>

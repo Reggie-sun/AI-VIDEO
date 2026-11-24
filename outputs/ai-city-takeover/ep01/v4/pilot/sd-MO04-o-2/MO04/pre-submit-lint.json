@@ -1,0 +1,45 @@
+{
+ "unit": "MO04",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "23ed1a35e265760a4f5f31e9ed46a275b84886985db756ee8c408ff984f2c615",
+ "compiled_prompt_sha256": "a41b690262012ed90f96949500dd5908fa68db2a03b5d171fcb37caa8a4f87f7",
+ "approval_sha256": "007b7b0599fae73961ed638c58af20cab11bdb321fc5da51d11dd6f2e376f047",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO04-o-2/continuity-report.json",
+  "sha256": "9e51afeea1e6e4510bf999d58c5b1fd60b1468ffd9f5977f7e32afd400084be2",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "不能出现第二块广告牌，白光只来自画面左侧灯箱；姓名贴不发光、无字；掏贴纸在片内 3.69 s 内完成；树枝回弹时头发和耳挂不换位；背景招牌无可读字"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

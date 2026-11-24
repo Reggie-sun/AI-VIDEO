@@ -1,0 +1,19 @@
+{
+ "schema": "iris-v4-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "MO13",
+   "attempt_id": "iris-mo13-n-1-source-001",
+   "operator_ceiling": 500,
+   "intent_at": "2026-11-23T06:15:37.546272+00:00",
+   "outcome": "submitted",
+   "recovered": {
+    "at": "2026-11-23",
+    "by": "主会话",
+    "method": "VideoGenerationService.recover_jimeng_unknown_once（只读回，未重提）",
+    "receipt": "paid-provider/submits/7feefe58….json ACCEPTED",
+    "note": "submit 报 canvas save unconfirmed；浏览器 URL 规整后读回 accepted"
+   }
+  }
+ ]
+}

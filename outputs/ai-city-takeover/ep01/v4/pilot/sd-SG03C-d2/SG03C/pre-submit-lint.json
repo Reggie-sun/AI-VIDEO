@@ -1,0 +1,56 @@
+{
+ "unit": "SG03C",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "83b1aa99f49c5b4317677c6711b4c744e88a47d5e553e1f419e426727d546811",
+ "compiled_prompt_sha256": "68fa0d91635d8d2d4ba4c8eb3103844c9bc7b611810e9b9561f30569fbcea237",
+ "approval_sha256": "4ff4d9dcb40ec0b648fd106053a737357203e4d1b892f72a0b6687fa95e3dc12",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03C-d2/continuity-report.json",
+  "sha256": "76af058a5f10bbe269d3e3e39d03ed3fe719e52fa055bd427b58e702a37d27f8",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。参考图与 d1 是同一张 p012c-w1d.png（sha 21c5f96a…2c48），对照 SG03-w1 实拍 4K 帧 t=4.6 的结论与 d1 相同。(1) 场地相同：同一根水泥柱和硬阴影、警示条、左侧戴墨镜的观众、青色和琥珀色灯管。(2) 轴线相同：工程师穿深蓝工装，在左前景向上看她；她在画面中间偏右。(3) 露的是左肩。(4) 黑高领内搭在。(5) 斜挎带从右肩斜到左胯。(6) 灰色卫衣面料的拉链短外套。(7) 红色只有左耳耳挂的一处红灯。(8) 人物身份一致。左前臂的灰袖在裁切范围外。头发比实拍更乱，属次要差异。",
+   "handoff": "PASS。剪法：SG03-w1 用到 49.08，在已接受的 2.0–5.4 s 范围内。之后接本镜窗口 2.15–3.52 s，即歌曲 49.08–50.45，唱 you're（2.38）和 awake（2.96–3.44），再切到 AWAKE 图形。人声 sha 4b3bb33c…3c09，长 4.000 s。切点前后是同一次俯身演唱的连续时刻。",
+   "axis_action_camera": "PASS。同机位、同视轴向她的脸推近约 1.5 倍。工程师、柱子、警示条、观众的比例变化一致，没有越轴。prompt 写明镜头固定，不推不拉不摇不环绕。切点处她从睁眼看着工程师变成闭眼抬下巴，这是有意安排在拍点上的转折，使用者是在 closeup3.html 并排页面上选的 D4-a。本镜只需唱两个词，共 1.37 s，4 s 的生成长度够用。",
+   "prompt_fit": "PASS。compiled-native-prompt.zh.txt、preview-approval.prompts.SG03C.text、closeup3.html 第 9 行、prepared.json 的 prompt_text（第 5251、5323、5427、5499、5602 行）逐字相同，与 d1 也相同。上传给模型的 sha 都等于认可值：prompt 68fa0d91635d8d2d4ba4c8eb3103844c9bc7b611810e9b9561f30569fbcea237（第 5690 行），参考图 21c5f96a6cdbdf4f39d99b9137e4092776d4f3b4d77adba4178532c473682c48（第 5697 行），人声 4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09（第 5704 行）。生成参数：multimodal（reference_to_video），4 s，4k，16:9，上限 400 CRD，只提交 1 次，不重试。attempt、policy、reservation 均为 iris-sg03c-d2-*，与 bound_ids 一致，和 d1 互不相同。节点 node_sz3yvhsr99 与 d1 的 node_k0cx3p56nj 不同，generation_POSTs=0，尚未提交。open_state 和 close_state（第 265、272 行）与首帧一致。上次 c 失败的五点在 prompt、首帧和剪法上都有对应措施，与 d1 相同：环绕、工程师消失、场地不同、开头抢拍、尾部空口型。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "生成方式是 reference_to_video，第 0 帧不锁定，首帧和 prompt 只能降低风险。Gate 要量机位漂移，并逐帧确认工程师一直在左前景。",
+    "对口型：Gate 用片段自带音轨和参考人声对齐，逐字核对 2.15–3.52 s，并查 2.15 s 那一帧是不是 you're 之前的口型。",
+    "使用范围到 3.52 s，比 awake 结束（3.44 s）多约 2 帧。Gate 要查这两帧有没有空口型或多出来的声音；有的话就把切点提前到 3.44。",
+    "切点处姿态跳变：SG03-w1 在 4.14 s 是睁眼，本镜 2.15 s 是闭眼抬下巴，而且由模型生成、不受控。要把这两帧并排审看，结论交给使用者。",
+    "分镜里 s012b 的切点仍写 48.17，与剪法的 49.08 不一致。只记为风险，需回写分镜。",
+    "两条 take 共用一次认可，总上限 800 CRD，各自只提交一次。两条都过 Gate 后挑一条，不提交第三条。",
+    "shot.duration_policy.seconds=6.0（prepared 第 48、497 行），与输出 4 s 不一致，交给 lint 判定。",
+    "人声内容我这边核不了：本地转写工具对纯 wav 报 no_video_stream，记为 NOT_EVALUATED。",
+    "我没有 Bash，无法核实 p012c-w1d.png 与 D4-a.png 是否逐字节相同，目前只有认可文件里的声明。",
+    "permit 在 2026-11-19T21:16:04Z 过期（operator-bound.json）。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

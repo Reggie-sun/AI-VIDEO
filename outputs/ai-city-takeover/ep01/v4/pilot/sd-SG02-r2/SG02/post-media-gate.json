@@ -1,0 +1,31 @@
+{
+ "unit": "SG02",
+ "take": "r2",
+ "media": {
+  "sha256": "0c7a34119f4ab9aa3870eb03a2e6442393352ba312d31320b07679699d6c5425"
+ },
+ "reviewed_by": "shot-gate-reviewer",
+ "overall": "FAIL",
+ "items": {
+  "speaks": "FAIL (in sync only clip 0.28–1.81 s; tail 0.2–0.3 s early)",
+  "identity": "PASS",
+  "action": "NOT_EVALUATED (tail frames)",
+  "camera_background": "PASS",
+  "technical": "PASS"
+ },
+ "usable_in_sync_span": {
+  "clip_s": [
+   0.28,
+   1.81
+  ],
+  "song_s": [
+   29.859,
+   31.389
+  ],
+  "placement_lag_s": -0.0499
+ },
+ "user_decision": {
+  "quote": "对得上的用，后半句切到 s009 (Recommended)",
+  "effect": "use clip 0.28–1.81 s only; cut to s009 near song 31.39 s (nearest beat); That's me / Bus stop over s009"
+ }
+}

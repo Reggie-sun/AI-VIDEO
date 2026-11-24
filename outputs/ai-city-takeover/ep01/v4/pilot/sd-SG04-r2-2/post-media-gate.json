@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-post-media-gate/1",
+ "unit": "SG04",
+ "take_sha256": "72fe8e1a1542d44d9924d34d963a9749280b10d143e8887ed3568cbc8db2a142",
+ "reviewer": "shot-gate-reviewer",
+ "verdict": "FAIL",
+ "items": {
+  "lip_sync": "FAIL (front lag 0.64 vs 0.88; 'I'm the call' not synced)",
+  "camera_locked": "PASS",
+  "engineer_hand": "FAIL (absent from f01)",
+  "gaze_to_camera": "NOT_EVALUATED",
+  "phone_below_chin_no_logo": "PASS",
+  "wardrobe_identity": "PASS",
+  "artifacts": "PASS",
+  "cut_from_s012": "FAIL (hand missing)"
+ },
+ "usable_song_s": [
+  52.47,
+  55.06
+ ],
+ "spent_CRD_observed": 400,
+ "parent_note": "subsegment use needs user decision; mock at excerpt/review/sg04-r2/"
+}

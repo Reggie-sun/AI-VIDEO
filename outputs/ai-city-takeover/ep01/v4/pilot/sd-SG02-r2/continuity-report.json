@@ -1,0 +1,30 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-18T02:04:09+00:00",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG02-r2/preview-approval.json",
+   "sha256": "9bebcd09dabe9d13b7a390773cc7e37f9c911974728033816ed37629928e9e95"
+  }
+ },
+ "units": {
+  "SG02": {
+   "verdict": "ready",
+   "continuity": "PASS（场记）",
+   "handoff": "PASS（按设计，省略撕贴）",
+   "axis_action_camera": "PASS：正对镜头锁定，说完停住，硬切 s009",
+   "prompt_fit": "PASS：编译文本与 r2 认可逐字相同",
+   "lint": "由主会话运行 lint.py",
+   "risks": [
+    "姓名贴 MO04 发光/SG02 哑白不连",
+    "手与姓名贴可能漂移",
+    "耳挂镜像或入耳式复发：逐帧查",
+    "首帧张嘴、I: 片内 0.17 s：sync_check",
+    "停住可能僵或提前收口",
+    "s009 起姓名贴消失"
+   ],
+   "full_report_note": "场记完整报告见本轮对话"
+  }
+ }
+}

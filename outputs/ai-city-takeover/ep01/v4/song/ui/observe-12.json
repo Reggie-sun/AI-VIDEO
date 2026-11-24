@@ -1,0 +1,51 @@
+{
+ "n": "12",
+ "at": "2026-11-17T14:29:08.622Z",
+ "fields_sha256": "ab5482b1e215d8a1e4d0d3154218a9581328208d3b3a03c9775d28947a88596a",
+ "read": {
+  "lyrics": "[Intro - instrumental, 8 bars, pager beep motif]\n\n\n\n\n[Spoken - deadpan, dry]\n\nIncident Week. Every look got somebody pag…",
+  "style": "industrial glitch club, 130 BPM, 4/4, distorted industrial kick, metallic percussion, pager and alarm tone samples, gated noise bursts, glitch cuts on the bar ends, dark sub bass, opens with an 8-bar instrumental intro, one American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, a euphoric sung chorus that bursts open on All hands, all night with a big lift and a shouted stacked last line, a stacked chanted post-chorus hook, key change up into the final chorus, aggressive, untamed, clean modern mix",
+  "exclude": "rap, male lead vocal, mumbled vocals, lo-fi, rock guitar, big room EDM, dubstep, electroclash, acid techno, trance, metal screaming",
+  "title": "All Hands r4",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": null,
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 4,
+  "lyrics_sha256": "b1c44053be5dc62fa0d2d9e55e334d93ada759791315374088b8636cb189d702"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

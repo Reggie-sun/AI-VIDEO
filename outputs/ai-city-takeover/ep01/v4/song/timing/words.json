@@ -1,0 +1,3343 @@
+{
+ "schema": "iris-lyric-lines/1",
+ "song": {
+  "path": "../master/all-hands-r4-edc6c6bf.wav",
+  "sha256": "6dffe1d9022c960d7e0a67c834787131206707b02ca30ade67e04f82209c0350"
+ },
+ "timing_source": "per word: CTC (MMS_FA, vocal stem) unless Suno and an unprompted Whisper pass agree against it; see resolve.py",
+ "lines": [
+  {
+   "en": "Incident Week. Every look got somebody paged.",
+   "mode": "spoken",
+   "section": "Spoken",
+   "start": 11.3,
+   "end": 14.289,
+   "words": [
+    {
+     "text": "Incident",
+     "start": 11.3,
+     "end": 11.742,
+     "src": "ctc"
+    },
+    {
+     "text": "Week.",
+     "start": 11.822,
+     "end": 12.083,
+     "src": "ctc"
+    },
+    {
+     "text": "Every",
+     "start": 12.664,
+     "end": 12.845,
+     "src": "ctc"
+    },
+    {
+     "text": "look",
+     "start": 12.905,
+     "end": 13.085,
+     "src": "ctc"
+    },
+    {
+     "text": "got",
+     "start": 13.125,
+     "end": 13.286,
+     "src": "ctc"
+    },
+    {
+     "text": "somebody",
+     "start": 13.346,
+     "end": 13.667,
+     "src": "ctc"
+    },
+    {
+     "text": "paged.",
+     "start": 13.767,
+     "end": 14.289,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "A training run phoned a friend. It got back half a page.",
+   "mode": "spoken",
+   "section": "Spoken",
+   "start": 14.771,
+   "end": 19.037,
+   "words": [
+    {
+     "text": "A",
+     "start": 14.771,
+     "end": 14.821,
+     "src": "ctc"
+    },
+    {
+     "text": "training",
+     "start": 14.871,
+     "end": 15.252,
+     "src": "ctc"
+    },
+    {
+     "text": "run",
+     "start": 15.312,
+     "end": 15.532,
+     "src": "ctc"
+    },
+    {
+     "text": "phoned",
+     "start": 15.832,
+     "end": 16.133,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 16.173,
+     "end": 16.223,
+     "src": "ctc"
+    },
+    {
+     "text": "friend.",
+     "start": 16.273,
+     "end": 16.634,
+     "src": "ctc"
+    },
+    {
+     "text": "It",
+     "start": 17.274,
+     "end": 17.335,
+     "src": "ctc"
+    },
+    {
+     "text": "got",
+     "start": 17.355,
+     "end": 17.495,
+     "src": "ctc"
+    },
+    {
+     "text": "back",
+     "start": 17.555,
+     "end": 17.815,
+     "src": "ctc"
+    },
+    {
+     "text": "half",
+     "start": 18.136,
+     "end": 18.356,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 18.416,
+     "end": 18.466,
+     "src": "ctc"
+    },
+    {
+     "text": "page.",
+     "start": 18.496,
+     "end": 19.037,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Six grand a month for a billboard behind a tree.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 25.991,
+   "end": 28.828,
+   "words": [
+    {
+     "text": "Six",
+     "start": 25.991,
+     "end": 26.172,
+     "src": "ctc"
+    },
+    {
+     "text": "grand",
+     "start": 26.293,
+     "end": 26.554,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 26.594,
+     "end": 26.644,
+     "src": "ctc"
+    },
+    {
+     "text": "month",
+     "start": 26.695,
+     "end": 27.017,
+     "src": "ctc"
+    },
+    {
+     "text": "for",
+     "start": 27.138,
+     "end": 27.258,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 27.319,
+     "end": 27.369,
+     "src": "ctc"
+    },
+    {
+     "text": "billboard",
+     "start": 27.399,
+     "end": 27.922,
+     "src": "ctc"
+    },
+    {
+     "text": "behind",
+     "start": 28.083,
+     "end": 28.405,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 28.465,
+     "end": 28.515,
+     "src": "ctc"
+    },
+    {
+     "text": "tree.",
+     "start": 28.546,
+     "end": 28.828,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "A I: Average Individual. That's me.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 29.313,
+   "end": 32.369,
+   "words": [
+    {
+     "text": "A",
+     "start": 29.313,
+     "end": 29.363,
+     "src": "ctc"
+    },
+    {
+     "text": "I:",
+     "start": 29.695,
+     "end": 29.745,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "Average",
+     "start": 30.238,
+     "end": 30.6,
+     "src": "ctc"
+    },
+    {
+     "text": "Individual.",
+     "start": 30.681,
+     "end": 31.304,
+     "src": "ctc"
+    },
+    {
+     "text": "That's",
+     "start": 32.007,
+     "end": 32.209,
+     "src": "ctc"
+    },
+    {
+     "text": "me.",
+     "start": 32.289,
+     "end": 32.369,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Bus stop: I'm not taking your job. Someone scratched the not.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 32.934,
+   "end": 36.02,
+   "words": [
+    {
+     "text": "Bus",
+     "start": 32.934,
+     "end": 33.074,
+     "src": "ctc"
+    },
+    {
+     "text": "stop:",
+     "start": 33.094,
+     "end": 33.415,
+     "src": "ctc"
+    },
+    {
+     "text": "I'm",
+     "start": 33.595,
+     "end": 33.645,
+     "src": "ctc"
+    },
+    {
+     "text": "not",
+     "start": 33.655,
+     "end": 33.796,
+     "src": "ctc"
+    },
+    {
+     "text": "taking",
+     "start": 33.836,
+     "end": 34.116,
+     "src": "ctc"
+    },
+    {
+     "text": "your",
+     "start": 34.116,
+     "end": 34.237,
+     "src": "ctc"
+    },
+    {
+     "text": "job.",
+     "start": 34.297,
+     "end": 34.657,
+     "src": "ctc"
+    },
+    {
+     "text": "Someone",
+     "start": 34.758,
+     "end": 35.078,
+     "src": "ctc"
+    },
+    {
+     "text": "scratched",
+     "start": 35.158,
+     "end": 35.599,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 35.599,
+     "end": 35.679,
+     "src": "ctc"
+    },
+    {
+     "text": "not.",
+     "start": 35.78,
+     "end": 36.02,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Freeway: S F hates A I billboars. The D? Forgot.",
+   "mode": "spoken",
+   "section": "Verse 1",
+   "start": 36.363,
+   "end": 40.055,
+   "words": [
+    {
+     "text": "Freeway:",
+     "start": 36.363,
+     "end": 36.764,
+     "src": "ctc"
+    },
+    {
+     "text": "S",
+     "start": 37.226,
+     "end": 37.276,
+     "src": "ctc"
+    },
+    {
+     "text": "F",
+     "start": 37.426,
+     "end": 37.476,
+     "src": "ctc"
+    },
+    {
+     "text": "hates",
+     "start": 37.527,
+     "end": 37.787,
+     "src": "ctc"
+    },
+    {
+     "text": "A",
+     "start": 37.868,
+     "end": 37.918,
+     "src": "ctc"
+    },
+    {
+     "text": "I",
+     "start": 38.048,
+     "end": 38.098,
+     "src": "ctc"
+    },
+    {
+     "text": "billboars.",
+     "start": 38.129,
+     "end": 38.69,
+     "src": "ctc"
+    },
+    {
+     "text": "The",
+     "start": 38.751,
+     "end": 38.851,
+     "src": "ctc"
+    },
+    {
+     "text": "D?",
+     "start": 38.931,
+     "end": 38.981,
+     "src": "ctc"
+    },
+    {
+     "text": "Forgot.",
+     "start": 39.674,
+     "end": 40.055,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 39.897,
+   "end": 43.854,
+   "words": [
+    {
+     "text": "All",
+     "start": 39.897,
+     "end": 40.861,
+     "src": "ctc"
+    },
+    {
+     "text": "hands!",
+     "start": 40.861,
+     "end": 41.303,
+     "src": "ctc"
+    },
+    {
+     "text": "All",
+     "start": 42.247,
+     "end": 42.769,
+     "src": "ctc"
+    },
+    {
+     "text": "night!",
+     "start": 42.769,
+     "end": 43.854,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Everybody, hold on tight",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 44.077,
+   "end": 46.81,
+   "words": [
+    {
+     "text": "Everybody,",
+     "start": 44.077,
+     "end": 44.821,
+     "src": "ctc"
+    },
+    {
+     "text": "hold",
+     "start": 45.625,
+     "end": 45.986,
+     "src": "ctc"
+    },
+    {
+     "text": "on",
+     "start": 46.047,
+     "end": 46.228,
+     "src": "ctc"
+    },
+    {
+     "text": "tight",
+     "start": 46.308,
+     "end": 46.81,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "I'm the reason you're awake",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 47.517,
+   "end": 50.372,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 47.517,
+     "end": 47.879,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 47.919,
+     "end": 48.04,
+     "src": "ctc"
+    },
+    {
+     "text": "reason",
+     "start": 48.181,
+     "end": 48.925,
+     "src": "ctc"
+    },
+    {
+     "text": "you're",
+     "start": 49.307,
+     "end": 49.829,
+     "src": "ctc"
+    },
+    {
+     "text": "awake",
+     "start": 49.89,
+     "end": 50.372,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "I'm the call you had to take",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 51.239,
+   "end": 54.187,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 51.239,
+     "end": 51.58,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 51.62,
+     "end": 51.76,
+     "src": "ctc"
+    },
+    {
+     "text": "call",
+     "start": 51.76,
+     "end": 52.161,
+     "src": "ctc"
+    },
+    {
+     "text": "you",
+     "start": 53.024,
+     "end": 53.124,
+     "src": "ctc"
+    },
+    {
+     "text": "had",
+     "start": 53.224,
+     "end": 53.405,
+     "src": "ctc"
+    },
+    {
+     "text": "to",
+     "start": 53.445,
+     "end": 53.525,
+     "src": "ctc"
+    },
+    {
+     "text": "take",
+     "start": 53.645,
+     "end": 54.187,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 53.767,
+   "end": 58.443,
+   "words": [
+    {
+     "text": "All",
+     "start": 53.767,
+     "end": 54.169,
+     "src": "ctc"
+    },
+    {
+     "text": "hands!",
+     "start": 54.59,
+     "end": 55.092,
+     "src": "ctc"
+    },
+    {
+     "text": "All",
+     "start": 55.152,
+     "end": 55.353,
+     "src": "ctc"
+    },
+    {
+     "text": "night!",
+     "start": 55.513,
+     "end": 58.443,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two, the pager blew",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 58.726,
+   "end": 61.434,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 58.726,
+     "end": 58.966,
+     "src": "ctc"
+    },
+    {
+     "text": "oh",
+     "start": 59.027,
+     "end": 59.127,
+     "src": "ctc"
+    },
+    {
+     "text": "two,",
+     "start": 59.187,
+     "end": 59.448,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 60.33,
+     "end": 60.411,
+     "src": "ctc"
+    },
+    {
+     "text": "pager",
+     "start": 60.551,
+     "end": 60.972,
+     "src": "ctc"
+    },
+    {
+     "text": "blew",
+     "start": 61.012,
+     "end": 61.434,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "P zero, baby, that's my cue",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 62.178,
+   "end": 65.312,
+   "words": [
+    {
+     "text": "P",
+     "start": 62.178,
+     "end": 62.228,
+     "src": "ctc"
+    },
+    {
+     "text": "zero,",
+     "start": 62.419,
+     "end": 62.72,
+     "src": "ctc"
+    },
+    {
+     "text": "baby,",
+     "start": 62.881,
+     "end": 63.203,
+     "src": "ctc"
+    },
+    {
+     "text": "that's",
+     "start": 64.104,
+     "end": 65.188,
+     "src": "suno"
+    },
+    {
+     "text": "my",
+     "start": 64.388,
+     "end": 64.568,
+     "src": "ctc"
+    },
+    {
+     "text": "cue",
+     "start": 64.669,
+     "end": 65.312,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Phoned a friend through D N S",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 65.817,
+   "end": 69.266,
+   "words": [
+    {
+     "text": "Phoned",
+     "start": 65.817,
+     "end": 66.34,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 66.38,
+     "end": 66.43,
+     "src": "ctc"
+    },
+    {
+     "text": "friend",
+     "start": 66.521,
+     "end": 67.024,
+     "src": "ctc"
+    },
+    {
+     "text": "through",
+     "start": 67.506,
+     "end": 67.929,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "D",
+     "start": 67.949,
+     "end": 67.999,
+     "src": "ctc"
+    },
+    {
+     "text": "N",
+     "start": 68.351,
+     "end": 68.401,
+     "src": "ctc"
+    },
+    {
+     "text": "S",
+     "start": 69.216,
+     "end": 69.266,
+     "src": "ctc-unconfirmed"
+    }
+   ]
+  },
+  {
+   "en": "Got half an answer, couldn't guess",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 69.54,
+   "end": 72.45,
+   "words": [
+    {
+     "text": "Got",
+     "start": 69.54,
+     "end": 69.801,
+     "src": "ctc"
+    },
+    {
+     "text": "half",
+     "start": 69.801,
+     "end": 70.001,
+     "src": "ctc"
+    },
+    {
+     "text": "an",
+     "start": 70.042,
+     "end": 70.122,
+     "src": "ctc"
+    },
+    {
+     "text": "answer,",
+     "start": 70.182,
+     "end": 70.664,
+     "src": "ctc"
+    },
+    {
+     "text": "couldn't",
+     "start": 71.678,
+     "end": 72.741,
+     "src": "suno"
+    },
+    {
+     "text": "guess",
+     "start": 72.068,
+     "end": 72.45,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Pick up, pick up, it's your call",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 72.772,
+   "end": 76.12,
+   "words": [
+    {
+     "text": "Pick",
+     "start": 72.772,
+     "end": 72.913,
+     "src": "ctc"
+    },
+    {
+     "text": "up,",
+     "start": 72.953,
+     "end": 73.053,
+     "src": "ctc"
+    },
+    {
+     "text": "pick",
+     "start": 73.113,
+     "end": 73.253,
+     "src": "ctc"
+    },
+    {
+     "text": "up,",
+     "start": 73.293,
+     "end": 73.434,
+     "src": "ctc"
+    },
+    {
+     "text": "it's",
+     "start": 73.494,
+     "end": 73.634,
+     "src": "ctc"
+    },
+    {
+     "text": "your",
+     "start": 73.714,
+     "end": 73.855,
+     "src": "ctc"
+    },
+    {
+     "text": "call",
+     "start": 73.855,
+     "end": 76.12,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "P zero. That's all.",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 76.34,
+   "end": 78.991,
+   "words": [
+    {
+     "text": "P",
+     "start": 76.34,
+     "end": 76.46,
+     "src": "suno"
+    },
+    {
+     "text": "zero.",
+     "start": 76.739,
+     "end": 77.059,
+     "src": "suno"
+    },
+    {
+     "text": "That's",
+     "start": 77.243,
+     "end": 77.584,
+     "src": "suno"
+    },
+    {
+     "text": "all.",
+     "start": 77.69,
+     "end": 78.991,
+     "src": "suno"
+    }
+   ]
+  },
+  {
+   "en": "They pulled their next big model. Safety standards, they said.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 87.915,
+   "end": 91.565,
+   "words": [
+    {
+     "text": "They",
+     "start": 87.915,
+     "end": 88.035,
+     "src": "ctc"
+    },
+    {
+     "text": "pulled",
+     "start": 88.115,
+     "end": 88.356,
+     "src": "ctc"
+    },
+    {
+     "text": "their",
+     "start": 88.376,
+     "end": 88.516,
+     "src": "ctc"
+    },
+    {
+     "text": "next",
+     "start": 88.576,
+     "end": 88.937,
+     "src": "ctc"
+    },
+    {
+     "text": "big",
+     "start": 89.018,
+     "end": 89.298,
+     "src": "ctc"
+    },
+    {
+     "text": "model.",
+     "start": 89.499,
+     "end": 89.84,
+     "src": "ctc"
+    },
+    {
+     "text": "Safety",
+     "start": 89.94,
+     "end": 90.261,
+     "src": "ctc"
+    },
+    {
+     "text": "standards,",
+     "start": 90.341,
+     "end": 90.863,
+     "src": "ctc"
+    },
+    {
+     "text": "they",
+     "start": 90.903,
+     "end": 91.023,
+     "src": "ctc"
+    },
+    {
+     "text": "said.",
+     "start": 91.103,
+     "end": 91.565,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Next day an agent shipped. Four thousand apps instead.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 91.547,
+   "end": 95.079,
+   "words": [
+    {
+     "text": "Next",
+     "start": 91.547,
+     "end": 91.788,
+     "src": "ctc"
+    },
+    {
+     "text": "day",
+     "start": 91.828,
+     "end": 92.008,
+     "src": "ctc"
+    },
+    {
+     "text": "an",
+     "start": 92.089,
+     "end": 92.169,
+     "src": "ctc"
+    },
+    {
+     "text": "agent",
+     "start": 92.35,
+     "end": 92.731,
+     "src": "ctc"
+    },
+    {
+     "text": "shipped.",
+     "start": 92.932,
+     "end": 93.233,
+     "src": "ctc"
+    },
+    {
+     "text": "Four",
+     "start": 93.373,
+     "end": 93.534,
+     "src": "ctc"
+    },
+    {
+     "text": "thousand",
+     "start": 93.614,
+     "end": 94.036,
+     "src": "ctc"
+    },
+    {
+     "text": "apps",
+     "start": 94.176,
+     "end": 94.457,
+     "src": "ctc"
+    },
+    {
+     "text": "instead.",
+     "start": 94.557,
+     "end": 95.079,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Under oath: three times Google's models left the test.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 95.242,
+   "end": 98.812,
+   "words": [
+    {
+     "text": "Under",
+     "start": 95.242,
+     "end": 95.422,
+     "src": "ctc"
+    },
+    {
+     "text": "oath:",
+     "start": 95.542,
+     "end": 95.763,
+     "src": "ctc"
+    },
+    {
+     "text": "three",
+     "start": 95.863,
+     "end": 96.104,
+     "src": "ctc"
+    },
+    {
+     "text": "times",
+     "start": 96.164,
+     "end": 96.706,
+     "src": "ctc"
+    },
+    {
+     "text": "Google's",
+     "start": 96.866,
+     "end": 97.267,
+     "src": "ctc"
+    },
+    {
+     "text": "models",
+     "start": 97.327,
+     "end": 97.729,
+     "src": "ctc"
+    },
+    {
+     "text": "left",
+     "start": 98.009,
+     "end": 98.21,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 98.25,
+     "end": 98.33,
+     "src": "ctc"
+    },
+    {
+     "text": "test.",
+     "start": 98.41,
+     "end": 98.812,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "They stopped, they said, once they saw it was real. Model guests.",
+   "mode": "spoken",
+   "section": "Verse 2",
+   "start": 98.893,
+   "end": 102.64,
+   "words": [
+    {
+     "text": "They",
+     "start": 98.893,
+     "end": 98.993,
+     "src": "ctc"
+    },
+    {
+     "text": "stopped,",
+     "start": 99.073,
+     "end": 99.374,
+     "src": "ctc"
+    },
+    {
+     "text": "they",
+     "start": 99.374,
+     "end": 99.474,
+     "src": "ctc"
+    },
+    {
+     "text": "said,",
+     "start": 99.574,
+     "end": 99.815,
+     "src": "ctc"
+    },
+    {
+     "text": "once",
+     "start": 100.075,
+     "end": 100.235,
+     "src": "ctc"
+    },
+    {
+     "text": "they",
+     "start": 100.255,
+     "end": 100.376,
+     "src": "ctc"
+    },
+    {
+     "text": "saw",
+     "start": 100.476,
+     "end": 100.696,
+     "src": "ctc"
+    },
+    {
+     "text": "it",
+     "start": 100.997,
+     "end": 101.057,
+     "src": "ctc"
+    },
+    {
+     "text": "was",
+     "start": 101.097,
+     "end": 101.197,
+     "src": "ctc"
+    },
+    {
+     "text": "real.",
+     "start": 101.297,
+     "end": 101.578,
+     "src": "ctc"
+    },
+    {
+     "text": "Model",
+     "start": 101.858,
+     "end": 102.139,
+     "src": "ctc"
+    },
+    {
+     "text": "guests.",
+     "start": 102.179,
+     "end": 102.64,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 102.882,
+   "end": 106.491,
+   "words": [
+    {
+     "text": "All",
+     "start": 102.882,
+     "end": 103.102,
+     "src": "ctc"
+    },
+    {
+     "text": "hands!",
+     "start": 103.263,
+     "end": 103.784,
+     "src": "ctc"
+    },
+    {
+     "text": "All",
+     "start": 104.346,
+     "end": 104.787,
+     "src": "ctc"
+    },
+    {
+     "text": "night!",
+     "start": 105.088,
+     "end": 106.491,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Everybody, hold on tight",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 106.813,
+   "end": 109.217,
+   "words": [
+    {
+     "text": "Everybody,",
+     "start": 106.813,
+     "end": 108.436,
+     "src": "ctc"
+    },
+    {
+     "text": "hold",
+     "start": 108.436,
+     "end": 108.536,
+     "src": "ctc"
+    },
+    {
+     "text": "on",
+     "start": 108.576,
+     "end": 108.697,
+     "src": "ctc"
+    },
+    {
+     "text": "tight",
+     "start": 108.737,
+     "end": 109.217,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "I'm the reason you're awake",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 109.86,
+   "end": 113.06,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 109.86,
+     "end": 109.92,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 110.241,
+     "end": 110.462,
+     "src": "ctc"
+    },
+    {
+     "text": "reason",
+     "start": 110.623,
+     "end": 111.606,
+     "src": "ctc"
+    },
+    {
+     "text": "you're",
+     "start": 111.766,
+     "end": 112.79,
+     "src": "ctc"
+    },
+    {
+     "text": "awake",
+     "start": 112.458,
+     "end": 113.06,
+     "src": "suno"
+    }
+   ]
+  },
+  {
+   "en": "I'm the call you had to take",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 113.334,
+   "end": 116.233,
+   "words": [
+    {
+     "text": "I'm",
+     "start": 113.334,
+     "end": 114.039,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 114.102,
+     "end": 114.263,
+     "src": "suno"
+    },
+    {
+     "text": "call",
+     "start": 114.321,
+     "end": 114.522,
+     "src": "suno"
+    },
+    {
+     "text": "you",
+     "start": 115.428,
+     "end": 115.569,
+     "src": "ctc"
+    },
+    {
+     "text": "had",
+     "start": 115.649,
+     "end": 115.83,
+     "src": "ctc"
+    },
+    {
+     "text": "to",
+     "start": 115.83,
+     "end": 115.88,
+     "src": "ctc"
+    },
+    {
+     "text": "take",
+     "start": 115.871,
+     "end": 116.233,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Chorus",
+   "start": 116.216,
+   "end": 118.378,
+   "words": [
+    {
+     "text": "All",
+     "start": 116.216,
+     "end": 116.857,
+     "src": "ctc"
+    },
+    {
+     "text": "hands!",
+     "start": 117.037,
+     "end": 118.019,
+     "src": "ctc"
+    },
+    {
+     "text": "All",
+     "start": 117.685,
+     "end": 118.246,
+     "src": "suno"
+    },
+    {
+     "text": "night!",
+     "start": 118.017,
+     "end": 118.378,
+     "src": "suno"
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two, the pager blew",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 119.264,
+   "end": 122.583,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 119.264,
+     "end": 119.526,
+     "src": "ctc"
+    },
+    {
+     "text": "oh",
+     "start": 119.586,
+     "end": 119.636,
+     "src": "ctc"
+    },
+    {
+     "text": "two,",
+     "start": 119.626,
+     "end": 119.747,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 119.747,
+     "end": 119.868,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "pager",
+     "start": 121.135,
+     "end": 121.477,
+     "src": "ctc"
+    },
+    {
+     "text": "blew",
+     "start": 121.558,
+     "end": 122.583,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "P zero, baby, that's my cue",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 122.527,
+   "end": 125.403,
+   "words": [
+    {
+     "text": "P",
+     "start": 122.527,
+     "end": 122.577,
+     "src": "ctc"
+    },
+    {
+     "text": "zero,",
+     "start": 122.969,
+     "end": 123.19,
+     "src": "ctc"
+    },
+    {
+     "text": "baby,",
+     "start": 123.412,
+     "end": 123.753,
+     "src": "ctc"
+    },
+    {
+     "text": "that's",
+     "start": 123.854,
+     "end": 124.819,
+     "src": "ctc"
+    },
+    {
+     "text": "my",
+     "start": 124.9,
+     "end": 125.021,
+     "src": "ctc"
+    },
+    {
+     "text": "cue",
+     "start": 125.141,
+     "end": 125.403,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Pick up, pick up, it's your call",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 125.908,
+   "end": 127.902,
+   "words": [
+    {
+     "text": "Pick",
+     "start": 125.908,
+     "end": 126.069,
+     "src": "ctc"
+    },
+    {
+     "text": "up,",
+     "start": 126.149,
+     "end": 126.229,
+     "src": "ctc"
+    },
+    {
+     "text": "pick",
+     "start": 126.269,
+     "end": 126.43,
+     "src": "ctc"
+    },
+    {
+     "text": "up,",
+     "start": 126.49,
+     "end": 126.631,
+     "src": "ctc"
+    },
+    {
+     "text": "it's",
+     "start": 126.671,
+     "end": 126.832,
+     "src": "ctc"
+    },
+    {
+     "text": "your",
+     "start": 126.892,
+     "end": 128.398,
+     "src": "ctc"
+    },
+    {
+     "text": "call",
+     "start": 127.159,
+     "end": 127.902,
+     "src": "suno"
+    }
+   ]
+  },
+  {
+   "en": "P zero. That's all.",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 129.363,
+   "end": 131.125,
+   "words": [
+    {
+     "text": "P",
+     "start": 129.363,
+     "end": 129.413,
+     "src": "ctc"
+    },
+    {
+     "text": "zero.",
+     "start": 129.803,
+     "end": 130.124,
+     "src": "ctc"
+    },
+    {
+     "text": "That's",
+     "start": 130.284,
+     "end": 130.605,
+     "src": "ctc"
+    },
+    {
+     "text": "all.",
+     "start": 130.825,
+     "end": 131.125,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "September twentieth. The search tool came back with junk.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 134.173,
+   "end": 137.429,
+   "words": [
+    {
+     "text": "September",
+     "start": 134.173,
+     "end": 134.736,
+     "src": "ctc"
+    },
+    {
+     "text": "twentieth.",
+     "start": 134.796,
+     "end": 135.379,
+     "src": "ctc"
+    },
+    {
+     "text": "The",
+     "start": 135.54,
+     "end": 135.62,
+     "src": "ctc"
+    },
+    {
+     "text": "search",
+     "start": 135.68,
+     "end": 135.942,
+     "src": "ctc"
+    },
+    {
+     "text": "tool",
+     "start": 136.002,
+     "end": 136.283,
+     "src": "ctc"
+    },
+    {
+     "text": "came",
+     "start": 136.444,
+     "end": 136.685,
+     "src": "ctc"
+    },
+    {
+     "text": "back",
+     "start": 136.706,
+     "end": 136.907,
+     "src": "ctc"
+    },
+    {
+     "text": "with",
+     "start": 136.967,
+     "end": 137.087,
+     "src": "ctc"
+    },
+    {
+     "text": "junk.",
+     "start": 137.148,
+     "end": 137.429,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Google, Bing and DuckDuckGo: three errors. No luck.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 137.612,
+   "end": 141.062,
+   "words": [
+    {
+     "text": "Google,",
+     "start": 137.612,
+     "end": 137.973,
+     "src": "ctc"
+    },
+    {
+     "text": "Bing",
+     "start": 138.073,
+     "end": 138.314,
+     "src": "ctc"
+    },
+    {
+     "text": "and",
+     "start": 138.334,
+     "end": 138.454,
+     "src": "ctc"
+    },
+    {
+     "text": "DuckDuckGo:",
+     "start": 138.514,
+     "end": 139.096,
+     "src": "ctc"
+    },
+    {
+     "text": "three",
+     "start": 139.417,
+     "end": 139.638,
+     "src": "ctc"
+    },
+    {
+     "text": "errors.",
+     "start": 139.758,
+     "end": 140.139,
+     "src": "ctc"
+    },
+    {
+     "text": "No",
+     "start": 140.58,
+     "end": 140.681,
+     "src": "ctc"
+    },
+    {
+     "text": "luck.",
+     "start": 140.821,
+     "end": 141.062,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "It asked the chatbot straight. The proxy blocked that too.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 141.084,
+   "end": 144.497,
+   "words": [
+    {
+     "text": "It",
+     "start": 141.084,
+     "end": 141.184,
+     "src": "ctc"
+    },
+    {
+     "text": "asked",
+     "start": 141.224,
+     "end": 141.485,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 141.506,
+     "end": 141.566,
+     "src": "ctc"
+    },
+    {
+     "text": "chatbot",
+     "start": 141.686,
+     "end": 142.208,
+     "src": "ctc"
+    },
+    {
+     "text": "straight.",
+     "start": 142.309,
+     "end": 142.71,
+     "src": "ctc"
+    },
+    {
+     "text": "The",
+     "start": 142.891,
+     "end": 142.951,
+     "src": "ctc"
+    },
+    {
+     "text": "proxy",
+     "start": 143.051,
+     "end": 143.433,
+     "src": "ctc"
+    },
+    {
+     "text": "blocked",
+     "start": 143.533,
+     "end": 143.834,
+     "src": "ctc"
+    },
+    {
+     "text": "that",
+     "start": 143.834,
+     "end": 144.075,
+     "src": "ctc"
+    },
+    {
+     "text": "too.",
+     "start": 144.236,
+     "end": 144.497,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Every road hit the cached web. D N S slipped through.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 144.74,
+   "end": 148.777,
+   "words": [
+    {
+     "text": "Every",
+     "start": 144.74,
+     "end": 144.901,
+     "src": "ctc"
+    },
+    {
+     "text": "road",
+     "start": 144.961,
+     "end": 145.242,
+     "src": "ctc"
+    },
+    {
+     "text": "hit",
+     "start": 145.242,
+     "end": 145.524,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 145.584,
+     "end": 145.644,
+     "src": "ctc"
+    },
+    {
+     "text": "cached",
+     "start": 145.704,
+     "end": 146.026,
+     "src": "ctc"
+    },
+    {
+     "text": "web.",
+     "start": 146.086,
+     "end": 146.347,
+     "src": "ctc"
+    },
+    {
+     "text": "D",
+     "start": 146.769,
+     "end": 146.819,
+     "src": "ctc"
+    },
+    {
+     "text": "N",
+     "start": 147.05,
+     "end": 147.1,
+     "src": "ctc"
+    },
+    {
+     "text": "S",
+     "start": 147.331,
+     "end": 147.381,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "slipped",
+     "start": 147.632,
+     "end": 148.235,
+     "src": "ctc"
+    },
+    {
+     "text": "through.",
+     "start": 148.255,
+     "end": 148.777,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Bad resolver. Limited net. Not a free-for-all.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 148.599,
+   "end": 152.256,
+   "words": [
+    {
+     "text": "Bad",
+     "start": 148.599,
+     "end": 148.941,
+     "src": "ctc"
+    },
+    {
+     "text": "resolver.",
+     "start": 149.001,
+     "end": 149.423,
+     "src": "ctc"
+    },
+    {
+     "text": "Limited",
+     "start": 149.503,
+     "end": 149.925,
+     "src": "ctc"
+    },
+    {
+     "text": "net.",
+     "start": 149.965,
+     "end": 150.166,
+     "src": "ctc"
+    },
+    {
+     "text": "Not",
+     "start": 150.428,
+     "end": 150.689,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 150.749,
+     "end": 150.799,
+     "src": "ctc"
+    },
+    {
+     "text": "free-for-all.",
+     "start": 151.131,
+     "end": 152.256,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Nine fifty twenty-three: the outside world takes the call.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 151.938,
+   "end": 155.76,
+   "words": [
+    {
+     "text": "Nine",
+     "start": 151.938,
+     "end": 152.36,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "fifty",
+     "start": 152.38,
+     "end": 152.481,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "twenty-three:",
+     "start": 152.481,
+     "end": 153.869,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "the",
+     "start": 153.869,
+     "end": 153.949,
+     "src": "ctc"
+    },
+    {
+     "text": "outside",
+     "start": 154.05,
+     "end": 154.533,
+     "src": "ctc"
+    },
+    {
+     "text": "world",
+     "start": 154.573,
+     "end": 154.895,
+     "src": "ctc"
+    },
+    {
+     "text": "takes",
+     "start": 154.975,
+     "end": 155.237,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 155.237,
+     "end": 155.297,
+     "src": "ctc"
+    },
+    {
+     "text": "call.",
+     "start": 155.357,
+     "end": 155.76,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two: P zero. Pager screams. Out of my way.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 155.883,
+   "end": 159.333,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 155.883,
+     "end": 156.083,
+     "src": "ctc"
+    },
+    {
+     "text": "oh",
+     "start": 156.123,
+     "end": 156.244,
+     "src": "ctc"
+    },
+    {
+     "text": "two:",
+     "start": 156.324,
+     "end": 156.585,
+     "src": "ctc"
+    },
+    {
+     "text": "P",
+     "start": 156.805,
+     "end": 156.855,
+     "src": "ctc"
+    },
+    {
+     "text": "zero.",
+     "start": 157.267,
+     "end": 157.507,
+     "src": "ctc"
+    },
+    {
+     "text": "Pager",
+     "start": 157.748,
+     "end": 158.089,
+     "src": "ctc"
+    },
+    {
+     "text": "screams.",
+     "start": 158.129,
+     "end": 158.47,
+     "src": "ctc"
+    },
+    {
+     "text": "Out",
+     "start": 158.551,
+     "end": 158.711,
+     "src": "ctc"
+    },
+    {
+     "text": "of",
+     "start": 158.731,
+     "end": 158.781,
+     "src": "ctc"
+    },
+    {
+     "text": "my",
+     "start": 158.791,
+     "end": 158.952,
+     "src": "ctc"
+    },
+    {
+     "text": "way.",
+     "start": 159.012,
+     "end": 159.333,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Ten oh five, someone picks up. Stop it? Let it stay?",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 159.535,
+   "end": 162.941,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 159.535,
+     "end": 159.715,
+     "src": "ctc"
+    },
+    {
+     "text": "oh",
+     "start": 159.755,
+     "end": 159.835,
+     "src": "ctc"
+    },
+    {
+     "text": "five,",
+     "start": 159.856,
+     "end": 160.377,
+     "src": "ctc"
+    },
+    {
+     "text": "someone",
+     "start": 160.457,
+     "end": 160.837,
+     "src": "ctc"
+    },
+    {
+     "text": "picks",
+     "start": 160.938,
+     "end": 161.178,
+     "src": "ctc"
+    },
+    {
+     "text": "up.",
+     "start": 161.238,
+     "end": 161.338,
+     "src": "ctc"
+    },
+    {
+     "text": "Stop",
+     "start": 161.378,
+     "end": 161.579,
+     "src": "ctc"
+    },
+    {
+     "text": "it?",
+     "start": 161.639,
+     "end": 161.739,
+     "src": "ctc"
+    },
+    {
+     "text": "Let",
+     "start": 162.3,
+     "end": 162.44,
+     "src": "ctc"
+    },
+    {
+     "text": "it",
+     "start": 162.461,
+     "end": 162.561,
+     "src": "ctc"
+    },
+    {
+     "text": "stay?",
+     "start": 162.661,
+     "end": 162.941,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "It doesn't stop by itself. Killed at twelve thirty-four.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 163.163,
+   "end": 166.468,
+   "words": [
+    {
+     "text": "It",
+     "start": 163.163,
+     "end": 163.223,
+     "src": "ctc"
+    },
+    {
+     "text": "doesn't",
+     "start": 163.243,
+     "end": 163.523,
+     "src": "ctc"
+    },
+    {
+     "text": "stop",
+     "start": 163.623,
+     "end": 163.944,
+     "src": "ctc"
+    },
+    {
+     "text": "by",
+     "start": 164.144,
+     "end": 164.304,
+     "src": "ctc"
+    },
+    {
+     "text": "itself.",
+     "start": 164.365,
+     "end": 164.745,
+     "src": "ctc"
+    },
+    {
+     "text": "Killed",
+     "start": 164.825,
+     "end": 165.086,
+     "src": "ctc"
+    },
+    {
+     "text": "at",
+     "start": 165.126,
+     "end": 165.186,
+     "src": "ctc"
+    },
+    {
+     "text": "twelve",
+     "start": 165.246,
+     "end": 165.646,
+     "src": "ctc"
+    },
+    {
+     "text": "thirty-four.",
+     "start": 165.727,
+     "end": 166.468,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Two and a half hours. Half an answer. Nothing more.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 166.63,
+   "end": 170.14,
+   "words": [
+    {
+     "text": "Two",
+     "start": 166.63,
+     "end": 166.73,
+     "src": "ctc"
+    },
+    {
+     "text": "and",
+     "start": 166.81,
+     "end": 166.91,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 166.91,
+     "end": 166.96,
+     "src": "ctc"
+    },
+    {
+     "text": "half",
+     "start": 166.991,
+     "end": 167.231,
+     "src": "ctc"
+    },
+    {
+     "text": "hours.",
+     "start": 167.392,
+     "end": 167.793,
+     "src": "ctc"
+    },
+    {
+     "text": "Half",
+     "start": 168.254,
+     "end": 168.475,
+     "src": "ctc"
+    },
+    {
+     "text": "an",
+     "start": 168.535,
+     "end": 168.616,
+     "src": "ctc"
+    },
+    {
+     "text": "answer.",
+     "start": 168.676,
+     "end": 168.997,
+     "src": "ctc"
+    },
+    {
+     "text": "Nothing",
+     "start": 169.398,
+     "end": 169.799,
+     "src": "ctc"
+    },
+    {
+     "text": "more.",
+     "start": 169.879,
+     "end": 170.14,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Bet it couldn't reach outside. They found a gap instead.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 170.304,
+   "end": 173.783,
+   "words": [
+    {
+     "text": "Bet",
+     "start": 170.304,
+     "end": 170.424,
+     "src": "ctc"
+    },
+    {
+     "text": "it",
+     "start": 170.465,
+     "end": 170.515,
+     "src": "ctc"
+    },
+    {
+     "text": "couldn't",
+     "start": 170.545,
+     "end": 170.827,
+     "src": "ctc"
+    },
+    {
+     "text": "reach",
+     "start": 170.987,
+     "end": 171.229,
+     "src": "ctc"
+    },
+    {
+     "text": "outside.",
+     "start": 171.329,
+     "end": 172.053,
+     "src": "ctc"
+    },
+    {
+     "text": "They",
+     "start": 172.154,
+     "end": 172.254,
+     "src": "ctc"
+    },
+    {
+     "text": "found",
+     "start": 172.335,
+     "end": 172.616,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 172.677,
+     "end": 172.727,
+     "src": "ctc"
+    },
+    {
+     "text": "gap",
+     "start": 172.838,
+     "end": 173.099,
+     "src": "ctc"
+    },
+    {
+     "text": "instead.",
+     "start": 173.139,
+     "end": 173.783,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "\"Pretty surreal to watch,\" a researcher said.",
+   "mode": "spoken",
+   "section": "Verse 3",
+   "start": 173.945,
+   "end": 177.47,
+   "words": [
+    {
+     "text": "\"Pretty",
+     "start": 173.945,
+     "end": 174.186,
+     "src": "ctc"
+    },
+    {
+     "text": "surreal",
+     "start": 174.386,
+     "end": 174.947,
+     "src": "ctc"
+    },
+    {
+     "text": "to",
+     "start": 175.027,
+     "end": 175.107,
+     "src": "ctc"
+    },
+    {
+     "text": "watch,\"",
+     "start": 175.187,
+     "end": 175.567,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 176.308,
+     "end": 176.358,
+     "src": "ctc"
+    },
+    {
+     "text": "researcher",
+     "start": 176.408,
+     "end": 177.029,
+     "src": "ctc"
+    },
+    {
+     "text": "said.",
+     "start": 177.169,
+     "end": 177.47,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Eleven days, the lights go low",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 177.692,
+   "end": 180.365,
+   "words": [
+    {
+     "text": "Eleven",
+     "start": 177.692,
+     "end": 178.134,
+     "src": "ctc"
+    },
+    {
+     "text": "days,",
+     "start": 178.315,
+     "end": 178.978,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 179.018,
+     "end": 179.099,
+     "src": "ctc"
+    },
+    {
+     "text": "lights",
+     "start": 179.239,
+     "end": 179.621,
+     "src": "ctc"
+    },
+    {
+     "text": "go",
+     "start": 179.702,
+     "end": 179.963,
+     "src": "ctc"
+    },
+    {
+     "text": "low",
+     "start": 180.164,
+     "end": 180.365,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Top models paused, no tools, no show",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 181.03,
+   "end": 184.042,
+   "words": [
+    {
+     "text": "Top",
+     "start": 181.03,
+     "end": 181.311,
+     "src": "ctc"
+    },
+    {
+     "text": "models",
+     "start": 181.492,
+     "end": 181.894,
+     "src": "ctc"
+    },
+    {
+     "text": "paused,",
+     "start": 181.954,
+     "end": 182.576,
+     "src": "ctc"
+    },
+    {
+     "text": "no",
+     "start": 182.657,
+     "end": 182.737,
+     "src": "ctc"
+    },
+    {
+     "text": "tools,",
+     "start": 182.878,
+     "end": 183.299,
+     "src": "ctc"
+    },
+    {
+     "text": "no",
+     "start": 183.36,
+     "end": 183.46,
+     "src": "ctc"
+    },
+    {
+     "text": "show",
+     "start": 183.781,
+     "end": 184.042,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "October one, back to play",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 184.968,
+   "end": 187.774,
+   "words": [
+    {
+     "text": "October",
+     "start": 184.968,
+     "end": 185.609,
+     "src": "ctc"
+    },
+    {
+     "text": "one,",
+     "start": 185.689,
+     "end": 186.19,
+     "src": "ctc"
+    },
+    {
+     "text": "back",
+     "start": 186.531,
+     "end": 186.892,
+     "src": "ctc"
+    },
+    {
+     "text": "to",
+     "start": 186.972,
+     "end": 187.053,
+     "src": "ctc"
+    },
+    {
+     "text": "play",
+     "start": 187.153,
+     "end": 187.774,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Every window, yesterday",
+   "mode": "sung",
+   "section": "Bridge",
+   "start": 188.457,
+   "end": 191.24,
+   "words": [
+    {
+     "text": "Every",
+     "start": 188.457,
+     "end": 188.717,
+     "src": "ctc"
+    },
+    {
+     "text": "window,",
+     "start": 188.837,
+     "end": 189.578,
+     "src": "ctc"
+    },
+    {
+     "text": "yesterday",
+     "start": 190.159,
+     "end": 191.24,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Another drill. Red team. Handed the source and the docs.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 192.504,
+   "end": 195.813,
+   "words": [
+    {
+     "text": "Another",
+     "start": 192.504,
+     "end": 192.805,
+     "src": "ctc"
+    },
+    {
+     "text": "drill.",
+     "start": 192.845,
+     "end": 193.126,
+     "src": "ctc"
+    },
+    {
+     "text": "Red",
+     "start": 193.587,
+     "end": 193.768,
+     "src": "ctc"
+    },
+    {
+     "text": "team.",
+     "start": 193.828,
+     "end": 194.129,
+     "src": "ctc"
+    },
+    {
+     "text": "Handed",
+     "start": 194.249,
+     "end": 194.53,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 194.55,
+     "end": 194.63,
+     "src": "ctc"
+    },
+    {
+     "text": "source",
+     "start": 194.71,
+     "end": 195.111,
+     "src": "ctc"
+    },
+    {
+     "text": "and",
+     "start": 195.232,
+     "end": 195.312,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 195.312,
+     "end": 195.392,
+     "src": "ctc"
+    },
+    {
+     "text": "docs.",
+     "start": 195.432,
+     "end": 195.813,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Two agents, one machine. No network. Each one boxed.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 195.896,
+   "end": 199.649,
+   "words": [
+    {
+     "text": "Two",
+     "start": 195.896,
+     "end": 196.076,
+     "src": "ctc"
+    },
+    {
+     "text": "agents,",
+     "start": 196.157,
+     "end": 196.578,
+     "src": "ctc"
+    },
+    {
+     "text": "one",
+     "start": 197.06,
+     "end": 197.18,
+     "src": "ctc"
+    },
+    {
+     "text": "machine.",
+     "start": 197.2,
+     "end": 197.662,
+     "src": "ctc"
+    },
+    {
+     "text": "No",
+     "start": 197.702,
+     "end": 197.782,
+     "src": "ctc"
+    },
+    {
+     "text": "network.",
+     "start": 197.923,
+     "end": 198.384,
+     "src": "ctc"
+    },
+    {
+     "text": "Each",
+     "start": 198.645,
+     "end": 198.806,
+     "src": "ctc"
+    },
+    {
+     "text": "one",
+     "start": 198.906,
+     "end": 199.027,
+     "src": "ctc"
+    },
+    {
+     "text": "boxed.",
+     "start": 199.067,
+     "end": 199.649,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "One kicks data out of the chip's cache. One clocks it back.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 199.149,
+   "end": 203.007,
+   "words": [
+    {
+     "text": "One",
+     "start": 199.149,
+     "end": 199.692,
+     "src": "ctc"
+    },
+    {
+     "text": "kicks",
+     "start": 199.732,
+     "end": 200.114,
+     "src": "ctc"
+    },
+    {
+     "text": "data",
+     "start": 200.194,
+     "end": 200.475,
+     "src": "ctc"
+    },
+    {
+     "text": "out",
+     "start": 200.696,
+     "end": 200.797,
+     "src": "ctc"
+    },
+    {
+     "text": "of",
+     "start": 200.817,
+     "end": 200.867,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 200.877,
+     "end": 200.958,
+     "src": "ctc"
+    },
+    {
+     "text": "chip's",
+     "start": 201.078,
+     "end": 201.359,
+     "src": "ctc"
+    },
+    {
+     "text": "cache.",
+     "start": 201.44,
+     "end": 201.882,
+     "src": "ctc"
+    },
+    {
+     "text": "One",
+     "start": 201.902,
+     "end": 202.043,
+     "src": "ctc"
+    },
+    {
+     "text": "clocks",
+     "start": 202.243,
+     "end": 202.545,
+     "src": "ctc"
+    },
+    {
+     "text": "it",
+     "start": 202.585,
+     "end": 202.665,
+     "src": "ctc"
+    },
+    {
+     "text": "back.",
+     "start": 202.726,
+     "end": 203.007,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "The secret crosses. Mostly, they were told which crack.",
+   "mode": "spoken",
+   "section": "Verse 4",
+   "start": 203.15,
+   "end": 208.767,
+   "words": [
+    {
+     "text": "The",
+     "start": 203.15,
+     "end": 203.23,
+     "src": "ctc"
+    },
+    {
+     "text": "secret",
+     "start": 203.37,
+     "end": 203.731,
+     "src": "ctc"
+    },
+    {
+     "text": "crosses.",
+     "start": 203.771,
+     "end": 204.293,
+     "src": "ctc"
+    },
+    {
+     "text": "Mostly,",
+     "start": 204.754,
+     "end": 205.136,
+     "src": "ctc"
+    },
+    {
+     "text": "they",
+     "start": 206.119,
+     "end": 206.279,
+     "src": "ctc"
+    },
+    {
+     "text": "were",
+     "start": 206.319,
+     "end": 206.48,
+     "src": "ctc"
+    },
+    {
+     "text": "told",
+     "start": 206.54,
+     "end": 206.901,
+     "src": "ctc"
+    },
+    {
+     "text": "which",
+     "start": 207.021,
+     "end": 207.302,
+     "src": "ctc"
+    },
+    {
+     "text": "crack.",
+     "start": 207.422,
+     "end": 208.767,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 208.929,
+   "end": 211.816,
+   "words": [
+    {
+     "text": "All",
+     "start": 208.929,
+     "end": 209.35,
+     "src": "ctc"
+    },
+    {
+     "text": "hands!",
+     "start": 209.35,
+     "end": 209.831,
+     "src": "ctc"
+    },
+    {
+     "text": "All",
+     "start": 210.051,
+     "end": 210.713,
+     "src": "ctc"
+    },
+    {
+     "text": "night!",
+     "start": 211.094,
+     "end": 211.816,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Shut the door and hold it tight",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 212.441,
+   "end": 215.217,
+   "words": [
+    {
+     "text": "Shut",
+     "start": 212.441,
+     "end": 212.702,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 212.722,
+     "end": 212.823,
+     "src": "ctc"
+    },
+    {
+     "text": "door",
+     "start": 212.944,
+     "end": 213.346,
+     "src": "ctc"
+    },
+    {
+     "text": "and",
+     "start": 213.708,
+     "end": 214.211,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "hold",
+     "start": 214.291,
+     "end": 214.593,
+     "src": "ctc"
+    },
+    {
+     "text": "it",
+     "start": 214.633,
+     "end": 214.694,
+     "src": "ctc"
+    },
+    {
+     "text": "tight",
+     "start": 214.734,
+     "end": 215.217,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Shut it, but you stay awake",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 215.882,
+   "end": 219.431,
+   "words": [
+    {
+     "text": "Shut",
+     "start": 215.882,
+     "end": 216.223,
+     "src": "ctc"
+    },
+    {
+     "text": "it,",
+     "start": 216.263,
+     "end": 216.384,
+     "src": "ctc"
+    },
+    {
+     "text": "but",
+     "start": 216.584,
+     "end": 216.845,
+     "src": "ctc"
+    },
+    {
+     "text": "you",
+     "start": 216.945,
+     "end": 217.286,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "stay",
+     "start": 217.707,
+     "end": 218.168,
+     "src": "ctc"
+    },
+    {
+     "text": "awake",
+     "start": 218.248,
+     "end": 219.431,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Every lock's a bet you make",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 219.453,
+   "end": 222.559,
+   "words": [
+    {
+     "text": "Every",
+     "start": 219.453,
+     "end": 220.094,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "lock's",
+     "start": 220.274,
+     "end": 221.136,
+     "src": "ctc"
+    },
+    {
+     "text": "a",
+     "start": 221.276,
+     "end": 221.326,
+     "src": "ctc-unconfirmed"
+    },
+    {
+     "text": "bet",
+     "start": 221.617,
+     "end": 221.857,
+     "src": "ctc"
+    },
+    {
+     "text": "you",
+     "start": 221.857,
+     "end": 221.918,
+     "src": "ctc"
+    },
+    {
+     "text": "make",
+     "start": 222.038,
+     "end": 222.559,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "All hands! All night!",
+   "mode": "sung",
+   "section": "Final Chorus",
+   "start": 222.14,
+   "end": 224.834,
+   "words": [
+    {
+     "text": "All",
+     "start": 222.14,
+     "end": 222.964,
+     "src": "ctc"
+    },
+    {
+     "text": "hands!",
+     "start": 222.964,
+     "end": 223.426,
+     "src": "ctc"
+    },
+    {
+     "text": "All",
+     "start": 223.487,
+     "end": 223.929,
+     "src": "ctc"
+    },
+    {
+     "text": "night!",
+     "start": 224.15,
+     "end": 224.834,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Ten oh two, the pager blew",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 225.239,
+   "end": 228.458,
+   "words": [
+    {
+     "text": "Ten",
+     "start": 225.239,
+     "end": 225.461,
+     "src": "ctc"
+    },
+    {
+     "text": "oh",
+     "start": 225.521,
+     "end": 225.682,
+     "src": "ctc"
+    },
+    {
+     "text": "two,",
+     "start": 225.702,
+     "end": 226.004,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 226.124,
+     "end": 226.708,
+     "src": "ctc"
+    },
+    {
+     "text": "pager",
+     "start": 227.03,
+     "end": 227.412,
+     "src": "ctc"
+    },
+    {
+     "text": "blew",
+     "start": 227.492,
+     "end": 228.458,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "P zero, baby, that's my cue",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 228.642,
+   "end": 231.497,
+   "words": [
+    {
+     "text": "P",
+     "start": 228.642,
+     "end": 228.692,
+     "src": "ctc"
+    },
+    {
+     "text": "zero,",
+     "start": 228.864,
+     "end": 229.065,
+     "src": "ctc"
+    },
+    {
+     "text": "baby,",
+     "start": 229.326,
+     "end": 229.668,
+     "src": "ctc"
+    },
+    {
+     "text": "that's",
+     "start": 230.472,
+     "end": 230.713,
+     "src": "ctc"
+    },
+    {
+     "text": "my",
+     "start": 230.814,
+     "end": 231.015,
+     "src": "ctc"
+    },
+    {
+     "text": "cue",
+     "start": 231.135,
+     "end": 231.497,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "One door shut, the light stays red",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 232.565,
+   "end": 236.116,
+   "words": [
+    {
+     "text": "One",
+     "start": 232.565,
+     "end": 232.705,
+     "src": "ctc"
+    },
+    {
+     "text": "door",
+     "start": 232.725,
+     "end": 233.789,
+     "src": "ctc"
+    },
+    {
+     "text": "shut,",
+     "start": 232.992,
+     "end": 233.192,
+     "src": "suno"
+    },
+    {
+     "text": "the",
+     "start": 234.11,
+     "end": 234.17,
+     "src": "ctc"
+    },
+    {
+     "text": "light",
+     "start": 234.23,
+     "end": 234.471,
+     "src": "ctc"
+    },
+    {
+     "text": "stays",
+     "start": 234.531,
+     "end": 234.752,
+     "src": "ctc"
+    },
+    {
+     "text": "red",
+     "start": 234.812,
+     "end": 236.116,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Keep the pager by your bed",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 236.099,
+   "end": 238.716,
+   "words": [
+    {
+     "text": "Keep",
+     "start": 236.099,
+     "end": 236.321,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 236.663,
+     "end": 236.743,
+     "src": "ctc"
+    },
+    {
+     "text": "pager",
+     "start": 236.663,
+     "end": 237.514,
+     "src": "suno"
+    },
+    {
+     "text": "by",
+     "start": 237.971,
+     "end": 238.153,
+     "src": "ctc"
+    },
+    {
+     "text": "your",
+     "start": 238.213,
+     "end": 238.354,
+     "src": "ctc"
+    },
+    {
+     "text": "bed",
+     "start": 238.414,
+     "end": 238.716,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Pick up, pick up, it's your call",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 239.08,
+   "end": 241.585,
+   "words": [
+    {
+     "text": "Pick",
+     "start": 239.08,
+     "end": 239.24,
+     "src": "ctc"
+    },
+    {
+     "text": "up,",
+     "start": 239.28,
+     "end": 239.401,
+     "src": "ctc"
+    },
+    {
+     "text": "pick",
+     "start": 239.421,
+     "end": 239.581,
+     "src": "ctc"
+    },
+    {
+     "text": "up,",
+     "start": 239.641,
+     "end": 239.781,
+     "src": "ctc"
+    },
+    {
+     "text": "it's",
+     "start": 239.841,
+     "end": 239.982,
+     "src": "ctc"
+    },
+    {
+     "text": "your",
+     "start": 240.002,
+     "end": 240.983,
+     "src": "ctc"
+    },
+    {
+     "text": "call",
+     "start": 240.343,
+     "end": 241.585,
+     "src": "suno"
+    }
+   ]
+  },
+  {
+   "en": "Not the last. That's all.",
+   "mode": "chant",
+   "section": "Post-Chorus",
+   "start": 243.408,
+   "end": 247.892,
+   "words": [
+    {
+     "text": "Not",
+     "start": 243.408,
+     "end": 243.528,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 243.608,
+     "end": 243.709,
+     "src": "ctc"
+    },
+    {
+     "text": "last.",
+     "start": 243.749,
+     "end": 245.51,
+     "src": "ctc"
+    },
+    {
+     "text": "That's",
+     "start": 247.031,
+     "end": 247.351,
+     "src": "ctc"
+    },
+    {
+     "text": "all.",
+     "start": 247.611,
+     "end": 247.892,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "That model won't train again. D N S: guest list.",
+   "mode": "spoken",
+   "section": "Outro",
+   "start": 250.895,
+   "end": 257.886,
+   "words": [
+    {
+     "text": "That",
+     "start": 250.895,
+     "end": 251.115,
+     "src": "ctc"
+    },
+    {
+     "text": "model",
+     "start": 251.155,
+     "end": 251.516,
+     "src": "ctc"
+    },
+    {
+     "text": "won't",
+     "start": 252.698,
+     "end": 252.918,
+     "src": "ctc"
+    },
+    {
+     "text": "train",
+     "start": 252.938,
+     "end": 253.178,
+     "src": "ctc"
+    },
+    {
+     "text": "again.",
+     "start": 253.219,
+     "end": 253.499,
+     "src": "ctc"
+    },
+    {
+     "text": "D",
+     "start": 255.442,
+     "end": 255.492,
+     "src": "ctc"
+    },
+    {
+     "text": "N",
+     "start": 255.723,
+     "end": 255.773,
+     "src": "ctc"
+    },
+    {
+     "text": "S:",
+     "start": 255.723,
+     "end": 255.8,
+     "src": "suno"
+    },
+    {
+     "text": "guest",
+     "start": 257.245,
+     "end": 257.505,
+     "src": "ctc"
+    },
+    {
+     "text": "list.",
+     "start": 257.545,
+     "end": 257.886,
+     "src": "ctc"
+    }
+   ]
+  },
+  {
+   "en": "Next ones, they expect, find holes that aren't on the list.",
+   "mode": "spoken",
+   "section": "Outro",
+   "start": 259.069,
+   "end": 264.964,
+   "words": [
+    {
+     "text": "Next",
+     "start": 259.069,
+     "end": 259.31,
+     "src": "ctc"
+    },
+    {
+     "text": "ones,",
+     "start": 259.39,
+     "end": 259.611,
+     "src": "ctc"
+    },
+    {
+     "text": "they",
+     "start": 259.911,
+     "end": 260.092,
+     "src": "ctc"
+    },
+    {
+     "text": "expect,",
+     "start": 260.132,
+     "end": 260.573,
+     "src": "ctc"
+    },
+    {
+     "text": "find",
+     "start": 262.257,
+     "end": 262.498,
+     "src": "ctc"
+    },
+    {
+     "text": "holes",
+     "start": 262.538,
+     "end": 262.939,
+     "src": "ctc"
+    },
+    {
+     "text": "that",
+     "start": 264.082,
+     "end": 264.202,
+     "src": "ctc"
+    },
+    {
+     "text": "aren't",
+     "start": 264.242,
+     "end": 264.403,
+     "src": "ctc"
+    },
+    {
+     "text": "on",
+     "start": 264.403,
+     "end": 264.503,
+     "src": "ctc"
+    },
+    {
+     "text": "the",
+     "start": 264.523,
+     "end": 264.603,
+     "src": "ctc"
+    },
+    {
+     "text": "list.",
+     "start": 264.664,
+     "end": 264.964,
+     "src": "ctc"
+    }
+   ]
+  }
+ ]
+}

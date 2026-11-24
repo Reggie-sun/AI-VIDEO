@@ -1,0 +1,76 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG10-m-2",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/audit/index.html\n\n剩下的 9 条开拍前，我按这几轮的教训把首帧和 prompt 又过了一遍：\n- s019、s026、s027 必须改：会朝镜头走出画，或者手要凭空伸进画面、唇的时候转开脸。\n- s027 还要重做首帧，先给你看。\n- s020、s022、s024、s025、s028、s029 是顺手改几句话：写明电脑和工牌没有标志、不推倒白板背面、不挡脸等。\n\n都不加钱。照页面改吗？",
+ "user_quote": "照页面改 (Recommended)",
+ "approved_at": "2026-11-22T23:03:07Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "08136c3c4fa651e4ca340779501ce55012409ab30e19c81079027e50a8efd3d8"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "ba953fc48129cbe074442ac57bdc4dd9aedb4b688032706baf9d7674c34818a8"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "2a906ad6b37601201cf2bc7d73eadb9e1f8cc520671d064a5b2c7175bb24e00a"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p026-b1.png",
+   "sha256": "0a361f2d941333afd0fa3372f2150e3ac167193c71a7a6bf222a19166aa5771f",
+   "role": "SG10 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG10m.wav",
+   "sha256": "aae6bec70aaf8d1062a7552fbfb8115e92e9818f6ff0bc52e26b0dc49a971900",
+   "role": "SG10 vocal"
+  }
+ ],
+ "prompts": {
+  "SG10": {
+   "text": "{{image:0}}中的她坐在睡着的值班工程师身边，她一直看着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中近景，镜头固定不动。唱到一半时他猛地睁开眼睛；最后她伸手从他松开的手里拿走黑色寻呼机，收到画面下方。车窗里不出现她的倒影。寻呼机屏幕只有灰绿底光，没有数字和字。嘴前没有任何遮挡。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "833226c19a373916739ca9f6b7f637f077248e45647acbd9841edc973c623b49"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 8,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 700,
+  "cumulative_CRD": 700
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p026-b1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P026/f1.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 B）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg10-m-2-source-001",
+  "policy_id": "iris-sg10-m-2-source-001",
+  "reservation_id": "iris-sg10-m-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG10-m-1",
+   "sd-SG10-m-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1400,
+  "this_take": "sd-SG10-m-2"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG10-n-1/preview-approval.json",
+  "sha256": "3336a5ce80417fe63442b79abaa92f91f76826ca16152d90bd12c9c79dbbf8ac",
+  "reason": "人声窗口与余量按 s015 教训调整；开拍前审查按页面逐句改 prompt（「照页面改 (Recommended)」，pilot/s015-030/audit/index.html）"
+ }
+}

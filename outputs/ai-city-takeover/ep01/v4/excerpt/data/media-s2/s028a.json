@@ -1,0 +1,77 @@
+{
+ "shot": "s028a",
+ "t0": 119.7801,
+ "t1": 121.1617,
+ "why": "accent 119.78: the floodlights come on (held first picture, dark 3 frames, one flicker), then she starts",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO13-n-1/MO13/project/state/video-generation/fetch/files/47c40d7a1b9a60c02cd432e5262b2bec2f557e5401b84e7cd9f71ac8af5499a6.mp4",
+ "clip_sha256": "47c40d7a1b9a60c02cd432e5262b2bec2f557e5401b84e7cd9f71ac8af5499a6",
+ "pictures": 145,
+ "frames": 33,
+ "first": {
+  "f": 1453,
+  "t": 119.7917,
+  "clip_t": 0.0,
+  "idx": 0
+ },
+ "last": {
+  "f": 1485,
+  "t": 121.125,
+  "clip_t": 1.1366,
+  "idx": 27
+ },
+ "crop": null,
+ "speed": 1.0,
+ "knots": [
+  [
+   119.7801,
+   0.0
+  ],
+  [
+   119.98843333333333,
+   0.0
+  ],
+  [
+   121.1617,
+   1.1732666666666585
+  ]
+ ],
+ "repeats": 5,
+ "skips": 0,
+ "map": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27
+ ],
+ "orange_px_max": 1,
+ "pager_red": null
+}

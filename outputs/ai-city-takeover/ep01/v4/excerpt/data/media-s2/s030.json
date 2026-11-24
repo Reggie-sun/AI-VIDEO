@@ -1,0 +1,55 @@
+{
+ "shot": "s030",
+ "t0": 131.2392,
+ "t1": 134.45833333333334,
+ "why": "the pager on the dry pool floor: one landing shake on 131.69; SEP 20 on 'September' 134.17 (graphic)",
+ "still": "outputs/ai-city-takeover/ep01/v4/board/plates/p030.png",
+ "still_sha256": "872d80bc86bd71a35a5673329402debafe47102df177fe4b028467fb983361cc",
+ "frames": 77,
+ "pictures": 77,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "land": 131.692
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 0
+ },
+ "log": [
+  {
+   "k": 11,
+   "zoom": 1.0,
+   "shake": [
+    0.0,
+    14.0
+   ],
+   "smear": 0.0
+  },
+  {
+   "k": 12,
+   "zoom": 1.0,
+   "shake": [
+    0.0,
+    -8.0
+   ],
+   "smear": 0.5
+  },
+  {
+   "k": 13,
+   "zoom": 1.0,
+   "shake": [
+    0.0,
+    3.0
+   ],
+   "smear": 0.225
+  }
+ ]
+}

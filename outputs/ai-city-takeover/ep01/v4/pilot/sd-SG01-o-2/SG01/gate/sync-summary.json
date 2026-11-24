@@ -1,0 +1,64 @@
+[
+ {
+  "name": "SG01-sd",
+  "take_sha256": "b068e9ab3d4d7190cecdd64c341ace9af16713a934473ca3992764418d0db82e",
+  "lag_s": -0.1499,
+  "ncc": 0.1811,
+  "copy": false,
+  "divergence": {
+   "frame": 307,
+   "rule": "stretch",
+   "last_match": 306,
+   "clip_s": 3.07,
+   "song_s": 14.37
+  },
+  "synced_until": {
+   "clip_s": 3.018,
+   "song_s": 14.318
+  },
+  "spans": [
+   {
+    "clip_s": [
+     1.32,
+     3.06
+    ],
+    "song_s": [
+     12.62,
+     14.36
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": -2.231,
+   "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+   "song_t_of_clip0": 13.381,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": -2.231,
+   "ncc": 0.482,
+   "max_dev_s": 0.312,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      2.125
+     ],
+     "lag_s": -2.243,
+     "windows": 6,
+     "min_ncc": 0.476
+    },
+    {
+     "clip_s": [
+      2.125,
+      3.625
+     ],
+     "lag_s": -2.513,
+     "windows": 6,
+     "min_ncc": 0.375
+    }
+   ]
+  }
+ }
+]

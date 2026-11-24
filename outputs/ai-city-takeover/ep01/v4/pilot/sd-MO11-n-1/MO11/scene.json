@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo11-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "7d02e4b9b490626014843c8fea6d7f4b8a54392db630de96906090be341afd0b",
+  "creation_receipt_id": "iris-v4-MO11-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7931058e70a85efaecd4557b1e2fafe34b69aef3b6462e674cde2d31b78c308b.json",
+      "content_hash": "7931058e70a85efaecd4557b1e2fafe34b69aef3b6462e674cde2d31b78c308b"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/952db032fe6205f39afb0be3eb7e523b1ebef386e2c55c7e2984b79f3c94d83c.json",
+      "content_hash": "952db032fe6205f39afb0be3eb7e523b1ebef386e2c55c7e2984b79f3c94d83c"
+    }
+  ],
+  "scene_id": "night-train-aisle",
+  "location": "同一节深夜通勤列车车厢的过道，开头那位值班工程师坐在她身边睡着",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变",
+    "除了耳挂上的小红灯，画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo11-first-frame"
+  ]
+}

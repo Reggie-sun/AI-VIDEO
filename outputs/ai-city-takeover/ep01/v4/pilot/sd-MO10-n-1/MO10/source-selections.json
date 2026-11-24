@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo10-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p020-b1.png",
+    "sha256": "7e6c124eabb1c32eb2a2924ee809ad1baead4998423d6c0e07ae3a103973f65d",
+    "size_bytes": 2082723,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p020-b1.png: the first frame",
+    "need_id": "hotel-ballroom-stage",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

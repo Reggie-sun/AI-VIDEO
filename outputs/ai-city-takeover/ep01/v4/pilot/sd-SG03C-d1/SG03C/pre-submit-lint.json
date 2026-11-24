@@ -1,0 +1,56 @@
+{
+ "unit": "SG03C",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "11aec11c5c44402137825d8d800ac76421736992654a19ccc19675751607072f",
+ "compiled_prompt_sha256": "68fa0d91635d8d2d4ba4c8eb3103844c9bc7b611810e9b9561f30569fbcea237",
+ "approval_sha256": "75fc149cd0f0c5a033b5b100b35c92332a995fdde6b84cc1bd39dc6e30b89bd1",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03C-d1/continuity-report.json",
+  "sha256": "613b9e0b896f9afb62b0790358cdf4e72e09b3b29d4915c412e47d454e66a4c8",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。打开 p012c-w1d.png，和 SG03-w1 实拍 4K 帧 t=4.6 逐项对照：\n(1) 场地相同：同一根水泥柱和柱上的硬阴影，柱边黄黑警示条，左侧戴墨镜和耳环的同一批观众，同样的青色和琥珀色灯管。上次 c 的“场地不同”已解决。\n(2) 轴线相同：工程师在画面左前景，脸侧着向上看她，穿深蓝工装；她在画面中间偏右，侧身对着他。\n(3) 左肩露出：画面右侧是她的左肩。\n(4) 黑高领内搭在。\n(5) 斜挎黑皮带从她的右肩（脖子左侧起）斜向画面右下，即左胯方向，与实拍一致。\n(6) 灰色卫衣面料的拉链短外套，右臂穿袖。\n(7) 红色只有画面右侧（她的左耳）耳挂上的一处小红灯，耳骨一排银钉也在；嘴唇是裸色，画面里没有别的红色。\n(8) 身份与 F1a 和实拍一致。\n左前臂的灰袖在这个裁切范围外，看不到，不算矛盾。头发比实拍更乱、更往前垂，属于次要差别。",
+   "handoff": "PASS。剪法：SG03-w1 唱到 49.08（SG03-w1 片段内约 4.14 s），这段落在使用者已接受的 SG03-w1 2.0–5.4 s 范围内；然后切到本镜唱 you're awake。本镜使用范围是窗口 2.15–3.52 s，对应歌曲 49.08–50.45：you're 在 2.38，awake 在 2.96–3.44；之后切到 AWAKE 图形。人声文件与前几版相同：sha 4b3bb33c…3c09，4.000 s。切点前后都是她俯身对着工程师唱、尚未唱完的同一时刻，接得上。",
+   "axis_action_camera": "PASS。这是同轴推近：同一机位、同一视轴，对着她的脸放大约 1.5 倍。几何上可以核对：工程师从实拍中的半张脸，推近后只剩画面左边缘的鼻子、颧骨和衣领；柱子、警示条、观众按大致相同的比例放大，没有越过轴线。prompt 写的是“镜头固定不动，不推不拉不摇不环绕，一镜到底”。表演上，切点前她睁眼看着他唱，切进来是闭眼、仰下巴、先合嘴，是一次落在拍点上的有意转折。closeup3.html 把实拍切出点和 D4-a 并排放着，使用者是看过对比后选的 D4-a。本镜要演的动作只有 you're awake 两个词，1.37 s，4 s 的生成长度足够。",
+   "prompt_fit": "PASS。compiled-native-prompt.zh.txt、preview-approval.prompts.SG03C.text、closeup3.html 第 9 行、prepared.json 的 prompt_text（第 5251、5323、5427、5499、5602 行）逐字相同。上传内容的 sha 都等于认可值：prompt 68fa0d91635d8d2d4ba4c8eb3103844c9bc7b611810e9b9561f30569fbcea237（第 5690 行）、参考图 21c5f96a6cdbdf4f39d99b9137e4092776d4f3b4d77adba4178532c473682c48（第 5697 行）、人声 4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09（第 5704 行）。生成方式 multimodal（reference_to_video），4 s，4k，16:9，上限 400 CRD，1 次，不重试。attempt、policy、reservation 均为 iris-sg03c-d1-*，与 bound_ids 一致；node node_k0cx3p56nj 的 generation_POSTs=0，尚未提交过。open_state（第 265 行）和 close_state（第 272 行）写明了左前景工程师、闭眼、抬下巴、合嘴、黑高领、左肩、斜挎带方向、唯一红灯，与首帧一致。上次 c 的 Gate FAIL 逐项都有对策：机位环绕靠 prompt 禁止推拉摇和环绕，并写明 close_state 机位不变；工程师丢失靠 prompt 和 close_state 都要求他在左前景，首帧里也有他；场地不同靠首帧取自实拍；开头抢拍靠首帧合嘴，且剪辑从 2.15 s 起用；尾部空口型靠剪辑在约 3.44–3.52 s 切走，不再用 3.52 s 之后的部分。prompt 也满足 PLAN-v4 对唱段的要求，写了景别、光和口型逐字同步。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "生成方式是 reference_to_video，第 0 帧不锁定（音频多模态这条路不支持首帧锁定）。闭嘴首帧和固定镜头的要求都只能降低风险，不能保证；上次 c 正是在这种方式下出现了环绕和工程师消失。Gate 要量机位漂移（前景和背景的像素位移），并逐帧确认工程师始终在左前景。",
+    "对口型：Gate 用片段自带的音轨与参考人声做对齐，逐字核对 2.15–3.52 s 内的 you're（2.38）和 awake（2.96–3.44），并确认 2.15 s 那一帧是 you're 之前的口型。上次 c 的可对齐区间是 1.5–3.808 s，开头有 -0.125 s 不稳的滞后，这次的使用范围落在类似区间内。",
+    "使用范围到 3.52 s，比 awake 结束的 3.44 s 多约 0.08 s，大约 2 帧。Gate 要确认这 2 帧里没有空口型或多出来的声音；不行就把切点提前到 3.44。",
+    "切点表演跳变：SG03-w1 在 49.08 时（片段内 4.14 s）睁眼看着工程师唱 reason；本镜在 2.15 s 时是闭眼抬下巴，而且这个姿态由模型生成，不受控。同轴推近叠加大幅度的头部姿态变化，可能被看成跳切。要把 SG03-w1 4.14 s 和本镜 2.15 s 的两帧并排审看。这是使用者看过并排页面后选定的方向，审看结论交给使用者。",
+    "分镜里 s012b 的切点仍写 48.17，与这次的剪法 49.08 不一致。按要求只记为风险，需要回写分镜。",
+    "两条 take 共用一次认可，总上限 800 CRD。各自只提交一次，两条都过 Gate 后挑一条；不能因为都不理想就提交第三条。",
+    "shot.duration_policy.seconds=6.0（prepared 第 48、497 行），与 4 s 的输出不一致，是同一模板问题，交给 lint 判定。",
+    "人声内容我这边核不了：本地转写工具对纯 wav 报 no_video_stream，记为 NOT_EVALUATED。",
+    "我没有 Bash，无法核实 p012c-w1d.png 与 D4-a.png 是否逐字节相同，目前只有认可文件里的声明为证。",
+    "permit 在 2026-11-19T21:15:56Z 过期（operator-bound.json）。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

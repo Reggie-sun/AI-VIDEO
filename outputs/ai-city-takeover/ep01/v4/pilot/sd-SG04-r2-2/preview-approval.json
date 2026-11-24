@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-sg04-r2-2-SG04",
+ "question": "第二轮首帧：http://127.0.0.1:8769/excerpt/flash/round2.html\n\n- s013（唱 I'm the call you had to take）：换成工程师抬头看她的仰拍。她站直了，手里拿着刚从他手里抽走的亮屏手机，低头看着他。我推荐 b。\n- s014（旋身收尾）：长焦正对 T 台，她在尽头急转身甩开长袖，然后按住寻呼机走开。我推荐 c。\n\n页面上都和前面已认可的镜头并排放着，生成用的 prompt 也在上面。每镜拍 2 条，挑最好的一条。\n\n可以按推荐的拍吗？",
+ "user_quote": "s013 用 b、s014 用 c，拍 (Recommended)",
+ "approved_at": "2026-11-19T17:13:30Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/round2.html",
+  "sha256": "0b137487eabd670b2ca09d91873b62fbf69e45a3c20b0cf4ab9d6319e38b1d28"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p013-w1.png",
+   "sha256": "2f159721e0da2b9e2247a32fadd14ec79b3628152c911f07cee5c2c4dd1f3f21",
+   "role": "SG04 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG04.wav",
+   "sha256": "055dd8719d0d773173c351b1d7e9d25ca6f3760957e4b6f3071195a1055afd91",
+   "role": "SG04 vocal"
+  }
+ ],
+ "prompts": {
+  "SG04": {
+   "text": "{{image:0}}中的她低头看着镜头唱歌，口型与{{audio:1}}里的人声逐字精确同步。仰拍中近景，机头直闪。手机一直拿在胸口下方，不举到脸边。镜头固定不动，不推不拉不摇不环绕，一镜到底。嘴前没有任何遮挡。",
+   "sha256": "418661cbbdca44cb4f535472388c18efa397e25b0295cdcba2b82b176e6ce67e"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p013-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/R2/S13-b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG04/preview-approval.json",
+  "sha256": "8cac4bb21df1f9744b28c92dd659f7c5be445d21a06a86ba53c004becee031a5"
+ },
+ "bound_ids": {
+  "attempt_id": "iris-sg04-r2-2-source-001",
+  "policy_id": "iris-sg04-r2-2-source-001",
+  "reservation_id": "iris-sg04-r2-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG04-r2-1",
+   "sd-SG04-r2-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG04-r2-2"
+ }
+}

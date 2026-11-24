@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg07-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p017-w2b.png",
+    "sha256": "0a75579f7d5b709d4b81499470f61e5531e5d9cf465570bdbf761204f56b0e60",
+    "size_bytes": 2156646,
+    "width": 1671,
+    "height": 941,
+    "role": "approved p017-w2b.png: the reference image",
+    "need_id": "folsom-curb",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg07-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG07.wav",
+    "sha256": "95e8b29ecb421ccaf057c447b9b7d8be1ed4f4d2a671bd991e45a0d61580d697",
+    "size_bytes": 688172,
+    "kind": "audio",
+    "duration_millis": 7802,
+    "sample_rate_hz": 44100,
+    "role": "approved SG07.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        71.1808,
+        78.9827
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

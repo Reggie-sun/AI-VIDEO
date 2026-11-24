@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg08-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "b2f520eaef099416cb5382602df071285bff2097eb12a5cdb2acae143bdc8e34",
+  "creation_receipt_id": "iris-v4-SG08-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c966880ca95d1d06acde8dc70af6de3bf27e2899596bd0c44e0f88f2621627cc.json",
+      "content_hash": "c966880ca95d1d06acde8dc70af6de3bf27e2899596bd0c44e0f88f2621627cc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7d81e0cb608ab5bf19c1d8912debc3bb8ffb54e4569e08f0e59da3df390daa96.json",
+      "content_hash": "7d81e0cb608ab5bf19c1d8912debc3bb8ffb54e4569e08f0e59da3df390daa96"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/9fe7ea42972f143d1d0608d4ad9131578d99c40162097fc7f4ccd2cd0f3489d9.json",
+      "content_hash": "9fe7ea42972f143d1d0608d4ad9131578d99c40162097fc7f4ccd2cd0f3489d9"
+    }
+  ],
+  "scene_id": "hearing-room-witness",
+  "location": "市议会听证室的木质证人席，桌上一支细鹅颈话筒压得很低偏在一侧",
+  "time": "白天",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变",
+    "除了耳挂上的小红灯，画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg08-reference"
+  ]
+}

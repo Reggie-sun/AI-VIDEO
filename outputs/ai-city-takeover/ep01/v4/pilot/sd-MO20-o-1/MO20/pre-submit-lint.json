@@ -1,0 +1,45 @@
+{
+ "unit": "MO20",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "d5511912a8ed9f180022584460bd051b15f241cb298d32602f5ea2868209d28e",
+ "compiled_prompt_sha256": "e5418f58f98511c1003e1cb1857b4dd269728df326697aa972875a92a67ef112",
+ "approval_sha256": "dc3ba526d0fd1dd2b1dcc8eae06abb1d8c072862ff6023e43ea3e0080e4ebf94",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO20-o-1/continuity-report.json",
+  "sha256": "f3a8075b5b0853bfe8b882bb7a99ddf31f8da344737c3318f905b71be1ea970b",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "她不能重新抓起听筒；撕纸、扔掉一半、留一半在片内 3.62 s 内；纸上无字；耳挂不能被头发吞掉或换耳；画面里嘴不动不算失败（念白在画外）"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

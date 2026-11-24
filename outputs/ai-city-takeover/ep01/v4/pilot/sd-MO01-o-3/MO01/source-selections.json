@@ -1,0 +1,14 @@
+[
+  {
+    "asset_id": "iris-c-v4-mo01-first-frame",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p001-w1.png",
+    "sha256": "63b1195d4528a7b75c7c1999abc3596499bee7a6d1bbe8920eb9f58aed37a611",
+    "size_bytes": 2540057,
+    "width": 1671,
+    "height": 941,
+    "role": "approved p001-w1.png: the first frame",
+    "need_id": "garage-backstage",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  }
+]

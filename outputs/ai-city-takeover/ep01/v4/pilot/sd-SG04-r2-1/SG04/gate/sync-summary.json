@@ -1,0 +1,64 @@
+[
+ {
+  "name": "SG04-sd",
+  "take_sha256": "e18949ce2639bdce058609c34bfb9b9926f98768420a52133237261f6d45ec29",
+  "lag_s": 0.9501,
+  "ncc": 0.1181,
+  "copy": false,
+  "divergence": {
+   "frame": 498,
+   "rule": "voice after the last match",
+   "last_match": 497,
+   "clip_s": 4.98,
+   "song_s": 54.963
+  },
+  "synced_until": {
+   "clip_s": 4.928,
+   "song_s": 54.911
+  },
+  "spans": [
+   {
+    "clip_s": [
+     2.12,
+     4.97
+    ],
+    "song_s": [
+     52.103,
+     54.953
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": 0.947,
+   "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+   "song_t_of_clip0": 49.986,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 0.947,
+   "ncc": 0.598,
+   "max_dev_s": 0.224,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      2.625
+     ],
+     "lag_s": 1.123,
+     "windows": 8,
+     "min_ncc": 0.621
+    },
+    {
+     "clip_s": [
+      2.625,
+      4.375
+     ],
+     "lag_s": 0.949,
+     "windows": 7,
+     "min_ncc": 0.833
+    }
+   ]
+  }
+ }
+]

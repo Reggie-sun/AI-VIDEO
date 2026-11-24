@@ -1,0 +1,25 @@
+{
+ "unit": "SG03",
+ "take": "w1",
+ "media": {
+  "sha256": "02169f1ebff05dc4700e37c6baa361adee2a24de2ad1cdd4460c8395063c0bbd"
+ },
+ "reviewed_by": "shot-gate-reviewer",
+ "overall": "FAIL",
+ "items": {
+  "sings": "FAIL (mouth open in silences 0–0.68, 1.87–2.58, tail)",
+  "identity": "PASS",
+  "action": "FAIL (laptop open then closed in 0–2 s)",
+  "camera_background": "FAIL (camera tilt/pan 0–2 s, slow drift after)",
+  "technical": "PASS (145 frames ≈24 fps)"
+ },
+ "sync": {
+  "lag_s": 0.0251,
+  "copy": true,
+  "synced_until_clip_s": 5.948
+ },
+ "user_decision": {
+  "quote": "按建议剪，继续拍 s011 (Recommended)",
+  "effect": "use clip ≈2.0–5.4 s ('I'm the reason you're awake'); cover 'hold on tight' with two short still inserts cropped from W1 plates (her hand on the chair back, the engineer looking up); no retake"
+ }
+}

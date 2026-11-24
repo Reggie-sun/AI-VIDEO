@@ -1,0 +1,69 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-MO13-n-1",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/audit/index.html\n\n剩下的 9 条开拍前，我按这几轮的教训把首帧和 prompt 又过了一遍：\n- s019、s026、s027 必须改：会朝镜头走出画，或者手要凭空伸进画面、唇的时候转开脸。\n- s027 还要重做首帧，先给你看。\n- s020、s022、s024、s025、s028、s029 是顺手改几句话：写明电脑和工牌没有标志、不推倒白板背面、不挡脸等。\n\n都不加钱。照页面改吗？",
+ "user_quote": "照页面改 (Recommended)",
+ "approved_at": "2026-11-22T23:03:07Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "08136c3c4fa651e4ca340779501ce55012409ab30e19c81079027e50a8efd3d8"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "ba953fc48129cbe074442ac57bdc4dd9aedb4b688032706baf9d7674c34818a8"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "2a906ad6b37601201cf2bc7d73eadb9e1f8cc520671d064a5b2c7175bb24e00a"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p028-b1.png",
+   "sha256": "3adfc73750b8ef030d28b2727e0f0cbf6fe066cbfdacc3db566b1d29dba5fcd6",
+   "role": "MO13 first frame"
+  }
+ ],
+ "prompts": {
+  "MO13": {
+   "text": "镜头固定不动。她转身朝画面右侧，沿台阶往上走，走到一半低头看一眼身前腰带上的黑色寻呼机，寻呼机的液晶屏发出灰绿色的光，再接着往上走，从画面右上方走出去。背后没有包，也没有任何挂件。寻呼机屏幕只有灰绿底光，没有数字和字。池底干燥，没有水。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "11727da8a5e4444d80753837e3d5aa7665db6710c922cc41c6285cb99adf3f5c"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 6,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 500,
+  "cumulative_CRD": 500
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p028-b1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P028/f1.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 B）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo13-n-1-source-001",
+  "policy_id": "iris-mo13-n-1-source-001",
+  "reservation_id": "iris-mo13-n-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO13-n-1",
+   "sd-MO13-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1000,
+  "this_take": "sd-MO13-n-1"
+ },
+ "decision_notes": [
+  "开拍前审查按页面逐句改 prompt（「照页面改 (Recommended)」，pilot/s015-030/audit/index.html）；本 take 文件夹原先的 approval（旧 prompt）备份为 preview-approval.json.before-audit-2026-11-22，未提交过"
+ ]
+}

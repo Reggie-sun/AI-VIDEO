@@ -1,0 +1,56 @@
+{
+ "unit": "MO06",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "f87128dff2f78e5cc62495677ca07f6821cc685a1788b4b3ae28986a19c3a09a",
+ "compiled_prompt_sha256": "16d83c7635fc7bf85418986b1f79753f020d0133964916d6be35c8b207d673cf",
+ "approval_sha256": "33a620ce8f7cbfb51212662b593d62bd75c9bb44401f8d0c0cdde47a3c4434f0",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO06-s-1/continuity-report.json",
+  "sha256": "2de1953c5d17565cdede24acbb963a32a6139f63665681d9b96fbcec00b58a2d",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。\n(1) 带子方向：在 p011-w1c.png 原图上，斜挎黑皮带从她的右肩（画面左，带扣约在 930,205）斜向画面右下，止于左胯一侧（约 1060,400）。zoom-s011-b.jpg 放大图看到的也是右肩到左胯。这与 SG03-w1、SG04 底片 p013-w1、X10b（背影，目测为右肩到左胯）一致。\n(2) 带子以外：和原首帧 p011-w1b 逐项对照，都没变。露左肩（画面右侧，整条左臂光着），长袖在右臂并向后甩到画面左，黑色高领，兜帽和抽绳，腰链、黑色寻呼机（液晶空白）、空白工牌都在，及膝靴。红色只有画面右侧（她的左耳）耳挂上的那一处小灯。脸、发型、姿势、步态（她左腿在前抬起）都一样。外套胸口有局部重绘：带子经过的地方，缝线和翻片的走向略有变化，属于编辑必然带来的小改动，不改变造型。\n(3) 场地和光线：两侧工程师（左边戴眼镜的卷发男、后面的大胡子男，右边扎发髻戴耳机的女人）、柱子上的黄黑警示条、天花板日光灯管、湿地面的倒影，都和 p011-w1b 一致，看不出漂移。",
+   "handoff": "PASS。s010→s011：前一镜结束在 X10b 天桥背影，带子是右肩到左胯；ALL HANDS 在 39.897 跨过剪点，40.786 硬切换场。p011-w1c 上方三分之一仍是暗的顶棚，可以放跨切的字。s011→s012（SG03-w1）：她向画面右前方走，s012 里她在前排的另一侧，中间是空间省略。露左肩、黑高领、带子方向现在都和 SG03-w1 一致，原来 MO06-w1b 那处带子方向相反的问题，在这条替换进剪辑后就消除了。",
+   "axis_action_camera": "PASS。机位、构图、动作起点都和 p011-w1b 相同：低机位，从侧前方拍，镜头固定，没有越轴。走一步、重心过去、长袖往回摆，放在 5 s 生成、4.156 s 使用的长度里足够。",
+   "prompt_fit": "PASS。compiled-native-prompt.zh.txt 与 preview-approval.prompts.MO06.text 逐字相同，也和 v4r1、w1b 时认可的那句一样，没有改动。prepared.json 里 prompt_text 出现 5 处，与上传项一致。上传内容的 sha 都等于认可值：prompt 16d83c7635fc7bf85418986b1f79753f020d0133964916d6be35c8b207d673cf（第 4721 行），首帧 22492025abac1e542346b54a26a0cfa19f78c00bb39a7448234618ff6e786b26（第 4728 行）。生成参数：first_frame、5 s、4k、16:9，上限 400 CRD，1 次，不重试。attempt、policy、reservation 均为 iris-mo06-s-1-*，节点 node_2c10m1t06s，generation_POSTs=0。open_state 和 close_state（第 204、211 行）与首帧一致。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "带子方向只锁在首帧里，prompt 没写带子。走动过程中模型可能把带子改回左肩、滑动或消失，Gate 要逐帧确认它一直是右肩到左胯。",
+    "首帧里她离镜头很近，镜头锁死，大约 1.5–2.5 s 就可能走出画面。Gate 要标出落步那一帧和出画那一帧，确认落步在 HANDS（0–4.156 s）之内。",
+    "长袖：Gate 要确认“摆回”这个动作确实发生，长袖不换到另一只手、不变短，左臂一直是光着的。",
+    "袖子细节和 SG03-w1 还有差别：s012 里她的左前臂和手套着一截灰袖，右臂的袖子只到手腕。前面已经报过，使用者也看过。",
+    "首帧右侧前排的笔记本盖上有类似苹果的标志，分镜禁止出现标志，Gate 要确认这些标没有在生成中变得更清楚。",
+    "s011 里的工程师穿灰色或炭灰色衣服，s012 那位穿深蓝工装，这是使用者认可过的设定，提醒 Gate 知道这一点。",
+    "这条要替换 v4r6 里已经剪进去的 MO06-w1b 走台。替换后要重新看拼接接点（39.674–50.93），单条过 Gate 不能代替看接点。",
+    "shot.duration_policy.seconds=6.0（prepared 第 43、441 行），与 5 s 输出不一致，交给 lint 判定。",
+    "我没有 Bash，没法核对 p011-w1c.png 与 STRAP/s011-b.png 是否逐字节相同，目前只有认可文件里的声明为证。",
+    "permit 在 2026-11-20T00:04:02Z 过期。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

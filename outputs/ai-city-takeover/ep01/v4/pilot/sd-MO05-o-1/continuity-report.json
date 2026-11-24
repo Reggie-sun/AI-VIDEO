@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-20",
+ "written_by": "主会话据 continuity-supervisor 2026-11-20 批报告转写（该子代理只读）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO05-o-1/preview-approval.json",
+   "sha256": "541208d714cfb1aff2240823d3d74d21405423f3d8fdd85c496f1d705249de47"
+  }
+ },
+ "units": {
+  "MO05": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "背影时斜挎带必须是右肩到左胯；远处背影的头发不变卷；桥下无红色车尾灯；广告牌无字；踹护栏在片内约 2.74 s；插兜时手不消失；靴子高度记清单"
+  }
+ }
+}

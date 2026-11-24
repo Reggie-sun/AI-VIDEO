@@ -1,0 +1,81 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG05-m-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s015-030/gate/sg05/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "981665ba8ce6be0abb8990c0d913cb21159e0e7b6dcf683d146be3e79dd15e26"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "7d89c71ea86aed9320d239b07df8d46761f7467a90c1d40899af15e90f679263"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "4c2cd4deaacdf1130fde65c89a396dee152a5da93d3cd356489e587ea514b529"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p015-w1.png",
+   "sha256": "b8eabb6ae89dbe66a01c8d6bf59809f8ed74c91e8a033f2ac9265b31da4a76d3",
+   "role": "SG05 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05m.wav",
+   "sha256": "85f247e588704eac72e2feec01b621911a84d290a3b873ba05322b840eb02b4c",
+   "role": "SG05 vocal"
+  }
+ ],
+ "prompts": {
+  "SG05": {
+   "text": "{{image:0}}中的她刚从钢制侧门里走上湿亮的人行道，对着镜头边走边唱，口型与{{audio:1}}里的人声逐字精确同步。中景，手持镜头在她前方与她同速后退，她和镜头的距离始终不变。唱到一半时她低头看一眼腰前腰链上震动的黑色寻呼机，用右手拇指按掉，再抬头接着唱。寻呼机和工牌一直挂在她身前的腰链上。嘴前没有任何遮挡。机头直闪。街上的车灯只有白色和琥珀色。街上只有停着的车，没有行驶的车。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "d06ca8ee630104c6b4aeacbaf0cc4474bc4986a162e65213819f2ccc3b43d4fe"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 8,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 700,
+  "cumulative_CRD": 700
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p015-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P015/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg05-m-1-source-001",
+  "policy_id": "iris-sg05-m-1-source-001",
+  "reservation_id": "iris-sg05-m-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG05-m-1",
+   "sd-SG05-m-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1400,
+  "this_take": "sd-SG05-m-1"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG05-n-1/preview-approval.json",
+  "sha256": "e443e0714925328488fde0e1a332531d2accd7f2b6940654e7cdaf78ca260b06",
+  "reason": "s015 重拍 m：n-1、n-2 两条 Gate 不通过（口型：人声从句中 59.157 s 切入、离 two 只有 0.03 s，模型先唱约 1.4 s 前奏，7 s 无余量，“that's my cue”被截；n-1 有开走的车的红尾灯；两条左肩成块模糊）；首帧 p015-w1 不变，人声改为 58.70–65.666 s（pilot/audio/SG05m.wav）、生成 8 s，prompt 加「街上只有停着的车，没有行驶的车。」；n approval 与 sd-SG05-n-1/n-2 产物保留"
+ },
+ "_template_notes": [
+  "本文件是 m-1 的模板；写成 pilot/sd-SG05-m-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s015-030-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "m-2：unit_group 末尾 m-1→m-2；bound_ids 三个 id 中 -m-1- → -m-2-；takes.this_take → sd-SG05-m-2（takes.folders 保持 [m-1, m-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG05-m-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG05 8 multimodal 700"
+ ]
+}

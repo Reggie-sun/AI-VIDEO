@@ -1,0 +1,10 @@
+{
+  "project_root": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-SG08-n-2/SG08/project",
+  "task_id": "iris-v4-sg08-source-001",
+  "request_hash": "b67d794defaad6f40918e1173a14f55399d48c247e32625ad7f2c9cf9e4f7d63",
+  "resolved_reference_order": [
+    "iris-c-v4-sg08-reference"
+  ],
+  "new_provider_calls": 0,
+  "new_attempt_started": false
+}

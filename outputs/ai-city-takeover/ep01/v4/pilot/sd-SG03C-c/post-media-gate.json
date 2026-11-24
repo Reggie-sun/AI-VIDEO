@@ -1,0 +1,4 @@
+{"schema":"iris-v4-post-media-gate/1","unit":"SG03C","take_sha256":"329d3a0690ae4563cccc853c5c910a5fa7a60072a2e6cefcea475fe6e7a4be6f","reviewer":"shot-gate-reviewer","verdict":"FAIL",
+ "items":{"lip_sync_1.24-4.0":"FAIL (lag -0.125 unsteady at onset; synced clip 1.5-3.808)","mouth_tail_3.44-4.0":"FAIL (open, extra voice)","camera_locked":"FAIL (orbit: foreground laptop -900px, background +570px)","engineer_foreground":"FAIL (absent)","wardrobe_identity":"PASS","artifacts_text_red":"PASS (16-frame sample)","cut_from_SG03-w1":"FAIL"},
+ "usable_audio_aligned_clip_s":[1.5,3.808],"spent_CRD":320,"balance":[49257,48937],
+ "parent_note":"Deviations (camera orbit, no engineer, location change vs SG03-w1) need the user's decision; previews A/B at excerpt/review/sg03c-c/. No retry."}

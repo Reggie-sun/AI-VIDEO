@@ -1,0 +1,20 @@
+{
+ "unit": "MO06",
+ "take": "w1b",
+ "media": {
+  "sha256": "63c54845fc17046e0c5d7a0213e113a4cfc20936a1548ee1cc8603ee6951bed2"
+ },
+ "reviewed_by": "shot-gate-reviewer",
+ "overall": "PASS",
+ "items": {
+  "action": "PASS (footfall ≈0.25–0.50 s below frame edge; weight transfer; sleeve swings back 2.0–2.5 s; engineers stand)",
+  "identity": "PASS (face recognisable only 0.0–0.8 s)",
+  "camera_background": "PASS (locked; inherited Apple-like laptop logo from plate)",
+  "technical": "PASS (121 frames ≈24 fps)"
+ },
+ "notes": [
+  "in-point ≈0.2–0.4 s to land footfall on HANDS 40.861",
+  "slight slow-motion feel (user's call)",
+  "mute clip audio; obscure inherited logo in post"
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG05-m-2",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/gate/sg05/index.html\n\ns015 两条（1,120 积分）的 Gate 都没过：\n- 口型：是我人声切得不对。从一句话中间切进去，模型先自己唱了约 1.4 秒前奏，7 秒没有余量，“that's my cue”被截掉了。\n- 红色：n-1 有一辆开走的车带红尾灯。\n- 两条的左肩都有成块模糊。\n\n脸、耳挂、造型、寻呼机都对。\n\n建议重拍，首帧不变：\n- 人声从 58.70 秒这句开头切起，生成 8 秒留出余量。\n- prompt 加一句「街上只有停着的车，没有行驶的车」。\n\n再拍 2 条，约 1,280 积分。怎么做？",
+ "user_quote": "按页面重拍 (Recommended)",
+ "approved_at": "2026-11-22T18:41:14Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "5b021df814f686eace8d44c89d18c6dda64f6684c6a05fae964053244706a137"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "50d432b2abb7fb11141202b5a8a4a01140d91ffdb35db9591f441053cf3b3fe2"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "b7f74db41234d5da01efc40eed0e0dbab22838b007d5a8887a7a327dbc4a758a"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p015-w1.png",
+   "sha256": "b8eabb6ae89dbe66a01c8d6bf59809f8ed74c91e8a033f2ac9265b31da4a76d3",
+   "role": "SG05 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG05m.wav",
+   "sha256": "85f247e588704eac72e2feec01b621911a84d290a3b873ba05322b840eb02b4c",
+   "role": "SG05 vocal"
+  }
+ ],
+ "prompts": {
+  "SG05": {
+   "text": "{{image:0}}中的她刚从钢制侧门里走上湿亮的人行道，对着镜头边走边唱，口型与{{audio:1}}里的人声逐字精确同步。中景，手持镜头在她前方与她同速后退，她和镜头的距离始终不变。唱到一半时她低头看一眼腰前腰链上震动的黑色寻呼机，用右手拇指按掉，再抬头接着唱。寻呼机和工牌一直挂在她身前的腰链上。嘴前没有任何遮挡。机头直闪。街上的车灯只有白色和琥珀色。街上只有停着的车，没有行驶的车。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "d06ca8ee630104c6b4aeacbaf0cc4474bc4986a162e65213819f2ccc3b43d4fe"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 8,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 700,
+  "cumulative_CRD": 700
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p015-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P015/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg05-m-2-source-001",
+  "policy_id": "iris-sg05-m-2-source-001",
+  "reservation_id": "iris-sg05-m-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG05-m-1",
+   "sd-SG05-m-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1400,
+  "this_take": "sd-SG05-m-2"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG05-n-1/preview-approval.json",
+  "sha256": "e443e0714925328488fde0e1a332531d2accd7f2b6940654e7cdaf78ca260b06",
+  "reason": "s015 重拍 m：n-1、n-2 两条 Gate 不通过（口型：人声从句中 59.157 s 切入、离 two 只有 0.03 s，模型先唱约 1.4 s 前奏，7 s 无余量，“that's my cue”被截；n-1 有开走的车的红尾灯；两条左肩成块模糊）；首帧 p015-w1 不变，人声改为 58.70–65.666 s（pilot/audio/SG05m.wav）、生成 8 s，prompt 加「街上只有停着的车，没有行驶的车。」；n approval 与 sd-SG05-n-1/n-2 产物保留"
+ }
+}

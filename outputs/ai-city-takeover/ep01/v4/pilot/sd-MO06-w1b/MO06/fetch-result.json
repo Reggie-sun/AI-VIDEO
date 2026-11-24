@@ -1,0 +1,14 @@
+{
+  "relative_path": "state/video-generation/fetch/files/63c54845fc17046e0c5d7a0213e113a4cfc20936a1548ee1cc8603ee6951bed2.mp4",
+  "receipt": {
+    "submission_fingerprint": "4b49e22632098c46b4abbe17b7c0103cf066cf9ca5da8945280cf98c56602edc",
+    "observation_fingerprint": "27495874dff9a5faf9348c3f934e77d21ecc5fec431c58cc66bc0e5e2572efda",
+    "paid_submit_receipt_fingerprint": "d0192b92ea917f9a019dea23529c363ab41fa38df5223c84c777b8fcc6959a26",
+    "provider_file_id": "v02870g10004dbv87ri7dld8u1qn0v10",
+    "content_type": "video/mp4",
+    "size_bytes": 31195952,
+    "artifact_sha256": "63c54845fc17046e0c5d7a0213e113a4cfc20936a1548ee1cc8603ee6951bed2",
+    "fetched_at": "2026-11-19T05:07:56.569826Z",
+    "fetch_fingerprint": "a3fb56ee858febdfcc835015a8fc84ff9691f65b7df529b1c230d77c2415e0f7"
+  }
+}

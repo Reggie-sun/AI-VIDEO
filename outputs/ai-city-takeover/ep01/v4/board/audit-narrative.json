@@ -1,0 +1,41 @@
+{
+ "pass": true,
+ "fails": {},
+ "report": {
+  "cuts_on_bar_lines": 30,
+  "cuts_off_bar_lines": 44,
+  "graphic_kinds": [
+   "board",
+   "callout",
+   "chat",
+   "clock",
+   "counter",
+   "diagram",
+   "gauge",
+   "interface",
+   "list",
+   "pager",
+   "quote",
+   "roster",
+   "spec",
+   "spellcheck",
+   "stamp",
+   "strike",
+   "tag",
+   "tally",
+   "terminal",
+   "ticket",
+   "timeline",
+   "trace"
+  ],
+  "lead_share": 0.977,
+  "sung_s": 105.27,
+  "motion_s": 111.42,
+  "clips": 50,
+  "shots": 75,
+  "mean_s": 3.64,
+  "pieces_under_1s": [],
+  "four_equal_in_a_row_from": [],
+  "server_room_shots": []
+ }
+}

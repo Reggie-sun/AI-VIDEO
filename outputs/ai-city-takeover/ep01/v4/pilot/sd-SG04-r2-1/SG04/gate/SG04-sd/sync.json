@@ -1,0 +1,190 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG04-r2-1/SG04/project/state/video-generation/fetch/files/e18949ce2639bdce058609c34bfb9b9926f98768420a52133237261f6d45ec29.mp4",
+ "take_sha256": "e18949ce2639bdce058609c34bfb9b9926f98768420a52133237261f6d45ec29",
+ "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG04.wav",
+ "window_sha256": "055dd8719d0d773173c351b1d7e9d25ca6f3760957e4b6f3071195a1055afd91",
+ "song_t0": 50.933,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": 0.9501,
+ "ncc": 0.1181,
+ "copy": false,
+ "threshold": {
+  "null90": 0.4674,
+  "matched_med": 0.6732,
+  "thr": 0.5497,
+  "strong_frames": 82
+ },
+ "frames": {
+  "total": 507,
+  "active": 507,
+  "matched": 246,
+  "matched_of_active": 0.485
+ },
+ "divergence": {
+  "frame": 498,
+  "rule": "voice after the last match",
+  "last_match": 497,
+  "clip_s": 4.98,
+  "song_s": 54.963
+ },
+ "synced_until": {
+  "clip_s": 4.928,
+  "song_s": 54.911
+ },
+ "spans": [
+  {
+   "clip_s": [
+    2.12,
+    4.97
+   ],
+   "song_s": [
+    52.103,
+    54.953
+   ]
+  }
+ ],
+ "envelope": {
+  "lag_s": 0.947,
+  "ncc": 0.598,
+  "windows": [
+   {
+    "clip_t0": 0.0,
+    "clip_t1": 1.5,
+    "lag_s": 1.171,
+    "ncc": 0.645
+   },
+   {
+    "clip_t0": 0.25,
+    "clip_t1": 1.75,
+    "lag_s": 1.171,
+    "ncc": 0.661
+   },
+   {
+    "clip_t0": 0.5,
+    "clip_t1": 2.0,
+    "lag_s": 1.124,
+    "ncc": 0.695
+   },
+   {
+    "clip_t0": 0.75,
+    "clip_t1": 2.25,
+    "lag_s": 1.124,
+    "ncc": 0.729
+   },
+   {
+    "clip_t0": 1.0,
+    "clip_t1": 2.5,
+    "lag_s": 1.122,
+    "ncc": 0.732
+   },
+   {
+    "clip_t0": 1.25,
+    "clip_t1": 2.75,
+    "lag_s": 1.123,
+    "ncc": 0.898
+   },
+   {
+    "clip_t0": 1.5,
+    "clip_t1": 3.0,
+    "lag_s": 1.123,
+    "ncc": 0.847
+   },
+   {
+    "clip_t0": 1.75,
+    "clip_t1": 3.25,
+    "lag_s": 1.121,
+    "ncc": 0.621
+   },
+   {
+    "clip_t0": 2.0,
+    "clip_t1": 3.5,
+    "lag_s": 0.952,
+    "ncc": 0.833
+   },
+   {
+    "clip_t0": 2.25,
+    "clip_t1": 3.75,
+    "lag_s": 0.952,
+    "ncc": 0.908
+   },
+   {
+    "clip_t0": 2.5,
+    "clip_t1": 4.0,
+    "lag_s": 0.951,
+    "ncc": 0.953
+   },
+   {
+    "clip_t0": 2.75,
+    "clip_t1": 4.25,
+    "lag_s": 0.949,
+    "ncc": 0.949
+   },
+   {
+    "clip_t0": 3.0,
+    "clip_t1": 4.5,
+    "lag_s": 0.948,
+    "ncc": 0.956
+   },
+   {
+    "clip_t0": 3.25,
+    "clip_t1": 4.75,
+    "lag_s": 0.947,
+    "ncc": 0.943
+   },
+   {
+    "clip_t0": 3.5,
+    "clip_t1": 5.0,
+    "lag_s": 0.945,
+    "ncc": 0.922
+   }
+  ],
+  "max_dev_s": 0.224,
+  "steady": false,
+  "segments": [
+   {
+    "clip_s": [
+     0.625,
+     2.625
+    ],
+    "lag_s": 1.123,
+    "windows": 8,
+    "min_ncc": 0.621
+   },
+   {
+    "clip_s": [
+     2.625,
+     4.375
+    ],
+    "lag_s": 0.949,
+    "windows": 7,
+    "min_ncc": 0.833
+   }
+  ]
+ },
+ "placement": {
+  "lag_s": 0.947,
+  "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+  "song_t_of_clip0": 49.986,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "SG04-sd",
+ "reviews": [
+  {
+   "kind": "placement",
+   "lag_s": 0.947,
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG04-r2-1/SG04/gate/SG04-sd/review-SG04-sd-e18949ce2639-placement-lag+0.947.mp4",
+   "sha256": "44d520a77e0ed5e38546011bd371035c298393cdaa850e0dc84289b02eb88af9"
+  }
+ ]
+}

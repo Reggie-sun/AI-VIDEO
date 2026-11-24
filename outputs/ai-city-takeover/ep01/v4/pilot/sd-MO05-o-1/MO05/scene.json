@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo05-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "3cdfc7bf596471812a80aa0cc9e163e6e9e4582e8e0ebf32ea0e4363d7ba442a",
+  "creation_receipt_id": "iris-v4-MO05-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/dc06ced815ebbc8a2e8cfbb01166cf383d794eaf2e51d2d5a876558f5ea2b870.json",
+      "content_hash": "dc06ced815ebbc8a2e8cfbb01166cf383d794eaf2e51d2d5a876558f5ea2b870"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a6988c9d1e1f6cee9b92defa281bc07ac6cdc0b207b31628b5df759303ea72ac.json",
+      "content_hash": "a6988c9d1e1f6cee9b92defa281bc07ac6cdc0b207b31628b5df759303ea72ac"
+    }
+  ],
+  "scene_id": "freeway-footbridge",
+  "location": "Potrero Hill 旁跨 US-101 高速的人行天桥，夜里，铁丝网护栏外是车流",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo05-first-frame"
+  ]
+}

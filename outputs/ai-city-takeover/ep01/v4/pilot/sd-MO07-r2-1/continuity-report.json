@@ -1,0 +1,47 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "inputs": {
+  "preview_approval": {
+   "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-1/preview-approval.json",
+   "user_quote": "s013 用 b、s014 用 c，拍 (Recommended)",
+   "approved_at": "2026-11-19T17:13:30Z",
+   "replaces_approval": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07/preview-approval.json (sha c3654e95…b441)",
+   "sha256_recorded": "prompt 0b5a2a72…812f; first_frame db997e4f…7950; page round2.html 0b137487…1d28",
+   "takes": "同一认可两条 take（r2-1/r2-2），各 1 次，合计上限 800 CRD"
+  },
+  "compiled_prompt": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-1/MO07/compiled-native-prompt.zh.txt",
+  "prepared": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-1/MO07/prepared.json",
+  "profile": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-1/MO07/profile.json",
+  "operator_bound": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r2-1/MO07/operator-bound.json",
+  "first_frame": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/plates/p014-w1.png",
+  "preview_page": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/round2.html",
+  "board": "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/board/shots.json (s014 第 1023–1076 行；s015 第 1078 行起)",
+  "prior_accepted": [
+   "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/R2/mo06w1b-4k-t0.2.png",
+   "/home/reggie/vscode_folder/AI-VIDEO/outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/R2/prev-s011-walk.jpg",
+   "s013 底片 p013-w1.png"
+  ]
+ },
+ "units": {
+  "MO07": {
+   "verdict": "blocked",
+   "continuity": "FAIL：只有斜挎带方向一项不对，其余都对。我把 p014-w1.png 和已接受的 s011（MO06-w1b 实拍 4K t=0.2）逐项对过。\n对得上的部分：\n(1) 场地是同一条 T 台：湿亮的水泥地，两侧坐着穿灰工装、抱笔记本的值班工程师，连人都一样（左边戴眼镜的卷发男、右边扎发髻戴耳机的女人在 s011 里也有）；柱子上有黄黑警示条，天花板上是青白色灯管。\n(2) 露左肩（画面右侧）。\n(3) 长袖在右臂，向画面左甩出，和 s011 一致。\n(4) 黑色高领在。\n(5) 腰链、寻呼机、空白工牌、及膝长靴都在。\n(6) 红色只有画面右侧，也就是她左耳挂上的那颗小灯。\n(7) 光线与 s011 相同，都是日光灯管加直闪。\n对不上的部分：斜挎带从她的左肩（画面右，紧挨露出的那侧肩）斜到右胯（画面左）。分镜 s014 的底片提示词（shots.json 第 1039 行）写的是“黑色斜挎皮带从右肩斜挎到左胯”，这次核对要求里也是这一条，紧挨着的 s013 底片和 s012 实拍也都是右肩到左胯。底片没有满足封存要求，所以判 FAIL。\n需要说明的是：已接受的 s011 本身就是左肩到右胯，p014 和它一致。这条前后不一致在 s011→s012 之间就已经存在，是我在 MO06-w1b 报告里漏查的，在这里补报。这一条要不要算次要问题、放行，只能由使用者当次决定。",
+   "handoff": "PASS（剪辑语义；服装那一项归在 continuity）。\ns013→s014：她从前排工程师旁边（仰拍中近景）切到 T 台尽头（长焦全身远景）。这是在 55.078 的“All hands! / All night!”节拍上做的空间省略。剪辑计划在 s013 结尾插一个“手机落回他怀里”的短插，交代她离开了他；s014 开场她已经回到 T 台在走。这样时间和空间都能交代过去，而且两侧还是同一批工程师，观众能认出是同一个秀场。\ns014→s015：MO07 结束时她一手按住腰间震动的寻呼机，朝画面右侧走开。s015 在 59.234 的重音上推开钢门走上人行道，寻呼机在尖叫，她低头看一眼、拇指按掉。动作上接得上：寻呼机从震动升级到尖叫，手一直按在寻呼机上。地点从 T 台换到侧门外，靠撞门的重音完成省略。方向上，她从画面右侧出画，s015 里她是朝镜头走、人在画面右三分之一，朝镜头走属于中性方向，不会显得反向。",
+   "axis_action_camera": "PASS。长焦从正面对着 T 台，镜头固定，两侧工程师左右对称，没有轴线问题。动作在首帧里已经开始：重心落在前脚，身体开始朝画面左转，长袖已经甩出，画面左边留了甩开的空间。prompt 接着写急转身、袖子甩圆落下、按住寻呼机、朝画面右侧走开。这一镜用歌曲 55.078–59.234，共 4.156 s，5 s 的生成有 0.84 s 余量。动作量偏多，见风险。",
+   "prompt_fit": "PASS。以下几处 prompt 逐字相同：compiled-native-prompt.zh.txt、preview-approval.prompts.MO07.text、round2.html 第 15 行、prepared.json 的 prompt_text（第 4379、4438、4528、4587、4676 行）。上传内容的 sha 都等于认可值：prompt 0b5a2a72ae7e1e9605c70387c904d1fc56e082347ea00d810e0d7d2878b1812f（第 4750 行），首帧 db997e4fe7d1704f96605bbfd4ad07dce38fac0e4fb345e8b9cb522775037950（第 4757 行）。生成参数：first_frame、5 s、4k、16:9、上限 400 CRD、1 次、不重试。attempt、policy、reservation 均为 iris-mo07-r2-1-*，节点 node_0pmbmgzr69，generation_POSTs=0。open_state 和 close_state（第 205、212 行）与首帧和分镜动作一致。\n上一轮失败点的对策：\n环绕：这次锁了首帧，prompt 也写了“镜头固定不动”，但没有像唱段那样写全“不推不拉不摇不环绕”。\n前景丢失：这一镜没有前景元素，不适用。\n抢拍：这一镜没有人声，不适用。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "【阻塞】斜挎带方向与分镜 s014 底片提示词、s013、s012 相反，与 s011 相同。三种处理办法：(a) 使用者明确接受，理由是 s011 已经是这个方向、s014 是远景、带子细，不额外花钱；(b) 重出 S14，提示词改为强调斜挎带从右肩到左胯，再请使用者认可；(c) 由使用者统一一下 W1 的斜挎带方向。三种都需要使用者当次决定。不能把 p014 镜像翻转：翻过来耳挂会到右耳，长袖会到左臂。",
+    "动作在 4.156 s 内比较挤：急转、袖子甩圆落下、按寻呼机、走出画面都要完成。按寻呼机最好落在 58.73 的“Ten oh two”上，也就是片内约 3.65 s，模型控制不了这个时机，只能在剪辑里用 0.84 s 余量去对。Gate 要标出转身、袖子落下、按寻呼机、出画各发生在哪一帧。",
+    "长袖：转身时袖子不能换到另一只手，不能变短，不能多出第二条长袖；左臂要一直露着。",
+    "logo：首帧右侧有几台笔记本盖子上能看到类似苹果的标（约在 1430,505 附近），s011 也有同样的情况。分镜要求画面里不出现任何标志，Gate 要确认这些标没有变清楚。",
+    "红灯：远景里耳挂很小，Gate 要放大确认红灯在她左耳（画面右侧），并且画面里没有别的红色。",
+    "s015 的分镜提示词和底片 p015（shots.json 第 1094 行）还是旧造型：22 岁、白色立领外套带红色灯线、阔腿裤。如果不改成 W1，s014→s015 这一刀会直接穿帮。这不影响 MO07 提交，但 s015 需要重做。",
+    "shot.duration_policy.seconds=6.0（prepared 第 43、442 行），而输出是 5 s，两者不一致，交给 lint 判定。",
+    "我没有 Bash，没法核对 p014-w1.png 和 S14-c.png 是否逐字节相同，目前只有认可文件里的声明。",
+    "permit 在 2026-11-19T23:20:20Z 过期。"
+   ]
+  }
+ }
+}

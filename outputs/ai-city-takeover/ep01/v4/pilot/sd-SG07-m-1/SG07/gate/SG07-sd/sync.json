@@ -1,0 +1,223 @@
+{
+ "schema": "motion-kit-sync-check/1",
+ "take": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG07-m-1/SG07/project/state/video-generation/fetch/files/d1740013cbd0c2199358c3b68d47dd624e36d609ad064602e407d21e1cd0e55b.mp4",
+ "take_sha256": "d1740013cbd0c2199358c3b68d47dd624e36d609ad064602e407d21e1cd0e55b",
+ "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG07.wav",
+ "window_sha256": "95e8b29ecb421ccaf057c447b9b7d8be1ed4f4d2a671bd991e45a0d61580d697",
+ "song_t0": 71.1808,
+ "constants": {
+  "sr": 16000,
+  "hop": 160,
+  "n_fft": 1024,
+  "mels": [
+   80,
+   50.0,
+   7600.0
+  ],
+  "copy_ncc": 0.2
+ },
+ "lag_s": -0.2249,
+ "ncc": 0.0472,
+ "copy": false,
+ "threshold": {
+  "null90": 0.5982,
+  "matched_med": 0.9222,
+  "thr": 0.7278,
+  "strong_frames": 21
+ },
+ "frames": {
+  "total": 908,
+  "active": 709,
+  "matched": 95,
+  "matched_of_active": 0.134
+ },
+ "divergence": {
+  "frame": 167,
+  "rule": "stretch",
+  "last_match": 166,
+  "clip_s": 1.67,
+  "song_s": 73.076
+ },
+ "synced_until": {
+  "clip_s": 1.618,
+  "song_s": 73.024
+ },
+ "spans": [
+  {
+   "clip_s": [
+    0.75,
+    1.73
+   ],
+   "song_s": [
+    72.156,
+    73.136
+   ]
+  }
+ ],
+ "envelope": {
+  "lag_s": -2.485,
+  "ncc": 0.86,
+  "windows": [
+   {
+    "clip_t0": 0.0,
+    "clip_t1": 1.5,
+    "lag_s": -2.213,
+    "ncc": 0.448
+   },
+   {
+    "clip_t0": 0.25,
+    "clip_t1": 1.75,
+    "lag_s": -2.421,
+    "ncc": 0.247
+   },
+   {
+    "clip_t0": 0.5,
+    "clip_t1": 2.0,
+    "lag_s": -2.315,
+    "ncc": 0.397
+   },
+   {
+    "clip_t0": 0.75,
+    "clip_t1": 2.25,
+    "lag_s": -2.321,
+    "ncc": 0.198
+   },
+   {
+    "clip_t0": 1.0,
+    "clip_t1": 2.5,
+    "lag_s": -2.664,
+    "ncc": 0.271
+   },
+   {
+    "clip_t0": 1.25,
+    "clip_t1": 2.75,
+    "lag_s": -2.441,
+    "ncc": 0.184
+   },
+   {
+    "clip_t0": 1.5,
+    "clip_t1": 3.0,
+    "lag_s": -2.449,
+    "ncc": 0.239
+   },
+   {
+    "clip_t0": 1.75,
+    "clip_t1": 3.25,
+    "lag_s": -2.454,
+    "ncc": 0.389
+   },
+   {
+    "clip_t0": 2.0,
+    "clip_t1": 3.5,
+    "lag_s": -2.47,
+    "ncc": 0.79
+   },
+   {
+    "clip_t0": 2.25,
+    "clip_t1": 3.75,
+    "lag_s": -2.478,
+    "ncc": 0.867
+   },
+   {
+    "clip_t0": 2.5,
+    "clip_t1": 4.0,
+    "lag_s": -2.489,
+    "ncc": 0.956
+   },
+   {
+    "clip_t0": 2.75,
+    "clip_t1": 4.25,
+    "lag_s": -2.49,
+    "ncc": 0.954
+   },
+   {
+    "clip_t0": 3.0,
+    "clip_t1": 4.5,
+    "lag_s": -2.491,
+    "ncc": 0.97
+   },
+   {
+    "clip_t0": 3.25,
+    "clip_t1": 4.75,
+    "lag_s": -2.492,
+    "ncc": 0.982
+   },
+   {
+    "clip_t0": 3.5,
+    "clip_t1": 5.0,
+    "lag_s": -2.496,
+    "ncc": 0.995
+   },
+   {
+    "clip_t0": 3.75,
+    "clip_t1": 5.25,
+    "lag_s": -2.498,
+    "ncc": 0.999
+   }
+  ],
+  "max_dev_s": 0.272,
+  "steady": false,
+  "segments": [
+   {
+    "clip_s": [
+     0.625,
+     0.875
+    ],
+    "lag_s": -2.213,
+    "windows": 1,
+    "min_ncc": 0.448
+   },
+   {
+    "clip_s": [
+     0.875,
+     1.125
+    ],
+    "lag_s": -2.421,
+    "windows": 1,
+    "min_ncc": 0.247
+   },
+   {
+    "clip_s": [
+     1.125,
+     1.625
+    ],
+    "lag_s": -2.318,
+    "windows": 2,
+    "min_ncc": 0.198
+   },
+   {
+    "clip_s": [
+     1.625,
+     1.875
+    ],
+    "lag_s": -2.664,
+    "windows": 1,
+    "min_ncc": 0.271
+   },
+   {
+    "clip_s": [
+     1.875,
+     4.625
+    ],
+    "lag_s": -2.489,
+    "windows": 11,
+    "min_ncc": 0.184
+   }
+  ]
+ },
+ "placement": {
+  "lag_s": -2.485,
+  "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+  "song_t_of_clip0": 73.6658,
+  "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+ },
+ "name": "SG07-sd",
+ "reviews": [
+  {
+   "kind": "placement",
+   "lag_s": -2.485,
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG07-m-1/SG07/gate/SG07-sd/review-SG07-sd-d1740013cbd0-placement-lag-2.485.mp4",
+   "sha256": "a0557c211bd1af0a86071835ef2a1172a07f27945516a42dbf14c88751a1818d"
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "unit": "MO02",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "27fb85c67f7171588e6aaf7f7c6730fb17d84daae61fcc5a81dad7f5482ac31d",
+ "compiled_prompt_sha256": "64a7f4c1a0d2125091eff03dc3a164a6c5bbd67ff6e9efc59947f52e09da6490",
+ "approval_sha256": "03f0f45d4adf7ba6b4b134a71bf64cb4689bb95d2ac5bc1cef0d491f08be3a92",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO02-o-2/continuity-report.json",
+  "sha256": "4e62ca8b79d493c96f4e512a04c81769aa751fed4b9875fc8697d989882c7f67",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "红光只能来自门缝、只扫靴子和地面；门牌和写字板无字；寻呼机扣到腰链上，不能消失或变成手机；右侧柱子不能凭空长出观众；斜挎带与露左肩保持"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 500,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   500
+  ]
+ },
+ "new_calls": 0
+}

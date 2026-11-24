@@ -1,0 +1,298 @@
+{
+  "shot": {
+    "shot_id": "ep01v4-mo01",
+    "scene_id": "garage-backstage",
+    "storyboard_beat_id": "mo01",
+    "intent": "镜头在化妆镜旁正面拍她，极慢地推近。她闭着眼，化妆师的粉扑按在她颧骨上；她睁开眼，用两根手指把粉扑推开，伸手从台面上拿起那台黑色寻呼机，在掌心掂一下，用拇指按掉它，然后从椅子上站起半身，寻呼机握在下巴下方。面无表情，带着一点好奇。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+    "dialogue": "",
+    "narration": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 6.0,
+      "minimum_seconds": null,
+      "maximum_seconds": null
+    },
+    "character_ids": [
+      "IRIS"
+    ],
+    "continuity_constraints": [
+      "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+      "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的首帧承担）",
+      "她睁眼，两根手指推开粉扑，拿起黑色寻呼机在掌心掂一下、用拇指按掉，站起半身，寻呼机握在下巴下方；不新增人物",
+      "摄影机在化妆镜旁正面拍她，全程极慢地推近，不摇、不环绕、不拍镜中像",
+      "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      },
+      {
+        "role": "first_frame",
+        "asset_ids": [
+          "iris-c-v4-mo01-first-frame"
+        ],
+        "allowed_asset_types": [
+          "image"
+        ]
+      }
+    ],
+    "motion_directives": [],
+    "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+    "hybrid_layers": [],
+    "composition_directives": [],
+    "review_policy": {
+      "required_checks": []
+    }
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "approved_keyframe",
+        "asset_id": "iris-c-v4-mo01-first-frame"
+      }
+    ],
+    "generation_intent": {
+      "reference_planning": {
+        "contract_version": "shot-reference-intent/1",
+        "facets": [
+          "slow_camera",
+          "stable"
+        ],
+        "structure": "continuous",
+        "segment_ids": [],
+        "events": [
+          {
+            "event_id": "open-composition",
+            "kind": "composition",
+            "visual_state": "她闭着眼，化妆师的粉扑按在她颧骨上",
+            "purpose": "极慢地推近",
+            "phase": "start",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          },
+          {
+            "event_id": "close-composition",
+            "kind": "composition",
+            "visual_state": "从椅子上站起半身，寻呼机握在下巴下方",
+            "purpose": "用拇指按掉它",
+            "phase": "end",
+            "segment_id": null,
+            "at_seconds": null,
+            "after_event_ids": [],
+            "control": "review_only",
+            "priority": "preferred"
+          }
+        ],
+        "anchors": [],
+        "selections": [],
+        "natural_generation": [
+          "用两根手指把粉扑推开"
+        ],
+        "director_coverage": {
+          "coverage_hash": "197101e56b72cc3bbfa463def8ad5c55709ded38278a8c1b932c1592402ed90c",
+          "unit_id": "MO01"
+        },
+        "preview_approval": {
+          "approval_hash": "7b5b14488dab7152911d3ca9a557b6a07644f89c136319fb9f94f121751ae5a5"
+        },
+        "identity_waivers": [
+          {
+            "character_id": "IRIS",
+            "reason": "首帧生视频：身份由使用者在预览中认可的首帧承担；认可的参考包只有首帧，不附身份图"
+          }
+        ]
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "MO01首帧：化妆镜旁正面近景，她闭着眼，化妆师的粉扑按在她颧骨上，黑色寻呼机还在台面上",
+        "state_hash": null,
+        "required_change": false
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_ref": null,
+        "state_text": "她从椅子上站起半身，寻呼机握在下巴下方，镜头已极慢地推近",
+        "state_hash": null,
+        "required_change": false
+      },
+      "identity_continuity": {
+        "character_ids": [],
+        "preservation": "unspecified",
+        "allowed_variation": []
+      },
+      "scene_continuity": {
+        "scene_id": "garage-backstage",
+        "time_of_day": "深夜",
+        "mood": "冷、面无表情、带着好奇",
+        "state_constraints": [
+          "MO01首帧：化妆镜旁正面近景，她闭着眼，化妆师的粉扑按在她颧骨上，黑色寻呼机还在台面上",
+          "不新增人物、设备、文字或界面"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "她在化妆台前，从坐着到站起半身",
+        "screen_direction": "保持参考图方向",
+        "entrance_state": null,
+        "exit_state": null,
+        "crossing_policy": "不换位、不翻轴"
+      },
+      "axis_continuity": {
+        "camera_axis": "参考图原机位视轴",
+        "framing_continuity": "MO01首帧：化妆镜旁正面近景",
+        "crossing_policy": "不翻轴、不环绕"
+      },
+      "subject_action": {
+        "start_state": "她闭着眼，化妆师的粉扑按在她颧骨上",
+        "progression": "她睁开眼，用两根手指把粉扑推开，从台面拿起黑色寻呼机，在掌心掂一下，用拇指按掉它",
+        "endpoint": {
+          "state_ref": null,
+          "state_text": "她从椅子上站起半身，寻呼机握在下巴下方",
+          "state_hash": null,
+          "required_change": false
+        }
+      },
+      "motion_envelope": {
+        "onset": "平滑开始",
+        "peak": "用拇指按掉寻呼机，站起半身",
+        "settle": "末段平稳停住",
+        "direction": "向前极慢推近",
+        "amplitude_class": "很小"
+      },
+      "pacing": {
+        "cadence": "五秒连续原速",
+        "tempo_class": "正常原速",
+        "shot_duration_seconds": 5.0
+      },
+      "camera_intent": {
+        "movement": "摄影机在化妆镜旁正面拍她，全程极慢地推近，不摇、不环绕",
+        "stability": "极慢平稳推近",
+        "framing_intent": "MO01首帧：化妆镜旁正面近景",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "MO01首帧原始构图",
+        "end_framing": "同一机位轴线上极慢推近后的近景",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "performance_intent": {
+        "trigger": "寻呼机的提示",
+        "visible_response": "睁眼推开粉扑，拿起寻呼机掂一下按掉，站起半身",
+        "gaze_target": "前方",
+        "body_behavior": "从坐着到站起半身",
+        "hand_behavior": "两根手指推开粉扑，拿起寻呼机在掌心掂一下，用拇指按掉",
+        "terminal_performance_state": "站起半身，寻呼机握在下巴下方",
+        "character_directions": [
+          {
+            "character_id": "IRIS",
+            "screen_identity": "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+            "role": "principal",
+            "visibility": "visible",
+            "offscreen_reason": null,
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "寻呼机的提示",
+                "emotion": "平静",
+                "intensity": "subtle",
+                "facial_expression": "面无表情，带着一点好奇",
+                "gaze_target": "前方",
+                "breathing": "自然平稳",
+                "body_behavior": "从坐着到站起半身"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "真人电影摄影",
+        "palette": "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色",
+        "material_treatment": "自然材质与真实光影",
+        "prohibited_visual_drift": [
+          "新增字幕、文字、图形或界面；平台正常人工智能标识保留",
+          "改变参考图的场景与光线"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "相机机头直闪与化妆灯泡",
+        "direction": "参考图方向",
+        "exposure_priority": "保留暗部细节",
+        "continuity_state": "与首帧同一冷光"
+      },
+      "ambience_intent": {
+        "environment_bed": "几乎无声（成片使用独立音轨）",
+        "foley_cues": [],
+        "explicitly_silent": false
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "speaker_id": null,
+        "verbatim_text": null,
+        "start_seconds": null,
+        "end_seconds": null,
+        "on_screen": null,
+        "response_obligation": null,
+        "lip_sync_required": false
+      },
+      "music_intent": {
+        "mode": "none",
+        "instrumentation": null,
+        "tempo_rhythm": null,
+        "dynamics": null
+      },
+      "primary_camera_motion": {
+        "movement_kind": "dolly_in",
+        "direction": "forward",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "IRIS",
+        "relation_kind": "fixed_frame",
+        "start_relation": "化妆镜旁正面近景，她坐在化妆台前",
+        "end_relation": "同一机位轴线极慢推近，她站起半身"
+      }
+    },
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": false,
+      "subject_motion_directive_present": true
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 5,
+      "geometry_policy": "adaptive",
+      "aspect_ratio": "16:9",
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "optional",
+    "quality_need": {
+      "objective_tier": "preview"
+    },
+    "conditioning_compatibility": {
+      "lane": "i2va",
+      "first_anchor_id": "iris-c-v4-mo01-first-frame",
+      "available_duration_seconds": 5.0
+    }
+  },
+  "composition": {
+    "muted": true,
+    "source_audio_policy": "MUTE",
+    "source_audio_reason": "成片使用已选定歌曲 all-hands-r4 母带独立音轨"
+  },
+  "boundary": {
+    "independent": true,
+    "reason": "按分镜 v4 由最终剪辑切接；不要求复制前镜终态"
+  }
+}

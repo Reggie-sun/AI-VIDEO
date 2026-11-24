@@ -1,0 +1,59 @@
+{
+ "schema": "iris-v4-preview-inputs/method-1",
+ "unit": "SG03",
+ "shot": "s012",
+ "lyric": "hold on tight / I'm the reason you're awake",
+ "image": {
+  "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012.png",
+  "sha256": "5c5323ace6605783c58a029b275e67b21523ed6f1f74d63a87f6de4ad5d5f0d2",
+  "note": "closed-mouth start (0.68 s silence before 'hold')"
+ },
+ "audio": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03.wav",
+  "sha256": "a41a1ba3c57e65a36154b84dd21c4a546c072d5e1a49ca06139b1f27f9e22559",
+  "seconds": 5.99,
+  "song_window": [
+   44.9422,
+   50.933
+  ]
+ },
+ "board": {
+  "path": "outputs/ai-city-takeover/ep01/v4/board/shots.json",
+  "sha256": "9fb5b8c0af31110e8298f9266d09f822ce5c8038e01bf3a771beb4368e045f84"
+ },
+ "digital_human": {
+  "mode": "即梦 数字人 · 大师模式（OmniHuman 1.5）",
+  "action_prompt": "镜头固定中景。她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上。开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地对着他唱，嘴随歌词自然张合，神情平静，眉头舒展；唱完最后一个字，她慢慢直起身。他抱着笔记本电脑往后缩，攥着椅子扶手。",
+  "action_prompt_sha256": "fadfdbbec51a021b5471eb64e902e71ff716c9b14600d9114977ce5ff82bd5fb"
+ },
+ "seedance_multimodal": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 6,
+  "resolution": "1080p",
+  "prompt": "{{image:0}}中的她弯腰凑在坐着的值班工程师脸前，一只手撑在他的椅背上，对着他唱歌，口型与{{audio:1}}里的人声逐字精确同步。中景，开头她嘴唇轻轻合上，静静看着他；唱第一个字时张开嘴，冷静而投入地唱，神情平静；唱完最后一个字，她慢慢直起身，他还攥着椅子扶手。他抱着笔记本电脑往后缩。镜头全程锁定，一镜到底。",
+  "prompt_sha256": "b219295c3d8757124350034d9b42e2ebac1f632201f5c161eeb0fa48d4e1ee13"
+ },
+ "technical_differences_from_board": [
+  "board camera '锁定中景，48.17 小节线上 4% 推近' → generated take locked; the 4% push is done in the edit (v3: 4 of 5 Seedance takes with camera moves failed)",
+  "plate p012 changed from open mouth to closed-mouth start (v3 r3b gate FAIL: open mouth frozen through silence)",
+  "no exact timestamps in prompts (Seedance 2.0 does not reliably follow precise timing); relative order only"
+ ],
+ "budget": {
+  "generations": 2,
+  "retries": 0,
+  "ceiling_per_take_CRD": {
+   "digital_human": 165,
+   "seedance_multimodal": 200
+  },
+  "cumulative_CRD": 365,
+  "observed_reference": "v3 digital human 4.37 s take cost 24 CRD"
+ },
+ "accept": [
+  "正常速度和原曲合在一起看，她在唱，口型逐字大致同步，无声处嘴合着",
+  "脸是 F1-a，耳挂与立领红线在画面右侧且一直亮着",
+  "神情平静、不喊、不发空，从头到尾同一种情绪",
+  "动作：凑近唱 → 唱完慢慢直起身；他往后缩",
+  "没有凭空出现的手或物体、没有牙齿碎裂、背景与机位稳定"
+ ]
+}

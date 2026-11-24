@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo06-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "cc21970f37a222c827cf4439823eec6afab17a66db11045e3c511556311e4e60",
+  "creation_receipt_id": "iris-v4-MO06-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/cf73ba135ffb9942f1747ed29c7fc8e4cdc49ca6b66d894df6c3ed1512b2559e.json",
+      "content_hash": "cf73ba135ffb9942f1747ed29c7fc8e4cdc49ca6b66d894df6c3ed1512b2559e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc.json",
+      "content_hash": "06ac4570d4fe756bf849f557e06475cc058e5dd73408a8995367bf76da8478dc"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/93863f8bf9bb4409847764ef621e5be963bab7266d828896b19338e9e8dc2f31.json",
+      "content_hash": "93863f8bf9bb4409847764ef621e5be963bab7266d828896b19338e9e8dc2f31"
+    }
+  ],
+  "shot_id": "ep01v4-mo06",
+  "scene_id": "garage-runway",
+  "storyboard_beat_id": "mo06",
+  "intent": "长焦正面，全身远景，镜头固定。地下停车场改成的秀场，她从走秀台远端快步走向镜头，步子很大，面无表情，外套肩线一颠一颠；两边前排工程师们一个接一个站起来；她走到走秀台中段。头顶一排排日光灯管亮着，湿的水泥地面反着光。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；造型1雕塑白：白色雕塑感短款立领外套与左侧立领的极细红灯线完整保持（由认可的首帧承担）",
+    "她快步走向镜头、外套肩线一颠一颠，走到走秀台中段；前排工程师一个接一个站起来，不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧的长焦正面构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo06-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

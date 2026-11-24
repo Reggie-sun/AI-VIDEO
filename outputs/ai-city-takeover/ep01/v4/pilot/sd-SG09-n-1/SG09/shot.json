@@ -1,0 +1,77 @@
+{
+  "artifact_id": "iris-v4-sg09-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "0046810c90f0587424bb81143898bf160bd18e116dd19a62258bd1b6e110bc35",
+  "creation_receipt_id": "iris-v4-SG09-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/f251c0288ac288a56615846b976ada9c738207a068aa4d69c841c0aa160a3503.json",
+      "content_hash": "f251c0288ac288a56615846b976ada9c738207a068aa4d69c841c0aa160a3503"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c05c62be19ddfaab29af5698dd432cc4fef002a8c58f5c1839a78b980ed6ebd1.json",
+      "content_hash": "c05c62be19ddfaab29af5698dd432cc4fef002a8c58f5c1839a78b980ed6ebd1"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ee83528f636ebd2de46db4d1493b5169cfae3ff1bb47974ff9cb13415807f311.json",
+      "content_hash": "ee83528f636ebd2de46db4d1493b5169cfae3ff1bb47974ff9cb13415807f311"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/67e15454b5d2f0680256fd6a265a7460386fe9c7ea5e928040bdce6983eb5fc7.json",
+      "content_hash": "67e15454b5d2f0680256fd6a265a7460386fe9c7ea5e928040bdce6983eb5fc7"
+    }
+  ],
+  "shot_id": "ep01v4-sg09",
+  "scene_id": "night-train-car",
+  "storyboard_beat_id": "sg09",
+  "intent": "{{image:0}}中的她站在列车车厢的过道里，一只手抓着头顶的吊环，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头随车身轻轻晃动。开头车厢顶灯闪一下。两边座位上的人抱着笔记本电脑打瞌睡，不抬头。嘴前没有任何遮挡。车窗里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤完整保持；没有立领灯线（由认可的参考图承担）",
+    "歌词期间嘴在唱、与参考人声逐字同步，无声处嘴唇闭合；对嘴准确度由片段自带音轨与参考人声的对齐量测和使用者审看判定",
+    "摄影机固定在车厢里，随车身轻轻晃动，不推近、不摇镜、不环绕，一镜到底；车窗里不出现她的倒影",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v4-sg09-reference"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

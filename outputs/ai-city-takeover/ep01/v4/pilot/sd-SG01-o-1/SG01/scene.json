@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg01-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "056c6b77d5f24e710ca2ee43582bdb3b4ffa7d5968720e9584048b5b7b180156",
+  "creation_receipt_id": "iris-v4-SG01-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/7042869358d2125b2098364ad6cd3e775f906b9e45ea5cb500d93262dedc04ec.json",
+      "content_hash": "7042869358d2125b2098364ad6cd3e775f906b9e45ea5cb500d93262dedc04ec"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a469aa1b97fc6fa402e1c1dc970457118cab99c3ae02f5974e3e519ffd334097.json",
+      "content_hash": "a469aa1b97fc6fa402e1c1dc970457118cab99c3ae02f5974e3e519ffd334097"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126.json",
+      "content_hash": "010c0d206715e0c9a3b8c3e922f74bac80ecdc6e411e760d75803de538a64126"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e5c382bb29d1d2a1cafbca2925432d8ae20357d00792381b8590f32ceb1b1fbd.json",
+      "content_hash": "e5c382bb29d1d2a1cafbca2925432d8ae20357d00792381b8590f32ceb1b1fbd"
+    }
+  ],
+  "scene_id": "runway-call-box",
+  "location": "走秀台尽头，一根混凝土柱子上的停车场紧急呼叫柱（带螺旋线电话听筒）",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg01-reference"
+  ]
+}

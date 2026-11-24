@@ -1,0 +1,22 @@
+{
+ "schema": "iris-v4-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "MO01",
+   "attempt_id": "iris-mo01-o-2-source-001",
+   "operator_ceiling": 400,
+   "intent_at": "2026-11-20T20:02:24.095222+00:00",
+   "outcome": "known_no_effect",
+   "reconciled": {
+    "at": "2026-11-20",
+    "by": "主会话",
+    "evidence": [
+     "sd-MO01-o-2/MO01/project/state/paid-provider/submits/cb5ff42dd97c7b1ba7a07f5f59142b7c013a2314889688ae0150a75545c41975.json outcome known_no_effect external_effect_id null",
+     "paid-provider/budgets/8b5c593b… reservation released actual_cost 0",
+     "operator 输出 AiVideoError: Jimeng reference upload did not complete; generation was not submitted",
+     "balance.cjs 前后 83693"
+    ]
+   }
+  }
+ ]
+}

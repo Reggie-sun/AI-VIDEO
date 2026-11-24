@@ -1,0 +1,55 @@
+{
+ "unit": "SG04",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "308d6d9657a68108080d6d51299a1ccc495961486b1b2f65e2d21deb421b57a6",
+ "compiled_prompt_sha256": "418661cbbdca44cb4f535472388c18efa397e25b0295cdcba2b82b176e6ce67e",
+ "approval_sha256": "b5a189fdcd477e00e1c0c83377882253d8fc5541faacabbcb7be3fd530e4fc4b",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG04-r2-2/continuity-report.json",
+  "sha256": "d915742d1442756a2be49d9a7b91a045c1f3abdd74b6e1cfae9210c836b6ad35",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。与 r2-1 用的是同一张参考图 p012013-w1.png（sha 2f159721…3f21），结论相同：露的是左肩；有黑色高领；斜挎带从右肩斜到左胯；灰色卫衣面料、拉链短外套；腰链、寻呼机、空白工牌都在；红色只有左耳挂灯一处；场地是同一根带黄黑警示条的柱子和 T 台、同一批观众；光线是机头直闪加手机冷光；左下角工程师的空手带着深蓝牛仔袖口。各项都和 SG03-w1、SG03C-d1、prev-s012-end 对得上。",
+   "handoff": "PASS（中间有省略，需要剪辑交代）。上一镜 s012 停在“工程师＋撑椅背的手＋AWAKE”，这一镜开场她已经站直、拿着抽走的手机。中间“站起来、拿走手机”的动作被剪掉了，靠 AWAKE 图形和她手里的手机让观众看懂。人声 SG04.wav：4.145 s，对应歌曲 50.933–55.0777；唱词“I'm the call you had to take All hands!”，在音频里从 0.31 s 唱到 4.16 s。",
+   "axis_action_camera": "PASS（反打没有越轴）。这一镜是从工程师视角往上仰拍：他的手从画面左下进来，她在画面中间偏右，低头往左下看。两人的左右位置和视线方向都和 s012 一致。背景里柱子在左、T 台在右，说明机位在轴线同一侧。机位要求固定。4.145 s 的唱段放在 5 s 的生成里，时长够用。",
+   "prompt_fit": "PASS。prompt 在 compiled-native-prompt.zh.txt、preview-approval、round2.html 第 9 行、prepared.json 的 prompt_text（第 5251、5323、5427、5499、5602 行）这几处逐字相同，也与 r2-1 相同。实际上传的三样东西 sha 都和认可值一致：prompt 418661cb…e67e（第 5690 行）、参考图 2f159721…3f21（第 5697 行）、人声 055dd871…5afd91（第 5704 行）。生成参数：multimodal、5 s、4k、16:9，上限 400 CRD，只提交 1 次、不重试。attempt、policy、reservation 都是 iris-sg04-r2-2-*，和 r2-1 不重复；节点 node_tydc147d76，和 r2-1 的 node_1ay527xv2h 不同，generation_POSTs=0。上一轮的失败点里，环绕、抢拍、场地不同、遮嘴这四项都有对策；前景丢失只有一半对策，见风险第 2 条。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "抢拍：开头静音只有 0.31 s，成片从 0 s 用到 4.145 s，开头没有可以裁掉的余量。这次是参考图生视频，不锁第 0 帧。Gate 要量对齐，逐字核对口型。",
+    "前景丢失：prompt 和结束状态都没要求左下角工程师的手一直留在画面里，Gate 要逐帧检查。",
+    "手机：在之前的镜头里没有出现过。“手机落回他怀里”的短插还没有素材。ui.call 图形要贴在手机屏幕上，但画面里能看到的是手机背面，屏幕不朝镜头。Gate 还要查手机背面有没有长出品牌标志。",
+    "end_seconds 是 4.16，比音频长度 4.145 s 还长，“All hands!”会被截在窗口末尾，Gate 要看这里的口型。",
+    "s013→s014 的空间跳跃要靠剪辑交代，见 MO07 报告。",
+    "shot.duration_policy.seconds=6.0，与输出的 5 s 不一致，交给 lint 判定。",
+    "人声内容我这边核不了：本地转写对纯 wav 报 no_video_stream，记为 NOT_EVALUATED。",
+    "我没有 Bash，没法核对 p013-w1 与 S13-b 是否逐字节相同，目前只有认可文件里的声明。",
+    "permit 到 2026-11-19T23:20:26Z 过期。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

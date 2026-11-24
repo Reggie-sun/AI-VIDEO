@@ -1,0 +1,43 @@
+{
+  "artifact_id": "iris-v4-sg11-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "d3684084ecb4ebcfd8602f19deb84bccace737aa6bbed39b8e8ae94530147409",
+  "creation_receipt_id": "iris-v4-SG11-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4680e3bd9f527502cf8329d4c74bd4c84c260756b40a5beabae55b3a82d716f3.json",
+      "content_hash": "4680e3bd9f527502cf8329d4c74bd4c84c260756b40a5beabae55b3a82d716f3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/331d7ace725f79ea73bcd8479adb0917f993bb13aedf8d6781dd64dadf4da165.json",
+      "content_hash": "331d7ace725f79ea73bcd8479adb0917f993bb13aedf8d6781dd64dadf4da165"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/20066536327debb91d0499ce1f11e64693e7347d061d05aa4f7e720f9bb29bd7.json",
+      "content_hash": "20066536327debb91d0499ce1f11e64693e7347d061d05aa4f7e720f9bb29bd7"
+    }
+  ],
+  "scene_id": "dry-pool-board-end",
+  "location": "同一座空泳池的跳板末端，夜里，身后是泛光灯",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变",
+    "除了耳挂上的小红灯，画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-sg11-reference"
+  ]
+}

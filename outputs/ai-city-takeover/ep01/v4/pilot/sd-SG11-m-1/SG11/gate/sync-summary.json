@@ -1,0 +1,137 @@
+[
+ {
+  "name": "SG11-sd",
+  "take_sha256": "90e1af07bc7a3be8e84e5d22ec4ab86eea4ec405789711ca3a93ebbc0fcaa186",
+  "lag_s": -0.3414,
+  "ncc": 0.0157,
+  "copy": false,
+  "divergence": {
+   "frame": 193,
+   "rule": "stretch",
+   "last_match": 192,
+   "clip_s": 1.93,
+   "song_s": 127.879
+  },
+  "synced_until": {
+   "clip_s": 1.878,
+   "song_s": 127.827
+  },
+  "spans": [
+   {
+    "clip_s": [
+     0.06,
+     0.67
+    ],
+    "song_s": [
+     126.009,
+     126.619
+    ]
+   },
+   {
+    "clip_s": [
+     1.02,
+     1.92
+    ],
+    "song_s": [
+     126.969,
+     127.869
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": 2.436,
+   "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+   "song_t_of_clip0": 123.172,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 2.436,
+   "ncc": 0.525,
+   "max_dev_s": 0.328,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      2.375,
+      3.375
+     ],
+     "lag_s": 2.602,
+     "windows": 4,
+     "min_ncc": 0.476
+    },
+    {
+     "clip_s": [
+      3.375,
+      3.625
+     ],
+     "lag_s": 2.108,
+     "windows": 1,
+     "min_ncc": 0.44
+    },
+    {
+     "clip_s": [
+      3.625,
+      3.875
+     ],
+     "lag_s": 2.414,
+     "windows": 1,
+     "min_ncc": 0.545
+    },
+    {
+     "clip_s": [
+      3.875,
+      4.375
+     ],
+     "lag_s": 2.317,
+     "windows": 2,
+     "min_ncc": 0.468
+    },
+    {
+     "clip_s": [
+      4.375,
+      4.625
+     ],
+     "lag_s": 2.18,
+     "windows": 1,
+     "min_ncc": 0.21
+    },
+    {
+     "clip_s": [
+      4.625,
+      5.375
+     ],
+     "lag_s": 2.325,
+     "windows": 3,
+     "min_ncc": 0.15
+    },
+    {
+     "clip_s": [
+      5.375,
+      5.625
+     ],
+     "lag_s": 2.707,
+     "windows": 1,
+     "min_ncc": 0.102
+    },
+    {
+     "clip_s": [
+      5.625,
+      5.875
+     ],
+     "lag_s": 2.253,
+     "windows": 1,
+     "min_ncc": 0.205
+    },
+    {
+     "clip_s": [
+      5.875,
+      6.375
+     ],
+     "lag_s": 2.364,
+     "windows": 2,
+     "min_ncc": 0.325
+    }
+   ]
+  }
+ }
+]

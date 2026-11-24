@@ -1,0 +1,916 @@
+{
+ "render": "outputs/ai-city-takeover/ep01/v4/excerpt/renders/IRIS-EP01-v4-excerpt-026-059-v3.mp4",
+ "spec": {
+  "width": 1920,
+  "height": 1080,
+  "fps": "24/1",
+  "frames": 796,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "color": [
+   "bt709",
+   "bt709",
+   "bt709"
+  ],
+  "audio": {
+   "codec": "aac",
+   "rate": "48000",
+   "channels": 2,
+   "bit_rate": "321407"
+  },
+  "duration": "33.188000",
+  "pass": true
+ },
+ "sound": {
+  "render_samples": 1592320,
+  "master_slice_samples": 1592000,
+  "offset_samples": 0,
+  "offset_ms": 0.0,
+  "rms_diff_db": -0.022,
+  "pass": true
+ },
+ "cuts": {
+  "cuts": [
+   {
+    "shot": "s008",
+    "planned_t": 29.7448,
+    "nearest_beat": 29.7448,
+    "cut_dt_beat": 0.0,
+    "frame": 89,
+    "frame_t": 29.7611,
+    "frame_dt_beat": 0.0163,
+    "render_change_frame": 89,
+    "change": 0.1548,
+    "pass": true
+   },
+   {
+    "shot": "s009",
+    "planned_t": 31.1263,
+    "nearest_beat": 31.1263,
+    "cut_dt_beat": 0.0,
+    "frame": 122,
+    "frame_t": 31.1361,
+    "frame_dt_beat": 0.0098,
+    "render_change_frame": 122,
+    "change": 0.1731,
+    "pass": true
+   },
+   {
+    "shot": "s009:X09b",
+    "planned_t": 35.2827,
+    "nearest_beat": 35.2827,
+    "cut_dt_beat": 0.0,
+    "frame": 222,
+    "frame_t": 35.3028,
+    "frame_dt_beat": 0.0201,
+    "render_change_frame": 222,
+    "change": 0.1531,
+    "pass": true
+   },
+   {
+    "shot": "s010",
+    "planned_t": 36.1999,
+    "nearest_beat": 36.1999,
+    "cut_dt_beat": 0.0,
+    "frame": 244,
+    "frame_t": 36.2195,
+    "frame_dt_beat": 0.0196,
+    "render_change_frame": 244,
+    "change": 0.1051,
+    "pass": true
+   },
+   {
+    "shot": "s010:X10b",
+    "planned_t": 39.8454,
+    "nearest_beat": 39.8454,
+    "cut_dt_beat": 0.0,
+    "frame": 331,
+    "frame_t": 39.8445,
+    "frame_dt_beat": -0.0009,
+    "render_change_frame": 331,
+    "change": 0.0691,
+    "pass": true
+   },
+   {
+    "shot": "s011",
+    "planned_t": 40.7859,
+    "nearest_beat": 40.7859,
+    "cut_dt_beat": 0.0,
+    "frame": 354,
+    "frame_t": 40.8028,
+    "frame_dt_beat": 0.0169,
+    "render_change_frame": 354,
+    "change": 0.0458,
+    "pass": true
+   },
+   {
+    "shot": "s012",
+    "planned_t": 44.9422,
+    "nearest_beat": 44.9422,
+    "cut_dt_beat": 0.0,
+    "frame": 453,
+    "frame_t": 44.9278,
+    "frame_dt_beat": -0.0144,
+    "render_change_frame": 453,
+    "change": 0.0677,
+    "pass": true
+   },
+   {
+    "shot": "s012:X12b",
+    "planned_t": 48.1698,
+    "nearest_beat": 48.1698,
+    "cut_dt_beat": 0.0,
+    "frame": 531,
+    "frame_t": 48.1778,
+    "frame_dt_beat": 0.008,
+    "render_change_frame": 531,
+    "change": 0.0678,
+    "pass": true
+   },
+   {
+    "shot": "s013",
+    "planned_t": 50.933,
+    "nearest_beat": 50.933,
+    "cut_dt_beat": 0.0,
+    "frame": 597,
+    "frame_t": 50.9278,
+    "frame_dt_beat": -0.0052,
+    "render_change_frame": 597,
+    "change": 0.0768,
+    "pass": true
+   },
+   {
+    "shot": "s014",
+    "planned_t": 55.0777,
+    "nearest_beat": 55.0777,
+    "cut_dt_beat": 0.0,
+    "frame": 697,
+    "frame_t": 55.0945,
+    "frame_dt_beat": 0.0168,
+    "render_change_frame": 697,
+    "change": 0.0751,
+    "pass": true
+   }
+  ],
+  "cut_threshold": 0.0366,
+  "unplanned_changes_above_threshold": [
+   44,
+   111,
+   177,
+   232,
+   265,
+   309,
+   431,
+   575,
+   619,
+   664,
+   752,
+   785
+  ],
+  "pass": true
+ },
+ "lyrics": {
+  "words": 64,
+  "on_time": 64,
+  "pass": true,
+  "rows": [
+   {
+    "line": 2,
+    "word": "Six",
+    "start": 25.991,
+    "onset_frame": 0,
+    "first_frame": 0,
+    "held_frames": 89,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "grand",
+    "start": 26.293,
+    "onset_frame": 6,
+    "first_frame": 6,
+    "held_frames": 83,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "a",
+    "start": 26.594,
+    "onset_frame": 13,
+    "first_frame": 13,
+    "held_frames": 76,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "month",
+    "start": 26.695,
+    "onset_frame": 15,
+    "first_frame": 15,
+    "held_frames": 74,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "for",
+    "start": 27.138,
+    "onset_frame": 26,
+    "first_frame": 26,
+    "held_frames": 63,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "a",
+    "start": 27.319,
+    "onset_frame": 30,
+    "first_frame": 30,
+    "held_frames": 59,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "billboard",
+    "start": 27.399,
+    "onset_frame": 32,
+    "first_frame": 32,
+    "held_frames": 57,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "behind",
+    "start": 28.083,
+    "onset_frame": 49,
+    "first_frame": 49,
+    "held_frames": 40,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "a",
+    "start": 28.465,
+    "onset_frame": 58,
+    "first_frame": 58,
+    "held_frames": 31,
+    "pass": true
+   },
+   {
+    "line": 2,
+    "word": "tree.",
+    "start": 28.546,
+    "onset_frame": 60,
+    "first_frame": 60,
+    "held_frames": 29,
+    "pass": true
+   },
+   {
+    "line": 3,
+    "word": "A",
+    "start": 29.313,
+    "onset_frame": 78,
+    "first_frame": 78,
+    "held_frames": 84,
+    "pass": true
+   },
+   {
+    "line": 3,
+    "word": "I:",
+    "start": 29.695,
+    "onset_frame": 87,
+    "first_frame": 87,
+    "held_frames": 75,
+    "pass": true
+   },
+   {
+    "line": 3,
+    "word": "Average",
+    "start": 30.238,
+    "onset_frame": 100,
+    "first_frame": 100,
+    "held_frames": 62,
+    "pass": true
+   },
+   {
+    "line": 3,
+    "word": "Individual.",
+    "start": 30.681,
+    "onset_frame": 111,
+    "first_frame": 111,
+    "held_frames": 51,
+    "pass": true
+   },
+   {
+    "line": 3,
+    "word": "That's",
+    "start": 32.007,
+    "onset_frame": 143,
+    "first_frame": 143,
+    "held_frames": 35,
+    "pass": true
+   },
+   {
+    "line": 3,
+    "word": "me.",
+    "start": 32.289,
+    "onset_frame": 150,
+    "first_frame": 150,
+    "held_frames": 28,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "Bus",
+    "start": 32.934,
+    "onset_frame": 165,
+    "first_frame": 165,
+    "held_frames": 57,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "stop:",
+    "start": 33.094,
+    "onset_frame": 169,
+    "first_frame": 169,
+    "held_frames": 53,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "I'm",
+    "start": 33.595,
+    "onset_frame": 181,
+    "first_frame": 181,
+    "held_frames": 41,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "not",
+    "start": 33.655,
+    "onset_frame": 182,
+    "first_frame": 182,
+    "held_frames": 40,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "taking",
+    "start": 33.836,
+    "onset_frame": 187,
+    "first_frame": 187,
+    "held_frames": 35,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "your",
+    "start": 34.116,
+    "onset_frame": 194,
+    "first_frame": 194,
+    "held_frames": 28,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "job.",
+    "start": 34.297,
+    "onset_frame": 198,
+    "first_frame": 198,
+    "held_frames": 24,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "Someone",
+    "start": 34.758,
+    "onset_frame": 209,
+    "first_frame": 209,
+    "held_frames": 35,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "scratched",
+    "start": 35.158,
+    "onset_frame": 219,
+    "first_frame": 219,
+    "held_frames": 25,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "the",
+    "start": 35.599,
+    "onset_frame": 229,
+    "first_frame": 229,
+    "held_frames": 15,
+    "pass": true
+   },
+   {
+    "line": 4,
+    "word": "not.",
+    "start": 35.78,
+    "onset_frame": 233,
+    "first_frame": 233,
+    "held_frames": 11,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "Freeway:",
+    "start": 36.363,
+    "onset_frame": 247,
+    "first_frame": 247,
+    "held_frames": 84,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "S",
+    "start": 37.226,
+    "onset_frame": 268,
+    "first_frame": 268,
+    "held_frames": 63,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "F",
+    "start": 37.426,
+    "onset_frame": 273,
+    "first_frame": 273,
+    "held_frames": 58,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "hates",
+    "start": 37.527,
+    "onset_frame": 275,
+    "first_frame": 275,
+    "held_frames": 56,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "A",
+    "start": 37.868,
+    "onset_frame": 284,
+    "first_frame": 284,
+    "held_frames": 47,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "I",
+    "start": 38.048,
+    "onset_frame": 288,
+    "first_frame": 288,
+    "held_frames": 43,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "billboars.",
+    "start": 38.129,
+    "onset_frame": 290,
+    "first_frame": 290,
+    "held_frames": 41,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "The",
+    "start": 38.751,
+    "onset_frame": 305,
+    "first_frame": 305,
+    "held_frames": 41,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "D?",
+    "start": 38.931,
+    "onset_frame": 309,
+    "first_frame": 309,
+    "held_frames": 37,
+    "pass": true
+   },
+   {
+    "line": 5,
+    "word": "Forgot.",
+    "start": 39.674,
+    "onset_frame": 327,
+    "first_frame": 327,
+    "held_frames": 19,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "All",
+    "start": 39.897,
+    "onset_frame": 332,
+    "first_frame": 332,
+    "held_frames": 99,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "hands!",
+    "start": 40.861,
+    "onset_frame": 355,
+    "first_frame": 355,
+    "held_frames": 76,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "All",
+    "start": 42.247,
+    "onset_frame": 389,
+    "first_frame": 389,
+    "held_frames": 42,
+    "pass": true
+   },
+   {
+    "line": 6,
+    "word": "night!",
+    "start": 42.769,
+    "onset_frame": 401,
+    "first_frame": 401,
+    "held_frames": 32,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "Everybody,",
+    "start": 44.077,
+    "onset_frame": 433,
+    "first_frame": 433,
+    "held_frames": 81,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "hold",
+    "start": 45.625,
+    "onset_frame": 470,
+    "first_frame": 470,
+    "held_frames": 44,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "on",
+    "start": 46.047,
+    "onset_frame": 480,
+    "first_frame": 480,
+    "held_frames": 34,
+    "pass": true
+   },
+   {
+    "line": 7,
+    "word": "tight",
+    "start": 46.308,
+    "onset_frame": 486,
+    "first_frame": 486,
+    "held_frames": 28,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "I'm",
+    "start": 47.517,
+    "onset_frame": 515,
+    "first_frame": 515,
+    "held_frames": 82,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "the",
+    "start": 47.919,
+    "onset_frame": 525,
+    "first_frame": 525,
+    "held_frames": 72,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "reason",
+    "start": 48.181,
+    "onset_frame": 531,
+    "first_frame": 531,
+    "held_frames": 66,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "you're",
+    "start": 49.307,
+    "onset_frame": 558,
+    "first_frame": 558,
+    "held_frames": 39,
+    "pass": true
+   },
+   {
+    "line": 8,
+    "word": "awake",
+    "start": 49.89,
+    "onset_frame": 572,
+    "first_frame": 572,
+    "held_frames": 25,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "I'm",
+    "start": 51.239,
+    "onset_frame": 604,
+    "first_frame": 604,
+    "held_frames": 80,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "the",
+    "start": 51.62,
+    "onset_frame": 614,
+    "first_frame": 614,
+    "held_frames": 70,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "call",
+    "start": 51.76,
+    "onset_frame": 617,
+    "first_frame": 617,
+    "held_frames": 67,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "you",
+    "start": 53.024,
+    "onset_frame": 647,
+    "first_frame": 647,
+    "held_frames": 37,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "had",
+    "start": 53.224,
+    "onset_frame": 652,
+    "first_frame": 652,
+    "held_frames": 32,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "to",
+    "start": 53.445,
+    "onset_frame": 657,
+    "first_frame": 657,
+    "held_frames": 27,
+    "pass": true
+   },
+   {
+    "line": 9,
+    "word": "take",
+    "start": 53.645,
+    "onset_frame": 662,
+    "first_frame": 662,
+    "held_frames": 22,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "All",
+    "start": 53.767,
+    "onset_frame": 665,
+    "first_frame": 665,
+    "held_frames": 117,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "hands!",
+    "start": 54.59,
+    "onset_frame": 685,
+    "first_frame": 685,
+    "held_frames": 97,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "All",
+    "start": 55.152,
+    "onset_frame": 698,
+    "first_frame": 698,
+    "held_frames": 84,
+    "pass": true
+   },
+   {
+    "line": 10,
+    "word": "night!",
+    "start": 55.513,
+    "onset_frame": 707,
+    "first_frame": 707,
+    "held_frames": 75,
+    "pass": true
+   },
+   {
+    "line": 11,
+    "word": "Ten",
+    "start": 58.726,
+    "onset_frame": 784,
+    "first_frame": 784,
+    "held_frames": 12,
+    "pass": true
+   },
+   {
+    "line": 11,
+    "word": "oh",
+    "start": 59.027,
+    "onset_frame": 791,
+    "first_frame": 791,
+    "held_frames": 5,
+    "pass": true
+   },
+   {
+    "line": 11,
+    "word": "two,",
+    "start": 59.187,
+    "onset_frame": 795,
+    "first_frame": 795,
+    "held_frames": 1,
+    "pass": true
+   }
+  ]
+ },
+ "flash": {
+  "max_flashes_per_second_any_cell": 1.0,
+  "at": {
+   "cell": 1,
+   "frame": 222
+  },
+  "single_frame_jumps": [],
+  "pass": true
+ },
+ "chinese": {
+  "cjk_in_drawn_sources": [],
+  "cjk_glyphs_in_fonts": {
+   "NimbusSans-Bold-subset.otf": 0,
+   "IBMPlexMono-Medium-subset.otf": 0,
+   "NimbusSans-Regular-subset.otf": 0,
+   "IBMPlexMono-SemiBold-subset.otf": 0,
+   "IBMPlexMono-Regular-subset.otf": 0,
+   "DINishCondensed-Bold-subset.otf": 0,
+   "DINishCondensed-Black-subset.otf": 0
+  },
+  "pass": true
+ },
+ "red": {
+  "still_red_boxes": {
+   "X07a": [
+    1038,
+    154,
+    1042,
+    159
+   ],
+   "X08a": [
+    1091,
+    187,
+    1101,
+    197
+   ],
+   "X09a": [
+    744,
+    263,
+    752,
+    272
+   ],
+   "X09b": [
+    1239,
+    234,
+    1254,
+    258
+   ],
+   "X10a": [
+    922,
+    244,
+    928,
+    251
+   ],
+   "X10b": [
+    957,
+    87,
+    959,
+    90
+   ],
+   "X11a": [
+    912,
+    97,
+    917,
+    102
+   ],
+   "X12a": [
+    819,
+    181,
+    829,
+    190
+   ],
+   "X12b": [
+    1183,
+    199,
+    1192,
+    208
+   ],
+   "X13a": [
+    897,
+    172,
+    905,
+    179
+   ],
+   "X14a": [
+    946,
+    129,
+    951,
+    132
+   ]
+  },
+  "still_red_is_lamp_only": {
+   "X07a": true,
+   "X08a": true,
+   "X09a": true,
+   "X09b": true,
+   "X10a": true,
+   "X10b": true,
+   "X11a": true,
+   "X12a": true,
+   "X12b": true,
+   "X13a": true,
+   "X14a": true
+  },
+  "method": "v3: render red mapped back through the frame's camera into its still; allowed where the still is red (checked on qa/v3/still-reds.jpg: her ear lamp only) or on the P0 label",
+  "frames_checked": 199,
+  "frames_with_red": 157,
+  "frames_with_red_outside_her_or_p0_over_12px": 0,
+  "worst": [
+   {
+    "frame": 0,
+    "red_px": 8,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 9
+   },
+   {
+    "frame": 4,
+    "red_px": 6,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 7
+   },
+   {
+    "frame": 8,
+    "red_px": 7,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 7
+   },
+   {
+    "frame": 12,
+    "red_px": 6,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 7
+   },
+   {
+    "frame": 16,
+    "red_px": 6,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 7
+   },
+   {
+    "frame": 20,
+    "red_px": 6,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 7
+   },
+   {
+    "frame": 24,
+    "red_px": 1,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 6
+   },
+   {
+    "frame": 28,
+    "red_px": 1,
+    "outside_px": 0,
+    "red_px_incl_isolated_specks": 6
+   }
+  ],
+  "pass": true
+ },
+ "pass": true
+}

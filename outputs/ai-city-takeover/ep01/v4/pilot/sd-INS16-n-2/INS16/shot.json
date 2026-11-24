@@ -1,0 +1,68 @@
+{
+  "artifact_id": "iris-v4-ins16-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "e5730cbdd81bd709b49c254226347c2e04fa68337e3c345e75e5112fad172286",
+  "creation_receipt_id": "iris-v4-INS16-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf.json",
+      "content_hash": "859b4c394a465b2fef27b166e2f81bdd26c1d081ba435134550f119c175f1abf"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176.json",
+      "content_hash": "fa1d02633a8b8909c48f437212660056ddf3e9645f5edcc03c6c812ac11e0176"
+    }
+  ],
+  "shot_id": "ep01v4-ins16",
+  "scene_id": "folsom-payphone-shelf",
+  "storyboard_beat_id": "ins16",
+  "intent": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [],
+  "continuity_constraints": [
+    "黑色听筒挂在金属电话线上来回晃，越晃越慢，最后几乎停住；电话线一直被拉直；画面里没有人，也没有手，不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图；背景的街灯和湿地面的反光保持虚焦",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-ins16-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

@@ -1,0 +1,51 @@
+{
+ "n": "4",
+ "at": "2026-11-17T03:42:48.171Z",
+ "fields_sha256": "7ec0d20d18fea2f61c6fb3752eeb63fc7118b7878b52f6e9c6c14b2af8bba3b5",
+ "read": {
+  "lyrics": "[Intro - instrumental, 8 bars, pager beep motif]\n\n\n\n\n[Spoken - deadpan, dry]\n\nIncident Week. Every look got somebody pag…",
+  "style": "ballroom vogue house, 128 BPM, 4/4, hard ballroom kick, the Ha crash on the off-beats, snapping claps, deep sub bass, cold minor-key synth stabs, runway catwalk energy, opens with an 8-bar instrumental intro, one American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, the chorus soars into a high airy emotional female vocal with stacked harmonies and long held notes on run and outside, a stacked chanted post-chorus hook, key change up into the final chorus, cold, fierce, untamed, clean modern mix",
+  "exclude": "rap, male lead vocal, mumbled vocals, lo-fi, rock guitar, big room EDM, dubstep, electroclash, acid techno, trance",
+  "title": "P Zero r2",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": null,
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 0,
+  "lyrics_sha256": "5932b87cb7b282700e52d822bdeea5042ae0f4d59e8c60c05e625c57c73cfb1c"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

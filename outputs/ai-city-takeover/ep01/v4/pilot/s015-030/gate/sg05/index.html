@@ -1,0 +1,13 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>s015 SG05 Gate</title>
+<style>body{background:#111;color:#ddd;font:15px/1.6 sans-serif;max-width:1400px;margin:24px auto;padding:0 16px}img,video{width:100%}.bad{color:#f77}</style>
+<h1>s015（SG05）两条：Gate 不通过</h1>
+<p class="bad">1. 口型：人声片段从 59.157 s 切起，离 "two" 只有 0.03 s，是在一句话中间切进去的；模型自己先唱了约 1.4 s 前奏，又把后面的停顿压缩，生成 7 s 没有余量，"that's my cue" 被截掉。n-1 可用约 4.4 s，n-2 约 3.5 s。</p>
+<p class="bad">2. 红色：n-1 有一辆开走的车，红尾灯从约 1 s 到 4 s，湿路面上还有倒影。</p>
+<p class="bad">3. 两条她裸露的左肩上都出现成块的模糊斑（模型瑕疵）。</p>
+<p>没问题的：脸、左耳耳挂、W1 造型、斜挎带方向，寻呼机在身前，拇指按掉后放回；手持后退跟拍，头没出画。</p>
+<h2>n-1（每 0.5 s 一张）</h2><img src="SG05-n-1.jpg"><video src="n-1.mp4" controls></video>
+<h2>n-2</h2><img src="SG05-n-2.jpg"><video src="n-2.mp4" controls></video>
+<h2>建议重拍（首帧不变）</h2>
+<ul><li>人声片段改成从 58.70 s（"Ten oh two" 这句开头，前面留一点空）到 65.67 s，生成 8 s，给模型的前奏留余量；剪辑仍从 59.23 s 用起。</li>
+<li>prompt 加一句「街上只有停着的车，没有行驶的车」，从源头去掉开走的红尾灯。</li>
+<li>2 条约 1,280 积分。</li></ul>

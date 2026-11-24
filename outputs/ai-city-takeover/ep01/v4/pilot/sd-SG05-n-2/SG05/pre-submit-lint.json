@@ -1,0 +1,43 @@
+{
+ "unit": "SG05",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "c38a59230e77ea68b4d40e00971bba4af44cfa426d6d72026b174006e8ceeabf",
+ "compiled_prompt_sha256": "3b684e29f0ad3326341cc43ee12a119bc2667178d201a1d693d673c883f4936f",
+ "approval_sha256": "b8386e83f81c9a094bb45c1b12797dee14fa60de28fa66d43b4060d20e7504db",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG05-n-2/continuity-report.json",
+  "sha256": "ab43a454998371b12ecb2e5462fb0c66c32ebc0e2e7d7cf8763a334f80eccd5c",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "见 s015–s030 连续性报告（2026-11-22）",
+   "prompt_fit": "PASS；compiled 与 egress prompt sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸与开场一致（像不像由使用者判）；耳挂在左耳小红灯亮；除耳灯无红色；无文字；唱段嘴前无遮挡、口型对人声、开头不张嘴定住；寻呼机按连续性安排；右手拇指按掉寻呼机后放回原位；手持倒退跟拍；车尾灯不红"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 600,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   600
+  ]
+ },
+ "new_calls": 0
+}

@@ -1,0 +1,55 @@
+{
+ "unit": "MO06",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "0ad82f3a18507a85fc7b57cf6ad41668848bd2630b5f34f1230e64223755a7db",
+ "compiled_prompt_sha256": "16d83c7635fc7bf85418986b1f79753f020d0133964916d6be35c8b207d673cf",
+ "approval_sha256": "74468b7948dec68135f6390dfbacac48cfcd23ea7c1077cd70b5b0086c147e98",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO06-s-2/continuity-report.json",
+  "sha256": "d5f4a43c87d713036ce225565b83bc0691ab0bf9c1d89958f7934bbbae8d1639",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。首帧与 s-1 相同，都是 p011-w1c.png（sha 22492025…6b26），结论也相同。(1) 带子从她的右肩斜到左胯，原图和 zoom-s011-b 放大图都确认过，和 SG03-w1、p013-w1、X10b 一致。(2) 带子以外的造型和原首帧 p011-w1b 一样：露左肩、右臂长袖、黑高领、兜帽、腰链、空白屏的寻呼机、空白工牌、及膝靴，红色只有左耳挂那一处。只有胸口一小块因为改带子做了局部重绘。(3) 场地、人物、灯光都看不出漂移。",
+   "handoff": "PASS。s010→s011：X10b 里带子也是右肩到左胯；ALL 在 39.897 跨切，40.786 硬切换场；画面上三分之一留了放字的暗区。s011→s012：露左肩、黑高领、带子方向都和 SG03-w1 一致。这一条替换 MO06-w1b 后，原来带子方向不一致的问题就消除了。",
+   "axis_action_camera": "PASS。低机位、侧前方、镜头固定，没有越轴。动作起点和原首帧一样。5 s 生成、4.156 s 使用，时长够。",
+   "prompt_fit": "PASS。compiled-native-prompt.zh.txt 和 preview-approval 逐字相同，与 s-1 以及 v4r1 认可的原文一致，prompt 没有改。prepared 里 prompt_text 出现 5 处。实际上传的 prompt sha 是 16d83c76…cf（第 4721 行），首帧 sha 是 22492025…6b26（第 4728 行），都等于认可值。生成参数：first_frame、5 s、4k、16:9，上限 400 CRD，1 次，不重试。attempt、policy、reservation 都是 iris-mo06-s-2-*，和 s-1 不重复；节点 node_5ftgmj87ab，和 s-1 的 node_2c10m1t06s 不同；generation_POSTs=0。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "带子方向只锁在首帧，prompt 没写。Gate 要逐帧确认带子一直是右肩到左胯，不会被改回去、滑掉或消失。",
+    "她可能早早走出画面。Gate 要标出落步和出画的帧，确认落步在 HANDS 窗口内。",
+    "长袖要真的“摆回”，不能换臂、不能变短；左臂要一直光着。",
+    "s012 的左前臂有灰袖，右袖只到手腕，和这一镜的袖子细节不同（之前已报过）。",
+    "笔记本上有类似苹果的 logo，Gate 要确认没有变清楚。",
+    "这条要替换 v4r6 里的 MO06-w1b，替换后要重看 39.674–50.93 这段拼接。",
+    "shot.duration_policy.seconds=6.0，与 5 s 输出不一致，交给 lint 判定。",
+    "我没有 Bash，没法核对首帧与 STRAP/s011-b 逐字节相同。",
+    "permit 在 2026-11-20T00:04:08Z 过期。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

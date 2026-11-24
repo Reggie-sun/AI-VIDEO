@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-sg03c-d1-SG03C",
+ "question": "重做的首帧：http://127.0.0.1:8769/excerpt/flash/closeup3.html\n\n这次底图直接用前一镜的实拍画面，往她脸上推近：同一个停车场，同一根柱子，左前景还是同一个工程师。她改成闭眼、下巴抬起、嘴先闭着，为的是避开上次开头抢拍。\n\n生成的 prompt 加了“镜头固定不动、工程师一直在画面里”。同一首帧拍 2 条，挑最好的一条。从 you're 前的拍点切进来，唱 you're awake。\n\n用哪张？",
+ "user_quote": "D4-a，拍 (Recommended)",
+ "approved_at": "2026-11-19T15:09:00Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/closeup3.html",
+  "sha256": "d0f1c4b6268792a4e682b655e545d17c61cbe73f82ae0f7206d06d5ea492f9d6"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012c-w1d.png",
+   "sha256": "21c5f96a6cdbdf4f39d99b9137e4092776d4f3b4d77adba4178532c473682c48",
+   "role": "SG03C reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03C.wav",
+   "sha256": "4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09",
+   "role": "SG03C vocal"
+  }
+ ],
+ "prompts": {
+  "SG03C": {
+   "text": "{{image:0}}中的她闭着眼睛唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，机头直闪。左前景的工程师一直在画面里。镜头固定不动，不推不拉不摇不环绕，一镜到底。嘴前没有任何遮挡。",
+   "sha256": "68fa0d91635d8d2d4ba4c8eb3103844c9bc7b611810e9b9561f30569fbcea237"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p012c-w1d.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/D4/D4-a.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03C-c/preview-approval.json",
+  "sha256": "ae54ec0feb7b7e72e91d159e13f38cc3290acdd6ad3cd6d5717ad065609929f1"
+ },
+ "bound_ids": {
+  "attempt_id": "iris-sg03c-d1-source-001",
+  "policy_id": "iris-sg03c-d1-source-001",
+  "reservation_id": "iris-sg03c-d1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG03C-d1",
+   "sd-SG03C-d2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG03C-d1"
+ }
+}

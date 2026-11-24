@@ -1,0 +1,72 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-INS16-n-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "981665ba8ce6be0abb8990c0d913cb21159e0e7b6dcf683d146be3e79dd15e26"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "7d89c71ea86aed9320d239b07df8d46761f7467a90c1d40899af15e90f679263"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "4c2cd4deaacdf1130fde65c89a396dee152a5da93d3cd356489e587ea514b529"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p016-ins16.png",
+   "sha256": "0cfbef8556488bc840ee8002ec5c75b87cbb7d8628957f4db2df6f195479b0f0",
+   "role": "INS16 first frame"
+  }
+ ],
+ "prompts": {
+  "INS16": {
+   "text": "镜头固定不动。投币电话的搁板下方，黑色听筒挂在金属电话线上来回晃：从首帧里偏向一侧的位置荡回来，荡过去，再荡回来，越晃越慢，晃动的幅度一次比一次小，最后几乎停住，只轻轻转一点。电话线一直被听筒拉直，从搁板前沿垂下来。听筒在后面钢板上的影子跟着一起晃。画面里没有人，也没有手。背景的街灯和湿地面的反光保持虚焦。机头直闪。街上的灯只有白色和琥珀色。画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "bb405202f3a2a2fb8fec63581d4a4c426200150260f831abc36d7cffb9c89728"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [],
+ "identity_waiver_basis": "画面里没有人物（p016-ins16.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/INS16/d.png 逐字节相同），不涉及身份",
+ "bound_ids": {
+  "attempt_id": "iris-ins16-n-1-source-001",
+  "policy_id": "iris-ins16-n-1-source-001",
+  "reservation_id": "iris-ins16-n-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-INS16-n-1",
+   "sd-INS16-n-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-INS16-n-1"
+ },
+ "decision_notes": [
+  "使用者看到的是生成 3 s（约 480 积分）；即梦 Seedance 合同最短 4 s（JimengProfile duration_seconds ≥ 4），主会话定改为 4 s、每条上限 400（logs/decisions.md 2026-11-22）；首帧与 prompt 不变"
+ ],
+ "_template_notes": [
+  "本文件是 n-1 的模板；写成 pilot/sd-INS16-n-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s015-030-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "n-2：unit_group 末尾 n-1→n-2；bound_ids 三个 id 中 -n-1- → -n-2-；takes.this_take → sd-INS16-n-2（takes.folders 保持 [n-1, n-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-INS16-n-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh INS16 4 first_frame 400"
+ ]
+}

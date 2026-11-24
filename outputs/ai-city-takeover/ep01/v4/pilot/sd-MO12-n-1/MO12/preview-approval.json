@@ -1,0 +1,18 @@
+{
+  "kind": "user-preview-approval/1",
+  "coverage_hash": "cd72220d54b3bb69f4aa1f3bf03d064f03479d0a757017453d5ad3148e4007fd",
+  "unit_ids": [
+    "MO12"
+  ],
+  "preview_artifacts": [
+    {
+      "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p027-b2.png",
+      "sha256": "e64597bf2e272caf96da11f24399f136e104b32e45d6d1cea8f0094af17a203c",
+      "role": "MO12 first frame"
+    }
+  ],
+  "user_quote": "用 a (Recommended)",
+  "identity_waivers": [
+    "IRIS"
+  ]
+}

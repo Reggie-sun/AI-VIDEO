@@ -1,0 +1,20 @@
+{
+ "schema_version": "iris-v4-unit/1",
+ "unit": "MO07",
+ "task": "IRIS EP01 v4 MO07; Seedance 2.0 VIP first_frame, 5 s 4k 16:9",
+ "user_quote": "两镜都用 b，拍 (Recommended)",
+ "preview_approval": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-s-2/preview-approval.json",
+ "attempt_id": "iris-mo07-s-2-source-001",
+ "policy_id": "iris-mo07-s-2-source-001",
+ "reservation_id": "iris-mo07-s-2-reservation-001",
+ "max_submit_count": 1,
+ "automatic_retries": 0,
+ "operator_currency": "CRD",
+ "operator_ceiling": 400,
+ "ledger": "ledger.json",
+ "cumulative_submit_ceiling": 1,
+ "cumulative_operator_credit_ceiling": 400,
+ "issued_at": "2026-11-19T18:04:20+00:00",
+ "expires_at": "2026-11-20T00:04:20+00:00",
+ "stop_on_unknown": true
+}

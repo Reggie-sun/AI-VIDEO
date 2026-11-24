@@ -1,0 +1,21 @@
+{
+ "bg_sigma": 24.0,
+ "fg_sigma": 2.6,
+ "matte": "u2netp (prep_media.matte), clips averaged over +-1 picture",
+ "seq": {
+  "s011s": 99,
+  "s012b": 99,
+  "s012c": 33,
+  "s013b": 67,
+  "s014a": 55,
+  "s014b": 33
+ },
+ "stills": [
+  "INS13-a",
+  "INS14-b",
+  "X10a",
+  "X10b",
+  "p012w1-engineer",
+  "p012w1-hand"
+ ]
+}

@@ -1,0 +1,36 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-18T00:13:38+00:00",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO06/preview-approval.json",
+   "sha256": "473277ff103e34c02230b67dc599bf21f203cddc95173d5371af04df3d3a9418"
+  },
+  "preview_inputs": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/preview-inputs.json",
+   "sha256": "9d668152515e92e089e2c3686528400d48e3dd7abe67e29b5a9773cb70ff80aa"
+  },
+  "preview_page": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/excerpt/index.html",
+   "sha256": "f4b740ac2478e12b150413f40f851420cc974eac1775923fc07b62db21e491d3"
+  }
+ },
+ "units": {
+  "MO06": {
+   "verdict": "ready",
+   "continuity": "PASS（场记逐项，见本轮报告）",
+   "handoff": "PASS（按设计）",
+   "axis_action_camera": "PASS",
+   "prompt_fit": "PASS：编译文本、认可、preview-inputs 逐字一致",
+   "lint": "由主会话运行 lint.py 取证",
+   "risks": [
+    "首帧已近中段，5 s 可能走到镜头前，剪辑取前段",
+    "群演服装与满座/空座不连（底片层）",
+    "多人起身手与电脑变形",
+    "腰上无寻呼机（底片层）"
+   ],
+   "full_report_note": "场记完整报告见本轮对话；主会话依其结论落盘"
+  }
+ }
+}

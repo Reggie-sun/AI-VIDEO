@@ -1,0 +1,27 @@
+{
+ "shot": "s018",
+ "t0": 78.9827,
+ "t1": 84.0214,
+ "why": "instrumental: EV S0002 high overhead still, slow pull-out to show the scale",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P018E/w1-local-car.png",
+ "still_sha256": "05b4080b6b8277ae488ea32a4ffce4f0e9633ab1929b0c8378c1037f9defc42a",
+ "frames": 121,
+ "pictures": 121,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.12,
+   1.0
+  ],
+  "center": [
+   0.55,
+   0.5
+  ],
+  "ease": true
+ },
+ "orange_first": {
+  "shifted_px": 110,
+  "kept_red_px_in_matte": 41
+ },
+ "log": []
+}

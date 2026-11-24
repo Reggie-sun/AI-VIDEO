@@ -1,0 +1,46 @@
+{
+ "unit": "MO07",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "167c69d7aee9c9f149311995b3c06504ff6ab887412a462ed883d137feadc3d3",
+ "compiled_prompt_sha256": "6ae93970c9a8d2beee3b4c0fbb33fd405b527956d044529d036876a9c31ca6c7",
+ "approval_sha256": "8ce3572eaf64873520cadecb41c73fbb065b05d6c17da58b419368c0762f940b",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r5-1/continuity-report.json",
+  "sha256": "20fa7eff6db6434d78c57721de458777c3abb8163e039210df6a69a63bcd4e11",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "首帧 p014-w1c 与 r4 同一张；脸、短发、左耳耳挂、W1 造型、斜挎带右肩→左胯、腰链寻呼机（不亮）与空白工牌与 INS14-b 一致",
+   "handoff": "前接 s013b 换机位硬切；剪辑用 0–3.69 s，3.69 s 时手已按寻呼机，切 INS14-b（已认可切法）",
+   "axis_action_camera": "长焦正面固定；首帧为跨步，以前脚为轴向画左急转身，背对后往画右后方走远；『已经停住』与行进中首帧有字面张力，落下首帧那一步允许",
+   "prompt_fit": "PASS；与 approval、审看页逐字一致（egress prompt sha 6ae93970…，615 字节）",
+   "gate_scope": "0–3.69 s：头顶任一帧出画 FAIL；落下首帧那一步之后再朝镜头迈步、人物持续变大 FAIL；开头腿部瞬变/变形 FAIL；旋身后出右边缘或靴尖出下边缘不判 FAIL",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "头顶不出画；不再朝镜头迈步；开头腿不瞬变；干脆急转身甩袖成圆；寻呼机与工牌全程在身前腰链不跳不消失；耳挂在左耳、小红灯在；寻呼机不亮红灯、除耳挂外无红色；斜挎带右肩→左胯；工程师全程低头不动；3.69 s 手按寻呼机（右手最好）；不走进右侧观众席；镜头不推拉、无文字"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

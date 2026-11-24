@@ -1,0 +1,72 @@
+{
+  "artifact_id": "iris-v4-mo07-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "dfa4cd258a449e76b468d658ba873518acae825156f7b82adc17a0b858f525f5",
+  "creation_receipt_id": "iris-v4-MO07-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/fbc6d97861b0758718370154cd80fcec756f8c0bc438a336228901bedc8fc971.json",
+      "content_hash": "fbc6d97861b0758718370154cd80fcec756f8c0bc438a336228901bedc8fc971"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/5548415b7037cabf6bae057bbb263cd91748c08fcc3a62f68eb24822c7953d46.json",
+      "content_hash": "5548415b7037cabf6bae057bbb263cd91748c08fcc3a62f68eb24822c7953d46"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/52521bc5d4ca2858f1dd745bac9d4ec6fda615d310f2e5c18f036e4b20bfc542.json",
+      "content_hash": "52521bc5d4ca2858f1dd745bac9d4ec6fda615d310f2e5c18f036e4b20bfc542"
+    }
+  ],
+  "shot_id": "ep01v4-mo07",
+  "scene_id": "runway-end-w1",
+  "storyboard_beat_id": "mo07",
+  "intent": "长焦全身远景，镜头固定不动。她走到走秀台尽头，重心落在前脚，一个干脆的急转身，长袖和外套下摆甩成一个圆再落下；转身后她头也不回，一只手按住腰间震动的黑色寻呼机，朝画面右侧走开。两侧的值班工程师抬头看着她。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的首帧承担）",
+    "她急转身、长袖和外套下摆甩成一个圆再落下，头也不回地按住腰间震动的寻呼机朝画面右侧走开；两侧值班工程师抬头看她，不新增人物",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，保持首帧构图",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "first_frame",
+      "asset_ids": [
+        "iris-c-v4-mo07-first-frame"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

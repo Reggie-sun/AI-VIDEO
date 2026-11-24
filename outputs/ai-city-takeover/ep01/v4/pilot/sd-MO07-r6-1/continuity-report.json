@@ -1,0 +1,24 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-21",
+ "written_by": "主会话据 continuity-supervisor r6 增量报告转写（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO07-r6-1/preview-approval.json",
+   "sha256": "fb2b31363c654607d5c2282f9c7914aab644364680e9842a887aab4cc4d8802d"
+  }
+ },
+ "units": {
+  "MO07": {
+   "verdict": "ready",
+   "continuity": "首帧 p014-w1c 不变；寻呼机在身前正中略偏她右侧、工牌在她左侧，与 s013b 末帧、INS14-b 一致；右手藏在甩出的长袖里，需收回伸出才能按",
+   "handoff": "前接 s013b 换机位硬切；后接 INS14-b 作反打细节插入（使用者认可），不再要求接手部动作；以 10:02 点亮读作“又响了”",
+   "axis_action_camera": "长焦正面固定；停→右手按→松手→向画左急转→背身往画右后方走远；首帧带转身惯性，与“先停下再按”有张力（主要风险）",
+   "prompt_fit": "PASS；egress prompt sha 7543c057…，732 字节，等于 approval",
+   "gate_scope": "按封存要求：按寻呼机须在转身前、面朝镜头、右手、身前腰链；左手按或转身后/背后按 FAIL（不放宽）。剪辑所用段：头顶出画 FAIL；落下首帧那一步后再朝镜头迈步 FAIL；开头腿瞬变 FAIL；转身后出右边缘或靴尖出下边缘不判 FAIL。用哪段素材出片后定",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "转身前按寻呼机；右手从袖口伸出按，不用左手、不按工牌；只甩一次袖；松手后干脆急转身甩袖成圆；寻呼机与工牌全程在身前，转身后背面不出现；寻呼机不亮红灯、除耳挂外无红色；耳挂左耳小红灯在；斜挎带右肩→左胯；工程师全程低头不动；背身走远不进右侧观众席；头顶不出画；镜头不推拉；无文字"
+  }
+ }
+}

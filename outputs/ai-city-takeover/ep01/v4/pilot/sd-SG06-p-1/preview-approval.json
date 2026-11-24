@@ -1,0 +1,76 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s015-030-SG06-p-1",
+ "question": "审看页：http://127.0.0.1:8769/pilot/s015-030/gate/sg06/index.html\n\ns016 两条（1,120 积分）没过 Gate。主要问题不在口型，而是她唱到一半就松手转身了。她的背面首帧里没给过，模型就自己补了一个黑色挎包，还把裙子画成了短裤。\n\n建议重拍，唱段里不转身：\n- s016 最后一句改成「松开手，听筒垂下去晃，她仍站在原地看着镜头」。\n- s017 结尾也改成只直起身，不走出画面。\n- 她离开画面交给剪辑。\n\ns016 再拍 2 条，约 1,120 积分；s017 只改 prompt，不加钱。怎么做？",
+ "user_quote": "按页面重拍，唱段不转身 (Recommended)",
+ "approved_at": "2026-11-22T20:44:44Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/index.html",
+  "sha256": "7cf0385e271f12525c178b6263ba89af6f2f22c82dce88b5ea8667220f61a107"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s015-030/submit/preview-inputs.json",
+  "sha256": "dff8586536d71aa7f9305bd027e157ad8ca10b3aca65deb3378fcfa51ed7042b"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s015-030-seedance.md",
+  "sha256": "9a298465c66d96d330b49406fcdf2d3c43fc910c7183f12c4ee92ff1c12a61f6"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p016-w1.png",
+   "sha256": "b176e3b2944c92c67cf7b438cb7c127d6336be690d4e6fda1d354d40c2743521",
+   "role": "SG06 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG06m.wav",
+   "sha256": "9bd0c1e889f18d480074b5969e8ca3e9e1eece7d22e08276504ce81912b4a624",
+   "role": "SG06 vocal"
+  }
+ ],
+ "prompts": {
+  "SG06": {
+   "text": "{{image:0}}中的她站在投币电话旁，伸直手臂把黑色听筒举在身侧，离脸一臂远，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。中景，镜头固定不动。唱最后一句时她松开手，听筒顺着金属电话线垂下去来回晃，她仍站在原地看着镜头。听筒不贴耳，不挡嘴。嘴前没有任何遮挡。机头直闪。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "6e169b093edf1ad533418ed9efd9344aff4e59179ebef6f96039808b6237062b"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 7,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 600,
+  "cumulative_CRD": 600
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p016-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S15-30/P016/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg06-p-1-source-001",
+  "policy_id": "iris-sg06-p-1-source-001",
+  "reservation_id": "iris-sg06-p-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG06-p-1",
+   "sd-SG06-p-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1200,
+  "this_take": "sd-SG06-p-1"
+ },
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG06-m-1/preview-approval.json",
+  "sha256": "0e22b8933588d5940a3c0506f21d3d40bcb64a2be0baf027b1136d2aa69df496",
+  "reason": "s016 重拍 p：m-1、m-2 两条 Gate 不通过（唱到 N 就松开听筒转身，首帧没给过她的背面，模型补了黑色挎包、把裙子画成短裤；m-1 听筒自己挂回钩上）；唱段里不转身、不出画，最后一句改为「她仍站在原地看着镜头」；首帧、人声 SG06m、7 s 不变；m approval 与 sd-SG06-m-1/m-2 产物保留"
+ }
+}

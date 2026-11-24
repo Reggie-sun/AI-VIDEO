@@ -1,0 +1,17 @@
+{
+ "clip_id": "edc6c6bf-2702-4bea-81df-07d680df4f38",
+ "share": "https://suno.com/s/GZ1nn6Ya6aCDiYYu",
+ "title": "All Hands r4",
+ "sound": "industrial glitch club",
+ "duration": "4:33",
+ "lyrics": "lyrics-v5.txt",
+ "fields": "fields-r4-industrial.json",
+ "picked": "2026-11-17",
+ "user_words": "https://suno.com/s/GZ1nn6Ya6aCDiYYu这个",
+ "wav": "master/all-hands-r4-edc6c6bf.wav",
+ "note": "downloaded via suno-cli after the user allowed the session cookie transfer (cookie never displayed or stored outside suno-cli's own auth file)",
+ "wav_sha256": "6dffe1d9022c960d7e0a67c834787131206707b02ca30ade67e04f82209c0350",
+ "wav_seconds": 273.32,
+ "wav_format": "48 kHz stereo",
+ "timed_lyrics": "master/suno-timed-lyrics.json"
+}

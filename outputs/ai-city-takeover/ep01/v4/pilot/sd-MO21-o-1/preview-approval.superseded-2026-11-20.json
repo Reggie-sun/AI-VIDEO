@@ -1,0 +1,66 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-opening-MO21-o-1",
+ "question": "审看页：http://127.0.0.1:8769/pilot/opening/index.html\n\n开头 s001–s010（0–40.8 秒）准备用 Seedance 2.0 VIP 4k 生成视频。页面上每镜有首帧、提示词、秒数、积分上限，并附上一镜的缩略图，方便看两镜接得上不上。\n\n- 首帧：全部是 W1 灰卫衣造型。s001–s005 和副歌是同一个停车场：暗场、青色灯管、黄黑警示柱，相机直闪拍摄。\n- 念白：s004 和 s008 用参考图加人声做口型同步，全程正对镜头。\n- 拍法：每镜用同一首帧拍 2 条，逐镜 Gate 后挑一条。预计 7,680 积分，上限 8,600。\n- 已知问题：s009 是侧面机位，看不到左耳耳挂；s002 门缝里的红光是分镜规定的。\n\n按这样拍吗？",
+ "user_quote": "按页面拍 (Recommended)",
+ "approved_at": "2026-11-20T19:16:00Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/opening/index.html",
+  "sha256": "447970689d3867d9c96460940d1dfa1fde06734dd417b7439f983bfcd914447f"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/opening/preview-inputs.json",
+  "sha256": "ffd95bd02363f82f80376a56c9a638193ea731119638d0de08cfb13531d433da"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/opening-seedance.md",
+  "sha256": "3e02c3266a2e47f88dbd9da9e65d98cbe59950e61dc4cc718ebacc811b45fbdc"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p009-w1.png",
+   "sha256": "451f67af1297cfcfc63229c06cc5129c063c7d8966682ed6932ed45b429ecc73",
+   "role": "MO21 first frame"
+  }
+ ],
+ "prompts": {
+  "MO21": {
+   "text": "镜头固定。她侧身坐在候车亭的长凳上，伸出一根手指，用指甲顺着灯箱玻璃上那道划痕慢慢划过去，停在划痕尽头。面无表情，带着一点好奇。机头直闪。画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "5043d74aa0922a246b124079700b92197efaa2e0560f0fbf5f4e28f1593c2e11"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p009-w1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/OPEN/OP09-a.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo21-o-1-source-001",
+  "policy_id": "iris-mo21-o-1-source-001",
+  "reservation_id": "iris-mo21-o-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO21-o-1",
+   "sd-MO21-o-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-MO21-o-1"
+ }
+}

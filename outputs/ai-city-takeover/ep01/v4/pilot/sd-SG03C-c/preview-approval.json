@@ -1,0 +1,56 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-sg03c-c-SG03C",
+ "question": "定稿首帧：http://127.0.0.1:8769/excerpt/flash/closeup2.html\n\n闭眼唱脸的首帧改了两次，两次都是场记拦下的衣服连续问题（露肩方向、黑色高领内搭）。现在和前一镜实拍并排放着，切过去不会穿帮。\n\n这是要花钱生成的新参考图，你之前没见过，所以请你确认一下。约 320 积分。",
+ "user_quote": "可以，拍 (Recommended)",
+ "approved_at": "2026-11-19T13:01:08Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/closeup2.html",
+  "sha256": "91996f9a7dbf929e9d65d7de4e5d79c59e3f4c75a7ea5443dc3e3d25af52d7c3"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p012c-w1c.png",
+   "sha256": "779b1414e29914a33b96a0489295c6c89338df44badcad1a38192a6f27f40687",
+   "role": "SG03C reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG03C.wav",
+   "sha256": "4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09",
+   "role": "SG03C vocal"
+  }
+ ],
+ "prompts": {
+  "SG03C": {
+   "text": "{{image:0}}中的她闭着眼睛唱歌，口型与{{audio:1}}里的人声逐字精确同步。近景，前排笔记本屏幕的光照着她的脸，嘴前没有任何遮挡。镜头全程锁定，一镜到底。",
+   "sha256": "5798f92846e0b0ef7cea1a277183c8794aa5a4f456c9c43e5bb80b71e495823c"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p012c-w1c.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/D3-b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "replaces_approval": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03C-b/preview-approval.json",
+  "sha256": "b606b67e9c8176efe750db179a5a7faf5db3a9d72bdfb64a29a4be439a18ad39"
+ },
+ "bound_ids": {
+  "attempt_id": "iris-sg03c-c-source-001",
+  "policy_id": "iris-sg03c-c-source-001",
+  "reservation_id": "iris-sg03c-c-reservation-001"
+ }
+}

@@ -1,0 +1,27 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>IRIS EP01 s015–s030 首帧里的车（车尾朝镜头检查）</title><style>body{background:#111;color:#ddd;font:14px/1.6 sans-serif;margin:20px;max-width:1700px}img{width:100%;display:block}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}figure{margin:0}figure.rec{outline:3px solid #6c6}figcaption{font-size:13px;color:#aaa}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #555;padding:3px 8px;font-size:13px;vertical-align:top}h2{margin-top:32px;border-top:1px solid #444;padding-top:12px}code{color:#9cf;font-size:12px}.ok{color:#6c6}.warn{color:#fc6}</style></head><body>
+<h1>首帧里车尾朝镜头的车：检查与修改（仅静图，未提交任何视频生成）</h1>
+<p>裁决：「照 s015 的教训改 (Recommended)」——首帧里车尾朝镜头的车先改成车头朝镜头或去掉（s015 m-2 里一辆车尾朝镜头的车亮着红尾灯开走了）。逐张看了 s016–s029 要生成的 12 张首帧。</p>
+<table><tr><th>首帧</th><th>unit</th><th>车</th><th>结论</th></tr>
+<tr><td>p016-w1</td><td>SG06</td><td>街上没有车</td><td class="ok">不改</td></tr>
+<tr><td>p017-w1</td><td>SG07</td><td>背景街边停着一辆浅色皮卡，<b>车尾朝镜头</b>（虚化，看得见一点尾灯）</td><td class="warn">改：候选 a / b 见下</td></tr>
+<tr><td>p018-w1</td><td>MO08</td><td>左下的出租车是<b>车头朝镜头</b>（白色大灯亮着）；右上远处两辆也是迎面的白色大灯；没有看到车尾</td><td class="ok">不改（见下方放大；你若仍想改这辆出租车，告诉我）</td></tr>
+<tr><td>p019-w1、p020-b1、p022-b1、p024-b2、p025-b1、p026-b1、p027-b1、p028-b1、p029-b1</td><td>MO09、MO10、SG08、SG09、MO11、SG10、MO12、MO13、SG11</td><td>室内、车厢、站台、泳池，没有车（p027 的列车停着开门，是侧面）</td><td class="ok">不改</td></tr>
+<tr><td>p015-w1</td><td>SG05</td><td>左侧路边停着的车车尾朝镜头</td><td>s015 已定用 m-2，红尾灯后期修成琥珀色；不在本页</td></tr></table>
+
+<h2>p017-w1（s017 SG07）：旧图 | a 去掉那辆车 | b 改成车头朝镜头、车灯关着</h2>
+<p>工具：<code>motion-kit/tools/codex_plate.py --edit-base board/plates/p017-w1.png</code>（提示词 <code>excerpt/flash/design/S15-30/CARS/prompts.md</code> 的 P017CA / P017CB，各 1 次；运行记录 <code>CARS/runs.md</code>）。只改那辆车，其余要求保持不变；图像模型会把整张图重画一遍，所以全图都有轻微像素差（a 平均 6.2、b 平均 3.4，0–255），人脸、造型、腰链、寻呼机、工牌、耳挂请看下面的放大。新图只放在 <code>excerpt/flash/design/S15-30/CARS/</code>，board 和 spec 都没改，认可后才接入（SG07 的首帧与 sha、分镜 s017 的 plate）。</p>
+<div class="g">
+<figure><img src="../../../board/plates/p017-w1.png"><figcaption>旧 p017-w1 · sha 76d9c053…</figcaption></figure>
+<figure><img src="../../../excerpt/flash/design/S15-30/CARS/p017-w2a.png"><figcaption>a：去掉皮卡 · p017-w2a.png · sha a5a277a0…</figcaption></figure>
+<figure class="rec"><img src="../../../excerpt/flash/design/S15-30/CARS/p017-w2b.png"><figcaption>b（推荐，改动最小）：皮卡改成车头朝镜头、车灯关着 · p017-w2b.png · sha 0a75579f…</figcaption></figure>
+</div>
+<h3>车的位置放大（2 倍）</h3>
+<div class="g"><figure><img src="zoom-p017-old.jpg"><figcaption>旧：车尾、尾灯</figcaption></figure><figure><img src="zoom-p017-a.jpg"><figcaption>a</figcaption></figure><figure class="rec"><img src="zoom-p017-b.jpg"><figcaption>b</figcaption></figure></div>
+<h3>她的脸和造型放大</h3>
+<div class="g"><figure><img src="zoom-p017-old-face.jpg"><figcaption>旧</figcaption></figure><figure><img src="zoom-p017-a-face.jpg"><figcaption>a</figcaption></figure><figure class="rec"><img src="zoom-p017-b-face.jpg"><figcaption>b</figcaption></figure></div>
+
+<h2>p018-w1（s018 MO08）：出租车放大</h2>
+<div class="g2"><figure><img src="zoom-p018-taxi.jpg"><figcaption>左下出租车：车头、白色大灯朝镜头</figcaption></figure><figure><img src="zoom-p018-far.jpg"><figcaption>右上远处：迎面的白色大灯</figcaption></figure></div>
+</body></html>

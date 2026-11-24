@@ -1,0 +1,42 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-round1-MO06-w1",
+ "question": "第一轮预览页：http://127.0.0.1:8769/excerpt/flash/v4r1.html s011（走台落步）和 s012（对工程师唱）各出了两张 W1 首帧，页面上有 prompt 原文。工程师改穿深蓝工装夹克；唱段首帧嘴先合着；两条约 880 积分，各一次、不重试。选哪两张，可以拍吗？",
+ "user_quote": "s011 选 1，s012 选 1，开拍",
+ "approved_at": "2026-11-19T03:39:16+00:00",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/v4r1.html",
+  "sha256": "a288fed9f5bf35e27392f0097e0a33e1c054cd8e6a0215d053197abdd6a30879"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p011-w1.png",
+   "sha256": "778664284bccb297561bfa0c4d1ab11c0676827f74eaf496dea968d5506f2799",
+   "role": "MO06 first frame"
+  }
+ ],
+ "prompts": {
+  "MO06": {
+   "text": "镜头固定，低机位，从侧前方拍。地下停车场改成的秀场，她沿着湿的水泥走秀台大步向前走，抬起的那只靴子落地，重心越过支撑脚，长的那只袖子随后摆回；面无表情，带着一点好奇看着前方；两边前排的值班工程师一个接一个站起来。",
+   "sha256": "16d83c7635fc7bf85418986b1f79753f020d0133964916d6be35c8b207d673cf"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 600,
+  "cumulative_CRD": 600
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p011-w1.png，与使用者选中的 V11a-1.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图"
+}

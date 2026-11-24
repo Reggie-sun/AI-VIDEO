@@ -1,0 +1,43 @@
+{
+ "unit": "MO08",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true,
+  "fresh_canvas_node": true
+ },
+ "pass": true,
+ "request_hash": "4102bb54cf4726c5f1cb832337dca3efe946ffdb0df868aa7ed763fb98232ae2",
+ "compiled_prompt_sha256": "64370caa0f9fb53368e3f8883c9369ebbcfd81d58efc7fc243a3565a5641d2ac",
+ "approval_sha256": "9038216a2e6fafc7983d99cb4dab2be2f6e83310dc5f5ecfbcd7b865d16b1f1a",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO08-n-2/continuity-report.json",
+  "sha256": "a47097a7ace360bc804fd65ff39ba90d88bbf37ab341fa8f06fc384fc95ea8ec",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "见 s015–s030 连续性报告（2026-11-22）",
+   "prompt_fit": "PASS；compiled 与 egress prompt sha 等于 approval",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸与开场一致（像不像由使用者判）；耳挂在左耳小红灯亮；除耳灯无红色；无文字；唱段嘴前无遮挡、口型对人声、开头不张嘴定住；寻呼机按连续性安排；人群不突然反向；出租车灯只有白/琥珀；她身上无寻呼机"
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 500,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   500
+  ]
+ },
+ "new_calls": 0
+}

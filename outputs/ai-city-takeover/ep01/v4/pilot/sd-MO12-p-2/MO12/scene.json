@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo12-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "d8003ee909535f2209bfa8d43df5739e9272f1f1dcce86308a6077b25a8f7e5b",
+  "creation_receipt_id": "iris-v4-MO12-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/082c9b819a6fee1239c38c2f60a6d366949c062163e5079d65c50566d22a4aa6.json",
+      "content_hash": "082c9b819a6fee1239c38c2f60a6d366949c062163e5079d65c50566d22a4aa6"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/85fb17c5daf44d746dec6421a5ccb5621c6ba14d86f19fabef26c34bb46890e3.json",
+      "content_hash": "85fb17c5daf44d746dec6421a5ccb5621c6ba14d86f19fabef26c34bb46890e3"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c29333ed394200deb5ff69cf821b1c7bb131f7f34e845ac181a07620f5555e83.json",
+      "content_hash": "c29333ed394200deb5ff69cf821b1c7bb131f7f34e845ac181a07620f5555e83"
+    }
+  ],
+  "scene_id": "subway-platform",
+  "location": "地下车站站台，列车停靠，车门开着，站台深处是出口楼梯",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变",
+    "除了耳挂上的小红灯，画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo12-first-frame"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-20",
+ "written_by": "主会话据 continuity-supervisor 2026-11-20 批报告转写（该子代理只读）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-MO04-o-1/preview-approval.json",
+   "sha256": "902797c0912efd68100440092ef2ac6d3fc150c670959a514e333da4df99b5dd"
+  }
+ },
+ "units": {
+  "MO04": {
+   "verdict": "ready",
+   "continuity": "见批报告；本批全部新拍，衔接按首帧与 prompt 结束状态推断",
+   "handoff": "推断 PASS",
+   "axis_action_camera": "PASS（左右关系已核对：耳挂在画面右侧即左耳，斜挎带画面左肩→画面右胯即她的右肩→左胯）",
+   "prompt_fit": "PASS（风险见 gate_watch）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "不能出现第二块广告牌，白光只来自画面左侧灯箱；姓名贴不发光、无字；掏贴纸在片内 3.69 s 内完成；树枝回弹时头发和耳挂不换位；背景招牌无可读字"
+  }
+ }
+}

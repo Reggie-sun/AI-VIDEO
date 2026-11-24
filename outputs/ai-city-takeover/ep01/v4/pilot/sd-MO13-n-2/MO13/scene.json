@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo13-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "017b8f0d6b53c788c2b6f7fd4650bf37a8af415652ef7ecc7f394a66a19b6776",
+  "creation_receipt_id": "iris-v4-MO13-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/336ce83f6fedacbb9f2500b028696b944d48fcda10af93100dfd31ff49028696.json",
+      "content_hash": "336ce83f6fedacbb9f2500b028696b944d48fcda10af93100dfd31ff49028696"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011.json",
+      "content_hash": "c680b0d0add420f76c74b5447ec0cb0269ce86ae0e77e2c18cdade03b6c4e011"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3ea2bdf707125d6c0df82037d052ffdd65687416c372ff3677b2cc10f9be2e90.json",
+      "content_hash": "3ea2bdf707125d6c0df82037d052ffdd65687416c372ff3677b2cc10f9be2e90"
+    }
+  ],
+  "scene_id": "dry-pool-tower",
+  "location": "一座放干了水的市立室外泳池，夜里，池边一排空折叠椅和高跳台",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变",
+    "除了耳挂上的小红灯，画面里没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo13-first-frame"
+  ]
+}

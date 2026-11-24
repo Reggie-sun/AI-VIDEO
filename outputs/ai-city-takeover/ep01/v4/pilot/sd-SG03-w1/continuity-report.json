@@ -1,0 +1,29 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-19T04:01:01+00:00",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03-w1/preview-approval.json",
+   "sha256": "eac2145480931cbba3bd774453c554b76d683467705d7dc5fda4b77b93c07207"
+  }
+ },
+ "units": {
+  "SG03": {
+   "verdict": "ready",
+   "continuity": "PASS（W1、F1a、露左肩、耳挂画面右、无他红）",
+   "handoff": "PASS（同一秀场、同侧前排；服装断点属 MO06，已由使用者改用 V11a-2 解决）",
+   "axis_action_camera": "PASS（她右他左视线对，锁定机位，人声 5.991 s 装进 6 s）",
+   "prompt_fit": "PASS（编译文本与认可逐字相同，sha 9b2f1923…）",
+   "lint": "由主会话运行 lint.py",
+   "risks": [
+    "逐字口型，尤其 I'm the reason you're awake",
+    "0–0.68 s 与 5.43–5.99 s 静音闭嘴",
+    "参考图非首帧：服装、露肩、耳挂侧逐项对照 p012-w1",
+    "背景 T 台模特与后排来宾可能抢视线",
+    "笔记本合着，图表锚点后期另找"
+   ],
+   "full_report_note": "场记完整报告见本轮对话"
+  }
+ }
+}

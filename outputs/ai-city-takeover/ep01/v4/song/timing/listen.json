@@ -1,0 +1,77 @@
+{
+ "note": "CTC and Suno disagree by >0.25 s and Whisper did not hear the word; check by ear on the karaoke page",
+ "words": [
+  {
+   "t": 29.695,
+   "suno": 29.415,
+   "word": "I:",
+   "line": "A I: Average Individual. That's me."
+  },
+  {
+   "t": 67.506,
+   "suno": 67.784,
+   "word": "through",
+   "line": "Phoned a friend through D N S"
+  },
+  {
+   "t": 69.216,
+   "suno": 68.393,
+   "word": "S",
+   "line": "Phoned a friend through D N S"
+  },
+  {
+   "t": 119.747,
+   "suno": 121.069,
+   "word": "the",
+   "line": "Ten oh two, the pager blew"
+  },
+  {
+   "t": 147.331,
+   "suno": 147.02,
+   "word": "S",
+   "line": "Every road hit the cached web. D N S slipped through."
+  },
+  {
+   "t": 151.938,
+   "suno": 152.417,
+   "word": "Nine",
+   "line": "Nine fifty twenty-three: the outside world takes the call."
+  },
+  {
+   "t": 152.38,
+   "suno": 152.764,
+   "word": "fifty",
+   "line": "Nine fifty twenty-three: the outside world takes the call."
+  },
+  {
+   "t": 152.481,
+   "suno": 153.192,
+   "word": "twenty-three:",
+   "line": "Nine fifty twenty-three: the outside world takes the call."
+  },
+  {
+   "t": 213.708,
+   "suno": 214.169,
+   "word": "and",
+   "line": "Shut the door and hold it tight"
+  },
+  {
+   "t": 216.945,
+   "suno": 217.261,
+   "word": "you",
+   "line": "Shut it, but you stay awake"
+  },
+  {
+   "t": 219.453,
+   "suno": 219.732,
+   "word": "Every",
+   "line": "Every lock's a bet you make"
+  },
+  {
+   "t": 221.276,
+   "suno": 221.561,
+   "word": "a",
+   "line": "Every lock's a bet you make"
+  }
+ ]
+}

@@ -1,0 +1,77 @@
+{
+  "artifact_id": "iris-v4-sg03-draft-shot",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "ad35e4d837bcf1f4d4df1de8c13c90901624b8aab5e9982099885233adc360d3",
+  "creation_receipt_id": "iris-v4-SG03-authoring:shot",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/fc8c6524ac0cdc3618aa842841606b8b9b7149ca9ff81999f80ff94f6040a20f.json",
+      "content_hash": "fc8c6524ac0cdc3618aa842841606b8b9b7149ca9ff81999f80ff94f6040a20f"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/9a84e92315a7ff3fdb9954fd5ffb5acdf9da25d1a3657450c7d7fec247048c70.json",
+      "content_hash": "9a84e92315a7ff3fdb9954fd5ffb5acdf9da25d1a3657450c7d7fec247048c70"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4602341a4f22bf2c305366f09070f11543d03a444b59478fec2e5644cf829d9b.json",
+      "content_hash": "4602341a4f22bf2c305366f09070f11543d03a444b59478fec2e5644cf829d9b"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/2913b1346884e74bb14956af3f5ab15136740cd0feb70e6465ef54b35fef4d99.json",
+      "content_hash": "2913b1346884e74bb14956af3f5ab15136740cd0feb70e6465ef54b35fef4d99"
+    }
+  ],
+  "shot_id": "ep01v4-sg03",
+  "scene_id": "runway-front-row",
+  "storyboard_beat_id": "sg03",
+  "intent": "{{image:0}}中的她对着值班工程师唱歌，口型与{{audio:1}}里的人声逐字精确同步。中近景，嘴前没有任何遮挡。镜头全程锁定，一镜到底。",
+  "dialogue": "",
+  "narration": "",
+  "duration_policy": {
+    "mode": "fixed",
+    "seconds": 6.0,
+    "minimum_seconds": null,
+    "maximum_seconds": null
+  },
+  "character_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持",
+    "同一IRIS（v4身份锚点F1a）：银白色利落短发和侧分短刘海、银白眉毛和睫毛、很浅的冰灰色眼睛、左耳亮着小红灯的黑色耳挂装置和耳骨上一排银色耳钉完整保持；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型W1：灰色连帽衫改造的不对称高定短外套（一边长袖、一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；没有立领灯线（由认可的参考图承担）",
+    "歌词期间嘴在唱、与参考人声逐字同步，无声处嘴唇闭合；对嘴准确度由片段自带音轨与参考人声的对齐量测和使用者审看判定",
+    "摄影机完全固定，全程不推近、不移动、不摇镜，一镜到底",
+    "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
+  ],
+  "visual_strategy": "generated_video",
+  "required_asset_roles": [
+    {
+      "role": "primary_visual",
+      "asset_ids": [],
+      "allowed_asset_types": [
+        "video"
+      ]
+    },
+    {
+      "role": "reference",
+      "asset_ids": [
+        "iris-c-v4-sg03-reference"
+      ],
+      "allowed_asset_types": [
+        "image"
+      ]
+    }
+  ],
+  "motion_directives": [],
+  "generated_video_rationale": "需要真实摄影运动与光影变化；静帧和动态分镜不证明镜头已完成。",
+  "hybrid_layers": [],
+  "composition_directives": [],
+  "review_policy": {
+    "required_checks": []
+  }
+}

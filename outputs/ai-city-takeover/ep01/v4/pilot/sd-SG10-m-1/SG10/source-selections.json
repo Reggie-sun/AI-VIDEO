@@ -1,0 +1,33 @@
+[
+  {
+    "asset_id": "iris-c-v4-sg10-reference",
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p026-b1.png",
+    "sha256": "0a361f2d941333afd0fa3372f2150e3ac167193c71a7a6bf222a19166aa5771f",
+    "size_bytes": 2034448,
+    "width": 1672,
+    "height": 941,
+    "role": "approved p026-b1.png: the reference image",
+    "need_id": "night-train-door-seat",
+    "anchor_role": "scene_environment",
+    "selected_for_provider": true
+  },
+  {
+    "asset_id": "iris-c-v4-sg10-vocal",
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG10m.wav",
+    "sha256": "aae6bec70aaf8d1062a7552fbfb8115e92e9818f6ff0bc52e26b0dc49a971900",
+    "size_bytes": 578900,
+    "kind": "audio",
+    "duration_millis": 6563,
+    "sample_rate_hz": 44100,
+    "role": "approved SG10m.wav: the vocal",
+    "derived_from": {
+      "path": "outputs/ai-city-takeover/ep01/v4/song/stems/htdemucs_ft/all-hands-r4-edc6c6bf/vocals.wav",
+      "song_window_seconds": [
+        109.56,
+        116.123
+      ],
+      "basis": "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json"
+    },
+    "selected_for_provider": true
+  }
+]

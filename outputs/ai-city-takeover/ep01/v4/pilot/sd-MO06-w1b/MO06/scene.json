@@ -1,0 +1,38 @@
+{
+  "artifact_id": "iris-v4-mo06-draft-scene",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "dfbffb07ab71de08b3a4bd1aa7dcbe611e98e80dcef0c2e09849ba3884019cf5",
+  "creation_receipt_id": "iris-v4-MO06-authoring:scene",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c4ba4c05fc134ff1f8981563db1f4c375d6187e2c4f272386ee568edeb18b330.json",
+      "content_hash": "c4ba4c05fc134ff1f8981563db1f4c375d6187e2c4f272386ee568edeb18b330"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/1b839c946f9514e47438eb98228174e46f83440141568722f6181fd21df38d9e.json",
+      "content_hash": "1b839c946f9514e47438eb98228174e46f83440141568722f6181fd21df38d9e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3101b5cfbc77c8d15ff37881abf01e28120a7a86df35ee45d5c45a6daf53d435.json",
+      "content_hash": "3101b5cfbc77c8d15ff37881abf01e28120a7a86df35ee45d5c45a6daf53d435"
+    }
+  ],
+  "scene_id": "garage-runway",
+  "location": "地下停车场改成的秀场，湿的水泥走秀台，头顶一排排日光灯管",
+  "time": "深夜",
+  "mood": "冷、面无表情、带着好奇",
+  "participant_ids": [
+    "IRIS"
+  ],
+  "continuity_constraints": [
+    "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
+    "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色"
+  ],
+  "visual_reference_asset_ids": [
+    "iris-c-v4-mo06-first-frame"
+  ]
+}

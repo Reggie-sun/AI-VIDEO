@@ -1,0 +1,54 @@
+{
+ "unit": "SG03C",
+ "checks": {
+  "exact_image_order": true,
+  "audio_binding": true,
+  "every_input_in_user_preview": true,
+  "prompt_language_policy": true,
+  "prompt_is_user_approved_text": true,
+  "directed_behaviour_in_text": true,
+  "no_platform_label_removal": true,
+  "bound_output": true,
+  "operator_ceiling_matches_preview": true,
+  "bound_matches_approval": true,
+  "cumulative_budget_left": true,
+  "continuity_report_ready": true,
+  "bound_ids_match_approval": true
+ },
+ "pass": true,
+ "request_hash": "f3958b427be1da839331987ba0240358e345b4f6ca27933e55edfdb6845afea7",
+ "compiled_prompt_sha256": "5798f92846e0b0ef7cea1a277183c8794aa5a4f456c9c43e5bb80b71e495823c",
+ "approval_sha256": "ae54ec0feb7b7e72e91d159e13f38cc3290acdd6ad3cd6d5717ad065609929f1",
+ "continuity_report": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG03C-c/continuity-report.json",
+  "sha256": "b3185d87ed8016e1c0a976ca99551f75543bd13c261f1b3d2b6563c2da80eab3",
+  "unit": {
+   "verdict": "ready",
+   "continuity": "PASS。打开 p012c-w1c.png，逐项和 SG03-w1 已实拍的 f12、f14 对照。(1) 露肩：画面右侧的肩是她的【左】肩，皮肤露在外面，和 f12、f14 一致。(2) 黑色高领内搭在，是无袖立领，与 f12 一致。她仰着下巴，所以领口到下巴之间露出一段喉部；f12 里她头往前探，领口离下巴更近。差别来自姿势，不是换了衣服。(3) 左前臂：画面右侧这条手臂从上臂往下套着灰色长袖，一直盖到手，与 f12、f14 右下角的灰袖一致。袖子起点比 f12 高一点：D3-b 在上臂，f12 约在肘部。这是次要差别。(4) 斜挎黑皮带从她的右肩（画面左）斜到左胯，带扣在胸前偏左，方向与 f12 一致。(5) 外套是灰色卫衣面料，带拉链和翻片，与 f12 的拉链短外套一致。(6) 腰链、黑色寻呼机（屏幕空白）、空白工牌、过膝靴都在。(7) 红色：只有她左耳挂件（画面右）上的小红灯，耳骨一排银钉也在，画面里没有别的红色。(8) 身份与 F1a 和 f12 一致：棱角脸、淡雀斑、眼尾细眼线、银白短发。(9) 前景虚焦的是穿深蓝工装的工程师，笔记本竖抱在胸前，几乎合上，边缘漏光，与 f12、f14 一致。",
+   "handoff": "PASS。上一镜 s012（SG03-w1）用到歌曲 48.17，本镜 s012b 从窗口 1.24 s（即 48.17）接上，落在 reason 起音 1.25 s 之前 10 ms。两镜是同一个瞬间：她俯身对着工程师唱，景别从中近景切到工程师肩后的近景。她从睁眼说唱变成闭眼仰头，这是设计帧认可的表演转折，属于有意的切换，不是没接上。本镜用 1.24–4.0 s，共 2.76 s，接到 50.93；s012b 槽位到 50.933，差 3 ms。人声文件 sha 4b3bb33c…3c09、4.000 s，与 sd-SG03C、sd-SG03C-b 相同，在 project/assets/audio 里按内容寻址存放。",
+   "axis_action_camera": "PASS。机位在工程师肩后：他在画面左前景、虚焦，她在画面中偏左、脸朝画面左。SG03-w1 里也是他在左、她在右，视线方向一致，没有越过 180 度线。prompt 写的是“镜头全程锁定，一镜到底”。动作只需要唱 reason（1.25）、you're（2.38）、awake（2.96–3.44），之后还有 0.56 s 收尾，4 s 生成装得下。灯光从 SG03-w1 的硬直闪加柱子硬阴影，换成屏幕光从下往上打、画面右三分之一压暗，这是有意的设计。背景从柱子和时装观众换成一排排亮着屏的笔记本，可以用机位改变来解释。",
+   "prompt_fit": "PASS。下面几处的 prompt 逐字相同：compiled-native-prompt.zh.txt、preview-approval.prompts.SG03C.text、prepared.json 的 prompt_text（第 5222、5294、5398、5470、5573 行），也和 sd-SG03C、sd-SG03C-b 相同。三样上传内容的 sha 都等于认可值：prompt 5798f92846e0b0ef7cea1a277183c8794aa5a4f456c9c43e5bb80b71e495823c（第 5661 行）；参考图 779b1414e29914a33b96a0489295c6c89338df44badcad1a38192a6f27f40687（第 5668 行，也是 registry 里按内容寻址的文件名）；人声 4b3bb33c38e611ead233914e0ddc8a37e5b725494414e7fba8ab945cbaba3c09（第 5675 行）。生成参数：multimodal、4 s、4k、16:9、上限 400 CRD、只提交 1 次、不重试（profile.json、operator-bound.json）。attempt、policy、reservation 都换成了新的 iris-sg03c-c-*，与 preview-approval.bound_ids 一致，上次指出的 id 复用问题已解决。manifest 里这条 attempt 是 status=running、phase=request、paid_submit_receipt=null；node node_zd91qb74kk 的 generation_POSTs=0，说明还没提交过。dialogue_intent 是“I'm the reason you're awake”，0.59–3.44 s。open_state（第 264 行）写明了黑高领、左肩、左前臂灰袖、斜挎带方向，与参考图一致。这次是使用者在 closeup2.html 上看过 D3-b 与 f12 并排后认可的，sd-SG03C-b 那次认可来源的问题已解决。",
+   "lint": "NOT_EVALUATED (Parent runs lint.py)",
+   "risks": [
+    "开头 0.59 s 静音时张嘴：参考图里她的嘴是张着的，open_state 也写了“嘴张开”。0–0.59 s 模型很可能从张嘴开始，甚至提前做出唱的动作。成片从 1.24 s 起用，这段本身不进成片。但如果模型整体抢拍，开头就开始唱，后面 reason、you're、awake 的口型会跟着提前。Gate 要用片段自带音轨和参考人声做对齐量测，逐字核对 1.24–3.44 s，并确认 1.24 s 那一帧是 r 发音前的口型。",
+    "3.44–4.0 s 的收尾进成片：awake 唱完后，嘴要合上或停稳，不能继续空做口型。Gate 要逐帧查。",
+    "仰头闭眼唱，下巴和嘴的幅度可能变形；黑高领的领口高度也可能在生成中漂移。",
+    "这是 reference_to_video，首帧不锁定。Gate 要取 1.24 s 那一帧，和 f12 并排逐项复核：左肩、黑高领、左前臂灰袖、斜挎带方向、耳挂和小红灯的位置，防止模型把服装改回去或镜像。",
+    "背景的折叠椅上只有亮着屏的笔记本，看不到坐着的人；f12 背景里是坐着的时装观众。用机位改变可以解释，但空椅子可能显得奇怪。Gate 还要查屏幕上有没有冒出文字、logo 或红色。设计帧里的字和图表是后期叠上去的，生成画面里不应出现。",
+    "shot.duration_policy.seconds=6.0（prepared 第 48、496 行），与输出和认可的 4 s 不一致，与前几单是同一模板问题，交给 lint 判定。",
+    "人声内容我这里核不了：本地转写工具对纯 wav 报 no_video_stream，这一项记 NOT_EVALUATED，需要 Parent 通过已授权的通道取证。",
+    "我没有 Bash，没法自己确认 p012c-w1c.png 与 D3-b.png 逐字节相同，目前只有认可文件里的声明，以及 registry 里按 sha 命名的文件作间接证据。",
+    "permit 在 2026-11-19T19:05:45Z 过期（operator-bound.json）。预览页写的是约 320 积分，上限 400 CRD；实际花费以结算为准，如实报告。"
+   ]
+  }
+ },
+ "budget": {
+  "operator_ceiling_CRD": 400,
+  "spent_submits": 0,
+  "cumulative_ceilings": [
+   1,
+   400
+  ]
+ },
+ "new_calls": 0
+}

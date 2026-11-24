@@ -1,0 +1,51 @@
+{
+ "n": "6",
+ "at": "2026-11-17T03:43:01.224Z",
+ "fields_sha256": "606797d420e3f5da6ba862a8173c871a3cfa760042b6c596bea6467933a4b392",
+ "read": {
+  "lyrics": "[Intro - instrumental, 8 bars, pager beep motif]\n\n\n\n\n[Spoken - deadpan, dry]\n\nIncident Week. Every look got somebody pag…",
+  "style": "industrial glitch club, 130 BPM, 4/4, distorted industrial kick, metallic percussion, pager and alarm tone samples, gated noise bursts, glitch cuts on the bar ends, dark sub bass, opens with an 8-bar instrumental intro, one American female lead throughout, crisp dry deadpan spoken-word verses, every word intelligible, the chorus soars into a high airy emotional female vocal with stacked harmonies and long held notes on run and outside, a stacked chanted post-chorus hook, key change up into the final chorus, cold, aggressive, untamed, clean modern mix",
+  "exclude": "rap, male lead vocal, mumbled vocals, lo-fi, rock guitar, big room EDM, dubstep, electroclash, acid techno, trance, metal screaming",
+  "title": "P Zero r2",
+  "model": "v6",
+  "advanced": "true",
+  "gender": [
+   {
+    "t": "Male",
+    "on": false
+   },
+   {
+    "t": "Female",
+    "on": true
+   }
+  ],
+  "max_mode": [
+   {
+    "t": "Off",
+    "on": true
+   },
+   {
+    "t": "On",
+    "on": false
+   }
+  ],
+  "my_taste": null,
+  "create_enabled": true,
+  "captcha": false,
+  "looked_outside_rows": 4,
+  "lyrics_sha256": "5932b87cb7b282700e52d822bdeea5042ae0f4d59e8c60c05e625c57c73cfb1c"
+ },
+ "checks": {
+  "lyrics": true,
+  "style": true,
+  "exclude": true,
+  "title": true,
+  "model_v6": true,
+  "create_enabled": true,
+  "no_captcha_on_page": true,
+  "female": true,
+  "max_mode_off": true,
+  "my_taste_off": true
+ },
+ "pass": true
+}

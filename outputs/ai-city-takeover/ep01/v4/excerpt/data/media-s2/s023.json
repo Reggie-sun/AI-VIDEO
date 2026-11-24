@@ -1,0 +1,26 @@
+{
+ "shot": "s023",
+ "t0": 101.448,
+ "t1": 103.294,
+ "why": "one line, one still: the blank visitor badge (Model guests); no move",
+ "still": "outputs/ai-city-takeover/ep01/v4/board/plates/p023-b1.png",
+ "still_sha256": "07bb239e5ca2c8ef1a94ed1be5c9b99926870b18c801ff48f3b31bb5e0a9e634",
+ "frames": 44,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 10
+ },
+ "log": []
+}

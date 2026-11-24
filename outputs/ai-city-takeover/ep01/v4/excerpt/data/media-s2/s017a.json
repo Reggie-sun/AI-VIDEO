@@ -1,0 +1,53 @@
+{
+ "shot": "s017a",
+ "t0": 72.098,
+ "t1": 73.0151,
+ "why": "m-1 A span (72.16-73.14): she sings 'Pick up' to him",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG07-m-1/SG07/project/state/video-generation/fetch/files/d1740013cbd0c2199358c3b68d47dd624e36d609ad064602e407d21e1cd0e55b.mp4",
+ "clip_sha256": "d1740013cbd0c2199358c3b68d47dd624e36d609ad064602e407d21e1cd0e55b",
+ "pictures": 217,
+ "frames": 22,
+ "first": {
+  "f": 308,
+  "t": 72.0833,
+  "clip_t": 0.6776,
+  "idx": 16
+ },
+ "last": {
+  "f": 329,
+  "t": 72.9583,
+  "clip_t": 1.5526,
+  "idx": 37
+ },
+ "crop": null,
+ "speed": 1.0,
+ "knots": null,
+ "repeats": 0,
+ "skips": 0,
+ "map": [
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31,
+  32,
+  33,
+  34,
+  35,
+  36,
+  37
+ ],
+ "orange_px_max": 18,
+ "pager_red": null
+}
