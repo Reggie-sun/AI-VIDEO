@@ -6,16 +6,16 @@ admission_basis: TWO_INDEPENDENT_ATTEMPTS
 material_update_target_claim:
 material_update_previous_evidence:
 material_update_delta:
-active_claim_version: 0
-active_evidence_status: NONE
-active_adoption_status: NOT_ADOPTED
-active_candidate_sha256:
-active_candidate_commit:
-active_adoption_commit:
-pending_claim_version: 1
-pending_evidence_status: SUPPORTED
+active_claim_version: 1
+active_evidence_status: SUPPORTED
+active_adoption_status: ADOPTED
+active_candidate_sha256: 3b94690dc6797c77afcdb639e0cada892a31630329684d423bcd60672b1942e1
+active_candidate_commit: 4ed70a8fc7a02177b944d4a80fc7ec0caad365da
+active_adoption_commit: 4ea48b83368456a9a89713bf270853508adbab3f
+pending_claim_version: 0
+pending_evidence_status: RETIRED
 pending_approval_status: CONFIRMED
-pending_adoption_status: APPLYING
+pending_adoption_status: NOT_ADOPTED
 confirmed_candidate_sha256: 3b94690dc6797c77afcdb639e0cada892a31630329684d423bcd60672b1942e1
 confirmed_candidate_commit: 4ed70a8fc7a02177b944d4a80fc7ec0caad365da
 confirmed_by: user
@@ -31,9 +31,9 @@ Date: 2026-11-23
 
 ## Active Claim
 
-`None`。首次候选，`active_claim_version: 0`，没有已被目标 owner 采纳的版本。
-
-## Pending Candidate
+Active v1 已获 exact user confirmation（2026-11-24「采纳 (Recommended)」），并在目标 Skill 验证通过后采纳。
+下方保留已确认的观察、证据与适用边界；只作 authoring 提醒，不是 Gate，不证明能提高出片通过率。
+原 pending preimage 保存在 `4ed70a8fc7a02177b944d4a80fc7ec0caad365da`；其他 Learning Claim 不变。
 
 ### Failure Pattern
 
@@ -112,10 +112,18 @@ Candidate checkpoint commit 为 `4ed70a8fc7a02177b944d4a80fc7ec0caad365da`（已
 
 ### Adoption Evidence
 
-`pending_adoption_status`：`APPLYING`。
+`active_adoption_status`：`ADOPTED`。
 
-- 唯一目标路径：`.agents/skills/seedance-authoring/references/seedance-2.0.md`，新增 `## Advisory: Turn-Away Without Back View` 一节（scope 只含 Seedance 2.0，故放在 2.0 overlay，不改 `SKILL.md`、`seedance-2.5.md`、`authoring-common.md`）。
-- 本次变更尚未 commit；adoption commit、目标 bytes SHA-256 与 Harness receipt 在主会话提交并核对后补写，届时再把本候选提升到 `Active Claim`。在此之前 `active_adoption_status` 保持 `NOT_ADOPTED`。
+- 唯一 target commit：`4ea48b83368456a9a89713bf270853508adbab3f`，含 `.agents/skills/seedance-authoring/references/seedance-2.0.md` 新增 `## Advisory: Turn-Away Without Back View` 一节（scope 只含 Seedance 2.0 overlay；`SKILL.md`、`seedance-2.5.md`、`authoring-common.md` 未改）。
+- 该 commit 中 target bytes SHA-256：`f690ce0112e35debb0833b6907a91a805ff1c6b8de43aa5d91e908c82b5c7175`（主会话 `git show` 重算核对一致）。
+- 目标 exact-staged receipts（同一暂存内容）：
+  - focused：`.agent/harness/runs/seedance-turn-away-adoption-20261124-focused/receipt.json`（passed）
+  - related：`.agent/harness/runs/seedance-turn-away-adoption-20261124-related/receipt.json`（passed，closure_eligible）
+- 未跑 full；离线 PASS 只证明文本契约与路由，不证明该提醒提高出片质量。
+
+## Pending Candidate
+
+无。`pending_claim_version: 0`；`pending_evidence_status: RETIRED` 仅表示 pending lane 已关闭，不表示 active v1 被 retired。后续 claim 或目标范围改变须创建新的 pending revision 并重新确认。
 
 ## Supersession And Reopen Conditions
 
