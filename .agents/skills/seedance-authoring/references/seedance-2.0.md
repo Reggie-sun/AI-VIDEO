@@ -25,6 +25,20 @@ support、limits、modes 与 surface behavior 的 authority。
 - 将 native audio、reference ceilings、duration、resolution、file format 与 surface syntax 视为
   current runtime facts；不得从 `2.0` label 推断。
 
+## Advisory: Turn-Away Without Back View
+
+Advisory only，不是 Gate，不阻断提交，不自动改写 prompt。Shot 要求人物转身或背对镜头、
+而首帧与参考都没有背面时，模型可能补造首帧没有的背面物件或改写下装（IRIS EP01 SG06 补出挎包、
+裙变短裤；MO07 寻呼机挪到后腰、工牌消失）。发现这种情况时写入 `authoring_warnings`，
+以下建议交 Director 决定：
+
+- 唱段单元不写转身，离开画面交给剪辑。
+- 动作单元把手部动作放在转身前，并写明随身物件挂在身前、背对镜头时看不见。
+
+限制：仅一部作品（Seedance 2.0，即梦 VIP，`first_frame`/`multimodal`，单人）的两个镜头；
+MO07 按此改写后同 prompt 仍有一条 take Gate FAIL；写明物件位置不保证通过，逐镜 Gate 判据不变。
+依据：[Learning Claim](../../../../docs/record_for_agent/learning/seedance-turn-away-unstated-back-details.md)。
+
 ## Repair Handoff
 
 遇到参考冲突、动作遗漏或时间漂移，回报 exact 结果、原文和技术适配差异；修复选择归

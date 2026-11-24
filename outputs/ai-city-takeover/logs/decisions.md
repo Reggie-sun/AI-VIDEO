@@ -874,3 +874,8 @@ c2 節奏不如 c1；方向改為回到原作做法：圖形與排版為主、�
 - s029 SG11 m-1（90e1af07…）、m-2（973775e2…）Gate FAIL（口型仅前 2 s；松手晚约 1.5 s；m-1 寻呼机小红点；m-2 带子伪影）。使用者原话「用 m-1，不对口型 + 卡松手 (Recommended)」：125.72–约 129.9 用 m-1 她静站不开口段，歌词画外音配图形；接 m-1 伸臂松手段，卡到松手落在 130.76；寻呼机红点做本地局部修色后重过 Gate（剪辑阶段做）。s029 花 1,120。
 - s027 MO12 背影版 p-1（33b46015…）、p-2（d916bd08…）主动作全 PASS，仅背景小路人正脸朝镜头判 FAIL。使用者原话「用 p-2，背景路人看镜头算次要 (Recommended)」：s027 用 p-2 片内 0–3.66。s027 共花 1,280（n 640 + p 640）。s015–s030 生成阶段结束，任务账合计 16,000。
 - 2026-11-23 s015–s030 剪辑审片 review-v1（正式片 `excerpt/renders/IRIS-EP01-agentcut-ev-s015-030-v1.mp4` sha 721b4c66…004e；0–134 连片 `IRIS-EP01-agentcut-ev-000-134-v1.mp4` sha a1c0c72d…2b7d；QA `excerpt/qa/s015-030-v1/qa.json`）。剪辑中主会话自查修复：s021/s023/s017p B 类清晰区改用 u2netp matte 跟人、s022 背景红色上限硬开关改软过渡（uCapSoft，仅本段）、s022 计数改逐个替换并移出标题、s021/s019/s026b 文字避脸、s018 静图用 P018E 深色轿车做框内局部合成（原图不改）、s029 寻呼机灯按色相改琥珀。Agentcut 页面由使用者原话「你自己点」授权，主会话在自动化浏览器页打开 iris-ep01-s015-030 后导出。红色 QA 6 帧（s017b f456、s029 f1694–1726 手部皮肤单像素压缩色噪，纯画面 0 px）未过原判据。使用者原话「认可，彩点算次要 (Recommended)」：认可本段（含 s024 推近/口型短、s027 背景路人、s022/s029 不对口型、s018 轿车），彩点改判次要。
+
+## 2026-11-24 Learning Claim seedance-turn-away-unstated-back-details 确认
+- 预览内容：claim（首帧无背面的转身镜头，Seedance 会补造背面物件；证据 SG06 挎包与裙变短裤、MO07 寻呼机与工牌移位）；目标 `seedance-authoring`，只作 advisory 检查、不设 Gate：唱段单元不写转身、离开画面交给剪辑；动作单元把手部动作放在转身前，并写明物件挂在身前；限制为仅本作品、改写后同 prompt 仍有一条 take 失败、写明物件位置不保证通过。
+- 候选身份：commit `4ed70a8fc7a02177b944d4a80fc7ec0caad365da` 中 `docs/record_for_agent/learning/seedance-turn-away-unstated-back-details.md`，SHA-256 `3b94690dc6797c77afcdb639e0cada892a31630329684d423bcd60672b1942e1`。
+- 使用者原话「采纳 (Recommended)」：确认该 claim 与上述唯一目标。
