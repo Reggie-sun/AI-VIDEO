@@ -1,0 +1,67 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-INS41-a-1",
+ "question": "问题页：http://127.0.0.1:8769/pilot/s031-048/issues/index.html\n\n连续性检查查出的问题都改完了，新画面我逐张看过。\n\n提示词：\n· 动作不再写“最后…”，改成对着具体哪一句词。\n· 纸币写成素面。\n· s041 写明只露出手。\n· s042 的布慢慢滑落，切进来时还在往下掉。\n· INS33 的手按在盖子上，接得上下一镜。\n\n画面：\n· s042 和 s046 的靴子改成及膝靴。\n· s046 的衣架堆到她这一头，给“推到隔板那头”留出了空间。\n· s037 首帧补上了微波炉。\n· INS37 左右翻转，工程师用没拿手机的左手按键。\n· s047 重做，隔板换到右边，和前后几镜一致。\n\n还剩一处小瑕疵：INS37 翻转后微波炉按键面板跑到了左边，而 s037 里是在右边。这个特写只有 1.37 秒，很难看出来。\n\n提交一共 11 条，每条拍 2 次，预计 10,400 积分，上限 11,200。怎么处理？",
+ "user_quote": "按问题页改好的开拍 (Recommended)",
+ "approved_at": "2026-11-25T08:13:32Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html",
+  "sha256": "bbc279093957b2a7fb9d67398db62f8aa58710729941cc25b790e9ee0c46803a"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/preview-inputs.json",
+  "sha256": "1772a88f222674703db7ca3ca2a30816e1cf2d86be2e3b230afa26f03977f828"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+  "sha256": "54f2f05f3ed7cb56d47d73e6e34bbc628512373e02f40d5eb3d9f6db3056391f"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p041-ins41.png",
+   "sha256": "54bffc0941fa0bc71b755011f6e938d2e21368d951afaee3e826cde4dc71985d",
+   "role": "INS41 first frame"
+  }
+ ],
+ "prompts": {
+  "INS41": {
+   "text": "镜头固定不动。夜里的百货橱窗，画面中间是最前面一具没有五官的素色人台，两只穿黑色长袖的手从画面上方把一块撑开的本白粗亚麻防尘布举在它头顶。两只手把布往下一拉，布落下来盖住人台的头和肩，慢慢垂好；两只手松开布，停在画面上方。人台始终没有五官和脸。后面的人台一直盖着布，不动。橱窗玻璃里没有倒影。画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "54662ccd29c2259ddc6ede09e9f354c750ee00f429d1fb8d0ba4a7becaa5ed5b"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [],
+ "identity_waiver_basis": "画面里没有人脸（p041-ins41.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/INS41/b.png 逐字节相同；只有手），不涉及身份",
+ "bound_ids": {
+  "attempt_id": "iris-ins41-a-1-source-001",
+  "policy_id": "iris-ins41-a-1-source-001",
+  "reservation_id": "iris-ins41-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-INS41-a-1",
+   "sd-INS41-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-INS41-a-1"
+ },
+ "decision_notes": [
+  "approval basis: outputs/ai-city-takeover/logs/decisions.md 2026-11-24/25 s031–s048 问题页条（使用者看过问题页 pilot/s031-048/issues/index.html 与提交页后认可）"
+ ]
+}

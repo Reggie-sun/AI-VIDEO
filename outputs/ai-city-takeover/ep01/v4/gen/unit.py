@@ -79,7 +79,7 @@ APPROVAL = PILOT / "preview-approval.json"
 REPORT = PILOT / "continuity-report.json"
 COVERAGE = V4 / "director-coverage.json"   # the Director's schema-4 coverage; its unit ids are the board clip ids
 BOARD = "outputs/ai-city-takeover/ep01/v4/board/shots.json"
-BOARD_SHA256 = "b5f599322f7f19daea1b7eb1f132bf640fdec4712c1cdf5da097ced5cfbe0107"   # 2026-11-23 s027 首帧换背影版 p027-b3（P027B/b）；此前 6840e33badcc2f23ce6680142391fa51d9b168ac28f710c42526d46704a88f29（2026-11-22 s027 首帧换 p027-b2（P027R/a）；此前 647cc110e8821ec442e06a6c2df769299b4ed25512de30cd00406ba2b34e0288（2026-11-22 加 s016 插镜 INS16（clips 里 SG06 之后，带 insert 文字）；此前 09fafac63c9079d9ec62d114e438008ca560d20847403844808ab37e9daa9f75（2026-11-22 s017 首帧换 p017-w2b（皮卡车头朝镜头）；此前 a009b70d0d35711dc54af2d5d0a687fb22c3b7d45091cf3c5c913a555b42c3fb（2026-11-22 唱段窗口按 s015 教训：SG06/SG09/SG10/SG11 窗口起点提前到句首前约 0.3 s；此前 b6fc004e5a49b52807401cbb4753fbed6e42c59bbdca60f661f718cebe3b92d2（2026-11-22 SG05 重拍 m：生成窗口起点 59.157→58.7（含 Ten oh），seconds 6.966；此前 19132f6e8a5d411f0ad3241ed1a47fe12de11267d12bac56a9a561b9c438a34e（2026-11-22 s024 首帧换重做车厢的 p024-b2（= P024R/b）；此前 34e9cd05f39b09cbc77c0931023a6444900bee0fe1e094b28055243801c401d1（2026-11-22 s015–s029 首帧换 p0NN-w1 / p0NN-b1、SG10 生成窗口起点 110.543→109.7027；此前 4fb460ca2a5c2baf4e87723a19b255f7ae214eb46a79308cd3f21aea106564d1（2026-11-21 MO07 首帧换 r4 修正版 p014-w1c；此前 4b620cb8166935bd2ef75fc25498d7aae84ee34a6bf0b9f2ad0b002c365812b4（2026-11-20 MO21 首帧换修正版 p009-w1b；此前 49b78ad4ee890935fbbfc66ecae001432143be4c2a7875dea526dfbf857e9472）））））））））
+BOARD_SHA256 = "15662cca27d3e3ee68ddc20737ecd04d9004dfb9e5d444085c1c69d082fc744c"   # 2026-11-25 s031–s048 r2：SG20 首帧与 s048 镜换 p048-w2（W1 左臂从肩到腕裸露，CONT1124/p048-arm-b-comp）；此前 e981c8f27d770cbb99b8aa15f72cc6fd4633300e46f359b44af6b153c39da41c（2026-11-24 s031–s048 提交前连续性修正：SG16 首帧换 p037-c2（加 S037A 那台微波炉）、INS37 换左右镜像 p037-ins37b（左手、插座在左；insert 文字同改）、SG19 换 p042-w2（及膝长靴）、MO15 换 p046-w2（及膝长靴 + 衣架堆在她这一头）；此前 3bee7e751d3bfdf080aee51cfcacb7295c2f590282281d6487658e6ee854e0a8（2026-11-24 s031–s048：SG12/SG15–SG20/MO15 首帧换 p031-c1 / p036-c1 / p037-c1 / p039-c1 / p041-c1 / p042-w1 / p046-w1 / p048-w1（S31-48 推荐件），念白/唱段窗口按句首前约 0.3 s 重切，加插镜 INS33 / INS37 / INS41（带 insert 文字）；此前 b5f599322f7f19daea1b7eb1f132bf640fdec4712c1cdf5da097ced5cfbe0107（2026-11-23 s027 首帧换背影版 p027-b3（P027B/b）；此前 6840e33badcc2f23ce6680142391fa51d9b168ac28f710c42526d46704a88f29（2026-11-22 s027 首帧换 p027-b2（P027R/a）；此前 647cc110e8821ec442e06a6c2df769299b4ed25512de30cd00406ba2b34e0288（2026-11-22 加 s016 插镜 INS16（clips 里 SG06 之后，带 insert 文字）；此前 09fafac63c9079d9ec62d114e438008ca560d20847403844808ab37e9daa9f75（2026-11-22 s017 首帧换 p017-w2b（皮卡车头朝镜头）；此前 a009b70d0d35711dc54af2d5d0a687fb22c3b7d45091cf3c5c913a555b42c3fb（2026-11-22 唱段窗口按 s015 教训：SG06/SG09/SG10/SG11 窗口起点提前到句首前约 0.3 s；此前 b6fc004e5a49b52807401cbb4753fbed6e42c59bbdca60f661f718cebe3b92d2（2026-11-22 SG05 重拍 m：生成窗口起点 59.157→58.7（含 Ten oh），seconds 6.966；此前 19132f6e8a5d411f0ad3241ed1a47fe12de11267d12bac56a9a561b9c438a34e（2026-11-22 s024 首帧换重做车厢的 p024-b2（= P024R/b）；此前 34e9cd05f39b09cbc77c0931023a6444900bee0fe1e094b28055243801c401d1（2026-11-22 s015–s029 首帧换 p0NN-w1 / p0NN-b1、SG10 生成窗口起点 110.543→109.7027；此前 4fb460ca2a5c2baf4e87723a19b255f7ae214eb46a79308cd3f21aea106564d1（2026-11-21 MO07 首帧换 r4 修正版 p014-w1c；此前 4b620cb8166935bd2ef75fc25498d7aae84ee34a6bf0b9f2ad0b002c365812b4（2026-11-20 MO21 首帧换修正版 p009-w1b；此前 49b78ad4ee890935fbbfc66ecae001432143be4c2a7875dea526dfbf857e9472））））））））））））
 PLATES = "outputs/ai-city-takeover/ep01/v4/board/plates/"
 ANCHOR = "outputs/ai-city-takeover/ep01/v4/face/IRIS-anchor-F1a.png"    # the v4 identity anchor (replaces canon v4 / E3)
 ANCHOR_SHA256 = "2dd80e2f0ff55fbe24a95c5d881a2d2422421c7d94b7a066a3dc6f2e54d55b6a"
@@ -97,7 +97,11 @@ LOOK_TEXT = {"L1": "；造型1雕塑白：白色雕塑感短款立领外套与�
                    "一边露肩）、斜挎黑色皮质背带、腰间细链挂黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴完整保持；"
                    "没有立领灯线",
              "B": "；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型B：黑色超大廓形的双排扣西装外套、白色高领上衣、黑色阔腿西裤"
-                  "完整保持；没有立领灯线"}
+                  "完整保持；没有立领灯线",
+             "C": "；二十八岁成熟、有棱角的脸，面无表情带着好奇；造型C：银灰色长款防水风衣（立领竖起、下摆到小腿、腰带打结）、"
+                  "黑色高领上衣、黑色阔腿裤、黑色尖头短靴完整保持；没有立领灯线"}
+# C (2026-11-24, s031-s041): the board's look LC (压轴风衣, text pinned by BOARD_SHA256) worn by the W1 face, as B is LB
+# (pilot/s031-048/plan/index.html 「按方案做首帧预览 (Recommended)」; preview 「全按推荐 (Recommended)」). Plates p0NN-c1.
 # B (2026-11-22, s020-s029): the board's look LB (证人席, text pinned by BOARD_SHA256) worn by the W1 face; the user chose
 # 「统一成开头的脸 (Recommended)」 on pilot/s015-030/preview/index.html (logs/decisions.md 2026-11-22). Plates p0NN-b1.
 # W1 (2026-11-18, v4 round 1: s011 / s012): the remade identity (28, mature angular face, deadpan-curious; direct-flash
@@ -113,12 +117,13 @@ W1_WARDROBE = ("她穿一件用灰色连帽衫改造成的不对称高定短外�
                "一台黑色老式寻呼机和一张空白工牌；黑色高腰迷你裙；黑色及膝长靴")
 # look-dependent intent text (L1 keeps its original wording; W1 plates are cold white / cyan / amber, no collar line)
 PALETTE = {"L1": "冷色调；红色只做讯号灯，是唯一暖色", "W1": "冷白、青蓝和琥珀色的夜间灯色；除了耳挂上的小红灯，没有任何红色",
-           "B": "除了耳挂上的小红灯，画面里没有任何红色"}
+           "B": "除了耳挂上的小红灯，画面里没有任何红色", "C": "除了耳挂上的小红灯，画面里没有任何红色"}
 # a spec may carry its own "palette" when its approved prompt names a different red rule (opening MO02 door light,
 # MO21 no visible ear device); otherwise the look's palette applies
 IDENTITY_CONTINUITY = {"L1": "人物身份、左耳装置与左侧立领红灯线位置一致（v4身份锚点F1a）",
                        "W1": "人物身份与左耳装置位置一致（v4身份锚点F1a），造型W1不变",
-                       "B": "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变"}
+                       "B": "人物身份与左耳装置位置一致（v4身份锚点F1a），造型B不变",
+                       "C": "人物身份与左耳装置位置一致（v4身份锚点F1a），造型C不变"}
 # a spec may carry its own "identity_continuity" when the look changes inside the take (s019 MO09: W1 -> B)
 WAIVER = "首帧生视频：身份由使用者在预览中认可的首帧承担；认可的参考包只有首帧，不附身份图"
 NO_TEXT = "画面中不新增任何文字、字母、数字、标志或图形；平台正常人工智能生成标识照常保留，不删除、不遮挡"
@@ -1015,9 +1020,393 @@ SPECS["SG11"] = clip_spec("SG11", "p029-b1", "f64e2472f4dfaefe426e33fe05bebf61fb
                    "对着镜头唱出这两句，口型与参考人声逐字同步"), vocal="SG11m", take_margin_seconds=1)
 
 
+# ---------------------------------------------------------------- s031-s048, 133.87-209.34 s (2026-11-24, look C then W1)
+# Director plan pilot/s031-048/plan/index.html (「按方案做首帧预览 (Recommended)」; forks s042 A 裹布 + 重音剪切, s045 A 副本不露脸,
+# s043 A 静止远景); first frames chosen on pilot/s031-048/preview/index.html (「全按推荐 (Recommended)」, logs/decisions.md
+# 2026-11-24). Plates board/plates/p0NN-c1 (s031-s041, look C = the board's LC on the opening face), p0NN-w1 (s042-s048, W1)
+# and p0NN-insNN (inserts) are excerpt/flash/design/S31-48/<x>.png byte for byte. Prompts: the main session's drafts in
+# excerpt/flash/s031-048-seedance.md, to be approved on pilot/s031-048/submit/index.html; every required phrase below is a
+# literal substring of that unit's draft. Rules carried from s015-s030 (HANDOFF-2026-11-23, the 2026-11-23 record and the
+# adopted seedance-authoring Turn-Away advisory): written from the first-frame state, no turning in spoken / sung units, no
+# walking at the lens and no exit, things that sprout text or red lights stated blank / unlit, one face.
+# Vocal windows start ~0.3 s before the phrase's first word; where that point lies inside the previous word (cut_audio
+# refuses it) the window starts where that word ends (SG08 / SG09m precedent) and never after the edit's in-point: SG15
+# 155.76 (end of "call."; plan 155.58), SG16 161.338 (end of "up."; plan 161.08), SG17 170.1094 (its plays start; plan 170.00),
+# SG18 177.47 (end of "said."; plan 177.39). Take = ceil(window) + 1 s (take_margin_seconds), minimum 4 s; SG20's vocal stops
+# at 208.80 (no "All") but the edit holds her still to 209.34, so its take covers 4.10 s + 1 s = 6 s (margin 2). Inserts and
+# MO15 follow INS16 (iris=False for a hand-only insert; the Jimeng minimum 4 s). Take folders sd-<UNIT>-a-1|2.
+# 2026-11-25 r3 (pilot/s031-048/r3/PATCH.md; supersedes r2): SG12 a-3 came back speaking Chinese after its prompt quoted a
+# Chinese rendering of the lyric (「删掉译文、精简动作后重拍 (Recommended)」, logs/decisions.md 2026-11-25). Spoken / sung prompts
+# quote no lyric text or translation and carry no quote marks; actions bind by ordinal only (说到第四句时 / 唱到第三句刚开口时),
+# the ordinal counted in the unit's own vocal window (excerpt/flash/s031-048-seedance-r3.md lists each window's sentences).
+# SG12 keeps only the belt cinch on the first word (no banknote tuck, no eye flick; takes sd-SG12-b-1|2); SG15 / SG16 / SG17 /
+# SG18 bind the 3rd / 4th / 2nd sentence / the 3rd sung line's first word; SG20 as r2.
+LC_MOOD = "冷、面无表情、带着好奇"
+SPOKEN_AMBIENCE = "片段自带音轨跟随参考人声（成片换成歌曲母带）"
+
+SPECS["SG12"] = clip_spec("SG12", "p031-c1", "3357a872a67fe8ee8e34928b4279413e3501f233956f3a8bd76b6957d70dcedf", 9, "C",
+    "multimodal", _board_scene("library-basement-vending", "图书馆地下一层贴瓷砖的走廊，一排旧自动售货机", time="白天", mood=LC_MOOD),
+    "中景", {
+        "open": "SG12参考图：中景，她站在一排旧自动售货机旁正对镜头，右手捏着折起来的素色纸币垂在腰前，嘴唇闭着；风衣腰带在腰间打着结",
+        "close": "她仍站在原地看着镜头，右手一直捏着纸币垂在腰前，机位与构图不变",
+        "action_start": "她站在售货机旁正对镜头，嘴唇闭着",
+        "progression": "对着镜头平平地说话，口型与参考人声逐字同步；说出第一个词的同时左手把风衣腰带一拉收紧",
+        "endpoint": "右手一直捏着纸币垂在腰前，她一直看着镜头，不转头", "camera": LOCKED_INTENT,
+        "framing": "SG12参考图：中景，她在售货机旁", "start_framing": "SG12参考图原始构图", "end_framing": "与起始相同的构图",
+        "light": "走廊顶上的灯管", "ambience": SPOKEN_AMBIENCE, "space": "她始终站在售货机旁原位", "motion_peak": "左手把风衣腰带一拉收紧",
+        "natural": ["说出第一个词的同时用左手把风衣腰带一拉收紧", "纸币上没有任何印花、字或数字", "嘴前没有任何遮挡",
+                    "售货机的小显示屏是黑的，不亮", "走廊里没有出口灯"],
+        "open_event": ("对着镜头平平地说话", "逐字精确同步"),
+        "close_event": ("右手一直捏着纸币垂在腰前", "她一直看着镜头，不转头，不转身")},
+    iris_performance("念白：九月二十日的搜索", "对着镜头平平地说，口型与参考人声逐字同步；说第一个词时收腰带", "镜头",
+                     "站在售货机旁，始终不转头、不转身", "左手收紧风衣腰带，右手一直捏着纸币垂在腰前", "她仍站在原地看着镜头，纸币仍在右手",
+                     "面无表情，带着一点好奇"),
+    _fixed("中景，她在售货机旁正对镜头", "构图与机位不变，她仍在原地"),
+    _lipsync_rules(LIPSYNC_SPOKEN, look="C"),
+    dialogue=_sung("September twentieth. The search tool came back with junk. Google, Bing and DuckDuckGo: three errors. "
+                   "No luck. It asked", 0.3, 7.42, "对着镜头平平地说出这几句，口型与参考人声逐字同步"), take_margin_seconds=1)
+
+SPECS["INS33"] = clip_spec("INS33", "p033-ins33", "9a45f99fd1911bcc00a043c0dd7aaaa6af434b18ca03aaeb8b81a36a7680d1e1", 4,
+    "C", "first_frame", _board_scene("archive-brass-tube-mouth", "报刊档案通道尽头墙上的黄铜气动传送管口", time="白天",
+                                     mood="冷、安静、一个动作"), "墙上黄铜传送管的圆形管口", {
+        "open": "INS33首帧：特写，墙上黄铜传送管的圆形管口，铰链上的黄铜盖向上打开；她的右手（银灰风衣袖口）从画面右侧握着黄铜筒停在管口外",
+        "close": "黄铜盖合上管口，她的手掌平按在合上的黄铜盖上，机位与构图不变",
+        "action_start": "她的右手握着黄铜筒停在管口外", "progression": "把黄铜筒整个推进管口里，松开手，手往回收",
+        "endpoint": "铰链上的黄铜盖落下来合上管口，她的手掌平按在合上的黄铜盖上", "camera": LOCKED_INTENT,
+        "framing": "INS33首帧：特写，黄铜管口", "start_framing": "INS33首帧原始构图", "end_framing": "与起始相同的构图",
+        "light": "侧面透进来的冷光", "ambience": MO_AMBIENCE, "space": "手在管口右侧，推进管口后收回", "motion_peak": "黄铜筒被推进管口",
+        "natural": ["手一直是五根手指", "没有任何刻字、刻度、数字或铭牌", "画面里没有任何红色"],
+        "open_event": ("她把黄铜筒整个推进管口里", "镜头固定不动"),
+        "close_event": ("铰链上的黄铜盖落下来，合上管口", "然后她的手掌平按在合上的黄铜盖上")},
+    {"trigger": "D N S slipped through", "visible_response": "她把黄铜筒推进管口、松手，盖子落下合上", "gaze_target": "画面里没有人脸",
+     "body_behavior": "只露出她的一只手和银灰风衣袖口", "hand_behavior": "右手把黄铜筒推进管口、松开，然后手掌平按在合上的黄铜盖上",
+     "terminal_performance_state": "盖子合上，手掌平按在黄铜盖上"},
+    {"subject_id": "brass-tube-mouth", "relation_kind": "fixed_frame", "start_relation": "特写，管口盖子开着，手握铜筒在管口外",
+     "end_relation": "构图与机位不变，盖子合上"},
+    [("performance", "她的右手把黄铜筒整个推进管口、松手收回，铰链上的黄铜盖落下合上，然后手掌平按在合上的黄铜盖上；只露出手和银灰风衣袖口，"
+                     "不新增人物", 0, PERFORMANCE_KEYS),
+     ("camera", LOCKED_INTENT + "，保持首帧构图；黄铜上没有刻字", 0, CAMERA_KEYS), ("no-new-graphics", NO_TEXT, 0, LABEL_KEYS)],
+    iris=False, palette="冷灰色调；画面里没有任何红色", take_margin_seconds=2)
+
+SPECS["SG15"] = clip_spec("SG15", "p036-c1", "27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0", 5, "C",
+    "multimodal", _board_scene("library-reading-room-aisle", "图书馆阅览室中央的过道，长木桌、绿玻璃罩阅读灯，一位中年读者坐在过道边",
+                               time="白天", mood=LC_MOOD), "中景", {
+        "open": ("SG15参考图：中景，她站在阅览室过道里身体朝向镜头，右手把黑色寻呼机攥在腰前，液晶屏空白灰绿；画面左侧一位中年读者坐在"
+                 "木椅上侧身抬头看她；嘴唇闭着"),
+        "close": "读者连人带椅子挪开让出过道，她仍站在原地，机位与构图不变",
+        "action_start": "她站在过道里攥着寻呼机，嘴唇闭着", "progression": "对着镜头平平地说话，口型与参考人声逐字同步；说到第三句时只垂下眼睛看那位读者",
+        "endpoint": "读者连人带椅子往身后的桌子挪过去，让出过道", "camera": LOCKED_INTENT,
+        "framing": "SG15参考图：中景，她在过道里", "start_framing": "SG15参考图原始构图", "end_framing": "与起始相同的构图",
+        "light": "高窗的日光与绿玻璃罩阅读灯", "ambience": SPOKEN_AMBIENCE, "space": "她始终站在过道原位，读者在画面左侧",
+        "motion_peak": "读者挪开椅子让路",
+        "natural": ["说到第三句时她只垂下眼睛看那位读者，不转头", "嘴前没有任何遮挡", "寻呼机屏幕没有数字和字，不亮红灯", "书脊都是素色的，没有字"],
+        "open_event": ("对着镜头平平地说话", "逐字精确同步"),
+        "close_event": ("读者连人带椅子往身后的桌子挪过去，让出过道", "她一直站在原地，不走动，不转身")},
+    iris_performance("念白：十点零二分，P0", "对着镜头平平地说，口型与参考人声逐字同步；说到第三句时只垂下眼睛看读者", "镜头，说到第三句时垂眼看读者",
+                     "站在过道里，始终不走动、不转身", "右手把寻呼机攥在腰前", "读者让开，她仍站在原地", "面无表情，带着一点好奇"),
+    _fixed("中景，她在过道里朝向镜头", "构图与机位不变，她仍在原地"),
+    _lipsync_rules(LIPSYNC_SPOKEN, look="C"),
+    dialogue=_sung("Ten oh two: P zero. Pager screams. Out of my way. Ten", 0.12, 3.83,
+                   "对着镜头平平地说出这几句，口型与参考人声逐字同步"), take_margin_seconds=1)
+
+SPECS["SG16"] = clip_spec("SG16", "p037-c2", "e6772d8ed350cb880170100f303c569bd35fe4770530426005364270161d5794", 7, "C",
+    "multimodal", _board_scene("staff-kitchenette", "员工茶水间，不锈钢料理台、开放式架子、咖啡机，开头那位值班工程师在画面左缘",
+                               time="白天", mood=LC_MOOD), "中景", {
+        "open": ("SG16参考图：中景，她坐在料理台上，双手捧着腿上的麦片碗，看着镜头，嘴唇闭着；画面左缘是值班工程师（开头那位，深蓝牛仔外套）"
+                 "的后脑、肩和举着手机贴在耳边的手；她身边台面上的不锈钢微波炉在转，炉内亮着暖黄的光"),
+        "close": "微波炉的灯熄灭、转盘停下，她把碗放到身边的台面上，工程师仍举着手机不动，机位与构图不变",
+        "action_start": "她坐在料理台上捧着碗，嘴唇闭着", "progression": "一直看着镜头平平地说话，口型与参考人声逐字同步",
+        "endpoint": "说到第四句时，微波炉的灯熄灭、转盘停下，她把碗放到身边的台面上", "camera": LOCKED_INTENT,
+        "framing": "SG16参考图：中景，她在料理台上", "start_framing": "SG16参考图原始构图", "end_framing": "与起始相同的构图",
+        "light": "窗外的日光与架子下的灯条", "ambience": SPOKEN_AMBIENCE, "space": "她坐在料理台原位，工程师在画面左缘",
+        "motion_peak": "把碗放到台面上",
+        "natural": ["不转过来，看不到他的脸", "嘴前没有任何遮挡", "手机背面是素色的，没有标志", "咖啡机和水壶上没有亮灯，也没有显示屏",
+                    "微波炉的显示屏是黑的，按键面板没有字"],
+        "open_event": ("她一直看着镜头平平地说话", "逐字精确同步"),
+        "close_event": ("说到第四句时，微波炉的灯熄灭、转盘停下，她把碗放到身边的台面上",
+                        "她一直坐在原地，不转头，不转身")},
+    iris_performance("念白：停掉还是留着", "一直看着镜头平平地说，口型与参考人声逐字同步；说到第四句时把碗放到台面上", "镜头",
+                     "坐在料理台上，始终不转头、不转身", "双手捧着碗，说到第四句时把碗放到身边台面上", "碗放在台面上，她仍看着镜头",
+                     "面无表情，带着一点好奇"),
+    _fixed("中景，她坐在料理台上，工程师在画面左缘", "构图与机位不变"),
+    [identity_rule("C", "参考图"), ("lip-sync", LIPSYNC_SPOKEN, 0, LIPSYNC_KEYS),
+     ("camera", LOCKED_INTENT + "，一镜到底；" + ENGINEER + "，只露后脑、肩和手", 0, CAMERA_KEYS),
+     ("no-new-graphics", NO_TEXT, 0, LABEL_KEYS)],
+    dialogue=_sung("Stop it? Let it stay? It doesn't stop by itself. Killed at twelve thirty-four.", 0.04, 5.13,
+                   "看着镜头平平地说出这几句，口型与参考人声逐字同步"), take_margin_seconds=1)
+
+SPECS["INS37"] = clip_spec("INS37", "p037-ins37b", "d2645329ef2187949671b31d9e6dce828ec99d3012b89428abdb4d672160f6d9", 4,
+    "C", "first_frame", _board_scene("staff-kitchenette-microwave", "员工茶水间料理台上的不锈钢微波炉，右边墙上是插座", time="白天",
+                                     mood="冷、安静、一个动作"), "料理台上的不锈钢微波炉", {
+        "open": ("INS37首帧（左右镜像）：特写，不锈钢微波炉正在转，炉内暖黄光，转盘上一只素色白马克杯，显示屏是黑的；工程师没拿手机的左手"
+                 "（深蓝牛仔袖子）从画面左侧伸进来，食指按在按键面板最下面那一格；左边墙上插座插着插头"),
+        "close": "插头拔下，炉内的灯熄灭，转盘停下，机位与构图不变",
+        "action_start": "食指按在按键面板最下面那一格上", "progression": "他连按两下那一格，微波炉照转",
+        "endpoint": "他抓住电线把插头从左边墙上的插座拔出来，炉内的灯熄灭，转盘停下", "camera": LOCKED_INTENT,
+        "framing": "INS37首帧：特写，微波炉正面", "start_framing": "INS37首帧原始构图", "end_framing": "与起始相同的构图",
+        "light": "微波炉内的暖黄光与茶水间的冷光", "ambience": MO_AMBIENCE, "space": "手在微波炉左侧，插座在左边墙上",
+        "motion_peak": "拔下插头，炉内灯熄灭",
+        "natural": ["显示屏始终是黑的，不亮任何数字", "按键面板是一整片素色，没有字、数字和图标", "画面里没有任何红色"],
+        "open_event": ("他连按两下那一格，微波炉照转", "镜头固定不动"),
+        "close_event": ("炉内的灯熄灭，转盘停下", "把插头从左边墙上的插座里拔出来")},
+    {"trigger": "163.70 的重音与 Killed", "visible_response": "连按两下停止键没用，拔掉插头后灯灭转盘停", "gaze_target": "画面里没有人脸",
+     "body_behavior": "只露出工程师没拿手机的左手和深蓝牛仔袖口", "hand_behavior": "左手食指连按两下按键，再抓住电线拔下插头",
+     "terminal_performance_state": "插头拔下，炉内灯灭，转盘停下"},
+    {"subject_id": "microwave", "relation_kind": "fixed_frame", "start_relation": "特写，微波炉在转，手指按在按键上",
+     "end_relation": "构图与机位不变，灯灭转盘停"},
+    [("performance", "工程师没拿手机的左手（深蓝牛仔袖子）从画面左侧伸进来连按两下按键，微波炉照转；他抓住电线拔下左边墙上的插头，"
+                     "炉内灯熄灭、转盘停下；只露出手和袖口，不新增人物",
+      0, PERFORMANCE_KEYS),
+     ("camera", LOCKED_INTENT + "，保持首帧构图；显示屏始终是黑的", 0, CAMERA_KEYS), ("no-new-graphics", NO_TEXT, 0, LABEL_KEYS)],
+    iris=False, palette="冷灰色调与炉内暖黄光；画面里没有任何红色", take_margin_seconds=2)
+
+# SG17: the user kept the door-crack red line as an exception like s002 (「留红光，和 s002 一样算例外 (Recommended)」,
+# logs/decisions.md 2026-11-24); no other red but the ear light.
+SPECS["SG17"] = clip_spec("SG17", "p039-c1", "9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342", 5, "C",
+    "multimodal", _board_scene("library-staff-door", "图书馆书库走廊里一扇关着的深色木员工门，门缝下透出一线红光", time="白天",
+                               mood=LC_MOOD), "低机位", {
+        "open": "SG17参考图：低机位，她蹲在关着的深色木门前看着镜头，门缝下一线红光贴着地面横在她右手指尖前，左臂搭在膝上，嘴唇闭着",
+        "close": "她的右手手掌平按在那道红光里，门一直关着，机位与构图不变",
+        "action_start": "她蹲在门前看着镜头，嘴唇闭着", "progression": "对着镜头平平地说话，口型与参考人声逐字同步",
+        "endpoint": "说到第二句时把右手手掌平按进那道红光里", "camera": LOCKED_INTENT,
+        "framing": "SG17参考图：低机位，她蹲在门前", "start_framing": "SG17参考图原始构图", "end_framing": "与起始相同的构图",
+        "light": "书库走廊的顶灯与门缝下的一线红光", "ambience": SPOKEN_AMBIENCE, "space": "她始终蹲在门前原位",
+        "motion_peak": "手掌平按进红光里",
+        "natural": ["门一直关着", "嘴前没有任何遮挡", "门上没有门牌、号码或标志", "红光不照到她的脸上"],
+        "open_event": ("对着镜头平平地说话", "逐字精确同步"),
+        "close_event": ("说到第二句时她把右手手掌平按进那道红光里", "她一直蹲在原地，不起身，不转身")},
+    iris_performance("念白：他们找到了一个缝", "对着镜头平平地说，口型与参考人声逐字同步；说到第二句时把右手手掌平按进门缝的红光里", "镜头",
+                     "蹲在门前，始终不起身、不转身、不前倾挡嘴", "右手手掌平按进门缝下的红光", "手掌按在红光里，门仍关着",
+                     "面无表情，带着一点好奇"),
+    _fixed("低机位，她蹲在门前", "构图与机位不变"),
+    _lipsync_rules(LIPSYNC_SPOKEN, look="C"),
+    dialogue=_sung("Bet it couldn't reach outside. They found a gap instead.", 0.19, 3.67,
+                   "对着镜头平平地说出这两句，口型与参考人声逐字同步"), take_margin_seconds=1,
+    palette="冷灰色调；除了耳挂上的小红灯和门缝下的一线红光（使用者认可的例外），没有任何红色")
+
+# SG17A / SG17B (2026-11-25 lip-sync A/B probe on s039; 「先用 SG17 做 A/B 对照 (Recommended)」, logs/decisions.md, after the
+# model-researcher summary): the board clip SG17 (clip=, coverage_unit=: no new board clip), its first frame p039-c1, and one
+# shared vocal SG17p = SG17.wav byte-exact samples + digital silence at the end to exactly 5.000 s (audio length = take
+# length, so no extra second: take = ceil(3.67) + 1 = 5). A: a minimal prompt, the first-frame state then only speech in
+# word-for-word sync, camera fixed, she stays put, the blank / red / no-text rules; the hand press and every other action
+# removed. B: A plus the exact English lines inside {} (braced_line, the one exemption in prompt_language_ok); nothing else
+# differs. Approval page pilot/s031-048/probe/index.html; takes sd-SG17A-p-1|2, sd-SG17B-p-1|2.
+SG17_LINES = "Bet it couldn't reach outside. They found a gap instead."
+for _unit, _braced in (("SG17A", None), ("SG17B", SG17_LINES)):
+    SPECS[_unit] = clip_spec(_unit, "p039-c1", "9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342", 5, "C",
+        "multimodal", _board_scene("library-staff-door", "图书馆书库走廊里一扇关着的深色木员工门，门缝下透出一线红光", time="白天",
+                                   mood=LC_MOOD), "低机位", {
+            "open": "SG17参考图：低机位，她蹲在关着的深色木门前看着镜头，门缝下一线红光贴着地面横在她右手指尖前，左臂搭在膝上，嘴唇闭着",
+            "close": "说完这两句，她仍蹲在原地看着镜头，机位与构图不变",
+            "action_start": "她蹲在门前看着镜头，嘴唇闭着", "progression": "对着镜头说话，口型与参考人声逐字同步",
+            "endpoint": "说完这两句，她一直蹲在原地", "camera": LOCKED_INTENT,
+            "framing": "SG17参考图：低机位，她蹲在门前", "start_framing": "SG17参考图原始构图", "end_framing": "与起始相同的构图",
+            "light": "书库走廊的顶灯与门缝下的一线红光", "ambience": SPOKEN_AMBIENCE, "space": "她始终蹲在门前原位",
+            "motion_peak": "对着镜头说这两句",
+            "natural": ["门上没有门牌、号码或标志", "没有任何别的红色", "红光不照到她的脸上"],
+            "open_event": ("她对着镜头说话", "逐字精确同步"), "close_event": ("镜头固定不动", "她一直蹲在原地")},
+        iris_performance("念白：两句（对口型探针）", "对着镜头说话，口型与参考人声逐字同步；没有别的动作", "镜头", "蹲在门前原位",
+                         "右手停在门缝红光前，左臂搭在膝上", "说完这两句，她仍蹲在原地看着镜头", "面无表情，带着一点好奇"),
+        _fixed("低机位，她蹲在门前", "构图与机位不变"),
+        _lipsync_rules(LIPSYNC_SPOKEN, look="C"),
+        dialogue=_sung(SG17_LINES, 0.19, 3.67, "对着镜头说出这两句，口型与参考人声逐字同步"), take_margin_seconds=1,
+        palette="冷灰色调；除了耳挂上的小红灯和门缝下的一线红光（使用者认可的例外），没有任何红色",
+        clip="SG17", coverage_unit="SG17", vocal="SG17p", **({"braced_line": _braced} if _braced else {}))
+
+# SG18: she is wrapped from shoulder to foot in the dust sheet, no clothes visible (fork s042 A, 「A 裹布 + 重音剪切
+# (Recommended)」); the LC -> W1 change is a cut on the 185.585 hit, so this take shows no wardrobe.
+SPECS["SG18"] = clip_spec("SG18", "p041-c1", "43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37", 10, "C",
+    "multimodal", _board_scene("dept-store-window-night", "夜里的百货橱窗，一排盖着本白防尘布的人台，玻璃外是街灯", time="深夜",
+                               mood=LC_MOOD), "中景", {
+        "open": "SG18参考图：中景，她站在盖着防尘布的人台中间，从肩到脚裹在本白粗亚麻防尘布里，布罩到下巴，只露出脸和银白短发，嘴唇闭着",
+        "close": "唱到第三句刚开口时，她的一只手从胸前布缝里伸出来抓住布边，手在下巴以下，手腕以上一直在布里，机位与构图不变",
+        "action_start": "她裹着防尘布站在人台中间，嘴唇闭着", "progression": "很轻地对着镜头唱，口型与参考人声逐字同步；一动不动",
+        "endpoint": "唱到第三句刚开口时，一只手从胸前的布缝里伸出来，抓住胸前的布边", "camera": LOCKED_INTENT + "，射灯亮度不变",
+        "framing": "SG18参考图：中景，她在人台中间", "start_framing": "SG18参考图原始构图", "end_framing": "与起始相同的构图",
+        "light": "橱窗里暗下来的射灯与玻璃外的街灯", "ambience": SG_AMBIENCE, "space": "她始终站在人台中间原位",
+        "motion_peak": "手从布缝里抓住布边",
+        "natural": ["防尘布一直裹着她，看不见布下面的衣服", "只露出手，手腕以上一直在布里", "嘴前没有任何遮挡", "人台都盖着布，没有脸",
+                    "橱窗玻璃里不出现她的倒影"],
+        "open_event": ("她很轻地对着镜头唱", "逐字精确同步"),
+        "close_event": ("唱到第三句刚开口时，她的一只手从胸前的布缝里伸出来", "她一直站在原地一动不动，不转身")},
+    iris_performance("桥段：灯暗下去", "很轻地对着镜头唱，口型与参考人声逐字同步；唱到第三句刚开口时一只手从布缝里抓住胸前的布边", "镜头",
+                     "裹在防尘布里一动不动，不转身", "一只手从胸前布缝里伸出来抓住布边，手在下巴以下", "手抓着布边，她仍看着镜头",
+                     "面无表情，带着一点好奇"),
+    _fixed("中景，她裹着防尘布站在人台中间", "构图与机位不变"),
+    [("identity", IDENTITY_TEXT + "；二十八岁成熟、有棱角的脸，面无表情带着好奇；本镜她从肩到脚裹在本白粗亚麻防尘布里，只露出脸和银白短发，"
+                  "看不见布下面的衣服（由认可的参考图承担）", 0, ("identity_waivers",) + IDENTITY_KEYS),
+     ("lip-sync", LIPSYNC, 0, LIPSYNC_KEYS),
+     ("camera", LOCKED_INTENT + "，一镜到底；射灯亮度不变；橱窗玻璃里不出现她的倒影", 0, CAMERA_KEYS),
+     ("no-new-graphics", NO_TEXT, 0, LABEL_KEYS)],
+    dialogue=_sung("Eleven days, the lights go low Top models paused, no tools, no show October", 0.22, 8.12,
+                   "很轻地对着镜头唱出这几句，口型与参考人声逐字同步"), take_margin_seconds=1,
+    identity_continuity="人物身份与左耳装置位置一致（v4身份锚点F1a）；本镜她裹在防尘布里，看不见衣服")
+
+SPECS["INS41"] = clip_spec("INS41", "p041-ins41", "54bffc0941fa0bc71b755011f6e938d2e21368d951afaee3e826cde4dc71985d", 4,
+    "C", "first_frame", _board_scene("dept-store-window-mannequin", "夜里的百货橱窗，最前面一具无脸素色人台，后面的人台都盖着布",
+                                     time="深夜", mood="冷、安静、一个动作"), "最前面一具没有五官的素色人台", {
+        "open": "INS41首帧：画面中间是最前面一具没有五官的素色人台，两只穿黑色长袖的手从画面上方把撑开的本白粗亚麻防尘布举在它头顶",
+        "close": "布盖住人台的头和肩垂好，两只手停在画面上方，机位与构图不变",
+        "action_start": "两只手把撑开的防尘布举在人台头顶", "progression": "两只手把布往下一拉，布落下来盖住人台的头和肩",
+        "endpoint": "布慢慢垂好，两只手松开布，停在画面上方", "camera": LOCKED_INTENT,
+        "framing": "INS41首帧：人台胸像", "start_framing": "INS41首帧原始构图", "end_framing": "与起始相同的构图",
+        "light": "橱窗里的射灯与玻璃外的街灯", "ambience": MO_AMBIENCE, "space": "人台在画面中间原位，手在画面上方",
+        "motion_peak": "布落下盖住人台",
+        "natural": ["人台始终没有五官和脸", "后面的人台一直盖着布，不动", "橱窗玻璃里没有倒影", "画面里没有任何红色"],
+        "open_event": ("两只手把布往下一拉", "镜头固定不动"), "close_event": ("盖住人台的头和肩，慢慢垂好", "两只手松开布，停在画面上方")},
+    {"trigger": "Top models paused", "visible_response": "防尘布被拉下来盖住人台的头和肩", "gaze_target": "画面里没有人脸",
+     "body_behavior": "只露出两只穿黑色长袖的手", "hand_behavior": "两只手把布往下一拉，松开后停在画面上方",
+     "terminal_performance_state": "布盖住人台垂好"},
+    {"subject_id": "front-mannequin", "relation_kind": "fixed_frame", "start_relation": "人台在画面中间，布举在它头顶",
+     "end_relation": "构图与机位不变，布盖住人台"},
+    [("performance", "两只穿黑色长袖的手把撑开的防尘布往下一拉，布落下盖住人台的头和肩、慢慢垂好；手松开后停在画面上方；人台没有五官；"
+                     "不新增人物", 0, PERFORMANCE_KEYS),
+     ("camera", LOCKED_INTENT + "，保持首帧构图；橱窗玻璃里没有倒影", 0, CAMERA_KEYS), ("no-new-graphics", NO_TEXT, 0, LABEL_KEYS)],
+    iris=False, palette="冷灰色调与琥珀色街灯；画面里没有任何红色", take_margin_seconds=1)
+
+SPECS["SG19"] = clip_spec("SG19", "p042-w2", "e20620659333e0987b5de00757707866dafc72cd0d15ed1cc19986c6de3ff364", 5, "W1",
+    "multimodal", _board_scene("dept-store-window-lit", "同一个百货橱窗，射灯全亮，四周是盖着本白防尘布的人台", time="深夜",
+                               mood=LC_MOOD), "中景", {
+        "open": ("SG19参考图：中景，她穿造型W1（黑色及膝长靴）站在灯全亮的橱窗里正对镜头，本白防尘布已从她肩上滑下、堆在腰后正慢慢往下滑落；"
+                 "寻呼机和空白工牌挂在身前的腰链上，嘴唇闭着"),
+        "close": "唱完这一句之后防尘布才落到她脚边，她站直对着镜头，机位与构图不变",
+        "action_start": "防尘布从她肩上滑下，堆在腰后，正慢慢往下滑落",
+        "progression": "她站直，对着镜头唱，口型与参考人声逐字同步；防尘布一直顺着她的腿慢慢往下滑（185.585 剪切点约片内 0.92 s 时布正落下）",
+        "endpoint": "唱完这一句之后防尘布才落到她脚边，双手垂在身侧", "camera": LOCKED_INTENT,
+        "framing": "SG19参考图：中景，她在橱窗里", "start_framing": "SG19参考图原始构图", "end_framing": "与起始相同的构图",
+        "light": "橱窗里全亮的射灯", "ambience": SG_AMBIENCE, "space": "她始终站在橱窗里原位", "motion_peak": "防尘布顺着她的腿慢慢往下滑",
+        "natural": ["黑色及膝长靴", "不弯腰捡布，双手垂在身侧", "嘴前没有任何遮挡", "寻呼机和工牌一直挂在她身前的腰链上",
+                    "画面里没有镜子，不出现她的倒影"],
+        "open_event": ("她站直，对着镜头唱", "逐字精确同步"),
+        "close_event": ("防尘布一直顺着她的腿慢慢往下滑，唱完这一句之后才落到她脚边", "她一直站在原地，不转身")},
+    iris_performance("桥段：十月一日，回来", "她站直对着镜头唱，口型与参考人声逐字同步；防尘布慢慢往下滑，唱完这一句之后才落到脚边", "镜头",
+                     "站在原地，始终不转身、不弯腰", "双手垂在身侧", "站直唱完这一句", "面无表情，带着一点好奇"),
+    _fixed("中景，她站在橱窗里正对镜头", "构图与机位不变"),
+    _lipsync_rules(LIPSYNC, look="W1"),
+    dialogue=_sung("October one, back to play", 0.3, 3.11, "站直对着镜头唱出这一句，口型与参考人声逐字同步"), take_margin_seconds=1)
+
+# MO15: the first frame has her LEFT hand on the hangers (P046/x); the user's note says the prompt must say 左手
+# Continuity fix 2026-11-24 (pilot/s031-048/issues): SG16 p037-c2 = P037/d + the S037A microwave (bounded composite, her
+# pixels unchanged; it goes dark on "Killed at twelve thirty-four", after INS37 pulls the plug); INS37 p037-ins37b = INS37/b
+# mirrored losslessly (the engineer phones with his right hand, so his left presses, from the left; socket on the left wall);
+# SG19 p042-w2 / MO15 p046-w2 = knee-high boots as W1 defines (bounded composites; MO15 also hangers bunched at her end).
+# Design files excerpt/flash/design/S31-48/CONT1124/. Pending the user's re-approval.
+# (logs/decisions.md 2026-11-24). Her left ear is turned away (P046/x shows the right ear, no device), so no red at all.
+SPECS["MO15"] = clip_spec("MO15", "p046-w2", "90ddcb4f2b5e4d2f1c21617e7bf5552dc45b1d8fb06e7d06a40092c27fcfbdf9", 6, "W1",
+    "first_frame", _board_scene("fitting-room-rail", "试衣间里的挂衣杆，杆的另一头是隔板，隔板那边是她的副本", time="白天",
+                                mood=LC_MOOD), "左手搭在杆上那一排衣架上", {
+        "open": ("MO15首帧：她侧身站在试衣间的挂衣杆前，左手搭在杆上那一排衣架上，衣架都挤在靠她这一头，靠隔板那段杆是空的；隔板上方露出另一只穿灰色长袖的手，拿着表盘空白的秒表；"
+                 "寻呼机和空白工牌挂在她身前的腰链上"),
+        "close": "她仍面向挂衣杆站在隔间里，隔板上方那只手拿着秒表，构图不变",
+        "action_start": "她左手搭在衣架上", "progression": "用左手一把把所有衣架推到隔板那头，拉回来，再换个节奏推一次",
+        "endpoint": "每推一次，隔板上方那只手按一下秒表", "camera": LOCKED_INTENT,
+        "framing": "MO15首帧：她在挂衣杆前", "start_framing": "MO15首帧原始构图", "end_framing": "与起始相同的构图",
+        "light": "试衣间顶上的灯片", "ambience": MO_AMBIENCE, "space": "她始终站在隔间里的挂衣杆前",
+        "motion_peak": "一把把所有衣架推到隔板那头",
+        "natural": ["隔板那边始终只露出那一只手，不露出头和脸", "衣服上没有吊牌、标签或字", "秒表表盘空白，没有数字",
+                    "她的左耳一直在头的另一侧，画面里看不到", "画面里没有任何红色"],
+        "open_event": ("她用左手一把把所有衣架推到隔板那头", "镜头固定不动"),
+        "close_event": ("隔板上方那只手按一下秒表", "她一直面向挂衣杆，不转身，不走出隔间")},
+    iris_performance("念白：一个把数据踢出缓存", "用左手把衣架一把推到隔板那头，拉回来，再换个节奏推一次", "挂衣杆",
+                     "面向挂衣杆站着，始终不转身、不走出隔间", "左手推衣架、拉回、再推", "仍面向挂衣杆站着", "面无表情"),
+    _fixed("她在挂衣杆前，隔板在画面右侧", "构图与机位不变"),
+    _motion_rules("她用左手一把把所有衣架推到隔板那头，拉回来，再换个节奏推一次；每推一次，隔板上方那只灰色长袖的手按一下秒表；"
+                  "她一直面向挂衣杆，不转身，不走出隔间；隔板那边只露出一只手，不露出头和脸；不新增人物", look="W1"),
+    take_margin_seconds=1, palette="冷白和灰色的室内灯光；画面里没有任何红色（本镜看不到左耳耳挂）")
+
+# SG20: the vocal stops at 208.80 (no "All"); the edit holds her still with the mouth closed to 209.34, 4.10 s into the
+# take, so the take is 6 s (4.10 s + 1 s, rounded up): margin 2 over ceil(3.559). 2026-11-25 r2: first frame p048-w2
+# (= CONT1124/p048-arm-b-comp: p048-w1 with only the left arm / jacket drape replaced, W1 left arm bare shoulder to wrist).
+SPECS["SG20"] = clip_spec("SG20", "p048-w2", "c31412c3ba0260f5c6937b8ce6ecf4cd8d1eef4c1a038ecc9fb082da94818c32", 6, "W1",
+    "multimodal", _board_scene("fitting-room-partition", "试衣间隔板旁铺着地毯的地面，背后是镜子和衣架", time="白天", mood=LC_MOOD),
+    "中近景", {
+        "open": "SG20参考图：中近景，她单膝跪在试衣间隔板旁的地毯上，身体微微前倾，看着镜头，嘴唇闭着；寻呼机和空白工牌挂在身前的腰链上",
+        "close": "说完嘴闭上，一动不动，一直看着镜头，机位与构图不变",
+        "action_start": "她跪在隔板旁看着镜头，嘴唇闭着", "progression": "很轻地、平平地对着镜头说一句话，口型与参考人声逐字同步",
+        "endpoint": "说完嘴闭上，一动不动", "camera": LOCKED_INTENT,
+        "framing": "SG20参考图：中近景，她跪在隔板旁", "start_framing": "SG20参考图原始构图", "end_framing": "与起始相同的构图",
+        "light": "试衣间顶上的筒灯", "ambience": SPOKEN_AMBIENCE, "space": "她始终跪在隔板旁原位", "motion_peak": "说完后静止",
+        "natural": ["嘴前没有任何遮挡", "她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖", "寻呼机和工牌一直挂在她身前的腰链上",
+                    "背后的镜子里只有衣架，不出现她的倒影"],
+        "open_event": ("她很轻地、平平地对着镜头说一句话", "逐字精确同步"), "close_event": ("说完嘴闭上，一动不动", "一直看着镜头")},
+    iris_performance("念白：他们被告诉了是哪道缝", "很轻地、平平地对着镜头说一句话，口型与参考人声逐字同步；说完嘴闭上一动不动", "镜头",
+                     "单膝跪在隔板旁，始终不动", "双手不进画面中心，不挡嘴", "嘴闭着一动不动，看着镜头", "面无表情"),
+    _fixed("中近景，她跪在隔板旁", "构图与机位不变"),
+    _lipsync_rules(LIPSYNC_SPOKEN, look="W1"),
+    dialogue=_sung("they were told which crack.", 0.88, 3.53, "对着镜头平平地说出这一句，口型与参考人声逐字同步"),
+    take_margin_seconds=2)
+
+# r4 (2026-11-25; 「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」, logs/decisions.md, after the SG17 A/B probe:
+# B's {English lines} gave much better words, every take re-voiced and the mouth ran 0.6-1.0 s late). SG16 / SG18 / SG20
+# are re-cut into one short window per edit span of pilot/s031-048/plan: SG16x s037b, SG16y s037d, SG18x s041a, SG18y
+# s041c, SG20x s048. Each is the board clip (clip=, coverage_unit=), its r3 first frame, and its own song_window: ~0.3 s
+# before the span's first word, else where the previous word ends (SG16x 161.338 "up.", SG18x 178.134 "Eleven"), never
+# after the in-point (SG16y 165.071: the 0.3 s point and the end of "Killed" both fall in it / after it), SG18y 183.66
+# (the sung "no" rings to ~183.64 past its 183.46 word end; 183.66 is the dip before "show"), SG20x 205.819 ("they"
+# 206.119 - 0.3; the 205.241 in-point is her still, closed mouth); to the span's last word end (SG20x 208.80, before
+# "All"). Vocal pilot/audio/<UNIT>p.wav = the stem cut + digital silence to exactly the take; take = max(4, ceil(span end
+# - window start + 1.0 s)), the 1.0 s being the probe's latest mouth onset (SG20x 5 s, the rest 4 s). Prompts: the probe's
+# minimal arm from each r3 first-frame sentence + braced_line ({} = the window's exact words, the prompt_language_ok
+# exemption); no line-bound action (bowl, microwave, hand: the edit and INS37 / INS41). Page pilot/s031-048/r4/index.html
+# (built by r4/build.py); takes sd-<UNIT>-r-1|2.
+R4_UNITS = {   # unit: (board clip, edit span it serves, song_window, take seconds, braced_line, dialogue start / end in the window)
+    "SG16x": ("SG16", "s037b", (161.338, 163.523), 4, "Stop it? Let it stay? It doesn't", 0.04, 2.19),
+    "SG16y": ("SG16", "s037d", (165.071, 166.468), 4, "at twelve thirty-four.", 0.06, 1.4),
+    "SG18x": ("SG18", "s041a", (178.134, 180.365), 4, "days, the lights go low", 0.18, 2.23),
+    "SG18y": ("SG18", "s041c", (183.66, 185.609), 4, "show October", 0.12, 1.95),
+    "SG20x": ("SG20", "s048", (205.819, 208.8), 5, "they were told which crack.", 0.3, 2.95),
+}
+R4_SCENE = {   # board clip: (r3 first-frame sentence, image purpose in it, speak / sing, she stays put, the shot's rules)
+    "SG16": ("{{image:0}}中的她坐在员工茶水间的料理台上，双手捧着放在腿上的麦片碗，勺子在碗里，看着镜头，嘴唇闭着；画面左缘是值班工程师的"
+             "后脑、牛仔外套的肩和举着手机贴在耳边的手；她身边台面上的不锈钢微波炉在转，炉内亮着暖黄的光。", "坐在员工茶水间的料理台上",
+             "说", "她一直坐在原地",
+             ["工程师一直举着手机贴在耳边，不转过来，看不到他的脸", "手机背面是素色的，没有标志", "架子上的罐子和杯子没有标签",
+              "咖啡机和水壶上没有亮灯，也没有显示屏", "微波炉的显示屏是黑的，按键面板没有字", "除了她左耳耳挂上的小红灯，画面里没有任何红色"]),
+    "SG18": ("{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，布像高领斗篷一样罩到下巴，"
+             "只露出脸和银白短发，看着镜头，嘴唇闭着。", "一排盖着白防尘布的人台中间", "唱", "她一直站在原地",
+             ["射灯亮度不变", "防尘布一直裹到下巴，看不见布下面的衣服，也看不见她的手", "人台都盖着布，没有脸",
+              "画面里没有镜子，橱窗玻璃里不出现她的倒影", "除了她左耳耳挂上的小红灯，画面里没有任何红色"]),
+    "SG20": ("{{image:0}}中的她单膝跪在试衣间隔板旁的地毯上，中近景，身体微微前倾，看着镜头，嘴唇闭着。", "中近景", "说", "她一直跪在原地",
+             ["说完嘴闭上，一动不动，一直看着镜头", "她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖",
+              "寻呼机和工牌一直挂在她身前的腰链上；寻呼机的液晶屏只有空白的灰绿底光，没有数字和字；工牌是空白的",
+              "背后的镜子里只有衣架，不出现她的倒影", "除了她左耳耳挂上的小红灯，画面里没有任何红色"]),
+}
+
+
+def r4_prompt(unit: str) -> str:
+    """The exact r4 native prompt: first frame, speech / song in sync, the {} lines, camera fixed, stays put, the rules."""
+    clip, lines = R4_UNITS[unit][0], R4_UNITS[unit][4]
+    start, _, verb, stay, rules = R4_SCENE[clip]
+    return (start + f"她对着镜头{'说话' if verb == '说' else verb}，口型与{{{{audio:1}}}}里的人声逐字精确同步。她用英文{verb}：{{{lines}}}不增不减，不翻译。"
+            f"镜头固定不动，{stay}。" + "".join(rule + "。" for rule in rules) + "画面中不得出现任何文字。")
+
+
+for _unit, (_clip, _span, _window, _seconds, _lines, _t0, _t1) in R4_UNITS.items():
+    _r3, (_start, _purpose, _verb, _stay, _rules) = SPECS[_clip], R4_SCENE[_clip]
+    SPECS[_unit] = clip_spec(_unit, _r3["plate"], _r3["plate_sha256"], _seconds, _r3["look"], "multimodal", _r3["scene"],
+        _purpose, {
+            **{k: _r3["intent"][k] for k in ("open", "action_start", "camera", "framing", "start_framing", "end_framing", "light",
+                                             "ambience", "space")},
+            "close": f"{_verb}完，{_stay}看着镜头，机位与构图不变", "progression": f"对着镜头{_verb}，口型与参考人声逐字同步",
+            "endpoint": f"{_verb}完，{_stay}", "motion_peak": f"对着镜头{_verb}（{_span}）", "natural": list(_rules),
+            "open_event": (f"她对着镜头{'说话' if _verb == '说' else _verb}", "逐字精确同步"), "close_event": ("镜头固定不动", _stay)},
+        iris_performance(f"r4 {_span}：{_lines}", f"对着镜头{_verb}，口型与参考人声逐字同步；没有别的动作", "镜头", _stay,
+                         {"SG16": "双手捧着腿上的碗", "SG18": "手一直在布里，不露出来", "SG20": "双手不进画面中心，不挡嘴"}[_clip],
+                         f"{_verb}完，{_stay}看着镜头", "面无表情，带着一点好奇"),
+        _r3["relation"], _r3["rules"],
+        dialogue=_sung(_lines, _t0, _t1, f"对着镜头{_verb}出这段英文，口型与参考人声逐字同步"),
+        clip=_clip, coverage_unit=_clip, vocal=_unit + "p", song_window=list(_window), braced_line=_lines,
+        **{k: _r3[k] for k in ("palette", "identity_continuity") if k in _r3})
+
 def prompt_language_ok(spec: dict, prompt: str) -> bool:
-    """Native prompts are pure Chinese (docs/canvas-continuous-production.md); material markers are native syntax."""
-    return not re.search("[A-Za-z]", re.sub(r"\{\{(?:image|audio|video):\d+\}\}", "", prompt))
+    """Native prompts are pure Chinese (docs/canvas-continuous-production.md); material markers are native syntax.
+    One narrow exemption: a spec with "braced_line" (SG17B, the 2026-11-25 A/B probe, 「先用 SG17 做 A/B 对照
+    (Recommended)」, and the r4 units SG16x / SG16y / SG18x / SG18y / SG20x, 「s039 拼切；剩下照这个写法拍，上限提到 15,000
+    (Recommended)」, logs/decisions.md) may carry exactly that English line once, inside {}."""
+    text = re.sub(r"\{\{(?:image|audio|video):\d+\}\}", "", prompt)
+    if spec.get("braced_line"):
+        text = text.replace("{" + spec["braced_line"] + "}", "", 1)
+    return not re.search("[A-Za-z]", text)
 
 
 # ---------------------------------------------------------------- helpers
@@ -1093,14 +1482,14 @@ def identity_blocks(look: str) -> list[str]:
     if hashlib.sha256((REPO / ANCHOR).read_bytes()).hexdigest() != ANCHOR_SHA256:
         raise Blocked("the v4 identity anchor changed since this lane was written: " + ANCHOR)
     data = board()
-    if look in ("W1", "B"):                       # not a board look: the approved round-1 plate prompts, pinned
+    if look in ("W1", "B", "C"):                  # not a board look: the approved round-1 plate prompts, pinned
         raw = (REPO / ROUND1).read_bytes()
         if hashlib.sha256(raw).hexdigest() != ROUND1_SHA256:
             raise Blocked(f"{ROUND1} changed since this lane was written; re-read it and update ROUND1_SHA256")
         if not all(text in raw.decode("utf-8") for text in (W1_NEAR, W1_FAR, W1_WARDROBE)):
             raise Blocked(f"the W1 identity text is not verbatim in {ROUND1}")
-        if look == "B":                           # the W1 face in the board's look LB
-            return [W1_NEAR, W1_FAR, next(x["text"] for x in data["looks"] if x["id"] == "LB"), None]
+        if look in ("B", "C"):                    # the W1 face in the board's look LB / LC
+            return [W1_NEAR, W1_FAR, next(x["text"] for x in data["looks"] if x["id"] == "L" + look), None]
         return [W1_NEAR, W1_FAR, W1_WARDROBE, None]   # no copies in this look
     looks = [x["text"] for x in data["looks"] if x["id"] == look]
     if len(looks) != 1:
@@ -1113,10 +1502,12 @@ def identity_blocks(look: str) -> list[str]:
 def draft(unit: str) -> Path:
     spec = SPECS[unit]
     root = UNITS / unit
-    clip = board_clip(unit)                       # pinned inputs first (no writes): board clip, spec, coverage
-    window_s = [clip["window"]["t0"], clip["window"]["t1"]]
-    if clip["start_frame"] != spec["plate"] or math.ceil(clip["seconds"]) + spec.get("take_margin_seconds", 0) != spec["duration"] or (
-            clip["tier"] == "sung") != bool(spec.get("audio")):
+    clip = board_clip(spec.get("clip", unit))     # pinned inputs first (no writes): board clip, spec, coverage
+    own = spec.get("song_window")                 # r4: a short window over one edit span, its vocal padded to the take
+    window_s = own or [clip["window"]["t0"], clip["window"]["t1"]]
+    take_ok = own[1] - own[0] <= spec["duration"] if own else (
+        math.ceil(clip["seconds"]) + spec.get("take_margin_seconds", 0) == spec["duration"])
+    if clip["start_frame"] != spec["plate"] or not take_ok or (clip["tier"] == "sung") != bool(spec.get("audio")):
         raise Blocked(f"{unit} spec (plate {spec['plate']}, {spec['duration']} s, {spec['input_mode']}) is not the board "
                       f"clip (plate {clip['start_frame']}, {clip['seconds']} s, {clip['tier']})")
     if not COVERAGE.is_file():
@@ -1208,7 +1599,7 @@ def draft(unit: str) -> Path:
         window = windows["windows"][audio["window"]]
         if window["path"] != rel or window["sha256"] != sha:
             raise Blocked("approved vocal is not the sealed window in " + VOCALS)
-        if window["song_window"] != window_s:     # cut from exactly this clip's generation window
+        if window["song_window"] != window_s:     # cut from exactly this clip's generation window (r4: the spec's own)
             raise Blocked(f"sealed vocal window {window['song_window']} is not the board clip window {window_s}")
         with wave.open(str(REPO / rel)) as wav:
             sr, n = wav.getframerate(), wav.getnframes()
@@ -1218,6 +1609,8 @@ def draft(unit: str) -> Path:
         millis = round(n * 1000 / sr)
         if not model.min_media_millis <= millis <= min(model.max_audio_millis, secs * 1000):
             raise Blocked(f"vocal window is {millis} ms; it must fit the model bound and the {secs} s take")
+        if own and millis != secs * 1000:         # r4: voice + digital silence is exactly the take (audio = generation)
+            raise Blocked(f"padded vocal is {millis} ms; it must be exactly the {secs} s take")
         item = {"asset_id": aid, "path": rel, "sha256": sha, "size_bytes": len(raw), "kind": "audio",
                 "duration_millis": millis, "sample_rate_hz": sr, "role": f"approved {Path(rel).name}: the vocal",
                 "derived_from": {"path": windows["source"], "song_window_seconds": window["song_window"],

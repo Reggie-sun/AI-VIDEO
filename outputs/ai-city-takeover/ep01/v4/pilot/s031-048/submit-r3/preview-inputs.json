@@ -1,0 +1,940 @@
+{
+ "schema": "iris-v4-preview-inputs/s031-048-r3-1",
+ "range_s": [
+  134.4435,
+  209.3395
+ ],
+ "method": "Seedance 2.0 VIP 4k（使用者 2026-11-17：画质最高/积分随便用）",
+ "director_plan": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/plan/index.html",
+  "sha256": "d3110cdbe4bfad23abd77ff082f34bc7e3511afae7674e4b6104b3832953430c"
+ },
+ "first_frame_preview": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/preview/index.html",
+  "sha256": "4454844f931a8088fc61b8c186a9896ed51d13063d0a52e47d004d65a0541ebe"
+ },
+ "base_pack": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/preview-inputs.json",
+  "sha256": "1772a88f222674703db7ca3ca2a30816e1cf2d86be2e3b230afa26f03977f828"
+ },
+ "supersedes": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r2/preview-inputs.json",
+  "sha256": "782f3bd92fab8c6c8cb76ba8350705c05d004b63b2a3cbbb6a411cf1b61dceb7"
+ },
+ "source_prompt_file": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md",
+ "source_prompt_file_sha256": "9040e687cfa8d6f5aa4b6339250faa6c636da4e525d2f5fc154e0b6858a5530b",
+ "board": {
+  "path": "outputs/ai-city-takeover/ep01/v4/board/shots.json",
+  "sha256": "15662cca27d3e3ee68ddc20737ecd04d9004dfb9e5d444085c1c69d082fc744c"
+ },
+ "patch": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/PATCH.md",
+ "plan": "每 unit 同一首帧拍 2 条，过逐镜 Gate 后挑一条；每条一次不重试",
+ "cost_basis": "4k 每秒 80 积分；单条上限 = 该价向上取整到百（与 submit/ 包同一口径，秒数不变）",
+ "total_seconds_per_take_set": 42,
+ "estimated_total_CRD": 6720,
+ "ceiling_per_take_sum_CRD": 3500,
+ "ceiling_total_CRD": 7000,
+ "new_over_plan": {
+  "unit": "SG12",
+  "estimated_CRD": 1440,
+  "ceiling_CRD": 1600,
+  "why": "SG12 原计划的 2 条已用掉（a-1 720、a-3 720；a-2 known_no_effect 未扣费），b-1 / b-2 是新增"
+ },
+ "units": [
+  {
+   "shot": "s031",
+   "unit": "SG12",
+   "clip": "SG12",
+   "mode": "multimodal",
+   "look": "C",
+   "take_tag": "b",
+   "song_span_s": [
+    134.4435,
+    141.2934
+   ],
+   "generation_window_s": [
+    133.873,
+    141.2934
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p031-c1.png",
+    "sha256": "3357a872a67fe8ee8e34928b4279413e3501f233956f3a8bd76b6957d70dcedf",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P031/a.png"
+   },
+   "prompt": "{{image:0}}中的她站在地下一层走廊里那排旧自动售货机旁，正对镜头，右手捏着一张折起来的素色纸币垂在腰前，纸币上没有任何印花、字或数字，嘴唇闭着。她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步；说出第一个词的同时用左手把风衣腰带一拉收紧，手一直在腰间；右手一直捏着纸币垂在腰前。她一直看着镜头，不转头，不转身。中景，镜头固定不动。她一直站在原地，不走动。嘴前没有任何遮挡。售货机里的商品是素色的，没有包装文字、标志或价签；售货机的小显示屏是黑的，不亮。走廊里没有出口灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "07e48aa0d6684d5a2faf66d46c4523229ce331bd90d55a197b2e3775e8bc2400",
+   "previous_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "205e592263c519b29257e80dfbd6e7e181a1e80f9ee12c38d4f75c9d0063eb73"
+   },
+   "base_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "205e592263c519b29257e80dfbd6e7e181a1e80f9ee12c38d4f75c9d0063eb73"
+   },
+   "ordinal_binding": null,
+   "required_phrases": [
+    "中景",
+    "对着镜头平平地说话",
+    "逐字精确同步",
+    "右手一直捏着纸币垂在腰前",
+    "她一直看着镜头，不转头，不转身",
+    "说出第一个词的同时用左手把风衣腰带一拉收紧",
+    "纸币上没有任何印花、字或数字",
+    "嘴前没有任何遮挡",
+    "售货机的小显示屏是黑的，不亮",
+    "走廊里没有出口灯"
+   ],
+   "seconds": 9,
+   "take_margin_seconds": 1,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 720,
+   "ceiling_per_take_CRD": 800,
+   "plan": {
+    "s031a": {
+     "time": "134.444–136.266 1.82 s",
+     "lyric": "(Septem)ber twentieth. The search tool",
+     "kind": "视频 SG12（念白 multimodal，生成 9 s）",
+     "picture": "银灰长风衣首次出场。她站在地下一层旧售货机旁，正对镜头；134.444 小节线上左手把风衣腰带一拉收紧（穿衣动作入场，LOOK C 卡落在这一下），平平地说 “…ber twentieth. The search tool”；最后眼睛往售货机那边一瞟。",
+     "why": "段落强拍 + 新造型新地点；“画面随台词到来”。眼睛一瞟把镜头交出去（作者 S0001→S0002 的睁眼→交出）。",
+     "why_motion": "视频：对镜头念白（EV 念白直视镜头用 V1）+ 收腰带的面料动作，静图给不了。",
+     "graphics": "LOOK C 卡（左上一行）在 134.444；工单卡 INC-0920 · SEP 20。字幕放她对侧（左下），不压脸。",
+     "blur": "A",
+     "look": "LC 银灰长风衣（立领竖起、下摆到小腿、腰带松结；黑高领、黑阔腿裤、黑尖头短靴）；开场脸；左耳耳挂红灯。不挂寻呼机。",
+     "cls": "v"
+    },
+    "s031c": {
+     "time": "139.923–141.293 1.37 s",
+     "lyric": "No luck.",
+     "kind": "视频 SG12（念白 multimodal，生成 9 s）",
+     "picture": "切回同一条：片段已往前走，她把被吐回来的纸币塞进风衣口袋，平平地说 “No luck.”，眼睛看向画面外的出口。",
+     "why": "A–B–A 切回（139.923 小节线，hits 0.41）。眼睛看向出口，引出下一镜的保安手掌。",
+     "why_motion": "视频：同一条 SG12 的后段，对镜头念白 + 收纸币。",
+     "graphics": "“NO LUCK” 小字随词出现、到切点退场。",
+     "blur": "A",
+     "look": "同 s031a。",
+     "cls": "v"
+    }
+   },
+   "plan_unit": {
+    "shots": "s031a、s031c",
+    "type": "念白 multimodal",
+    "gen": "9 s × 2 ≈ 1440 积分",
+    "frame_vocal": "首帧 p031 改（见下）。人声 133.87–141.293 s（September 前 0.3 s 起），生成 +1 s 余量。",
+    "prompt_points": "「{{image:0}}中的她站在图书馆地下一层那台旧自动售货机旁，正对镜头，右手捏着一张折起来的纸币垂在腰前，嘴唇闭着。」开头她用左手把风衣腰带一拉收紧；对着镜头平平地说话，口型与人声逐字同步；最后把纸币塞进风衣口袋，只用眼睛往画面左侧瞟一眼，不转头不转身。镜头固定。售货机的显示屏是黑的、没有字；机器里的商品没有包装文字、标志或价签；墙上没有出口灯。 每条另附：除了她左耳耳挂上的小红灯，画面里没有任何红色；画面中不得出现任何文字。",
+    "risks": "售货机、商品、价签会长字；红色出口灯；收腰带时手挡嘴；看出口时转头；念白口型（SG08 两条一条全闭嘴一条改词）。",
+    "gate": "用到的段：134.444–136.266（口型 ber twentieth / The search tool + 收腰带）、139.923–141.293（No luck + 塞口袋 + 眼神）。中间 3.66 s 被售货机静图盖住。"
+   },
+   "lesson_risks": [
+    "a-3 说成中文：prompt 引了歌词译文。r3 起不引任何歌词原文或译文、不加引号，动作只按句序写；Gate 先听她说的是不是英语",
+    "念白口型最不稳（s015–s030 SG08 一条全闭嘴、一条改词；SG11 只对上前 2 s）→ 只验收 134.44–136.27、139.92–141.29 两段",
+    "人声尾巴含下一句 “It as-” 约 0.21 s（方案窗口止于 141.293 切点），切点前嘴可能张开",
+    "售货机商品与小屏会长字、走廊出口灯会出红",
+    "收腰带的手离嘴近；r3 去掉塞纸币和瞟眼，纸币一直捏在腰前，看向售货机交给剪辑",
+    "a-1 首词疑唱错、s031a 段嘴晚约 4 帧；a-1 / a-3 第四句后转头不回——r3 写明一直看着镜头，不转头"
+   ],
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG12.wav",
+    "sha256": "654f8d48cd7baf5b8a11ad4fe93c763a4bd2b4b98a1fca3d099631eebd48701b",
+    "seconds": 7.42,
+    "song_window_s": [
+     133.873,
+     141.2934
+    ],
+    "clip_words": [
+     "September",
+     "twentieth.",
+     "The",
+     "search",
+     "tool",
+     "came",
+     "back",
+     "with",
+     "junk.",
+     "Google,",
+     "Bing",
+     "and",
+     "DuckDuckGo:",
+     "three",
+     "errors.",
+     "No",
+     "luck.",
+     "It",
+     "asked"
+    ],
+    "sentences": [
+     {
+      "text": "September twentieth.",
+      "start": 0.3,
+      "end": 1.51,
+      "complete": true
+     },
+     {
+      "text": "The search tool came back with junk.",
+      "start": 1.67,
+      "end": 3.56,
+      "complete": true
+     },
+     {
+      "text": "Google, Bing and DuckDuckGo: three errors.",
+      "start": 3.74,
+      "end": 6.27,
+      "complete": true
+     },
+     {
+      "text": "No luck.",
+      "start": 6.71,
+      "end": 7.19,
+      "complete": true
+     },
+     {
+      "text": "It asked",
+      "start": 7.21,
+      "end": 7.61,
+      "complete": false
+     }
+    ],
+    "lyric_text": "September twentieth. The search tool came back with junk. Google, Bing and DuckDuckGo: three errors. No luck. It asked",
+    "dialogue_s": [
+     0.3,
+     7.42
+    ]
+   }
+  },
+  {
+   "shot": "s036",
+   "unit": "SG15",
+   "clip": "SG15",
+   "mode": "multimodal",
+   "look": "C",
+   "take_tag": "a",
+   "song_span_s": [
+    155.9336,
+    159.5907
+   ],
+   "generation_window_s": [
+    155.76,
+    159.5907
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p036-c1.png",
+    "sha256": "27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P036/x.png"
+   },
+   "prompt": "{{image:0}}中的她站在阅览室中央的过道里，身体朝向镜头，右手把一台黑色老式寻呼机攥在腰前，寻呼机的液晶屏只有空白的灰绿底光；画面左侧一位中年读者坐在木椅上，侧身抬头看她；她嘴唇闭着。她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步。说到第三句时她只垂下眼睛看那位读者，不转头；读者连人带椅子往身后的桌子挪过去，让出过道。她一直站在原地，不走动，不转身。中景，镜头固定不动。嘴前没有任何遮挡。后面的读者一直低头看书。寻呼机屏幕没有数字和字，不亮红灯。书脊都是素色的，没有字；阅读灯是绿玻璃灯罩，只亮暖白光。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "cc4e4aa499d968069e8cf362e489106c85559bc28c204b333c291f216409a834",
+   "previous_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r2.md",
+    "sha256": "6fd10c2fd0f347c75bebfe3d6afa2561e8a3d01c7917c507e7ed8052e161d38e"
+   },
+   "base_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "80348f7686f71125b7444eb4cc638e8d6efaa562f00025c4fec7874428f4144b"
+   },
+   "ordinal_binding": {
+    "ordinal": 3,
+    "text": "说到第三句时",
+    "sentence_starts_with": "Out"
+   },
+   "required_phrases": [
+    "中景",
+    "对着镜头平平地说话",
+    "逐字精确同步",
+    "读者连人带椅子往身后的桌子挪过去，让出过道",
+    "她一直站在原地，不走动，不转身",
+    "说到第三句时她只垂下眼睛看那位读者，不转头",
+    "嘴前没有任何遮挡",
+    "寻呼机屏幕没有数字和字，不亮红灯",
+    "书脊都是素色的，没有字"
+   ],
+   "seconds": 5,
+   "take_margin_seconds": 1,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 400,
+   "ceiling_per_take_CRD": 400,
+   "plan": {
+    "s036a": {
+     "time": "155.934–156.851 0.92 s",
+     "lyric": "Ten oh two:",
+     "kind": "视频 SG15（念白 multimodal，生成 6 s）",
+     "picture": "阅览室过道：她站着，寻呼机攥在腰前，液晶亮着空白灰绿光；坐着的读者把椅子横在她前面。她对镜头说 “Ten oh two:”。",
+     "why": "换地点，切在 155.934 拍（Ten 155.88）。",
+     "why_motion": "视频：对镜头念白。",
+     "graphics": "工单卡在这里准备放大。",
+     "blur": "A",
+     "look": "LC；开场脸；寻呼机首次出现在她手里（屏空白）。",
+     "cls": "v"
+    },
+    "s036c": {
+     "time": "157.768–159.591 1.82 s",
+     "lyric": "Pager screams. Out of my way.",
+     "kind": "视频 SG15（念白 multimodal，生成 6 s）",
+     "picture": "切回同一条：她低头对读者说 “Pager screams. Out of my way.”；158.232 小节线（hits 0.31）他把椅子往里一拉给她让出路。她原地不动，离开交给剪辑。",
+     "why": "A–B–A 切回，157.768 拍（Pager 157.75）。",
+     "why_motion": "视频：对人说话 + 对方的动作。",
+     "graphics": "Pager screams 上寻呼机图标在工单卡上闪一次；字幕放她对侧。",
+     "blur": "A",
+     "look": "同 s036a。读者：无名中年读者，无胸牌。",
+     "cls": "v"
+    }
+   },
+   "plan_unit": {
+    "shots": "s036a、s036c",
+    "type": "念白 multimodal",
+    "gen": "6 s × 2 ≈ 960 积分",
+    "frame_vocal": "首帧 p036 改。人声 155.58–159.591 s（Ten 前 0.3 s）。",
+    "prompt_points": "「{{image:0}}中的她站在阅览室中央过道里，身体朝向镜头，右手把一台黑色老式寻呼机攥在腰前，液晶屏亮着空白的灰绿光；她左前方一位坐着的读者把椅子横在过道上，抬头看她；她嘴唇闭着。」她对着镜头平平地说话，口型同步；说最后一句时她低眼看那位读者，读者把椅子往桌子里拉，让出过道；她一直站在原地，不走动，不转身。镜头固定。书脊都是素色没有字，桌上没有屏幕；阅读灯是绿玻璃罩。 每条另附：除了她左耳耳挂上的小红灯，画面里没有任何红色；画面中不得出现任何文字。",
+    "risks": "读者区书脊长字；寻呼机屏出数字或红光；她迈步走向镜头（板子原写法，已删）；低眼时转头遮嘴。",
+    "gate": "用到 155.934–156.851（Ten oh two）、157.768–159.591（Pager screams. Out of my way + 让椅子）。"
+   },
+   "lesson_risks": [
+    "a-3 说成中文：prompt 引了歌词译文。r3 起不引任何歌词原文或译文、不加引号，动作只按句序写；Gate 先听她说的是不是英语",
+    "窗口起点 155.76（“Ten” 前 0.12 s）：方案的 155.58 落在 “call.” 里，cut_audio 拒切，按 SG08/SG09m 先例从上一词结束处起；生成因此 5 s（方案 6 s）",
+    "人声尾巴含下一句 “Ten” 约 0.06 s",
+    "寻呼机液晶会出数字或红光；书脊会长字",
+    "低眼看读者时转头遮嘴（已写只动眼）；读者挪椅可能带出别的动作",
+    "“最后一句”有歧义（窗口尾巴带下一句 Ten）；r3 绑“说到第三句时”（Out of my way，片内约 2.79 s）"
+   ],
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG15.wav",
+    "sha256": "d4317a2e9d22e3c619a8face8aafecf7ac4cc41086d4cf9a8eca5db9e34e070d",
+    "seconds": 3.83,
+    "song_window_s": [
+     155.76,
+     159.5907
+    ],
+    "clip_words": [
+     "Ten",
+     "oh",
+     "two:",
+     "P",
+     "zero.",
+     "Pager",
+     "screams.",
+     "Out",
+     "of",
+     "my",
+     "way.",
+     "Ten"
+    ],
+    "sentences": [
+     {
+      "text": "Ten oh two: P zero.",
+      "start": 0.12,
+      "end": 1.75,
+      "complete": true
+     },
+     {
+      "text": "Pager screams.",
+      "start": 1.99,
+      "end": 2.71,
+      "complete": true
+     },
+     {
+      "text": "Out of my way.",
+      "start": 2.79,
+      "end": 3.57,
+      "complete": true
+     },
+     {
+      "text": "Ten",
+      "start": 3.78,
+      "end": 3.96,
+      "complete": false
+     }
+    ],
+    "lyric_text": "Ten oh two: P zero. Pager screams. Out of my way. Ten",
+    "dialogue_s": [
+     0.12,
+     3.83
+    ]
+   }
+  },
+  {
+   "shot": "s037",
+   "unit": "SG16",
+   "clip": "SG16",
+   "mode": "multimodal",
+   "look": "C",
+   "take_tag": "a",
+   "song_span_s": [
+    161.4135,
+    166.4755
+   ],
+   "generation_window_s": [
+    161.338,
+    166.4755
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p037-c2.png",
+    "sha256": "e6772d8ed350cb880170100f303c569bd35fe4770530426005364270161d5794",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p037-mw-b-comp.png"
+   },
+   "prompt": "{{image:0}}中的她坐在员工茶水间的料理台上，双手捧着放在腿上的麦片碗，勺子在碗里，看着镜头，嘴唇闭着；画面左缘是值班工程师的后脑、牛仔外套的肩和举着手机贴在耳边的手；她身边台面上的不锈钢微波炉在转，炉内亮着暖黄的光。她一直看着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步；说到第四句时，微波炉的灯熄灭、转盘停下，她把碗放到身边的台面上。她一直坐在原地，不转头，不转身。工程师一直举着手机贴在耳边，不动，不转过来，看不到他的脸。中景，镜头固定不动。嘴前没有任何遮挡。手机背面是素色的，没有标志；架子上的罐子和杯子没有标签；咖啡机和水壶上没有亮灯，也没有显示屏；微波炉的显示屏是黑的，按键面板没有字。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "b62e1021a959a5f84e4d21c0b538e2ed3df387a0e34d67df960000a3cf0dd4f3",
+   "previous_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "80ce1e0226410f65188f1cc3f0ad94eb5f19c652f9bcabccd3cf8f452fb4ddb5"
+   },
+   "base_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "80ce1e0226410f65188f1cc3f0ad94eb5f19c652f9bcabccd3cf8f452fb4ddb5"
+   },
+   "ordinal_binding": {
+    "ordinal": 4,
+    "text": "说到第四句时",
+    "sentence_starts_with": "Killed"
+   },
+   "required_phrases": [
+    "中景",
+    "她一直看着镜头平平地说话",
+    "逐字精确同步",
+    "说到第四句时，微波炉的灯熄灭、转盘停下，她把碗放到身边的台面上",
+    "她一直坐在原地，不转头，不转身",
+    "不转过来，看不到他的脸",
+    "嘴前没有任何遮挡",
+    "手机背面是素色的，没有标志",
+    "咖啡机和水壶上没有亮灯，也没有显示屏",
+    "微波炉的显示屏是黑的，按键面板没有字"
+   ],
+   "seconds": 7,
+   "take_margin_seconds": 1,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 560,
+   "ceiling_per_take_CRD": 600,
+   "plan": {
+    "s037b": {
+     "time": "161.413–163.701 2.29 s",
+     "lyric": "Stop it? Let it stay? It doesn't",
+     "kind": "视频 SG16（念白 multimodal，生成 7 s）",
+     "picture": "她坐在料理台上，麦片碗在腿上，一直看着镜头平平地问 “Stop it? Let it stay?”；画面左缘是举着手机的工程师的肩。",
+     "why": "切到说这句的人，161.413 拍（Stop 161.38）。",
+     "why_motion": "视频：对镜头念白，有人在场。",
+     "graphics": "对话框按钮 STOP IT? / LET IT STAY? 在两个问句上出现，光标来回晃；放在工程师那一侧，不压她的脸。",
+     "blur": "A",
+     "look": "LC；开场脸；工程师同上。",
+     "cls": "v"
+    },
+    "s037d": {
+     "time": "165.071–166.476 1.41 s",
+     "lyric": "at twelve thirty-four.",
+     "kind": "视频 SG16（念白 multimodal，生成 7 s）",
+     "picture": "切回她：她把碗放回台面，对镜头说 “at twelve thirty-four.”。",
+     "why": "A–B–A 切回，165.071 拍。",
+     "why_motion": "视频：同一条 SG16 的后段。",
+     "graphics": "KILLED 12:34:30 收进工单卡（P0 · KILLED）。",
+     "blur": "A",
+     "look": "同 s037b。",
+     "cls": "v"
+    }
+   },
+   "plan_unit": {
+    "shots": "s037b、s037d",
+    "type": "念白 multimodal",
+    "gen": "7 s × 2 ≈ 1120 积分",
+    "frame_vocal": "首帧 p037 改并重新取景：她坐在料理台上、碗在腿上，工程师在画面左缘只露肩和举手机的手，微波炉不入画（避免 A′ 里灯亮/灭接不上）。人声 161.08–166.476 s。",
+    "prompt_points": "「{{image:0}}中的她坐在员工茶水间的料理台上，麦片碗放在腿上，勺子在碗里，看着镜头，嘴唇闭着；画面左缘是值班工程师的肩和举着手机贴在耳边的手。」她一直看着镜头平平地说话，口型同步；最后把碗放回身边台面。工程师一直举着手机不动。镜头固定。手机背面是素色没有标志；架子上的罐子没有标签。 每条另附：除了她左耳耳挂上的小红灯，画面里没有任何红色；画面中不得出现任何文字。",
+    "risks": "“对他说”会转头把嘴转走（已改为一直看镜头）；工程师乱动；罐子/手机长字。",
+    "gate": "用到 161.413–163.701（Stop it? Let it stay?）、165.071–166.476（at twelve thirty-four + 放碗）。"
+   },
+   "lesson_risks": [
+    "a-3 说成中文：prompt 引了歌词译文。r3 起不引任何歌词原文或译文、不加引号，动作只按句序写；Gate 先听她说的是不是英语",
+    "窗口起点 161.338（“Stop” 前 0.04 s）：方案的 161.08 落在 “picks” 里，cut_audio 拒切，按 SG08（0.05 s）先例从 “up.” 结束处起",
+    "工程师转过来露脸（只许一张脸）；罐子/手机/咖啡机长字或亮灯",
+    "念白口型（同 SG12）",
+    "首帧加了 S037A 那台微波炉：灯要在第四句（Killed at twelve thirty-four，片内约 3.49 s）熄灭，接 INS37 拔插头；显示屏会长数字"
+   ],
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16.wav",
+    "sha256": "c37372c6517726b504264f88c9e4fdb2d230df6daa65ad748d42019513acc6c0",
+    "seconds": 5.14,
+    "song_window_s": [
+     161.338,
+     166.4755
+    ],
+    "clip_words": [
+     "Stop",
+     "it?",
+     "Let",
+     "it",
+     "stay?",
+     "It",
+     "doesn't",
+     "stop",
+     "by",
+     "itself.",
+     "Killed",
+     "at",
+     "twelve",
+     "thirty-four."
+    ],
+    "sentences": [
+     {
+      "text": "Stop it?",
+      "start": 0.04,
+      "end": 0.4,
+      "complete": true
+     },
+     {
+      "text": "Let it stay?",
+      "start": 0.96,
+      "end": 1.6,
+      "complete": true
+     },
+     {
+      "text": "It doesn't stop by itself.",
+      "start": 1.83,
+      "end": 3.41,
+      "complete": true
+     },
+     {
+      "text": "Killed at twelve thirty-four.",
+      "start": 3.49,
+      "end": 5.13,
+      "complete": true
+     }
+    ],
+    "lyric_text": "Stop it? Let it stay? It doesn't stop by itself. Killed at twelve thirty-four.",
+    "dialogue_s": [
+     0.04,
+     5.13
+    ]
+   }
+  },
+  {
+   "shot": "s039",
+   "unit": "SG17",
+   "clip": "SG17",
+   "mode": "multimodal",
+   "look": "C",
+   "take_tag": "a",
+   "song_span_s": [
+    170.1094,
+    173.7781
+   ],
+   "generation_window_s": [
+    170.1094,
+    173.7781
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p039-c1.png",
+    "sha256": "9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P039/b.png"
+   },
+   "prompt": "{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光贴着地面，横在她右手指尖前；她的左臂搭在膝上，看着镜头，嘴唇闭着。她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步；说到第二句时她把右手手掌平按进那道红光里，门一直关着。她一直蹲在原地，不起身，不转身，身体不前倾挡住嘴。镜头固定不动。嘴前没有任何遮挡。门上没有门牌、号码或标志；书脊都是素色的，没有字。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色；红光不照到她的脸上。画面中不得出现任何文字。",
+   "prompt_sha256": "eec4a799292c843c3aae588ab302908e21401b145ac6e2762db59926380b5b71",
+   "previous_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r2.md",
+    "sha256": "cef851eb6b90ede29ffc165de7910a82fbbef838000960daf517a0bd046e51f1"
+   },
+   "base_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "7ccebd6c1af15cafd26f066db5b8411a000055f3fd20508f760770993891083c"
+   },
+   "ordinal_binding": {
+    "ordinal": 2,
+    "text": "说到第二句时",
+    "sentence_starts_with": "They"
+   },
+   "required_phrases": [
+    "低机位",
+    "对着镜头平平地说话",
+    "逐字精确同步",
+    "说到第二句时她把右手手掌平按进那道红光里",
+    "她一直蹲在原地，不起身，不转身",
+    "门一直关着",
+    "嘴前没有任何遮挡",
+    "门上没有门牌、号码或标志",
+    "红光不照到她的脸上"
+   ],
+   "seconds": 5,
+   "take_margin_seconds": 1,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 400,
+   "ceiling_per_take_CRD": 400,
+   "plan": {
+    "s039": {
+     "time": "170.109–173.778 3.67 s",
+     "lyric": "Bet it couldn't reach outside. They found a gap instead.",
+     "kind": "视频 SG17（念白 multimodal，生成 5 s）",
+     "picture": "低机位：她蹲在一扇关着的员工门前，门缝下一线红光横在她指尖；对镜头说 “Bet it couldn't reach outside. They found a gap instead.”，gap（172.84）上把手掌平按进那道光，门不开。",
+     "why": "新一句，170.109 拍。gap 正好落在 172.849 小节线上，动作在画内完成，不另插镜。",
+     "why_motion": "视频：对镜头念白 + 按进光里的手。",
+     "graphics": "门板上大字 A GAP IN OUR CONTROLS 在 gap 进；红光按拍变宽是后期。",
+     "blur": "A",
+     "look": "LC；开场脸。红色只有耳挂和门缝一线光（规则 gap_ear）。",
+     "cls": "v"
+    }
+   },
+   "plan_unit": {
+    "shots": "s039",
+    "type": "念白 multimodal",
+    "gen": "5 s × 2 ≈ 800 积分",
+    "frame_vocal": "首帧 p039 改。人声 170.00–173.778 s（Bet 前 0.3 s）。",
+    "prompt_points": "「{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光横在她右手指尖前，她看着镜头，嘴唇闭着。」她对着镜头平平地说话，口型同步；说到最后一句时把右手手掌平按进那道红光里；门一直关着。她不转身，不起身。镜头固定。门上没有门牌、号码或标志。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色。 每条另附：除了她左耳耳挂上的小红灯，画面里没有任何红色；画面中不得出现任何文字。",
+    "risks": "红光溢到脸上或变成红灯；门上长牌子；按手时身体前倾挡嘴。",
+    "gate": "用到 170.109–173.778 整段（口型 + gap 按手）。"
+   },
+   "lesson_risks": [
+    "a-3 说成中文：prompt 引了歌词译文。r3 起不引任何歌词原文或译文、不加引号，动作只按句序写；Gate 先听她说的是不是英语",
+    "窗口起点 170.1094＝剪辑入点（“Bet” 前 0.195 s）：方案的 170.00 落在 “more.” 里",
+    "红光溢到脸上或变成红灯（只许门缝一线，使用者「留红光，和 s002 一样算例外」）",
+    "按手时身体前倾挡嘴；门上长牌子",
+    "r3 绑“说到第二句时”（They found a gap instead，片内约 2.04 s；开头的 more. 尾巴不算一句）"
+   ],
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17.wav",
+    "sha256": "ae7ab1b7d5037f877dfb44ada668b7d83445a1caf1f512235989727a7921a6bd",
+    "seconds": 3.67,
+    "song_window_s": [
+     170.1094,
+     173.7781
+    ],
+    "clip_words": [
+     "Bet",
+     "it",
+     "couldn't",
+     "reach",
+     "outside.",
+     "They",
+     "found",
+     "a",
+     "gap",
+     "instead."
+    ],
+    "sentences": [
+     {
+      "text": "Bet it couldn't reach outside.",
+      "start": 0.19,
+      "end": 1.94,
+      "complete": true
+     },
+     {
+      "text": "They found a gap instead.",
+      "start": 2.04,
+      "end": 3.67,
+      "complete": true
+     }
+    ],
+    "lyric_text": "Bet it couldn't reach outside. They found a gap instead.",
+    "dialogue_s": [
+     0.19,
+     3.67
+    ]
+   }
+  },
+  {
+   "shot": "s041",
+   "unit": "SG18",
+   "clip": "SG18",
+   "mode": "multimodal",
+   "look": "C",
+   "take_tag": "a",
+   "song_span_s": [
+    178.3293,
+    185.5855
+   ],
+   "generation_window_s": [
+    177.47,
+    185.5855
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p041-c1.png",
+    "sha256": "43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P041/c.png"
+   },
+   "prompt": "{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，布像高领斗篷一样罩到下巴，只露出脸和银白短发，看着镜头，嘴唇闭着。她很轻地对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。她一直站在原地一动不动，不转身；防尘布一直裹着她，看不见布下面的衣服。唱到第三句刚开口时，她的一只手从胸前的布缝里伸出来，抓住胸前的布边，手在下巴以下；只露出手，手腕以上一直在布里。中景，镜头固定不动，射灯亮度不变。嘴前没有任何遮挡。人台都盖着布，没有脸。画面里没有镜子，橱窗玻璃里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "146b8f1d643787f3d7e0c59e3fcf029fdcf8cc3b7c76f143c2769157b3fea6d0",
+   "previous_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "855330794cd8a1f3728c821faf065586d221cee6e0123a1de794dd600a77e936"
+   },
+   "base_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "855330794cd8a1f3728c821faf065586d221cee6e0123a1de794dd600a77e936"
+   },
+   "ordinal_binding": {
+    "ordinal": 3,
+    "text": "唱到第三句刚开口时",
+    "sentence_starts_with": "October"
+   },
+   "required_phrases": [
+    "中景",
+    "她很轻地对着镜头唱",
+    "逐字精确同步",
+    "唱到第三句刚开口时，她的一只手从胸前的布缝里伸出来",
+    "她一直站在原地一动不动，不转身",
+    "防尘布一直裹着她，看不见布下面的衣服",
+    "只露出手，手腕以上一直在布里",
+    "嘴前没有任何遮挡",
+    "人台都盖着布，没有脸",
+    "橱窗玻璃里不出现她的倒影"
+   ],
+   "seconds": 10,
+   "take_margin_seconds": 1,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 800,
+   "ceiling_per_take_CRD": 800,
+   "plan": {
+    "s041a": {
+     "time": "178.329–181.023 2.69 s",
+     "lyric": "the lights go low",
+     "kind": "视频 SG18（唱段 multimodal，生成 10 s）",
+     "picture": "夜里的百货橱窗：一排盖着白防尘布的人台中间，她也从肩到脚裹在同一种布里，只露脸，安静地对镜头唱 “the lights go low”。",
+     "why": "桥段强拍 178.329 硬切：换地点、换时间、换造型（快速换装用剪切完成，布下面的衣服看不见）。",
+     "why_motion": "视频：唱段对口型。射灯每拍暗一盏是后期，不让模型改灯。",
+     "graphics": "日历计数 SEP 20 → OCT 1，每个八分音划掉一天，DAY n / 11 逐个替换；堆叠字左三分之一。",
+     "blur": "D",
+     "look": "防尘布（本白粗亚麻、毛边）裹住全身，只露脸和头发；开场脸；耳挂红灯。",
+     "cls": "v"
+    },
+    "s041c": {
+     "time": "183.763–185.585 1.82 s",
+     "lyric": "show … Octo-",
+     "kind": "视频 SG18（唱段 multimodal，生成 10 s）",
+     "picture": "切回 SG18：她唱 “show”，换气里一动不动；“Octo-”起时一只手从布里抓住胸前的布边。",
+     "why": "A–B–A 切回，183.763 小节线正在 show（183.78）上。",
+     "why_motion": "视频；换气段（184.04–184.97）镜头和人都不动。",
+     "graphics": "日历停在 DAY 11 / 11。",
+     "blur": "D",
+     "look": "同 s041a。",
+     "cls": "v"
+    }
+   },
+   "plan_unit": {
+    "shots": "s041a、s041c",
+    "type": "唱段 multimodal",
+    "gen": "10 s × 2 ≈ 1600 积分",
+    "frame_vocal": "首帧 p041 改。人声 177.39–185.585 s（Eleven 前 0.3 s；Octo- 也在窗口内）。",
+    "prompt_points": "「{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，只露出脸和银白短发，看着镜头，嘴唇闭着。」她很轻地对着镜头唱，口型与人声逐字同步；她一动不动，不转身；最后一只手从布里抓住胸前的布边，手在下巴以下。镜头固定，射灯亮度不变。画面里没有镜子，玻璃里不出现她的倒影。人台都盖着布，没有脸。 每条另附：除了她左耳耳挂上的小红灯，画面里没有任何红色；画面中不得出现任何文字。",
+    "risks": "半速轻声唱的口型（音量低）；10 s 长窗口中段漂移；玻璃倒影；人台长出脸；模型自己改灯光。",
+    "gate": "用到 178.329–181.023（the lights go low）、183.763–185.585（show + 换气静止 + Octo-）。"
+   },
+   "lesson_risks": [
+    "a-3 说成中文：prompt 引了歌词译文。r3 起不引任何歌词原文或译文、不加引号，动作只按句序写；Gate 先听她说的是不是英语",
+    "窗口起点 177.47（“Eleven” 前 0.22 s）：方案的 177.39 落在 “said.” 里",
+    "半速轻声唱、10 s 长窗口中段漂移（口型风险最高）",
+    "玻璃倒影；人台长出脸；模型自己改灯光",
+    "布下衣服被模型编出来（已写看不见布下面的衣服）",
+    "抓布边绑“唱到第三句刚开口时”：第三句在本窗口只露出第一个词（October，片内约 7.50 s）"
+   ],
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18.wav",
+    "sha256": "5c13eaad7bd649e3e025cdbdb0f280084692d555a08484e3b31e9e1d64d2be13",
+    "seconds": 8.12,
+    "song_window_s": [
+     177.47,
+     185.5855
+    ],
+    "clip_words": [
+     "Eleven",
+     "days,",
+     "the",
+     "lights",
+     "go",
+     "low",
+     "Top",
+     "models",
+     "paused,",
+     "no",
+     "tools,",
+     "no",
+     "show",
+     "October"
+    ],
+    "sentences": [
+     {
+      "text": "Eleven days, the lights go low",
+      "start": 0.22,
+      "end": 2.9,
+      "complete": true
+     },
+     {
+      "text": "Top models paused, no tools, no show",
+      "start": 3.56,
+      "end": 6.57,
+      "complete": true
+     },
+     {
+      "text": "October",
+      "start": 7.5,
+      "end": 8.14,
+      "complete": false
+     }
+    ],
+    "lyric_text": "Eleven days, the lights go low Top models paused, no tools, no show October",
+    "dialogue_s": [
+     0.22,
+     8.12
+    ]
+   }
+  },
+  {
+   "shot": "s048",
+   "unit": "SG20",
+   "clip": "SG20",
+   "mode": "multimodal",
+   "look": "W1",
+   "take_tag": "a",
+   "song_span_s": [
+    205.2412,
+    209.3395
+   ],
+   "generation_window_s": [
+    205.2412,
+    208.8
+   ],
+   "first_frame": {
+    "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p048-w2.png",
+    "sha256": "c31412c3ba0260f5c6937b8ce6ecf4cd8d1eef4c1a038ecc9fb082da94818c32",
+    "design_frame": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p048-arm-b-comp.png"
+   },
+   "prompt": "{{image:0}}中的她单膝跪在试衣间隔板旁的地毯上，中近景，身体微微前倾，看着镜头，嘴唇闭着。她很轻地、平平地对着镜头说一句话，口型与{{audio:1}}里的人声逐字精确同步；说完嘴闭上，一动不动，一直看着镜头。镜头固定不动。嘴前没有任何遮挡。她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖。寻呼机和工牌一直挂在她身前的腰链上；寻呼机的液晶屏只有空白的灰绿底光，没有数字和字；工牌是空白的。背后的镜子里只有衣架，不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "prompt_sha256": "ff7c0176bc5e5a3c41b4af6fbfa8aa869498a33c4eb680a291d7abdcde5af7da",
+   "previous_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r2.md",
+    "sha256": "ff7c0176bc5e5a3c41b4af6fbfa8aa869498a33c4eb680a291d7abdcde5af7da"
+   },
+   "base_prompt": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+    "sha256": "161dc2984c3146aad07b3dc793ee21c30e3d54771b609d7ef53416f6065890b6"
+   },
+   "ordinal_binding": null,
+   "required_phrases": [
+    "中近景",
+    "她很轻地、平平地对着镜头说一句话",
+    "逐字精确同步",
+    "说完嘴闭上，一动不动",
+    "一直看着镜头",
+    "嘴前没有任何遮挡",
+    "她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖",
+    "寻呼机和工牌一直挂在她身前的腰链上",
+    "背后的镜子里只有衣架，不出现她的倒影"
+   ],
+   "seconds": 6,
+   "take_margin_seconds": 2,
+   "resolution": "4k",
+   "aspect": "16:9",
+   "takes": 2,
+   "est_cost_per_take_CRD": 480,
+   "ceiling_per_take_CRD": 500,
+   "plan": {
+    "s048": {
+     "time": "205.241–209.339 4.10 s",
+     "lyric": "they were told which crack. (All hands!)",
+     "kind": "视频 SG20（念白 multimodal，生成 6 s）",
+     "picture": "特写：她跪在隔板旁，看着镜头，像说“别太激动”一样平平地说 “they were told which crack.”；说完不动，嘴闭着，“All hands!” 前一拍静止。",
+     "why": "205.241 拍切入（Mostly, 在上一镜画外）。209.339 重音（hits 1.00）切进末段副歌。",
+     "why_motion": "视频：贴耳的念白要看到嘴。",
+     "graphics": "脚注 WE DIRECTED AGENTS TO INVESTIGATE（they 206.12）+ 原文小字；208.929 ALL HANDS! 整屏砸字（masthead），然后 209.339 切末段副歌（网屏在这一刀从点网硬切线网）。",
+     "blur": "B",
+     "look": "W1；开场脸；左耳耳挂红灯。",
+     "cls": "v"
+    }
+   },
+   "plan_unit": {
+    "shots": "s048",
+    "type": "念白 multimodal",
+    "gen": "6 s × 2 ≈ 960 积分",
+    "frame_vocal": "首帧 p048 改。人声 205.24–208.80 s（Mostly, 之后的空隙起，不从句中切入），208.80 起人声静音，避免她跟着唱 All。",
+    "prompt_points": "「{{image:0}}中的她单膝跪在试衣间隔板旁，特写，看着镜头，嘴唇闭着。」她很轻地、平平地对镜头说一句话，口型同步；说完嘴闭上，一动不动。镜头固定。 每条另附：除了她左耳耳挂上的小红灯，画面里没有任何红色；画面中不得出现任何文字。",
+    "risks": "贴耳轻声的口型；说完自己加动作；跟着 All 张嘴（人声已静音处理）。",
+    "gate": "用到 205.241–209.339：口型 206.12–207.9；208.0–209.339 必须静止闭嘴。"
+   },
+   "lesson_risks": [
+    "a-3 说成中文：prompt 引了歌词译文。r3 起不引任何歌词原文或译文、不加引号，动作只按句序写；Gate 先听她说的是不是英语",
+    "人声 208.80 后静音，剪辑要她静止闭嘴到 209.34（“All” 不能张嘴）；生成 6 s 留余量",
+    "贴耳轻声的口型；说完自己加动作",
+    "背后镜子里出现倒影",
+    "W1 左臂必须从肩到腕裸露（s042 / s046 一致）；首帧 p048-w2 已改，prompt 也写明，Gate 时看她左臂有没有长出袖子"
+   ],
+   "vocal": {
+    "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG20.wav",
+    "sha256": "27a638f479ce1e541be7df55be1a79d667b18a6953e694f758070dc7ebfb568c",
+    "seconds": 3.56,
+    "song_window_s": [
+     205.2412,
+     208.8
+    ],
+    "clip_words": [
+     "they",
+     "were",
+     "told",
+     "which",
+     "crack."
+    ],
+    "sentences": [
+     {
+      "text": "they were told which crack.",
+      "start": 0.88,
+      "end": 3.53,
+      "complete": true
+     }
+    ],
+    "lyric_text": "they were told which crack.",
+    "dialogue_s": [
+     0.88,
+     3.53
+    ]
+   }
+  }
+ ],
+ "stills": [
+  {
+   "segment": "s047",
+   "frames": [
+    {
+     "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p047-rb-c-2944.png",
+     "sha256": "2c2fafd823f177a14d5d80271d1246a7a09ff5060c1c51184cd766427da37ec7"
+    }
+   ],
+   "replaces": {
+    "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p047-rb-b-2944.png",
+    "sha256": "623087a4ff8ded0ab8774d0f7c6a561c1b24eacd570336c9bc12ae8ed3c98f7f"
+   },
+   "plan": {
+    "time": "202.966–205.241 2.28 s",
+    "lyric": "The secret crosses. Mostly,",
+    "kind": "静图 —",
+    "picture": "她单膝跪在两个隔间之间的隔板下，从离地一掌高的缝看过去，一张白纸条正从缝里滑到她手边。",
+    "why": "新一句起拍：切在 202.966 拍（The secret 203.15）。",
+    "why_motion": "静图 + 2.5D：纸条层按十六分音滑进来，204.788 拍停在她手边；隔板层锁定。",
+    "graphics": "终端：secret（203.37）上一串 ▯▮▮▯▮▯▯▮ 打出来，crosses（203.77）上 SECRET RECEIVED ✓。",
+    "blur": "A",
+    "look": "W1；开场脸；迷你裙不深蹲，改单膝跪、侧身。",
+    "cls": "s"
+   }
+  }
+ ],
+ "known_issues": [
+  {
+   "where": "范围",
+   "issue": "本包只有 SG12、SG15、SG16、SG17、SG18、SG20；INS33、INS37、INS41、SG19、MO15 仍按 submit/ 包与 s031-048-seedance.md 提交，本包不改它们。submit-r2/ 包与 r2.patch 作废（r2 的改动都在 r3.patch 里）。",
+   "proposal": "—"
+  },
+  {
+   "where": "应用顺序",
+   "issue": "本包的 board sha 是 r3/PATCH.md 应用之后的值；当前一批提交完、PATCH 应用前不要写这六条的 approval。",
+   "proposal": "当前一批提交完 → 应用 PATCH.md → 跑本脚本 --check 与测试 → 写 approval。"
+  },
+  {
+   "where": "SG16 / SG18 旧 approval",
+   "issue": "sd-SG16-a-1|2、sd-SG18-a-1|2 里还躺着上一批（引译文的 prompt）写好的 preview-approval.json，未提交。",
+   "proposal": "应用 PATCH 时改名为 preview-approval.held-r3.json（保留不删），再按 r3 模板重写；continuity-report.json 也要按 r3 prompt 重出。"
+  },
+  {
+   "where": "s047 静图",
+   "issue": "沿用 r2：s047 改用 CONT1124/p047-rb-c-2944（左臂裸露）；它是静图，不生成，只影响剪辑取图。",
+   "proposal": "剪辑时用新图。"
+  }
+ ]
+}

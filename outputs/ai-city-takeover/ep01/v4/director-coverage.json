@@ -90,10 +90,10 @@
     "source_text": "可以，按这个往下做"
    }
   ],
-  "target_duration_seconds": 252.397,
+  "target_duration_seconds": 255.638,
   "coverage_strategy": "multi_shot",
   "strategy_source": "agent_directed",
-  "director_decision_rationale": "按作者的制作方法：三位导演各出一版分镜（fashion / meme / narrative），三位评审（观众、导演、制片）打分，总导演合并成一版，经作者审计表与事实核对后，使用者看过贴了底片的卡片并认可「可以，按这个往下做」。一首 4:33 的歌要逐句落在她嘴上、按段落换地点和造型，一条机位轨迹承载不了，所以是多镜头；这里每个覆盖单元就是分镜 board/shots.json（sha256 b5f599322f7f19daea1b7eb1f132bf640fdec4712c1cdf5da097ced5cfbe0107）的一个生成片段，逐字取自分镜。",
+  "director_decision_rationale": "按作者的制作方法：三位导演各出一版分镜（fashion / meme / narrative），三位评审（观众、导演、制片）打分，总导演合并成一版，经作者审计表与事实核对后，使用者看过贴了底片的卡片并认可「可以，按这个往下做」。一首 4:33 的歌要逐句落在她嘴上、按段落换地点和造型，一条机位轨迹承载不了，所以是多镜头；这里每个覆盖单元就是分镜 board/shots.json（sha256 15662cca27d3e3ee68ddc20737ecd04d9004dfb9e5d444085c1c69d082fc744c）的一个生成片段，逐字取自分镜。",
   "strategy_request_evidence": null,
   "director_skill": "open-video"
  },
@@ -1011,7 +1011,7 @@
   },
   {
    "unit_id": "SG12",
-   "duration_seconds": 7.32,
+   "duration_seconds": 7.42,
    "beat_function": "reveal",
    "objective": "Verse 3 · SG12（s031）：她（银灰长风衣）对着镜头平平地说 September twentieth. The search tool came back with junk.；Google, Bing and DuckDuckGo 上她把同一张纸币依次塞进三台售货机，每一台都把纸币吐回来；No luck 上她把纸币在膝上抹平，塞回风衣口袋",
    "open_state": "她（银灰长风衣）对着镜头平平地说 September twentieth. The search tool came back with junk.",
@@ -1074,6 +1074,37 @@
    ]
   },
   {
+   "unit_id": "INS33",
+   "duration_seconds": 1.834,
+   "beat_function": "reveal",
+   "objective": "Verse 3 · INS33（s033）：slipped through 上的插镜：墙上黄铜传送管口特写，她的右手（银灰风衣袖口）把黄铜筒推进管口、松手，黄铜盖落下合上",
+   "open_state": "slipped through 上的插镜：墙上黄铜传送管口特写，她的右手（银灰风衣袖口）把黄铜筒推进管口、松手，黄铜盖落下合上",
+   "close_state": "盖子合上，她的手掌平放在盖子旁",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "锁定",
+   "visible_change": "slipped through 上的插镜：墙上黄铜传送管口特写，她的右手（银灰风衣袖口）把黄铜筒推进管口、松手，黄铜盖落下合上。结束：盖子合上，她的手掌平放在盖子旁。",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-01",
+    "C-02",
+    "C-04",
+    "C-05",
+    "C-06",
+    "C-07",
+    "C-08",
+    "C-09",
+    "C-10",
+    "C-11",
+    "C-12",
+    "C-13",
+    "C-14",
+    "C-15",
+    "C-16",
+    "C-17"
+   ]
+  },
+  {
    "unit_id": "SG14",
    "duration_seconds": 4.969,
    "beat_function": "reveal",
@@ -1107,7 +1138,7 @@
   },
   {
    "unit_id": "SG15",
-   "duration_seconds": 4.233,
+   "duration_seconds": 3.831,
    "beat_function": "reveal",
    "objective": "Verse 3 · SG15（s036）：阅读桌上她的寻呼机在尖叫；她一把抓起，沿过道大步走，对挡在过道里的一个读者说 Out of my way；158.232 他把椅子往里一拉给她让路",
    "open_state": "阅读桌上她的寻呼机在尖叫",
@@ -1139,7 +1170,7 @@
   },
   {
    "unit_id": "SG16",
-   "duration_seconds": 7.042,
+   "duration_seconds": 5.138,
    "beat_function": "reveal",
    "objective": "Verse 3 · SG16（s037）：工程师在 picks up 上接起手机，僵住；她坐在料理台上，麦片碗端在腿上、勺子放进碗里，对他说 Stop it? Let it stay?；身后的微波炉一直嗡嗡转、停不下来；163.70 的重音上他连按两下停止键，没用；她对镜头说 It doesn't stop by itself；Killed 上他一把拔掉微波炉插头",
    "open_state": "工程师在 picks up 上接起手机，僵住",
@@ -1170,8 +1201,39 @@
    ]
   },
   {
+   "unit_id": "INS37",
+   "duration_seconds": 1.37,
+   "beat_function": "reveal",
+   "objective": "Verse 3 · INS37（s037）：163.70 重音与 Killed 上的插镜：微波炉正面特写，值班工程师没拿手机的左手（深蓝牛仔袖口）从画面左侧伸进来，连按两下停止键，炉子照转；他抓住电线把插头从左边墙上的插座拔掉，炉内灯熄灭，转盘停下",
+   "open_state": "163.70 重音与 Killed 上的插镜：微波炉正面特写，值班工程师没拿手机的左手（深蓝牛仔袖口）从画面左侧伸进来，连按两下停止键，炉子照转",
+   "close_state": "灯灭了，转盘停住",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "锁定",
+   "visible_change": "163.70 重音与 Killed 上的插镜：微波炉正面特写，值班工程师没拿手机的左手（深蓝牛仔袖口）从画面左侧伸进来，连按两下停止键，炉子照转；他抓住电线把插头从左边墙上的插座拔掉，炉内灯熄灭，转盘停下。结束：灯灭了，转盘停住。",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-01",
+    "C-02",
+    "C-04",
+    "C-05",
+    "C-06",
+    "C-07",
+    "C-08",
+    "C-09",
+    "C-10",
+    "C-11",
+    "C-12",
+    "C-13",
+    "C-14",
+    "C-15",
+    "C-16",
+    "C-17"
+   ]
+  },
+  {
    "unit_id": "SG17",
-   "duration_seconds": 4.845,
+   "duration_seconds": 3.669,
    "beat_function": "reveal",
    "objective": "Verse 3 · SG17（s039）：她蹲在门前，门缝下的一线红光横在她指尖上；她对着镜头说 Bet it couldn't reach outside. They found a gap instead.；gap 上她把手掌平按进那道光里",
    "open_state": "她蹲在门前，门缝下的一线红光横在她指尖上",
@@ -1203,7 +1265,7 @@
   },
   {
    "unit_id": "SG18",
-   "duration_seconds": 6.444,
+   "duration_seconds": 8.115,
    "beat_function": "reversal",
    "objective": "Bridge · SG18（s041）：她站在一排盖着防尘布的人台中间，肩上也披着一块同样的布；射灯一盏盏暗下去，街灯照着她的脸，她唱 the lights go low / Top models paused, no tools, no show；181.104 的重音上她把一块防尘布拽下来盖住身边人台的头",
    "open_state": "她站在一排盖着防尘布的人台中间，肩上也披着一块同样的布",
@@ -1234,8 +1296,39 @@
    ]
   },
   {
+   "unit_id": "INS41",
+   "duration_seconds": 2.74,
+   "beat_function": "reversal",
+   "objective": "Bridge · INS41（s041）：Top models paused 上的插镜：橱窗里最前面一具无脸素色人台，两只穿黑袖子的手把撑开的防尘布从它头顶拉下来，布落在 181.104 的重音上，盖住头和肩",
+   "open_state": "Top models paused 上的插镜：橱窗里最前面一具无脸素色人台，两只穿黑袖子的手把撑开的防尘布从它头顶拉下来，布落在 181.104 的重音上，盖住头和肩",
+   "close_state": "布垂好，人台被盖住",
+   "shot_scale": "close_up",
+   "camera_treatment": "static",
+   "camera_intent": "锁定",
+   "visible_change": "Top models paused 上的插镜：橱窗里最前面一具无脸素色人台，两只穿黑袖子的手把撑开的防尘布从它头顶拉下来，布落在 181.104 的重音上，盖住头和肩。结束：布垂好，人台被盖住。",
+   "transition_out": "cut",
+   "constraint_ids": [
+    "C-01",
+    "C-02",
+    "C-04",
+    "C-05",
+    "C-06",
+    "C-07",
+    "C-08",
+    "C-09",
+    "C-10",
+    "C-11",
+    "C-12",
+    "C-13",
+    "C-14",
+    "C-15",
+    "C-16",
+    "C-17"
+   ]
+  },
+  {
    "unit_id": "SG19",
-   "duration_seconds": 4.145,
+   "duration_seconds": 3.692,
    "beat_function": "reversal",
    "objective": "Bridge · SG19（s042）：185.586 的重音上橱窗的灯全部砰地亮回来；她一把扯掉肩上的防尘布，造型 1 回来，对着橱窗玻璃外唱 October one, back to play",
    "open_state": "185.586 的重音上橱窗的灯全部砰地亮回来",
@@ -1329,7 +1422,7 @@
   },
   {
    "unit_id": "SG20",
-   "duration_seconds": 4.098,
+   "duration_seconds": 3.559,
    "beat_function": "reveal",
    "objective": "Verse 4 · SG20（s048）：她用指尖把纸条按在地毯上，抬起眼皮，平平地说 they were told which crack，像在说“别太激动”；说完把纸条翻过去扣在掌下",
    "open_state": "她用指尖把纸条按在地毯上，抬起眼皮，平平地说 they were told which crack，像在说“别太激动”",

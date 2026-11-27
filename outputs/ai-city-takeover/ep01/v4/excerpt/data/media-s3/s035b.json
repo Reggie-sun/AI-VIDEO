@@ -1,0 +1,66 @@
+{
+ "shot": "s035b",
+ "t0": 154.5752,
+ "t1": 155.9336,
+ "why": "the canister drops into the basket and lands on 'call' (155.24), one landing shake (as s030)",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S035B/a-2944.png",
+ "still_sha256": "8b3cfbb801be1db70d068c048989823bb8156a07ba9c03ab662b93fcb36953d4",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S035B/a-2944.png",
+   "sha256": "8b3cfbb801be1db70d068c048989823bb8156a07ba9c03ab662b93fcb36953d4"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S035B/canister-2-2944.png",
+   "sha256": "e8e9e5da6dd3bf2c9783aa74bde63bbf9d5427604cd4b4d9c5300a3b62d97e14"
+  }
+ ],
+ "frames": 32,
+ "pictures": 32,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "drop": 155.24,
+  "land": 155.24
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 33
+ },
+ "log": [
+  {
+   "k": 16,
+   "zoom": 1.0,
+   "shake": [
+    0.0,
+    14.0
+   ],
+   "smear": 0.0
+  },
+  {
+   "k": 17,
+   "zoom": 1.0,
+   "shake": [
+    0.0,
+    -8.0
+   ],
+   "smear": 0.5
+  },
+  {
+   "k": 18,
+   "zoom": 1.0,
+   "shake": [
+    0.0,
+    3.0
+   ],
+   "smear": 0.225
+  }
+ ]
+}

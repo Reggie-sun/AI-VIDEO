@@ -1,0 +1,1593 @@
+{
+ "film": "outputs/ai-city-takeover/ep01/v4/excerpt/renders/IRIS-EP01-agentcut-ev-s031-048-v1.mp4",
+ "film_sha256": "951ed6bce9c2f47658fad305754d07744a683d1988f7aec89a8c358439bed2e3",
+ "picture": "outputs/ai-city-takeover/ep01/v4/excerpt/renders/IRIS-EP01-s031-048-v1-picture.mp4",
+ "picture_sha256": "4e27c10db5699c4e2965368c9d0f9c00926473bdfd4d097760b4d6316b1bd3eb",
+ "spec": {
+  "video": {
+   "codec_name": "h264",
+   "codec_type": "video",
+   "width": 1920,
+   "height": 1080,
+   "r_frame_rate": "24/1",
+   "nb_read_frames": "1797"
+  },
+  "audio": [
+   {
+    "codec_name": "aac",
+    "codec_type": "audio",
+    "sample_rate": "48000",
+    "channels": 2,
+    "r_frame_rate": "0/0",
+    "nb_read_frames": "3510"
+   }
+  ],
+  "pass": true
+ },
+ "sound": {
+  "film_samples": 3594000,
+  "master_samples": 3594000,
+  "master_window_s": [
+   134.45833333333334,
+   209.33333333333334
+  ],
+  "offset_samples": 0,
+  "offset_ms": 0.0,
+  "rms_diff_db": -0.056,
+  "pass": true
+ },
+ "flash": {
+  "max_flashes_per_second_any_cell": 1.5,
+  "at": {
+   "cell": 7,
+   "frame": 329
+  },
+  "windows_over_3_per_second_start_frames": [],
+  "single_frame_jumps": [
+   {
+    "frame": 433,
+    "song_t": 152.5,
+    "d_prev": 0.0218,
+    "d_next": 0.0213
+   }
+  ],
+  "pass": true
+ },
+ "cuts": {
+  "cuts": [
+   {
+    "cut": "s031b",
+    "t": 136.2663,
+    "frame": 43,
+    "song_frame": 3270,
+    "nearest_beat": 136.2663,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0163,
+    "picture_change_peak_frame": 43,
+    "pass": true
+   },
+   {
+    "cut": "s031c",
+    "t": 139.9234,
+    "frame": 131,
+    "song_frame": 3358,
+    "nearest_beat": 139.9234,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0067,
+    "picture_change_peak_frame": 131,
+    "pass": true
+   },
+   {
+    "cut": "s032",
+    "t": 141.2934,
+    "frame": 164,
+    "song_frame": 3391,
+    "nearest_beat": 141.2934,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0017,
+    "picture_change_peak_frame": 164,
+    "pass": true
+   },
+   {
+    "cut": "s033a",
+    "t": 144.4978,
+    "frame": 241,
+    "song_frame": 3468,
+    "nearest_beat": 144.4978,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0022,
+    "picture_change_peak_frame": 241,
+    "pass": true
+   },
+   {
+    "cut": "s033b",
+    "t": 147.2493,
+    "frame": 307,
+    "song_frame": 3534,
+    "nearest_beat": 147.2493,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0007,
+    "picture_change_peak_frame": 307,
+    "pass": true
+   },
+   {
+    "cut": "s034",
+    "t": 149.0837,
+    "frame": 351,
+    "song_frame": 3578,
+    "nearest_beat": 149.0837,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0004,
+    "picture_change_peak_frame": 351,
+    "pass": true
+   },
+   {
+    "cut": "s035a",
+    "t": 151.8237,
+    "frame": 417,
+    "song_frame": 3644,
+    "nearest_beat": 151.8237,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0096,
+    "picture_change_peak_frame": 417,
+    "pass": true
+   },
+   {
+    "cut": "s035b",
+    "t": 154.5752,
+    "frame": 483,
+    "song_frame": 3710,
+    "nearest_beat": 154.5752,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0081,
+    "picture_change_peak_frame": 483,
+    "pass": true
+   },
+   {
+    "cut": "s036a",
+    "t": 155.9336,
+    "frame": 515,
+    "song_frame": 3742,
+    "nearest_beat": 155.9336,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0169,
+    "picture_change_peak_frame": 515,
+    "pass": true
+   },
+   {
+    "cut": "s036b",
+    "t": 156.8508,
+    "frame": 537,
+    "song_frame": 3764,
+    "nearest_beat": 156.8508,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0175,
+    "picture_change_peak_frame": 537,
+    "pass": true
+   },
+   {
+    "cut": "s036c",
+    "t": 157.768,
+    "frame": 559,
+    "song_frame": 3786,
+    "nearest_beat": 157.768,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.018,
+    "picture_change_peak_frame": 559,
+    "pass": true
+   },
+   {
+    "cut": "s037a",
+    "t": 159.5907,
+    "frame": 603,
+    "song_frame": 3830,
+    "nearest_beat": 159.5907,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0074,
+    "picture_change_peak_frame": 603,
+    "pass": true
+   },
+   {
+    "cut": "s037b",
+    "t": 161.4135,
+    "frame": 647,
+    "song_frame": 3874,
+    "nearest_beat": 161.4135,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0032,
+    "picture_change_peak_frame": 647,
+    "pass": true
+   },
+   {
+    "cut": "s037c1",
+    "t": 163.7007,
+    "frame": 702,
+    "song_frame": 3929,
+    "nearest_beat": 163.7007,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0076,
+    "picture_change_peak_frame": 702,
+    "pass": true
+   },
+   {
+    "cut": "s037c2",
+    "t": 164.1883,
+    "frame": 714,
+    "song_frame": 3941,
+    "nearest_beat": 164.1883,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.02,
+    "picture_change_peak_frame": 714,
+    "pass": true
+   },
+   {
+    "cut": "s037d",
+    "t": 165.0707,
+    "frame": 735,
+    "song_frame": 3962,
+    "nearest_beat": 165.0707,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0126,
+    "picture_change_peak_frame": 735,
+    "pass": true
+   },
+   {
+    "cut": "s038a",
+    "t": 166.4755,
+    "frame": 768,
+    "song_frame": 3995,
+    "nearest_beat": 166.4755,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0172,
+    "picture_change_peak_frame": 768,
+    "pass": true
+   },
+   {
+    "cut": "s038b",
+    "t": 168.2866,
+    "frame": 812,
+    "song_frame": 4039,
+    "nearest_beat": 168.2866,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0051,
+    "picture_change_peak_frame": 812,
+    "pass": true
+   },
+   {
+    "cut": "s038c",
+    "t": 169.2154,
+    "frame": 834,
+    "song_frame": 4061,
+    "nearest_beat": 169.2154,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0071,
+    "picture_change_peak_frame": 834,
+    "pass": true
+   },
+   {
+    "cut": "s039a",
+    "t": 170.1094,
+    "frame": 856,
+    "song_frame": 4083,
+    "nearest_beat": 170.1094,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0156,
+    "picture_change_peak_frame": 856,
+    "pass": true
+   },
+   {
+    "cut": "s039b",
+    "t": 171.9554,
+    "frame": 900,
+    "song_frame": 4127,
+    "nearest_beat": 171.9554,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0029,
+    "picture_change_peak_frame": 900,
+    "pass": true
+   },
+   {
+    "cut": "s040a",
+    "t": 173.7781,
+    "frame": 944,
+    "song_frame": 4171,
+    "nearest_beat": 173.7781,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0136,
+    "picture_change_peak_frame": 944,
+    "pass": true
+   },
+   {
+    "cut": "s040b",
+    "t": 176.5181,
+    "frame": 1009,
+    "song_frame": 4236,
+    "nearest_beat": 176.5181,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0181,
+    "picture_change_peak_frame": 1009,
+    "pass": true
+   },
+   {
+    "cut": "s041a",
+    "t": 178.3293,
+    "frame": 1053,
+    "song_frame": 4280,
+    "nearest_beat": 178.3293,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.004,
+    "picture_change_peak_frame": 1053,
+    "pass": true
+   },
+   {
+    "cut": "s041b",
+    "t": 181.0228,
+    "frame": 1118,
+    "song_frame": 4345,
+    "nearest_beat": 181.0228,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0189,
+    "picture_change_peak_frame": 1118,
+    "pass": true
+   },
+   {
+    "cut": "s041c",
+    "t": 183.7627,
+    "frame": 1183,
+    "song_frame": 4410,
+    "nearest_beat": 183.7627,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0127,
+    "picture_change_peak_frame": 1183,
+    "pass": true
+   },
+   {
+    "cut": "s042",
+    "t": 185.5855,
+    "frame": 1227,
+    "song_frame": 4454,
+    "nearest_beat": 185.5855,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0022,
+    "picture_change_peak_frame": 1227,
+    "pass": true
+   },
+   {
+    "cut": "s043",
+    "t": 188.3603,
+    "frame": 1294,
+    "song_frame": 4521,
+    "nearest_beat": 188.3603,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0147,
+    "picture_change_peak_frame": 1294,
+    "pass": true
+   },
+   {
+    "cut": "s044",
+    "t": 192.923,
+    "frame": 1403,
+    "song_frame": 4630,
+    "nearest_beat": 192.923,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0063,
+    "picture_change_peak_frame": 1403,
+    "pass": true
+   },
+   {
+    "cut": "s045",
+    "t": 195.6629,
+    "frame": 1469,
+    "song_frame": 4696,
+    "nearest_beat": 195.6629,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0038,
+    "picture_change_peak_frame": 1469,
+    "pass": true
+   },
+   {
+    "cut": "s046a",
+    "t": 198.8673,
+    "frame": 1546,
+    "song_frame": 4773,
+    "nearest_beat": 198.8673,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0077,
+    "picture_change_peak_frame": 1546,
+    "pass": true
+   },
+   {
+    "cut": "s046b",
+    "t": 201.5956,
+    "frame": 1611,
+    "song_frame": 4838,
+    "nearest_beat": 201.5956,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0123,
+    "picture_change_peak_frame": 1611,
+    "pass": true
+   },
+   {
+    "cut": "s047",
+    "t": 202.9656,
+    "frame": 1644,
+    "song_frame": 4871,
+    "nearest_beat": 202.9656,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": -0.0073,
+    "picture_change_peak_frame": 1644,
+    "pass": true
+   },
+   {
+    "cut": "s048",
+    "t": 205.2412,
+    "frame": 1699,
+    "song_frame": 4926,
+    "nearest_beat": 205.2412,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.0088,
+    "picture_change_peak_frame": 1699,
+    "pass": true
+   },
+   {
+    "cut": "s048p",
+    "t": 208.4107,
+    "frame": 1775,
+    "song_frame": 5002,
+    "nearest_beat": 208.4107,
+    "cut_dt_beat": 0.0,
+    "frame_dt_beat": 0.006,
+    "picture_change_peak_frame": 1775,
+    "pass": true
+   }
+  ],
+  "pass": true,
+  "change_peak_on_cut": 35,
+  "n": 35
+ },
+ "lips": {
+  "s031a": {
+   "take": "SG12b1",
+   "take_sha256": "efd0b7a0abc0c14ef3346cf2505e2df596f058be02af7b5dbe6161a4561fa137",
+   "song": [
+    134.4583,
+    136.25
+   ],
+   "clip_in": 1.0103,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG12.wav",
+   "gate_copy": false,
+   "gate_lag_s": 0.4251,
+   "gate_spans_in_shot_song_s": [
+    [
+     134.458,
+     136.25
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 37,
+    "nonzero": [
+     -1,
+     -1,
+     1,
+     -1,
+     1,
+     1
+    ],
+    "frames": 43
+   },
+   "sync_check": {
+    "lag_s": 0.0001,
+    "ncc": 0.3849,
+    "copy": true,
+    "synced_until": {
+     "clip_s": 1.748,
+     "song_s": 136.206
+    },
+    "spans": [
+     {
+      "clip_s": [
+       0.0,
+       1.79
+      ],
+      "song_s": [
+       134.458,
+       136.248
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": null,
+     "rule": "none",
+     "last_match": 179,
+     "clip_s": null,
+     "song_s": null
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     134.458,
+     136.248
+    ]
+   ],
+   "covered_share": 0.999
+  },
+  "s031c": {
+   "take": "SG12a1",
+   "take_sha256": "2a8b972e2909dd526051dfe1c188447116451f046ad395c66af40c5419e6b126",
+   "song": [
+    139.9167,
+    141.2917
+   ],
+   "clip_in": 6.3107,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG12.wav",
+   "gate_copy": false,
+   "gate_lag_s": 0.2501,
+   "gate_spans_in_shot_song_s": [
+    [
+     140.053,
+     141.292
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 19,
+    "nonzero": [
+     1,
+     1,
+     -1,
+     1,
+     1,
+     1,
+     1,
+     -1,
+     -2,
+     -1,
+     1,
+     -1,
+     -2,
+     1
+    ],
+    "frames": 33
+   },
+   "sync_check": {
+    "lag_s": null,
+    "ncc": null,
+    "copy": null,
+    "synced_until": null,
+    "spans": null,
+    "divergence": null,
+    "error": "sel)\n               ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 250, in best_lag\n    scores.append(env_ncc(env_t[i0:i1], env_r[i0 - L:i1 - L]) if i1 - i0 > 20 else -1.0)\n                  ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 240, in env_ncc\n    return float((a * b).sum() / den) if den > 1e-9 else 0.0\n                  ~~^~~\nValueError: operands could not be broadcast together with shapes (137,) (138,) \n"
+   },
+   "visible_lip_synced_song_s": [],
+   "covered_share": 0.0
+  },
+  "s037b": {
+   "take": "SG16xr2",
+   "take_sha256": "d16b18f28a6bdeb4921c05c1172b09ecf615906d4c51031f1fd328f901a4fa86",
+   "song": [
+    161.4167,
+    163.7083
+   ],
+   "clip_in": 0.4887,
+   "knots": [
+    [
+     161.4135,
+     0.4855000000000052
+    ],
+    [
+     161.92,
+     0.9919999999999936
+    ],
+    [
+     162.26,
+     1.4919999999999969
+    ],
+    [
+     162.95,
+     2.1819999999999946
+    ],
+    [
+     163.15,
+     2.7120000000000117
+    ],
+    [
+     163.7007,
+     3.262700000000018
+    ]
+   ],
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16xp.wav",
+   "gate_copy": true,
+   "gate_lag_s": 0.9001,
+   "gate_spans_in_shot_song_s": [],
+   "picture_offset_vs_placement": {
+    "0": 17,
+    "nonzero": [
+     -1,
+     -1,
+     -2,
+     -4,
+     1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -4,
+     -1,
+     -3,
+     2,
+     1,
+     4,
+     4,
+     4,
+     1,
+     2,
+     1,
+     -1,
+     1,
+     1,
+     3,
+     2,
+     2,
+     2,
+     4,
+     4,
+     4,
+     4,
+     2,
+     1,
+     -1,
+     2,
+     1,
+     -1,
+     -2
+    ],
+    "frames": 55
+   },
+   "sync_check": {
+    "lag_s": 0.1651,
+    "ncc": 0.3292,
+    "copy": true,
+    "synced_until": {
+     "clip_s": 1.788,
+     "song_s": 163.04
+    },
+    "spans": [
+     {
+      "clip_s": [
+       1.03,
+       1.83
+      ],
+      "song_s": [
+       162.282,
+       163.082
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": 184,
+     "rule": "stretch",
+     "last_match": 183,
+     "clip_s": 1.84,
+     "song_s": 163.092
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     162.282,
+     163.082
+    ]
+   ],
+   "covered_share": 0.349
+  },
+  "s037d": {
+   "take": "SG16yr2",
+   "take_sha256": "b33c935adbcfdc09af927a0a28d37c200bd276ae5ee868457a52a180a0ea61d7",
+   "song": [
+    165.0833,
+    166.4583
+   ],
+   "clip_in": 1.3796,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16yp.wav",
+   "gate_copy": false,
+   "gate_lag_s": 0.4606,
+   "gate_spans_in_shot_song_s": [],
+   "picture_offset_vs_placement": {
+    "0": 6,
+    "nonzero": [
+     -1,
+     -2,
+     -3,
+     3,
+     2,
+     1,
+     2,
+     1,
+     1,
+     4,
+     3,
+     2,
+     2,
+     1,
+     -1,
+     1,
+     4,
+     3,
+     2,
+     1,
+     -1,
+     1,
+     -1,
+     -2,
+     -3,
+     -4,
+     3
+    ],
+    "frames": 33
+   },
+   "sync_check": {
+    "lag_s": null,
+    "ncc": null,
+    "copy": null,
+    "synced_until": null,
+    "spans": null,
+    "divergence": null,
+    "error": "sel)\n               ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 250, in best_lag\n    scores.append(env_ncc(env_t[i0:i1], env_r[i0 - L:i1 - L]) if i1 - i0 > 20 else -1.0)\n                  ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 240, in env_ncc\n    return float((a * b).sum() / den) if den > 1e-9 else 0.0\n                  ~~^~~\nValueError: operands could not be broadcast together with shapes (137,) (138,) \n"
+   },
+   "visible_lip_synced_song_s": [],
+   "covered_share": 0.0
+  },
+  "s039a": {
+   "take": "SG17Bp1",
+   "take_sha256": "4de4bdb69755bece72ac46228e9631b6b5abfaeecfb4dca3951afa6072d700f2",
+   "song": [
+    170.125,
+    171.9583
+   ],
+   "clip_in": 0.8906,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav",
+   "gate_copy": false,
+   "gate_lag_s": 0.8751,
+   "gate_spans_in_shot_song_s": [
+    [
+     170.804,
+     171.958
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 31,
+    "nonzero": [
+     -1,
+     -1,
+     -2,
+     -1,
+     -2,
+     4,
+     2,
+     1,
+     -1,
+     1,
+     1,
+     2,
+     1
+    ],
+    "frames": 44
+   },
+   "sync_check": {
+    "lag_s": 0.0001,
+    "ncc": 0.2258,
+    "copy": true,
+    "synced_until": {
+     "clip_s": 1.788,
+     "song_s": 171.913
+    },
+    "spans": [
+     {
+      "clip_s": [
+       0.68,
+       1.83
+      ],
+      "song_s": [
+       170.805,
+       171.955
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": null,
+     "rule": "none",
+     "last_match": 183,
+     "clip_s": null,
+     "song_s": null
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     170.805,
+     171.955
+    ]
+   ],
+   "covered_share": 0.627
+  },
+  "s039b": {
+   "take": "SG17Ap2",
+   "take_sha256": "b63f349bbe6b004b2429b165818da1624a13d67470d3cc0c9cde4996f3db047f",
+   "song": [
+    171.9583,
+    173.7917
+   ],
+   "clip_in": 2.4489,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav",
+   "gate_copy": false,
+   "gate_lag_s": 0.6001,
+   "gate_spans_in_shot_song_s": [
+    [
+     172.389,
+     173.779
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 33,
+    "nonzero": [
+     -1,
+     -1,
+     -3,
+     -4,
+     -1,
+     1,
+     -1,
+     -1,
+     -1,
+     1,
+     1
+    ],
+    "frames": 44
+   },
+   "sync_check": {
+    "lag_s": 0.0001,
+    "ncc": 0.4442,
+    "copy": true,
+    "synced_until": {
+     "clip_s": 1.788,
+     "song_s": 173.746
+    },
+    "spans": [
+     {
+      "clip_s": [
+       0.45,
+       1.83
+      ],
+      "song_s": [
+       172.408,
+       173.788
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": null,
+     "rule": "none",
+     "last_match": 183,
+     "clip_s": null,
+     "song_s": null
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     172.408,
+     173.788
+    ]
+   ],
+   "covered_share": 0.753
+  },
+  "s041a": {
+   "take": "SG18xr1",
+   "take_sha256": "d5dee82a57d635cb7098b4ec5a01ed6ac912a8ccd6902450543dc7b9a633a05c",
+   "song": [
+    178.3333,
+    181.0417
+   ],
+   "clip_in": 1.124,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18xp.wav",
+   "gate_copy": true,
+   "gate_lag_s": 0.9251,
+   "gate_spans_in_shot_song_s": [
+    [
+     178.333,
+     180.389
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 33,
+    "nonzero": [
+     3,
+     2,
+     1,
+     1,
+     -1,
+     2,
+     2,
+     1,
+     1,
+     1,
+     -1,
+     -2,
+     -1,
+     -1,
+     -1,
+     1,
+     -1,
+     1,
+     -1,
+     3,
+     2,
+     1,
+     -1,
+     2,
+     1,
+     1,
+     1,
+     -1,
+     -1,
+     1,
+     1,
+     -1
+    ],
+    "frames": 65
+   },
+   "sync_check": {
+    "lag_s": 0.0004,
+    "ncc": 0.3945,
+    "copy": true,
+    "synced_until": {
+     "clip_s": 2.018,
+     "song_s": 180.351
+    },
+    "spans": [
+     {
+      "clip_s": [
+       0.19,
+       2.06
+      ],
+      "song_s": [
+       178.523,
+       180.393
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": 207,
+     "rule": "stretch",
+     "last_match": 206,
+     "clip_s": 2.07,
+     "song_s": 180.403
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     178.523,
+     180.393
+    ]
+   ],
+   "covered_share": 0.69
+  },
+  "s041c": {
+   "take": "SG18yr3",
+   "take_sha256": "1afce3556edffd98ee5fb927482378b590df3cba694a10e5dfca9aa7724376ac",
+   "song": [
+    183.75,
+    185.5833
+   ],
+   "clip_in": 0.0853,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18yp.wav",
+   "gate_copy": true,
+   "gate_lag_s": -0.005,
+   "gate_spans_in_shot_song_s": [
+    [
+     183.75,
+     185.583
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 11,
+    "nonzero": [
+     4,
+     3,
+     2,
+     1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -2,
+     1,
+     1,
+     -1,
+     -2,
+     1,
+     3,
+     2,
+     2,
+     1,
+     2,
+     1,
+     -1,
+     2,
+     1,
+     -1,
+     -1,
+     -2,
+     2,
+     1,
+     -1,
+     1,
+     -1,
+     -2,
+     -3
+    ],
+    "frames": 44
+   },
+   "sync_check": {
+    "lag_s": -0.0003,
+    "ncc": 0.5789,
+    "copy": true,
+    "synced_until": {
+     "clip_s": 1.788,
+     "song_s": 185.538
+    },
+    "spans": [
+     {
+      "clip_s": [
+       0.0,
+       1.83
+      ],
+      "song_s": [
+       183.75,
+       185.58
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": null,
+     "rule": "none",
+     "last_match": 183,
+     "clip_s": null,
+     "song_s": null
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     183.75,
+     185.58
+    ]
+   ],
+   "covered_share": 0.998
+  },
+  "s042": {
+   "take": "SG19a2",
+   "take_sha256": "697c36de92d21875d69e03bdb4d308dfba2f36583f5a28fe23dcaec5e9b64197",
+   "song": [
+    185.5833,
+    188.375
+   ],
+   "clip_in": 1.5148,
+   "knots": null,
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG19.wav",
+   "gate_copy": true,
+   "gate_lag_s": 0.6001,
+   "gate_spans_in_shot_song_s": [
+    [
+     185.583,
+     188.318
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 51,
+    "nonzero": [
+     -1,
+     -1,
+     -1,
+     1,
+     1,
+     -1,
+     1,
+     1,
+     -1,
+     1,
+     2,
+     1,
+     2,
+     1,
+     -1,
+     -2
+    ],
+    "frames": 67
+   },
+   "sync_check": {
+    "lag_s": 0.0006,
+    "ncc": 0.7085,
+    "copy": true,
+    "synced_until": {
+     "clip_s": 2.748,
+     "song_s": 188.331
+    },
+    "spans": [
+     {
+      "clip_s": [
+       0.0,
+       2.79
+      ],
+      "song_s": [
+       185.583,
+       188.373
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": null,
+     "rule": "none",
+     "last_match": 279,
+     "clip_s": null,
+     "song_s": null
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     185.583,
+     188.373
+    ]
+   ],
+   "covered_share": 0.999
+  },
+  "s048": {
+   "take": "SG20xr1",
+   "take_sha256": "cd4119ce1f587ac5abfc7528b492d557ab6a71998c0737f58fdf11e9593e36e3",
+   "song": [
+    205.25,
+    208.4167
+   ],
+   "clip_in": 0.0,
+   "knots": [
+    [
+     205.2412,
+     0.0
+    ],
+    [
+     205.39399999999998,
+     0.0
+    ],
+    [
+     208.4107,
+     3.016700000000003
+    ]
+   ],
+   "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG20xp.wav",
+   "gate_copy": false,
+   "gate_lag_s": 0.4751,
+   "gate_spans_in_shot_song_s": [
+    [
+     206.164,
+     206.934
+    ],
+    [
+     207.204,
+     208.174
+    ]
+   ],
+   "picture_offset_vs_placement": {
+    "0": 28,
+    "nonzero": [
+     2,
+     2,
+     2,
+     2,
+     1,
+     4,
+     3,
+     2,
+     1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -4,
+     -2,
+     -1,
+     -2,
+     1,
+     -1,
+     -2,
+     -3,
+     1,
+     1,
+     1,
+     -1,
+     1,
+     -1,
+     -2,
+     -1,
+     -4,
+     -4,
+     1,
+     1,
+     -1,
+     2,
+     1,
+     -1,
+     1,
+     -1,
+     -1,
+     3,
+     2,
+     1,
+     1,
+     1,
+     2,
+     1,
+     -1
+    ],
+    "frames": 76
+   },
+   "sync_check": {
+    "lag_s": 0.4751,
+    "ncc": 0.1809,
+    "copy": false,
+    "synced_until": {
+     "clip_s": 1.878,
+     "song_s": 206.653
+    },
+    "spans": [
+     {
+      "clip_s": [
+       0.81,
+       2.83
+      ],
+      "song_s": [
+       205.585,
+       207.605
+      ]
+     }
+    ],
+    "divergence": {
+     "frame": 193,
+     "rule": "stretch",
+     "last_match": 192,
+     "clip_s": 1.93,
+     "song_s": 206.705
+    },
+    "error": null
+   },
+   "visible_lip_synced_song_s": [
+    [
+     205.585,
+     207.605
+    ]
+   ],
+   "covered_share": 0.638
+  }
+ },
+ "red": {
+  "frames_checked": 899,
+  "every": 2,
+  "complete": true,
+  "frames_with_red": 541,
+  "exception": {
+   "shots": [
+    "s039a",
+    "s039b"
+   ],
+   "box": [
+    0.0,
+    0.84,
+    0.42,
+    1.0
+   ],
+   "frames_with_exception_red": 44
+  },
+  "bad_frames": [
+   328
+  ],
+  "per_shot": {
+   "s031a": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 26,
+    "max_exception_px": 0
+   },
+   "s031b": {
+    "frames": 44,
+    "over_12": 0,
+    "max_outside_px": 1,
+    "at": 60,
+    "max_red_px": 4,
+    "max_exception_px": 0
+   },
+   "s031c": {
+    "frames": 16,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 12,
+    "max_exception_px": 0
+   },
+   "s032": {
+    "frames": 39,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 6,
+    "max_exception_px": 0
+   },
+   "s033a": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 5,
+    "at": 246,
+    "max_red_px": 5,
+    "max_exception_px": 0
+   },
+   "s033b": {
+    "frames": 22,
+    "over_12": 1,
+    "max_outside_px": 29,
+    "at": 328,
+    "max_red_px": 59,
+    "max_exception_px": 0
+   },
+   "s034": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 4,
+    "at": 352,
+    "max_red_px": 106,
+    "max_exception_px": 0
+   },
+   "s035a": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 5,
+    "at": 430,
+    "max_red_px": 25,
+    "max_exception_px": 0
+   },
+   "s035b": {
+    "frames": 16,
+    "over_12": 0,
+    "max_outside_px": 3,
+    "at": 502,
+    "max_red_px": 3,
+    "max_exception_px": 0
+   },
+   "s036a": {
+    "frames": 11,
+    "over_12": 0,
+    "max_outside_px": 1,
+    "at": 516,
+    "max_red_px": 7,
+    "max_exception_px": 0
+   },
+   "s036b": {
+    "frames": 11,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s036c": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 6,
+    "at": 594,
+    "max_red_px": 20,
+    "max_exception_px": 0
+   },
+   "s037a": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 19,
+    "max_exception_px": 0
+   },
+   "s037b": {
+    "frames": 27,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 26,
+    "max_exception_px": 0
+   },
+   "s037c1": {
+    "frames": 6,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s037c2": {
+    "frames": 11,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s037d": {
+    "frames": 16,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 13,
+    "max_exception_px": 0
+   },
+   "s038a": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 3,
+    "max_exception_px": 0
+   },
+   "s038b": {
+    "frames": 11,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s038c": {
+    "frames": 11,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 8,
+    "max_exception_px": 0
+   },
+   "s039a": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 559,
+    "max_exception_px": 262
+   },
+   "s039b": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 385,
+    "max_exception_px": 217
+   },
+   "s040a": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 8,
+    "max_exception_px": 0
+   },
+   "s040b": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s041a": {
+    "frames": 32,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s041b": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 8,
+    "at": 1180,
+    "max_red_px": 8,
+    "max_exception_px": 0
+   },
+   "s041c": {
+    "frames": 22,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s042": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 30,
+    "max_exception_px": 0
+   },
+   "s043": {
+    "frames": 55,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 0,
+    "max_exception_px": 0
+   },
+   "s044": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 24,
+    "max_exception_px": 0
+   },
+   "s045": {
+    "frames": 38,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 18,
+    "max_exception_px": 0
+   },
+   "s046a": {
+    "frames": 33,
+    "over_12": 0,
+    "max_outside_px": 10,
+    "at": 1568,
+    "max_red_px": 14,
+    "max_exception_px": 0
+   },
+   "s046b": {
+    "frames": 16,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 12,
+    "max_exception_px": 0
+   },
+   "s047": {
+    "frames": 28,
+    "over_12": 0,
+    "max_outside_px": 4,
+    "at": 1670,
+    "max_red_px": 105,
+    "max_exception_px": 0
+   },
+   "s048": {
+    "frames": 38,
+    "over_12": 0,
+    "max_outside_px": 7,
+    "at": 1706,
+    "max_red_px": 100,
+    "max_exception_px": 0
+   },
+   "s048p": {
+    "frames": 11,
+    "over_12": 0,
+    "max_outside_px": 0,
+    "at": null,
+    "max_red_px": 26,
+    "max_exception_px": 0
+   }
+  },
+  "pass": false
+ }
+}

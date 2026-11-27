@@ -1,0 +1,85 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-r3-SG12-b-1",
+ "question": "<主会话问使用者的原问题，逐字（认可页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/index.html",
+  "sha256": "e88334d59cd140b47f683d89f9633b4f738882aecd851d2b6dbd8899b78e48df"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/preview-inputs.json",
+  "sha256": "bae532c8f168a8fb67542813e4ea33dbdaedd33f2dc6450a675efbc032b1852e"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md",
+  "sha256": "9040e687cfa8d6f5aa4b6339250faa6c636da4e525d2f5fc154e0b6858a5530b"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p031-c1.png",
+   "sha256": "3357a872a67fe8ee8e34928b4279413e3501f233956f3a8bd76b6957d70dcedf",
+   "role": "SG12 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG12.wav",
+   "sha256": "654f8d48cd7baf5b8a11ad4fe93c763a4bd2b4b98a1fca3d099631eebd48701b",
+   "role": "SG12 vocal"
+  }
+ ],
+ "prompts": {
+  "SG12": {
+   "text": "{{image:0}}中的她站在地下一层走廊里那排旧自动售货机旁，正对镜头，右手捏着一张折起来的素色纸币垂在腰前，纸币上没有任何印花、字或数字，嘴唇闭着。她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步；说出第一个词的同时用左手把风衣腰带一拉收紧，手一直在腰间；右手一直捏着纸币垂在腰前。她一直看着镜头，不转头，不转身。中景，镜头固定不动。她一直站在原地，不走动。嘴前没有任何遮挡。售货机里的商品是素色的，没有包装文字、标志或价签；售货机的小显示屏是黑的，不亮。走廊里没有出口灯。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "07e48aa0d6684d5a2faf66d46c4523229ce331bd90d55a197b2e3775e8bc2400"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 9,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 800,
+  "cumulative_CRD": 800
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p031-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P031/a.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣））的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg12-b-1-source-001",
+  "policy_id": "iris-sg12-b-1-source-001",
+  "reservation_id": "iris-sg12-b-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG12-b-1",
+   "sd-SG12-b-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1600,
+  "this_take": "sd-SG12-b-1"
+ },
+ "decision_notes": [
+  "2026-11-24 连续性修正：纸币素色无字；收腰带绑在第一个词，塞纸币 + 眼睛往左瞟绑在第四句“运气不好”（No luck），去掉“最后”",
+  "2026-11-25 a-1（2a8b972e…）Gate FAIL；a-2 known_no_effect；a-3（9e5230d5…）Gate FAIL：原生音轨与口型是中文",
+  "2026-11-25 r3：使用者「删掉译文、精简动作后重拍 (Recommended)」：删掉塞纸币与瞟眼（看向售货机交给剪辑），只留说第一个词时收腰带，纸币一直捏在腰前；不引歌词译文；重拍 2 条，take 文件夹 sd-SG12-b-1|2；首帧、秒数、人声不变"
+ ],
+ "_template_notes": [
+  "本文件是 r3 的 b-1 模板；先按 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/PATCH.md 改好 unit.py / shots.json / 测试并跑通，再写成 pilot/sd-SG12-b-1/preview-approval.json：删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位（新文件夹；sd-SG12-a-1|2|3 是已用掉的旧 take，不动）。",
+  "b-2：unit_group 末尾 b-1→b-2；bound_ids 三个 id 中 -b-1- → -b-2-；takes.this_take → sd-SG12-b-2（takes.folders 保持 [b-1, b-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG12-b-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG12 9 multimodal 800"
+ ],
+ "review_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html",
+  "sha256": "45f950b4b5c011c560a99de5b5d485f5f9b47c165f90aaa5f2089ccfdd3f8c1e"
+ }
+}

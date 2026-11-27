@@ -1,0 +1,32 @@
+{
+ "shot": "s037a",
+ "t0": 159.5907,
+ "t1": 161.4135,
+ "why": "the engineer frozen with the phone; she soft behind; timestamps are graphics",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S037A/a-2944.png",
+ "still_sha256": "5dc6c0c4e4e0005f34f4039b1c3695abc61ad33340042a81c7e2477b8a5091ab",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S037A/a-2944.png",
+   "sha256": "5dc6c0c4e4e0005f34f4039b1c3695abc61ad33340042a81c7e2477b8a5091ab"
+  }
+ ],
+ "frames": 44,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 39,
+  "kept_red_px_in_matte": 0
+ },
+ "log": []
+}

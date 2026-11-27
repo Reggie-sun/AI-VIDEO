@@ -1,0 +1,22 @@
+{
+ "schema": "iris-v4-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "SG19",
+   "attempt_id": "iris-sg19-a-1-source-001",
+   "operator_ceiling": 400,
+   "intent_at": "2026-11-25T12:10:34.666785+00:00",
+   "outcome": "known_no_effect",
+   "reconciled": {
+    "at": "2026-11-25",
+    "by": "主会话",
+    "evidence": [
+     "sd-SG19-a-1/SG19/project/state/paid-provider/submits/56a255b9….json outcome known_no_effect external_effect_id null",
+     "paid-provider/budgets/…62df63766c5830f.json reservation iris-sg19-a-1-reservation-001 status released",
+     "run_unit.sh：STOP submit not confirmed；balance.cjs 前后 65506",
+     "先例：sd-MO01-o-2、sd-MO11-n-1、sd-SG12-a-2；不重试同一 attempt"
+    ]
+   }
+  }
+ ]
+}

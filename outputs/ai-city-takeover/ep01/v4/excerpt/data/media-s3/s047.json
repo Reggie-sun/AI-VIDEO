@@ -1,0 +1,32 @@
+{
+ "shot": "s047",
+ "t0": 202.9656,
+ "t1": 205.2412,
+ "why": "CONT1124/p047-rb-c: the strip under the partition, a slow push",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p047-rb-c-2944.png",
+ "still_sha256": "2c2fafd823f177a14d5d80271d1246a7a09ff5060c1c51184cd766427da37ec7",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p047-rb-c-2944.png",
+   "sha256": "2c2fafd823f177a14d5d80271d1246a7a09ff5060c1c51184cd766427da37ec7"
+  }
+ ],
+ "frames": 55,
+ "pictures": 55,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.04
+  ],
+  "center": [
+   0.6,
+   0.6
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 136
+ },
+ "log": []
+}

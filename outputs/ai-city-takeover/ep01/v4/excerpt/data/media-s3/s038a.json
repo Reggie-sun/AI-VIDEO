@@ -1,0 +1,32 @@
+{
+ "shot": "s038a",
+ "t0": 166.4755,
+ "t1": 168.2866,
+ "why": "on the stairs with the two half pages; the timeline graphic",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P038/a-2944.png",
+ "still_sha256": "992df364526c17646b1dac9a56eadf659a2238d4b0e270499d1ee9884a6d00b3",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P038/a-2944.png",
+   "sha256": "992df364526c17646b1dac9a56eadf659a2238d4b0e270499d1ee9884a6d00b3"
+  }
+ ],
+ "frames": 44,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 29
+ },
+ "log": []
+}

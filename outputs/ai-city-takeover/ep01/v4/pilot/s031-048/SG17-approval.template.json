@@ -1,0 +1,79 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-SG17-a-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html",
+  "sha256": "bbc279093957b2a7fb9d67398db62f8aa58710729941cc25b790e9ee0c46803a"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/preview-inputs.json",
+  "sha256": "1772a88f222674703db7ca3ca2a30816e1cf2d86be2e3b230afa26f03977f828"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+  "sha256": "54f2f05f3ed7cb56d47d73e6e34bbc628512373e02f40d5eb3d9f6db3056391f"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p039-c1.png",
+   "sha256": "9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342",
+   "role": "SG17 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17.wav",
+   "sha256": "ae7ab1b7d5037f877dfb44ada668b7d83445a1caf1f512235989727a7921a6bd",
+   "role": "SG17 vocal"
+  }
+ ],
+ "prompts": {
+  "SG17": {
+   "text": "{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光贴着地面，横在她右手指尖前；她的左臂搭在膝上，看着镜头，嘴唇闭着。她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步；说到最后一句时她把右手手掌平按进那道红光里，门一直关着。她一直蹲在原地，不起身，不转身，身体不前倾挡住嘴。镜头固定不动。嘴前没有任何遮挡。门上没有门牌、号码或标志；书脊都是素色的，没有字。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色；红光不照到她的脸上。画面中不得出现任何文字。",
+   "sha256": "7ccebd6c1af15cafd26f066db5b8411a000055f3fd20508f760770993891083c"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p039-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P039/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣））的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg17-a-1-source-001",
+  "policy_id": "iris-sg17-a-1-source-001",
+  "reservation_id": "iris-sg17-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG17-a-1",
+   "sd-SG17-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG17-a-1"
+ },
+ "decision_notes": [
+  "门缝下一线红光：使用者「留红光，和 s002 一样算例外 (Recommended)」（只允许这一线，其余除耳挂灯外无红）"
+ ],
+ "_template_notes": [
+  "本文件是 a-1 的模板；写成 pilot/sd-SG17-a-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s031-048-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "a-2：unit_group 末尾 a-1→a-2；bound_ids 三个 id 中 -a-1- → -a-2-；takes.this_take → sd-SG17-a-2（takes.folders 保持 [a-1, a-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG17-a-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG17 5 multimodal 400"
+ ]
+}

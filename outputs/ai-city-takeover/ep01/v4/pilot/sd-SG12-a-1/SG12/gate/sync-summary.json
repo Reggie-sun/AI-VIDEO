@@ -1,0 +1,92 @@
+[
+ {
+  "name": "SG12-sd",
+  "take_sha256": "2a8b972e2909dd526051dfe1c188447116451f046ad395c66af40c5419e6b126",
+  "lag_s": 0.2501,
+  "ncc": 0.1503,
+  "copy": false,
+  "divergence": {
+   "frame": 787,
+   "rule": "stretch",
+   "last_match": 770,
+   "clip_s": 7.87,
+   "song_s": 141.493
+  },
+  "synced_until": {
+   "clip_s": 7.658,
+   "song_s": 141.281
+  },
+  "spans": [
+   {
+    "clip_s": [
+     3.2,
+     5.71
+    ],
+    "song_s": [
+     136.823,
+     139.333
+    ]
+   },
+   {
+    "clip_s": [
+     6.43,
+     7.7
+    ],
+    "song_s": [
+     140.053,
+     141.323
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": 0.267,
+   "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+   "song_t_of_clip0": 133.606,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 0.267,
+   "ncc": 0.719,
+   "max_dev_s": 0.167,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      1.375
+     ],
+     "lag_s": 0.433,
+     "windows": 3,
+     "min_ncc": 0.884
+    },
+    {
+     "clip_s": [
+      1.375,
+      2.875
+     ],
+     "lag_s": 0.35,
+     "windows": 6,
+     "min_ncc": 0.603
+    },
+    {
+     "clip_s": [
+      2.875,
+      5.875
+     ],
+     "lag_s": 0.27,
+     "windows": 12,
+     "min_ncc": 0.72
+    },
+    {
+     "clip_s": [
+      5.875,
+      8.125
+     ],
+     "lag_s": 0.252,
+     "windows": 9,
+     "min_ncc": 0.861
+    }
+   ]
+  }
+ }
+]

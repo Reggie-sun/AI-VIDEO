@@ -1,0 +1,832 @@
+{
+ "s031a": {
+  "take": "SG12b1",
+  "take_sha256": "efd0b7a0abc0c14ef3346cf2505e2df596f058be02af7b5dbe6161a4561fa137",
+  "song": [
+   134.4583,
+   136.25
+  ],
+  "clip_in": 1.0103,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG12.wav",
+  "gate_copy": false,
+  "gate_lag_s": 0.4251,
+  "gate_spans_in_shot_song_s": [
+   [
+    134.458,
+    136.25
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 37,
+   "nonzero": [
+    -1,
+    -1,
+    1,
+    -1,
+    1,
+    1
+   ],
+   "frames": 43
+  },
+  "sync_check": {
+   "lag_s": 0.0001,
+   "ncc": 0.3849,
+   "copy": true,
+   "synced_until": {
+    "clip_s": 1.748,
+    "song_s": 136.206
+   },
+   "spans": [
+    {
+     "clip_s": [
+      0.0,
+      1.79
+     ],
+     "song_s": [
+      134.458,
+      136.248
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": null,
+    "rule": "none",
+    "last_match": 179,
+    "clip_s": null,
+    "song_s": null
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    134.458,
+    136.248
+   ]
+  ],
+  "covered_share": 0.999
+ },
+ "s031c": {
+  "take": "SG12a1",
+  "take_sha256": "2a8b972e2909dd526051dfe1c188447116451f046ad395c66af40c5419e6b126",
+  "song": [
+   139.9167,
+   141.2917
+  ],
+  "clip_in": 6.3107,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG12.wav",
+  "gate_copy": false,
+  "gate_lag_s": 0.2501,
+  "gate_spans_in_shot_song_s": [
+   [
+    140.053,
+    141.292
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 19,
+   "nonzero": [
+    1,
+    1,
+    -1,
+    1,
+    1,
+    1,
+    1,
+    -1,
+    -2,
+    -1,
+    1,
+    -1,
+    -2,
+    1
+   ],
+   "frames": 33
+  },
+  "sync_check": {
+   "lag_s": null,
+   "ncc": null,
+   "copy": null,
+   "synced_until": null,
+   "spans": null,
+   "divergence": null,
+   "error": "sel)\n               ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 250, in best_lag\n    scores.append(env_ncc(env_t[i0:i1], env_r[i0 - L:i1 - L]) if i1 - i0 > 20 else -1.0)\n                  ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 240, in env_ncc\n    return float((a * b).sum() / den) if den > 1e-9 else 0.0\n                  ~~^~~\nValueError: operands could not be broadcast together with shapes (137,) (138,) \n"
+  },
+  "visible_lip_synced_song_s": [],
+  "covered_share": 0.0
+ },
+ "s037b": {
+  "take": "SG16xr2",
+  "take_sha256": "d16b18f28a6bdeb4921c05c1172b09ecf615906d4c51031f1fd328f901a4fa86",
+  "song": [
+   161.4167,
+   163.7083
+  ],
+  "clip_in": 0.4887,
+  "knots": [
+   [
+    161.4135,
+    0.4855000000000052
+   ],
+   [
+    161.92,
+    0.9919999999999936
+   ],
+   [
+    162.26,
+    1.4919999999999969
+   ],
+   [
+    162.95,
+    2.1819999999999946
+   ],
+   [
+    163.15,
+    2.7120000000000117
+   ],
+   [
+    163.7007,
+    3.262700000000018
+   ]
+  ],
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16xp.wav",
+  "gate_copy": true,
+  "gate_lag_s": 0.9001,
+  "gate_spans_in_shot_song_s": [],
+  "picture_offset_vs_placement": {
+   "0": 17,
+   "nonzero": [
+    -1,
+    -1,
+    -2,
+    -4,
+    1,
+    -1,
+    -2,
+    -3,
+    -4,
+    -4,
+    -1,
+    -3,
+    2,
+    1,
+    4,
+    4,
+    4,
+    1,
+    2,
+    1,
+    -1,
+    1,
+    1,
+    3,
+    2,
+    2,
+    2,
+    4,
+    4,
+    4,
+    4,
+    2,
+    1,
+    -1,
+    2,
+    1,
+    -1,
+    -2
+   ],
+   "frames": 55
+  },
+  "sync_check": {
+   "lag_s": 0.1651,
+   "ncc": 0.3292,
+   "copy": true,
+   "synced_until": {
+    "clip_s": 1.788,
+    "song_s": 163.04
+   },
+   "spans": [
+    {
+     "clip_s": [
+      1.03,
+      1.83
+     ],
+     "song_s": [
+      162.282,
+      163.082
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": 184,
+    "rule": "stretch",
+    "last_match": 183,
+    "clip_s": 1.84,
+    "song_s": 163.092
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    162.282,
+    163.082
+   ]
+  ],
+  "covered_share": 0.349
+ },
+ "s037d": {
+  "take": "SG16yr2",
+  "take_sha256": "b33c935adbcfdc09af927a0a28d37c200bd276ae5ee868457a52a180a0ea61d7",
+  "song": [
+   165.0833,
+   166.4583
+  ],
+  "clip_in": 1.3796,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16yp.wav",
+  "gate_copy": false,
+  "gate_lag_s": 0.4606,
+  "gate_spans_in_shot_song_s": [],
+  "picture_offset_vs_placement": {
+   "0": 6,
+   "nonzero": [
+    -1,
+    -2,
+    -3,
+    3,
+    2,
+    1,
+    2,
+    1,
+    1,
+    4,
+    3,
+    2,
+    2,
+    1,
+    -1,
+    1,
+    4,
+    3,
+    2,
+    1,
+    -1,
+    1,
+    -1,
+    -2,
+    -3,
+    -4,
+    3
+   ],
+   "frames": 33
+  },
+  "sync_check": {
+   "lag_s": null,
+   "ncc": null,
+   "copy": null,
+   "synced_until": null,
+   "spans": null,
+   "divergence": null,
+   "error": "sel)\n               ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 250, in best_lag\n    scores.append(env_ncc(env_t[i0:i1], env_r[i0 - L:i1 - L]) if i1 - i0 > 20 else -1.0)\n                  ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/reggie/vscode_folder/AI-VIDEO/motion-kit/tools/sync_check.py\", line 240, in env_ncc\n    return float((a * b).sum() / den) if den > 1e-9 else 0.0\n                  ~~^~~\nValueError: operands could not be broadcast together with shapes (137,) (138,) \n"
+  },
+  "visible_lip_synced_song_s": [],
+  "covered_share": 0.0
+ },
+ "s039a": {
+  "take": "SG17Bp1",
+  "take_sha256": "4de4bdb69755bece72ac46228e9631b6b5abfaeecfb4dca3951afa6072d700f2",
+  "song": [
+   170.125,
+   171.9583
+  ],
+  "clip_in": 0.8906,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav",
+  "gate_copy": false,
+  "gate_lag_s": 0.8751,
+  "gate_spans_in_shot_song_s": [
+   [
+    170.804,
+    171.958
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 31,
+   "nonzero": [
+    -1,
+    -1,
+    -2,
+    -1,
+    -2,
+    4,
+    2,
+    1,
+    -1,
+    1,
+    1,
+    2,
+    1
+   ],
+   "frames": 44
+  },
+  "sync_check": {
+   "lag_s": 0.0001,
+   "ncc": 0.2258,
+   "copy": true,
+   "synced_until": {
+    "clip_s": 1.788,
+    "song_s": 171.913
+   },
+   "spans": [
+    {
+     "clip_s": [
+      0.68,
+      1.83
+     ],
+     "song_s": [
+      170.805,
+      171.955
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": null,
+    "rule": "none",
+    "last_match": 183,
+    "clip_s": null,
+    "song_s": null
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    170.805,
+    171.955
+   ]
+  ],
+  "covered_share": 0.627
+ },
+ "s039b": {
+  "take": "SG17Ap2",
+  "take_sha256": "b63f349bbe6b004b2429b165818da1624a13d67470d3cc0c9cde4996f3db047f",
+  "song": [
+   171.9583,
+   173.7917
+  ],
+  "clip_in": 2.4489,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav",
+  "gate_copy": false,
+  "gate_lag_s": 0.6001,
+  "gate_spans_in_shot_song_s": [
+   [
+    172.389,
+    173.779
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 33,
+   "nonzero": [
+    -1,
+    -1,
+    -3,
+    -4,
+    -1,
+    1,
+    -1,
+    -1,
+    -1,
+    1,
+    1
+   ],
+   "frames": 44
+  },
+  "sync_check": {
+   "lag_s": 0.0001,
+   "ncc": 0.4442,
+   "copy": true,
+   "synced_until": {
+    "clip_s": 1.788,
+    "song_s": 173.746
+   },
+   "spans": [
+    {
+     "clip_s": [
+      0.45,
+      1.83
+     ],
+     "song_s": [
+      172.408,
+      173.788
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": null,
+    "rule": "none",
+    "last_match": 183,
+    "clip_s": null,
+    "song_s": null
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    172.408,
+    173.788
+   ]
+  ],
+  "covered_share": 0.753
+ },
+ "s041a": {
+  "take": "SG18xr1",
+  "take_sha256": "d5dee82a57d635cb7098b4ec5a01ed6ac912a8ccd6902450543dc7b9a633a05c",
+  "song": [
+   178.3333,
+   181.0417
+  ],
+  "clip_in": 1.124,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18xp.wav",
+  "gate_copy": true,
+  "gate_lag_s": 0.9251,
+  "gate_spans_in_shot_song_s": [
+   [
+    178.333,
+    180.389
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 33,
+   "nonzero": [
+    3,
+    2,
+    1,
+    1,
+    -1,
+    2,
+    2,
+    1,
+    1,
+    1,
+    -1,
+    -2,
+    -1,
+    -1,
+    -1,
+    1,
+    -1,
+    1,
+    -1,
+    3,
+    2,
+    1,
+    -1,
+    2,
+    1,
+    1,
+    1,
+    -1,
+    -1,
+    1,
+    1,
+    -1
+   ],
+   "frames": 65
+  },
+  "sync_check": {
+   "lag_s": 0.0004,
+   "ncc": 0.3945,
+   "copy": true,
+   "synced_until": {
+    "clip_s": 2.018,
+    "song_s": 180.351
+   },
+   "spans": [
+    {
+     "clip_s": [
+      0.19,
+      2.06
+     ],
+     "song_s": [
+      178.523,
+      180.393
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": 207,
+    "rule": "stretch",
+    "last_match": 206,
+    "clip_s": 2.07,
+    "song_s": 180.403
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    178.523,
+    180.393
+   ]
+  ],
+  "covered_share": 0.69
+ },
+ "s041c": {
+  "take": "SG18yr3",
+  "take_sha256": "1afce3556edffd98ee5fb927482378b590df3cba694a10e5dfca9aa7724376ac",
+  "song": [
+   183.75,
+   185.5833
+  ],
+  "clip_in": 0.0853,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18yp.wav",
+  "gate_copy": true,
+  "gate_lag_s": -0.005,
+  "gate_spans_in_shot_song_s": [
+   [
+    183.75,
+    185.583
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 11,
+   "nonzero": [
+    4,
+    3,
+    2,
+    1,
+    -1,
+    -2,
+    -3,
+    -4,
+    -2,
+    1,
+    1,
+    -1,
+    -2,
+    1,
+    3,
+    2,
+    2,
+    1,
+    2,
+    1,
+    -1,
+    2,
+    1,
+    -1,
+    -1,
+    -2,
+    2,
+    1,
+    -1,
+    1,
+    -1,
+    -2,
+    -3
+   ],
+   "frames": 44
+  },
+  "sync_check": {
+   "lag_s": -0.0003,
+   "ncc": 0.5789,
+   "copy": true,
+   "synced_until": {
+    "clip_s": 1.788,
+    "song_s": 185.538
+   },
+   "spans": [
+    {
+     "clip_s": [
+      0.0,
+      1.83
+     ],
+     "song_s": [
+      183.75,
+      185.58
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": null,
+    "rule": "none",
+    "last_match": 183,
+    "clip_s": null,
+    "song_s": null
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    183.75,
+    185.58
+   ]
+  ],
+  "covered_share": 0.998
+ },
+ "s042": {
+  "take": "SG19a2",
+  "take_sha256": "697c36de92d21875d69e03bdb4d308dfba2f36583f5a28fe23dcaec5e9b64197",
+  "song": [
+   185.5833,
+   188.375
+  ],
+  "clip_in": 1.5148,
+  "knots": null,
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG19.wav",
+  "gate_copy": true,
+  "gate_lag_s": 0.6001,
+  "gate_spans_in_shot_song_s": [
+   [
+    185.583,
+    188.318
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 51,
+   "nonzero": [
+    -1,
+    -1,
+    -1,
+    1,
+    1,
+    -1,
+    1,
+    1,
+    -1,
+    1,
+    2,
+    1,
+    2,
+    1,
+    -1,
+    -2
+   ],
+   "frames": 67
+  },
+  "sync_check": {
+   "lag_s": 0.0006,
+   "ncc": 0.7085,
+   "copy": true,
+   "synced_until": {
+    "clip_s": 2.748,
+    "song_s": 188.331
+   },
+   "spans": [
+    {
+     "clip_s": [
+      0.0,
+      2.79
+     ],
+     "song_s": [
+      185.583,
+      188.373
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": null,
+    "rule": "none",
+    "last_match": 279,
+    "clip_s": null,
+    "song_s": null
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    185.583,
+    188.373
+   ]
+  ],
+  "covered_share": 0.999
+ },
+ "s048": {
+  "take": "SG20xr1",
+  "take_sha256": "cd4119ce1f587ac5abfc7528b492d557ab6a71998c0737f58fdf11e9593e36e3",
+  "song": [
+   205.25,
+   208.4167
+  ],
+  "clip_in": 0.0,
+  "knots": [
+   [
+    205.2412,
+    0.0
+   ],
+   [
+    205.39399999999998,
+    0.0
+   ],
+   [
+    208.4107,
+    3.016700000000003
+   ]
+  ],
+  "window": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG20xp.wav",
+  "gate_copy": false,
+  "gate_lag_s": 0.4751,
+  "gate_spans_in_shot_song_s": [
+   [
+    206.164,
+    206.934
+   ],
+   [
+    207.204,
+    208.174
+   ]
+  ],
+  "picture_offset_vs_placement": {
+   "0": 28,
+   "nonzero": [
+    2,
+    2,
+    2,
+    2,
+    1,
+    4,
+    3,
+    2,
+    1,
+    -1,
+    -2,
+    -3,
+    -4,
+    -4,
+    -2,
+    -1,
+    -2,
+    1,
+    -1,
+    -2,
+    -3,
+    1,
+    1,
+    1,
+    -1,
+    1,
+    -1,
+    -2,
+    -1,
+    -4,
+    -4,
+    1,
+    1,
+    -1,
+    2,
+    1,
+    -1,
+    1,
+    -1,
+    -1,
+    3,
+    2,
+    1,
+    1,
+    1,
+    2,
+    1,
+    -1
+   ],
+   "frames": 76
+  },
+  "sync_check": {
+   "lag_s": 0.4751,
+   "ncc": 0.1809,
+   "copy": false,
+   "synced_until": {
+    "clip_s": 1.878,
+    "song_s": 206.653
+   },
+   "spans": [
+    {
+     "clip_s": [
+      0.81,
+      2.83
+     ],
+     "song_s": [
+      205.585,
+      207.605
+     ]
+    }
+   ],
+   "divergence": {
+    "frame": 193,
+    "rule": "stretch",
+    "last_match": 192,
+    "clip_s": 1.93,
+    "song_s": 206.705
+   },
+   "error": null
+  },
+  "visible_lip_synced_song_s": [
+   [
+    205.585,
+    207.605
+   ]
+  ],
+  "covered_share": 0.638
+ }
+}

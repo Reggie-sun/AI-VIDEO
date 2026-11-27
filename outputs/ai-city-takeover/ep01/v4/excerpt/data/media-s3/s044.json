@@ -1,0 +1,32 @@
+{
+ "shot": "s044",
+ "t0": 192.923,
+ "t1": 195.6629,
+ "why": "192.923 hit, new paragraph: the binder handed over; RT-DRILL box",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P044/a-2944.png",
+ "still_sha256": "8e0c5ea6ef2e83c62a43af9548dde9ce599991f33ebef905e7a1d33b47b07460",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P044/a-2944.png",
+   "sha256": "8e0c5ea6ef2e83c62a43af9548dde9ce599991f33ebef905e7a1d33b47b07460"
+  }
+ ],
+ "frames": 66,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 82
+ },
+ "log": []
+}

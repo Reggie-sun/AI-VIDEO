@@ -1,0 +1,85 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-r3-SG15-a-1",
+ "question": "<主会话问使用者的原问题，逐字（认可页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/index.html",
+  "sha256": "e88334d59cd140b47f683d89f9633b4f738882aecd851d2b6dbd8899b78e48df"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/preview-inputs.json",
+  "sha256": "bae532c8f168a8fb67542813e4ea33dbdaedd33f2dc6450a675efbc032b1852e"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md",
+  "sha256": "9040e687cfa8d6f5aa4b6339250faa6c636da4e525d2f5fc154e0b6858a5530b"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p036-c1.png",
+   "sha256": "27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0",
+   "role": "SG15 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG15.wav",
+   "sha256": "d4317a2e9d22e3c619a8face8aafecf7ac4cc41086d4cf9a8eca5db9e34e070d",
+   "role": "SG15 vocal"
+  }
+ ],
+ "prompts": {
+  "SG15": {
+   "text": "{{image:0}}中的她站在阅览室中央的过道里，身体朝向镜头，右手把一台黑色老式寻呼机攥在腰前，寻呼机的液晶屏只有空白的灰绿底光；画面左侧一位中年读者坐在木椅上，侧身抬头看她；她嘴唇闭着。她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步。说到第三句时她只垂下眼睛看那位读者，不转头；读者连人带椅子往身后的桌子挪过去，让出过道。她一直站在原地，不走动，不转身。中景，镜头固定不动。嘴前没有任何遮挡。后面的读者一直低头看书。寻呼机屏幕没有数字和字，不亮红灯。书脊都是素色的，没有字；阅读灯是绿玻璃灯罩，只亮暖白光。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "cc4e4aa499d968069e8cf362e489106c85559bc28c204b333c291f216409a834"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p036-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P036/x.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣））的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg15-a-1-source-001",
+  "policy_id": "iris-sg15-a-1-source-001",
+  "reservation_id": "iris-sg15-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG15-a-1",
+   "sd-SG15-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG15-a-1"
+ },
+ "decision_notes": [
+  "方案的人声起点 155.58 落在上一词 “call.” 里（cut_audio 拒切），改从 155.76 起；生成 5 s（方案 6 s）",
+  "2026-11-25 r2：挪椅子改绑第三句“让开”（窗口内句序：Ten oh two: P zero. / Pager screams. / Out of my way.，尾巴带下一句 Ten）；首帧、秒数、人声不变",
+  "2026-11-25 r3：去掉引号里的歌词译文，改写“说到第三句时”；首帧、秒数、人声不变"
+ ],
+ "_template_notes": [
+  "本文件是 r3 的 a-1 模板；先按 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/PATCH.md 改好 unit.py / shots.json / 测试并跑通，再写成 pilot/sd-SG15-a-1/preview-approval.json：删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位（同一文件夹里的 preview-approval.held-r2.json 是更早被取代的旧件，保留不动）。",
+  "a-2：unit_group 末尾 a-1→a-2；bound_ids 三个 id 中 -a-1- → -a-2-；takes.this_take → sd-SG15-a-2（takes.folders 保持 [a-1, a-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG15-a-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG15 5 multimodal 400"
+ ],
+ "review_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html",
+  "sha256": "45f950b4b5c011c560a99de5b5d485f5f9b47c165f90aaa5f2089ccfdd3f8c1e"
+ }
+}

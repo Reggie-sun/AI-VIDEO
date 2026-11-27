@@ -1,0 +1,32 @@
+{
+ "shot": "s043",
+ "t0": 188.3603,
+ "t1": 192.923,
+ "why": "the still wide shot in the breath: the window row, nothing moves; tags are graphics",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P043/a-2944.png",
+ "still_sha256": "8a1483eeb0f256d99163316603ce1ceff9a5f376b8c2be343206badab90c7f76",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P043/a-2944.png",
+   "sha256": "8a1483eeb0f256d99163316603ce1ceff9a5f376b8c2be343206badab90c7f76"
+  }
+ ],
+ "frames": 109,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 8
+ },
+ "log": []
+}

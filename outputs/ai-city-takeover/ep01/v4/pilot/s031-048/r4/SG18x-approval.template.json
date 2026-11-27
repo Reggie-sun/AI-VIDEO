@@ -1,0 +1,87 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s041a-r4-SG18x-r-1",
+ "question": "<主会话问使用者的原问题，逐字（认可页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r4/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r4/index.html",
+  "sha256": "2de28a0dcc22a34efd3ffb7e42b069d8c4737cd6fa7fb43d3f0aee2b0a2c09db"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p041-c1.png",
+   "sha256": "43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37",
+   "role": "SG18x reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18xp.wav",
+   "sha256": "24cb4c9e31556357ee051577b51ed25051de59ffcb97613473025291a6e64f38",
+   "role": "SG18x vocal"
+  }
+ ],
+ "prompts": {
+  "SG18x": {
+   "text": "{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，布像高领斗篷一样罩到下巴，只露出脸和银白短发，看着镜头，嘴唇闭着。她对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。她用英文唱：{days, the lights go low}不增不减，不翻译。镜头固定不动，她一直站在原地。射灯亮度不变。防尘布一直裹到下巴，看不见布下面的衣服，也看不见她的手。人台都盖着布，没有脸。画面里没有镜子，橱窗玻璃里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "c814ce793e232d923ed2730c78801a8d1feddcab94851856d582712f79882f2c"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p041-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P041/c.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣），本镜裹在防尘布里）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg18x-r-1-source-001",
+  "policy_id": "iris-sg18x-r-1-source-001",
+  "reservation_id": "iris-sg18x-r-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame and vocal; spans measured, cut and covered across takes after both Gates",
+  "folders": [
+   "sd-SG18x-r-1",
+   "sd-SG18x-r-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG18x-r-1",
+  "r4": {
+   "units": [
+    "SG16x",
+    "SG16y",
+    "SG18x",
+    "SG18y",
+    "SG20x"
+   ],
+   "total_takes": 10,
+   "total_ceiling_CRD": 4000,
+   "section_ceiling_CRD": 15000,
+   "previous_section_ceiling_CRD": 12800
+  }
+ },
+ "decision_notes": [
+  "使用者原话「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」（logs/decisions.md 2026-11-25）：SG16、SG20、SG18 改写为 prompt 含 {英文原台词}、按剪辑段拆 4–5 s 短窗口、每窗口 2 条、跨条量剪盖；本段上限 12,800 → 15,000。",
+  "SG18x 服务 s041a（178.329–181.023）；人声 SG18xp.wav = 人声轨 178.134–180.365（2.231 s）逐样本 + 末尾数字静音，共 4 s；花括号内为该窗口 words.json 的原词。",
+  "prompt 不写任何绑台词的动作（放碗、微波炉熄灯、伸手抓布）；丢失的节拍见认可页“会丢的方案节拍”。",
+  "旧 sd-SG18-a-1|2 的审批原样挂起，不因 r4 改动。"
+ ],
+ "_template_notes": [
+  "本文件是 SG18x 的 r-1 模板；使用者在认可页认可后，写成 pilot/sd-SG18x-r-1/preview-approval.json：删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位，其余逐字不变。",
+  "r-2：unit_group 末尾 r-1→r-2；bound_ids 三个 id 中 -r-1- → -r-2-；takes.this_take → sd-SG18x-r-2（takes.folders 保持 [r-1, r-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG18x-r-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG18x 4 multimodal 400；run_unit.sh 用 VOCAL=SG18xp，T0 = 178.134"
+ ]
+}

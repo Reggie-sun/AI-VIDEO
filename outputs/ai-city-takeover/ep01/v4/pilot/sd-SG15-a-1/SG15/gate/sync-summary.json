@@ -1,0 +1,64 @@
+[
+ {
+  "name": "SG15-sd",
+  "take_sha256": "e2338edb69a148d8d145dd889541eb3248e4409e2a61880c40648f83dc0a9d04",
+  "lag_s": 0.4096,
+  "ncc": 0.0179,
+  "copy": false,
+  "divergence": {
+   "frame": null,
+   "rule": "none",
+   "last_match": 486,
+   "clip_s": null,
+   "song_s": null
+  },
+  "synced_until": {
+   "clip_s": 4.818,
+   "song_s": 160.168
+  },
+  "spans": [
+   {
+    "clip_s": [
+     4.33,
+     4.86
+    ],
+    "song_s": [
+     159.68,
+     160.21
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": -1.874,
+   "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+   "song_t_of_clip0": 157.634,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": -1.874,
+   "ncc": 0.481,
+   "max_dev_s": 0.305,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      0.875
+     ],
+     "lag_s": -1.865,
+     "windows": 1,
+     "min_ncc": 0.447
+    },
+    {
+     "clip_s": [
+      0.875,
+      2.125
+     ],
+     "lag_s": -2.167,
+     "windows": 5,
+     "min_ncc": 0.437
+    }
+   ]
+  }
+ }
+]

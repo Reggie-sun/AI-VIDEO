@@ -1,0 +1,32 @@
+{
+ "shot": "s038b",
+ "t0": 168.2866,
+ "t1": 169.2154,
+ "why": "insert on 'Half': the two half pages; the section's one photocopy dither (EV S0039)",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S038B/b-2944.png",
+ "still_sha256": "6717514ffa2e47419e3d0c784d195579c8424bb8c9187cac1c5a6f478dcc10bb",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S038B/b-2944.png",
+   "sha256": "6717514ffa2e47419e3d0c784d195579c8424bb8c9187cac1c5a6f478dcc10bb"
+  }
+ ],
+ "frames": 22,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 0
+ },
+ "log": []
+}

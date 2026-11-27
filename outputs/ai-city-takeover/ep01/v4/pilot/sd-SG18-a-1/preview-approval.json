@@ -1,0 +1,80 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-r3-SG18-a-1",
+ "question": "对照页：http://127.0.0.1:8769/pilot/s031-048/r3/index.html\n\n6 条有念白或唱段的提示词里，歌词译文和引号都删掉了，动作只写“第几句时”。句子顺序用歌词时间和实际人声核对过。\n\n· SG12：只留开口时收腰带；纸币一直捏在腰前；写明一直看镜头、不转头。\n· SG15：改为“说到第三句时”读者挪椅子。\n· SG16：改为“说到第四句时”放碗、微波炉熄灯。\n· SG17：改为“说到第二句时”按手。\n· SG18：改为“唱到第三句刚开口时”伸手。\n· SG20：本来就没有译文，不变。\n\n另外加了一条自动检查：念白和唱段的提示词里不许出现引号、英文或歌词译文。\n\n花费：这 6 条各拍 2 次，约 6,720 积分。其中 SG12 重拍的 1,440 是计划外新增，本段合计约 11,840，上限 12,800。按这一页开拍吗？",
+ "user_quote": "按 r3 开拍 (Recommended)",
+ "approved_at": "2026-11-25T04:33:58Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/index.html",
+  "sha256": "e88334d59cd140b47f683d89f9633b4f738882aecd851d2b6dbd8899b78e48df"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/preview-inputs.json",
+  "sha256": "bae532c8f168a8fb67542813e4ea33dbdaedd33f2dc6450a675efbc032b1852e"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md",
+  "sha256": "9040e687cfa8d6f5aa4b6339250faa6c636da4e525d2f5fc154e0b6858a5530b"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p041-c1.png",
+   "sha256": "43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37",
+   "role": "SG18 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18.wav",
+   "sha256": "5c13eaad7bd649e3e025cdbdb0f280084692d555a08484e3b31e9e1d64d2be13",
+   "role": "SG18 vocal"
+  }
+ ],
+ "prompts": {
+  "SG18": {
+   "text": "{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，布像高领斗篷一样罩到下巴，只露出脸和银白短发，看着镜头，嘴唇闭着。她很轻地对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。她一直站在原地一动不动，不转身；防尘布一直裹着她，看不见布下面的衣服。唱到第三句刚开口时，她的一只手从胸前的布缝里伸出来，抓住胸前的布边，手在下巴以下；只露出手，手腕以上一直在布里。中景，镜头固定不动，射灯亮度不变。嘴前没有任何遮挡。人台都盖着布，没有脸。画面里没有镜子，橱窗玻璃里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "146b8f1d643787f3d7e0c59e3fcf029fdcf8cc3b7c76f143c2769157b3fea6d0"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 10,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 800,
+  "cumulative_CRD": 800
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p041-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P041/c.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣），本镜裹在防尘布里）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg18-a-1-source-001",
+  "policy_id": "iris-sg18-a-1-source-001",
+  "reservation_id": "iris-sg18-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG18-a-1",
+   "sd-SG18-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1600,
+  "this_take": "sd-SG18-a-1"
+ },
+ "decision_notes": [
+  "s041→s042 换装：使用者「A 裹布 + 重音剪切 (Recommended)」：她从肩到脚裹在防尘布里，185.585 重音上剪到 W1",
+  "2026-11-24 连续性修正：抓布边绑在最后一个词“十月”（October）刚开口时；只露出手，手腕以上一直在布里",
+  "2026-11-25 r3：去掉引号里的歌词译文，抓布边改写“唱到第三句刚开口时”（窗口内第三句只到 October）；首帧、秒数、人声不变；本 a-1 / a-2 文件夹里上一批的 approval 由本模板取代"
+ ],
+ "review_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html",
+  "sha256": "45f950b4b5c011c560a99de5b5d485f5f9b47c165f90aaa5f2089ccfdd3f8c1e"
+ }
+}

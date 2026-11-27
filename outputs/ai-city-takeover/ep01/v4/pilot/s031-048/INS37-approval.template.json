@@ -1,0 +1,72 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-INS37-a-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html",
+  "sha256": "bbc279093957b2a7fb9d67398db62f8aa58710729941cc25b790e9ee0c46803a"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/preview-inputs.json",
+  "sha256": "1772a88f222674703db7ca3ca2a30816e1cf2d86be2e3b230afa26f03977f828"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+  "sha256": "54f2f05f3ed7cb56d47d73e6e34bbc628512373e02f40d5eb3d9f6db3056391f"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p037-ins37b.png",
+   "sha256": "d2645329ef2187949671b31d9e6dce828ec99d3012b89428abdb4d672160f6d9",
+   "role": "INS37 first frame"
+  }
+ ],
+ "prompts": {
+  "INS37": {
+   "text": "镜头固定不动。特写，料理台上的不锈钢微波炉正在转，炉内亮着暖黄的光，转盘上放着一只素色白马克杯；微波炉的显示屏是黑的，什么也不显示；他没拿手机的左手穿着深蓝牛仔袖子，从画面左侧伸进来，食指按在按键面板最下面那一格上。他连按两下那一格，微波炉照转；然后他抓住电线，把插头从左边墙上的插座里拔出来，炉内的灯熄灭，转盘停下。按键面板是一整片素色，没有字、数字和图标；显示屏始终是黑的，不亮任何数字。画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "c7476b2e2ff4a35575828424ccc0217dc6ba09d2744679cf155c3c43d01aa3b5"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [],
+ "identity_waiver_basis": "画面里没有人脸（p037-ins37b.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/ins37-flip.png 逐字节相同；只有手），不涉及身份",
+ "bound_ids": {
+  "attempt_id": "iris-ins37-a-1-source-001",
+  "policy_id": "iris-ins37-a-1-source-001",
+  "reservation_id": "iris-ins37-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-INS37-a-1",
+   "sd-INS37-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-INS37-a-1"
+ },
+ "decision_notes": [
+  "2026-11-24 连续性修正：工程师右手拿手机，按键的是左手；首帧 p037-ins37b = INS37/b 左右镜像（无损），手从左边伸进来，插座在左边墙上"
+ ],
+ "_template_notes": [
+  "本文件是 a-1 的模板；写成 pilot/sd-INS37-a-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s031-048-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "a-2：unit_group 末尾 a-1→a-2；bound_ids 三个 id 中 -a-1- → -a-2-；takes.this_take → sd-INS37-a-2（takes.folders 保持 [a-1, a-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-INS37-a-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh INS37 4 first_frame 400"
+ ]
+}

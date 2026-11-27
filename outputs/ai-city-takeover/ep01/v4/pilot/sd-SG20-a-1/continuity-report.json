@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-25",
+ "written_by": "主会话据 continuity-supervisor 2026-11-25 复核（1–4 项：SG16/SG18 全 PASS；SG15/SG17 仅“最后一句”FAIL、SG20 仅 W1 左臂 FAIL）转写；剩余缺口经 r2/r3 修复并由使用者认可（「按 r2 开拍，图用推荐」「按 r3 开拍」），r3 测试 113 passed 含禁引号/译文检查（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG20-a-1/preview-approval.json",
+   "sha256": "d0c65754260bf56b72d5bf32f5d5d1c6416eff319359403a9d5e1cef7f460f6c"
+  }
+ },
+ "units": {
+  "SG20": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；r3 prompt 从首帧起始状态写起、只按句序绑定动作、无引号与歌词译文",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸一致；W1 左肩与左臂裸露（外套只有右臂长袖）；及膝靴；单膝跪地看镜头；说英文；说完闭嘴不动；镜子无倒影；寻呼机工牌空白；除耳灯无红；念白口型"
+  }
+ }
+}

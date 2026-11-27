@@ -1,0 +1,80 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-r3-SG17-a-1",
+ "question": "对照页：http://127.0.0.1:8769/pilot/s031-048/r3/index.html\n\n6 条有念白或唱段的提示词里，歌词译文和引号都删掉了，动作只写“第几句时”。句子顺序用歌词时间和实际人声核对过。\n\n· SG12：只留开口时收腰带；纸币一直捏在腰前；写明一直看镜头、不转头。\n· SG15：改为“说到第三句时”读者挪椅子。\n· SG16：改为“说到第四句时”放碗、微波炉熄灯。\n· SG17：改为“说到第二句时”按手。\n· SG18：改为“唱到第三句刚开口时”伸手。\n· SG20：本来就没有译文，不变。\n\n另外加了一条自动检查：念白和唱段的提示词里不许出现引号、英文或歌词译文。\n\n花费：这 6 条各拍 2 次，约 6,720 积分。其中 SG12 重拍的 1,440 是计划外新增，本段合计约 11,840，上限 12,800。按这一页开拍吗？",
+ "user_quote": "按 r3 开拍 (Recommended)",
+ "approved_at": "2026-11-25T04:33:58Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/index.html",
+  "sha256": "e88334d59cd140b47f683d89f9633b4f738882aecd851d2b6dbd8899b78e48df"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/preview-inputs.json",
+  "sha256": "bae532c8f168a8fb67542813e4ea33dbdaedd33f2dc6450a675efbc032b1852e"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md",
+  "sha256": "9040e687cfa8d6f5aa4b6339250faa6c636da4e525d2f5fc154e0b6858a5530b"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p039-c1.png",
+   "sha256": "9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342",
+   "role": "SG17 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17.wav",
+   "sha256": "ae7ab1b7d5037f877dfb44ada668b7d83445a1caf1f512235989727a7921a6bd",
+   "role": "SG17 vocal"
+  }
+ ],
+ "prompts": {
+  "SG17": {
+   "text": "{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光贴着地面，横在她右手指尖前；她的左臂搭在膝上，看着镜头，嘴唇闭着。她对着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步；说到第二句时她把右手手掌平按进那道红光里，门一直关着。她一直蹲在原地，不起身，不转身，身体不前倾挡住嘴。镜头固定不动。嘴前没有任何遮挡。门上没有门牌、号码或标志；书脊都是素色的，没有字。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色；红光不照到她的脸上。画面中不得出现任何文字。",
+   "sha256": "eec4a799292c843c3aae588ab302908e21401b145ac6e2762db59926380b5b71"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p039-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P039/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣））的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg17-a-1-source-001",
+  "policy_id": "iris-sg17-a-1-source-001",
+  "reservation_id": "iris-sg17-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG17-a-1",
+   "sd-SG17-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG17-a-1"
+ },
+ "decision_notes": [
+  "门缝下一线红光：使用者「留红光，和 s002 一样算例外 (Recommended)」（只允许这一线，其余除耳挂灯外无红）",
+  "2026-11-25 r2：按手改绑第二句“他们找到了一道缝”（窗口内句序：Bet it couldn't reach outside. / They found a gap instead.）；首帧、秒数、人声不变",
+  "2026-11-25 r3：去掉引号里的歌词译文，改写“说到第二句时”；首帧、秒数、人声不变"
+ ],
+ "review_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html",
+  "sha256": "45f950b4b5c011c560a99de5b5d485f5f9b47c165f90aaa5f2089ccfdd3f8c1e"
+ }
+}

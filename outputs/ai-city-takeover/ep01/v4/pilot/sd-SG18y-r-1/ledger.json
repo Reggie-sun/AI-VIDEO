@@ -1,0 +1,23 @@
+{
+ "schema": "iris-v4-paid-ledger/1",
+ "submits": [
+  {
+   "unit": "SG18y",
+   "attempt_id": "iris-sg18y-r-1-source-001",
+   "operator_ceiling": 400,
+   "intent_at": "2026-11-26T10:20:51.709986+00:00",
+   "outcome": "known_no_effect",
+   "reconciled": {
+    "at": "2026-11-26",
+    "by": "主会话",
+    "evidence": [
+     "sd-SG18y-r-1/SG18y/project/state/paid-provider/submits/2141525b….json outcome known_no_effect external_effect_id null",
+     "reservation iris-sg18y-r-1-reservation-001 status released",
+     "operator: AiVideoError: Jimeng reference upload did not complete; generation was not submitted",
+     "balance.cjs 前后 50507",
+     "先例 sd-MO01-o-2 / sd-MO11-n-1 / sd-SG12-a-2 / sd-SG19-a-1；不重试同一 attempt"
+    ]
+   }
+  }
+ ]
+}

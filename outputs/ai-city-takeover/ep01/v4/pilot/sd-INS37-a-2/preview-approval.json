@@ -1,0 +1,68 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-INS37-a-2",
+ "question": "问题页：http://127.0.0.1:8769/pilot/s031-048/issues/index.html\n\n连续性检查查出的问题都改完了，新画面我逐张看过。\n\n提示词：\n· 动作不再写“最后…”，改成对着具体哪一句词。\n· 纸币写成素面。\n· s041 写明只露出手。\n· s042 的布慢慢滑落，切进来时还在往下掉。\n· INS33 的手按在盖子上，接得上下一镜。\n\n画面：\n· s042 和 s046 的靴子改成及膝靴。\n· s046 的衣架堆到她这一头，给“推到隔板那头”留出了空间。\n· s037 首帧补上了微波炉。\n· INS37 左右翻转，工程师用没拿手机的左手按键。\n· s047 重做，隔板换到右边，和前后几镜一致。\n\n还剩一处小瑕疵：INS37 翻转后微波炉按键面板跑到了左边，而 s037 里是在右边。这个特写只有 1.37 秒，很难看出来。\n\n提交一共 11 条，每条拍 2 次，预计 10,400 积分，上限 11,200。怎么处理？",
+ "user_quote": "按问题页改好的开拍 (Recommended)",
+ "approved_at": "2026-11-25T08:13:32Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html",
+  "sha256": "bbc279093957b2a7fb9d67398db62f8aa58710729941cc25b790e9ee0c46803a"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/preview-inputs.json",
+  "sha256": "1772a88f222674703db7ca3ca2a30816e1cf2d86be2e3b230afa26f03977f828"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+  "sha256": "54f2f05f3ed7cb56d47d73e6e34bbc628512373e02f40d5eb3d9f6db3056391f"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p037-ins37b.png",
+   "sha256": "d2645329ef2187949671b31d9e6dce828ec99d3012b89428abdb4d672160f6d9",
+   "role": "INS37 first frame"
+  }
+ ],
+ "prompts": {
+  "INS37": {
+   "text": "镜头固定不动。特写，料理台上的不锈钢微波炉正在转，炉内亮着暖黄的光，转盘上放着一只素色白马克杯；微波炉的显示屏是黑的，什么也不显示；他没拿手机的左手穿着深蓝牛仔袖子，从画面左侧伸进来，食指按在按键面板最下面那一格上。他连按两下那一格，微波炉照转；然后他抓住电线，把插头从左边墙上的插座里拔出来，炉内的灯熄灭，转盘停下。按键面板是一整片素色，没有字、数字和图标；显示屏始终是黑的，不亮任何数字。画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "c7476b2e2ff4a35575828424ccc0217dc6ba09d2744679cf155c3c43d01aa3b5"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [],
+ "identity_waiver_basis": "画面里没有人脸（p037-ins37b.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/ins37-flip.png 逐字节相同；只有手），不涉及身份",
+ "bound_ids": {
+  "attempt_id": "iris-ins37-a-2-source-001",
+  "policy_id": "iris-ins37-a-2-source-001",
+  "reservation_id": "iris-ins37-a-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-INS37-a-1",
+   "sd-INS37-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-INS37-a-2"
+ },
+ "decision_notes": [
+  "2026-11-24 连续性修正：工程师右手拿手机，按键的是左手；首帧 p037-ins37b = INS37/b 左右镜像（无损），手从左边伸进来，插座在左边墙上",
+  "approval basis: outputs/ai-city-takeover/logs/decisions.md 2026-11-24/25 s031–s048 问题页条（使用者看过问题页 pilot/s031-048/issues/index.html 与提交页后认可）"
+ ]
+}

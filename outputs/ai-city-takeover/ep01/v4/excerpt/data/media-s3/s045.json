@@ -1,0 +1,36 @@
+{
+ "shot": "s045",
+ "t0": 195.6629,
+ "t1": 198.8673,
+ "why": "two booths from above (the copy's face hidden); one 1.03 push step on the 196.580 bar line",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P045/c-2944.png",
+ "still_sha256": "83028d96accdfcb161e2d616cf7c70f25ae51d966b20ac909bf69fcce1b112ba",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P045/c-2944.png",
+   "sha256": "83028d96accdfcb161e2d616cf7c70f25ae51d966b20ac909bf69fcce1b112ba"
+  }
+ ],
+ "frames": 77,
+ "pictures": 77,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "step": [
+   196.5801,
+   1.03
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 263
+ },
+ "log": []
+}

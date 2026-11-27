@@ -1,0 +1,45 @@
+{
+ "shot": "s040b",
+ "t0": 176.5181,
+ "t1": 178.3293,
+ "why": "the monitor: the camera switches on the 177.435 beat, the screen goes dark on 'Eleven' (177.69)",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S040B/a2-fix-2944.png",
+ "still_sha256": "971edce297fec6acc9bec0ff1864e104bc0959189e0e149f7a218646cd072290",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S040B/a2-fix-2944.png",
+   "sha256": "971edce297fec6acc9bec0ff1864e104bc0959189e0e149f7a218646cd072290"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S040B/b2-2944.png",
+   "sha256": "4301890cbd3595b06cdee6ff20ebc7f255468558fb3b1d56b6d151be7c076ad7"
+  }
+ ],
+ "frames": 44,
+ "pictures": 44,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "swap": {
+   "img": "S040Bb",
+   "t": 177.4353
+  },
+  "dim": {
+   "t": 177.69,
+   "to": 0.35,
+   "frames": 5
+  }
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 0
+ },
+ "log": []
+}

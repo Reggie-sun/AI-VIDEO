@@ -257,6 +257,260 @@
    "sample_rate_hz": 44100,
    "seconds": 5.63,
    "sha256": "e53fe70efaf330d3153bebca43f3bdcc9a0118e32eb3241ad78fd75945725dc8"
+  },
+  "SG12": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG12.wav",
+   "song_window": [
+    133.873,
+    141.2934
+   ],
+   "plays": [
+    134.4435,
+    141.2934
+   ],
+   "samples": 327240,
+   "sample_rate_hz": 44100,
+   "seconds": 7.42,
+   "sha256": "654f8d48cd7baf5b8a11ad4fe93c763a4bd2b4b98a1fca3d099631eebd48701b"
+  },
+  "SG15": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG15.wav",
+   "song_window": [
+    155.76,
+    159.5907
+   ],
+   "plays": [
+    155.9336,
+    159.5907
+   ],
+   "samples": 168934,
+   "sample_rate_hz": 44100,
+   "seconds": 3.83,
+   "sha256": "d4317a2e9d22e3c619a8face8aafecf7ac4cc41086d4cf9a8eca5db9e34e070d"
+  },
+  "SG16": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16.wav",
+   "song_window": [
+    161.338,
+    166.4755
+   ],
+   "plays": [
+    161.4135,
+    166.4755
+   ],
+   "samples": 226564,
+   "sample_rate_hz": 44100,
+   "seconds": 5.14,
+   "sha256": "c37372c6517726b504264f88c9e4fdb2d230df6daa65ad748d42019513acc6c0"
+  },
+  "SG17": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17.wav",
+   "song_window": [
+    170.1094,
+    173.7781
+   ],
+   "plays": [
+    170.1094,
+    173.7781
+   ],
+   "samples": 161789,
+   "sample_rate_hz": 44100,
+   "seconds": 3.67,
+   "sha256": "ae7ab1b7d5037f877dfb44ada668b7d83445a1caf1f512235989727a7921a6bd"
+  },
+  "SG18": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18.wav",
+   "song_window": [
+    177.47,
+    185.5855
+   ],
+   "plays": [
+    178.3293,
+    185.5855
+   ],
+   "samples": 357894,
+   "sample_rate_hz": 44100,
+   "seconds": 8.12,
+   "sha256": "5c13eaad7bd649e3e025cdbdb0f280084692d555a08484e3b31e9e1d64d2be13"
+  },
+  "SG19": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG19.wav",
+   "song_window": [
+    184.6683,
+    188.3603
+   ],
+   "plays": [
+    185.5855,
+    188.3603
+   ],
+   "samples": 162817,
+   "sample_rate_hz": 44100,
+   "seconds": 3.69,
+   "sha256": "3925c3ceb5d7bcd27f4d6fb27f59fc98cda49c9715e714ff1d4526eeafe5cabc"
+  },
+  "SG20": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG20.wav",
+   "song_window": [
+    205.2412,
+    208.8
+   ],
+   "plays": [
+    205.2412,
+    209.3395
+   ],
+   "samples": 156943,
+   "sample_rate_hz": 44100,
+   "seconds": 3.56,
+   "sha256": "27a638f479ce1e541be7df55be1a79d667b18a6953e694f758070dc7ebfb568c"
+  },
+  "SG17p": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav",
+   "song_window": [
+    170.1094,
+    173.7781
+   ],
+   "plays": [
+    170.1094,
+    173.7781
+   ],
+   "samples": 220500,
+   "sample_rate_hz": 44100,
+   "seconds": 5.0,
+   "sha256": "24cca57f1368993a90619f1b07c34b4989ff5498e381dee4c7e847f2826abbe2",
+   "padded": {
+    "from": "SG17",
+    "from_sha256": "ae7ab1b7d5037f877dfb44ada668b7d83445a1caf1f512235989727a7921a6bd",
+    "voice_samples": 161789,
+    "silence_samples": 58711,
+    "silence": "digital zeros appended at the end",
+    "to_seconds": 5.0,
+    "basis": "2026-11-25 SG17 A/B probe: audio length = generation length (「先用 SG17 做 A/B 对照 (Recommended)」, logs/decisions.md)"
+   }
+  },
+  "SG16xp": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16xp.wav",
+   "song_window": [
+    161.338,
+    163.523
+   ],
+   "plays": [
+    161.413,
+    163.701
+   ],
+   "samples": 176400,
+   "sample_rate_hz": 44100,
+   "seconds": 4.0,
+   "sha256": "719541e9f46f04472c299fa92dc6231ea0984f99701cd54a485cb08121a5aa26",
+   "padded": {
+    "from": "stem",
+    "from_sha256": "4c7c36a0d1ce9dc1bf31d23bae198f37a596774fd32ffa08a7178d29d3637878",
+    "voice_samples": 96358,
+    "silence_samples": 80042,
+    "silence": "digital zeros appended at the end",
+    "to_seconds": 4.0,
+    "serves": "s037b",
+    "basis": "2026-11-25 r4 short windows, audio length = generation length (「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」, logs/decisions.md)"
+   }
+  },
+  "SG16yp": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16yp.wav",
+   "song_window": [
+    165.071,
+    166.468
+   ],
+   "plays": [
+    165.071,
+    166.476
+   ],
+   "samples": 176400,
+   "sample_rate_hz": 44100,
+   "seconds": 4.0,
+   "sha256": "600d3550b3517056325cf9d76085c4d855aef87f73a89b59755df6f560adacdc",
+   "padded": {
+    "from": "stem",
+    "from_sha256": "4c7c36a0d1ce9dc1bf31d23bae198f37a596774fd32ffa08a7178d29d3637878",
+    "voice_samples": 61608,
+    "silence_samples": 114792,
+    "silence": "digital zeros appended at the end",
+    "to_seconds": 4.0,
+    "serves": "s037d",
+    "basis": "2026-11-25 r4 short windows, audio length = generation length (「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」, logs/decisions.md)"
+   }
+  },
+  "SG18xp": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18xp.wav",
+   "song_window": [
+    178.134,
+    180.365
+   ],
+   "plays": [
+    178.329,
+    181.023
+   ],
+   "samples": 176400,
+   "sample_rate_hz": 44100,
+   "seconds": 4.0,
+   "sha256": "24cb4c9e31556357ee051577b51ed25051de59ffcb97613473025291a6e64f38",
+   "padded": {
+    "from": "stem",
+    "from_sha256": "4c7c36a0d1ce9dc1bf31d23bae198f37a596774fd32ffa08a7178d29d3637878",
+    "voice_samples": 98387,
+    "silence_samples": 78013,
+    "silence": "digital zeros appended at the end",
+    "to_seconds": 4.0,
+    "serves": "s041a",
+    "basis": "2026-11-25 r4 short windows, audio length = generation length (「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」, logs/decisions.md)"
+   }
+  },
+  "SG18yp": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18yp.wav",
+   "song_window": [
+    183.66,
+    185.609
+   ],
+   "plays": [
+    183.763,
+    185.585
+   ],
+   "samples": 176400,
+   "sample_rate_hz": 44100,
+   "seconds": 4.0,
+   "sha256": "4708c8ceef0ff75cc7bc86503d87c3ad05bdc1052291841face4da2c220c6f66",
+   "padded": {
+    "from": "stem",
+    "from_sha256": "4c7c36a0d1ce9dc1bf31d23bae198f37a596774fd32ffa08a7178d29d3637878",
+    "voice_samples": 85951,
+    "silence_samples": 90449,
+    "silence": "digital zeros appended at the end",
+    "to_seconds": 4.0,
+    "serves": "s041c",
+    "basis": "2026-11-25 r4 short windows, audio length = generation length (「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」, logs/decisions.md)"
+   }
+  },
+  "SG20xp": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG20xp.wav",
+   "song_window": [
+    205.819,
+    208.8
+   ],
+   "plays": [
+    205.241,
+    209.339
+   ],
+   "samples": 220500,
+   "sample_rate_hz": 44100,
+   "seconds": 5.0,
+   "sha256": "d23d0202e0a4e408c91a113643db1530d765feec2276e914ef32ec0307b1b0f0",
+   "padded": {
+    "from": "stem",
+    "from_sha256": "4c7c36a0d1ce9dc1bf31d23bae198f37a596774fd32ffa08a7178d29d3637878",
+    "voice_samples": 131462,
+    "silence_samples": 89038,
+    "silence": "digital zeros appended at the end",
+    "to_seconds": 5.0,
+    "serves": "s048",
+    "basis": "2026-11-25 r4 short windows, audio length = generation length (「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」, logs/decisions.md)"
+   }
   }
  }
 }

@@ -1,0 +1,32 @@
+{
+ "shot": "s040a",
+ "t0": 173.7781,
+ "t1": 176.5181,
+ "why": "the guard booth, his mug already in her hand; the quote is a graphic",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P040/a-2944.png",
+ "still_sha256": "cb2778f57101bb560c94409ef34133fc291f87212ab973f997407ef57cf9f26f",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P040/a-2944.png",
+   "sha256": "cb2778f57101bb560c94409ef34133fc291f87212ab973f997407ef57cf9f26f"
+  }
+ ],
+ "frames": 65,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 49
+ },
+ "log": []
+}

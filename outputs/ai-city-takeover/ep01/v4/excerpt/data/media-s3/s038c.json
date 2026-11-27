@@ -1,0 +1,32 @@
+{
+ "shot": "s038c",
+ "t0": 169.2154,
+ "t1": 170.1094,
+ "why": "back to s038a, cropped 1.1x ('Nothing more')",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P038/a-2944.png",
+ "still_sha256": "992df364526c17646b1dac9a56eadf659a2238d4b0e270499d1ee9884a6d00b3",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P038/a-2944.png",
+   "sha256": "992df364526c17646b1dac9a56eadf659a2238d4b0e270499d1ee9884a6d00b3"
+  }
+ ],
+ "frames": 22,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.1,
+   1.1
+  ],
+  "center": [
+   0.6,
+   0.4
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 35
+ },
+ "log": []
+}

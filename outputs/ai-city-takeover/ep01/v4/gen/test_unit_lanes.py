@@ -309,8 +309,11 @@ def test_specs_agree_with_the_board_and_the_lyric_timing():
     assert hashlib.sha256((REPO / U.BOARD).read_bytes()).hexdigest() == U.BOARD_SHA256
     words = [w for line in json.loads(C.WORDS.read_text())["lines"] for w in line["words"]]
     for unit, spec in U.SPECS.items():
+        unit = spec.get("clip", unit)                            # the SG17A / SG17B probe arms are the board clip SG17
         clip = next(c for c in board["clips"] if c["clip"] == unit)
         assert sha(U.PLATES + clip["start_frame"] + ".png") == spec["plate_sha256"]
+        if spec.get("song_window"):                              # r4 short windows: test_r4_windows_* check their own
+            continue
         margin = spec.get("take_margin_seconds", 0)              # SG05 m: one second over its window for the lead-in
         assert spec["generation"]["seconds"] == spec["duration"] >= clip["seconds"] + margin > spec["duration"] - 1
         if spec.get("dialogue"):
@@ -320,7 +323,8 @@ def test_specs_agree_with_the_board_and_the_lyric_timing():
             assert spec["dialogue"]["start_seconds"] == round(inside[0]["start"] - t0, 2)
             # a last word that runs past the take (SG08, SG09) ends where the take ends: the vocal window is cut there
             # ... and, for the m re-windowed units, never past the vocal window's end (SG09 m: 4.543 s window, 5 s take)
-            window_end = round(clip["window"]["t1"] - t0, 2) if unit in S1530_M[1:] else spec["duration"]
+            # ... and so for every s031-s048 spoken / sung unit (SG20: 3.56 s vocal, 6 s take)
+            window_end = round(clip["window"]["t1"] - t0, 2) if unit in S1530_M[1:] + S3148_LIPSYNC else spec["duration"]
             assert spec["dialogue"]["end_seconds"] == min(round(inside[-1]["end"] - t0, 2), window_end, spec["duration"])
 
 
@@ -1050,6 +1054,7 @@ S1530_ROWS = {row["unit"]: row for row in json.loads((S1530 / "submit/preview-in
 
 
 S1530_M = ("SG05", "SG06", "SG07", "SG08", "SG09", "SG10", "SG11")
+S1530_BOARD_SHA256 = "b5f599322f7f19daea1b7eb1f132bf640fdec4712c1cdf5da097ced5cfbe0107"   # board/shots.json of the last pack build
 
 
 def s1530_tag(unit: str) -> str:
@@ -1085,7 +1090,9 @@ def test_s1530_pack_is_the_board_plates_the_drafts_and_the_specs():
     unit), prompt (verbatim draft block), required phrases, vocal window and lyric agree with the spec; cost 80 CRD/s."""
     inputs = json.loads((S1530 / "submit/preview-inputs.json").read_text(encoding="utf-8"))
     assert sha(inputs["source_prompt_file"]) == inputs["source_prompt_file_sha256"]
-    assert inputs["board"]["sha256"] == U.BOARD_SHA256 == sha(U.BOARD)
+    # the s015-s030 pack is frozen at the board it was last built from (its generation ended 2026-11-23); later segments
+    # change the board (s031-s048, 2026-11-24) without touching any s015-s030 shot or clip, which the rows below still check
+    assert inputs["board"]["sha256"] == S1530_BOARD_SHA256 and sha(U.BOARD) == U.BOARD_SHA256
     blocks = dict(re.findall(r"^## s\d{3} · (\w+) · .*?\n\n```prompt\n(.*?)\n```",
                              (REPO / inputs["source_prompt_file"]).read_text(encoding="utf-8"), re.S | re.M))
     assert list(blocks) == list(S1530_ROWS) == S1530_UNITS
@@ -1427,3 +1434,783 @@ def test_s1530_templates_pass_draft_materialize_and_lint(lane, monkeypatch, caps
                          check=True).stdout
     checks = json.loads(out.strip().splitlines()[-1])
     assert [k for k, v in checks.items() if not v] == []
+
+
+# ---------------------------------------------------------------- s031-s048 (2026-11-24, pilot/s031-048/submit)
+S3148 = REPO / "outputs/ai-city-takeover/ep01/v4/pilot/s031-048"
+S3148_UNITS = ["SG12", "INS33", "SG15", "SG16", "INS37", "SG17", "SG18", "INS41", "SG19", "MO15", "SG20"]
+S3148_LIPSYNC = ("SG12", "SG15", "SG16", "SG17", "SG18", "SG19", "SG20")
+S3148_ROWS = {row["unit"]: row for row in json.loads((S3148 / "submit/preview-inputs.json").read_text(encoding="utf-8"))["units"]}
+# 2026-11-25 r3 (pilot/s031-048/r3/PATCH.md; supersedes r2, which was never applied): SG12 a-3 spoke Chinese after its prompt
+# quoted a Chinese rendering of the lyric (「删掉译文、精简动作后重拍 (Recommended)」). SG12 / SG15 / SG16 / SG17 / SG18 / SG20 are
+# re-approved from pilot/s031-048/submit-r3 (prompts excerpt/flash/s031-048-seedance-r3.md: no lyric text or translation, no
+# quote marks, actions bound by ordinal only; SG12 only the belt cinch, re-shot in sd-SG12-b-1|2; SG15 / SG17 / SG20 carry r2:
+# SG20 first frame p048-w2 with the W1 left arm bare). The base pack and its templates stay frozen at the board they were
+# built from; INS33 / INS37 / INS41 / SG19 / MO15 were submitted from them.
+S3148_R3 = ("SG12", "SG15", "SG16", "SG17", "SG18", "SG20")
+S3148_TAGS = {"SG12": "b"}                                     # SG12 a-1 / a-2 / a-3 are used; the others reuse a-1|2
+S3148_BOARD_SHA256 = "e981c8f27d770cbb99b8aa15f72cc6fd4633300e46f359b44af6b153c39da41c"   # board/shots.json of the base pack build
+S3148_R3_INPUTS = json.loads((S3148 / "submit-r3/preview-inputs.json").read_text(encoding="utf-8"))
+S3148_ROWS.update({row["unit"]: row for row in S3148_R3_INPUTS["units"]})
+# the user's picks on pilot/s031-048/preview (「全按推荐 (Recommended)」, logs/decisions.md 2026-11-24): unit -> (plate, design frame);
+# SG16 / INS37 / SG19 / MO15 replaced by the 2026-11-24 pre-submit continuity fixes (CONT1124, pilot/s031-048/issues, pending)
+S3148_PLATES = {"SG12": ("p031-c1", "P031/a"), "INS33": ("p033-ins33", "INS33/b"), "SG15": ("p036-c1", "P036/x"),
+                "SG16": ("p037-c2", "CONT1124/p037-mw-b-comp"), "INS37": ("p037-ins37b", "CONT1124/ins37-flip"),
+                "SG17": ("p039-c1", "P039/b"), "SG18": ("p041-c1", "P041/c"), "INS41": ("p041-ins41", "INS41/b"),
+                "SG19": ("p042-w2", "CONT1124/p042-knee-b-comp"), "MO15": ("p046-w2", "CONT1124/p046-kh-b-comp"),
+                "SG20": ("p048-w2", "CONT1124/p048-arm-b-comp")}     # r2 / r3: W1 left arm bare (p048-w1 had it sleeved)
+
+
+def s3148_take(unit: str, n: int) -> dict:
+    """The unit's <tag>-1 approval template turned into take n as its _template_notes say (placeholders left in)."""
+    value = json.loads(((S3148 / "r3") if unit in S3148_R3 else S3148).joinpath(f"{unit}-approval.template.json").read_text(
+        encoding="utf-8"))
+    assert len(value.pop("_template_notes")) == 3
+    tag = S3148_TAGS.get(unit, "a")
+    swap = lambda text: text.replace(f"-{tag}-1", f"-{tag}-{n}")
+    value["unit_group"] = swap(value["unit_group"])
+    value["bound_ids"] = {k: swap(v) for k, v in value["bound_ids"].items()}
+    value["takes"]["this_take"] = swap(value["takes"]["this_take"])
+    return value
+
+
+def test_s3148_pack_is_the_board_plates_the_drafts_and_the_specs():
+    """Each first frame is a NEW board plate (no earlier plate overwritten) and the chosen design frame byte for byte; mode,
+    seconds, prompt (verbatim draft block), required phrases, vocal window and lyric agree with the spec; 80 CRD/s × 2."""
+    inputs = json.loads((S3148 / "submit/preview-inputs.json").read_text(encoding="utf-8"))
+    # the base pack is frozen at its build's board; the r3 pack (its six units) is built from the current board
+    assert inputs["board"]["sha256"] == S3148_BOARD_SHA256 and S3148_R3_INPUTS["board"]["sha256"] == U.BOARD_SHA256 == sha(U.BOARD)
+    blocks = {}
+    for pack in (inputs, S3148_R3_INPUTS):                # r3 blocks replace the base drafts of its six units
+        assert sha(pack["source_prompt_file"]) == pack["source_prompt_file_sha256"]
+        blocks.update(re.findall(r"^## s\d{3} · (\w+) · .*?\n\n```prompt\n(.*?)\n```",
+                                 (REPO / pack["source_prompt_file"]).read_text(encoding="utf-8"), re.S | re.M))
+    assert list(blocks) == list(S3148_ROWS) == S3148_UNITS and [r["unit"] for r in S3148_R3_INPUTS["units"]] == list(S3148_R3)
+    board = json.loads((REPO / U.BOARD).read_bytes())
+    shots, clips = {s["id"]: s for s in board["shots"]}, {c["clip"]: c for c in board["clips"]}
+    coverage = {u["unit_id"]: u for u in json.loads(U.COVERAGE.read_text(encoding="utf-8"))["coverage_units"]}
+    windows = json.loads((REPO / U.VOCALS).read_text(encoding="utf-8"))["windows"]
+    before = json.loads((REPO / "outputs/ai-city-takeover/ep01/v4/board/shots.json.before-s031-048-2026-11-24").read_bytes())
+    old_plates = {c["start_frame"] for c in before["clips"]} | {s["plate"] for s in before["shots"]}
+    for unit, row in S3148_ROWS.items():
+        spec, clip, shot = U.SPECS[unit], clips[unit], shots[row["shot"]]
+        plate, frame = S3148_PLATES[unit]
+        assert clip["start_frame"] == clip["plate"] == spec["plate"] == plate and plate not in old_plates
+        insert = unit.startswith("INS")
+        assert clip["used_by"] == [row["shot"]] and ("insert" in clip) == insert
+        assert insert or shot["plate"] == plate              # an insert keeps its shot's own plate
+        assert spec["image"][1] == row["first_frame"]["path"] == U.PLATES + plate + ".png"
+        assert row["first_frame"]["design_frame"].endswith(f"design/S31-48/{frame}.png")
+        assert sha(row["first_frame"]["path"]) == sha(row["first_frame"]["design_frame"]) == spec["plate_sha256"]
+        assert (row["mode"], row["seconds"]) == (spec["input_mode"], spec["duration"]) == (
+            spec["generation"]["mode"], spec["generation"]["seconds"])
+        assert spec["duration"] == max(4, math.ceil(coverage[unit]["duration_seconds"]) + spec.get("take_margin_seconds", 0))
+        assert 4 <= spec["duration"] <= 15 and spec["input_mode"] == ("multimodal" if unit in S3148_LIPSYNC else "first_frame")
+        assert row["prompt"] == blocks[unit] and hashlib.sha256(row["prompt"].encode()).hexdigest() == row["prompt_sha256"]
+        assert U.prompt_language_ok(spec, row["prompt"])
+        literals = [spec["image"][4], *spec["intent"]["open_event"], *spec["intent"]["close_event"], *spec["intent"]["natural"]]
+        assert row["required_phrases"] == literals and len(set(literals)) == len(literals) >= 6
+        assert [x for x in literals if x not in row["prompt"]] == []
+        assert (row["est_cost_per_take_CRD"], row["ceiling_per_take_CRD"]) == (
+            spec["duration"] * 80, math.ceil(spec["duration"] * 0.8) * 100)
+        assert row["lesson_risks"] and row["plan_unit"]["gate"]
+        if spec["input_mode"] == "multimodal":
+            assert {"逐字精确同步", "嘴前没有任何遮挡"} <= set(literals)
+            assert set(U.MARKERS.findall(row["prompt"])) == {"{{image:0}}", "{{audio:1}}"}
+            vocal, window = row["vocal"], windows[spec["audio"]["window"]]
+            assert spec["audio"]["window"] == unit and vocal["path"].endswith(f"pilot/audio/{unit}.wav")
+            assert vocal["path"] == spec["audio"]["path"] == window["path"] and sha(vocal["path"]) == vocal["sha256"] == window["sha256"]
+            assert window["song_window"] == vocal["song_window_s"] == [clip["window"]["t0"], clip["window"]["t1"]]
+            assert vocal["lyric_text"] == spec["dialogue"]["verbatim_text"] == " ".join(clip["words"])
+            assert window["seconds"] <= spec["duration"]
+        else:
+            assert not U.MARKERS.findall(row["prompt"]) and "vocal" not in row
+    # 9 + 4 + 5 + 7 + 4 + 5 + 10 + 4 + 5 + 6 + 6 s; 80 CRD/s, two takes each
+    assert inputs["total_seconds_per_take_set"] == 65 and inputs["estimated_total_CRD"] == 65 * 80 * 2 == 10400
+    assert inputs["ceiling_total_CRD"] == 11200
+    for still in inputs["stills"]:                    # stills are the preview's recommended design frames, not generated
+        assert all(sha(f["path"]) == f["sha256"] for f in still["frames"]) and still["plan"]["cls"] == "s"
+    # r3 keeps every unit's seconds: 9 + 5 + 7 + 5 + 10 + 6 s, two takes each; SG12's two b takes are new over the 10,400 plan
+    # (its planned two were spent on a-1 and a-3), the other five were inside it
+    r3 = S3148_R3_INPUTS
+    assert (r3["total_seconds_per_take_set"], r3["estimated_total_CRD"], r3["ceiling_total_CRD"]) == (42, 42 * 80 * 2, 7000)
+    assert {k: r3["new_over_plan"][k] for k in ("unit", "estimated_CRD", "ceiling_CRD")} == {"unit": "SG12", "estimated_CRD": 1440,
+                                                                                              "ceiling_CRD": 1600}
+    for key, pack in (("base_pack", "submit"), ("supersedes", "submit-r2")):
+        path = f"outputs/ai-city-takeover/ep01/v4/pilot/s031-048/{pack}/preview-inputs.json"
+        assert r3[key] == {"path": path, "sha256": sha(path)}
+    [still] = r3["stills"]                            # r2's s047, remade with the W1 left arm bare
+    assert still["segment"] == "s047" and still["frames"][0]["path"].endswith("CONT1124/p047-rb-c-2944.png")
+    assert sha(still["frames"][0]["path"]) == still["frames"][0]["sha256"] and sha(still["replaces"]["path"]) == still["replaces"]["sha256"]
+    r2_blocks = dict(re.findall(r"^## s\d{3} · (\w+) · .*?\n\n```prompt\n(.*?)\n```",
+                                (REPO / "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r2.md").read_text(
+                                    encoding="utf-8"), re.S | re.M))
+    for unit in S3148_R3:                             # the previous prompt is r2's for SG15 / SG17 / SG20, else the base draft
+        base = next(r for r in inputs["units"] if r["unit"] == unit)
+        row = S3148_ROWS[unit]
+        previous = hashlib.sha256(r2_blocks[unit].encode()).hexdigest() if unit in ("SG15", "SG17", "SG20") else base["prompt_sha256"]
+        assert row["previous_prompt"]["sha256"] == previous and row["base_prompt"]["sha256"] == base["prompt_sha256"]
+        assert (row["prompt_sha256"] == previous) == (unit == "SG20") and row["prompt_sha256"] != base["prompt_sha256"]
+
+
+def test_s3148_vocal_windows():
+    """Each vocal window starts ~0.3 s before its phrase; where that point is inside the previous word (cut_audio refuses)
+    it starts where that word ends, never after the edit's in-point (SG08 / SG09m precedent). Take = ceil(window) + 1 s;
+    SG20's vocal stops before "All" and its take covers the edit to 209.34 + 1 s. The wavs are cut_audio cuts, sealed."""
+    board = json.loads((REPO / U.BOARD).read_bytes())
+    clips = {c["clip"]: c for c in board["clips"]}
+    words = [w for line in json.loads(C.WORDS.read_text())["lines"] for w in line["words"]]
+    windows = json.loads((REPO / U.VOCALS).read_text(encoding="utf-8"))["windows"]
+    bounded = {"SG15": 0.123, "SG16": 0.04, "SG17": 0.195, "SG18": 0.222}      # previous word's end or the in-point
+    for unit in S3148_LIPSYNC:
+        spec, clip = U.SPECS[unit], clips[unit]
+        t0, t1 = clip["window"]["t0"], clip["window"]["t1"]
+        assert C.inside_word(t0, json.loads(C.WORDS.read_text())) == []
+        first = next(w for w in words if w["start"] >= t0)
+        lead = round(first["start"] - t0, 3)
+        assert lead >= 0.3 - 1e-6 or bounded[unit] == lead
+        if unit in bounded and unit != "SG17":
+            prev = max((w for w in words if w["end"] <= t0 + 1e-6), key=lambda w: w["end"])
+            assert prev["end"] == t0 and first["start"] - 0.3 < prev["end"]
+        assert clip["plays"]["t0"] >= t0 and spec["dialogue"]["start_seconds"] == round(first["start"] - t0, 2)
+        margin = 2 if unit == "SG20" else 1
+        assert spec["take_margin_seconds"] == margin and spec["duration"] == math.ceil(clip["seconds"]) + margin
+        assert clip["plays"]["t1"] - t0 + 1 <= spec["duration"]           # every edit span has a second of handle
+        rel = f"outputs/ai-city-takeover/ep01/v4/pilot/audio/{unit}.wav"
+        assert windows[unit]["path"] == rel and windows[unit]["song_window"] == [t0, t1] and sha(rel) == windows[unit]["sha256"]
+        frames_, sr, ch, width = frames(REPO / rel)
+        payload, _, n = C.cut_window(C.STEM, t0, t1)
+        assert (frames_, sr, ch, width) == (payload, 44100, 1, 2) and n == windows[unit]["samples"]
+    assert clips["SG20"]["window"]["t1"] == 208.8 < next(w["start"] for w in words if w["text"] == "All" and w["start"] > 208)
+    assert clips["SG17"]["window"]["t0"] == clips["SG17"]["plays"]["t0"] == 170.1094
+
+
+def test_s3148_prompts_follow_the_lessons():
+    """The binding lessons: no turning in spoken / sung takes, no walking at the lens and no exit, blank / unlit things,
+    one face, s039 only the door-crack red line, MO15 left hand, s041 wrapped, the duplicate never shows its face."""
+    rows = S3148_ROWS
+    for unit, row in rows.items():
+        prompt = row["prompt"]
+        assert all(prompt[i - 1] == "不" for i in (m.start() for m in re.finditer("转身|转头|走出|起身", prompt))), unit
+        assert not [x for x in ("走向镜头", "朝镜头走", "出画", "走出画面", "走开", "离开画面") if x in prompt], unit
+        assert prompt.endswith("画面中不得出现任何文字。")
+        if unit == "SG17":
+            assert "画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色" in prompt
+            assert "除了她左耳耳挂上的小红灯，画面里没有任何红色" not in prompt and "门缝" in U.SPECS[unit]["palette"]
+        elif unit.startswith("INS") or unit == "MO15":
+            assert "画面里没有任何红色。" in prompt and "耳挂" not in prompt
+        else:
+            assert "除了她左耳耳挂上的小红灯，画面里没有任何红色。" in prompt
+    assert "左手搭在杆上那一排衣架上" in rows["MO15"]["prompt"] and "她用左手一把把所有衣架" in rows["MO15"]["prompt"]
+    assert "右手" not in rows["MO15"]["prompt"] and "不露出头和脸" in rows["MO15"]["prompt"]
+    assert "从肩到脚裹在同一种本白粗亚麻防尘布里" in rows["SG18"]["prompt"] and "看不见布下面的衣服" in rows["SG18"]["prompt"]
+    assert "看不到他的脸" in rows["SG16"]["prompt"] and "没有五官" in rows["INS41"]["prompt"]
+    blank = {"SG12": "售货机的小显示屏是黑的，不亮", "INS33": "没有任何刻字、刻度、数字或铭牌", "SG15": "寻呼机屏幕没有数字和字，不亮红灯",
+             "SG16": "咖啡机和水壶上没有亮灯，也没有显示屏", "INS37": "显示屏始终是黑的，不亮任何数字", "SG17": "门上没有门牌、号码或标志",
+             "SG19": "工牌是空白的", "MO15": "秒表表盘空白，没有数字", "SG20": "工牌是空白的"}
+    for unit, phrase in blank.items():
+        assert phrase in rows[unit]["prompt"], unit
+    for unit in ("INS33", "INS37", "INS41"):              # hand-only inserts take unit.py's no-person path, as INS16
+        spec = U.SPECS[unit]
+        assert (spec["iris"], spec["identity_waiver"], spec["duration"]) == (False, None, 4)
+        assert "character_directions" not in spec["performance"]
+    assert U.SPECS["SG18"]["look"] == "C" and "裹在防尘布里" in U.SPECS["SG18"]["identity_continuity"]
+    # r3: every action is bound by ordinal (no "last sentence": SG15's window ends on the next line's "Ten"); SG12 keeps only
+    # the belt cinch on the first word (no banknote tuck, no eye flick); SG20 states the W1 left arm bare (r2)
+    assert all("最后" not in rows[unit]["prompt"] for unit in S3148_R3)
+    assert "说到第三句时她只垂下眼睛看那位读者，不转头" in rows["SG15"]["prompt"]
+    assert "说到第四句时，微波炉的灯熄灭、转盘停下，她把碗放到身边的台面上" in rows["SG16"]["prompt"]
+    assert "说到第二句时她把右手手掌平按进那道红光里" in rows["SG17"]["prompt"]
+    assert "唱到第三句刚开口时，她的一只手从胸前的布缝里伸出来" in rows["SG18"]["prompt"]
+    assert "她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖" in rows["SG20"]["prompt"]
+    sg12 = rows["SG12"]["prompt"]
+    assert "说出第一个词的同时用左手把风衣腰带一拉收紧" in sg12 and "右手一直捏着纸币垂在腰前" in sg12
+    assert not [x for x in ("塞进", "口袋", "瞟", "第四句") if x in sg12]
+
+
+
+# Chinese renderings the s031-s048 drafts once quoted for a lyric line (SG12 a-3 then spoke Chinese); r3 bans them outright
+S3148_RETIRED_RENDERINGS = ("运气不好", "让开", "找到了一道缝", "十二点三十四分", "十月")
+S3148_ORDINALS = {"SG15": ("说到第三句时", 3, "Out"), "SG16": ("说到第四句时", 4, "Killed"), "SG17": ("说到第二句时", 2, "They"),
+                  "SG18": ("唱到第三句刚开口时", 3, "October")}
+
+
+def s3148_sentences(t0: float, t1: float) -> list[list[str]]:
+    """The sentences heard in a vocal window (words.json): spoken lines split at . ? !, a sung line is one sentence; a tail
+    of the previous sentence (words starting before t0) does not count."""
+    out = []
+    for line in json.loads(C.WORDS.read_text())["lines"]:
+        current = []
+        for i, w in enumerate(line["words"]):
+            if t0 <= w["start"] < t1:
+                current.append(w["text"])
+            if current and (i == len(line["words"]) - 1 or (line["mode"] == "spoken" and w["text"][-1] in ".?!")):
+                out.append(current)
+                current = []
+    return out
+
+
+def test_s3148_spoken_and_sung_prompts_quote_no_lyric():
+    """No spoken or sung prompt quotes lyric text or any translation of it (SG12 a-3 re-voiced its line in Chinese after the
+    prompt quoted 「运气不好」; 「删掉译文、精简动作后重拍 (Recommended)」, logs/decisions.md 2026-11-25): no quote marks at all,
+    no Latin letters, no fragment of the line's Chinese gloss (lyrics/glosses-v5.json), none of the retired renderings.
+    Actions bind by ordinal only, and each ordinal names a sentence that starts inside the unit's own vocal window."""
+    glosses = json.loads((REPO / "outputs/ai-city-takeover/ep01/v4/lyrics/glosses-v5.json").read_text(encoding="utf-8"))
+    lines = json.loads(C.WORDS.read_text())["lines"]
+    windows = json.loads((REPO / U.VOCALS).read_text(encoding="utf-8"))["windows"]
+    prompts = {unit: S3148_ROWS[unit]["prompt"] for unit in S3148_LIPSYNC} | SG17_PROBE_PROMPTS | R4_PROMPTS
+    # The one exemption: SG17B (「先用 SG17 做 A/B 对照 (Recommended)」, logs/decisions.md 2026-11-25: "B=A+英文原台词入 {} …
+    # B 臂豁免“prompt 不写英文”") and the r4 units (「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」). Exactly the
+    # window's English words, once, inside {}; with that sentence removed the prompt must pass every check below.
+    assert [unit for unit, spec in U.SPECS.items() if spec.get("braced_line")] == ["SG17B", *R4]
+    for unit in ("SG17B", *R4):
+        braced = "{" + U.SPECS[unit]["braced_line"] + "}"
+        assert U.SPECS[unit]["braced_line"] == U.SPECS[unit]["dialogue"]["verbatim_text"] and prompts[unit].count(braced) == 1
+        assert not U.prompt_language_ok(U.SPECS["SG17A"], prompts[unit])      # the exemption does not reach any other spec
+        assert not U.prompt_language_ok(U.SPECS[U.SPECS[unit].get("clip", unit)], prompts[unit])
+        prompts[unit] = prompts[unit].replace(braced, "", 1)
+    for unit, prompt in prompts.items():
+        spec = U.SPECS[unit]
+        t0, t1 = windows[spec["audio"]["window"]]["song_window"]
+        assert not [q for q in "「」『』“”‘’\"'" if q in prompt], unit
+        assert U.prompt_language_ok(spec, prompt) and not [x for x in S3148_RETIRED_RENDERINGS if x in prompt], unit
+        heard = [g for line in lines if line["end"] > t0 and line["start"] < t1 for g in [glosses.get(line["en"], "")]]
+        fragments = {f for g in heard for f in re.split(r"[，。：；！？、“”「」（）\s,.:;!?()]+", re.sub(r"（[^）]*）", "", g))
+                     if len(f) >= 3 and not re.search("[A-Za-z0-9]", f)}
+        assert heard and not [f for f in fragments if f in prompt], unit
+        literals = [spec["image"][4], *spec["intent"]["open_event"], *spec["intent"]["close_event"], *spec["intent"]["natural"]]
+        assert not [x for x in literals if re.search("[「」『』“”‘’\"']", x)], unit
+        said = s3148_sentences(t0, t1)
+        if unit in S3148_ORDINALS:
+            words, n, first = S3148_ORDINALS[unit]
+            assert words in prompt and said[n - 1][0] == first, (unit, said)
+        bound = [re.search("第.+?句", S3148_ORDINALS[unit][0]).group(0)] if unit in S3148_ORDINALS else []
+        assert re.findall("第[一二三四五六七八九十]+句", prompt) == bound, unit      # the one bound ordinal, nothing else
+    assert [s[0] for s in s3148_sentences(*windows["SG12"]["song_window"])] == ["September", "The", "Google,", "No", "It"]
+    assert "说出第一个词的同时" in S3148_ROWS["SG12"]["prompt"]                    # SG12 binds only its first word
+
+def test_s3148_templates_shape_both_takes_with_fresh_ids():
+    """Fresh ids per take, never another take's; an approval the main session already wrote (and its operator bound) carries
+    exactly its own template's pack, prompt and ids. The r3 units bind the submit-r3 pack; SG12's r3 takes are b-1|2 (a
+    superseded approval stays only as preview-approval.held-r2|r3.json)."""
+    packs = {False: "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/",
+             True: "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/"}
+    own = {f"sd-{unit}-{S3148_TAGS.get(unit, 'a')}-{n}" for unit in S3148_UNITS for n in (1, 2)}
+    bound = {b.parent.parent.name: json.loads(b.read_text()) for b in (REPO / "outputs/ai-city-takeover/ep01/v4/pilot").glob(
+        "sd-*/*/operator-bound.json")}
+    used = {value.get(k) for name, value in bound.items() if name not in own for k in ("attempt_id", "policy_id", "reservation_id")}
+    ids = []
+    for unit, row in S3148_ROWS.items():
+        spec = U.SPECS[unit]
+        page, inputs = packs[unit in S3148_R3] + "index.html", packs[unit in S3148_R3] + "preview-inputs.json"
+        tag = S3148_TAGS.get(unit, "a")
+        for n in (1, 2):
+            value = s3148_take(unit, n)
+            assert sorted(placeholders(value)) == sorted([value["question"], value["user_quote"], value["approved_at"]])
+            assert value["preview_page"] == {"path": page, "sha256": sha(page)}
+            assert value["preview_inputs"] == {"path": inputs, "sha256": sha(inputs)}
+            assert value["prompts"] == {unit: {"text": row["prompt"], "sha256": row["prompt_sha256"]}}
+            artifacts = [{"path": spec["image"][1], "sha256": spec["plate_sha256"], "role": f"{unit} {U.APPROVAL_ROLE[spec['input_mode']]}"}]
+            if spec.get("audio"):
+                artifacts.append({"path": spec["audio"]["path"], "sha256": sha(spec["audio"]["path"]), "role": f"{unit} vocal"})
+            assert value["preview_artifacts"] == artifacts and value["generation"] == spec["generation"]
+            ceiling = row["ceiling_per_take_CRD"]
+            assert value["budget"] == {"generations": 1, "retries": 0, "operator_ceiling_per_unit_CRD": ceiling,
+                                       "cumulative_CRD": ceiling}
+            assert value["identity_waivers"] == (["IRIS"] if spec["iris"] else [])
+            assert value["takes"]["folders"] == [f"sd-{unit}-{tag}-1", f"sd-{unit}-{tag}-2"]
+            assert value["takes"]["this_take"] == f"sd-{unit}-{tag}-{n}" and "replaces_approval" not in value
+            ident = f"iris-{unit.lower()}-{tag}-{n}"
+            assert value["bound_ids"] == {"attempt_id": f"{ident}-source-001", "policy_id": f"{ident}-source-001",
+                                          "reservation_id": f"{ident}-reservation-001"}
+            ids += value["bound_ids"].values()
+            folder = S3148.parent / f"sd-{unit}-{tag}-{n}"     # a folders exist (b: the main session makes them); approvals are its own
+            assert folder.is_dir() or tag == "b"
+            written = folder / "preview-approval.json"
+            if written.exists():
+                approval = json.loads(written.read_text(encoding="utf-8"))
+                keys = ("preview_page", "preview_inputs", "prompt_source", "preview_artifacts", "prompts", "generation", "bound_ids")
+                assert {k: approval[k] for k in keys} == {k: value[k] for k in keys}, folder.name
+            if folder.name in bound:
+                assert {k: bound[folder.name][k] for k in value["bound_ids"]} == value["bound_ids"], folder.name
+    assert len(set(ids)) == 11 * 2 * 2 and not set(ids) & used
+
+
+@pytest.mark.parametrize("unit", S3148_UNITS)
+def test_s3148_templates_pass_draft_materialize_and_lint(lane, monkeypatch, capsys, unit):
+    """The a-1 template with only its placeholders filled drafts, resolves the 4k request with the exact prompt, image
+    and vocal, and passes every lint check (tmp lane; nothing is written under the repo, nothing is called)."""
+    monkeypatch.setattr(U, "VOCALS", "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json")
+    row, spec = S3148_ROWS[unit], U.SPECS[unit]
+    value = s3148_take(unit, 1) | {"question": "q", "user_quote": "按页面拍 (Recommended)", "approved_at": "2026-11-24T08:00:00Z"}
+    approve(lane, value)
+    U.draft(unit)
+    node = f"node_dryrun3148{unit.lower()}"
+    ceiling = row["ceiling_per_take_CRD"]
+    profile = PROFILE | {"input_mode": spec["input_mode"], "node_id": node, "duration_seconds": spec["duration"],
+                         "benefit_amount": spec["duration"], "credit_upper_bound": ceiling}
+    path = lane / unit / "profile.json"
+    path.write_text(json.dumps(profile))
+    U.materialize(unit, path)
+    capsys.readouterr()
+    U.show(unit)
+    request = json.loads(capsys.readouterr().out)
+    assert (request["model"], request["input_mode"], request["seconds"], request["resolution"], request["aspect"],
+            request["prompt"]) == ("seedance_2.0_vip", spec["input_mode"], spec["duration"], "4k", "16:9", row["prompt"])
+    assert [b["asset_sha256"] for b in request["image_bindings"]] == [spec["plate_sha256"]]
+    assert [b["asset_sha256"] for b in request["media_bindings"]] == (
+        [row["vocal"]["sha256"]] if spec["input_mode"] == "multimodal" else [])
+    bound = {"schema_version": "iris-v4-unit/1", "unit": unit, "task": f"IRIS EP01 v4 {unit}（{row['shot']}，a-1）",
+             "user_quote": value["user_quote"], "preview_approval": str(lane / "preview-approval.json"), **value["bound_ids"],
+             "max_submit_count": 1, "automatic_retries": 0, "operator_currency": "CRD", "operator_ceiling": ceiling,
+             "ledger": "ledger.json", "cumulative_submit_ceiling": 1, "cumulative_operator_credit_ceiling": ceiling,
+             "issued_at": "2026-11-24T08:30:00+00:00", "expires_at": "2026-11-24T14:30:00+00:00", "stop_on_unknown": True}
+    (lane / unit / "operator-bound.json").write_text(json.dumps(bound, ensure_ascii=False))
+    (lane / unit / "node-created.json").write_text(json.dumps({"node_id": node, "empty": True}))
+    (lane / "continuity-report.json").write_text(json.dumps({"units": {unit: {"verdict": "ready"}}}))
+    code = "import json, sys; sys.path.insert(0, sys.argv[1]); import lint; print(json.dumps(lint.lint(sys.argv[2])['checks']))"
+    env = {k: v for k, v in os.environ.items() if k not in {"SD_PILOT", "SD_UNITS"}} | {
+        "SD_TRIAL": str(lane), "PYTHONDONTWRITEBYTECODE": "1", "PYTHONWARNINGS": "ignore"}
+    out = subprocess.run([sys.executable, "-c", code, str(GEN), unit], cwd=REPO, capture_output=True, text=True, env=env,
+                         check=True).stdout
+    checks = json.loads(out.strip().splitlines()[-1])
+    assert [k for k, v in checks.items() if not v] == []
+
+
+# ---------------------------------------------------------------- SG17 A/B lip-sync probe (2026-11-25, pilot/s031-048/probe)
+# 「先用 SG17 做 A/B 对照 (Recommended)」 (logs/decisions.md 2026-11-25, after the model-researcher summary): two arms on s039,
+# two takes each, 5 s 4k multimodal, first frame p039-c1, one shared vocal SG17p (SG17.wav + digital silence at the end to
+# exactly 5.000 s). A = the first-frame state, then only speech in word-for-word sync; B = A + the exact English lines in {}.
+SG17_PROBE = REPO / "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/probe"
+SG17_START = ("{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光贴着地面，横在她右手指尖前；"
+              "她的左臂搭在膝上，看着镜头，嘴唇闭着。")
+SG17A_PROMPT = (SG17_START + "她对着镜头说话，口型与{{audio:1}}里的人声逐字精确同步。镜头固定不动，她一直蹲在原地。"
+                "门上没有门牌、号码或标志。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色；红光不照到她的脸上。"
+                "画面中不得出现任何文字。")
+SG17B_SENTENCE = "她用英文说：{Bet it couldn't reach outside. They found a gap instead.}不增不减，不翻译。"
+SG17B_PROMPT = SG17A_PROMPT.replace("逐字精确同步。", "逐字精确同步。" + SG17B_SENTENCE)
+SG17_PROBE_PROMPTS = {"SG17A": SG17A_PROMPT, "SG17B": SG17B_PROMPT}
+# anything she could do besides speaking (the r3 hand press 按 / 手掌 and the usual drift: standing, turning, leaning, gestures)
+SG17_ACTIONS = ("按", "手", "伸", "抬", "举", "放", "拿", "推", "拉", "摸", "碰", "握", "攥", "收", "起", "站", "走", "转", "低头",
+                "点头", "摇头", "挥", "指向", "前倾", "靠", "眨", "笑", "张开", "合上", "移", "挪", "动作", "打开", "开门", "回头")
+
+
+def sg17_take(unit: str, n: int) -> dict:
+    """The arm's p-1 approval template turned into take n as its _template_notes say (placeholders left in)."""
+    value = json.loads((SG17_PROBE / f"{unit}-approval.template.json").read_text(encoding="utf-8"))
+    assert len(value.pop("_template_notes")) == 3
+    swap = lambda text: text.replace("-p-1", f"-p-{n}")
+    value["unit_group"] = swap(value["unit_group"])
+    value["bound_ids"] = {k: swap(v) for k, v in value["bound_ids"].items()}
+    value["takes"]["this_take"] = swap(value["takes"]["this_take"])
+    return value
+
+
+def test_sg17_probe_arm_a_only_speaks_and_b_adds_only_the_braced_lines():
+    """A holds the first-frame state, then no action but speaking (the hand press and every other action removed) and the
+    kept blank / red / no-text rules; B is A plus exactly the {} sentence after the sync sentence, nothing else."""
+    assert SG17A_PROMPT.startswith(SG17_START)
+    rest = SG17A_PROMPT[len(SG17_START):]
+    assert [x for x in SG17_ACTIONS if x in rest] == [] and "说话" in rest and "逐字精确同步" in rest
+    assert not [x for x in ("按", "手掌", "平按") if x in SG17A_PROMPT]           # no hand action anywhere, start state included
+    for kept in ("镜头固定不动", "她一直蹲在原地", "门上没有门牌", "画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色",
+                 "红光不照到她的脸上", "画面中不得出现任何文字。"):
+        assert kept in SG17A_PROMPT, kept
+    assert len(re.findall("[A-Za-z]", SG17A_PROMPT.replace("{{image:0}}", "").replace("{{audio:1}}", ""))) == 0
+    i = SG17B_PROMPT.index(SG17B_SENTENCE)
+    assert SG17B_PROMPT[:i] + SG17B_PROMPT[i + len(SG17B_SENTENCE):] == SG17A_PROMPT and SG17B_PROMPT.count("{") == SG17A_PROMPT.count("{") + 1
+    assert SG17B_PROMPT[i - len("逐字精确同步。"):i] == "逐字精确同步。"
+    assert "{" + U.SG17_LINES + "}" in SG17B_SENTENCE and U.SG17_LINES == U.SPECS["SG17"]["dialogue"]["verbatim_text"]
+    for unit, prompt in SG17_PROBE_PROMPTS.items():
+        spec = U.SPECS[unit]
+        literals = [spec["image"][4], *spec["intent"]["open_event"], *spec["intent"]["close_event"], *spec["intent"]["natural"]]
+        assert [x for x in literals if x not in prompt] == [] and U.prompt_language_ok(spec, prompt)
+        assert set(U.MARKERS.findall(prompt)) == {"{{image:0}}", "{{audio:1}}"}
+    assert not U.prompt_language_ok(U.SPECS["SG17A"], SG17B_PROMPT)
+
+
+def test_sg17_probe_specs_vocal_and_folders():
+    """Both arms are the board clip SG17 (no new board clip), first frame p039-c1, 5 s multimodal with vocal SG17p: SG17.wav's
+    exact samples + digital zeros at the end to 5.000 s, sealed with SG17's song window; SG17.wav itself and the old
+    sd-SG17-a-1|2 approvals are untouched; the arms differ only by name and braced_line."""
+    windows = json.loads((REPO / U.VOCALS).read_text(encoding="utf-8"))["windows"]
+    sg17, padded = windows["SG17"], windows["SG17p"]
+    assert sha(sg17["path"]) == sg17["sha256"] == "ae7ab1b7d5037f877dfb44ada668b7d83445a1caf1f512235989727a7921a6bd"
+    voice, sr, ch, width = frames(REPO / sg17["path"])
+    data, sr_p, ch_p, width_p = frames(REPO / padded["path"])
+    assert (sr_p, ch_p, width_p) == (sr, ch, width) == (44100, 1, 2) and len(data) == 2 * 5 * sr == 2 * padded["samples"]
+    assert data == voice + b"\x00\x00" * (5 * sr - sg17["samples"]) and sha(padded["path"]) == padded["sha256"]
+    assert padded["path"] == "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav" and padded["seconds"] == 5.0
+    assert padded["song_window"] == sg17["song_window"] == [170.1094, 173.7781]
+    assert padded["padded"]["silence_samples"] == 5 * sr - sg17["samples"] == 58711 and padded["padded"]["from_sha256"] == sg17["sha256"]
+    a, b = U.SPECS["SG17A"], U.SPECS["SG17B"]
+    for unit, spec in (("SG17A", a), ("SG17B", b)):
+        assert (spec["clip"], spec["coverage_unit"], spec["plate"], spec["plate_sha256"]) == (
+            "SG17", "SG17", "p039-c1", U.SPECS["SG17"]["plate_sha256"])
+        assert spec["generation"] == {**U.GENERATION_LIPSYNC, "seconds": 5} and spec["duration"] == 5
+        assert spec["audio"] == {"asset_id": f"iris-c-v4-{unit.lower()}-vocal", "path": padded["path"], "window": "SG17p"}
+        assert spec["dialogue"] == U.SPECS["SG17"]["dialogue"] | {"response_obligation": "对着镜头说出这两句，口型与参考人声逐字同步"}
+        assert "按" not in json.dumps(spec["performance"], ensure_ascii=False) + json.dumps(spec["intent"], ensure_ascii=False)
+    same = lambda spec: {k: v for k, v in spec.items() if k not in ("shot_id", "beat", "audio", "image", "braced_line")}
+    assert same(a) == same(b) and "braced_line" not in a and b["braced_line"] == U.SG17_LINES
+    for unit in ("SG17A", "SG17B"):
+        for n in (1, 2):
+            assert (SG17_PROBE.parent.parent / f"sd-{unit}-p-{n}").is_dir()
+    for n in (1, 2):                                    # the held r3 SG17 approvals stay as they were
+        old = json.loads((SG17_PROBE.parent.parent / f"sd-SG17-a-{n}/preview-approval.json").read_text(encoding="utf-8"))
+        assert list(old["prompts"]) == ["SG17"] and old["preview_artifacts"][1]["path"].endswith("pilot/audio/SG17.wav")
+        assert (SG17_PROBE.parent.parent / f"sd-SG17-a-{n}/preview-approval.held-r2.json").is_file()
+
+
+def test_sg17_probe_page_and_templates():
+    """The page asks one question first, shows the first frame, the SG17p player, both exact prompts and the diff, the cost
+    (4 × 400 = 1,600) and what is measured; each arm's template shapes both takes with fresh ids and the exact prompt."""
+    page = (SG17_PROBE / "index.html").read_text(encoding="utf-8")
+    body = page[page.index("<body>"):]
+    assert body.index('class="q"') < body.index("<h2>") and body.count("问题：") == 1 and "(Recommended)" in body
+    assert 'src="../../../board/plates/p039-c1.png"' in page and 'src="../../audio/SG17p.wav"' in page
+    import html
+    for prompt in SG17_PROBE_PROMPTS.values():                  # verbatim (B's added sentence is marked <ins> as the diff)
+        assert html.escape(prompt) in page.replace("<ins>", "").replace("</ins>", "")
+        assert hashlib.sha256(prompt.encode()).hexdigest() in page
+    assert page.count(f"<ins>{html.escape(SG17B_SENTENCE)}</ins>") == 2 and "4 条 × 400 = 1,600" in page
+    for measured in ("语言", "逐词准确度", "copy", "lag / ncc", "spans", "逐镜 Gate"):
+        assert measured in page, measured
+    ids, bound = [], {b.parent.parent.name: json.loads(b.read_text()) for b in (REPO / "outputs/ai-city-takeover/ep01/v4/pilot").glob(
+        "sd-*/*/operator-bound.json")}
+    own = {f"sd-{unit}-p-{n}" for unit in SG17_PROBE_PROMPTS for n in (1, 2)}
+    used = {v.get(k) for name, v in bound.items() if name not in own for k in ("attempt_id", "policy_id", "reservation_id")}
+    for unit, prompt in SG17_PROBE_PROMPTS.items():
+        spec = U.SPECS[unit]
+        for n in (1, 2):
+            value = sg17_take(unit, n)
+            assert sorted(placeholders(value)) == sorted([value["question"], value["user_quote"], value["approved_at"]])
+            page_rel = "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/probe/index.html"
+            assert value["preview_page"] == {"path": page_rel, "sha256": sha(page_rel)}
+            assert value["prompts"] == {unit: {"text": prompt, "sha256": hashlib.sha256(prompt.encode()).hexdigest()}}
+            assert value["preview_artifacts"] == [
+                {"path": spec["image"][1], "sha256": spec["plate_sha256"], "role": f"{unit} reference image"},
+                {"path": spec["audio"]["path"], "sha256": sha(spec["audio"]["path"]), "role": f"{unit} vocal"}]
+            assert value["generation"] == spec["generation"] and value["identity_waivers"] == ["IRIS"]
+            assert value["budget"] == {"generations": 1, "retries": 0, "operator_ceiling_per_unit_CRD": 400, "cumulative_CRD": 400}
+            assert value["takes"]["folders"] == [f"sd-{unit}-p-1", f"sd-{unit}-p-2"] and value["takes"]["this_take"] == f"sd-{unit}-p-{n}"
+            assert value["takes"]["probe"]["total_ceiling_CRD"] == 4 * 400
+            ident = f"iris-{unit.lower()}-p-{n}"
+            assert value["bound_ids"] == {"attempt_id": f"{ident}-source-001", "policy_id": f"{ident}-source-001",
+                                          "reservation_id": f"{ident}-reservation-001"}
+            ids += value["bound_ids"].values()
+            written = SG17_PROBE.parent.parent / f"sd-{unit}-p-{n}" / "preview-approval.json"
+            if written.exists():                                   # the main session wrote it after 「按页面开拍 (Recommended)」
+                approval = json.loads(written.read_text(encoding="utf-8"))
+                keys = ("preview_page", "preview_artifacts", "prompts", "generation", "budget", "bound_ids", "takes")
+                assert {k: approval[k] for k in keys} == {k: value[k] for k in keys}, written.parent.name
+            if written.parent.name in bound:                       # its operator bound exactly the template's ids
+                assert {k: bound[written.parent.name][k] for k in value["bound_ids"]} == value["bound_ids"]
+    assert len(set(ids)) == 4 * 2 and not set(ids) & used          # attempt_id = policy_id, as every earlier take
+
+
+@pytest.mark.parametrize("unit", ["SG17A", "SG17B"])
+def test_sg17_probe_templates_pass_draft_materialize_and_lint(lane, monkeypatch, capsys, unit):
+    """The p-1 template with only its placeholders filled drafts, resolves the 4k 5 s request with the exact prompt, p039-c1
+    and SG17p, and passes every lint check (tmp lane; nothing is written under the repo, nothing is called)."""
+    monkeypatch.setattr(U, "VOCALS", "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json")
+    spec = U.SPECS[unit]
+    value = sg17_take(unit, 1) | {"question": "q", "user_quote": "按这两条 prompt 开拍 (Recommended)", "approved_at": "2026-11-25T08:00:00Z"}
+    approve(lane, value)
+    U.draft(unit)
+    node = f"node_dryrunprobe{unit.lower()}"
+    profile = PROFILE | {"input_mode": "multimodal", "node_id": node, "duration_seconds": 5, "benefit_amount": 5,
+                         "credit_upper_bound": 400}
+    path = lane / unit / "profile.json"
+    path.write_text(json.dumps(profile))
+    U.materialize(unit, path)
+    capsys.readouterr()
+    U.show(unit)
+    request = json.loads(capsys.readouterr().out)
+    assert (request["model"], request["input_mode"], request["seconds"], request["resolution"], request["aspect"],
+            request["prompt"]) == ("seedance_2.0_vip", "multimodal", 5, "4k", "16:9", SG17_PROBE_PROMPTS[unit])
+    assert [b["asset_sha256"] for b in request["image_bindings"]] == [spec["plate_sha256"]]
+    assert [b["asset_sha256"] for b in request["media_bindings"]] == [sha(spec["audio"]["path"])]
+    bound = {"schema_version": "iris-v4-unit/1", "unit": unit, "task": f"IRIS EP01 v4 {unit}（s039，p-1）",
+             "user_quote": value["user_quote"], "preview_approval": str(lane / "preview-approval.json"), **value["bound_ids"],
+             "max_submit_count": 1, "automatic_retries": 0, "operator_currency": "CRD", "operator_ceiling": 400,
+             "ledger": "ledger.json", "cumulative_submit_ceiling": 1, "cumulative_operator_credit_ceiling": 400,
+             "issued_at": "2026-11-25T08:30:00+00:00", "expires_at": "2026-11-25T14:30:00+00:00", "stop_on_unknown": True}
+    (lane / unit / "operator-bound.json").write_text(json.dumps(bound, ensure_ascii=False))
+    (lane / unit / "node-created.json").write_text(json.dumps({"node_id": node, "empty": True}))
+    (lane / "continuity-report.json").write_text(json.dumps({"units": {unit: {"verdict": "ready"}}}))
+    code = "import json, sys; sys.path.insert(0, sys.argv[1]); import lint; print(json.dumps(lint.lint(sys.argv[2])['checks']))"
+    env = {k: v for k, v in os.environ.items() if k not in {"SD_PILOT", "SD_UNITS"}} | {
+        "SD_TRIAL": str(lane), "PYTHONDONTWRITEBYTECODE": "1", "PYTHONWARNINGS": "ignore"}
+    out = subprocess.run([sys.executable, "-c", code, str(GEN), unit], cwd=REPO, capture_output=True, text=True, env=env,
+                         check=True).stdout
+    checks = json.loads(out.strip().splitlines()[-1])
+    assert [k for k, v in checks.items() if not v] == []
+
+
+# ---------------------------------------------------------------- r4 short lip-sync windows (2026-11-25, pilot/s031-048/r4)
+# 「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」 (logs/decisions.md 2026-11-25, last entry, after the SG17 A/B
+# probe: B's {English lines} gave much better words; every take re-voiced, mouth onset 0.6-1.0 s late). SG16 / SG18 / SG20
+# re-cut into one short window per edit span of pilot/s031-048/plan (SG16x s037b, SG16y s037d, SG18x s041a, SG18y s041c,
+# SG20x s048), each with the probe's B prompt shape; two takes each, measured, cut and covered across takes.
+R4 = tuple(U.R4_UNITS)
+R4_DIR = REPO / "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r4"
+R4_PROMPTS = {unit: U.r4_prompt(unit) for unit in R4}
+R4_PROMPT_SHA256 = {"SG16x": "ac5c511f77e1fc6163d55f8ae83d20e00d83d5566cef708d79af1598152fa871",
+                    "SG16y": "f1ea02b6e15b4e696a00573e33018696e44e303ca2bef5483b7c5e0b94f43fec",
+                    "SG18x": "c814ce793e232d923ed2730c78801a8d1feddcab94851856d582712f79882f2c",
+                    "SG18y": "03601c4eefac00a0f7c9964c8a0c009fb9c5b5394a2a1a41cd04e63e9f922def",
+                    "SG20x": "1146eec4f25897bb4d2c4907388d924625c9f9f9de4c8e30e7e5ebb774ca08c4"}
+# the edit span (plan) each serves; the r3 first frame of its board clip
+R4_SPANS = {"SG16x": ("s037b", 161.413, 163.701), "SG16y": ("s037d", 165.071, 166.476), "SG18x": ("s041a", 178.329, 181.023),
+            "SG18y": ("s041c", 183.763, 185.585), "SG20x": ("s048", 205.241, 209.339)}
+R4_PLATES = {"SG16": "p037-c2", "SG18": "p041-c1", "SG20": "p048-w2"}
+# window starts that are not simply "first word - 0.3 s": the end of the previous word when that point is inside it
+# (SG16x "up.", SG18x "Eleven"), the in-point when the previous word ends after it (SG16y "Killed" 165.086 > 165.071),
+# and SG18y 183.66, where the sung "no" rings past its 183.46 word end to the dip before "show" (measured below)
+R4_START = {"SG16x": "previous_word_end", "SG16y": "in_point", "SG18x": "previous_word_end", "SG18y": "acoustic_dip",
+            "SG20x": "first_word_minus_0.3"}
+
+
+def r4_words(t0: float, t1: float) -> list[dict]:
+    return [w for line in json.loads(C.WORDS.read_text())["lines"] for w in line["words"] if t0 <= w["start"] < t1]
+
+
+def r4_take(unit: str, n: int) -> dict:
+    """The unit's r-1 approval template turned into take n as its _template_notes say (placeholders left in)."""
+    value = json.loads((R4_DIR / f"{unit}-approval.template.json").read_text(encoding="utf-8"))
+    assert len(value.pop("_template_notes")) == 3
+    swap = lambda text: text.replace("-r-1", f"-r-{n}")
+    value["unit_group"] = swap(value["unit_group"])
+    value["bound_ids"] = {k: swap(v) for k, v in value["bound_ids"].items()}
+    value["takes"]["this_take"] = swap(value["takes"]["this_take"])
+    return value
+
+
+def test_r4_windows_cover_one_edit_span_each_and_are_padded_stem_cuts():
+    """Each window: starts ~0.3 s before its span's first word (or as R4_START says, never inside a word, never after the
+    in-point except SG20x, whose span opens on her still, closed mouth), ends at the span's last word end (SG20x at 208.80,
+    before "All"), no next word inside; the wav is the stem's exact samples + digital zeros to exactly the take; take =
+    max(4, ceil(span end - window start + 1.0 s)) so a 1 s late mouth still covers the span; sealed in windows.json."""
+    plan = (REPO / "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/plan/index.html").read_text(encoding="utf-8")
+    book = json.loads((REPO / U.VOCALS).read_text(encoding="utf-8"))
+    words_book = json.loads(C.WORDS.read_text())
+    every = [w for line in words_book["lines"] for w in line["words"]]
+    board = {c["clip"]: c for c in json.loads((REPO / U.BOARD).read_bytes())["clips"]}
+    for unit, (clip, span, (t0, t1), secs, lines, d0, d1) in U.R4_UNITS.items():
+        spec, (name, a, b) = U.SPECS[unit], R4_SPANS[unit]
+        assert span == name and f"{span}</td><td>{a:.3f}–{b:.3f}" in plan and board[clip]["plays"]["t0"] <= a + 0.001 < b
+        assert spec["song_window"] == [t0, t1] and spec["duration"] == secs == spec["generation"]["seconds"]
+        assert secs == max(4, math.ceil(b - t0 + 1.0)) and 4 <= secs <= 5
+        assert C.inside_word(t0, words_book) == [] == C.inside_word(t1, words_book)
+        inside = r4_words(t0, t1)
+        first, last = inside[0], inside[-1]
+        prev = max((w for w in every if w["end"] <= first["start"] and w is not first), key=lambda w: w["end"])
+        nxt = min((w for w in every if w["start"] >= t1), key=lambda w: w["start"])
+        # every word heard in the span for at least 0.1 s is in the window (s048 holds her still, mouth closed, over the
+        # "All" that starts at 208.929); the next word starts after the window ends
+        heard = [w for w in every if min(w["end"], b) - max(w["start"], a) >= 0.1 and not (unit == "SG20x" and w["start"] > t1)]
+        assert [w["text"] for w in heard if w not in inside] == [] and nxt["start"] > t1 and nxt not in heard
+        rule = R4_START[unit]
+        if rule == "first_word_minus_0.3":
+            assert t0 == round(first["start"] - 0.3, 3) and prev["end"] < t0
+        elif rule == "previous_word_end":
+            assert t0 == prev["end"] and first["start"] - 0.3 < prev["end"] <= a
+        elif rule == "in_point":
+            assert t0 == a and first["start"] - 0.3 < prev["end"] and prev["end"] > a
+        else:
+            assert prev["end"] < first["start"] - 0.3 < t0 < first["start"]
+        assert t0 <= a or unit == "SG20x"
+        assert t1 == (208.8 if unit == "SG20x" else last["end"]) and (unit != "SG20x" or (last["end"] < t1 < nxt["start"]
+                                                                                         and nxt["text"] == "All"))
+        assert spec["dialogue"]["verbatim_text"] == lines == " ".join(w["text"] for w in inside)
+        assert (spec["dialogue"]["start_seconds"], spec["dialogue"]["end_seconds"]) == (
+            d0, d1) == (round(first["start"] - t0, 2), min(round(last["end"] - t0, 2), round(t1 - t0, 2)))
+        entry, rel = book["windows"][f"{unit}p"], f"outputs/ai-city-takeover/ep01/v4/pilot/audio/{unit}p.wav"
+        assert spec["audio"] == {"asset_id": f"iris-c-v4-{unit.lower()}-vocal", "path": rel, "window": f"{unit}p"}
+        assert entry["path"] == rel and entry["song_window"] == [t0, t1] and entry["plays"] == [a, b] and sha(rel) == entry["sha256"]
+        data, sr, ch, width = frames(REPO / rel)
+        voice, sr_v, n = C.cut_window(C.STEM, t0, t1)
+        assert (sr, ch, width) == (sr_v, 1, 2) == (44100, 1, 2) and entry["samples"] == secs * sr == len(data) // 2
+        assert data == voice + b"\x00\x00" * (secs * sr - n) and entry["seconds"] == float(secs)
+        assert entry["padded"] == {"from": "stem", "from_sha256": book["source_sha256"], "voice_samples": n,
+                                        "silence_samples": secs * sr - n, "silence": "digital zeros appended at the end",
+                                        "to_seconds": float(secs), "serves": span, "basis": entry["padded"]["basis"]}
+    # SG18y: the sung "no" (183.36-183.46 in words.json) rings on in the stem; 183.66 is the dip before "show" (183.781)
+    voice, sr, _ = C.cut_window(C.STEM, 183.46, 183.80)
+
+    def level(t: float) -> float:                    # dB of the 20 ms from t (mono stem cut)
+        i = round((t - 183.46) * sr)
+        x = [int.from_bytes(voice[2 * k:2 * k + 2], "little", signed=True) for k in range(i, i + round(0.02 * sr))]
+        return 20 * math.log10(math.sqrt(sum(v * v for v in x) / len(x)) / 32768 + 1e-9)
+
+    assert level(183.48) > -23 and level(183.58) > -26 and level(183.66) < level(183.64) and level(183.66) < level(183.70)
+    # the old r3 windows and their wavs are untouched
+    old = json.loads((REPO / "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json.before-r4-2026-11-25").read_text())
+    assert {k: v for k, v in book["windows"].items() if not k.endswith("p") or k == "SG17p"} == old["windows"]
+    assert all(sha(v["path"]) == v["sha256"] for v in old["windows"].values())
+
+
+def test_r4_specs_are_the_board_clip_with_their_own_window():
+    """SG16x/y, SG18x/y, SG20x are the board clips SG16 / SG18 / SG20 (no new clip, coverage unit = the clip), the r3
+    first frame, look, scene and rules; multimodal 4k with the padded vocal; braced_line = the window's words."""
+    for unit, (clip, *_rest) in U.R4_UNITS.items():
+        spec, r3 = U.SPECS[unit], U.SPECS[clip]
+        assert (spec["clip"], spec["coverage_unit"], spec["plate"], spec["plate_sha256"]) == (
+            clip, clip, R4_PLATES[clip], r3["plate_sha256"]) and r3["plate"] == R4_PLATES[clip]
+        assert (spec["look"], spec["scene"], spec["rules"], spec["relation"]) == (r3["look"], r3["scene"], r3["rules"], r3["relation"])
+        assert spec["generation"] == {**U.GENERATION_LIPSYNC, "seconds": spec["duration"]} and spec["input_mode"] == "multimodal"
+        assert spec["braced_line"] == spec["dialogue"]["verbatim_text"] and "take_margin_seconds" not in spec
+        assert spec["dialogue"]["language"] == "en" and spec["iris"] is True
+    assert [u for u in U.SPECS if u.startswith(("SG16", "SG18", "SG20"))] == ["SG16", "SG18", "SG20", *R4]
+
+
+def test_r4_prompts_are_the_probe_shape_from_the_r3_first_frame():
+    """Each prompt = the r3 prompt's first-frame sentence, then speak / sing to camera in word-for-word sync, the one {}
+    sentence with exactly its window's words, camera fixed, she stays put, the shot's blank / red / text rules; no action
+    bound to a line (no bowl, microwave going dark, hand) and no other action; SG18 wrapped with no hand, SG20 the bare
+    left arm and the still, closed mouth after the line."""
+    r3 = dict(re.findall(r"^## s\d{3} · (\w+) · .*?\n\n```prompt\n(.*?)\n```",
+                         (REPO / "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md").read_text(
+                             encoding="utf-8"), re.S | re.M))
+    allowed = ("工程师一直举着手机贴在耳边", "手机背面", "微波炉的显示屏是黑的", "也看不见她的手", "说完嘴闭上，一动不动")   # states
+    for unit, prompt in R4_PROMPTS.items():
+        spec, clip = U.SPECS[unit], U.R4_UNITS[unit][0]
+        assert hashlib.sha256(prompt.encode()).hexdigest() == R4_PROMPT_SHA256[unit]
+        start = r3[clip][:r3[clip].index("。") + 1]
+        assert prompt.startswith(start) and "嘴唇闭着" in start
+        verb = "唱" if clip == "SG18" else "说"
+        sync = f"她对着镜头{'说话' if verb == '说' else verb}，口型与{{{{audio:1}}}}里的人声逐字精确同步。"
+        braced = f"她用英文{verb}：{{{spec['braced_line']}}}不增不减，不翻译。"
+        stay = f"镜头固定不动，{U.R4_SCENE[clip][3]}。"
+        assert prompt.index(sync) == len(start) and prompt.index(braced) == len(start) + len(sync)
+        assert prompt.index(stay) == len(start) + len(sync) + len(braced) and prompt.endswith("画面中不得出现任何文字。")
+        assert prompt.count("{") == 5 and set(U.MARKERS.findall(prompt)) == {"{{image:0}}", "{{audio:1}}"}
+        assert spec["braced_line"] == " ".join(w["text"] for w in r4_words(*spec["song_window"]))
+        rest = prompt[len(start):].replace(braced, "").replace(stay, "")         # 站 / 坐 / 跪 在原地 is staying put
+        for phrase in allowed:
+            rest = re.sub(phrase + "[^。]*。", "", rest)
+        assert [x for x in SG17_ACTIONS if x in rest] == [], unit
+        assert not [x for x in ("碗", "熄灭", "转盘停", "布缝", "伸出", "抓住", "第") if x in prompt[len(start):]], unit
+        assert len(re.findall("[A-Za-z]", prompt.replace(braced, "").replace("{{image:0}}", "").replace("{{audio:1}}", ""))) == 0
+        assert U.prompt_language_ok(spec, prompt) and not U.prompt_language_ok(U.SPECS[clip], prompt)
+        assert all(rule in prompt for rule in U.R4_SCENE[clip][4]) and "除了她左耳耳挂上的小红灯，画面里没有任何红色。" in prompt
+        literals = [spec["image"][4], *spec["intent"]["open_event"], *spec["intent"]["close_event"], *spec["intent"]["natural"]]
+        assert [x for x in literals if x not in prompt] == []
+    for unit in ("SG16x", "SG16y"):
+        assert "看不到他的脸" in R4_PROMPTS[unit] and "微波炉的显示屏是黑的" in R4_PROMPTS[unit]
+    for unit in ("SG18x", "SG18y"):
+        assert "防尘布一直裹到下巴，看不见布下面的衣服，也看不见她的手" in R4_PROMPTS[unit] and "射灯亮度不变" in R4_PROMPTS[unit]
+    assert "她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖" in R4_PROMPTS["SG20x"] and "工牌是空白的" in R4_PROMPTS["SG20x"]
+    assert "她用英文唱：" in R4_PROMPTS["SG18x"] and "她用英文说：" in R4_PROMPTS["SG20x"]
+
+
+def test_r4_page_and_templates():
+    """The page asks one question first, shows each unit's first frame, vocal player, exact prompt, window, span, seconds and
+    cost (80 CRD/s × 2), the total and the section ceiling 15,000 (previous 12,800); each template shapes r-1|2 with fresh
+    ids, the exact prompt, plate and padded vocal; approvals written after 「按 r4 开拍」 match the templates."""
+    import html
+    page = (R4_DIR / "index.html").read_text(encoding="utf-8")
+    body = page[page.index("<body>"):]
+    assert body.index('class="q"') < body.index("<h2>") and body.count("问题：") == 1 and body.count("(Recommended)") == 2
+    assert "http://127.0.0.1:8769/pilot/s031-048/r4/index.html" in body and "15,000" in body and "12,800" in body
+    est = sum(80 * U.SPECS[u]["duration"] * 2 for u in R4)
+    assert est == 3360 and f"约 {est:,} 积分" in body and "8,560" in body and "10,840" in body
+    for unit in R4:
+        spec, (span, a, b) = U.SPECS[unit], R4_SPANS[unit]
+        t0, t1 = spec["song_window"]
+        assert f'src="../../../board/plates/{spec["plate"]}.png"' in page and f'src="../../audio/{unit}p.wav"' in page
+        assert html.escape(R4_PROMPTS[unit]) in page.replace("<ins>", "").replace("</ins>", "") and R4_PROMPT_SHA256[unit] in page
+        assert f"{span} {a:.3f}–{b:.3f}" in page and f"{t0:.3f}–{t1:.3f}" in page and f"{spec['duration']:.3f} s" in page
+        assert f"80 积分/秒 × {spec['duration']} s × 2 条 = {80 * spec['duration'] * 2:,}" in page
+        assert f"<code>VOCAL={unit}p</code>，<code>T0 = {t0}</code>" in page
+    for beat in ("s037d（SG16y）", "放碗这一拍丢失", "s041c（SG18y）", "INS41"):
+        assert beat in page
+    bound = {b.parent.parent.name: json.loads(b.read_text()) for b in (REPO / "outputs/ai-city-takeover/ep01/v4/pilot").glob(
+        "sd-*/*/operator-bound.json")}
+    own = {f"sd-{u}-r-{k}" for u in R4 for k in (1, 2, 3)}       # r4's own takes (SG18y r-3 replaced a no-effect r-1)
+    used = {v.get(k) for name, v in bound.items() if name not in own for k in ("attempt_id", "policy_id", "reservation_id")}
+    ids, page_rel = [], "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r4/index.html"
+    for unit in R4:
+        spec = U.SPECS[unit]
+        for n in (1, 2):
+            value = r4_take(unit, n)
+            assert sorted(placeholders(value)) == sorted([value["question"], value["user_quote"], value["approved_at"]])
+            assert value["preview_page"] == {"path": page_rel, "sha256": sha(page_rel)}
+            assert value["prompts"] == {unit: {"text": R4_PROMPTS[unit], "sha256": R4_PROMPT_SHA256[unit]}}
+            assert value["preview_artifacts"] == [
+                {"path": spec["image"][1], "sha256": spec["plate_sha256"], "role": f"{unit} reference image"},
+                {"path": spec["audio"]["path"], "sha256": sha(spec["audio"]["path"]), "role": f"{unit} vocal"}]
+            assert value["generation"] == spec["generation"] and value["identity_waivers"] == ["IRIS"]
+            assert value["budget"] == {"generations": 1, "retries": 0, "operator_ceiling_per_unit_CRD": 400, "cumulative_CRD": 400}
+            assert value["takes"]["folders"] == [f"sd-{unit}-r-1", f"sd-{unit}-r-2"] and value["takes"]["this_take"] == f"sd-{unit}-r-{n}"
+            assert value["takes"]["r4"] == {"units": list(R4), "total_takes": 10, "total_ceiling_CRD": 4000,
+                                            "section_ceiling_CRD": 15000, "previous_section_ceiling_CRD": 12800}
+            ident = f"iris-{unit.lower()}-r-{n}"
+            assert value["bound_ids"] == {"attempt_id": f"{ident}-source-001", "policy_id": f"{ident}-source-001",
+                                          "reservation_id": f"{ident}-reservation-001"}
+            ids += value["bound_ids"].values()
+            folder = REPO / "outputs/ai-city-takeover/ep01/v4/pilot" / f"sd-{unit}-r-{n}"
+            written = folder / "preview-approval.json"
+            assert folder.is_dir()
+            if written.exists():                                   # the main session wrote it after 「按 r4 开拍 (Recommended)」
+                approval = json.loads(written.read_text(encoding="utf-8"))
+                keys = ("preview_page", "preview_artifacts", "prompts", "generation", "budget", "bound_ids", "takes")
+                assert {k: approval[k] for k in keys} == {k: value[k] for k in keys}, folder.name
+            if folder.name in bound:                               # its operator bound exactly the template's ids
+                assert {k: bound[folder.name][k] for k in value["bound_ids"]} == value["bound_ids"]
+    assert len(set(ids)) == 5 * 2 * 2 and not set(ids) & used
+
+
+@pytest.mark.parametrize("unit", R4)
+def test_r4_templates_pass_draft_materialize_and_lint(lane, monkeypatch, capsys, unit):
+    """The r-1 template with only its placeholders filled drafts, resolves the 4k request with the exact prompt, first frame
+    and padded vocal, and passes every lint check (tmp lane; nothing is written under the repo, nothing is called)."""
+    monkeypatch.setattr(U, "VOCALS", "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json")
+    spec = U.SPECS[unit]
+    value = r4_take(unit, 1) | {"question": "q", "user_quote": "按这 5 条开拍 (Recommended)", "approved_at": "2026-11-25T08:00:00Z"}
+    approve(lane, value)
+    U.draft(unit)
+    node = f"node_dryrunr4{unit.lower()}"
+    secs = spec["duration"]
+    profile = PROFILE | {"input_mode": "multimodal", "node_id": node, "duration_seconds": secs, "benefit_amount": secs,
+                         "credit_upper_bound": 400}
+    path = lane / unit / "profile.json"
+    path.write_text(json.dumps(profile))
+    U.materialize(unit, path)
+    capsys.readouterr()
+    U.show(unit)
+    request = json.loads(capsys.readouterr().out)
+    assert (request["model"], request["input_mode"], request["seconds"], request["resolution"], request["aspect"],
+            request["prompt"]) == ("seedance_2.0_vip", "multimodal", secs, "4k", "16:9", R4_PROMPTS[unit])
+    assert [b["asset_sha256"] for b in request["image_bindings"]] == [spec["plate_sha256"]]
+    assert [b["asset_sha256"] for b in request["media_bindings"]] == [sha(spec["audio"]["path"])]
+    bound = {"schema_version": "iris-v4-unit/1", "unit": unit, "task": f"IRIS EP01 v4 {unit}（{U.R4_UNITS[unit][1]}，r-1）",
+             "user_quote": value["user_quote"], "preview_approval": str(lane / "preview-approval.json"), **value["bound_ids"],
+             "max_submit_count": 1, "automatic_retries": 0, "operator_currency": "CRD", "operator_ceiling": 400,
+             "ledger": "ledger.json", "cumulative_submit_ceiling": 1, "cumulative_operator_credit_ceiling": 400,
+             "issued_at": "2026-11-25T08:30:00+00:00", "expires_at": "2026-11-25T14:30:00+00:00", "stop_on_unknown": True}
+    (lane / unit / "operator-bound.json").write_text(json.dumps(bound, ensure_ascii=False))
+    (lane / unit / "node-created.json").write_text(json.dumps({"node_id": node, "empty": True}))
+    (lane / "continuity-report.json").write_text(json.dumps({"units": {unit: {"verdict": "ready"}}}))
+    code = "import json, sys; sys.path.insert(0, sys.argv[1]); import lint; print(json.dumps(lint.lint(sys.argv[2])['checks']))"
+    env = {k: v for k, v in os.environ.items() if k not in {"SD_PILOT", "SD_UNITS"}} | {
+        "SD_TRIAL": str(lane), "PYTHONDONTWRITEBYTECODE": "1", "PYTHONWARNINGS": "ignore"}
+    out = subprocess.run([sys.executable, "-c", code, str(GEN), unit], cwd=REPO, capture_output=True, text=True, env=env,
+                         check=True).stdout
+    checks = json.loads(out.strip().splitlines()[-1])
+    assert [k for k, v in checks.items() if not v] == []
+
+
+def test_r4_draft_blocks_a_window_or_padding_that_is_not_the_spec(lane, monkeypatch):
+    """The own-window path still fails closed: a sealed window other than the spec's, or a vocal not padded to the take."""
+    monkeypatch.setattr(U, "VOCALS", "outputs/ai-city-takeover/ep01/v4/pilot/audio/windows.json")
+    approve(lane, r4_take("SG16x", 1) | {"question": "q", "user_quote": "q (Recommended)", "approved_at": "2026-11-25T08:00:00Z"})
+    monkeypatch.setitem(U.SPECS["SG16x"], "song_window", [161.338, 163.6])
+    assert "is not the board clip window" in blocked("SG16x")
+    monkeypatch.setitem(U.SPECS["SG16x"], "song_window", [161.338, 163.523])
+    monkeypatch.setitem(U.SPECS["SG16x"], "duration", 5)
+    monkeypatch.setitem(U.SPECS["SG16x"], "generation", {**U.SPECS["SG16x"]["generation"], "seconds": 5})
+    approve(lane, r4_take("SG16x", 1) | {"question": "q", "user_quote": "q (Recommended)", "approved_at": "2026-11-25T08:00:00Z",
+                                         "generation": U.SPECS["SG16x"]["generation"]})
+    assert "padded vocal is 4000 ms; it must be exactly the 5 s take" in blocked("SG16x")

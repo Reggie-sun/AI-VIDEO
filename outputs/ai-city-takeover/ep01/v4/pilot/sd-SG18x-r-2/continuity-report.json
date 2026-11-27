@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-25",
+ "written_by": "主会话据 continuity-supervisor 2026-11-25 复核（同首帧 p037-c2/p041-c1/p048-w2，1–3 项 PASS）转写；r4 prompt 只保留首帧状态与说/唱，动作交剪辑（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG18x-r-2/preview-approval.json",
+   "sha256": "6bcb6228bbbccf1fba0c45babc84dc0e2da6ee31fd7edcac8add54fa9cad57c8"
+  }
+ },
+ "units": {
+  "SG18x": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；首帧起始状态一致，只说/唱",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸一致；裹布到下巴不见衣服与手；唱英文且词对；口型分段；不转身；人台无脸；无倒影；除耳灯无红"
+  }
+ }
+}

@@ -1,0 +1,52 @@
+[
+ {
+  "name": "SG16y-sd",
+  "take_sha256": "d01bb7922f3b340b4d55ad375d214dcb7b498666125a0e50093337b3b2679214",
+  "lag_s": 0.9079,
+  "ncc": 0.1054,
+  "copy": false,
+  "divergence": {
+   "frame": 44,
+   "rule": "stretch",
+   "last_match": null,
+   "clip_s": 0.44,
+   "song_s": 164.603
+  },
+  "synced_until": null,
+  "spans": [
+   {
+    "clip_s": [
+     1.57,
+     2.24
+    ],
+    "song_s": [
+     165.733,
+     166.403
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": 1.366,
+   "method": "tool 63 envelope lag (re-sung, steady)",
+   "song_t_of_clip0": 163.705,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 1.366,
+   "ncc": 0.932,
+   "max_dev_s": 0.01,
+   "steady": true,
+   "segments": [
+    {
+     "clip_s": [
+      1.125,
+      3.125
+     ],
+     "lag_s": 1.361,
+     "windows": 8,
+     "min_ncc": 0.892
+    }
+   ]
+  }
+ }
+]

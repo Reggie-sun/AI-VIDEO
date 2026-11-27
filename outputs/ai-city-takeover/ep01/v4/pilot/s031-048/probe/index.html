@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>SG17 A/B 对口型探针（s039）</title>
+<style>
+body{font:15px/1.6 system-ui,sans-serif;max-width:1100px;margin:24px auto;padding:0 16px;color:#222}
+.q{background:#fff4d6;border:2px solid #e0a800;padding:12px 16px;border-radius:8px}
+.q ol{margin:6px 0 0} pre{white-space:pre-wrap;background:#f6f6f6;padding:10px;border-radius:6px}
+ins{background:#c8f7c5;text-decoration:none} del{background:#f7c5c5} img{max-width:100%}
+table{border-collapse:collapse} td,th{border:1px solid #ccc;padding:4px 8px;vertical-align:top} code{font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+</style></head><body>
+<div class="q"><b>问题：</b>SG17 A/B 对口型探针：按下面 A、B 两条 exact prompt 各拍 2 条（共 4 条，约 1,600 积分）吗？
+<ol><li>按这两条 prompt 开拍 (Recommended)</li><li>先改 prompt 再看</li><li>先不拍</li></ol>
+审片地址：http://127.0.0.1:8769/pilot/s031-048/probe/index.html</div>
+
+<h2>依据</h2>
+<p>使用者原话「先用 SG17 做 A/B 对照 (Recommended)」（logs/decisions.md 2026-11-25 念白对口型调研之后）。两臂只差一处：B 在 A 上加一句英文原台词入 {}。
+同意改的两条规矩：生成不再多留 1 s（改为人声后补静音到生成时长）；B 臂豁免“prompt 不写英文”（只此一句、只在 {} 里）。</p>
+
+<h2>共同输入</h2>
+<div class="grid"><div><p>首帧（两臂相同）<br><code>outputs/ai-city-takeover/ep01/v4/board/plates/p039-c1.png</code><br>sha256 <code>9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342</code></p>
+<img src="../../../board/plates/p039-c1.png" alt="p039-c1"></div>
+<div><p>人声 SG17p.wav（两臂相同，5.000 s = 生成时长）<br><code>outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav</code><br>sha256 <code>24cca57f1368993a90619f1b07c34b4989ff5498e381dee4c7e847f2826abbe2</code></p>
+<audio controls preload="metadata" src="../../audio/SG17p.wav"></audio>
+<p>来源：原 SG17.wav（3.669 s，歌曲 170.1094–173.7781，sha256 <code>ae7ab1b7d5037f877dfb44ada668b7d83445a1caf1f512235989727a7921a6bd</code>，保留不动）逐样本相同，末尾补 1.331 s 数字静音（58,711 个 0 样本）。</p>
+<p>原窗口对照：<audio controls preload="metadata" src="../../audio/SG17.wav"></audio></p>
+<p>台词（窗口内两句）：1 “Bet it couldn't reach outside.” 2 “They found a gap instead.”</p></div></div>
+
+<h2>人声窗口检查</h2>
+<ul>
+<li>干声：句间停顿处人声轨 −38～−47 dB，同一时刻母带 −14～−19 dB；音乐被压掉约 28 dB，停顿里只剩约 −44 dB 的微弱残留（约 850–900 Hz），比人声（约 −22 dB）低约 20 dB。判断：干净，无可闻音乐串音。</li>
+<li>结尾：“instead.” 在 173.783 结束（窗口末 173.7781，只差 5 ms 的余音）；下一句 “Pretty” 173.945 才开始，窗口里没有下一句的起音。</li>
+<li>开头的 “more.” 尾巴：可闻。片内 0–0.12 s 约 −24～−30 dB（“more.” 本体约 −21 dB），0.15 s 起降到 −44 dB，“Bet” 约 0.20 s 起。
+不重切：170.1094 是剪辑入点，母带在这一刻同样带着这段尾音；窗口起点挪到尾巴之后会晚于入点（违反“窗口起点不晚于入点”）。两臂用同一文件，尾巴不影响 A/B 的比较。
+留意：模型可能在第 1 帧带一个收口动作。</li>
+<li>Whisper large-v3（本地，参考人声本身的基线）：<table><tr><th>文件</th><th>结果</th></tr><tr><td>SG17.wav（原窗口 3.669 s）</td><td>en：That I couldn&#x27;t reach outside / They found a gap in the steps（0–3.42 s）</td></tr><tr><td>SG17p.wav（补静音 5.000 s）</td><td>en：That I couldn&#x27;t reach outside / They found a gap in the steps（0–3.50 s；静音段无字）</td></tr></table>
+参考人声自己就被听成 “That I … / … in the steps”：判 take 的逐词准确度时，以这条基线为对照，不以 100% 为门槛。</li>
+</ul>
+
+<h2>两条 exact prompt</h2>
+<h3>A（SG17A，精简：只有首帧状态 + 说话同步）</h3><p>sha256 <code>0b7d157abdf38ea1eaae6e866ff277f83f3c90a1db9363423c90fec4fca771d1</code></p><pre>{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光贴着地面，横在她右手指尖前；她的左臂搭在膝上，看着镜头，嘴唇闭着。她对着镜头说话，口型与{{audio:1}}里的人声逐字精确同步。镜头固定不动，她一直蹲在原地。门上没有门牌、号码或标志。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色；红光不照到她的脸上。画面中不得出现任何文字。</pre>
+<h3>B（SG17B，A + 英文原台词入 {}）</h3><p>sha256 <code>e81c9834065bec695de4930a45c189034388c374e7ec9fbf4a7b8c832308edec</code></p><pre>{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光贴着地面，横在她右手指尖前；她的左臂搭在膝上，看着镜头，嘴唇闭着。她对着镜头说话，口型与{{audio:1}}里的人声逐字精确同步。<ins>她用英文说：{Bet it couldn&#x27;t reach outside. They found a gap instead.}不增不减，不翻译。</ins>镜头固定不动，她一直蹲在原地。门上没有门牌、号码或标志。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色；红光不照到她的脸上。画面中不得出现任何文字。</pre>
+<h3>差异（B 相对 A）</h3><pre>只在“…逐字精确同步。”之后插入一句：
+<ins>她用英文说：{Bet it couldn&#x27;t reach outside. They found a gap instead.}不增不减，不翻译。</ins>
+其余逐字相同。</pre>
+<p>与旧 SG17（r3）相比两臂都去掉了：<del>说到第二句时她把右手手掌平按进那道红光里</del>、<del>门一直关着</del>、<del>不起身，不转身，身体不前倾挡住嘴</del>、<del>嘴前没有任何遮挡</del>、<del>书脊都是素色的，没有字</del>、“平平地”。</p>
+
+<h2>生成设置与花费</h2>
+<table>
+<tr><td>模型 / 方式</td><td>Seedance 2.0 VIP · multimodal（图 + 音频）· 5 s · 4K · 16:9 · reference_audio</td></tr>
+<tr><td>A 臂</td><td>sd-SG17A-p-1、sd-SG17A-p-2</td></tr>
+<tr><td>B 臂</td><td>sd-SG17B-p-1、sd-SG17B-p-2</td></tr>
+<tr><td>花费</td><td>4 条 × 400 = 1,600 积分（每条上限 400）</td></tr>
+<tr><td>旧 SG17-a-1/2</td><td>原样保留，审批仍挂起，不拍</td></tr>
+</table>
+
+<h2>每条量什么</h2>
+<ol>
+<li>语言：Whisper 判定的语言必须是英语。</li>
+<li>逐词准确度：Whisper 转写对照两句原词（同时对照上面的参考基线）。</li>
+<li>copy：片子自带音轨与 SG17p 的全局 NCC（&gt; 0.2 算照搬）。</li>
+<li>lag / ncc：全局延迟与 NCC，及滑窗延迟是否稳定（sync_check.py，T0 = 170.1094）。</li>
+<li>spans：同步区间与分叉点，换算到歌曲时间；两句各自是否落在同步区间里。</li>
+<li>静音段（3.67–5.00 s）：嘴唇闭合。</li>
+<li>逐镜 Gate（video-analysis MCP）：脸与身份（v4 F1a，造型 C）；首帧构图不变、镜头固定；她一直蹲在原地，不起身、不转身；
+无多余手部动作；门上无门牌、号码或标志；红色只有耳挂小红灯与门缝一线红光；红光不照到脸上；画面无文字；口型按句对齐。</li>
+</ol>
+<p>A/B 判读：同首帧、同音频、同设置，只差 {} 一句；两臂各 2 条，按上面各项逐条并排比较，再定 SG16 / SG20 / SG18 的写法。</p>
+</body></html>

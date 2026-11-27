@@ -1,0 +1,80 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-SG19-a-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html",
+  "sha256": "bbc279093957b2a7fb9d67398db62f8aa58710729941cc25b790e9ee0c46803a"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/preview-inputs.json",
+  "sha256": "1772a88f222674703db7ca3ca2a30816e1cf2d86be2e3b230afa26f03977f828"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+  "sha256": "54f2f05f3ed7cb56d47d73e6e34bbc628512373e02f40d5eb3d9f6db3056391f"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p042-w2.png",
+   "sha256": "e20620659333e0987b5de00757707866dafc72cd0d15ed1cc19986c6de3ff364",
+   "role": "SG19 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG19.wav",
+   "sha256": "3925c3ceb5d7bcd27f4d6fb27f59fc98cda49c9715e714ff1d4526eeafe5cabc",
+   "role": "SG19 vocal"
+  }
+ ],
+ "prompts": {
+  "SG19": {
+   "text": "{{image:0}}中的她站在灯全亮的橱窗里，四周是盖着白防尘布的人台；她穿着参考图里那套衣服：灰色连帽衫改造的不对称短外套（右臂长袖，左肩露出）、从右肩斜挎到左胯的黑色皮带、身前腰链上挂着黑色寻呼机和空白工牌、黑色高腰迷你裙、黑色及膝长靴；本白防尘布已经从她肩上滑下，堆在她腰后，正慢慢往下滑落；她看着镜头，嘴唇闭着。她站直，对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步；防尘布一直顺着她的腿慢慢往下滑，唱完这一句之后才落到她脚边。她一直站在原地，不转身，不弯腰捡布，双手垂在身侧。中景，镜头固定不动。嘴前没有任何遮挡。寻呼机和工牌一直挂在她身前的腰链上；寻呼机的液晶屏只有空白的灰绿底光，没有数字和字；工牌是空白的。画面里没有镜子，不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "94efecb53eeb6b6dc1734aab6a7f5b76315c67beb9d7ae3d32770dfd91856756"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p042-w2.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p042-knee-b-comp.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg19-a-1-source-001",
+  "policy_id": "iris-sg19-a-1-source-001",
+  "reservation_id": "iris-sg19-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG19-a-1",
+   "sd-SG19-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG19-a-1"
+ },
+ "decision_notes": [
+  "s041→s042 换装：使用者「A 裹布 + 重音剪切 (Recommended)」：SG19 从“布已离肩”开始，扯布由剪切完成；首帧 P042/a（头到大腿）",
+  "2026-11-24 连续性修正：首帧换 p042-w2（及膝长靴）；布慢慢往下落，唱完这一句之后才落到脚边（185.585 剪切点约片内 0.92 s 时布正落下）"
+ ],
+ "_template_notes": [
+  "本文件是 a-1 的模板；写成 pilot/sd-SG19-a-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s031-048-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "a-2：unit_group 末尾 a-1→a-2；bound_ids 三个 id 中 -a-1- → -a-2-；takes.this_take → sd-SG19-a-2（takes.folders 保持 [a-1, a-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG19-a-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG19 5 multimodal 400"
+ ]
+}

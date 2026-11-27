@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-25",
+ "written_by": "主会话据 continuity-supervisor 2026-11-25 复核（SG17 1 连续性/2 交接/3 轴线动作机位 PASS，同首帧 p039-c1）转写；探针 prompt 只删动作、首帧起始状态描述不变（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG17B-p-2/preview-approval.json",
+   "sha256": "630cd6b323ebe8253627b5218883c3260c5d36d4e3f0a68bd6040a29a5b20fa1"
+  }
+ },
+ "units": {
+  "SG17B": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；首帧起始状态一致，只说话",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸一致；LC；门缝一线红光（唯一例外）不照脸；说英文、逐词对照基线转写；copy/lag/spans；3.67–5.00 s 静音段闭嘴；不起身不转身；嘴不被挡；门无牌；无字"
+  }
+ }
+}

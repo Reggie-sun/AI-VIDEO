@@ -1,0 +1,36 @@
+{
+ "shot": "s035a",
+ "t0": 151.8237,
+ "t1": 154.5752,
+ "why": "the empty basket; one 1.04 push step on the 152.741 bar line with the clock counter",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S035A/a-2944.png",
+ "still_sha256": "be96f684baeb0b1e334a1bacbb4e12a9ec8f2bd0401ed87b8e26fe0f4bb5a204",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S035A/a-2944.png",
+   "sha256": "be96f684baeb0b1e334a1bacbb4e12a9ec8f2bd0401ed87b8e26fe0f4bb5a204"
+  }
+ ],
+ "frames": 66,
+ "pictures": 66,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "step": [
+   152.7409,
+   1.04
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 15,
+  "kept_red_px_in_matte": 35
+ },
+ "log": []
+}

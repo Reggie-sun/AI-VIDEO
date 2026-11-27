@@ -1,0 +1,55 @@
+[
+ {
+  "name": "SG18y-sd",
+  "take_sha256": "1afce3556edffd98ee5fb927482378b590df3cba694a10e5dfca9aa7724376ac",
+  "lag_s": -0.005,
+  "ncc": 0.5596,
+  "copy": true,
+  "divergence": {
+   "frame": 199,
+   "rule": "stretch",
+   "last_match": 198,
+   "clip_s": 1.99,
+   "song_s": 185.655
+  },
+  "synced_until": {
+   "clip_s": 1.938,
+   "song_s": 185.603
+  },
+  "spans": [
+   {
+    "clip_s": [
+     0.03,
+     1.98
+    ],
+    "song_s": [
+     183.695,
+     185.645
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": -0.005,
+   "method": "tool 15 waveform lag (copy)",
+   "song_t_of_clip0": 183.665,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 0.003,
+   "ncc": 0.871,
+   "max_dev_s": 0.01,
+   "steady": true,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      2.375
+     ],
+     "lag_s": 0.004,
+     "windows": 7,
+     "min_ncc": 0.691
+    }
+   ]
+  }
+ }
+]

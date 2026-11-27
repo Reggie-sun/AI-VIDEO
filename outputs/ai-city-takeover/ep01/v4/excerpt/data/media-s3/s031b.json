@@ -1,0 +1,32 @@
+{
+ "shot": "s031b",
+ "t0": 136.2663,
+ "t1": 139.9234,
+ "why": "what she sees: the three vending machines (one line, one still); names and error codes are graphics",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S031B/a-2944.png",
+ "still_sha256": "2ac6f0e91b13dca28b102d3a8524bfa3c9fb5db2f89fe9769ba91856c4cb25f8",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/S031B/a-2944.png",
+   "sha256": "2ac6f0e91b13dca28b102d3a8524bfa3c9fb5db2f89fe9769ba91856c4cb25f8"
+  }
+ ],
+ "frames": 88,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 18
+ },
+ "log": []
+}

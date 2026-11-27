@@ -1,0 +1,36 @@
+{
+ "shot": "s036c",
+ "t0": 157.768,
+ "t1": 159.5907,
+ "why": "back to the still, the push run on by song time; 'Pager screams. Out of my way' off screen",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P036/x.png",
+ "still_sha256": "27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P036/x.png",
+   "sha256": "27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0"
+  }
+ ],
+ "frames": 44,
+ "pictures": 44,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.08
+  ],
+  "center": [
+   0.62,
+   0.42
+  ],
+  "span": [
+   155.9336,
+   159.5907
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 27
+ },
+ "log": []
+}

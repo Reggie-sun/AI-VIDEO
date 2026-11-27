@@ -1,0 +1,237 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><title>IRIS EP01 s031–s048 首帧/静图预览</title><style>body{background:#111;color:#ddd;font:14px/1.55 sans-serif;margin:20px;max-width:1800px}img{width:100%;display:block}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}figure{margin:0}figure.rec{outline:3px solid #6c6}figure.ref img{max-height:260px;object-fit:contain;background:#000}h2{margin-top:36px;border-top:1px solid #444;padding-top:14px}code{color:#9cf;font-size:11px}.act{color:#fc6}.bad{color:#f88}.ok{color:#8d8}.iss{color:#f99}.box{border:1px solid #6c6;padding:10px 14px;background:#182018}table{border-collapse:collapse}td,th{border:1px solid #555;padding:3px 6px;font-size:12px;vertical-align:top}</style></head><body>
+<h1>IRIS EP01 s031–s048 首帧与静图候选（只有静图，没有提交任何视频生成）</h1>
+<p>按已认可的导演方案（<a href="../plan/index.html">plan</a>；logs/decisions.md 2026-11-24「按方案做首帧预览」及三处分叉 A）制作。旧底图 <code>board/plates/</code> 一张没改；候选在 <code>excerpt/flash/design/S31-48/&lt;镜&gt;/</code>，每个文件夹有 <code>prompt.md</code>（原样送给 image_gen 的提示词）、<code>runs.md</code>（每次调用的参考图 sha、输出 sha）、<code>sha256.txt</code>。工具：<code>motion-kit/tools/codex_plate.py</code>（--edit-base 旧底图 + --ref）；脸参考与 s015–s030 相同：<code>S15-30/refs/face-P016b.png</code>、<code>face-F1a.png</code>；W1 参考 <code>board/plates/p011-w1c.png</code>、<code>S15-30/refs/w1-close-p012w1.png</code>；工程师 <code>S15-30/refs/engineer-p012w1.png</code>；LC 风衣参考从 p031 裁出、不含脸（<code>S31-48/refs/lc-coat-p031.png</code>）。绿框 = 推荐。</p>
+<div class=box><h3 style="margin-top:0">要你决定的（4 项，其余都按推荐）</h3><ol><li>s042（SG19）首帧：<b>A 头到大腿（P042/a，推荐）</b>——W1 每一件和正在落下的布都在画里；B 头到腰（P042/b）——脸更大、口型好验收，但布和腰链以下看不到。</li><li>s045 机位：<b>A 正上方俯拍（P045/c，推荐，方案写法）</b>；B 保持旧底图的斜俯拍（P045/a），两人的姿态更好读。</li><li>s037b/d（SG16）首帧：<b>A 人更近（P037/d，推荐）</b>；B 中景、看得到更多茶水间（P037/c）。</li><li>s033a 远景尺度：<b>A 她很小（S033A/a，推荐，方案写法）</b>；B 她大一点、远景里也认得出脸（S033A/b）。</li></ol></div>
+<p>自检（每张都做）：1400 宽全图目检 + 240 宽缩略看整体；脸用 haar 检测裁出后和开场脸（P016/b、F1a）并排；红色用像素检测（R 主导且 G&lt;0.5R、B&lt;0.55R，或色相在红 ±15° 且饱和度、亮度 &gt;0.35）定位再目检——粉红色的细线检测不到，所以风衣立领另做了一张放大并排逐张看；文字、手指、服装、嘴、耳挂在哪只耳朵逐张放大看。视频首帧保持 image_gen 原图 1672×941（和 s015–s030 的首帧一样）；静图推荐件另存 <code>*-2944.png</code>，用 Lanczos 放大到 2944 宽。Real-ESRGAN（本机 realesr-general-x4v3）先试过，弃用：它把她的雀斑抹掉（脸变了），还把书脊锐化出像字的笔画，见 <a href="evidence/esrgan-vs-native.jpg">对比图</a>（左原图 / 右 ESRGAN）。观感好坏由你判，下面只是我的核对。</p>
+<p>新图数量：方案表里新做是 10 行（s031b、s033a、INS33、s035a、s035b、s037a、INS37、s038b、s040b、INS41），比交代的 “9 张” 多 1 张；全部做了。另外 s040b 要两个机位、s032 要掌心实的拉焦版、s035b 加了一张单独的铜筒元素。旧底图 p033、p035 方案里不用，没有改。</p>
+<h2>s031a / s031c · SG12 念白首帧（视频）</h2><p class=act>方案：她站在售货机旁正对镜头，左手收腰带，念白，最后眼睛往左一瞟；s031b 售货机静图盖中段。</p><div class=g>
+<figure><a href="../../../board/plates/p031.png" target="_blank"><img loading="lazy" src="../../../board/plates/p031.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p031.png</code><br><small>sha256 9a953f0c5b460c01…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P031/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P031/a.png"></a><figcaption><b>推荐</b> · a：以 p031 编辑<br><span class=ok>✓ 全项通过</span><br><code>excerpt/flash/design/S31-48/P031/a.png</code><br><small>sha256 3357a872a67fe8ee…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P031/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P031/b.png"></a><figcaption>b：同 a 另一抽<br><span class=ok>✓ 纸币上有不可读的淡纹</span><br><code>excerpt/flash/design/S31-48/P031/b.png</code><br><small>sha256 92bb1ada9a98ef54…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；不再塞币→正对镜头、折起的纸币垂在腰前；左手挨着腰带；售货机屏黑、商品素色无字无价签；走廊无出口灯。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P031/a.png</code>（sha256 <code>3357a872a67fe8ee8e34928b4279413e3501f233956f3a8bd76b6957d70dcedf</code>）。a 的纸币只有素边框、完全没有纹样；左手就在腰带上，方便视频第一拍收腰带。</p>
+<h2>s031b · 售货机静图（新做）</h2><p class=act>方案：她看到的：三台旧售货机，她在右缘侧身入画；图形在黑屏上砸名字和错误码。</p><div class=g>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/S031B/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S031B/a.png"></a><figcaption><b>推荐</b> · a：她在右缘半身入画<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S031B/a.png</code><br><small>sha256 97b631940e67e24d…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S031B/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S031B/b.png"></a><figcaption>b：她全身站在走廊里<br><span class=ok>✓ 不是“右缘入画”</span><br><code>excerpt/flash/design/S31-48/S031B/b.png</code><br><small>sha256 7b7cfa6a2c6afc56…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：同一条走廊，三台机器各一块黑屏，商品素色；她 LC、侧脸朝机器，左耳红灯朝镜头。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/S031B/a-2944.png</code>（sha256 <code>2ac6f0e91b13dca28b102d3a8524bfa3c9fb5db2f89fe9769ba91856c4cb25f8</code>）。a 符合方案“右缘侧身入画”，三块黑屏都完整可做图形锚点。已 Lanczos 放大到 2944 宽。</p>
+<p class=iss>待处理：侧脸，脸的比对只能看侧面轮廓与雀斑。</p>
+<h2>s032 · 闸机静图（拉焦）</h2><p class=act>方案：前景保安掌心（虚）→ 141.758 焦点拉到她脸；她停在闸机前一步、两手插兜看镜头。</p><div class=g>
+<figure><a href="../../../board/plates/p032.png" target="_blank"><img loading="lazy" src="../../../board/plates/p032.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p032.png</code><br><small>sha256 a2954156b99e33fb…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P032/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P032/a.png"></a><figcaption>a：脸实<br><span class=bad>✗ 远处拱门上方有一块红绿色出口牌 → 本地去色得 a-fix</span><br><code>excerpt/flash/design/S31-48/P032/a.png</code><br><small>sha256 6d6e81f1f3a919ba…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P032/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P032/b.png"></a><figcaption>b：同 a 另一抽<br><span class=bad>✗ 同一块出口牌</span><br><code>excerpt/flash/design/S31-48/P032/b.png</code><br><small>sha256 13813bc063d346ed…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P032/a-fix.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P032/a-fix.png"></a><figcaption><b>推荐</b> · a-fix：a 去掉出口牌颜色（本地，只动 20×20 px）<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P032/a-fix.png</code><br><small>sha256 285ddb5fb8fb237c…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P032/a-palm.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P032/a-palm.png"></a><figcaption>a-palm：以 a-fix 编辑成掌心实、人虚<br><span class=ok>✓ 拉焦另一端</span><br><code>excerpt/flash/design/S31-48/P032/a-palm.png</code><br><small>sha256 fb3478d670fdf595…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；停步、两手插兜看镜头；闸机/保安台/袖子无字无臂章；另出掌心实版本供拉焦。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P032/a-fix-2944.png</code>（sha256 <code>022c75bbff85e97983919c6b945bb62b27ee94537cbfc60a1706321bb52e25c9</code>）。a-fix（脸实）+ a-palm（掌心实）一对，后期在两张之间做焦点拉动；两张都已 Lanczos 放大到 2944 宽（a-palm-2944.png）。</p>
+<p class=iss>待处理：她站在闸机列之间的空当里（不是闸机外一步），方案“停在闸机前一步”的意思仍成立，后期不动。</p>
+<h2>s033a · 档案通道远景（新做）</h2><p class=act>方案：两排报纸合订本的长通道，她小小站在尽头黄铜管站旁。</p><div class=g>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/S033A/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S033A/a.png"></a><figcaption><b>推荐</b> · a：她约占画高 1/5<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S033A/a.png</code><br><small>sha256 6d4a7d3169e05d24…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S033A/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S033A/b.png"></a><figcaption>b：她约占画高 1/3<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S033A/b.png</code><br><small>sha256 368e89c6dc2f86a5…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：书脊素色无字；黄铜管站与接收篮在尽头；她 LC、正对镜头。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/S033A/a-2944.png</code>（sha256 <code>53d257bb679a26b888ea4390bb5a75366f6cd35dff17b5c60dd1853ce89dfd88</code>）。a 的尺度最像方案“小小地站在尽头”，三条路线图有足够空墙面。</p>
+<p class=iss>待处理：a 的脸只有十几像素高，远景里无法逐项比对脸（b 能看清，若你想远景也认得出脸就选 b）。</p>
+<h2>s033b · INS33 插镜首帧（视频）</h2><p class=act>方案：她的右手把黄铜筒推进管口、松手、盖子合上。</p><div class=g>
+<figure><a href="../../../excerpt/flash/design/S31-48/INS33/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/INS33/a.png"></a><figcaption>a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/INS33/a.png</code><br><small>sha256 f10b8c0884a7f92e…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/INS33/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/INS33/b.png"></a><figcaption><b>推荐</b> · b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/INS33/b.png</code><br><small>sha256 9a45f99fd1911bcc…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：黄铜管口特写、盖子开着，银灰风衣袖口的手握着素面铜筒停在管口外。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/INS33/b.png</code>（sha256 <code>9a45f99fd1911bcc00a043c0dd7aaaa6af434b18ca03aaeb8b81a36a7680d1e1</code>）。b 的铜筒正对管口、手指五根清楚，推进动作的起始状态最明确；黄铜无刻字。</p>
+<h2>s034 · 手按黄铜盖静图</h2><p class=act>方案：重音冲击：她手掌平按黄铜盖、看镜头；管内铜筒层向上拖影（后期）。</p><div class=g>
+<figure><a href="../../../board/plates/p034.png" target="_blank"><img loading="lazy" src="../../../board/plates/p034.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p034.png</code><br><small>sha256 ebb815d00d100f8a…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P034/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P034/a.png"></a><figcaption><b>推荐</b> · a：保留铰链盖<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P034/a.png</code><br><small>sha256 0fc9f71961ada8b7…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P034/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P034/b.png"></a><figcaption>b：盖子变成圆顶<br><span class=ok>✓ 但读起来不像盖子</span><br><code>excerpt/flash/design/S31-48/P034/b.png</code><br><small>sha256 813da022e6e98a47…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；看镜头；闭嘴；黄铜盖无刻度刻字。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P034/a-2944.png</code>（sha256 <code>b13896c7f5c385f65ce15f89118b0f8c151281236e6984313c4eee8c05d0d91f</code>）。a 的盖子有铰链，和 INS33 的开合盖是同一种东西。拖影用的铜筒层见 s035b 的 canister-2（单独元素）。</p>
+<p class=iss>待处理：“另抠一层铜筒”没有从这张图里抠：盖子是合着的，看不见筒；改为单独出一张和 INS33 一样的铜筒元素（S035B/canister-2）。</p>
+<h2>s035a · 她 + 接收篮静图（新做）</h2><p class=act>方案：她站在黄铜接收篮旁抬眼看管口，篮子空。</p><div class=g>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/S035A/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S035A/a.png"></a><figcaption><b>推荐</b> · a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S035A/a.png</code><br><small>sha256 a08705ec3520b165…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S035A/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S035A/b.png"></a><figcaption>b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S035A/b.png</code><br><small>sha256 c73531b7cc986806…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做（p035 不用）：中景，她 LC、闭嘴、仰头看上方管子，篮子空。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/S035A/a-2944.png</code>（sha256 <code>be96f684baeb0b1e334a1bacbb4e12a9ec8f2bd0401ed87b8e26fe0f4bb5a204</code>）。两张几乎一样，a 的脸更清楚。</p>
+<p class=iss>待处理：她看的是篮子上方的竖管，不是正上方的出口嘴；时间戳图形不受影响。</p>
+<h2>s035b · 接收篮特写 + 铜筒元素（新做）</h2><p class=act>方案：铜筒层从画外落进篮子，155.26 落地冲一下（2.5D）。</p><div class=g>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/S035B/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S035B/a.png"></a><figcaption><b>推荐</b> · a：空篮特写<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S035B/a.png</code><br><small>sha256 4962b266ed65d8cf…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S035B/canister.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S035B/canister.png"></a><figcaption>canister：第一版铜筒元素<br><span class=bad>✗ 有铰链和铆钉，和 INS33 手里的素面筒不一致</span><br><code>excerpt/flash/design/S31-48/S035B/canister.png</code><br><small>sha256 ea62ac6efb9d0b5d…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S035B/canister-2.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S035B/canister-2.png"></a><figcaption>canister-2：照 INS33/b 的筒重出<br><span class=ok>✓ 浅灰平底，供抠层</span><br><code>excerpt/flash/design/S31-48/S035B/canister-2.png</code><br><small>sha256 7879e3ede9d70ea9…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：黄铜网篮特写（空）；另出一张素色背景上的铜筒元素，s035b 落入、s034 拖影共用。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/S035B/a-2944.png</code>（sha256 <code>8b3cfbb801be1db70d068c048989823bb8156a07ba9c03ab662b93fcb36953d4</code>）。篮子与 s035a 同一种；canister-2 和 INS33 推荐件同一只筒。两张都已放大到 2944 宽。</p>
+<p class=iss>待处理：铜筒还没抠成透明层（背景是平的浅灰，剪辑时抠）。</p>
+<h2>s036a / s036c · SG15 念白首帧（视频）</h2><p class=act>方案：阅览室过道：她站着、寻呼机攥在腰前；读者把椅子横在她前面，最后一句时让路。</p><div class=g>
+<figure><a href="../../../board/plates/p036.png" target="_blank"><img loading="lazy" src="../../../board/plates/p036.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p036.png</code><br><small>sha256 30d62a00b3f5fe1d…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P036/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P036/a.png"></a><figcaption>a<br><span class=bad>✗ 风衣立领内侧一道粉红细线（像旧 L1 红线）；读者是深色卷发，容易被看成开场工程师</span><br><code>excerpt/flash/design/S31-48/P036/a.png</code><br><small>sha256 85906648fbcb8906…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P036/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P036/b.png"></a><figcaption>b<br><span class=bad>✗ 同一道粉红立领线</span><br><code>excerpt/flash/design/S31-48/P036/b.png</code><br><small>sha256 d9c77ac8f5c91ab8…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P036/x.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P036/x.png"></a><figcaption><b>推荐</b> · x：以 b 编辑，只去掉立领粉线<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P036/x.png</code><br><small>sha256 27b0d88d3a5c8d23…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；站定不走向镜头；右手攥寻呼机在腰前、液晶空白灰绿；读者横椅坐着抬头看她；书脊无字。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P036/x.png</code>（sha256 <code>27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0</code>）。x 去掉了粉红立领线，读者是灰发中年人（不会被认成工程师）。</p>
+<p class=iss>待处理：读者的椅子只是侧坐在过道边上，没有完全横在她正前方；让路动作仍可写成“把椅子往桌子里拉”。</p>
+<h2>s037a · 工程师静图（新做）</h2><p class=act>方案：开场工程师在微波炉前举着手机僵住，她在后面料理台上（虚）。</p><div class=g>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/S037A/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S037A/a.png"></a><figcaption><b>推荐</b> · a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S037A/a.png</code><br><small>sha256 c31e0db698631bf0…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S037A/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S037A/b.png"></a><figcaption>b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S037A/b.png</code><br><small>sha256 c8b27882b8ab6b2a…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：开场工程师（深色卷发、胡茬、深蓝牛仔夹克）、微波炉内灯亮、显示屏黑、手机素背；她 LC 坐在料理台上。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/S037A/a-2944.png</code>（sha256 <code>5dc6c0c4e4e0005f34f4039b1c3695abc61ad33340042a81c7e2477b8a5091ab</code>）。a 的工程师占画面更大、“僵住”的眼神更清楚。</p>
+<p class=iss>待处理：她在背景里并不够虚（方案写“虚焦”），剪辑时按 B 类模糊加景深。</p>
+<h2>s037b / s037d · SG16 念白首帧（视频）</h2><p class=act>方案：她坐在料理台上、碗在腿上一直看镜头念白；画面左缘只有工程师的肩和举手机的手；微波炉出画。</p><div class=g>
+<figure><a href="../../../board/plates/p037.png" target="_blank"><img loading="lazy" src="../../../board/plates/p037.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p037.png</code><br><small>sha256 830b7a7723d7f925…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P037/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P037/a.png"></a><figcaption>a：以 p037 编辑推近<br><span class=bad>✗ 输出 1312×1199，不是 16:9</span><br><code>excerpt/flash/design/S31-48/P037/a.png</code><br><small>sha256 329488f1fce81c9f…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P037/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P037/b.png"></a><figcaption>b：同 a 另一抽<br><span class=bad>✗ 同上</span><br><code>excerpt/flash/design/S31-48/P037/b.png</code><br><small>sha256 cc12ec7d4eaa3811…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P037/c.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P037/c.png"></a><figcaption>c：按参考重新构图（中景）<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P037/c.png</code><br><small>sha256 3c460193384a5127…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P037/d.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P037/d.png"></a><figcaption><b>推荐</b> · d：同 c 另一抽（人更近）<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P037/d.png</code><br><small>sha256 746a2fe070aace10…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；碗在腿上；工程师换开场那位，只露肩、后脑和举手机的手；微波炉不在画面里；罐子无标签。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P037/d.png</code>（sha256 <code>746a2fe070aace1075e2f179153dbff985622dc58f5501990459a2ff669e7aef</code>）。d 的脸更大，念白口型更容易验收；工程师手和牛仔袖都在左缘。</p>
+<h2>s037c · INS37 插镜首帧（视频）</h2><p class=act>方案：他连按两下停止键，拔插头，灯灭转盘停。</p><div class=g>
+<figure><a href="../../../excerpt/flash/design/S31-48/INS37/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/INS37/a.png"></a><figcaption>a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/INS37/a.png</code><br><small>sha256 942b4a5bb0944583…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/INS37/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/INS37/b.png"></a><figcaption><b>推荐</b> · b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/INS37/b.png</code><br><small>sha256 d4dfc4f09006c0f5…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：微波炉暖光、素色马克杯、黑显示屏、无字按键面板；牛仔袖口的手指按在最下一格；墙上插座和插头在画内。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/INS37/b.png</code>（sha256 <code>d4dfc4f09006c0f540700dfa4ed859da25fb39f5f16ceae68a51f23675fa5470</code>）。b 的插座和电线更清楚，拔插头这一下有落点。</p>
+<p class=iss>待处理：插座是美式三孔（素色，无字）。</p>
+<h2>s038a / s038c · 楼梯静图</h2><p class=act>方案：她坐在台阶上，膝上两张空白半页纸并排，看镜头；s038c 裁紧 ≤1.1×。</p><div class=g>
+<figure><a href="../../../board/plates/p038.png" target="_blank"><img loading="lazy" src="../../../board/plates/p038.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p038.png</code><br><small>sha256 b9120ef30bc27edf…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P038/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P038/a.png"></a><figcaption><b>推荐</b> · a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P038/a.png</code><br><small>sha256 270c94d874ed26cc…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P038/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P038/b.png"></a><figcaption>b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P038/b.png</code><br><small>sha256 9e89f57778ba60d0…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；两张空白半页纸；打开的空铜筒放在身边台阶上。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P038/a-2944.png</code>（sha256 <code>992df364526c17646b1dac9a56eadf659a2238d4b0e270499d1ee9884a6d00b3</code>）。a 更正面看镜头。已放大到 2944 宽，裁 1.1× 后仍高于 1920。</p>
+<h2>s038b · 半页纸插镜（新做）</h2><p class=act>方案：膝上两张半页纸微距特写，K 复印抖动。</p><div class=g>
+<figure><a href="../../../excerpt/flash/design/S31-48/S038B/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S038B/a.png"></a><figcaption>a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S038B/a.png</code><br><small>sha256 5ba39ab70069df24…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/S038B/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S038B/b.png"></a><figcaption><b>推荐</b> · b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S038B/b.png</code><br><small>sha256 a4810fa335345a8b…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：两张空白撕开的半页纸，银灰风衣下摆、黑裤，浅景深。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/S038B/b-2944.png</code>（sha256 <code>6717514ffa2e47419e3d0c784d195579c8424bb8c9187cac1c5a6f478dcc10bb</code>）。b 两张纸居中、撕口对着，手在角上不抢画面。</p>
+<h2>s039 · SG17 念白首帧（视频）</h2><p class=act>方案：低机位：她蹲在关着的门前，门缝下一线红光在指尖前；gap 上把手掌按进光里。</p><div class=g>
+<figure><a href="../../../board/plates/p039.png" target="_blank"><img loading="lazy" src="../../../board/plates/p039.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p039.png</code><br><small>sha256 44fd548338066e3f…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P039/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P039/a.png"></a><figcaption>a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P039/a.png</code><br><small>sha256 7a093c42d04c7b36…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P039/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P039/b.png"></a><figcaption><b>推荐</b> · b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P039/b.png</code><br><small>sha256 9343996355399b73…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；看镜头；门无牌无字；红色只剩耳挂和门缝一线光。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P039/b.png</code>（sha256 <code>9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342</code>）。b 的眼神正对镜头。</p>
+<p class=iss>待处理：两张的指尖都几乎贴着红线（提示词要求差一指宽）；视频里“按进光里”仍成立。</p>
+<h2>s040a · 保安亭静图</h2><p class=act>方案：越过研究员的肩：她已把他的马克杯拿在手里，他的手还停在半空。</p><div class=g>
+<figure><a href="../../../board/plates/p040.png" target="_blank"><img loading="lazy" src="../../../board/plates/p040.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p040.png</code><br><small>sha256 9e54c7f64f1eb8cb…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P040/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P040/a.png"></a><figcaption><b>推荐</b> · a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P040/a.png</code><br><small>sha256 8b342fe61d4ff0aa…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P040/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P040/b.png"></a><figcaption>b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P040/b.png</code><br><small>sha256 49711a29d5521d5a…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；杯子在她手里、他手空停半空；研究员改直发、眼镜、灰连帽衫、背对；监控画面无字。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P040/a-2944.png</code>（sha256 <code>cb2778f57101bb560c94409ef34133fc291f87212ab973f997407ef57cf9f26f</code>）。两张几乎一样；a 他的手离杯子更近，“刚被拿走”更好读。</p>
+<h2>s040b · 监控屏特写（新做，两个机位都要）</h2><p class=act>方案：176.518 换一个走廊机位，Eleven 上屏幕暗下去。</p><div class=g>
+<figure><a href="../../../excerpt/flash/design/S31-48/S040B/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S040B/a.png"></a><figcaption>a：第一版机位一<br><span class=bad>✗ 显像管厚边屏，和 s040a 的平板屏不一致</span><br><code>excerpt/flash/design/S31-48/S040B/a.png</code><br><small>sha256 8ace1ebd2ce192f0…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S040B/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S040B/b.png"></a><figcaption>b：第一版机位二<br><span class=bad>✗ 同上</span><br><code>excerpt/flash/design/S31-48/S040B/b.png</code><br><small>sha256 04fdcd42bb900cbe…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S040B/a2.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S040B/a2.png"></a><figcaption>a2：照 P040/a 的平板屏重出，机位一<br><span class=bad>✗ 书架上方小牌子有伪文字划痕 → 本地模糊成空白牌得 a2-fix</span><br><code>excerpt/flash/design/S31-48/S040B/a2.png</code><br><small>sha256 e742c817085767a5…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/S040B/a2-fix.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S040B/a2-fix.png"></a><figcaption><b>推荐</b> · a2-fix<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S040B/a2-fix.png</code><br><small>sha256 d4f62e87aa15b787…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/S040B/b2.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/S040B/b2.png"></a><figcaption>b2：机位二（十字路口 + 推车）<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/S040B/b2.png</code><br><small>sha256 effff5eeb25c24d3…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：s040a 那台细边框平板屏，黑白监控画面，空无一人，无时间码。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/S040B/a2-fix-2944.png</code>（sha256 <code>971edce297fec6acc9bec0ff1864e104bc0959189e0e149f7a218646cd072290</code>）。a2-fix（176.518 前）+ b2（176.518 后）两张都用，均已放大到 2944 宽（b2-2944.png）。</p>
+<h2>s041a / s041c · SG18 唱段首帧（视频）</h2><p class=act>方案：夜里橱窗：她从肩到脚裹在防尘布里，只露脸；轻声唱。</p><div class=g>
+<figure><a href="../../../board/plates/p041.png" target="_blank"><img loading="lazy" src="../../../board/plates/p041.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p041.png</code><br><small>sha256 a69a010ff46516a3…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P041/c.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P041/c.png"></a><figcaption><b>推荐</b> · c：改写提示词后重出<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P041/c.png</code><br><small>sha256 43f64d7fdfd5d39b…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P041/d.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P041/d.png"></a><figcaption>d：同 c 另一抽<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P041/d.png</code><br><small>sha256 f32a5ce5e0f502ce…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；本白粗亚麻布像高领斗篷从下巴罩到脚，看不见任何衣服；人台都盖布无脸；玻璃无倒影。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P041/c.png</code>（sha256 <code>43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37</code>）。c、d 几乎一样，c 的布在胸前合拢的缝更清楚，方便 Octo- 时手从布里抓布边。</p>
+<p class=iss>待处理：第一轮 a、b 两抽都被 image_gen 输出审核拦截（moderation_blocked，没有文件）；改写成“厚实不透明的高领斗篷”后通过。</p>
+<h2>s041b · INS41 插镜首帧（视频）</h2><p class=act>方案：两只黑袖子的手把防尘布从人台头顶拉下来，布落在 181.104 重音上。</p><div class=g>
+<figure><a href="../../../excerpt/flash/design/S31-48/INS41/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/INS41/a.png"></a><figcaption>a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/INS41/a.png</code><br><small>sha256 177050514a620238…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/INS41/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/INS41/b.png"></a><figcaption><b>推荐</b> · b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/INS41/b.png</code><br><small>sha256 54bffc0941fa0bc7…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>新做：无五官素色人台，两只黑袖子的手把撑开的防尘布举在它头顶，后面人台已盖布。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/INS41/b.png</code>（sha256 <code>54bffc0941fa0bc71b755011f6e938d2e21368d951afaee3e826cde4dc71985d</code>）。b 的布离头更近、两边垂得更低，落下更快能落在重音上。</p>
+<p class=iss>待处理：人台是裸胸像（无五官、无乳头细节），和旧板子一致。</p>
+<h2>s042 · SG19 唱段首帧（视频）</h2><p class=act>方案：砰的灯全亮：她已是 W1，防尘布正从背上滑到脚边，站直唱。</p><div class=g>
+<figure><a href="../../../board/plates/p042.png" target="_blank"><img loading="lazy" src="../../../board/plates/p042.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p042.png</code><br><small>sha256 66c8fc4d2d17f7e3…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P042/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P042/a.png"></a><figcaption><b>推荐</b> · a：头到大腿<br><span class=ok>✓ W1 全件入画</span><br><code>excerpt/flash/design/S31-48/P042/a.png</code><br><small>sha256 dff8339fc891ffce…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P042/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P042/b.png"></a><figcaption>b：头到腰<br><span class=ok>✓ 脸更大</span><br><code>excerpt/flash/design/S31-48/P042/b.png</code><br><small>sha256 8b211dd70c27ade6…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P042/c.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P042/c.png"></a><figcaption>c：试拉成中景<br><span class=bad>✗ 输出竖图 1086×1448</span><br><code>excerpt/flash/design/S31-48/P042/c.png</code><br><small>sha256 10a96044a0999862…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P042/d.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P042/d.png"></a><figcaption>d：同 c<br><span class=bad>✗ 输出竖图 1024×1536</span><br><code>excerpt/flash/design/S31-48/P042/d.png</code><br><small>sha256 4249179ceca616ff…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；L1 → W1（灰不对称外套露左肩、右臂长袖、斜挎带右肩→左胯、腰链挂寻呼机和空白工牌、迷你裙、长靴）；布已离肩往下滑；射灯全亮。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P042/a.png</code>（sha256 <code>dff8339fc891ffce23bf366ee7d1c7f24c2f4264a50a4df52845c494f6b11c90</code>）。a 能同时看到 W1 每一件和正在落的布，换装这一刀最好读；b 的脸更大、口型更好验收（见上方决定 1）。</p>
+<h2>s043 · 橱窗远景静图（换气）</h2><p class=act>方案：清晨 Union Square 一排橱窗，她停在最后一扇前不动，标签按拍出现。</p><div class=g>
+<figure><a href="../../../board/plates/p043.png" target="_blank"><img loading="lazy" src="../../../board/plates/p043.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p043.png</code><br><small>sha256 38e8366253950007…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P043/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P043/a.png"></a><figcaption><b>推荐</b> · a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P043/a.png</code><br><small>sha256 3a1e1b5dd021a068…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P043/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P043/b.png"></a><figcaption>b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P043/b.png</code><br><small>sha256 57f0d2ce49f670a6…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸（远景）；L1 → W1；站定不走；人台已揭布、无工人；店面无招牌字。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P043/a-2944.png</code>（sha256 <code>8a1483eeb0f256d99163316603ce1ceff9a5f376b8c2be343206badab90c7f76</code>）。a 腰链上的寻呼机和工牌更清楚。</p>
+<p class=iss>待处理：檐口有装饰浮雕（不是文字）；远景脸约 25 px 高，只能看轮廓和发型。</p>
+<h2>s044 · 试衣间入口静图</h2><p class=act>方案：店员递来服装袋和活页夹，她翻页。</p><div class=g>
+<figure><a href="../../../board/plates/p044.png" target="_blank"><img loading="lazy" src="../../../board/plates/p044.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p044.png</code><br><small>sha256 4aa64697eb2f3aeb…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P044/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P044/a.png"></a><figcaption><b>推荐</b> · a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P044/a.png</code><br><small>sha256 096bf2ce784c6597…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P044/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P044/b.png"></a><figcaption>b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P044/b.png</code><br><small>sha256 7be19d8f1e1e04d3…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；L1 → W1；活页夹纸页空白；服装袋无标志。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P044/a-2944.png</code>（sha256 <code>8e0c5ea6ef2e83c62a43af9548dde9ce599991f33ebef905e7a1d33b47b07460</code>）。两张几乎一样，a 手指更自然。</p>
+<p class=iss>待处理：整张偏暖（底图就是暖光），指尖皮肤被红色检测标出，目检是肤色不是红色。</p>
+<h2>s045 · 两个隔间俯拍静图</h2><p class=act>方案：左格她（灯亮），右格副本（灯灭），副本只露头顶和手。</p><div class=g>
+<figure><a href="../../../board/plates/p045.png" target="_blank"><img loading="lazy" src="../../../board/plates/p045.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p045.png</code><br><small>sha256 386cd40e90e01b01…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P045/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P045/a.png"></a><figcaption>a：保持底图斜俯拍<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P045/a.png</code><br><small>sha256 45ac013b097559f6…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P045/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P045/b.png"></a><figcaption>b：同 a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P045/b.png</code><br><small>sha256 ca61e5748273c03c…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P045/c.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P045/c.png"></a><figcaption><b>推荐</b> · c：改正上方俯拍<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P045/c.png</code><br><small>sha256 d1c3a6a2a48a47ae…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P045/d.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P045/d.png"></a><figcaption>d：同 c<br><span class=ok>✓ 她的耳挂灯看不清</span><br><code>excerpt/flash/design/S31-48/P045/d.png</code><br><small>sha256 60687f86862347e9…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>她：开场脸、W1、去立领红线、看镜头；副本：同发型与 W1，埋头抱膝，只露头顶、头发和手，耳挂不亮；右格灯灭。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P045/c-2944.png</code>（sha256 <code>83028d96accdfcb161e2d616cf7c70f25ae51d966b20ac909bf69fcce1b112ba</code>）。c 是方案写的“正上方俯拍”，两格就是示意图本身，最适合 AGENT A / AGENT B 框（见上方决定 2）。</p>
+<p class=iss>待处理：副本的脸在四张里都完全看不到。</p>
+<h2>s046a / s046b · MO15 动作首帧（视频）</h2><p class=act>方案：她推衣架、隔板上方副本的手按秒表；s046b 从 4K 裁秒表。</p><div class=g>
+<figure><a href="../../../board/plates/p046.png" target="_blank"><img loading="lazy" src="../../../board/plates/p046.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p046.png</code><br><small>sha256 b0d941a497af130b…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P046/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P046/a.png"></a><figcaption>a<br><span class=bad>✗ 她朝右侧身，看得见的是右耳，耳挂和红灯却戴在右耳；伸向衣架的左臂穿着袖子（W1 左臂应裸）</span><br><code>excerpt/flash/design/S31-48/P046/a.png</code><br><small>sha256 805e2bfd1fb601ae…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P046/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P046/b.png"></a><figcaption>b<br><span class=bad>✗ 同 a</span><br><code>excerpt/flash/design/S31-48/P046/b.png</code><br><small>sha256 65e7924e16dc63d8…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P046/x.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P046/x.png"></a><figcaption><b>推荐</b> · x：以 a 编辑修这两处<br><span class=ok>✓ 右耳无耳挂；左臂裸露</span><br><code>excerpt/flash/design/S31-48/P046/x.png</code><br><small>sha256 d10b3b6761226ffd…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；L1 → W1；侧身面向挂衣杆；衣服无吊牌；隔板上方只有一只灰长袖的手和表盘空白的秒表。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P046/x.png</code>（sha256 <code>d10b3b6761226ffd018bbe7e5d82ef895ce5711f02d1f26fb45be195b639f24d</code>）。x 修好了耳挂边和左臂，其余与 a 一致。</p>
+<p class=iss>待处理：搭在衣架上的是她的左手（方案 prompt 写“右手”）：拍之前 MO15 prompt 要改成“左手”。</p>
+<h2>s047 · 隔板缝静图</h2><p class=act>方案：她单膝跪在隔板下，从缝看过去，一张白纸条滑到手边。</p><div class=g>
+<figure><a href="../../../board/plates/p047.png" target="_blank"><img loading="lazy" src="../../../board/plates/p047.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p047.png</code><br><small>sha256 2be2fb12535b9bdb…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P047/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P047/a.png"></a><figcaption><b>推荐</b> · a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P047/a.png</code><br><small>sha256 6aade7821c7542e0…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P047/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P047/b.png"></a><figcaption>b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P047/b.png</code><br><small>sha256 29d02e925bc0b6e1…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；L1 → W1；深蹲改单膝跪；纸条空白；闭嘴。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P047/a-2944.png</code>（sha256 <code>4b966382e77d542aeaf48054f2ed248cdda56fbf493705bc9bed3914c335dd27</code>）。a 单膝着地更明确。</p>
+<h2>s048 · SG20 念白首帧（视频）</h2><p class=act>方案：特写：她跪在隔板旁看镜头，轻声说完后静止闭嘴。</p><div class=g>
+<figure><a href="../../../board/plates/p048.png" target="_blank"><img loading="lazy" src="../../../board/plates/p048.png"></a><figcaption>旧底图（未改）<br><code>board/plates/p048.png</code><br><small>sha256 2ff160cb99a9613e…</small></figcaption></figure>
+<figure><a href="../../../excerpt/flash/design/S31-48/P048/a.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P048/a.png"></a><figcaption>a<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P048/a.png</code><br><small>sha256 d2169d6e5517d9f2…</small></figcaption></figure>
+<figure class=rec><a href="../../../excerpt/flash/design/S31-48/P048/b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S31-48/P048/b.png"></a><figcaption><b>推荐</b> · b<br><span class=ok>✓</span><br><code>excerpt/flash/design/S31-48/P048/b.png</code><br><small>sha256 96bffc3c7fbcc0c9…</small></figcaption></figure>
+<figure class=ref><a href="../../../excerpt/flash/design/S15-30/refs/face-P016b.png" target="_blank"><img loading="lazy" src="../../../excerpt/flash/design/S15-30/refs/face-P016b.png"></a><figcaption>开场脸（对照）<br><code>excerpt/flash/design/S15-30/refs/face-P016b.png</code></figcaption></figure>
+</div>
+<p><b>改了什么：</b>开场脸；闭嘴；L1 → W1；单膝跪；看镜头；双手和纸条都在画外。</p>
+<p><b>推荐：</b><code>excerpt/flash/design/S31-48/P048/b.png</code>（sha256 <code>96bffc3c7fbcc0c9ddd660c4b32579c89d522f89c1aa3d8f2c6e23a286e9a62a</code>）。b 的耳挂灯清楚、着地的膝更明确。</p>
+<p class=iss>待处理：景别是中近景（头到膝），不是大特写；需要更紧时从 4K 成片裁。</p>
+<h2>没做 / 做不到的</h2><ul><li>没有提交任何即梦或 Seedance 视频，没有付费调用；没有改 board/、没有改旧底图、没有 commit。</li><li>“另抠一层铜筒”只给了平底元素图（canister-2），透明层留给剪辑抠。</li><li>MO15 的 prompt 还写着“右手”，首帧里是左手搭衣架，拍之前要改。</li></ul>
+</body></html>

@@ -1,0 +1,80 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-r3-SG20-a-2",
+ "question": "对照页：http://127.0.0.1:8769/pilot/s031-048/r3/index.html\n\n6 条有念白或唱段的提示词里，歌词译文和引号都删掉了，动作只写“第几句时”。句子顺序用歌词时间和实际人声核对过。\n\n· SG12：只留开口时收腰带；纸币一直捏在腰前；写明一直看镜头、不转头。\n· SG15：改为“说到第三句时”读者挪椅子。\n· SG16：改为“说到第四句时”放碗、微波炉熄灯。\n· SG17：改为“说到第二句时”按手。\n· SG18：改为“唱到第三句刚开口时”伸手。\n· SG20：本来就没有译文，不变。\n\n另外加了一条自动检查：念白和唱段的提示词里不许出现引号、英文或歌词译文。\n\n花费：这 6 条各拍 2 次，约 6,720 积分。其中 SG12 重拍的 1,440 是计划外新增，本段合计约 11,840，上限 12,800。按这一页开拍吗？",
+ "user_quote": "按 r3 开拍 (Recommended)",
+ "approved_at": "2026-11-25T04:33:58Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/index.html",
+  "sha256": "e88334d59cd140b47f683d89f9633b4f738882aecd851d2b6dbd8899b78e48df"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/preview-inputs.json",
+  "sha256": "bae532c8f168a8fb67542813e4ea33dbdaedd33f2dc6450a675efbc032b1852e"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md",
+  "sha256": "9040e687cfa8d6f5aa4b6339250faa6c636da4e525d2f5fc154e0b6858a5530b"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p048-w2.png",
+   "sha256": "c31412c3ba0260f5c6937b8ce6ecf4cd8d1eef4c1a038ecc9fb082da94818c32",
+   "role": "SG20 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG20.wav",
+   "sha256": "27a638f479ce1e541be7df55be1a79d667b18a6953e694f758070dc7ebfb568c",
+   "role": "SG20 vocal"
+  }
+ ],
+ "prompts": {
+  "SG20": {
+   "text": "{{image:0}}中的她单膝跪在试衣间隔板旁的地毯上，中近景，身体微微前倾，看着镜头，嘴唇闭着。她很轻地、平平地对着镜头说一句话，口型与{{audio:1}}里的人声逐字精确同步；说完嘴闭上，一动不动，一直看着镜头。镜头固定不动。嘴前没有任何遮挡。她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖。寻呼机和工牌一直挂在她身前的腰链上；寻呼机的液晶屏只有空白的灰绿底光，没有数字和字；工牌是空白的。背后的镜子里只有衣架，不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "ff7c0176bc5e5a3c41b4af6fbfa8aa869498a33c4eb680a291d7abdcde5af7da"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 6,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 500,
+  "cumulative_CRD": 500
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p048-w2.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p048-arm-b-comp.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg20-a-2-source-001",
+  "policy_id": "iris-sg20-a-2-source-001",
+  "reservation_id": "iris-sg20-a-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG20-a-1",
+   "sd-SG20-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1000,
+  "this_take": "sd-SG20-a-2"
+ },
+ "decision_notes": [
+  "人声窗口止于 208.80（“All” 208.93 之前），剪辑用到 209.34：生成 = 用到的 4.10 s + 1 s 余量取 6 s（方案同为 6 s）",
+  "2026-11-25 r2：首帧换 p048-w2（W1 左臂从肩到腕裸露，本地有界合成只换左臂与外套垂布，其余逐像素等于 p048-w1）；prompt 加“她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖”",
+  "2026-11-25 r3：prompt 与 r2 相同（本来就没有引号或译文）"
+ ],
+ "review_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html",
+  "sha256": "45f950b4b5c011c560a99de5b5d485f5f9b47c165f90aaa5f2089ccfdd3f8c1e"
+ }
+}

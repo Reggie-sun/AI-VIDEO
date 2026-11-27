@@ -1,0 +1,351 @@
+{
+ "range": [
+  226,
+  340
+ ],
+ "every": 2,
+ "rows": [
+  {
+   "frame": 226,
+   "red_px": 5,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 228,
+   "red_px": 3,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 230,
+   "red_px": 3,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 232,
+   "red_px": 4,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 234,
+   "red_px": 4,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 236,
+   "red_px": 5,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 238,
+   "red_px": 5,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 240,
+   "red_px": 6,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 242,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 244,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 246,
+   "red_px": 5,
+   "outside_her_px": 5,
+   "exception_px": 0
+  },
+  {
+   "frame": 248,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 250,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 252,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 254,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 256,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 258,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 260,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 262,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 264,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 266,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 268,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 270,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 272,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 274,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 276,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 278,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 280,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 282,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 284,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 286,
+   "red_px": 1,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 288,
+   "red_px": 1,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 290,
+   "red_px": 1,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 292,
+   "red_px": 1,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 294,
+   "red_px": 1,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 296,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 298,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 300,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 302,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 304,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 306,
+   "red_px": 1,
+   "outside_her_px": 1,
+   "exception_px": 0
+  },
+  {
+   "frame": 308,
+   "red_px": 8,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 310,
+   "red_px": 3,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 312,
+   "red_px": 0,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 314,
+   "red_px": 8,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 316,
+   "red_px": 5,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 318,
+   "red_px": 2,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 320,
+   "red_px": 14,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 322,
+   "red_px": 59,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 324,
+   "red_px": 42,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 326,
+   "red_px": 20,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 328,
+   "red_px": 29,
+   "outside_her_px": 29,
+   "exception_px": 0
+  },
+  {
+   "frame": 330,
+   "red_px": 8,
+   "outside_her_px": 8,
+   "exception_px": 0
+  },
+  {
+   "frame": 332,
+   "red_px": 8,
+   "outside_her_px": 7,
+   "exception_px": 0
+  },
+  {
+   "frame": 334,
+   "red_px": 1,
+   "outside_her_px": 0,
+   "exception_px": 0
+  },
+  {
+   "frame": 336,
+   "red_px": 6,
+   "outside_her_px": 5,
+   "exception_px": 0
+  },
+  {
+   "frame": 338,
+   "red_px": 7,
+   "outside_her_px": 0,
+   "exception_px": 0
+  }
+ ]
+}

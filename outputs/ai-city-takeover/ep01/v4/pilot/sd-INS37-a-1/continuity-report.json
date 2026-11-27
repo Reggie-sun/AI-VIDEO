@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-25",
+ "written_by": "主会话据 continuity-supervisor 复核报告（2026-11-25，1–4 项全 PASS）转写（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-INS37-a-1/preview-approval.json",
+   "sha256": "52221dc24edf49c080ade5bcab934bd6abd422ba2ad6e5cb5f7f355728768e6d"
+  }
+ },
+ "units": {
+  "INS37": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；首帧起始状态、prompt 与 approval 一致（复核表 1 连续性/2 交接/3 轴线动作机位/4 prompt 适配均 PASS）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "深蓝牛仔袖左手从画左进；按最下格两下后拔左墙插头、炉灯灭转盘停；显示屏全程黑；面板无字；无红"
+  }
+ }
+}

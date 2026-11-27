@@ -1,0 +1,10 @@
+{
+ "shot": "s036b",
+ "t0": 156.8508,
+ "t1": 157.768,
+ "why": "pure graphic frame on 'P zero': black, no screen; the P0 ticket is the Agentcut layer",
+ "black": true,
+ "frames": 22,
+ "pictures": 1,
+ "fixed": true
+}

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>s031–s048 r4 短窗口对口型（SG16x、SG16y、SG18x、SG18y、SG20x）</title>
+<style>
+body{font:15px/1.6 system-ui,sans-serif;max-width:1100px;margin:24px auto;padding:0 16px;color:#222}
+.q{background:#fff4d6;border:2px solid #e0a800;padding:12px 16px;border-radius:8px}
+.q ol{margin:6px 0 0} pre{white-space:pre-wrap;background:#f6f6f6;padding:10px;border-radius:6px}
+ins{background:#c8f7c5;text-decoration:none} img{max-width:100%}
+table{border-collapse:collapse} td,th{border:1px solid #ccc;padding:4px 8px;vertical-align:top} code{font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px} .unit{border-top:3px solid #888;margin-top:28px}
+</style></head><body>
+<div class="q"><b>问题：</b>按下面 5 条 exact prompt 与人声短窗口拍 r4（SG16x、SG16y、SG18x、SG18y、SG20x 各 2 条，共 10 条，约 3,360 积分；
+本段上限 15,000，旧上限 12,800）吗？
+<ol><li>按这 5 条开拍 (Recommended)</li><li>先改 prompt 或窗口再看</li><li>先不拍</li></ol>
+审片地址：http://127.0.0.1:8769/pilot/s031-048/r4/index.html</div>
+
+<h2>依据</h2>
+<p>使用者原话「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」（logs/decisions.md 2026-11-25 最后一条）。SG17 A/B 探针：B 臂（{英文原台词}）词准 80–90%，A 臂 30–50%；
+四条都重新配音（copy=false），开口晚 0.6–1.0 s。本轮照 B 臂写法：每个剪辑段一个短窗口，prompt 含 {该窗口的英文原词}，每窗口 2 条，跨条量、剪、盖。</p>
+<ul>
+<li>窗口：剪辑段第一个词前约 0.3 s 起；落在上一个词里就从上一个词结束处起，且不晚于入点；止于剪辑段最后一个词结束。人声后补数字静音到整秒（≥4 s），音频长度 = 生成时长。</li>
+<li>生成时长 = max(4, ⌈剪辑段结束 − 窗口起点 + 1.0 s⌉)：1.0 s 是探针里最晚的开口延迟，保证嘴晚 1 s 时 take 仍盖住整段。SG20x 因此 5 s，其余 4 s。</li>
+<li>prompt：从 r3 的首帧状态句起，照探针 A/B 的精简写法（对镜头说/唱 + 口型逐字同步 + {英文} + 镜头固定 + 她在原地 + 本镜必需的空白/红色/文字规则）；不写任何绑台词的动作。</li>
+<li>首帧与 r3 相同：p037-c2、p041-c1、p048-w2。</li>
+</ul>
+
+<h2>花费</h2>
+<table>
+<tr><th>单元</th><th>秒</th><th>每条（80 积分/秒）</th><th>2 条</th><th>每条上限</th></tr>
+<tr><td>SG16x</td><td>4</td><td>320</td><td>640</td><td>400</td></tr>
+<tr><td>SG16y</td><td>4</td><td>320</td><td>640</td><td>400</td></tr>
+<tr><td>SG18x</td><td>4</td><td>320</td><td>640</td><td>400</td></tr>
+<tr><td>SG18y</td><td>4</td><td>320</td><td>640</td><td>400</td></tr>
+<tr><td>SG20x</td><td>5</td><td>400</td><td>800</td><td>400</td></tr>
+<tr><th>合计</th><th>21</th><th></th><th>3,360</th><th>4,000（10 条上限）</th></tr></table>
+<p>本段已花（任务账，按 logs/decisions.md 逐条）：SG12（a-1 720 + a-3 720 + b-1|2 1,440） 2,880；INS33 640；INS37 640；INS41 640；SG19（a-2；a-1 known_no_effect） 400；MO15（任务账） 960；SG15 800；SG17 A/B 探针 1,600，合计 <b>8,560</b>。
+交接里写的约 10,840 与 decisions.md 逐条之和差 2,280，待主会话对账。</p>
+<p>拍完 r4 后预计：8,560 + 3,360 = <b>11,920</b>（按 10,840 算为 14,200；10 条全按上限为 12,560 / 14,840）。
+本段上限 <b>15,000</b>（新）；旧上限 12,800 并存记录。</p>
+
+<h2>会丢的方案节拍（剪辑处理或使用者知悉）</h2><ul>
+<li><b>s037d（SG16y）</b>：“说到第四句时微波炉的灯熄灭、转盘停下，她把碗放到台面上”不再写进 prompt：她会一直捧着碗；首帧 p037-c2 的微波炉亮着在转，而 INS37 刚拔掉插头。剪辑处理：s037d 里微波炉炉窗做后期局部压暗（转盘若可见则冻结该区域）；放碗这一拍丢失。</li>
+<li><b>s037b（SG16x）</b>：无动作要求，不丢拍；末 0.18 s（163.52–163.70）母带里是 “stop” 的 s- 起音，这段 take 嘴在收，切 INS37 盖住。</li>
+<li><b>s041c（SG18y）</b>：“Octo- 时一只手从布里抓住胸前布边”丢失（使用者已定：布一直裹着、不伸手）；手的那一拍由 INS41 与 185.585 的剪切承担。</li>
+<li><b>s041a（SG18x）</b>：无动作要求；射灯每拍暗一盏本来就是后期。</li>
+<li><b>s048（SG20x）</b>：无动作；“说完静止闭嘴”保留在 prompt 里。窗口从 “they” 前 0.3 s 起（205.819），s048 入点 205.241 早 0.578 s：按探针的嘴晚 0.6–1.0 s 对齐时 take 开头正好盖住入点；若这条嘴不晚，入点后最多 0.578 s 用第 0 帧（闭嘴静止）顶上。</li>
+</ul>
+
+<div class="unit"><h2>SG16x · s037b（SG16 的一个剪辑段）</h2>
+<table>
+<tr><td>剪辑段（方案）</td><td>s037b 161.413–163.701（2.29 s）：Stop it? Let it stay? It doesn&#x27;t</td></tr>
+<tr><td>人声窗口（歌曲 s）</td><td>161.338–163.523（人声 2.185 s）+ 数字静音 → 4.000 s</td></tr>
+<tr><td>窗口里的词（words.json）</td><td><code>Stop it? Let it stay? It doesn&#x27;t</code></td></tr>
+<tr><td>生成</td><td>Seedance 2.0 VIP · multimodal（图 + 音频）· 4 s · 4K · 16:9 · reference_audio</td></tr>
+<tr><td>花费</td><td>80 积分/秒 × 4 s × 2 条 = 640（每条上限 400）</td></tr>
+<tr><td>take 文件夹</td><td>sd-SG16x-r-1、sd-SG16x-r-2</td></tr>
+<tr><td>提交</td><td><code>VOCAL=SG16xp</code>，<code>T0 = 161.338</code></td></tr>
+</table>
+<div class="grid"><div><p>首帧（与 r3 相同）<br><code>outputs/ai-city-takeover/ep01/v4/board/plates/p037-c2.png</code><br>sha256 <code>e6772d8ed350cb880170100f303c569bd35fe4770530426005364270161d5794</code></p>
+<img src="../../../board/plates/p037-c2.png" alt="p037-c2"></div>
+<div><p>人声 SG16xp.wav（4.000 s = 生成时长）<br><code>outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16xp.wav</code><br>sha256 <code>719541e9f46f04472c299fa92dc6231ea0984f99701cd54a485cb08121a5aa26</code></p>
+<audio controls preload="metadata" src="../../audio/SG16xp.wav"></audio>
+<p>人声检查：干声——窗口内人声轨 -25.2 dB、伴奏三轨（bass+drums+other）-40.1 dB，人声轨里与伴奏相关的成分比人声低 29.9 dB
+（最静的 100 ms 在 162.018：人声轨 -82.1 dB，母带 -88.7 dB），判断无可闻音乐串音；
+开头 20 ms -23.1 dB（上一个词 “up.” 止于 161.338），
+结尾 20 ms -20.6 dB；下一个词 “stop” 在 163.623 才开始（窗口后 0.100 s），窗口里没有下一句的起音。</p>
+<p>本地 Whisper large-v3（参考人声本身的基线）：en：Stop it, let it stay / It doesn&#x27;t（0–2.18 s）</p></div></div>
+<h3>exact prompt</h3><p>sha256 <code>ac5c511f77e1fc6163d55f8ae83d20e00d83d5566cef708d79af1598152fa871</code>（绿色为 {英文原词} 一句）</p><pre>{{image:0}}中的她坐在员工茶水间的料理台上，双手捧着放在腿上的麦片碗，勺子在碗里，看着镜头，嘴唇闭着；画面左缘是值班工程师的后脑、牛仔外套的肩和举着手机贴在耳边的手；她身边台面上的不锈钢微波炉在转，炉内亮着暖黄的光。她对着镜头说话，口型与{{audio:1}}里的人声逐字精确同步。<ins>她用英文说：{Stop it? Let it stay? It doesn&#x27;t}不增不减，不翻译。</ins>镜头固定不动，她一直坐在原地。工程师一直举着手机贴在耳边，不转过来，看不到他的脸。手机背面是素色的，没有标志。架子上的罐子和杯子没有标签。咖啡机和水壶上没有亮灯，也没有显示屏。微波炉的显示屏是黑的，按键面板没有字。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</pre></div>
+
+<div class="unit"><h2>SG16y · s037d（SG16 的一个剪辑段）</h2>
+<table>
+<tr><td>剪辑段（方案）</td><td>s037d 165.071–166.476（1.41 s）：at twelve thirty-four.</td></tr>
+<tr><td>人声窗口（歌曲 s）</td><td>165.071–166.468（人声 1.397 s）+ 数字静音 → 4.000 s</td></tr>
+<tr><td>窗口里的词（words.json）</td><td><code>at twelve thirty-four.</code></td></tr>
+<tr><td>生成</td><td>Seedance 2.0 VIP · multimodal（图 + 音频）· 4 s · 4K · 16:9 · reference_audio</td></tr>
+<tr><td>花费</td><td>80 积分/秒 × 4 s × 2 条 = 640（每条上限 400）</td></tr>
+<tr><td>take 文件夹</td><td>sd-SG16y-r-1、sd-SG16y-r-2</td></tr>
+<tr><td>提交</td><td><code>VOCAL=SG16yp</code>，<code>T0 = 165.071</code></td></tr>
+</table>
+<div class="grid"><div><p>首帧（与 r3 相同）<br><code>outputs/ai-city-takeover/ep01/v4/board/plates/p037-c2.png</code><br>sha256 <code>e6772d8ed350cb880170100f303c569bd35fe4770530426005364270161d5794</code></p>
+<img src="../../../board/plates/p037-c2.png" alt="p037-c2"></div>
+<div><p>人声 SG16yp.wav（4.000 s = 生成时长）<br><code>outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16yp.wav</code><br>sha256 <code>600d3550b3517056325cf9d76085c4d855aef87f73a89b59755df6f560adacdc</code></p>
+<audio controls preload="metadata" src="../../audio/SG16yp.wav"></audio>
+<p>人声检查：干声——窗口内人声轨 -24.6 dB、伴奏三轨（bass+drums+other）-16.4 dB，人声轨里与伴奏相关的成分比人声低 26.9 dB
+（最静的 100 ms 在 165.131：人声轨 -41.3 dB，母带 -13.7 dB），判断无可闻音乐串音；
+开头 20 ms -30.4 dB（上一个词 “Killed” 止于 165.086），
+结尾 20 ms -28.8 dB；下一个词 “Two” 在 166.63 才开始（窗口后 0.162 s），窗口里没有下一句的起音。</p>
+<p>本地 Whisper large-v3（参考人声本身的基线）：en：1234（0–1.22 s）</p></div></div>
+<h3>exact prompt</h3><p>sha256 <code>f1ea02b6e15b4e696a00573e33018696e44e303ca2bef5483b7c5e0b94f43fec</code>（绿色为 {英文原词} 一句）</p><pre>{{image:0}}中的她坐在员工茶水间的料理台上，双手捧着放在腿上的麦片碗，勺子在碗里，看着镜头，嘴唇闭着；画面左缘是值班工程师的后脑、牛仔外套的肩和举着手机贴在耳边的手；她身边台面上的不锈钢微波炉在转，炉内亮着暖黄的光。她对着镜头说话，口型与{{audio:1}}里的人声逐字精确同步。<ins>她用英文说：{at twelve thirty-four.}不增不减，不翻译。</ins>镜头固定不动，她一直坐在原地。工程师一直举着手机贴在耳边，不转过来，看不到他的脸。手机背面是素色的，没有标志。架子上的罐子和杯子没有标签。咖啡机和水壶上没有亮灯，也没有显示屏。微波炉的显示屏是黑的，按键面板没有字。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</pre></div>
+
+<div class="unit"><h2>SG18x · s041a（SG18 的一个剪辑段）</h2>
+<table>
+<tr><td>剪辑段（方案）</td><td>s041a 178.329–181.023（2.69 s）：the lights go low</td></tr>
+<tr><td>人声窗口（歌曲 s）</td><td>178.134–180.365（人声 2.231 s）+ 数字静音 → 4.000 s</td></tr>
+<tr><td>窗口里的词（words.json）</td><td><code>days, the lights go low</code></td></tr>
+<tr><td>生成</td><td>Seedance 2.0 VIP · multimodal（图 + 音频）· 4 s · 4K · 16:9 · reference_audio</td></tr>
+<tr><td>花费</td><td>80 积分/秒 × 4 s × 2 条 = 640（每条上限 400）</td></tr>
+<tr><td>take 文件夹</td><td>sd-SG18x-r-1、sd-SG18x-r-2</td></tr>
+<tr><td>提交</td><td><code>VOCAL=SG18xp</code>，<code>T0 = 178.134</code></td></tr>
+</table>
+<div class="grid"><div><p>首帧（与 r3 相同）<br><code>outputs/ai-city-takeover/ep01/v4/board/plates/p041-c1.png</code><br>sha256 <code>43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37</code></p>
+<img src="../../../board/plates/p041-c1.png" alt="p041-c1"></div>
+<div><p>人声 SG18xp.wav（4.000 s = 生成时长）<br><code>outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18xp.wav</code><br>sha256 <code>24cb4c9e31556357ee051577b51ed25051de59ffcb97613473025291a6e64f38</code></p>
+<audio controls preload="metadata" src="../../audio/SG18xp.wav"></audio>
+<p>人声检查：干声——窗口内人声轨 -22.5 dB、伴奏三轨（bass+drums+other）-28.1 dB，人声轨里与伴奏相关的成分比人声低 23.5 dB
+（最静的 100 ms 在 178.694：人声轨 -34.7 dB，母带 -30.6 dB），判断无可闻音乐串音；
+开头 20 ms -24.1 dB（上一个词 “Eleven” 止于 178.134），
+结尾 20 ms -25.0 dB；下一个词 “Top” 在 181.03 才开始（窗口后 0.665 s），窗口里没有下一句的起音。</p>
+<p>本地 Whisper large-v3（参考人声本身的基线）：en：Days the lights go low（0–2.24 s）</p></div></div>
+<h3>exact prompt</h3><p>sha256 <code>c814ce793e232d923ed2730c78801a8d1feddcab94851856d582712f79882f2c</code>（绿色为 {英文原词} 一句）</p><pre>{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，布像高领斗篷一样罩到下巴，只露出脸和银白短发，看着镜头，嘴唇闭着。她对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。<ins>她用英文唱：{days, the lights go low}不增不减，不翻译。</ins>镜头固定不动，她一直站在原地。射灯亮度不变。防尘布一直裹到下巴，看不见布下面的衣服，也看不见她的手。人台都盖着布，没有脸。画面里没有镜子，橱窗玻璃里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</pre></div>
+
+<div class="unit"><h2>SG18y · s041c（SG18 的一个剪辑段）</h2>
+<table>
+<tr><td>剪辑段（方案）</td><td>s041c 183.763–185.585（1.82 s）：show … Octo-</td></tr>
+<tr><td>人声窗口（歌曲 s）</td><td>183.660–185.609（人声 1.949 s）+ 数字静音 → 4.000 s</td></tr>
+<tr><td>窗口里的词（words.json）</td><td><code>show October</code></td></tr>
+<tr><td>生成</td><td>Seedance 2.0 VIP · multimodal（图 + 音频）· 4 s · 4K · 16:9 · reference_audio</td></tr>
+<tr><td>花费</td><td>80 积分/秒 × 4 s × 2 条 = 640（每条上限 400）</td></tr>
+<tr><td>take 文件夹</td><td>sd-SG18y-r-1、sd-SG18y-r-2</td></tr>
+<tr><td>提交</td><td><code>VOCAL=SG18yp</code>，<code>T0 = 183.66</code></td></tr>
+</table>
+<div class="grid"><div><p>首帧（与 r3 相同）<br><code>outputs/ai-city-takeover/ep01/v4/board/plates/p041-c1.png</code><br>sha256 <code>43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37</code></p>
+<img src="../../../board/plates/p041-c1.png" alt="p041-c1"></div>
+<div><p>人声 SG18yp.wav（4.000 s = 生成时长）<br><code>outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18yp.wav</code><br>sha256 <code>4708c8ceef0ff75cc7bc86503d87c3ad05bdc1052291841face4da2c220c6f66</code></p>
+<audio controls preload="metadata" src="../../audio/SG18yp.wav"></audio>
+<p>人声检查：干声——窗口内人声轨 -23.9 dB、伴奏三轨（bass+drums+other）-35.4 dB，人声轨里与伴奏相关的成分比人声低 24.0 dB
+（最静的 100 ms 在 184.260：人声轨 -39.4 dB，母带 -32.1 dB），判断无可闻音乐串音；
+开头 20 ms -29.7 dB（上一个词 “no” 止于 183.46），
+结尾 20 ms -21.2 dB；下一个词 “one,” 在 185.689 才开始（窗口后 0.080 s），窗口里没有下一句的起音。</p>
+<p>本地 Whisper large-v3（参考人声本身的基线）：en：show october（0–1.84 s）</p></div></div>
+<h3>exact prompt</h3><p>sha256 <code>03601c4eefac00a0f7c9964c8a0c009fb9c5b5394a2a1a41cd04e63e9f922def</code>（绿色为 {英文原词} 一句）</p><pre>{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，布像高领斗篷一样罩到下巴，只露出脸和银白短发，看着镜头，嘴唇闭着。她对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。<ins>她用英文唱：{show October}不增不减，不翻译。</ins>镜头固定不动，她一直站在原地。射灯亮度不变。防尘布一直裹到下巴，看不见布下面的衣服，也看不见她的手。人台都盖着布，没有脸。画面里没有镜子，橱窗玻璃里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</pre></div>
+
+<div class="unit"><h2>SG20x · s048（SG20 的一个剪辑段）</h2>
+<table>
+<tr><td>剪辑段（方案）</td><td>s048 205.241–209.339（4.10 s）：they were told which crack.（208.80 后静止闭嘴到 All hands!）</td></tr>
+<tr><td>人声窗口（歌曲 s）</td><td>205.819–208.800（人声 2.981 s）+ 数字静音 → 5.000 s</td></tr>
+<tr><td>窗口里的词（words.json）</td><td><code>they were told which crack.</code></td></tr>
+<tr><td>生成</td><td>Seedance 2.0 VIP · multimodal（图 + 音频）· 5 s · 4K · 16:9 · reference_audio</td></tr>
+<tr><td>花费</td><td>80 积分/秒 × 5 s × 2 条 = 800（每条上限 400）</td></tr>
+<tr><td>take 文件夹</td><td>sd-SG20x-r-1、sd-SG20x-r-2</td></tr>
+<tr><td>提交</td><td><code>VOCAL=SG20xp</code>，<code>T0 = 205.819</code></td></tr>
+</table>
+<div class="grid"><div><p>首帧（与 r3 相同）<br><code>outputs/ai-city-takeover/ep01/v4/board/plates/p048-w2.png</code><br>sha256 <code>c31412c3ba0260f5c6937b8ce6ecf4cd8d1eef4c1a038ecc9fb082da94818c32</code></p>
+<img src="../../../board/plates/p048-w2.png" alt="p048-w2"></div>
+<div><p>人声 SG20xp.wav（5.000 s = 生成时长）<br><code>outputs/ai-city-takeover/ep01/v4/pilot/audio/SG20xp.wav</code><br>sha256 <code>d23d0202e0a4e408c91a113643db1530d765feec2276e914ef32ec0307b1b0f0</code></p>
+<audio controls preload="metadata" src="../../audio/SG20xp.wav"></audio>
+<p>人声检查：干声——窗口内人声轨 -27.2 dB、伴奏三轨（bass+drums+other）-44.8 dB，人声轨里与伴奏相关的成分比人声低 14.9 dB
+（最静的 100 ms 在 205.879：人声轨 -82.4 dB，母带 -87.8 dB），判断无可闻音乐串音；
+开头 20 ms -81.9 dB（上一个词 “Mostly,” 止于 205.136），
+结尾 20 ms -36.3 dB；下一个词 “All” 在 208.929 才开始（窗口后 0.129 s），窗口里没有下一句的起音。</p>
+<p>本地 Whisper large-v3（参考人声本身的基线）：en：They were told which crack, crack, crack.（0–2.92 s；重复的 crack 是 Whisper 的常见幻听，原声只有一次）</p></div></div>
+<h3>exact prompt</h3><p>sha256 <code>1146eec4f25897bb4d2c4907388d924625c9f9f9de4c8e30e7e5ebb774ca08c4</code>（绿色为 {英文原词} 一句）</p><pre>{{image:0}}中的她单膝跪在试衣间隔板旁的地毯上，中近景，身体微微前倾，看着镜头，嘴唇闭着。她对着镜头说话，口型与{{audio:1}}里的人声逐字精确同步。<ins>她用英文说：{they were told which crack.}不增不减，不翻译。</ins>镜头固定不动，她一直跪在原地。说完嘴闭上，一动不动，一直看着镜头。她的左肩和整条左臂一直裸露，灰色外套只有右臂一只长袖。寻呼机和工牌一直挂在她身前的腰链上；寻呼机的液晶屏只有空白的灰绿底光，没有数字和字；工牌是空白的。背后的镜子里只有衣架，不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。</pre></div>
+
+<h2>每条量什么（逐镜 Gate 之前与之中）</h2>
+<ol><li>语言：英语；逐词准确度对照 {} 里的原词。</li><li>copy、lag / ncc、spans（sync_check.py，T0 = 窗口起点）：开口延迟与同步区间换算到歌曲时间，看能否盖住剪辑段。</li>
+<li>静音补齐段嘴唇闭合（会念进去的话按 lag 截掉）。</li><li>逐镜 Gate（video-analysis MCP）：脸与身份、首帧构图不变、镜头固定、她在原地、空白/红色/文字规则、口型按词对齐；只验收本单元服务的剪辑段。</li></ol>
+</body></html>

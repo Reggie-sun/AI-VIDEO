@@ -1,0 +1,84 @@
+{
+ "film": "outputs/ai-city-takeover/ep01/v4/excerpt/renders/IRIS-EP01-agentcut-ev-000-209-v1.mp4",
+ "film_sha256": "b945988ae5eb5e987e561d53e04d3c6869337c08c9f661b11596e3cff0899c2e",
+ "parts": {
+  "000-134": {
+   "sha256": "a1c0c72d53766a2a1cbfeb99c710ba6885aeed45e2a48b96056a585469b02b7d",
+   "frames": 3227
+  },
+  "s031-048": {
+   "sha256": "951ed6bce9c2f47658fad305754d07744a683d1988f7aec89a8c358439bed2e3",
+   "frames": 1797
+  }
+ },
+ "method": "video streams copied (h264_mp4toannexb, concatenated, remuxed at 24 fps, timescale 24; no re-encode); sound = one master cut 0-10048000 samples (0-209.3333 s) encoded once AAC 320k",
+ "frame_exact": "decoded framemd5: frames 0-3226 equal the 0-134 v1 film, 3227-5023 equal the s031-048 export",
+ "sound_windows": {
+  "whole_0_209.333": {
+   "film_samples": 10048000,
+   "master_samples": 10048000,
+   "master_window_s": [
+    0,
+    209.33333333333334
+   ],
+   "offset_samples": 0,
+   "offset_ms": 0.0,
+   "rms_diff_db": -0.008,
+   "pass": true
+  },
+  "start_0_10": {
+   "film_samples": 480000,
+   "master_samples": 480000,
+   "master_window_s": [
+    0,
+    10
+   ],
+   "offset_samples": 0,
+   "offset_ms": 0.0,
+   "rms_diff_db": -0.013,
+   "pass": true
+  },
+  "join1_54.25_64.25": {
+   "film_samples": 480000,
+   "master_samples": 480000,
+   "master_window_s": [
+    54.25,
+    64.25
+   ],
+   "offset_samples": 0,
+   "offset_ms": 0.0,
+   "rms_diff_db": -0.006,
+   "pass": true
+  },
+  "join2_129.458_139.458": {
+   "film_samples": 480000,
+   "master_samples": 480000,
+   "master_window_s": [
+    129.4583,
+    139.4583
+   ],
+   "offset_samples": 0,
+   "offset_ms": 0.0,
+   "rms_diff_db": -0.018,
+   "pass": true
+  },
+  "end_199.333_209.333": {
+   "film_samples": 480000,
+   "master_samples": 480000,
+   "master_window_s": [
+    199.3333,
+    209.3333
+   ],
+   "offset_samples": 0,
+   "offset_ms": 0.0,
+   "rms_diff_db": -0.019,
+   "pass": true
+  }
+ },
+ "video_pts_s": {
+  "frame_1422": 59.25,
+  "frame_3227": 134.458333,
+  "frame_5023": 209.291667,
+  "max_dev_from_k_over_24_s": 3.333333342681044e-07
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "shot": "s036a",
+ "t0": 155.9336,
+ "t1": 156.8508,
+ "why": "SG15 dropped (user \u300c\u6539\u9759\u56fe + \u56fe\u5f62\uff0c\u4e0d\u518d\u62cd\u300d): the first-frame still P036/x, slow push; 'Ten oh two' off screen",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P036/x.png",
+ "still_sha256": "27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P036/x.png",
+   "sha256": "27b0d88d3a5c8d23024319d309f5133617cd4dc52f33b50bfd7e8c4f89641ad0"
+  }
+ ],
+ "frames": 22,
+ "pictures": 22,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.08
+  ],
+  "center": [
+   0.62,
+   0.42
+  ],
+  "span": [
+   155.9336,
+   159.5907
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 26
+ },
+ "log": []
+}

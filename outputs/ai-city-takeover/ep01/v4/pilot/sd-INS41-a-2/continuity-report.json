@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-25",
+ "written_by": "主会话据 continuity-supervisor 复核报告（2026-11-25，1–4 项全 PASS）转写（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-INS41-a-2/preview-approval.json",
+   "sha256": "16a7b03995a037a37c57ce9a4895e8383cd7b6c2e43448d498af85513acb6846"
+  }
+ },
+ "units": {
+  "INS41": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；首帧起始状态、prompt 与 approval 一致（复核表 1 连续性/2 交接/3 轴线动作机位/4 prompt 适配均 PASS）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "两只黑长袖手从上方落布盖住无五官人台、停在画面上方不出画；后排人台不动；无倒影；无红；无字"
+  }
+ }
+}

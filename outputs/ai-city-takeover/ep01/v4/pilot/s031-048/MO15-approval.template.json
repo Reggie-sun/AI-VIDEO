@@ -1,0 +1,75 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-MO15-a-1",
+ "question": "<主会话问使用者的原问题，逐字（审看页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/index.html",
+  "sha256": "bbc279093957b2a7fb9d67398db62f8aa58710729941cc25b790e9ee0c46803a"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit/preview-inputs.json",
+  "sha256": "1772a88f222674703db7ca3ca2a30816e1cf2d86be2e3b230afa26f03977f828"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance.md",
+  "sha256": "54f2f05f3ed7cb56d47d73e6e34bbc628512373e02f40d5eb3d9f6db3056391f"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p046-w2.png",
+   "sha256": "90ddcb4f2b5e4d2f1c21617e7bf5552dc45b1d8fb06e7d06a40092c27fcfbdf9",
+   "role": "MO15 first frame"
+  }
+ ],
+ "prompts": {
+  "MO15": {
+   "text": "镜头固定不动。左边试衣间里，她侧身站在挂衣杆前，面向挂衣杆，左手搭在杆上那一排衣架上，衣架都挤在杆上靠她这一头，靠隔板那段杆是空的；隔板上方露出另一只穿灰色长袖的手，拿着一只表盘空白的秒表。她用左手一把把所有衣架推到隔板那头，拉回来，再换个节奏推一次；每推一次，隔板上方那只手按一下秒表。她一直面向挂衣杆，不转身，不走出隔间；她的左耳一直在头的另一侧，画面里看不到。隔板那边始终只露出那一只手，不露出头和脸。衣服上没有吊牌、标签或字；秒表表盘空白，没有数字；寻呼机和空白工牌一直挂在她身前的腰链上，寻呼机屏幕没有数字和字。画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "7fb4d3501c7475d61394e81089ef68dd6656015978275459c57185ee91a31c37"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "first_frame",
+  "seconds": 6,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": null
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 500,
+  "cumulative_CRD": 500
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "first frame（p046-w2.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p046-kh-b-comp.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 W1）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-mo15-a-1-source-001",
+  "policy_id": "iris-mo15-a-1-source-001",
+  "reservation_id": "iris-mo15-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-MO15-a-1",
+   "sd-MO15-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1000,
+  "this_take": "sd-MO15-a-1"
+ },
+ "decision_notes": [
+  "首帧 p046-w1（P046/x）里搭在衣架上的是她的左手；使用者 2026-11-24 备注 MO15 的 prompt 要写“左手”，已改",
+  "2026-11-24 连续性修正：首帧换 p046-w2（及膝长靴；衣架堆在她这一头、靠隔板那段杆空着，推衣架才有地方推）"
+ ],
+ "_template_notes": [
+  "本文件是 a-1 的模板；写成 pilot/sd-MO15-a-1/preview-approval.json 前删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位。prompt 若按「已知问题」改过，先改 s031-048-seedance.md、unit.py spec 与本页并重建，再写 approval。",
+  "a-2：unit_group 末尾 a-1→a-2；bound_ids 三个 id 中 -a-1- → -a-2-；takes.this_take → sd-MO15-a-2（takes.folders 保持 [a-1, a-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-MO15-a-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh MO15 6 first_frame 500"
+ ]
+}

@@ -1,0 +1,78 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s039-probe-SG17A-p-2",
+ "question": "对照页：http://127.0.0.1:8769/pilot/s031-048/probe/index.html\n\nSG17 的 A/B 对照准备好了，页面上有两组提示词全文和参考人声。\n· A：只写首帧状态，再加“对着镜头说话，口型逐字同步，镜头固定，她一直蹲在原地”，以及门牌、红色、文字这几条规矩。按手和其他动作都去掉了。\n· B：和 A 一模一样，只多一句「她用英文说：{Bet it couldn't reach outside. They found a gap instead.}不增不减，不翻译。」\n· 人声：干声，用静音补齐到正好 5 秒。开头有上一句 “more.” 的一点尾音，就是剪辑入点本来的样子。\n\n4 条各 400 积分，共 1,600。按这两条提示词开拍吗？",
+ "user_quote": "按页面开拍 (Recommended)",
+ "approved_at": "2026-11-26T06:50:40Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/probe/index.html",
+  "sha256": "f6eb58c34e67ef7917b1b2a55e39afc6df1369891edeeb68d63c16895ed83127"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p039-c1.png",
+   "sha256": "9343996355399b73a603c1842c2616b20819746b2a6581bca9f82c1d54e61342",
+   "role": "SG17A reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG17p.wav",
+   "sha256": "24cca57f1368993a90619f1b07c34b4989ff5498e381dee4c7e847f2826abbe2",
+   "role": "SG17A vocal"
+  }
+ ],
+ "prompts": {
+  "SG17A": {
+   "text": "{{image:0}}中的她蹲在一扇关着的深色木门前，低机位，门缝下透进来的一线红光贴着地面，横在她右手指尖前；她的左臂搭在膝上，看着镜头，嘴唇闭着。她对着镜头说话，口型与{{audio:1}}里的人声逐字精确同步。镜头固定不动，她一直蹲在原地。门上没有门牌、号码或标志。画面里除了她左耳耳挂上的小红灯和门缝下那一线红光，没有任何别的红色；红光不照到她的脸上。画面中不得出现任何文字。",
+   "sha256": "0b7d157abdf38ea1eaae6e866ff277f83f3c90a1db9363423c90fec4fca771d1"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 5,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p039-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P039/b.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣））的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg17a-p-2-source-001",
+  "policy_id": "iris-sg17a-p-2-source-001",
+  "reservation_id": "iris-sg17a-p-2-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per arm from the same first frame and vocal; arms compared after all four Gates",
+  "folders": [
+   "sd-SG17A-p-1",
+   "sd-SG17A-p-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG17A-p-2",
+  "probe": {
+   "arms": [
+    "SG17A",
+    "SG17B"
+   ],
+   "other_arm": "SG17B",
+   "total_takes": 4,
+   "total_ceiling_CRD": 1600
+  }
+ },
+ "decision_notes": [
+  "使用者原话「先用 SG17 做 A/B 对照 (Recommended)」（logs/decisions.md 2026-11-25）：A=精简 prompt（只说话+口型逐字同步+镜头固定，去按手动作）+人声静音补齐到生成时长；B=A+英文原台词入 {}；每臂 2 条约 1,600；生成不再多留 1 s（改静音补齐）、B 臂豁免“prompt 不写英文”。",
+  "门缝下一线红光：使用者「留红光，和 s002 一样算例外 (Recommended)」（只允许这一线，其余除耳挂灯外无红）",
+  "人声 SG17p.wav = SG17.wav（170.1094–173.7781，3.669 s）逐样本相同 + 末尾 1.331 s 数字静音，共 5.000 s；SG17.wav 保留不动；开头 0–0.12 s 有上一句 “more.” 的尾音，170.1094 是剪辑入点，不重切。",
+  "旧 sd-SG17-a-1|2 的审批原样挂起，不因本探针改动。"
+ ]
+}

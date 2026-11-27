@@ -1,0 +1,82 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s041c-r4-SG18y-r-1",
+ "question": "认可页：http://127.0.0.1:8769/pilot/s031-048/r4/index.html\n\n剩下 3 条按新写法拆成 5 个短窗口：\n· SG16 拆成 x、y 两个窗口，各 4 秒。\n· SG18 拆成 x、y 两个窗口，各 4 秒。\n· SG20 一个窗口，5 秒。\n每个窗口只管一段要剪进片里的台词。提示词只写首帧状态，再加“用英文说（唱）：{原台词}”，动作全部交给剪辑。\n\n会丢掉的方案动作：\n· s037d：她放下碗这一下没了，她会一直捧着碗。首帧里微波炉还亮着，可上一个插镜刚拔了插头。剪辑时会把炉窗压暗、转盘定住。\n· s041c：唱到 “Octo-” 时从布里伸手这一下没了，靠插镜 INS41 和 185.585 那一刀来承担。\n\n花费：这次 3,360 积分。前面我报的已花金额算错了：按任务账逐条加，实际已花 8,560，不是 10,840。拍完这次约 11,920，在新上限 15,000 以内。\n\n按这一页开拍吗？",
+ "user_quote": "按 r4 开拍 (Recommended)",
+ "approved_at": "2026-11-26T08:32:57Z",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r4/index.html",
+  "sha256": "2de28a0dcc22a34efd3ffb7e42b069d8c4737cd6fa7fb43d3f0aee2b0a2c09db"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p041-c1.png",
+   "sha256": "43f64d7fdfd5d39b7622bab1647902715de4fdcd299bd2b012b2986993032c37",
+   "role": "SG18y reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG18yp.wav",
+   "sha256": "4708c8ceef0ff75cc7bc86503d87c3ad05bdc1052291841face4da2c220c6f66",
+   "role": "SG18y vocal"
+  }
+ ],
+ "prompts": {
+  "SG18y": {
+   "text": "{{image:0}}中的她站在夜里百货橱窗里一排盖着白防尘布的人台中间，从肩到脚裹在同一种本白粗亚麻防尘布里，布像高领斗篷一样罩到下巴，只露出脸和银白短发，看着镜头，嘴唇闭着。她对着镜头唱，口型与{{audio:1}}里的人声逐字精确同步。她用英文唱：{show October}不增不减，不翻译。镜头固定不动，她一直站在原地。射灯亮度不变。防尘布一直裹到下巴，看不见布下面的衣服，也看不见她的手。人台都盖着布，没有脸。画面里没有镜子，橱窗玻璃里不出现她的倒影。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "03601c4eefac00a0f7c9964c8a0c009fb9c5b5394a2a1a41cd04e63e9f922def"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 4,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 400,
+  "cumulative_CRD": 400
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p041-c1.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P041/c.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣），本镜裹在防尘布里）的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg18y-r-1-source-001",
+  "policy_id": "iris-sg18y-r-1-source-001",
+  "reservation_id": "iris-sg18y-r-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame and vocal; spans measured, cut and covered across takes after both Gates",
+  "folders": [
+   "sd-SG18y-r-1",
+   "sd-SG18y-r-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 800,
+  "this_take": "sd-SG18y-r-1",
+  "r4": {
+   "units": [
+    "SG16x",
+    "SG16y",
+    "SG18x",
+    "SG18y",
+    "SG20x"
+   ],
+   "total_takes": 10,
+   "total_ceiling_CRD": 4000,
+   "section_ceiling_CRD": 15000,
+   "previous_section_ceiling_CRD": 12800
+  }
+ },
+ "decision_notes": [
+  "使用者原话「s039 拼切；剩下照这个写法拍，上限提到 15,000 (Recommended)」（logs/decisions.md 2026-11-25）：SG16、SG20、SG18 改写为 prompt 含 {英文原台词}、按剪辑段拆 4–5 s 短窗口、每窗口 2 条、跨条量剪盖；本段上限 12,800 → 15,000。",
+  "SG18y 服务 s041c（183.763–185.585）；人声 SG18yp.wav = 人声轨 183.66–185.609（1.949 s）逐样本 + 末尾数字静音，共 4 s；花括号内为该窗口 words.json 的原词。",
+  "prompt 不写任何绑台词的动作（放碗、微波炉熄灯、伸手抓布）；丢失的节拍见认可页“会丢的方案节拍”。",
+  "旧 sd-SG18-a-1|2 的审批原样挂起，不因 r4 改动。"
+ ]
+}

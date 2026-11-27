@@ -1,0 +1,44 @@
+{
+ "shot": "s037c1",
+ "t0": 163.7007,
+ "t1": 164.1883,
+ "why": "INS37 a-1 clip 1.25-1.74: his finger on stop (the 163.70 hit); insert -> D",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-INS37-a-1/INS37/project/state/video-generation/fetch/files/6dd35e2799abee41dd250afa9192393c29b06eca0ecb9d2dde949b81222d2dd7.mp4",
+ "clip_sha256": "6dd35e2799abee41dd250afa9192393c29b06eca0ecb9d2dde949b81222d2dd7",
+ "pictures": 97,
+ "frames": 12,
+ "first": {
+  "f": 702,
+  "t": 163.7083,
+  "clip_t": 1.2576,
+  "idx": 30
+ },
+ "last": {
+  "f": 713,
+  "t": 164.1667,
+  "clip_t": 1.716,
+  "idx": 41
+ },
+ "crop": null,
+ "knots": null,
+ "repeats": 0,
+ "skips": 0,
+ "map": [
+  30,
+  31,
+  32,
+  33,
+  34,
+  35,
+  36,
+  37,
+  38,
+  39,
+  40,
+  41
+ ],
+ "orange_px_max": 0,
+ "keep_red_box": null,
+ "mw_box": null,
+ "press": null
+}

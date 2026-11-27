@@ -1,0 +1,179 @@
+[
+ {
+  "name": "SG12-sd",
+  "take_sha256": "9e5230d527a2edced2cf651711a9787c058639aa1b23dbec6f763f79058a5d96",
+  "lag_s": -0.1309,
+  "ncc": 0.04,
+  "copy": false,
+  "divergence": {
+   "frame": 0,
+   "rule": "stretch",
+   "last_match": null,
+   "clip_s": 0.0,
+   "song_s": 134.004
+  },
+  "synced_until": null,
+  "spans": [
+   {
+    "clip_s": [
+     0.58,
+     1.08
+    ],
+    "song_s": [
+     134.584,
+     135.084
+    ]
+   },
+   {
+    "clip_s": [
+     2.09,
+     2.74
+    ],
+    "song_s": [
+     136.094,
+     136.744
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": -0.005,
+   "method": "tool 63 envelope lag (re-sung, NOT steady: judge by eye)",
+   "song_t_of_clip0": 133.878,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": -0.005,
+   "ncc": 0.292,
+   "max_dev_s": 0.505,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      1.375
+     ],
+     "lag_s": -0.004,
+     "windows": 3,
+     "min_ncc": 0.405
+    },
+    {
+     "clip_s": [
+      1.375,
+      1.625
+     ],
+     "lag_s": 0.167,
+     "windows": 1,
+     "min_ncc": 0.542
+    },
+    {
+     "clip_s": [
+      1.625,
+      2.125
+     ],
+     "lag_s": -0.086,
+     "windows": 2,
+     "min_ncc": 0.358
+    },
+    {
+     "clip_s": [
+      2.125,
+      2.375
+     ],
+     "lag_s": 0.35,
+     "windows": 1,
+     "min_ncc": 0.33
+    },
+    {
+     "clip_s": [
+      2.375,
+      2.625
+     ],
+     "lag_s": -0.09,
+     "windows": 1,
+     "min_ncc": 0.325
+    },
+    {
+     "clip_s": [
+      2.625,
+      2.875
+     ],
+     "lag_s": -0.027,
+     "windows": 1,
+     "min_ncc": 0.42
+    },
+    {
+     "clip_s": [
+      2.875,
+      4.125
+     ],
+     "lag_s": -0.422,
+     "windows": 5,
+     "min_ncc": 0.397
+    },
+    {
+     "clip_s": [
+      4.125,
+      4.375
+     ],
+     "lag_s": -0.161,
+     "windows": 1,
+     "min_ncc": 0.455
+    },
+    {
+     "clip_s": [
+      4.375,
+      4.625
+     ],
+     "lag_s": -0.084,
+     "windows": 1,
+     "min_ncc": 0.282
+    },
+    {
+     "clip_s": [
+      4.625,
+      5.875
+     ],
+     "lag_s": 0.269,
+     "windows": 2,
+     "min_ncc": 0.377
+    },
+    {
+     "clip_s": [
+      5.875,
+      6.125
+     ],
+     "lag_s": 0.5,
+     "windows": 1,
+     "min_ncc": 0.226
+    },
+    {
+     "clip_s": [
+      6.125,
+      6.375
+     ],
+     "lag_s": 0.187,
+     "windows": 1,
+     "min_ncc": 0.192
+    },
+    {
+     "clip_s": [
+      6.375,
+      7.375
+     ],
+     "lag_s": -0.002,
+     "windows": 4,
+     "min_ncc": 0.26
+    },
+    {
+     "clip_s": [
+      7.375,
+      7.625
+     ],
+     "lag_s": -0.442,
+     "windows": 1,
+     "min_ncc": 0.687
+    }
+   ]
+  }
+ }
+]

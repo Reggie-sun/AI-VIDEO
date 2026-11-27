@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-11-23（本机日期；数字与哈希取自磁盘文件，核不到的标 NOT_EVALUATED）
 
+## Supersession Notice — 2026-11-26（部分取代，本记录仍可检索）
+
+后续证据见 [2026-11-26 s031–s048 拍摄与剪辑检查点](2026-11-26-iris-ep01-s031-048-shoot-and-assembly-checkpoint.md)，以及 `git log`（`4ed70a8f`、`4ea48b83`、`8e9c1d3a`）与 `outputs/ai-city-takeover/logs/decisions.md` 2026-11-24「Learning Claim … 确认」条。下列当前面向的说法已被取代，原时序与测量作为历史保留：
+
+- **「commit / push：待做」「本记录写成时 `outputs/ai-city-takeover/ep01/v4/` 整个目录仍未跟踪」**：本记录与 s015–s030 的脚本、记录、认可已在提交 `4ed70a8f`（「IRIS EP01 v4: s015–s030 shoot and assembly records, scripts and approvals」）入库；2026-11-26 核对时 `HEAD` 与 `origin/main` 同为 `8e9c1d3a`，说明已推送。**该提交对应的 Harness 验证与 receipt 本次没有核对，仍记为未验证。**
+- **「Learning 评估」第 1 项「转身候选 `pending_candidate` / `PENDING_CONFIRMATION` / `NOT_ADOPTED`，没有 candidate checkpoint commit」**：2026-11-24 使用者原话「采纳 (Recommended)」确认该 claim，候选 checkpoint 为 `4ed70a8fc7a02177b944d4a80fc7ec0caad365da`（SHA-256 `3b94690dc6797c77afcdb639e0cada892a31630329684d423bcd60672b1942e1`），adoption 提交 `4ea48b83368456a9a89713bf270853508adbab3f`（`.agents/skills/seedance-authoring/references/seedance-2.0.md` 新增 advisory 一节），`docs/record_for_agent/learning/seedance-turn-away-unstated-back-details.md` 现为 active v1、`ADOPTED`（以该文件为准）。「Agent Guardrails」里「转身候选在使用者 exact confirmation 和目标 owner 验证前不改 Skill」已不再是当前状态；该 claim 的 scope 与 exclusions 仍按它自己的文件。
+- 「Remaining Risks」里「Harness 验证与提交（待做）」「push 时连同已有 3 个本地提交一起推」同上已被取代。其余内容（使用者认可 review-v1、花费、QA 数字、「量、剪、盖」与人声窗口的 `no_candidate`、开头暂定）不受影响。
+
 ## Purpose
 
 记下 2026-11-21 至 2026-11-23 这一段的真实状态：开头 0–59.23 s 暂定 v3 的来历，首轮副歌之后 s015–s030（歌 59.23–134.44 s）从导演方案、首帧预览、13 个 Seedance 单元的逐条 Gate 与「量、剪、盖」分段验收、到 Agentcut 版式层导出、QA、使用者认可 review-v1 的全过程，并分清：使用者裁决、Provider 与 operator 事件、主会话自审修复、技术 QA 与人工认可、花费口径、尚未做完的验证与提交。

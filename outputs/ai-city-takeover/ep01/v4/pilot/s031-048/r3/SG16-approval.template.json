@@ -1,0 +1,85 @@
+{
+ "schema": "iris-v4-preview-approval/1",
+ "unit_group": "v4-s031-048-r3-SG16-a-1",
+ "question": "<主会话问使用者的原问题，逐字（认可页 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html）>",
+ "user_quote": "<使用者原话，逐字>",
+ "approved_at": "<UTC ISO 时间，带时区>",
+ "preview_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/index.html",
+  "sha256": "e88334d59cd140b47f683d89f9633b4f738882aecd851d2b6dbd8899b78e48df"
+ },
+ "preview_inputs": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/submit-r3/preview-inputs.json",
+  "sha256": "bae532c8f168a8fb67542813e4ea33dbdaedd33f2dc6450a675efbc032b1852e"
+ },
+ "prompt_source": {
+  "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/s031-048-seedance-r3.md",
+  "sha256": "9040e687cfa8d6f5aa4b6339250faa6c636da4e525d2f5fc154e0b6858a5530b"
+ },
+ "preview_artifacts": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/board/plates/p037-c2.png",
+   "sha256": "e6772d8ed350cb880170100f303c569bd35fe4770530426005364270161d5794",
+   "role": "SG16 reference image"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/audio/SG16.wav",
+   "sha256": "c37372c6517726b504264f88c9e4fdb2d230df6daa65ad748d42019513acc6c0",
+   "role": "SG16 vocal"
+  }
+ ],
+ "prompts": {
+  "SG16": {
+   "text": "{{image:0}}中的她坐在员工茶水间的料理台上，双手捧着放在腿上的麦片碗，勺子在碗里，看着镜头，嘴唇闭着；画面左缘是值班工程师的后脑、牛仔外套的肩和举着手机贴在耳边的手；她身边台面上的不锈钢微波炉在转，炉内亮着暖黄的光。她一直看着镜头平平地说话，口型与{{audio:1}}里的人声逐字精确同步；说到第四句时，微波炉的灯熄灭、转盘停下，她把碗放到身边的台面上。她一直坐在原地，不转头，不转身。工程师一直举着手机贴在耳边，不动，不转过来，看不到他的脸。中景，镜头固定不动。嘴前没有任何遮挡。手机背面是素色的，没有标志；架子上的罐子和杯子没有标签；咖啡机和水壶上没有亮灯，也没有显示屏；微波炉的显示屏是黑的，按键面板没有字。除了她左耳耳挂上的小红灯，画面里没有任何红色。画面中不得出现任何文字。",
+   "sha256": "b62e1021a959a5f84e4d21c0b538e2ed3df387a0e34d67df960000a3cf0dd4f3"
+  }
+ },
+ "generation": {
+  "model": "seedance_2.0_vip",
+  "mode": "multimodal",
+  "seconds": 7,
+  "resolution": "4k",
+  "aspect": "16:9",
+  "audio": "reference_audio"
+ },
+ "budget": {
+  "generations": 1,
+  "retries": 0,
+  "operator_ceiling_per_unit_CRD": 600,
+  "cumulative_CRD": 600
+ },
+ "identity_waivers": [
+  "IRIS"
+ ],
+ "identity_waiver_basis": "reference image（p037-c2.png，与 outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p037-mw-b-comp.png 逐字节相同）承担 IRIS（v4 锚点 F1a，造型 C（LC 银灰长风衣））的身份；不附身份图",
+ "bound_ids": {
+  "attempt_id": "iris-sg16-a-1-source-001",
+  "policy_id": "iris-sg16-a-1-source-001",
+  "reservation_id": "iris-sg16-a-1-reservation-001"
+ },
+ "takes": {
+  "approval": "one approval, two takes per unit from the same first frame; the best one is picked after both Gates",
+  "folders": [
+   "sd-SG16-a-1",
+   "sd-SG16-a-2"
+  ],
+  "generations_per_take": 1,
+  "total_generations": 2,
+  "total_ceiling_CRD": 1200,
+  "this_take": "sd-SG16-a-1"
+ },
+ "decision_notes": [
+  "方案的人声起点 161.08 落在 “picks” 里（cut_audio 拒切），改从 161.338（“up.” 结束）起；生成 7 s 不变",
+  "2026-11-24 连续性修正：首帧 p037-c2 加上 S037A 那台微波炉（本地合成，她的像素不变）；放碗与灯灭绑在“十二点三十四分停掉”那句",
+  "2026-11-25 r3：去掉引号里的歌词译文，灯灭放碗改写“说到第四句时”（窗口内第四句 Killed at twelve thirty-four.）；首帧、秒数、人声不变；本 a-1 / a-2 文件夹里上一批的 approval 由本模板取代"
+ ],
+ "_template_notes": [
+  "本文件是 r3 的 a-1 模板；先按 outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/PATCH.md 改好 unit.py / shots.json / 测试并跑通，再写成 pilot/sd-SG16-a-1/preview-approval.json：删除本 _template_notes 字段并填好 question / user_quote / approved_at 三个占位；文件夹里上一批写好的 preview-approval.json 先改名为 preview-approval.held-r3.json（保留不动）。",
+  "a-2：unit_group 末尾 a-1→a-2；bound_ids 三个 id 中 -a-1- → -a-2-；takes.this_take → sd-SG16-a-2（takes.folders 保持 [a-1, a-2]）；其余逐字相同。",
+  "prep_unit.sh 命令（主会话执行）：TRIAL_DIR=outputs/ai-city-takeover/ep01/v4/pilot/sd-SG16-a-<k> bash outputs/ai-city-takeover/ep01/v4/gen/prep_unit.sh SG16 7 multimodal 600"
+ ],
+ "review_page": {
+  "path": "outputs/ai-city-takeover/ep01/v4/pilot/s031-048/r3/index.html",
+  "sha256": "45f950b4b5c011c560a99de5b5d485f5f9b47c165f90aaa5f2089ccfdd3f8c1e"
+ }
+}

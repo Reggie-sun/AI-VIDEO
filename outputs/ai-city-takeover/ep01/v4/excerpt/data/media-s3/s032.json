@@ -1,0 +1,41 @@
+{
+ "shot": "s032",
+ "t0": 141.2934,
+ "t1": 144.4978,
+ "why": "the guard's palm and her at the gate; the focus pulls palm -> her face on the 141.758 bar line (two plates)",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P032/a-palm-2944.png",
+ "still_sha256": "89aa920fea174156efa90bf5df1c43a27b2ca6f5f1d21d94fa7060d56250cd08",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P032/a-palm-2944.png",
+   "sha256": "89aa920fea174156efa90bf5df1c43a27b2ca6f5f1d21d94fa7060d56250cd08"
+  },
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/P032/a-fix-2944.png",
+   "sha256": "022c75bbff85e97983919c6b945bb62b27ee94537cbfc60a1706321bb52e25c9"
+  }
+ ],
+ "frames": 77,
+ "pictures": 77,
+ "fixed": false,
+ "move": {
+  "zoom": [
+   1.0,
+   1.0
+  ],
+  "center": [
+   0.5,
+   0.5
+  ],
+  "xfade": {
+   "img": "P032fix",
+   "t": 141.7578,
+   "frames": 5
+  }
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 73
+ },
+ "log": []
+}

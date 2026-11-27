@@ -1,0 +1,20 @@
+{
+ "schema": "iris-v4-continuity-report/1",
+ "reviewed_by": "continuity-supervisor",
+ "reviewed_at": "2026-11-25",
+ "written_by": "主会话据 continuity-supervisor 复核报告（2026-11-25，1–4 项全 PASS）转写（ready）",
+ "inputs": {
+  "preview_approval": {
+   "path": "outputs/ai-city-takeover/ep01/v4/pilot/sd-SG19-a-1/preview-approval.json",
+   "sha256": "0698fa6b8541029fc1426bbf4afef29d0f1036a2851722a007c09f84c8751c94"
+  }
+ },
+ "units": {
+  "SG19": {
+   "verdict": "ready",
+   "prompt_fit": "PASS；首帧起始状态、prompt 与 approval 一致（复核表 1 连续性/2 交接/3 轴线动作机位/4 prompt 适配均 PASS）",
+   "lint": "由 lint.py 执行",
+   "gate_watch": "脸一致；W1 全套（右长袖左肩裸、斜挎带、腰链寻呼机与空白工牌、黑迷你裙、及膝靴）；片内≈0.92 s 布仍在落、唱完第一句后才落到脚边；不转身不弯腰；除耳灯无红；唱段口型分段"
+  }
+ }
+}

@@ -1,0 +1,32 @@
+{
+ "shot": "s048p",
+ "t0": 208.4107,
+ "t1": 209.3395,
+ "why": "the paper strip close-up (p047 crop) covers the third 'crack' (r-1's mouth shut there; user \u300cr-1 + \u7eb8\u6761\u63d2\u955c\u76d6\u4f4f\u7b2c\u4e09\u4e2a crack\u300d)",
+ "still": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p047-rb-c-2944.png",
+ "still_sha256": "2c2fafd823f177a14d5d80271d1246a7a09ff5060c1c51184cd766427da37ec7",
+ "stills": [
+  {
+   "path": "outputs/ai-city-takeover/ep01/v4/excerpt/flash/design/S31-48/CONT1124/p047-rb-c-2944.png",
+   "sha256": "2c2fafd823f177a14d5d80271d1246a7a09ff5060c1c51184cd766427da37ec7"
+  }
+ ],
+ "frames": 22,
+ "pictures": 1,
+ "fixed": true,
+ "move": {
+  "zoom": [
+   2.5,
+   2.5
+  ],
+  "center": [
+   0.76,
+   0.88
+  ]
+ },
+ "orange_first": {
+  "shifted_px": 0,
+  "kept_red_px_in_matte": 0
+ },
+ "log": []
+}

@@ -1,0 +1,62 @@
+[
+ {
+  "name": "SG16x-sd",
+  "take_sha256": "d16b18f28a6bdeb4921c05c1172b09ecf615906d4c51031f1fd328f901a4fa86",
+  "lag_s": 0.9001,
+  "ncc": 0.2735,
+  "copy": true,
+  "divergence": {
+   "frame": 371,
+   "rule": "stretch",
+   "last_match": 312,
+   "clip_s": 3.71,
+   "song_s": 164.148
+  },
+  "synced_until": {
+   "clip_s": 3.078,
+   "song_s": 163.516
+  },
+  "spans": [],
+  "placement": {
+   "lag_s": 0.9001,
+   "method": "tool 15 waveform lag (copy)",
+   "song_t_of_clip0": 160.4379,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 0.569,
+   "ncc": 0.474,
+   "max_dev_s": 0.477,
+   "steady": false,
+   "segments": [
+    {
+     "clip_s": [
+      0.875,
+      2.125
+     ],
+     "lag_s": 0.566,
+     "windows": 5,
+     "min_ncc": 0.59
+    },
+    {
+     "clip_s": [
+      2.125,
+      2.625
+     ],
+     "lag_s": 0.108,
+     "windows": 2,
+     "min_ncc": 0.344
+    },
+    {
+     "clip_s": [
+      2.625,
+      3.125
+     ],
+     "lag_s": 0.907,
+     "windows": 2,
+     "min_ncc": 0.492
+    }
+   ]
+  }
+ }
+]

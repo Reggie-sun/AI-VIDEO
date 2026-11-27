@@ -1,0 +1,55 @@
+[
+ {
+  "name": "SG19-sd",
+  "take_sha256": "697c36de92d21875d69e03bdb4d308dfba2f36583f5a28fe23dcaec5e9b64197",
+  "lag_s": 0.6001,
+  "ncc": 0.5674,
+  "copy": true,
+  "divergence": {
+   "frame": 426,
+   "rule": "stretch",
+   "last_match": 425,
+   "clip_s": 4.26,
+   "song_s": 188.328
+  },
+  "synced_until": {
+   "clip_s": 4.208,
+   "song_s": 188.276
+  },
+  "spans": [
+   {
+    "clip_s": [
+     1.15,
+     4.25
+    ],
+    "song_s": [
+     185.218,
+     188.318
+    ]
+   }
+  ],
+  "placement": {
+   "lag_s": 0.6001,
+   "method": "tool 15 waveform lag (copy)",
+   "song_t_of_clip0": 184.0679,
+   "note": "song time = song_t0 + clip time - lag; in-point for a shot starting at song time T is T - song_t0 + lag"
+  },
+  "envelope": {
+   "lag_s": 0.571,
+   "ncc": 0.885,
+   "max_dev_s": 0.03,
+   "steady": true,
+   "segments": [
+    {
+     "clip_s": [
+      0.625,
+      4.375
+     ],
+     "lag_s": 0.599,
+     "windows": 15,
+     "min_ncc": 0.746
+    }
+   ]
+  }
+ }
+]

@@ -1,0 +1,53 @@
+{
+ "shot": "s037c2",
+ "t0": 164.1883,
+ "t1": 165.0707,
+ "why": "jump cut on the 164.188 beat to clip 3.10-3.98: the plug pulled, the light out (user \u300c\u7528 a-1 \u8df3\u5207\u300d)",
+ "clip": "outputs/ai-city-takeover/ep01/v4/pilot/sd-INS37-a-1/INS37/project/state/video-generation/fetch/files/6dd35e2799abee41dd250afa9192393c29b06eca0ecb9d2dde949b81222d2dd7.mp4",
+ "clip_sha256": "6dd35e2799abee41dd250afa9192393c29b06eca0ecb9d2dde949b81222d2dd7",
+ "pictures": 97,
+ "frames": 21,
+ "first": {
+  "f": 714,
+  "t": 164.2083,
+  "clip_t": 3.12,
+  "idx": 75
+ },
+ "last": {
+  "f": 734,
+  "t": 165.0417,
+  "clip_t": 3.9534,
+  "idx": 95
+ },
+ "crop": null,
+ "knots": null,
+ "repeats": 0,
+ "skips": 0,
+ "map": [
+  75,
+  76,
+  77,
+  78,
+  79,
+  80,
+  81,
+  82,
+  83,
+  84,
+  85,
+  86,
+  87,
+  88,
+  89,
+  90,
+  91,
+  92,
+  93,
+  94,
+  95
+ ],
+ "orange_px_max": 0,
+ "keep_red_box": null,
+ "mw_box": null,
+ "press": null
+}
